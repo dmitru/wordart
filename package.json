@@ -1,0 +1,41 @@
+{
+  "name": "wordart",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "format": "NODE_ENV=production prettier --write \"src/**/*.{ts,tsx,js,jsx}\"",
+    "generate": "plop --plopfile tools/generators/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/dmitriy.borodiy/online-tuner.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/dmitriy.borodiy/online-tuner/issues"
+  },
+  "homepage": "https://gitlab.com/dmitriy.borodiy/online-tuner#readme",
+  "dependencies": {
+    "next": "^9.3.4",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "styled-components": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^13.11.1",
+    "@types/react": "^16.9.34",
+    "@types/styled-components": "^5.0.1",
+    "babel-plugin-styled-components": "^1.10.7",
+    "husky": "^4.2.5",
+    "plop": "^2.6.0",
+    "prettier": "^2.0.4",
+    "pretty-quick": "^2.0.1",
+    "typescript": "^3.8.3"
+  }
+}
