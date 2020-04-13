@@ -47,13 +47,17 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
         count: number
         level: number
         bounds: Rect
-        intersects: boolean
+        overlapsShape: boolean
         children?: HierarchicalBounds[]
-        transform?: {
-          x: number
-          y: number
-        }
+        transform?: Transform
       }
+
+      type Transform = {
+        x: number
+        y: number
+      }
+
+      const MAX_LEVELS = 8
 
       const divideBounds = (bounds: Rect): Rect[] => {
         const x1 = bounds.x
@@ -109,7 +113,7 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
               count: 1,
               bounds,
               level,
-              intersects: false,
+              overlapsShape: false,
             }
           }
 
@@ -118,7 +122,7 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
               count: 1,
               bounds,
               level,
-              intersects: true,
+              overlapsShape: true,
             }
           }
 
@@ -132,7 +136,7 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
           return {
             bounds,
             level,
-            intersects: true,
+            overlapsShape: true,
             children,
             count: children ? sum(children.map((child) => child.count)) : 1,
           }
@@ -152,13 +156,13 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
       ) => {
         ctx.save()
         ctx.lineWidth = 1
-        ctx.strokeStyle = 'red'
+        ctx.strokeStyle = hBounds.children ? 'red' : 'yellow'
 
         if (hBounds.transform) {
           ctx.translate(hBounds.transform.x, hBounds.transform.y)
         }
 
-        if (hBounds.intersects) {
+        if (hBounds.overlapsShape) {
           ctx.strokeRect(
             hBounds.bounds.x,
             hBounds.bounds.y,
@@ -216,7 +220,7 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
           curHBounds: HierarchicalBounds,
           curPath: Rect[]
         ): PointHierarchicalBoundsCollisionInfo => {
-          if (!curHBounds.intersects) {
+          if (!curHBounds.overlapsShape) {
             return { collides: false, path: [...curPath, curHBounds.bounds] }
           }
 
@@ -249,6 +253,137 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
         return result
       }
 
+      type HierarchicalBoundsCollisionInfo = {
+        collides: boolean
+        path1?: Rect[]
+        path2?: Rect[]
+      }
+
+      const collideHierarchicalBounds = (
+        hBounds1: HierarchicalBounds,
+        hBounds2: HierarchicalBounds
+      ): HierarchicalBoundsCollisionInfo => {
+        if (
+          !areRectsIntersecting(
+            transformRect(hBounds1.bounds, hBounds1.transform),
+            transformRect(hBounds2.bounds, hBounds2.transform)
+          )
+        ) {
+          return { collides: false }
+        }
+
+        const check = (
+          curHBounds1: HierarchicalBounds,
+          curHBounds2: HierarchicalBounds,
+          curPath1: Rect[],
+          curPath2: Rect[]
+        ): HierarchicalBoundsCollisionInfo => {
+          // return { collides: true, path1: curPath1, path2: curPath2 }
+          if (!curHBounds1.overlapsShape || !curHBounds2.overlapsShape) {
+            return {
+              collides: false,
+              path1: [...curPath1, curHBounds1.bounds],
+              path2: [...curPath2, curHBounds2.bounds],
+            }
+          }
+
+          // invatiant: both hbounds overlap shape
+          if (!curHBounds1.children && !curHBounds2.children) {
+            // reached leaves
+            return {
+              collides: true,
+              path1: [...curPath1, curHBounds1.bounds],
+              path2: [...curPath2, curHBounds2.bounds],
+            }
+          }
+
+          if (curHBounds2.children && !curHBounds1.children) {
+            for (let child of curHBounds2.children) {
+              if (
+                !areRectsIntersecting(
+                  transformRect(hBounds1.bounds, hBounds1.transform),
+                  transformRect(child.bounds, hBounds2.transform)
+                )
+              ) {
+                continue
+              }
+
+              const childCheckResult = check(curHBounds1, child, curPath1, [
+                ...curPath2,
+                child.bounds,
+              ])
+              if (childCheckResult.collides) {
+                return childCheckResult
+              }
+            }
+          }
+
+          if (curHBounds1.children && !curHBounds2.children) {
+            for (let child of curHBounds1.children) {
+              if (
+                !areRectsIntersecting(
+                  transformRect(child.bounds, hBounds1.transform),
+                  transformRect(hBounds2.bounds, hBounds2.transform)
+                )
+              ) {
+                continue
+              }
+
+              const childCheckResult = check(
+                child,
+                hBounds2,
+                [...curPath1, child.bounds],
+                curPath2
+              )
+              if (childCheckResult.collides) {
+                return childCheckResult
+              }
+            }
+          }
+
+          if (curHBounds1.children && curHBounds2.children)
+            for (let child1 of curHBounds1.children) {
+              for (let child2 of curHBounds2.children) {
+                if (
+                  !areRectsIntersecting(
+                    transformRect(child1.bounds, hBounds1.transform),
+                    transformRect(child2.bounds, hBounds2.transform)
+                  )
+                ) {
+                  continue
+                }
+
+                const childCheckResult = check(
+                  child1,
+                  child2,
+                  [...curPath1, child1.bounds],
+                  [...curPath2, child2.bounds]
+                )
+                if (childCheckResult.collides) {
+                  return childCheckResult
+                }
+              }
+            }
+
+          return {
+            collides: false,
+            path1: [...curPath1, curHBounds1.bounds],
+            path2: [...curPath2, curHBounds2.bounds],
+          }
+        }
+
+        const t1 = performance.now()
+        const result = check(
+          hBounds1,
+          hBounds2,
+          [hBounds1.bounds],
+          [hBounds2.bounds]
+        )
+        const t2 = performance.now()
+        console.debug(`collideHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`)
+        return result
+      }
+
       const computeHierarchicalBoundsForPath = (path: opentype.Path) => {
         const pathBbox = path.getBoundingBox()
 
@@ -276,7 +411,7 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
 
         const isRectIntersecting = (
           bounds: Rect,
-          dx = 5
+          dx = 3
         ): 'full' | 'partial' | 'none' => {
           const maxX = bounds.x + bounds.w
           const maxY = bounds.y + bounds.h
@@ -307,17 +442,57 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
           w: pathBbox.x2 - pathBbox.x1,
           h: pathBbox.y2 - pathBbox.y1,
         }
-        const hBounds = computeHierarchicalBounds(bounds, isRectIntersecting, 7)
+        const hBounds = computeHierarchicalBounds(
+          bounds,
+          isRectIntersecting,
+          MAX_LEVELS
+        )
 
         hBounds.transform = { x: pathBbox.x1, y: pathBbox.y1 }
 
         return { hBounds }
       }
 
+      const transformRect = (rect: Rect, transform?: Transform): Rect =>
+        transform
+          ? {
+              x: rect.x + transform.x,
+              y: rect.y + transform.y,
+              w: rect.w,
+              h: rect.h,
+            }
+          : rect
+
+      const areRectsIntersecting = (rect1: Rect, rect2: Rect) => {
+        const minX1 = rect1.x
+        const maxX1 = rect1.x + rect1.w
+
+        const minX2 = rect2.x
+        const maxX2 = rect2.x + rect2.w
+
+        const minY1 = rect1.y
+        const maxY1 = rect1.y + rect1.h
+
+        const minY2 = rect2.y
+        const maxY2 = rect2.y + rect2.h
+
+        // If one rectangle is above other
+        if (minY1 >= maxY2 || minY2 >= maxY1) {
+          return false
+        }
+
+        // If one rectangle is on left side of the other
+        if (minX1 >= maxX2 || minX2 >= maxX1) {
+          return false
+        }
+
+        return true
+      }
+
       const path1 = font.getPath('OUT', 100, 520, 590)
       const hBounds1 = computeHierarchicalBoundsForPath(path1).hBounds
 
-      const path2 = font.getPath('Li', 0, 0, 170)
+      const path2 = font.getPath('!', 0, 0, 170)
       const hBounds2 = computeHierarchicalBoundsForPath(path2).hBounds
 
       path1.draw(ctx)
@@ -325,6 +500,8 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
 
       let x = 0,
         y = 0
+
+      const hBounds2BaseTransform = { ...hBounds2.transform! }
 
       canvas.addEventListener('mousemove', (e) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -334,27 +511,41 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
         path1.draw(ctx)
         renderHierarchicalBounds(ctx, hBounds1)
 
+        const collisionInfo = collideHierarchicalBounds(hBounds1, hBounds2)
+
         ctx.save()
         ctx.translate(x, y)
         path2.draw(ctx)
-        renderHierarchicalBounds(ctx, hBounds2)
+        // @ts-ignore
+        path2.fill = collisionInfo.collides ? '#999' : 'black'
         ctx.restore()
+        hBounds2.transform = {
+          x: hBounds2BaseTransform.x + x,
+          y: hBounds2BaseTransform.y + y,
+        }
+        renderHierarchicalBounds(ctx, hBounds2)
 
-        const collisionInfo = collidePointAndHierarchicalBounds(
-          { x, y },
-          hBounds1
-        )
-
-        ctx.save()
         if (collisionInfo.collides && hBounds1.transform) {
+          ctx.save()
           ctx.translate(hBounds1.transform.x, hBounds1.transform.y)
-          if (collisionInfo.path) {
+          if (collisionInfo.path1) {
             ctx.fillStyle = '#0f09'
-            const rect = collisionInfo.path[collisionInfo.path.length - 1]
+            const rect = collisionInfo.path1[collisionInfo.path1.length - 1]
             ctx.fillRect(rect.x, rect.y, rect.w, rect.h)
           }
+          ctx.restore()
         }
-        ctx.restore()
+
+        if (collisionInfo.collides && hBounds2.transform) {
+          ctx.save()
+          ctx.translate(hBounds2.transform.x, hBounds2.transform.y)
+          if (collisionInfo.path2) {
+            ctx.fillStyle = '#f0f9'
+            const rect = collisionInfo.path2[collisionInfo.path2.length - 1]
+            ctx.fillRect(rect.x, rect.y, rect.w, rect.h)
+          }
+          ctx.restore()
+        }
 
         ctx.beginPath()
         ctx.moveTo(x, y)
