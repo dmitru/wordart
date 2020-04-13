@@ -13,11 +13,11 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
       // @ts-ignore
       window['font'] = font
 
-      const c = new fabric.Canvas(canvas.id, {
-        preserveObjectStacking: true,
-        imageSmoothingEnabled: false,
-        enableRetinaScaling: false,
-      })
+      // const c = new fabric.Canvas(canvas.id, {
+      //   preserveObjectStacking: true,
+      //   imageSmoothingEnabled: false,
+      //   enableRetinaScaling: false,
+      // })
 
       // const text = new fabric.Text('Hello', {
       //   left: 40,
@@ -27,9 +27,9 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
       // c.add(text)
       // c.renderAll()
 
-      const ctx = c.getContext()
+      const ctx = canvas.getContext('2d')!
 
-      const path = font.getPath('H', 40, 340, 350)
+      const path = font.getPath('Hel', 40, 340, 350)
       path.draw(ctx)
       const bbox = path.getBoundingBox()
 
@@ -182,13 +182,18 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
           }
         }
 
-        return computeHierarchicalBoundsImpl(bounds, 0)
+        const t1 = performance.now()
+        const result = computeHierarchicalBoundsImpl(bounds, 0)
+        const t2 = performance.now()
+        console.debug(`computeHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`)
+
+        return result
       }
 
       const hierarchicalBounds = computeHierarchicalBounds(
         fullBounds,
         isRectIntersecting,
-        6
+        7
       )
       console.log('hierarchicalBounds', hierarchicalBounds)
 
@@ -215,7 +220,96 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
         }
       }
 
+      type PointHierarchicalBoundsCollisionInfo = {
+        collides: boolean
+        path?: Rect[]
+      }
+
+      const isWithinRect = (point: Point, rect: Rect): boolean => {
+        if (point.x < rect.x) {
+          return false
+        }
+        if (point.y < rect.y) {
+          return false
+        }
+        if (point.x > rect.x + rect.width) {
+          return false
+        }
+        if (point.y > rect.y + rect.height) {
+          return false
+        }
+        return true
+      }
+
+      const collidePointAndHierarchicalBounds = (
+        point: Point,
+        hBounds: HierarchicalBounds
+      ): PointHierarchicalBoundsCollisionInfo => {
+        if (!isWithinRect(point, hBounds.bounds)) {
+          return { collides: false }
+        }
+
+        const check = (
+          curHBounds: HierarchicalBounds,
+          curPath: Rect[]
+        ): PointHierarchicalBoundsCollisionInfo => {
+          if (!curHBounds.intersects) {
+            return { collides: false, path: [...curPath, curHBounds.bounds] }
+          }
+
+          // curHBounds.intersects === true
+          if (!curHBounds.children) {
+            // reached the leaf
+            return { collides: true, path: [...curPath, curHBounds.bounds] }
+          }
+
+          for (let child of curHBounds.children) {
+            if (!isWithinRect(point, child.bounds)) {
+              continue
+            }
+
+            const childCheckResult = check(child, [...curPath, child.bounds])
+            if (childCheckResult.collides) {
+              return childCheckResult
+            }
+          }
+
+          return { collides: false, path: [...curPath, curHBounds.bounds] }
+        }
+
+        const t1 = performance.now()
+        const result = check(hBounds, [hBounds.bounds])
+        const t2 = performance.now()
+        console.debug(
+          `collidePointAndHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`
+        )
+        return result
+      }
+
       renderHierarchicalBounds(ctx, hierarchicalBounds)
+
+      let x = 0,
+        y = 0
+
+      canvas.addEventListener('mousemove', (e) => {
+        x = e.offsetX
+        y = e.offsetY
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        path.draw(ctx)
+        renderHierarchicalBounds(ctx, hierarchicalBounds)
+
+        const collisionInfo = collidePointAndHierarchicalBounds(
+          { x, y },
+          hierarchicalBounds
+        )
+
+        ctx.beginPath()
+        ctx.moveTo(x, y)
+        ctx.fillStyle = collisionInfo.collides ? 'lime' : 'teal'
+        ctx.arc(x, y, 3, 0, 2 * Math.PI)
+        ctx.fill()
+      })
 
       // const viewBox: Rect = { x: 0, y: 0, width: 600, height: 600 }
 
