@@ -1,5 +1,6 @@
 import Document, { DocumentContext } from 'next/document'
 import { ServerStyleSheet } from 'styled-components'
+import 'lib/wordart/console-extensions'
 
 /**
  * Enables styled-components SSR:

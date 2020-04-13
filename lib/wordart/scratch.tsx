@@ -2,6 +2,7 @@ import * as opentype from 'opentype.js'
 import { WordArtData } from './types'
 import { fabric } from 'fabric'
 import { sum } from 'lodash'
+import 'lib/wordart/console-extensions'
 
 export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
   return new Promise<void>((resolve) => {
@@ -29,22 +30,6 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
 
       const ctx = canvas.getContext('2d')!
 
-      const path = font.getPath('Hel', 40, 340, 350)
-      path.draw(ctx)
-      const bbox = path.getBoundingBox()
-
-      const imageData = ctx.getImageData(
-        0,
-        0,
-        ctx.canvas.width,
-        ctx.canvas.height
-      )
-
-      const isPointIntersecting = (x: number, y: number): boolean => {
-        const index = Math.round(y) * imageData.width + Math.round(x)
-        return imageData.data[4 * index + 3] > 0
-      }
-
       // Visualize sample points
       // for (let x = 0; x < imageData.width; x += 5) {
       //   for (let y = 0; y < imageData.height; y += 5) {
@@ -57,12 +42,6 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
       // }
 
       // Build hierarchical bounding boxes
-      const fullBounds: Rect = {
-        x: bbox.x1,
-        y: bbox.y1,
-        width: bbox.x2 - bbox.x1,
-        height: bbox.y2 - bbox.y1,
-      }
 
       type HierarchicalBounds = {
         count: number
@@ -70,40 +49,17 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
         bounds: Rect
         intersects: boolean
         children?: HierarchicalBounds[]
-      }
-
-      const isRectIntersecting = (
-        bounds: Rect,
-        dx = 5
-      ): 'full' | 'partial' | 'none' => {
-        const maxX = bounds.x + bounds.width
-        const maxY = bounds.y + bounds.height
-
-        let checked = 0
-        let overlapping = 0
-
-        for (let x = Math.ceil(bounds.x); x < Math.floor(maxX); x += dx) {
-          for (let y = Math.ceil(bounds.y); y < Math.floor(maxY); y += dx) {
-            const intersecting = isPointIntersecting(x, y)
-            if (intersecting) {
-              overlapping += 1
-            }
-            checked += 1
-          }
+        transform?: {
+          x: number
+          y: number
         }
-
-        if (overlapping === 0) {
-          return 'none'
-        }
-
-        return checked === overlapping ? 'full' : 'partial'
       }
 
       const divideBounds = (bounds: Rect): Rect[] => {
         const x1 = bounds.x
-        const x2 = bounds.x + bounds.width
+        const x2 = bounds.x + bounds.w
         const y1 = bounds.y
-        const y2 = bounds.y + bounds.height
+        const y2 = bounds.y + bounds.h
 
         const mx = (x1 + x2) / 2
         const my = (y1 + y2) / 2
@@ -112,26 +68,26 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
           {
             x: x1,
             y: y1,
-            width: mx - x1,
-            height: my - y1,
+            w: mx - x1,
+            h: my - y1,
           },
           {
             x: mx,
             y: y1,
-            width: x2 - mx,
-            height: my - y1,
+            w: x2 - mx,
+            h: my - y1,
           },
           {
             x: x1,
             y: my,
-            width: mx - x1,
-            height: y2 - my,
+            w: mx - x1,
+            h: y2 - my,
           },
           {
             x: mx,
             y: my,
-            width: x2 - mx,
-            height: y2 - my,
+            w: x2 - mx,
+            h: y2 - my,
           },
         ]
 
@@ -190,26 +146,24 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
         return result
       }
 
-      const hierarchicalBounds = computeHierarchicalBounds(
-        fullBounds,
-        isRectIntersecting,
-        7
-      )
-      console.log('hierarchicalBounds', hierarchicalBounds)
-
       const renderHierarchicalBounds = (
         ctx: CanvasRenderingContext2D,
         hBounds: HierarchicalBounds
       ) => {
+        ctx.save()
         ctx.lineWidth = 1
         ctx.strokeStyle = 'red'
+
+        if (hBounds.transform) {
+          ctx.translate(hBounds.transform.x, hBounds.transform.y)
+        }
 
         if (hBounds.intersects) {
           ctx.strokeRect(
             hBounds.bounds.x,
             hBounds.bounds.y,
-            hBounds.bounds.width,
-            hBounds.bounds.height
+            hBounds.bounds.w,
+            hBounds.bounds.h
           )
         }
 
@@ -218,6 +172,8 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
             renderHierarchicalBounds(ctx, child)
           )
         }
+
+        ctx.restore()
       }
 
       type PointHierarchicalBoundsCollisionInfo = {
@@ -232,10 +188,10 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
         if (point.y < rect.y) {
           return false
         }
-        if (point.x > rect.x + rect.width) {
+        if (point.x > rect.x + rect.w) {
           return false
         }
-        if (point.y > rect.y + rect.height) {
+        if (point.y > rect.y + rect.h) {
           return false
         }
         return true
@@ -245,7 +201,14 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
         point: Point,
         hBounds: HierarchicalBounds
       ): PointHierarchicalBoundsCollisionInfo => {
-        if (!isWithinRect(point, hBounds.bounds)) {
+        const pointTranslated = hBounds.transform
+          ? {
+              x: point.x - hBounds.transform.x,
+              y: point.y - hBounds.transform.y,
+            }
+          : point
+
+        if (!isWithinRect(pointTranslated, hBounds.bounds)) {
           return { collides: false }
         }
 
@@ -264,7 +227,7 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
           }
 
           for (let child of curHBounds.children) {
-            if (!isWithinRect(point, child.bounds)) {
+            if (!isWithinRect(pointTranslated, child.bounds)) {
               continue
             }
 
@@ -280,29 +243,118 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
         const t1 = performance.now()
         const result = check(hBounds, [hBounds.bounds])
         const t2 = performance.now()
-        console.debug(
-          `collidePointAndHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`
-        )
+        // console.debug(
+        //   `collidePointAndHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`
+        // )
         return result
       }
 
-      renderHierarchicalBounds(ctx, hierarchicalBounds)
+      const computeHierarchicalBoundsForPath = (path: opentype.Path) => {
+        const pathBbox = path.getBoundingBox()
+
+        const canvas = document.createElement('canvas') as HTMLCanvasElement
+        canvas.width = pathBbox.x2 - pathBbox.x1
+        canvas.height = pathBbox.y2 - pathBbox.y1
+
+        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+        ctx.translate(-pathBbox.x1, -pathBbox.y1)
+
+        path.draw(ctx)
+        console.screenshot(ctx.canvas)
+
+        const imageData = ctx.getImageData(
+          0,
+          0,
+          ctx.canvas.width,
+          ctx.canvas.height
+        )
+
+        const isPointIntersecting = (x: number, y: number): boolean => {
+          const index = Math.round(y) * imageData.width + Math.round(x)
+          return imageData.data[4 * index + 3] > 0
+        }
+
+        const isRectIntersecting = (
+          bounds: Rect,
+          dx = 5
+        ): 'full' | 'partial' | 'none' => {
+          const maxX = bounds.x + bounds.w
+          const maxY = bounds.y + bounds.h
+
+          let checked = 0
+          let overlapping = 0
+
+          for (let x = Math.ceil(bounds.x); x < Math.floor(maxX); x += dx) {
+            for (let y = Math.ceil(bounds.y); y < Math.floor(maxY); y += dx) {
+              const intersecting = isPointIntersecting(x, y)
+              if (intersecting) {
+                overlapping += 1
+              }
+              checked += 1
+            }
+          }
+
+          if (overlapping === 0) {
+            return 'none'
+          }
+
+          return checked === overlapping ? 'full' : 'partial'
+        }
+
+        const bounds: Rect = {
+          x: 0,
+          y: 0,
+          w: pathBbox.x2 - pathBbox.x1,
+          h: pathBbox.y2 - pathBbox.y1,
+        }
+        const hBounds = computeHierarchicalBounds(bounds, isRectIntersecting, 7)
+
+        hBounds.transform = { x: pathBbox.x1, y: pathBbox.y1 }
+
+        return { hBounds }
+      }
+
+      const path1 = font.getPath('OUT', 100, 520, 590)
+      const hBounds1 = computeHierarchicalBoundsForPath(path1).hBounds
+
+      const path2 = font.getPath('Li', 0, 0, 170)
+      const hBounds2 = computeHierarchicalBoundsForPath(path2).hBounds
+
+      path1.draw(ctx)
+      renderHierarchicalBounds(ctx, hBounds1)
 
       let x = 0,
         y = 0
 
       canvas.addEventListener('mousemove', (e) => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
         x = e.offsetX
         y = e.offsetY
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        path.draw(ctx)
-        renderHierarchicalBounds(ctx, hierarchicalBounds)
+        path1.draw(ctx)
+        renderHierarchicalBounds(ctx, hBounds1)
+
+        ctx.save()
+        ctx.translate(x, y)
+        path2.draw(ctx)
+        renderHierarchicalBounds(ctx, hBounds2)
+        ctx.restore()
 
         const collisionInfo = collidePointAndHierarchicalBounds(
           { x, y },
-          hierarchicalBounds
+          hBounds1
         )
+
+        ctx.save()
+        if (collisionInfo.collides && hBounds1.transform) {
+          ctx.translate(hBounds1.transform.x, hBounds1.transform.y)
+          if (collisionInfo.path) {
+            ctx.fillStyle = '#0f09'
+            const rect = collisionInfo.path[collisionInfo.path.length - 1]
+            ctx.fillRect(rect.x, rect.y, rect.w, rect.h)
+          }
+        }
+        ctx.restore()
 
         ctx.beginPath()
         ctx.moveTo(x, y)
@@ -369,8 +421,8 @@ const generateWordArt = (args: {
   const tags: WordArtRenderTag[] = []
   for (let i = 0; i < 100; ++i) {
     const word = sample(words)
-    const x = Math.random() * viewBox.width
-    const y = Math.random() * viewBox.height
+    const x = Math.random() * viewBox.w
+    const y = Math.random() * viewBox.h
     const scale = 0.2 + Math.random() * 2
 
     const tag: WordArtRenderTag = {
@@ -394,7 +446,7 @@ export function sample<T>(array: T[]): T {
 }
 
 export type Point = { x: number; y: number }
-export type Rect = { x: number; y: number; width: number; height: number }
+export type Rect = { x: number; y: number; w: number; h: number }
 
 export type WordArtRenderData = {
   viewBox: Rect
