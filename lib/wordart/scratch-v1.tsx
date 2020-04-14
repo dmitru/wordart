@@ -149,7 +149,7 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
         return result
       }
 
-      const renderHierarchicalBounds = (
+      const drawHBounds = (
         ctx: CanvasRenderingContext2D,
         hBounds: HierarchicalBounds
       ) => {
@@ -171,9 +171,7 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
         }
 
         if (hBounds.children) {
-          hBounds.children.forEach((child) =>
-            renderHierarchicalBounds(ctx, child)
-          )
+          hBounds.children.forEach((child) => drawHBounds(ctx, child))
         }
 
         ctx.restore()
@@ -495,7 +493,7 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
       const hBounds2 = computeHierarchicalBoundsForPath(path2).hBounds
 
       path1.draw(ctx)
-      renderHierarchicalBounds(ctx, hBounds1)
+      drawHBounds(ctx, hBounds1)
 
       let x = 0,
         y = 0
@@ -508,7 +506,7 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
         y = e.offsetY
 
         path1.draw(ctx)
-        renderHierarchicalBounds(ctx, hBounds1)
+        drawHBounds(ctx, hBounds1)
 
         const collisionInfo = collideHierarchicalBounds(hBounds1, hBounds2)
 
@@ -522,7 +520,7 @@ export const scratch = async (canvas: HTMLCanvasElement): Promise<void> => {
           x: hBounds2BaseTransform.x + x,
           y: hBounds2BaseTransform.y + y,
         }
-        renderHierarchicalBounds(ctx, hBounds2)
+        drawHBounds(ctx, hBounds2)
 
         if (collisionInfo.collides && hBounds1.transform) {
           ctx.save()

@@ -19,6 +19,7 @@ export const mkTransform = (x: number, y: number, scale = 1): Transform => ({
 })
 
 export type HBounds = {
+  /** Can only be translate or scale; no rotation is allowed */
   transform: Matrix
   count: number
   level: number
@@ -28,7 +29,10 @@ export type HBounds = {
 }
 
 export const mergeHBounds = (hBounds: HBounds[]): HBounds => {
-  const bounds = boundsForRects(hBounds.map((hb) => hb.bounds))!
+  const bounds = boundsForRects(
+    hBounds.map((hb) => hb.bounds),
+    hBounds.map((hb) => hb.transform)
+  )!
 
   return {
     transform: identity(),
@@ -205,8 +209,8 @@ export const collideHBounds = (
 ): HBoundsCollisionInfo => {
   if (
     !areRectsIntersecting(
-      transformRect(hBounds1.bounds, hBounds1.transform),
-      transformRect(hBounds2.bounds, hBounds2.transform)
+      transformRect(hBounds1.transform, hBounds1.bounds),
+      transformRect(hBounds2.transform, hBounds2.bounds)
     )
   ) {
     return { collides: false }
@@ -241,8 +245,8 @@ export const collideHBounds = (
       for (let child of curHBounds2.children) {
         if (
           !areRectsIntersecting(
-            transformRect(hBounds1.bounds, hBounds1.transform),
-            transformRect(child.bounds, hBounds2.transform)
+            transformRect(hBounds1.transform, hBounds1.bounds),
+            transformRect(hBounds2.transform, child.bounds)
           )
         ) {
           continue
@@ -262,8 +266,8 @@ export const collideHBounds = (
       for (let child of curHBounds1.children) {
         if (
           !areRectsIntersecting(
-            transformRect(child.bounds, hBounds1.transform),
-            transformRect(hBounds2.bounds, hBounds2.transform)
+            transformRect(hBounds1.transform, child.bounds),
+            transformRect(hBounds2.transform, hBounds2.bounds)
           )
         ) {
           continue
@@ -286,8 +290,8 @@ export const collideHBounds = (
         for (let child2 of curHBounds2.children) {
           if (
             !areRectsIntersecting(
-              transformRect(child1.bounds, hBounds1.transform),
-              transformRect(child2.bounds, hBounds2.transform)
+              transformRect(hBounds1.transform, child1.bounds),
+              transformRect(hBounds2.transform, child2.bounds)
             )
           ) {
             continue
@@ -358,16 +362,6 @@ export const divideBounds = (bounds: Rect): Rect[] => {
   return result
 }
 
-export const transformRect = (rect: Rect, transform?: Matrix): Rect =>
-  transform
-    ? {
-        x: rect.x + transform.e,
-        y: rect.y + transform.f,
-        w: rect.w,
-        h: rect.h,
-      }
-    : rect
-
 export const areRectsIntersecting = (rect1: Rect, rect2: Rect) => {
   const minX1 = rect1.x
   const maxX1 = rect1.x + rect1.w
@@ -394,18 +388,38 @@ export const areRectsIntersecting = (rect1: Rect, rect2: Rect) => {
   return true
 }
 
-export const boundsForRects = (rects: Rect[]): Rect | undefined => {
+export const transformRect = (transform: Matrix, rect: Rect): Rect => {
+  const br = applyToPoint(transform, {
+    x: rect.x + rect.w,
+    y: rect.y + rect.h,
+  })
+  const tl = applyToPoint(transform, {
+    x: rect.x,
+    y: rect.y,
+  })
+  return { x: tl.x, y: tl.y, w: br.x - tl.x, h: br.y - tl.y }
+}
+
+export const boundsForRects = (
+  rects: Rect[],
+  transforms?: Matrix[]
+): Rect | undefined => {
   if (rects.length === 0) {
     return undefined
   }
-  let xMin = rects[0].x
-  let xMax = rects[0].x + rects[0].w
-  let yMin = rects[0].y
-  let yMax = rects[0].y + rects[0].h
 
-  const len = rects.length
+  const rectsTransformed = transforms
+    ? rects.map((rect, index) => transformRect(transforms[index], rect))
+    : rects
+
+  let xMin = rectsTransformed[0].x
+  let xMax = rectsTransformed[0].x + rectsTransformed[0].w
+  let yMin = rectsTransformed[0].y
+  let yMax = rectsTransformed[0].y + rectsTransformed[0].h
+
+  const len = rectsTransformed.length
   for (let i = 1; i < len; ++i) {
-    const { x, y, w, h } = rects[i]
+    const { x, y, w, h } = rectsTransformed[i]
     if (x < xMin) {
       xMin = x
     }

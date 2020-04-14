@@ -17,6 +17,7 @@ import {
   mkTransform,
   mergeHBounds,
   computeHBoundsForPath,
+  transformRect,
 } from 'lib/wordart/geometry'
 import { loadFont } from 'lib/wordart/fonts'
 import { sample } from 'lodash'
@@ -77,11 +78,16 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
 }
 
 const renderScene = (scene: GeneratedScene, ctx: CanvasRenderingContext2D) => {
+  ctx.save()
   for (let tag of scene.tags) {
-    // ctx.fillStyle = '#f002'
-    // ctx.fillRect(tag.bounds.x, tag.bounds.y, tag.bounds.w, tag.bounds.h)
+    ctx.fillStyle = '#f002'
+    ctx.fillRect(tag.bounds.x, tag.bounds.y, tag.bounds.w, tag.bounds.h)
+
     tag.draw(ctx)
+
+    drawHBounds(ctx, tag.hBounds)
   }
+  ctx.restore()
 }
 
 export class GeneratedScene {
@@ -159,26 +165,29 @@ export class Tag {
   set left(left: number) {
     this._left = left
     this._transform = null
+    this._hBounds = null
   }
 
   set top(top: number) {
     this._top = top
     this._transform = null
+    this._hBounds = null
   }
 
   set scale(scale: number) {
     this._scale = scale
     this._transform = null
+    this._hBounds = null
   }
 
   set angle(angle: number) {
     this._angle = angle
     this._transform = null
+    this._hBounds = null
   }
 
   draw = (ctx: CanvasRenderingContext2D) => {
     ctx.save()
-    ctx.resetTransform()
     ctx.setTransform(this.transform)
     for (const [index, symbol] of this.word.symbols.entries()) {
       symbol.draw(ctx)
@@ -187,8 +196,23 @@ export class Tag {
     ctx.restore()
   }
 
+  get hBounds(): HBounds {
+    if (!this._hBounds) {
+      this._hBounds = this._computeHBounds()
+    }
+    return this._hBounds
+  }
+
   get bounds(): Rect {
-    return this.word.bounds
+    return transformRect(this.transform, this.word.bounds)
+  }
+
+  _computeHBounds = (): HBounds => {
+    // if (this._angle === 0) {
+    const wordHBounds = { ...this.word.hBounds }
+    wordHBounds.transform = this.transform
+    return wordHBounds
+    // }
   }
 
   // getHBox = (): HBounds => {
@@ -229,8 +253,16 @@ export class Word {
 
   get hBounds() {
     if (!this._hBounds) {
-      const symbolHBounds = this.symbols.map((s) => s.hBounds)
-      const symbolHBoundsTranslated = symbolHBounds
+      let currentOffset = 0
+      const symbolHBounds = this.symbols.map((s, index) => {
+        const symbolHBounds = { ...s.hBounds }
+        symbolHBounds.transform = compose(
+          translate(currentOffset, 0),
+          symbolHBounds.transform
+        )
+        currentOffset += this.symbolOffsets[index]
+        return symbolHBounds
+      })
       this._hBounds = mergeHBounds(symbolHBounds)
     }
 
@@ -240,6 +272,42 @@ export class Word {
   get bounds() {
     return this.hBounds.bounds
   }
+}
+
+const drawHBounds = (ctx: CanvasRenderingContext2D, hBounds: HBounds) => {
+  const drawHBoundsImpl = (hBounds: HBounds) => {
+    ctx.save()
+    ctx.lineWidth = 1
+    ctx.strokeStyle = hBounds.children ? 'red' : 'yellow'
+
+    ctx.transform(
+      hBounds.transform.a,
+      hBounds.transform.b,
+      hBounds.transform.c,
+      hBounds.transform.d,
+      hBounds.transform.e,
+      hBounds.transform.f
+    )
+
+    if (hBounds.overlapsShape) {
+      ctx.strokeRect(
+        hBounds.bounds.x,
+        hBounds.bounds.y,
+        hBounds.bounds.w,
+        hBounds.bounds.h
+      )
+    }
+
+    if (hBounds.children) {
+      hBounds.children.forEach((child) => drawHBoundsImpl(child))
+    }
+
+    ctx.restore()
+  }
+
+  ctx.save()
+  drawHBoundsImpl(hBounds)
+  ctx.restore()
 }
 
 export class Symbol {
@@ -292,17 +360,17 @@ export const generateWordArt = (args: {
   const { font, viewBox } = args
 
   const scene = new GeneratedScene(font, viewBox)
-  const words = ['you', 'great', 'awesome', 'love', 'v', 'meaning']
+  const words = ['you', 'great', 'awesome', 'love', 'meaning']
   for (let word of words) {
     scene.addWord(word)
   }
 
-  for (let i = 0; i < 100; ++i) {
-    const x = Math.random() * viewBox.w
-    const y = Math.random() * viewBox.h
-    const scale = 0.2 + Math.random() * 2
-    scene.addRandomTag(x, y, scale)
-  }
+  // for (let i = 0; i < 100; ++i) {
+  //   const x = Math.random() * viewBox.w
+  //   const y = Math.random() * viewBox.h
+  //   const scale = 0.2 + Math.random() * 2
+  //   scene.addRandomTag(x, y, scale)
+  // }
 
   return scene
 }
