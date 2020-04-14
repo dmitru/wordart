@@ -1,9 +1,10 @@
-import { sum } from 'lodash'
+import { sum, min, max } from 'lodash'
 import {
   Matrix,
   applyToPoint,
   identity,
   translate,
+  applyToPoints,
 } from 'transformation-matrix'
 
 export type Transform = {
@@ -400,6 +401,36 @@ export const transformRect = (transform: Matrix, rect: Rect): Rect => {
   return { x: tl.x, y: tl.y, w: br.x - tl.x, h: br.y - tl.y }
 }
 
+export const rectToPoints = (rect: Rect): Point[] => {
+  const tl = {
+    x: rect.x,
+    y: rect.y,
+  }
+  const tr = {
+    x: rect.x + rect.w,
+    y: rect.y,
+  }
+  const bl = {
+    x: rect.x,
+    y: rect.y + rect.h,
+  }
+  const br = {
+    x: rect.x + rect.w,
+    y: rect.y + rect.h,
+  }
+  return [tl, tr, bl, br]
+}
+
+export const aabbForRect = (transform: Matrix, rect: Rect): Rect => {
+  const points = rectToPoints(rect)
+  const pointsTransformed = applyToPoints(transform, points)
+  const x1 = min(pointsTransformed.map((p) => p.x))!
+  const x2 = max(pointsTransformed.map((p) => p.x))!
+  const y1 = min(pointsTransformed.map((p) => p.y))!
+  const y2 = max(pointsTransformed.map((p) => p.y))!
+  return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 }
+}
+
 export const boundsForRects = (
   rects: Rect[],
   transforms?: Matrix[]
@@ -437,14 +468,33 @@ export const boundsForRects = (
   return { x: xMin, y: yMin, w: xMax - xMin, h: yMax - yMin }
 }
 
-export const computeHBoundsForPath = (path: opentype.Path) => {
+export const computeHBoundsForPath = (
+  path: opentype.Path,
+  transform = identity()
+) => {
   const pathBbox = path.getBoundingBox()
+  const pathBboxRect = {
+    x: pathBbox.x1,
+    y: pathBbox.y1,
+    w: pathBbox.x2 - pathBbox.x1,
+    h: pathBbox.y2 - pathBbox.y1,
+  }
+  const pathAaab = aabbForRect(transform, pathBboxRect)
 
   const canvas = document.createElement('canvas') as HTMLCanvasElement
-  canvas.width = pathBbox.x2 - pathBbox.x1
-  canvas.height = pathBbox.y2 - pathBbox.y1
+  canvas.width = pathAaab.w
+  canvas.height = pathAaab.h
 
   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+  ctx.transform(
+    transform.a,
+    transform.b,
+    transform.c,
+    transform.d,
+    transform.e,
+    transform.f
+  )
+
   ctx.translate(-pathBbox.x1, -pathBbox.y1)
 
   path.draw(ctx)

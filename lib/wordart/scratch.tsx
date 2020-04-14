@@ -54,9 +54,9 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
     } else if (key === 's') {
       tag.scale = tag._scale - 0.1
     } else if (key === 'd') {
-      tag.angle = tag._angle + 0.1
+      tag.angle = tag._angle + 0.03
     } else if (key === 'a') {
-      tag.angle = tag._angle - 0.1
+      tag.angle = tag._angle - 0.03
     }
   })
 
@@ -149,6 +149,9 @@ export class Tag {
   constructor(id: TagId, word: Word, x: number, y: number, scale = 1) {
     this.id = id
     this.word = word
+    this._left = x
+    this._top = y
+    this._scale = scale
   }
 
   get transform() {
@@ -204,15 +207,21 @@ export class Tag {
   }
 
   get bounds(): Rect {
-    return transformRect(this.transform, this.word.bounds)
+    return transformRect(this.hBounds.transform, this.hBounds.bounds)
   }
 
   _computeHBounds = (): HBounds => {
-    // if (this._angle === 0) {
-    const wordHBounds = { ...this.word.hBounds }
-    wordHBounds.transform = this.transform
+    const wordHBounds = {
+      ...(this._angle != 0
+        ? this.word.computeHBounds(this._angle)
+        : this.word.hBounds),
+    }
+    wordHBounds.transform = compose(
+      translate(this._left, this._top),
+      // @ts-ignore
+      scale(this._scale)
+    )
     return wordHBounds
-    // }
   }
 
   // getHBox = (): HBounds => {
@@ -267,6 +276,29 @@ export class Word {
     }
 
     return this._hBounds
+  }
+
+  computeHBounds = (angle = 0) => {
+    if (angle === 0) {
+      return this.hBounds
+    }
+
+    let currentOffset = 0
+    const symbolHBounds = this.symbols.map((symbol, index) => {
+      const symbolHBounds = symbol.computeHBounds(angle)
+
+      symbolHBounds.transform = compose(
+        rotate(angle),
+        translate(currentOffset, 0),
+        rotate(-angle),
+        symbolHBounds.transform
+      )
+
+      currentOffset += this.symbolOffsets[index]
+      return symbolHBounds
+    })
+
+    return mergeHBounds(symbolHBounds)
   }
 
   get bounds() {
@@ -329,11 +361,16 @@ export class Symbol {
     this.glyph.getPath(0, 0, this.fontSize).draw(ctx)
   }
 
+  computeHBounds(angle = 0): HBounds {
+    return computeHBoundsForPath(
+      this.glyph.getPath(0, 0, this.fontSize),
+      rotate(angle)
+    ).hBounds
+  }
+
   get hBounds() {
     if (!this._hBounds) {
-      this._hBounds = computeHBoundsForPath(
-        this.glyph.getPath(0, 0, this.fontSize)
-      ).hBounds
+      this._hBounds = this.computeHBounds()
     }
 
     return this._hBounds
