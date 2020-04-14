@@ -5,6 +5,8 @@ import {
   identity,
   translate,
   applyToPoints,
+  compose,
+  inverse,
 } from 'transformation-matrix'
 
 export type Transform = {
@@ -479,26 +481,25 @@ export const computeHBoundsForPath = (
     w: pathBbox.x2 - pathBbox.x1,
     h: pathBbox.y2 - pathBbox.y1,
   }
-  const pathAaab = aabbForRect(transform, pathBboxRect)
+
+  const pathTransform = compose(
+    translate(-pathBboxRect.x, -pathBboxRect.y),
+    transform
+  )
+  const pathAaab = aabbForRect(pathTransform, pathBboxRect)
+  const pathAaabTransform = compose(
+    translate(-pathAaab.x, -pathAaab.y),
+    pathTransform
+  )
 
   const canvas = document.createElement('canvas') as HTMLCanvasElement
   canvas.width = pathAaab.w
   canvas.height = pathAaab.h
-
   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-  ctx.transform(
-    transform.a,
-    transform.b,
-    transform.c,
-    transform.d,
-    transform.e,
-    transform.f
-  )
-
-  ctx.translate(-pathBbox.x1, -pathBbox.y1)
-
+  ctx.save()
+  ctx.setTransform(pathAaabTransform)
   path.draw(ctx)
-  console.screenshot(ctx.canvas)
+  ctx.restore()
 
   const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
 
@@ -534,15 +535,20 @@ export const computeHBoundsForPath = (
     return checked === overlapping ? 'full' : 'partial'
   }
 
-  const bounds: Rect = {
-    x: 0,
-    y: 0,
-    w: pathBbox.x2 - pathBbox.x1,
-    h: pathBbox.y2 - pathBbox.y1,
-  }
-  const hBounds = computeHBounds(bounds, isRectIntersecting)
-
-  hBounds.transform = translate(pathBbox.x1, pathBbox.y1)
-
+  const hBounds = computeHBounds(
+    {
+      x: 0,
+      y: 0,
+      h: canvas.height,
+      w: canvas.width,
+    },
+    isRectIntersecting
+  )
+  renderHBounds(ctx, hBounds)
+  console.screenshot(ctx.canvas)
+  hBounds.transform = compose(
+    translate(pathBboxRect.x, pathBboxRect.y)
+    // inverse(pathTransform)
+  )
   return { hBounds }
 }
