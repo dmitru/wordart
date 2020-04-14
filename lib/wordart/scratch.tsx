@@ -1,14 +1,24 @@
 import * as opentype from 'opentype.js'
+import {
+  Matrix,
+  identity,
+  translate,
+  compose,
+  scale,
+  rotate,
+} from 'transformation-matrix'
+import * as fermat from '@mathigon/fermat'
 import 'lib/wordart/console-extensions'
 import {
   Rect,
-  computeHBounds,
   renderHBounds,
   Transform,
   HBounds,
   mkTransform,
   mergeHBounds,
+  computeHBoundsForPath,
 } from 'lib/wordart/geometry'
+import { loadFont } from 'lib/wordart/fonts'
 import { sample } from 'lodash'
 
 export const scratch = async (canvas: HTMLCanvasElement) => {
@@ -19,13 +29,6 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
 
   const ctx = canvas.getContext('2d')!
 
-  // Build hierarchical bounding boxes
-  // const path1 = font.getPath('OUT', 100, 520, 590)
-  // const hBounds1 = computeHBoundsForPath(path1).hBounds
-
-  // path1.draw(ctx)
-  // renderHBounds(ctx, hBounds1)
-
   const viewBox: Rect = { x: 0, y: 0, w: canvas.width, h: canvas.height }
   const scene = generateWordArt({ font, viewBox })
   console.log(scene)
@@ -34,13 +37,51 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
     console.log(symbol.hBounds)
   }
 
-  const word = scene.words[4]
+  const tag = scene.addRandomTag(0, 0)
 
-  ctx.translate(0, 200)
-  word.draw(ctx)
-  renderHBounds(ctx, word.hBounds)
+  canvas.addEventListener('mousemove', (e) => {
+    const x = e.offsetX
+    const y = e.offsetY
+    tag.left = x
+    tag.top = y
+  })
 
-  // renderScene(scene)
+  document.addEventListener('keydown', (e) => {
+    const key = e.key
+    if (key === 'w') {
+      tag.scale = tag._scale + 0.1
+    } else if (key === 's') {
+      tag.scale = tag._scale - 0.1
+    } else if (key === 'd') {
+      tag.angle = tag._angle + 0.1
+    } else if (key === 'a') {
+      tag.angle = tag._angle - 0.1
+    }
+  })
+
+  let raf = -1
+
+  const render = () => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+    renderScene(scene, ctx)
+    raf = requestAnimationFrame(render)
+  }
+
+  raf = requestAnimationFrame(render)
+
+  // const word = scene.words[4]
+
+  // ctx.translate(100, 200)
+  // word.draw(ctx)
+  // renderHBounds(ctx, word.hBounds)
+}
+
+const renderScene = (scene: GeneratedScene, ctx: CanvasRenderingContext2D) => {
+  for (let tag of scene.tags) {
+    // ctx.fillStyle = '#f002'
+    // ctx.fillRect(tag.bounds.x, tag.bounds.y, tag.bounds.w, tag.bounds.h)
+    tag.draw(ctx)
+  }
 }
 
 export class GeneratedScene {
@@ -79,22 +120,79 @@ export class GeneratedScene {
     const word = sample(this.words)!
     const tag = new Tag(id, word, x, y, scale)
     this.tags.push(tag)
+
+    return tag
   }
 }
 
 export class Tag {
   word: Word
-  transform: Transform
+  _transform: Matrix | null = null
   id: number
+
+  private _hBounds: HBounds | null = null
+
+  /** left (X) coord of the center of the tag */
+  _left: number = 0
+  /** top (Y) coord of the center of the tag */
+  _top: number = 0
+
+  _angle: number = 0
+  _scale: number = 1
 
   constructor(id: TagId, word: Word, x: number, y: number, scale = 1) {
     this.id = id
     this.word = word
-    this.transform = mkTransform(x, y, scale)
+  }
+
+  get transform() {
+    if (!this._transform) {
+      this._transform = compose(
+        translate(this._left, this._top),
+        rotate(this._angle),
+        scale(this._scale)
+      )
+    }
+    return this._transform
+  }
+
+  set left(left: number) {
+    this._left = left
+    this._transform = null
+  }
+
+  set top(top: number) {
+    this._top = top
+    this._transform = null
+  }
+
+  set scale(scale: number) {
+    this._scale = scale
+    this._transform = null
+  }
+
+  set angle(angle: number) {
+    this._angle = angle
+    this._transform = null
+  }
+
+  draw = (ctx: CanvasRenderingContext2D) => {
+    ctx.save()
+    ctx.resetTransform()
+    ctx.setTransform(this.transform)
+    for (const [index, symbol] of this.word.symbols.entries()) {
+      symbol.draw(ctx)
+      ctx.translate(this.word.symbolOffsets[index], 0)
+    }
+    ctx.restore()
+  }
+
+  get bounds(): Rect {
+    return this.word.bounds
   }
 
   // getHBox = (): HBounds => {
-  //   return mergeHBounds()
+  //   return this.word.hBounds
   // }
 }
 
@@ -131,10 +229,16 @@ export class Word {
 
   get hBounds() {
     if (!this._hBounds) {
-      this._hBounds = mergeHBounds(this.symbols.map((s) => s.hBounds))
+      const symbolHBounds = this.symbols.map((s) => s.hBounds)
+      const symbolHBoundsTranslated = symbolHBounds
+      this._hBounds = mergeHBounds(symbolHBounds)
     }
 
     return this._hBounds
+  }
+
+  get bounds() {
+    return this.hBounds.bounds
   }
 }
 
@@ -188,7 +292,7 @@ export const generateWordArt = (args: {
   const { font, viewBox } = args
 
   const scene = new GeneratedScene(font, viewBox)
-  const words = ['you', 'great', 'awesome', 'love', 'universe', 'meaning']
+  const words = ['you', 'great', 'awesome', 'love', 'v', 'meaning']
   for (let word of words) {
     scene.addWord(word)
   }
@@ -211,74 +315,3 @@ export type TagId = number
 export type SymbolId = string
 
 // ---------------------
-
-export const computeHBoundsForPath = (path: opentype.Path) => {
-  const pathBbox = path.getBoundingBox()
-
-  const canvas = document.createElement('canvas') as HTMLCanvasElement
-  canvas.width = pathBbox.x2 - pathBbox.x1
-  canvas.height = pathBbox.y2 - pathBbox.y1
-
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-  ctx.translate(-pathBbox.x1, -pathBbox.y1)
-
-  path.draw(ctx)
-  console.screenshot(ctx.canvas)
-
-  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
-
-  const isPointIntersecting = (x: number, y: number): boolean => {
-    const index = Math.round(y) * imageData.width + Math.round(x)
-    return imageData.data[4 * index + 3] > 0
-  }
-
-  const isRectIntersecting = (
-    bounds: Rect,
-    dx = 2
-  ): 'full' | 'partial' | 'none' => {
-    const maxX = bounds.x + bounds.w
-    const maxY = bounds.y + bounds.h
-
-    let checked = 0
-    let overlapping = 0
-
-    for (let x = Math.ceil(bounds.x); x < Math.floor(maxX); x += dx) {
-      for (let y = Math.ceil(bounds.y); y < Math.floor(maxY); y += dx) {
-        const intersecting = isPointIntersecting(x, y)
-        if (intersecting) {
-          overlapping += 1
-        }
-        checked += 1
-      }
-    }
-
-    if (overlapping === 0) {
-      return 'none'
-    }
-
-    return checked === overlapping ? 'full' : 'partial'
-  }
-
-  const bounds: Rect = {
-    x: 0,
-    y: 0,
-    w: pathBbox.x2 - pathBbox.x1,
-    h: pathBbox.y2 - pathBbox.y1,
-  }
-  const hBounds = computeHBounds(bounds, isRectIntersecting)
-
-  hBounds.transform = { x: pathBbox.x1, y: pathBbox.y1, scale: 1 }
-
-  return { hBounds }
-}
-
-export const loadFont = (path: string): Promise<opentype.Font> =>
-  new Promise<opentype.Font>((resolve, reject) =>
-    opentype.load(path, (error, font) => {
-      if (!font || error) {
-        reject(error || new Error('Failed to load font'))
-        return
-      }
-      resolve(font)
-    })
-  )

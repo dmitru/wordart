@@ -1,4 +1,10 @@
 import { sum } from 'lodash'
+import {
+  Matrix,
+  applyToPoint,
+  identity,
+  translate,
+} from 'transformation-matrix'
 
 export type Transform = {
   x: number
@@ -13,18 +19,19 @@ export const mkTransform = (x: number, y: number, scale = 1): Transform => ({
 })
 
 export type HBounds = {
+  transform: Matrix
   count: number
   level: number
   bounds: Rect
   overlapsShape: boolean
   children?: HBounds[]
-  transform?: Transform
 }
 
 export const mergeHBounds = (hBounds: HBounds[]): HBounds => {
   const bounds = boundsForRects(hBounds.map((hb) => hb.bounds))!
 
   return {
+    transform: identity(),
     level: 0,
     bounds,
     children: hBounds,
@@ -42,6 +49,7 @@ export const computeHBounds = (
     const intersecting = isRectIntersecting(bounds)
     if (intersecting === 'none') {
       return {
+        transform: identity(),
         count: 1,
         bounds,
         level,
@@ -51,6 +59,7 @@ export const computeHBounds = (
 
     if (intersecting === 'full') {
       return {
+        transform: identity(),
         count: 1,
         bounds,
         level,
@@ -66,6 +75,7 @@ export const computeHBounds = (
             computeHBoundsImpl(childBounds, level + 1)
           )
     return {
+      transform: identity(),
       bounds,
       level,
       overlapsShape: true,
@@ -91,7 +101,7 @@ export const renderHBounds = (
   ctx.strokeStyle = hBounds.children ? 'red' : 'yellow'
 
   if (hBounds.transform) {
-    ctx.translate(hBounds.transform.x, hBounds.transform.y)
+    ctx.setTransform(hBounds.transform)
   }
 
   if (hBounds.overlapsShape) {
@@ -139,10 +149,7 @@ export const collidePointAndHBounds = (
   hBounds: HBounds
 ): PointAndHBoundsCollision => {
   const pointTranslated = hBounds.transform
-    ? {
-        x: point.x - hBounds.transform.x,
-        y: point.y - hBounds.transform.y,
-      }
+    ? applyToPoint(hBounds.transform, point)
     : point
 
   if (!collidePointAndRect(pointTranslated, hBounds.bounds)) {
@@ -351,11 +358,11 @@ export const divideBounds = (bounds: Rect): Rect[] => {
   return result
 }
 
-export const transformRect = (rect: Rect, transform?: Transform): Rect =>
+export const transformRect = (rect: Rect, transform?: Matrix): Rect =>
   transform
     ? {
-        x: rect.x + transform.x,
-        y: rect.y + transform.y,
+        x: rect.x + transform.e,
+        y: rect.y + transform.f,
         w: rect.w,
         h: rect.h,
       }
@@ -414,4 +421,64 @@ export const boundsForRects = (rects: Rect[]): Rect | undefined => {
   }
 
   return { x: xMin, y: yMin, w: xMax - xMin, h: yMax - yMin }
+}
+
+export const computeHBoundsForPath = (path: opentype.Path) => {
+  const pathBbox = path.getBoundingBox()
+
+  const canvas = document.createElement('canvas') as HTMLCanvasElement
+  canvas.width = pathBbox.x2 - pathBbox.x1
+  canvas.height = pathBbox.y2 - pathBbox.y1
+
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+  ctx.translate(-pathBbox.x1, -pathBbox.y1)
+
+  path.draw(ctx)
+  console.screenshot(ctx.canvas)
+
+  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+  const isPointIntersecting = (x: number, y: number): boolean => {
+    const index = Math.round(y) * imageData.width + Math.round(x)
+    return imageData.data[4 * index + 3] > 0
+  }
+
+  const isRectIntersecting = (
+    bounds: Rect,
+    dx = 2
+  ): 'full' | 'partial' | 'none' => {
+    const maxX = bounds.x + bounds.w
+    const maxY = bounds.y + bounds.h
+
+    let checked = 0
+    let overlapping = 0
+
+    for (let x = Math.ceil(bounds.x); x < Math.floor(maxX); x += dx) {
+      for (let y = Math.ceil(bounds.y); y < Math.floor(maxY); y += dx) {
+        const intersecting = isPointIntersecting(x, y)
+        if (intersecting) {
+          overlapping += 1
+        }
+        checked += 1
+      }
+    }
+
+    if (overlapping === 0) {
+      return 'none'
+    }
+
+    return checked === overlapping ? 'full' : 'partial'
+  }
+
+  const bounds: Rect = {
+    x: 0,
+    y: 0,
+    w: pathBbox.x2 - pathBbox.x1,
+    h: pathBbox.y2 - pathBbox.y1,
+  }
+  const hBounds = computeHBounds(bounds, isRectIntersecting)
+
+  hBounds.transform = translate(pathBbox.x1, pathBbox.y1)
+
+  return { hBounds }
 }
