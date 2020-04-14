@@ -211,11 +211,7 @@ export class Tag {
   }
 
   _computeHBounds = (): HBounds => {
-    const wordHBounds = {
-      ...(this._angle != 0
-        ? this.word.computeHBounds(this._angle)
-        : this.word.hBounds),
-    }
+    const wordHBounds = this.word.computeHBounds(this._angle, this._scale)
     wordHBounds.transform = compose(
       translate(this._left, this._top),
       // @ts-ignore
@@ -278,20 +274,18 @@ export class Word {
     return this._hBounds
   }
 
-  computeHBounds = (angle = 0) => {
-    if (angle === 0) {
-      return this.hBounds
-    }
-
+  computeHBounds = (angle = 0, scaleFactor = 1) => {
     let currentOffset = 0
+
     const symbolHBounds = this.symbols.map((symbol, index) => {
-      const symbolHBounds = symbol.computeHBounds(angle)
+      const symbolHBounds = symbol.computeHBounds(angle, scaleFactor)
 
       symbolHBounds.transform = compose(
         rotate(angle),
         translate(currentOffset, 0),
         rotate(-angle),
-        symbolHBounds.transform
+        symbolHBounds.transform,
+        scale(1 / scaleFactor)
       )
 
       currentOffset += this.symbolOffsets[index]
@@ -361,10 +355,10 @@ export class Symbol {
     this.glyph.getPath(0, 0, this.fontSize).draw(ctx)
   }
 
-  computeHBounds(angle = 0): HBounds {
+  computeHBounds(angle = 0, scaleFactor = 1): HBounds {
     return computeHBoundsForPath(
       this.glyph.getPath(0, 0, this.fontSize),
-      rotate(angle)
+      compose(rotate(angle), scale(scaleFactor))
     ).hBounds
   }
 
@@ -397,7 +391,7 @@ export const generateWordArt = (args: {
   const { font, viewBox } = args
 
   const scene = new GeneratedScene(font, viewBox)
-  const words = ['you', 'great', 'awesome', 'love', 'meaning']
+  const words = ['you', 'gre', 'awes', 'love', 'mea']
   for (let word of words) {
     scene.addWord(word)
   }

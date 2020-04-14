@@ -492,6 +492,8 @@ export const computeHBoundsForPath = (
     pathTransform
   )
 
+  console.log('pathBbox', pathBboxRect, pathAaab)
+
   const canvas = document.createElement('canvas') as HTMLCanvasElement
   canvas.width = pathAaab.w
   canvas.height = pathAaab.h
@@ -542,13 +544,14 @@ export const computeHBoundsForPath = (
       h: canvas.height,
       w: canvas.width,
     },
-    isRectIntersecting
+    isRectIntersecting,
+    6
   )
   renderHBounds(ctx, hBounds)
+
   console.screenshot(ctx.canvas)
   hBounds.transform = compose(
-    translate(pathBboxRect.x, pathBboxRect.y)
-    // inverse(pathTransform)
+    translate(pathBboxRect.x + pathAaab.x, pathBboxRect.y + pathAaab.y)
   )
   return { hBounds }
 }
