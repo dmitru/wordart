@@ -356,10 +356,18 @@ export class Symbol {
   }
 
   computeHBounds(angle = 0, scaleFactor = 1): HBounds {
-    return computeHBoundsForPath(
+    const hBounds = computeHBoundsForPath(
       this.glyph.getPath(0, 0, this.fontSize),
-      compose(rotate(angle), scale(scaleFactor))
+      angle,
+      scaleFactor
+      // compose(rotate(angle), scale(scaleFactor))
     ).hBounds
+    // hBounds.transform = compose(
+    //   rotate(angle),
+    //   hBounds.transform,
+    //   scale(scaleFactor)
+    // )
+    return hBounds
   }
 
   get hBounds() {
@@ -391,7 +399,8 @@ export const generateWordArt = (args: {
   const { font, viewBox } = args
 
   const scene = new GeneratedScene(font, viewBox)
-  const words = ['you', 'gre', 'awes', 'love', 'mea']
+  // const words = ['you', 'gre', 'awes', 'love', 'mea']
+  const words = ['oooooooooo']
   for (let word of words) {
     scene.addWord(word)
   }

@@ -7,6 +7,8 @@ import {
   applyToPoints,
   compose,
   inverse,
+  rotate,
+  scale,
 } from 'transformation-matrix'
 
 export type Transform = {
@@ -472,8 +474,11 @@ export const boundsForRects = (
 
 export const computeHBoundsForPath = (
   path: opentype.Path,
-  transform = identity()
+  angle = 0,
+  scaleFactor = 1
 ) => {
+  // console.log('transform = ', angle, scaleFactor)
+
   const pathBbox = path.getBoundingBox()
   const pathBboxRect = {
     x: pathBbox.x1,
@@ -483,16 +488,24 @@ export const computeHBoundsForPath = (
   }
 
   const pathTransform = compose(
-    translate(-pathBboxRect.x, -pathBboxRect.y),
-    transform
+    rotate(angle, pathBboxRect.x, pathBboxRect.y + pathBboxRect.h),
+    scale(scaleFactor)
   )
+
   const pathAaab = aabbForRect(pathTransform, pathBboxRect)
+
   const pathAaabTransform = compose(
     translate(-pathAaab.x, -pathAaab.y),
     pathTransform
   )
 
-  console.log('pathBbox', pathBboxRect, pathAaab)
+  // console.log(
+  //   'pathBbox',
+  //   pathBboxRect.x.toFixed(1),
+  //   pathBboxRect.y.toFixed(1),
+  //   pathAaab.x.toFixed(1),
+  //   pathAaab.y.toFixed(1)
+  // )
 
   const canvas = document.createElement('canvas') as HTMLCanvasElement
   canvas.width = pathAaab.w
@@ -549,9 +562,21 @@ export const computeHBoundsForPath = (
   )
   renderHBounds(ctx, hBounds)
 
-  console.screenshot(ctx.canvas)
+  // console.screenshot(ctx.canvas)
   hBounds.transform = compose(
-    translate(pathBboxRect.x + pathAaab.x, pathBboxRect.y + pathAaab.y)
+    translate(
+      (-pathBboxRect.x + pathAaab.x) / scaleFactor,
+      (-pathBboxRect.y + pathAaab.y - pathBboxRect.h) / scaleFactor
+    )
   )
+
+  console.log(
+    'hBounds: ',
+    hBounds.transform.e,
+    hBounds.transform.f,
+    hBounds.transform.a,
+    hBounds.transform.d
+  )
+
   return { hBounds }
 }
