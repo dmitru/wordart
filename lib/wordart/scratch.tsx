@@ -70,15 +70,15 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
     // }
   })
 
-  let raf = -1
+  // let raf = -1
 
-  const render = () => {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-    renderScene(scene, ctx)
-    raf = requestAnimationFrame(render)
-  }
+  // const render = () => {
+  //   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+  //   renderScene(scene, ctx)
+  //   raf = requestAnimationFrame(render)
+  // }
 
-  raf = requestAnimationFrame(render)
+  // raf = requestAnimationFrame(render)
 }
 
 export const generateWordArt = (args: {
@@ -89,7 +89,23 @@ export const generateWordArt = (args: {
   const { font, viewBox, ctx } = args
 
   const scene = new GeneratedScene(font, viewBox)
-  const words = ['universe', 'love', 'wind', 'earth', 'water', 'fire']
+  const words = [
+    'universe',
+    'love',
+    'wind',
+    'earth',
+    'water',
+    'fire',
+    'words',
+    'many',
+    'happiness',
+    'emotion',
+    'bliss',
+    'serenity',
+    'lots',
+    'fun',
+    'cheerful',
+  ]
   // const words = ['II']
   for (let word of words) {
     scene.addWord(word)
@@ -104,13 +120,19 @@ export const generateWordArt = (args: {
     return false
   }
 
+  // Precompute all hbounds
+  const protoTags = scene.words.map((word) => new Tag(0, word, 0, 0, 1, 0))
+  protoTags.forEach((tag) => console.log(tag.bounds))
+
   // let nWords = 0
   const configs = [
-    { nWords: 5, scale: 0.8 },
-    { nWords: 8, scale: 0.75 },
-    { nWords: 10, scale: 0.6 },
-    { nWords: 20, scale: 0.5 },
+    { nWords: 1, scale: 1.2 },
+    { nWords: 3, scale: 0.8 },
+    { nWords: 5, scale: 0.6 },
+    { nWords: 10, scale: 0.5 },
     { nWords: 50, scale: 0.2 },
+    { nWords: 100, scale: 0.1 },
+    // { nWords: 0, scale: 0.2 },
     // { nWords: 50, scale: 0.1 },
     // { nWords: 50, scale: 0.075 },
     // { nWords: 50, scale: 0.05 },
@@ -121,8 +143,7 @@ export const generateWordArt = (args: {
     // let scale = 0.1 + (1 - (i * 0.9) / nWords) * Math.random()
 
     for (let i = 0; i < nWords; ++i) {
-      const word = sample(scene.words)!
-      const tag = new Tag(0, word, 0, 0, 1, 0)
+      const tag = sample(protoTags)!
 
       const x1 = 10
       const x2 = viewBox.w - 10
@@ -130,7 +151,7 @@ export const generateWordArt = (args: {
       const y2 = viewBox.h - 10
 
       tag.scale = scale
-      tag.angle = sample([0, Math.PI / 2])!
+      // tag.angle = sample([0, Math.PI / 2])!
 
       let placed = false
 
@@ -165,7 +186,7 @@ export const generateWordArt = (args: {
           ) {
             if (!doesCollideOtherTags(tag)) {
               const tagAdded = scene.addTag(
-                word,
+                tag.word,
                 tag.left,
                 tag.top,
                 tag.scale,
@@ -191,6 +212,8 @@ export const generateWordArt = (args: {
 
           iteration += 1
         }
+
+        // console.log('placed', placed, i, nWords)
 
         if (placed) {
           break
@@ -328,7 +351,7 @@ export class Tag {
   set scale(scale: number) {
     this._scale = scale
     this._transform = null
-    this._hBounds = null
+    // this._hBounds = null
   }
 
   get angle() {
@@ -356,7 +379,7 @@ export class Tag {
       ...this._hBounds,
       transform: tm.compose(
         tm.translate(this._left, this._top),
-        // tm.scale(this._scale),
+        tm.scale(this._scale),
         this._hBounds.transform
       ),
     }
@@ -370,14 +393,14 @@ export class Tag {
     let currentOffset = 0
 
     const symbolHBounds = this.word.symbols.map((symbol, index) => {
-      const symbolHBounds = symbol.computeHBounds(this._angle, this._scale)
+      const symbolHBounds = symbol.computeHBounds(this._angle, 1)
 
       symbolHBounds.transform = compose(
-        tm.scale(this._scale),
+        // tm.scale(this._scale),
         tm.rotate(this._angle),
         tm.translate(currentOffset),
         tm.rotate(-this._angle),
-        tm.scale(1 / this._scale),
+        // tm.scale(1 / this._scale),
         symbolHBounds.transform
       )
 

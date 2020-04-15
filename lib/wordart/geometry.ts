@@ -101,7 +101,8 @@ export const computeHBounds = (
   const t1 = performance.now()
   const result = computeHBoundsImpl(bounds, 0)
   const t2 = performance.now()
-  console.debug(`computeHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`)
+  console.debug('computeHierarchicalBounds')
+  // console.debug(`computeHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`)
 
   return result
 }
@@ -546,7 +547,7 @@ export const computeHBoundsForPath = (
   const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
 
   const isPointIntersecting = (x: number, y: number): boolean => {
-    const index = Math.round(y) * imageData.width + Math.round(x)
+    const index = y * imageData.width + x
     return imageData.data[4 * index + 3] > 0
   }
 
@@ -596,7 +597,7 @@ export const computeHBoundsForPath = (
       w: canvas.width,
     },
     isRectIntersecting,
-    3
+    4
   )
   renderHBounds(ctx, hBounds)
 
