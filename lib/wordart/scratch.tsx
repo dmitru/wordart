@@ -7,6 +7,7 @@ import {
   scale,
   rotate,
 } from 'transformation-matrix'
+import * as tm from 'transformation-matrix'
 import * as fermat from '@mathigon/fermat'
 import 'lib/wordart/console-extensions'
 import {
@@ -168,13 +169,13 @@ export class Tag {
   set left(left: number) {
     this._left = left
     this._transform = null
-    this._hBounds = null
+    // this._hBounds = null
   }
 
   set top(top: number) {
     this._top = top
     this._transform = null
-    this._hBounds = null
+    // this._hBounds = null
   }
 
   set scale(scale: number) {
@@ -192,10 +193,7 @@ export class Tag {
   draw = (ctx: CanvasRenderingContext2D) => {
     ctx.save()
     ctx.setTransform(this.transform)
-    for (const [index, symbol] of this.word.symbols.entries()) {
-      symbol.draw(ctx)
-      ctx.translate(this.word.symbolOffsets[index], 0)
-    }
+    this.word.draw(ctx)
     ctx.restore()
   }
 
@@ -203,7 +201,13 @@ export class Tag {
     if (!this._hBounds) {
       this._hBounds = this._computeHBounds()
     }
-    return this._hBounds
+    return {
+      ...this._hBounds,
+      transform: tm.compose(
+        tm.translate(this._left, this._top),
+        this._hBounds.transform
+      ),
+    }
   }
 
   get bounds(): Rect {
@@ -211,12 +215,25 @@ export class Tag {
   }
 
   _computeHBounds = (): HBounds => {
-    const wordHBounds = this.word.computeHBounds(this._angle, this._scale)
-    wordHBounds.transform = compose(
-      translate(this._left, this._top),
-      // @ts-ignore
-      scale(this._scale)
-    )
+    let currentOffset = 0
+
+    const symbolHBounds = this.word.symbols.map((symbol, index) => {
+      const symbolHBounds = symbol.computeHBounds(this._angle, this._scale)
+
+      symbolHBounds.transform = compose(
+        tm.scale(this._scale),
+        tm.rotate(this._angle),
+        tm.translate(currentOffset),
+        tm.rotate(-this._angle),
+        tm.scale(1 / this._scale),
+        symbolHBounds.transform
+      )
+
+      currentOffset += this.word.symbolOffsets[index]
+      return symbolHBounds
+    })
+
+    const wordHBounds = mergeHBounds(symbolHBounds)
     return wordHBounds
   }
 
@@ -281,6 +298,7 @@ export class Word {
       const symbolHBounds = symbol.computeHBounds(angle, scaleFactor)
 
       symbolHBounds.transform = compose(
+        scale(scaleFactor),
         rotate(angle),
         translate(currentOffset, 0),
         rotate(-angle),
@@ -331,9 +349,7 @@ const drawHBounds = (ctx: CanvasRenderingContext2D, hBounds: HBounds) => {
     ctx.restore()
   }
 
-  ctx.save()
   drawHBoundsImpl(hBounds)
-  ctx.restore()
 }
 
 export class Symbol {
@@ -399,8 +415,7 @@ export const generateWordArt = (args: {
   const { font, viewBox } = args
 
   const scene = new GeneratedScene(font, viewBox)
-  // const words = ['you', 'gre', 'awes', 'love', 'mea']
-  const words = ['oooooooooo']
+  const words = ['you', 'gre', 'awes', 'love', 'mea']
   for (let word of words) {
     scene.addWord(word)
   }

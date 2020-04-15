@@ -1,6 +1,8 @@
 import { sum, min, max } from 'lodash'
-import {
-  Matrix,
+import * as tm from 'transformation-matrix'
+import { Matrix } from 'transformation-matrix'
+
+const {
   applyToPoint,
   identity,
   translate,
@@ -9,7 +11,7 @@ import {
   inverse,
   rotate,
   scale,
-} from 'transformation-matrix'
+} = tm
 
 export type Transform = {
   x: number
@@ -54,6 +56,9 @@ export const computeHBounds = (
   isRectIntersecting: (rect: Rect) => 'full' | 'partial' | 'none',
   maxLevel = 5
 ): HBounds => {
+  // @ts-ignore
+  window['tm'] = tm // eslint-disable-line
+
   const computeHBoundsImpl = (bounds: Rect, level: number): HBounds => {
     const intersecting = isRectIntersecting(bounds)
     if (intersecting === 'none') {
@@ -487,25 +492,16 @@ export const computeHBoundsForPath = (
     h: pathBbox.y2 - pathBbox.y1,
   }
 
-  const pathTransform = compose(
-    rotate(angle, pathBboxRect.x, pathBboxRect.y + pathBboxRect.h),
-    scale(scaleFactor)
+  const pathAaab = aabbForRect(
+    compose(rotate(angle), scale(scaleFactor)),
+    pathBboxRect
   )
-
-  const pathAaab = aabbForRect(pathTransform, pathBboxRect)
 
   const pathAaabTransform = compose(
     translate(-pathAaab.x, -pathAaab.y),
-    pathTransform
+    rotate(angle),
+    scale(scaleFactor)
   )
-
-  // console.log(
-  //   'pathBbox',
-  //   pathBboxRect.x.toFixed(1),
-  //   pathBboxRect.y.toFixed(1),
-  //   pathAaab.x.toFixed(1),
-  //   pathAaab.y.toFixed(1)
-  // )
 
   const canvas = document.createElement('canvas') as HTMLCanvasElement
   canvas.width = pathAaab.w
@@ -550,6 +546,17 @@ export const computeHBoundsForPath = (
     return checked === overlapping ? 'full' : 'partial'
   }
 
+  // Visualize sample points
+  for (let x = 0; x < imageData.width; x += 5) {
+    for (let y = 0; y < imageData.height; y += 5) {
+      const intersecting = isPointIntersecting(x, y)
+      if (intersecting) {
+        ctx.fillStyle = 'yellow'
+        ctx.fillRect(x, y, 2, 2)
+      }
+    }
+  }
+
   const hBounds = computeHBounds(
     {
       x: 0,
@@ -563,20 +570,8 @@ export const computeHBoundsForPath = (
   renderHBounds(ctx, hBounds)
 
   // console.screenshot(ctx.canvas)
-  hBounds.transform = compose(
-    translate(
-      (-pathBboxRect.x + pathAaab.x) / scaleFactor,
-      (-pathBboxRect.y + pathAaab.y - pathBboxRect.h) / scaleFactor
-    )
-  )
 
-  console.log(
-    'hBounds: ',
-    hBounds.transform.e,
-    hBounds.transform.f,
-    hBounds.transform.a,
-    hBounds.transform.d
-  )
+  hBounds.transform = translate(pathAaab.x, pathAaab.y)
 
   return { hBounds }
 }
