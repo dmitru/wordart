@@ -33,47 +33,152 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
   const ctx = canvas.getContext('2d')!
 
   const viewBox: Rect = { x: 0, y: 0, w: canvas.width, h: canvas.height }
-  const scene = generateWordArt({ font, viewBox })
-  console.log(scene)
+  let scene = generateWordArt({ font, viewBox })
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+  renderScene(scene, ctx)
 
-  const tagBg = scene.addRandomTag(300, 300, 1.3, 0.3)
+  // const tagBg = scene.addRandomTag(300, 300, 1.3, 0.3)
 
-  const tag = scene.addRandomTag(0, 0)
+  // const tag = scene.addRandomTag(0, 0)
 
-  let collides = false
-  canvas.addEventListener('mousemove', (e) => {
-    const x = e.offsetX
-    const y = e.offsetY
-    tag.left = x
-    tag.top = y
+  // let collides = false
+  // canvas.addEventListener('mousemove', (e) => {
+  //   const x = e.offsetX
+  //   const y = e.offsetY
+  //   tag.left = x
+  //   tag.top = y
 
-    collides = collideHBounds(tag.hBounds, tagBg.hBounds).collides
+  //   collides = collideHBounds(tag.hBounds, tagBg.hBounds).collides
 
-    tag.fillStyle = collides ? 'green' : 'black'
-  })
+  //   tag.fillStyle = collides ? 'green' : 'black'
+  // })
 
   document.addEventListener('keydown', (e) => {
     const key = e.key
-    if (key === 'w') {
-      tag.scale = tag._scale + 0.1
-    } else if (key === 's') {
-      tag.scale = tag._scale - 0.1
-    } else if (key === 'd') {
-      tag.angle = tag._angle + 0.03
-    } else if (key === 'a') {
-      tag.angle = tag._angle - 0.03
+    if (key === 'g') {
+      scene = generateWordArt({ font, viewBox })
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+      renderScene(scene, ctx)
     }
+    // if (key === 'w') {
+    //   tag.scale = tag._scale + 0.1
+    // } else if (key === 's') {
+    //   tag.scale = tag._scale - 0.1
+    // } else if (key === 'd') {
+    //   tag.angle = tag._angle + 0.03
+    // } else if (key === 'a') {
+    //   tag.angle = tag._angle - 0.03
+    // }
   })
 
-  let raf = -1
+  // let raf = -1
 
-  const render = () => {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-    renderScene(scene, ctx)
-    raf = requestAnimationFrame(render)
+  // const render = () => {
+  //   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+  //   renderScene(scene, ctx)
+  //   raf = requestAnimationFrame(render)
+  // }
+
+  // raf = requestAnimationFrame(render)
+}
+
+export const generateWordArt = (args: {
+  font: opentype.Font
+  viewBox: Rect
+}): GeneratedScene => {
+  const { font, viewBox } = args
+
+  const scene = new GeneratedScene(font, viewBox)
+  const words = ['you', 'me', 'and', 'everything', 'caught', 'in', 'fire']
+  for (let word of words) {
+    scene.addWord(word)
   }
 
-  raf = requestAnimationFrame(render)
+  const doesCollideOtherTags = (tag: Tag) => {
+    for (let t of scene.tags) {
+      if (collideHBounds(t.hBounds, tag.hBounds).collides) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  let nWords = 80
+  for (let i = 0; i < nWords; ++i) {
+    const word = sample(scene.words)!
+    const tag = new Tag(0, word, 0, 0, 1, 0)
+
+    const x1 = 10
+    const x2 = viewBox.w - 10
+    const y1 = 10
+    const y2 = viewBox.h - 10
+
+    let scale = 0.1 + (1 - (i * 0.9) / nWords) * Math.random()
+    tag.scale = scale
+    const angle = sample([0, Math.PI / 2])!
+    tag.angle = angle
+
+    for (let attempt = 0; attempt < 15; ++attempt) {
+      let cx0 = x1 + Math.random() * (x2 - x1 - tag.bounds.w)
+      let cy0 = y1 + Math.random() * (y2 - y1 - tag.bounds.h)
+
+      let cx = cx0
+      let cy = cy0
+
+      let angle = 0
+      let radius = 10
+
+      let placed = false
+      let iteration = 0
+
+      while (iteration < 20) {
+        tag.left = cx
+        tag.top = cy
+
+        const bounds = tag.bounds
+
+        if (
+          !(
+            bounds.x < x1 ||
+            bounds.x + bounds.w > x2 ||
+            bounds.y < y1 ||
+            bounds.y + bounds.h > y2
+          )
+        ) {
+          if (!doesCollideOtherTags(tag)) {
+            const tagAdded = scene.addTag(
+              word,
+              tag.left,
+              tag.top,
+              tag.scale,
+              tag.angle
+            )
+            tagAdded._hBounds = tag._hBounds
+            console.log('attempt: ', attempt, 'iteration: ', iteration)
+            placed = true
+            break
+          }
+        }
+
+        cx = cx0 + Math.cos(angle) * radius
+        cy = cx0 + Math.sin(angle) * radius
+
+        radius += 5
+        angle += Math.PI / 10
+
+        iteration += 1
+      }
+
+      if (placed) {
+        break
+      }
+
+      scale /= 1.5
+    }
+  }
+
+  return scene
 }
 
 const renderScene = (scene: GeneratedScene, ctx: CanvasRenderingContext2D) => {
@@ -84,7 +189,7 @@ const renderScene = (scene: GeneratedScene, ctx: CanvasRenderingContext2D) => {
 
     tag.draw(ctx)
 
-    drawHBounds(ctx, tag.hBounds)
+    // drawHBounds(ctx, tag.hBounds)
   }
   ctx.restore()
 }
@@ -116,13 +221,16 @@ export class GeneratedScene {
     }
   }
 
-  addRandomTag = (x: number, y: number, scale = 1, angle = 0) => {
+  removeTag = (tag: Tag) => {
+    this.tags = this.tags.filter((t) => t === tag)
+  }
+
+  addTag = (word: Word, x: number, y: number, scale = 1, angle = 0) => {
     if (this.words.length === 0) {
       throw new Error('No words added')
     }
 
     const id = (this.nextTagId += 1)
-    const word = sample(this.words)!
     const tag = new Tag(id, word, x, y, scale, angle)
     this.tags.push(tag)
 
@@ -137,7 +245,7 @@ export class Tag {
 
   fillStyle: string = 'black'
 
-  private _hBounds: HBounds | null = null
+  _hBounds: HBounds | null = null
 
   /** left (X) coord of the center of the tag */
   _left: number = 0
@@ -174,22 +282,35 @@ export class Tag {
     return this._transform
   }
 
+  get left() {
+    return this._left
+  }
+
   set left(left: number) {
     this._left = left
     this._transform = null
   }
 
+  get top() {
+    return this._top
+  }
   set top(top: number) {
     this._top = top
     this._transform = null
   }
 
+  get scale() {
+    return this._scale
+  }
   set scale(scale: number) {
     this._scale = scale
     this._transform = null
-    this._hBounds = null
+    // this._hBounds = null
   }
 
+  get angle() {
+    return this._angle
+  }
   set angle(angle: number) {
     this._angle = angle
     this._transform = null
@@ -360,28 +481,6 @@ export const stringToSymbols = (
   font
     .stringToGlyphs(text)
     .map((otGlyph) => new Symbol(font, otGlyph, fontSize))
-
-export const generateWordArt = (args: {
-  font: opentype.Font
-  viewBox: Rect
-}): GeneratedScene => {
-  const { font, viewBox } = args
-
-  const scene = new GeneratedScene(font, viewBox)
-  const words = ['y', 'g']
-  for (let word of words) {
-    scene.addWord(word)
-  }
-
-  // for (let i = 0; i < 100; ++i) {
-  //   const x = Math.random() * viewBox.w
-  //   const y = Math.random() * viewBox.h
-  //   const scale = 0.2 + Math.random() * 2
-  //   scene.addRandomTag(x, y, scale)
-  // }
-
-  return scene
-}
 
 export type Glyph = opentype.Glyph
 export type Font = opentype.Font

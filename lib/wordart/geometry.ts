@@ -230,16 +230,16 @@ export const collideHBounds = (
     curHBounds1: HBounds,
     curHBounds2: HBounds,
     transform1: Matrix,
-    transform2: Matrix,
-    curPath1: Rect[],
-    curPath2: Rect[]
+    transform2: Matrix
+    // curPath1: Rect[],
+    // curPath2: Rect[]
   ): HBoundsCollisionInfo => {
     // return { collides: true, path1: curPath1, path2: curPath2 }
     if (!curHBounds1.overlapsShape || !curHBounds2.overlapsShape) {
       return {
         collides: false,
-        path1: [...curPath1, curHBounds1.bounds],
-        path2: [...curPath2, curHBounds2.bounds],
+        // path1: [...curPath1, curHBounds1.bounds],
+        // path2: [...curPath2, curHBounds2.bounds],
       }
     }
 
@@ -248,8 +248,8 @@ export const collideHBounds = (
       // reached leaves
       return {
         collides: true,
-        path1: [...curPath1, curHBounds1.bounds],
-        path2: [...curPath2, curHBounds2.bounds],
+        // path1: [...curPath1, curHBounds1.bounds],
+        // path2: [...curPath2, curHBounds2.bounds],
       }
     }
 
@@ -268,9 +268,9 @@ export const collideHBounds = (
           curHBounds1,
           child,
           transform1,
-          compose(transform2, child.transform),
-          curPath1,
-          [...curPath2, child.bounds]
+          compose(transform2, child.transform)
+          // curPath1,
+          // [...curPath2, child.bounds]
         )
         if (childCheckResult.collides) {
           return childCheckResult
@@ -293,9 +293,9 @@ export const collideHBounds = (
           child,
           hBounds2,
           compose(transform1, child.transform),
-          transform2,
-          [...curPath1, child.bounds],
-          curPath2
+          transform2
+          // [...curPath1, child.bounds],
+          // curPath2
         )
         if (childCheckResult.collides) {
           return childCheckResult
@@ -325,9 +325,9 @@ export const collideHBounds = (
             child1,
             child2,
             compose(transform1, child1.transform),
-            compose(transform2, child2.transform),
-            [...curPath1, child1.bounds],
-            [...curPath2, child2.bounds]
+            compose(transform2, child2.transform)
+            // [...curPath1, child1.bounds],
+            // [...curPath2, child2.bounds]
           )
           if (childCheckResult.collides) {
             return childCheckResult
@@ -337,8 +337,8 @@ export const collideHBounds = (
 
     return {
       collides: false,
-      path1: [...curPath1, curHBounds1.bounds],
-      path2: [...curPath2, curHBounds2.bounds],
+      // path1: [...curPath1, curHBounds1.bounds],
+      // path2: [...curPath2, curHBounds2.bounds],
     }
   }
 
@@ -347,9 +347,9 @@ export const collideHBounds = (
     hBounds1,
     hBounds2,
     hBounds1.transform,
-    hBounds2.transform,
-    [hBounds1.bounds],
-    [hBounds2.bounds]
+    hBounds2.transform
+    // [hBounds1.bounds],
+    // [hBounds2.bounds]
   )
   const t2 = performance.now()
   // console.debug(`collideHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`)
