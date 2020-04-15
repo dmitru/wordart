@@ -36,6 +36,7 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
   let scene = generateWordArt({ ctx, font, viewBox })
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
   renderScene(scene, ctx)
+  console.log('scene', scene)
 
   // const tagBg = scene.addTag(scene.words[0], 300, 100, 2, Math.PI / 2)
   // const tag = scene.addTag(scene.words[0], 0, 0, 1, 0)
@@ -58,6 +59,7 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
       scene = generateWordArt({ ctx, font, viewBox })
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       renderScene(scene, ctx)
+      console.log('scene', scene)
     }
     // if (key === 'w') {
     //   tag.scale = tag._scale + 0.1
@@ -121,7 +123,11 @@ export const generateWordArt = (args: {
   }
 
   // Precompute all hbounds
-  const protoTags = scene.words.map((word) => new Tag(0, word, 0, 0, 1, 0))
+  let protoTags = [
+    ...scene.words.map((word) => new Tag(0, word, 0, 0, 1, 0)),
+    ...scene.words.map((word) => new Tag(0, word, 0, 0, 1, Math.PI / 2)),
+  ]
+
   protoTags.forEach((tag) => console.log(tag.bounds))
 
   // let nWords = 0
@@ -376,17 +382,23 @@ export class Tag {
       this._hBounds = this._computeHBounds()
     }
     return {
-      ...this._hBounds,
+      count: this._hBounds.count,
+      level: this._hBounds.level,
+      bounds: this._hBounds.bounds,
+      overlapsShape: this._hBounds.overlapsShape,
+      children: this._hBounds.children,
       transform: tm.compose(
         tm.translate(this._left, this._top),
         tm.scale(this._scale),
-        this._hBounds.transform
+        this._hBounds.transform ? this._hBounds.transform : identity()
       ),
     }
   }
 
   get bounds(): Rect {
-    return transformRect(this.hBounds.transform, this.hBounds.bounds)
+    return this.hBounds.transform
+      ? transformRect(this.hBounds.transform, this.hBounds.bounds)
+      : this.hBounds.bounds
   }
 
   _computeHBounds = (): HBounds => {
@@ -401,7 +413,7 @@ export class Tag {
         tm.translate(currentOffset),
         tm.rotate(-this._angle),
         // tm.scale(1 / this._scale),
-        symbolHBounds.transform
+        symbolHBounds.transform ? symbolHBounds.transform : identity()
       )
 
       currentOffset += this.word.symbolOffsets[index]
@@ -452,14 +464,16 @@ const drawHBounds = (ctx: CanvasRenderingContext2D, hBounds: HBounds) => {
     ctx.lineWidth = 0.5
     ctx.strokeStyle = hBounds.overlapsShape ? 'red' : 'yellow'
 
-    ctx.transform(
-      hBounds.transform.a,
-      hBounds.transform.b,
-      hBounds.transform.c,
-      hBounds.transform.d,
-      hBounds.transform.e,
-      hBounds.transform.f
-    )
+    if (hBounds.transform) {
+      ctx.transform(
+        hBounds.transform.a,
+        hBounds.transform.b,
+        hBounds.transform.c,
+        hBounds.transform.d,
+        hBounds.transform.e,
+        hBounds.transform.f
+      )
+    }
 
     // if (hBounds.overlapsShape) {
     ctx.strokeRect(

@@ -27,7 +27,7 @@ export const mkTransform = (x: number, y: number, scale = 1): Transform => ({
 
 export type HBounds = {
   /** Can only be translate or scale; no rotation is allowed */
-  transform: Matrix
+  transform?: Matrix
   count: number
   level: number
   bounds: Rect
@@ -42,7 +42,6 @@ export const mergeHBounds = (hBounds: HBounds[]): HBounds => {
   )!
 
   return {
-    transform: identity(),
     level: 0,
     bounds,
     children: hBounds,
@@ -63,7 +62,6 @@ export const computeHBounds = (
     const intersecting = isRectIntersecting(bounds)
     if (intersecting === 'none') {
       return {
-        transform: identity(),
         count: 1,
         bounds,
         level,
@@ -73,7 +71,6 @@ export const computeHBounds = (
 
     if (intersecting === 'full') {
       return {
-        transform: identity(),
         count: 1,
         bounds,
         level,
@@ -89,7 +86,6 @@ export const computeHBounds = (
             computeHBoundsImpl(childBounds, level + 1)
           )
     return {
-      transform: identity(),
       bounds,
       level,
       overlapsShape: true,
@@ -224,14 +220,20 @@ export const collideHBounds = (
     curHBounds2: HBounds,
     transform1: Matrix,
     transform2: Matrix
-    // curPath1: Rect[],
-    // curPath2: Rect[]
   ): HBoundsCollisionInfo => {
     if (!curHBounds1.overlapsShape || !curHBounds2.overlapsShape) {
       return {
         collides: false,
         // path1: [...curPath1, curHBounds1.bounds],
         // path2: [...curPath2, curHBounds2.bounds],
+      }
+    }
+
+    // invatiant: both hbounds overlap shape
+    if (!curHBounds1.children && !curHBounds2.children) {
+      // reached leaves
+      return {
+        collides: true,
       }
     }
 
@@ -244,97 +246,47 @@ export const collideHBounds = (
     ) {
       return { collides: false }
     }
-    // return { collides: true, path1: curPath1, path2: curPath2 }
-
-    // invatiant: both hbounds overlap shape and are intersecting
-    if (!curHBounds1.children && !curHBounds2.children) {
-      // reached leaves
-      return {
-        collides: true,
-        // path1: [...curPath1, curHBounds1.bounds],
-        // path2: [...curPath2, curHBounds2.bounds],
-      }
-    }
 
     if (!curHBounds1.children && curHBounds2.children) {
       for (let child of curHBounds2.children) {
-        // if (
-        //   !areRectsIntersecting(
-        //     transformRect(transform1, hBounds1.bounds),
-        //     transformRect(compose(transform2, child.transform), child.bounds)
-        //   )
-        // ) {
-        //   continue
-        // }
-
         const childCheckResult = check(
           curHBounds1,
           child,
           transform1,
-          compose(transform2, child.transform)
-          // curPath1,
-          // [...curPath2, child.bounds]
+          child.transform ? compose(transform2, child.transform) : transform2
         )
         if (childCheckResult.collides) {
           return childCheckResult
         }
       }
-
-      // return { collides: true }
     }
 
     if (curHBounds1.children && !curHBounds2.children) {
       for (let child of curHBounds1.children) {
-        // if (
-        //   !areRectsIntersecting(
-        //     transformRect(compose(transform1, child.transform), child.bounds),
-        //     transformRect(transform2, hBounds2.bounds)
-        //   )
-        // ) {
-        //   continue
-        // }
-
         const childCheckResult = check(
           child,
           curHBounds2,
-          compose(transform1, child.transform),
+          child.transform ? compose(transform1, child.transform) : transform1,
           transform2
-          // [...curPath1, child.bounds],
-          // curPath2
         )
         if (childCheckResult.collides) {
           return childCheckResult
         }
       }
-
-      // return { collides: true }
     }
 
     if (curHBounds1.children && curHBounds2.children)
       for (let child1 of curHBounds1.children) {
         for (let child2 of curHBounds2.children) {
-          // if (
-          //   !areRectsIntersecting(
-          //     transformRect(
-          //       compose(transform1, child1.transform),
-          //       child1.bounds
-          //     ),
-          //     transformRect(
-          //       compose(transform2, child2.transform),
-          //       child2.bounds
-          //     )
-          //   )
-          // ) {
-          //   continue
-          // }
-
           const childCheckResult = check(
             child1,
             child2,
-            compose(transform1, child1.transform),
-            compose(transform2, child2.transform)
-            // [...curPath1, child1.bounds],
-            // [...curPath2, child2.bounds]
+            child1.transform
+              ? compose(transform1, child1.transform)
+              : transform1,
+            child2.transform
+              ? compose(transform2, child2.transform)
+              : transform2
           )
           if (childCheckResult.collides) {
             return childCheckResult
@@ -342,12 +294,8 @@ export const collideHBounds = (
         }
       }
 
-    // return { collides: true }
-
     return {
       collides: false,
-      // path1: [...curPath1, curHBounds1.bounds],
-      // path2: [...curPath2, curHBounds2.bounds],
     }
   }
 
@@ -355,10 +303,8 @@ export const collideHBounds = (
   const result = check(
     hBounds1,
     hBounds2,
-    hBounds1.transform,
-    hBounds2.transform
-    // [hBounds1.bounds],
-    // [hBounds2.bounds]
+    hBounds1.transform || identity(),
+    hBounds2.transform || identity()
   )
   const t2 = performance.now()
   // console.debug(`collideHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`)
@@ -474,14 +420,18 @@ export const aabbForRect = (transform: Matrix, rect: Rect): Rect => {
 
 export const boundsForRects = (
   rects: Rect[],
-  transforms?: Matrix[]
+  transforms?: (Matrix | undefined)[]
 ): Rect | undefined => {
   if (rects.length === 0) {
     return undefined
   }
 
   const rectsTransformed = transforms
-    ? rects.map((rect, index) => transformRect(transforms[index], rect))
+    ? rects.map((rect, index) =>
+        transforms[index] != null
+          ? transformRect(transforms[index]!, rect)
+          : rect
+      )
     : rects
 
   let xMin = rectsTransformed[0].x
@@ -599,7 +549,7 @@ export const computeHBoundsForPath = (
     isRectIntersecting,
     4
   )
-  renderHBounds(ctx, hBounds)
+  // renderHBounds(ctx, hBounds)
 
   // console.screenshot(ctx.canvas)
 
