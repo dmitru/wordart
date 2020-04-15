@@ -215,17 +215,9 @@ export type HBoundsCollisionInfo = {
 
 export const collideHBounds = (
   hBounds1: HBounds,
-  hBounds2: HBounds
+  hBounds2: HBounds,
+  padding = 0
 ): HBoundsCollisionInfo => {
-  if (
-    !areRectsIntersecting(
-      transformRect(hBounds1.transform, hBounds1.bounds),
-      transformRect(hBounds2.transform, hBounds2.bounds)
-    )
-  ) {
-    return { collides: false }
-  }
-
   const check = (
     curHBounds1: HBounds,
     curHBounds2: HBounds,
@@ -234,7 +226,6 @@ export const collideHBounds = (
     // curPath1: Rect[],
     // curPath2: Rect[]
   ): HBoundsCollisionInfo => {
-    // return { collides: true, path1: curPath1, path2: curPath2 }
     if (!curHBounds1.overlapsShape || !curHBounds2.overlapsShape) {
       return {
         collides: false,
@@ -243,7 +234,18 @@ export const collideHBounds = (
       }
     }
 
-    // invatiant: both hbounds overlap shape
+    if (
+      !areRectsIntersecting(
+        transformRect(transform1, curHBounds1.bounds),
+        transformRect(transform2, curHBounds2.bounds),
+        padding
+      )
+    ) {
+      return { collides: false }
+    }
+    // return { collides: true, path1: curPath1, path2: curPath2 }
+
+    // invatiant: both hbounds overlap shape and are intersecting
     if (!curHBounds1.children && !curHBounds2.children) {
       // reached leaves
       return {
@@ -253,16 +255,16 @@ export const collideHBounds = (
       }
     }
 
-    if (curHBounds2.children && !curHBounds1.children) {
+    if (!curHBounds1.children && curHBounds2.children) {
       for (let child of curHBounds2.children) {
-        if (
-          !areRectsIntersecting(
-            transformRect(transform1, hBounds1.bounds),
-            transformRect(compose(transform2, child.transform), child.bounds)
-          )
-        ) {
-          continue
-        }
+        // if (
+        //   !areRectsIntersecting(
+        //     transformRect(transform1, hBounds1.bounds),
+        //     transformRect(compose(transform2, child.transform), child.bounds)
+        //   )
+        // ) {
+        //   continue
+        // }
 
         const childCheckResult = check(
           curHBounds1,
@@ -276,22 +278,24 @@ export const collideHBounds = (
           return childCheckResult
         }
       }
+
+      // return { collides: true }
     }
 
     if (curHBounds1.children && !curHBounds2.children) {
       for (let child of curHBounds1.children) {
-        if (
-          !areRectsIntersecting(
-            transformRect(compose(transform1, child.transform), child.bounds),
-            transformRect(transform2, hBounds2.bounds)
-          )
-        ) {
-          continue
-        }
+        // if (
+        //   !areRectsIntersecting(
+        //     transformRect(compose(transform1, child.transform), child.bounds),
+        //     transformRect(transform2, hBounds2.bounds)
+        //   )
+        // ) {
+        //   continue
+        // }
 
         const childCheckResult = check(
           child,
-          hBounds2,
+          curHBounds2,
           compose(transform1, child.transform),
           transform2
           // [...curPath1, child.bounds],
@@ -301,25 +305,27 @@ export const collideHBounds = (
           return childCheckResult
         }
       }
+
+      // return { collides: true }
     }
 
     if (curHBounds1.children && curHBounds2.children)
       for (let child1 of curHBounds1.children) {
         for (let child2 of curHBounds2.children) {
-          if (
-            !areRectsIntersecting(
-              transformRect(
-                compose(transform1, child1.transform),
-                child1.bounds
-              ),
-              transformRect(
-                compose(transform2, child2.transform),
-                child2.bounds
-              )
-            )
-          ) {
-            continue
-          }
+          // if (
+          //   !areRectsIntersecting(
+          //     transformRect(
+          //       compose(transform1, child1.transform),
+          //       child1.bounds
+          //     ),
+          //     transformRect(
+          //       compose(transform2, child2.transform),
+          //       child2.bounds
+          //     )
+          //   )
+          // ) {
+          //   continue
+          // }
 
           const childCheckResult = check(
             child1,
@@ -334,6 +340,8 @@ export const collideHBounds = (
           }
         }
       }
+
+    // return { collides: true }
 
     return {
       collides: false,
@@ -395,18 +403,18 @@ export const divideBounds = (bounds: Rect): Rect[] => {
   return result
 }
 
-export const areRectsIntersecting = (rect1: Rect, rect2: Rect) => {
-  const minX1 = rect1.x
-  const maxX1 = rect1.x + rect1.w
+export const areRectsIntersecting = (rect1: Rect, rect2: Rect, padding = 0) => {
+  const minX1 = rect1.x - padding
+  const maxX1 = rect1.x + rect1.w + padding
 
-  const minX2 = rect2.x
-  const maxX2 = rect2.x + rect2.w
+  const minX2 = rect2.x - padding
+  const maxX2 = rect2.x + rect2.w + padding
 
-  const minY1 = rect1.y
-  const maxY1 = rect1.y + rect1.h
+  const minY1 = rect1.y - padding
+  const maxY1 = rect1.y + rect1.h + padding
 
-  const minY2 = rect2.y
-  const maxY2 = rect2.y + rect2.h
+  const minY2 = rect2.y - padding
+  const maxY2 = rect2.y + rect2.h + padding
 
   // If one rectangle is above other
   if (minY1 >= maxY2 || minY2 >= maxY1) {
@@ -588,7 +596,7 @@ export const computeHBoundsForPath = (
       w: canvas.width,
     },
     isRectIntersecting,
-    6
+    3
   )
   renderHBounds(ctx, hBounds)
 

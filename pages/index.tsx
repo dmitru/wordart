@@ -15,7 +15,7 @@ const HomePage = () => {
   return (
     <Layout>
       <h1>Hello world!</h1>
-      <Canvas width={1200} height={700} ref={canvasRef} id="scene" />
+      <Canvas width={1200} height={600} ref={canvasRef} id="scene" />
     </Layout>
   )
 }

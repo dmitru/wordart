@@ -33,13 +33,12 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
   const ctx = canvas.getContext('2d')!
 
   const viewBox: Rect = { x: 0, y: 0, w: canvas.width, h: canvas.height }
-  let scene = generateWordArt({ font, viewBox })
+  let scene = generateWordArt({ ctx, font, viewBox })
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
   renderScene(scene, ctx)
 
-  // const tagBg = scene.addRandomTag(300, 300, 1.3, 0.3)
-
-  // const tag = scene.addRandomTag(0, 0)
+  // const tagBg = scene.addTag(scene.words[0], 300, 100, 2, Math.PI / 2)
+  // const tag = scene.addTag(scene.words[0], 0, 0, 1, 0)
 
   // let collides = false
   // canvas.addEventListener('mousemove', (e) => {
@@ -56,7 +55,7 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
   document.addEventListener('keydown', (e) => {
     const key = e.key
     if (key === 'g') {
-      scene = generateWordArt({ font, viewBox })
+      scene = generateWordArt({ ctx, font, viewBox })
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       renderScene(scene, ctx)
     }
@@ -71,110 +70,134 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
     // }
   })
 
-  // let raf = -1
+  let raf = -1
 
-  // const render = () => {
-  //   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-  //   renderScene(scene, ctx)
-  //   raf = requestAnimationFrame(render)
-  // }
+  const render = () => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+    renderScene(scene, ctx)
+    raf = requestAnimationFrame(render)
+  }
 
-  // raf = requestAnimationFrame(render)
+  raf = requestAnimationFrame(render)
 }
 
 export const generateWordArt = (args: {
+  ctx: CanvasRenderingContext2D
   font: opentype.Font
   viewBox: Rect
 }): GeneratedScene => {
-  const { font, viewBox } = args
+  const { font, viewBox, ctx } = args
 
   const scene = new GeneratedScene(font, viewBox)
-  const words = ['you', 'me', 'and', 'everything', 'caught', 'in', 'fire']
+  const words = ['universe', 'love', 'wind', 'earth', 'water', 'fire']
+  // const words = ['II']
   for (let word of words) {
     scene.addWord(word)
   }
 
   const doesCollideOtherTags = (tag: Tag) => {
     for (let t of scene.tags) {
-      if (collideHBounds(t.hBounds, tag.hBounds).collides) {
+      if (collideHBounds(t.hBounds, tag.hBounds, 2).collides) {
         return true
       }
     }
-
     return false
   }
 
-  let nWords = 80
-  for (let i = 0; i < nWords; ++i) {
-    const word = sample(scene.words)!
-    const tag = new Tag(0, word, 0, 0, 1, 0)
+  // let nWords = 0
+  const configs = [
+    { nWords: 5, scale: 0.8 },
+    { nWords: 8, scale: 0.75 },
+    { nWords: 10, scale: 0.6 },
+    { nWords: 20, scale: 0.5 },
+    { nWords: 50, scale: 0.2 },
+    // { nWords: 50, scale: 0.1 },
+    // { nWords: 50, scale: 0.075 },
+    // { nWords: 50, scale: 0.05 },
+  ]
+  for (const config of configs) {
+    let nWords = config.nWords
+    let scale = config.scale
+    // let scale = 0.1 + (1 - (i * 0.9) / nWords) * Math.random()
 
-    const x1 = 10
-    const x2 = viewBox.w - 10
-    const y1 = 10
-    const y2 = viewBox.h - 10
+    for (let i = 0; i < nWords; ++i) {
+      const word = sample(scene.words)!
+      const tag = new Tag(0, word, 0, 0, 1, 0)
 
-    let scale = 0.1 + (1 - (i * 0.9) / nWords) * Math.random()
-    tag.scale = scale
-    const angle = sample([0, Math.PI / 2])!
-    tag.angle = angle
+      const x1 = 10
+      const x2 = viewBox.w - 10
+      const y1 = 10
+      const y2 = viewBox.h - 10
 
-    for (let attempt = 0; attempt < 15; ++attempt) {
-      let cx0 = x1 + Math.random() * (x2 - x1 - tag.bounds.w)
-      let cy0 = y1 + Math.random() * (y2 - y1 - tag.bounds.h)
-
-      let cx = cx0
-      let cy = cy0
-
-      let angle = 0
-      let radius = 10
+      tag.scale = scale
+      tag.angle = sample([0, Math.PI / 2])!
 
       let placed = false
-      let iteration = 0
 
-      while (iteration < 20) {
-        tag.left = cx
-        tag.top = cy
+      for (let attempt = 0; attempt < 20; ++attempt) {
+        let cx0 = x1 + Math.random() * (x2 - x1 - tag.bounds.w)
+        let cy0 =
+          y1 +
+          (y2 - y1) / 2 -
+          tag.bounds.h / 2 +
+          (Math.random() - 0.5) * (y2 - y1 - tag.bounds.h)
 
-        const bounds = tag.bounds
+        let cx = cx0
+        let cy = cy0
 
-        if (
-          !(
-            bounds.x < x1 ||
-            bounds.x + bounds.w > x2 ||
-            bounds.y < y1 ||
-            bounds.y + bounds.h > y2
-          )
-        ) {
-          if (!doesCollideOtherTags(tag)) {
-            const tagAdded = scene.addTag(
-              word,
-              tag.left,
-              tag.top,
-              tag.scale,
-              tag.angle
+        let angle = Math.random() > 0.5 ? 0 : Math.PI
+        let radius = viewBox.h * (0.1 + Math.random() * 0.2)
+        let iteration = 0
+
+        while (iteration < 20) {
+          tag.left = cx
+          tag.top = cy
+
+          const bounds = tag.bounds
+
+          if (
+            !(
+              bounds.x < x1 ||
+              bounds.x + bounds.w > x2 ||
+              bounds.y < y1 ||
+              bounds.y + bounds.h > y2
             )
-            tagAdded._hBounds = tag._hBounds
-            console.log('attempt: ', attempt, 'iteration: ', iteration)
-            placed = true
-            break
+          ) {
+            if (!doesCollideOtherTags(tag)) {
+              const tagAdded = scene.addTag(
+                word,
+                tag.left,
+                tag.top,
+                tag.scale,
+                tag.angle
+              )
+              tagAdded._hBounds = tag._hBounds
+
+              // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+              // renderScene(scene, ctx)
+              // console.screenshot(ctx.canvas, 0.4)
+
+              console.log('attempt: ', attempt, 'iteration: ', iteration)
+              placed = true
+              break
+            }
           }
+
+          cx = cx0 + Math.cos(angle) * radius
+          cy = cx0 + Math.sin(angle) * radius
+
+          radius += (0.1 * viewBox.h) / 10
+          angle += (2 * Math.PI) / 10
+
+          iteration += 1
         }
 
-        cx = cx0 + Math.cos(angle) * radius
-        cy = cx0 + Math.sin(angle) * radius
+        if (placed) {
+          break
+        }
 
-        radius += 5
-        angle += Math.PI / 10
-
-        iteration += 1
+        // scale = Math.max(0.1, scale / 1.2)
       }
-
-      if (placed) {
-        break
-      }
-
-      scale /= 1.5
     }
   }
 
@@ -305,7 +328,7 @@ export class Tag {
   set scale(scale: number) {
     this._scale = scale
     this._transform = null
-    // this._hBounds = null
+    this._hBounds = null
   }
 
   get angle() {
@@ -333,6 +356,7 @@ export class Tag {
       ...this._hBounds,
       transform: tm.compose(
         tm.translate(this._left, this._top),
+        // tm.scale(this._scale),
         this._hBounds.transform
       ),
     }
@@ -397,10 +421,13 @@ export class Word {
 }
 
 const drawHBounds = (ctx: CanvasRenderingContext2D, hBounds: HBounds) => {
-  const drawHBoundsImpl = (hBounds: HBounds) => {
+  const drawHBoundsImpl = (hBounds: HBounds, level = 0) => {
+    if (level > 5) {
+      return
+    }
     ctx.save()
-    ctx.lineWidth = 1
-    ctx.strokeStyle = hBounds.children ? 'red' : 'yellow'
+    ctx.lineWidth = 0.5
+    ctx.strokeStyle = hBounds.overlapsShape ? 'red' : 'yellow'
 
     ctx.transform(
       hBounds.transform.a,
@@ -411,17 +438,17 @@ const drawHBounds = (ctx: CanvasRenderingContext2D, hBounds: HBounds) => {
       hBounds.transform.f
     )
 
-    if (hBounds.overlapsShape) {
-      ctx.strokeRect(
-        hBounds.bounds.x,
-        hBounds.bounds.y,
-        hBounds.bounds.w,
-        hBounds.bounds.h
-      )
-    }
+    // if (hBounds.overlapsShape) {
+    ctx.strokeRect(
+      hBounds.bounds.x,
+      hBounds.bounds.y,
+      hBounds.bounds.w,
+      hBounds.bounds.h
+    )
+    // }
 
     if (hBounds.children) {
-      hBounds.children.forEach((child) => drawHBoundsImpl(child))
+      hBounds.children.forEach((child) => drawHBoundsImpl(child, level + 1))
     }
 
     ctx.restore()
@@ -458,14 +485,6 @@ export class Symbol {
       angle,
       scaleFactor
     ).hBounds
-  }
-
-  get hBounds() {
-    if (!this._hBounds) {
-      this._hBounds = this.computeHBounds()
-    }
-
-    return this._hBounds
   }
 }
 
