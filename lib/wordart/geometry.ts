@@ -547,15 +547,15 @@ export const computeHBoundsForPath = (
   }
 
   // Visualize sample points
-  for (let x = 0; x < imageData.width; x += 5) {
-    for (let y = 0; y < imageData.height; y += 5) {
-      const intersecting = isPointIntersecting(x, y)
-      if (intersecting) {
-        ctx.fillStyle = 'yellow'
-        ctx.fillRect(x, y, 2, 2)
-      }
-    }
-  }
+  // for (let x = 0; x < imageData.width; x += 5) {
+  //   for (let y = 0; y < imageData.height; y += 5) {
+  //     const intersecting = isPointIntersecting(x, y)
+  //     if (intersecting) {
+  //       ctx.fillStyle = 'yellow'
+  //       ctx.fillRect(x, y, 2, 2)
+  //     }
+  //   }
+  // }
 
   const hBounds = computeHBounds(
     {

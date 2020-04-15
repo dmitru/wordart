@@ -35,9 +35,7 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
   const scene = generateWordArt({ font, viewBox })
   console.log(scene)
 
-  for (let symbol of scene.symbols.values()) {
-    console.log(symbol.hBounds)
-  }
+  const tagBg = scene.addRandomTag(300, 300, 1.3, 0.3)
 
   const tag = scene.addRandomTag(0, 0)
 
@@ -118,14 +116,14 @@ export class GeneratedScene {
     }
   }
 
-  addRandomTag = (x: number, y: number, scale = 1) => {
+  addRandomTag = (x: number, y: number, scale = 1, angle = 0) => {
     if (this.words.length === 0) {
       throw new Error('No words added')
     }
 
     const id = (this.nextTagId += 1)
     const word = sample(this.words)!
-    const tag = new Tag(id, word, x, y, scale)
+    const tag = new Tag(id, word, x, y, scale, angle)
     this.tags.push(tag)
 
     return tag
@@ -147,12 +145,20 @@ export class Tag {
   _angle: number = 0
   _scale: number = 1
 
-  constructor(id: TagId, word: Word, x: number, y: number, scale = 1) {
+  constructor(
+    id: TagId,
+    word: Word,
+    x: number,
+    y: number,
+    scale = 1,
+    angle = 0
+  ) {
     this.id = id
     this.word = word
     this._left = x
     this._top = y
     this._scale = scale
+    this._angle = angle
   }
 
   get transform() {
@@ -169,13 +175,11 @@ export class Tag {
   set left(left: number) {
     this._left = left
     this._transform = null
-    // this._hBounds = null
   }
 
   set top(top: number) {
     this._top = top
     this._transform = null
-    // this._hBounds = null
   }
 
   set scale(scale: number) {
@@ -236,10 +240,6 @@ export class Tag {
     const wordHBounds = mergeHBounds(symbolHBounds)
     return wordHBounds
   }
-
-  // getHBox = (): HBounds => {
-  //   return this.word.hBounds
-  // }
 }
 
 export class Word {
@@ -249,8 +249,6 @@ export class Word {
   symbols: Symbol[]
   symbolOffsets: number[]
   fontSize: number
-
-  private _hBounds: HBounds | null = null
 
   constructor(id: WordId, text: string, font: Font, fontSize = 200) {
     this.id = id
@@ -271,50 +269,6 @@ export class Word {
       ctx.translate(this.symbolOffsets[index], 0)
     }
     ctx.restore()
-  }
-
-  get hBounds() {
-    if (!this._hBounds) {
-      let currentOffset = 0
-      const symbolHBounds = this.symbols.map((s, index) => {
-        const symbolHBounds = { ...s.hBounds }
-        symbolHBounds.transform = compose(
-          translate(currentOffset, 0),
-          symbolHBounds.transform
-        )
-        currentOffset += this.symbolOffsets[index]
-        return symbolHBounds
-      })
-      this._hBounds = mergeHBounds(symbolHBounds)
-    }
-
-    return this._hBounds
-  }
-
-  computeHBounds = (angle = 0, scaleFactor = 1) => {
-    let currentOffset = 0
-
-    const symbolHBounds = this.symbols.map((symbol, index) => {
-      const symbolHBounds = symbol.computeHBounds(angle, scaleFactor)
-
-      symbolHBounds.transform = compose(
-        scale(scaleFactor),
-        rotate(angle),
-        translate(currentOffset, 0),
-        rotate(-angle),
-        symbolHBounds.transform,
-        scale(1 / scaleFactor)
-      )
-
-      currentOffset += this.symbolOffsets[index]
-      return symbolHBounds
-    })
-
-    return mergeHBounds(symbolHBounds)
-  }
-
-  get bounds() {
-    return this.hBounds.bounds
   }
 }
 
@@ -372,18 +326,11 @@ export class Symbol {
   }
 
   computeHBounds(angle = 0, scaleFactor = 1): HBounds {
-    const hBounds = computeHBoundsForPath(
+    return computeHBoundsForPath(
       this.glyph.getPath(0, 0, this.fontSize),
       angle,
       scaleFactor
-      // compose(rotate(angle), scale(scaleFactor))
     ).hBounds
-    // hBounds.transform = compose(
-    //   rotate(angle),
-    //   hBounds.transform,
-    //   scale(scaleFactor)
-    // )
-    return hBounds
   }
 
   get hBounds() {
