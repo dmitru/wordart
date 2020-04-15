@@ -229,6 +229,8 @@ export const collideHBounds = (
   const check = (
     curHBounds1: HBounds,
     curHBounds2: HBounds,
+    transform1: Matrix,
+    transform2: Matrix,
     curPath1: Rect[],
     curPath2: Rect[]
   ): HBoundsCollisionInfo => {
@@ -255,17 +257,21 @@ export const collideHBounds = (
       for (let child of curHBounds2.children) {
         if (
           !areRectsIntersecting(
-            transformRect(hBounds1.transform, hBounds1.bounds),
-            transformRect(hBounds2.transform, child.bounds)
+            transformRect(transform1, hBounds1.bounds),
+            transformRect(compose(transform2, child.transform), child.bounds)
           )
         ) {
           continue
         }
 
-        const childCheckResult = check(curHBounds1, child, curPath1, [
-          ...curPath2,
-          child.bounds,
-        ])
+        const childCheckResult = check(
+          curHBounds1,
+          child,
+          transform1,
+          compose(transform2, child.transform),
+          curPath1,
+          [...curPath2, child.bounds]
+        )
         if (childCheckResult.collides) {
           return childCheckResult
         }
@@ -276,8 +282,8 @@ export const collideHBounds = (
       for (let child of curHBounds1.children) {
         if (
           !areRectsIntersecting(
-            transformRect(hBounds1.transform, child.bounds),
-            transformRect(hBounds2.transform, hBounds2.bounds)
+            transformRect(compose(transform1, child.transform), child.bounds),
+            transformRect(transform2, hBounds2.bounds)
           )
         ) {
           continue
@@ -286,6 +292,8 @@ export const collideHBounds = (
         const childCheckResult = check(
           child,
           hBounds2,
+          compose(transform1, child.transform),
+          transform2,
           [...curPath1, child.bounds],
           curPath2
         )
@@ -300,8 +308,14 @@ export const collideHBounds = (
         for (let child2 of curHBounds2.children) {
           if (
             !areRectsIntersecting(
-              transformRect(hBounds1.transform, child1.bounds),
-              transformRect(hBounds2.transform, child2.bounds)
+              transformRect(
+                compose(transform1, child1.transform),
+                child1.bounds
+              ),
+              transformRect(
+                compose(transform2, child2.transform),
+                child2.bounds
+              )
             )
           ) {
             continue
@@ -310,6 +324,8 @@ export const collideHBounds = (
           const childCheckResult = check(
             child1,
             child2,
+            compose(transform1, child1.transform),
+            compose(transform2, child2.transform),
             [...curPath1, child1.bounds],
             [...curPath2, child2.bounds]
           )
@@ -327,7 +343,14 @@ export const collideHBounds = (
   }
 
   const t1 = performance.now()
-  const result = check(hBounds1, hBounds2, [hBounds1.bounds], [hBounds2.bounds])
+  const result = check(
+    hBounds1,
+    hBounds2,
+    hBounds1.transform,
+    hBounds2.transform,
+    [hBounds1.bounds],
+    [hBounds2.bounds]
+  )
   const t2 = performance.now()
   // console.debug(`collideHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`)
   return result

@@ -19,6 +19,7 @@ import {
   mergeHBounds,
   computeHBoundsForPath,
   transformRect,
+  collideHBounds,
 } from 'lib/wordart/geometry'
 import { loadFont } from 'lib/wordart/fonts'
 import { sample } from 'lodash'
@@ -39,11 +40,16 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
 
   const tag = scene.addRandomTag(0, 0)
 
+  let collides = false
   canvas.addEventListener('mousemove', (e) => {
     const x = e.offsetX
     const y = e.offsetY
     tag.left = x
     tag.top = y
+
+    collides = collideHBounds(tag.hBounds, tagBg.hBounds).collides
+
+    tag.fillStyle = collides ? 'green' : 'black'
   })
 
   document.addEventListener('keydown', (e) => {
@@ -68,12 +74,6 @@ export const scratch = async (canvas: HTMLCanvasElement) => {
   }
 
   raf = requestAnimationFrame(render)
-
-  // const word = scene.words[4]
-
-  // ctx.translate(100, 200)
-  // word.draw(ctx)
-  // renderHBounds(ctx, word.hBounds)
 }
 
 const renderScene = (scene: GeneratedScene, ctx: CanvasRenderingContext2D) => {
@@ -134,6 +134,8 @@ export class Tag {
   word: Word
   _transform: Matrix | null = null
   id: number
+
+  fillStyle: string = 'black'
 
   private _hBounds: HBounds | null = null
 
@@ -197,6 +199,7 @@ export class Tag {
   draw = (ctx: CanvasRenderingContext2D) => {
     ctx.save()
     ctx.setTransform(this.transform)
+    ctx.fillStyle = this.fillStyle
     this.word.draw(ctx)
     ctx.restore()
   }
@@ -322,7 +325,10 @@ export class Symbol {
   }
 
   draw = (ctx: CanvasRenderingContext2D) => {
-    this.glyph.getPath(0, 0, this.fontSize).draw(ctx)
+    const path = this.glyph.getPath(0, 0, this.fontSize)
+    // @ts-ignore
+    path.fill = ctx.fillStyle
+    path.draw(ctx)
   }
 
   computeHBounds(angle = 0, scaleFactor = 1): HBounds {
@@ -362,7 +368,7 @@ export const generateWordArt = (args: {
   const { font, viewBox } = args
 
   const scene = new GeneratedScene(font, viewBox)
-  const words = ['you', 'gre', 'awes', 'love', 'mea']
+  const words = ['y', 'g']
   for (let word of words) {
     scene.addWord(word)
   }
