@@ -174,12 +174,16 @@ export const generateWordArt = (args: {
       let cx0 = lastSucceeded
         ? lastSucceeded.x
         : x1 + Math.random() * (x2 - x1 - tag.bounds.w)
+
       let cy0 = lastSucceeded
         ? lastSucceeded.y
         : y1 +
           (y2 - y1) / 2 -
           tag.bounds.h / 2 +
           (Math.random() - 0.5) * (y2 - y1 - tag.bounds.h)
+
+      // const cx0 = (x2 - x1) / 2 - tag.bounds.w
+      // const cy0 = (y2 - y1) / 2 - tag.bounds.h / 2
 
       let cx = cx0
       let cy = cy0
