@@ -23,17 +23,22 @@
   "homepage": "https://gitlab.com/dmitriy.borodiy/online-tuner#readme",
   "dependencies": {
     "@mathigon/fermat": "^0.3.6",
+    "@timohausmann/quadtree-js": "^1.2.1",
     "@types/lodash": "^4.14.149",
+    "chroma-js": "^2.1.0",
     "fabric": "^3.6.3",
     "lodash": "^4.17.15",
     "next": "^9.3.4",
     "opentype.js": "^1.1.0",
+    "quadtree-lib": "^1.0.9",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "styled-components": "^5.1.0",
+    "superquad": "^1.2.1",
     "transformation-matrix": "^2.3.0"
   },
   "devDependencies": {
+    "@types/chroma-js": "^2.0.0",
     "@types/fabric": "^3.6.2",
     "@types/node": "^13.11.1",
     "@types/opentype.js": "^0.7.2",

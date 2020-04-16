@@ -8,14 +8,13 @@ const HomePage = () => {
 
   useEffect(() => {
     if (canvasRef.current) {
-      scratch(canvasRef.current)
+      return scratch(canvasRef.current)
     }
   }, [canvasRef.current])
 
   return (
     <Layout>
-      <h1>Hello world!</h1>
-      <Canvas width={1200} height={600} ref={canvasRef} id="scene" />
+      <Canvas width={800} height={600} ref={canvasRef} id="scene" />
     </Layout>
   )
 }

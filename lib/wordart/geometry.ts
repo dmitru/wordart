@@ -7,11 +7,32 @@ const {
   identity,
   translate,
   applyToPoints,
-  compose,
-  inverse,
+
   rotate,
   scale,
 } = tm
+
+export const multiply = (m1: Matrix, m2: Matrix): Matrix => {
+  return {
+    a: m1.a * m2.a + m1.c * m2.b,
+    c: m1.a * m2.c + m1.c * m2.d,
+    e: m1.a * m2.e + m1.c * m2.f + m1.e,
+    b: m1.b * m2.a + m1.d * m2.b,
+    d: m1.b * m2.c + m1.d * m2.d,
+    f: m1.b * m2.e + m1.d * m2.f + m1.f,
+  }
+}
+
+export const multiplyNoSkew = (m1: Matrix, m2: Matrix): Matrix => {
+  return {
+    a: m1.a * m2.a,
+    c: 0,
+    e: m1.a * m2.e + m1.e,
+    b: 0,
+    d: m1.d * m2.d,
+    f: m1.d * m2.f + m1.f,
+  }
+}
 
 export type Transform = {
   x: number
@@ -94,10 +115,10 @@ export const computeHBounds = (
     }
   }
 
-  const t1 = performance.now()
+  // const t1 = performance.now()
   const result = computeHBoundsImpl(bounds, 0)
-  const t2 = performance.now()
-  console.debug('computeHierarchicalBounds')
+  // const t2 = performance.now()
+  // console.debug('computeHierarchicalBounds')
   // console.debug(`computeHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`)
 
   return result
@@ -195,9 +216,9 @@ export const collidePointAndHBounds = (
     return { collides: false, path: [...curPath, curHBounds.bounds] }
   }
 
-  const t1 = performance.now()
+  // const t1 = performance.now()
   const result = check(hBounds, [hBounds.bounds])
-  const t2 = performance.now()
+  // const t2 = performance.now()
   // console.debug(
   //   `collidePointAndHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`
   // )
@@ -209,6 +230,8 @@ export type HBoundsCollisionInfo = {
   path1?: Rect[]
   path2?: Rect[]
 }
+
+const id = identity()
 
 export const collideHBounds = (
   hBounds1: HBounds,
@@ -249,11 +272,15 @@ export const collideHBounds = (
 
     if (!curHBounds1.children && curHBounds2.children) {
       for (let child of curHBounds2.children) {
+        const child2Transform = child.transform
+          ? multiplyNoSkew(transform2, child.transform)
+          : transform2
+
         const childCheckResult = check(
           curHBounds1,
           child,
           transform1,
-          child.transform ? compose(transform2, child.transform) : transform2
+          child2Transform
         )
         if (childCheckResult.collides) {
           return childCheckResult
@@ -263,10 +290,14 @@ export const collideHBounds = (
 
     if (curHBounds1.children && !curHBounds2.children) {
       for (let child of curHBounds1.children) {
+        const child1Transform = child.transform
+          ? multiplyNoSkew(transform1, child.transform)
+          : transform1
+
         const childCheckResult = check(
           child,
           curHBounds2,
-          child.transform ? compose(transform1, child.transform) : transform1,
+          child1Transform,
           transform2
         )
         if (childCheckResult.collides) {
@@ -275,24 +306,34 @@ export const collideHBounds = (
       }
     }
 
-    if (curHBounds1.children && curHBounds2.children)
-      for (let child1 of curHBounds1.children) {
-        for (let child2 of curHBounds2.children) {
+    if (curHBounds1.children && curHBounds2.children) {
+      const ch1Cnt = curHBounds1.children.length
+      const ch2Cnt = curHBounds2.children.length
+
+      for (let i1 = 0; i1 < ch1Cnt; ++i1) {
+        const child1 = curHBounds1.children[i1]
+        const child1Transform = child1.transform
+          ? multiplyNoSkew(transform1, child1.transform)
+          : transform1
+
+        for (let i2 = 0; i2 < ch2Cnt; ++i2) {
+          const child2 = curHBounds2.children[i2]
+          const child2Transform = child2.transform
+            ? multiplyNoSkew(transform2, child2.transform)
+            : transform2
+
           const childCheckResult = check(
             child1,
             child2,
-            child1.transform
-              ? compose(transform1, child1.transform)
-              : transform1,
-            child2.transform
-              ? compose(transform2, child2.transform)
-              : transform2
+            child1Transform,
+            child2Transform
           )
           if (childCheckResult.collides) {
             return childCheckResult
           }
         }
       }
+    }
 
     return {
       collides: false,
@@ -475,13 +516,12 @@ export const computeHBoundsForPath = (
   }
 
   const pathAaab = aabbForRect(
-    compose(rotate(angle), scale(scaleFactor)),
+    multiply(rotate(angle), scale(scaleFactor)),
     pathBboxRect
   )
 
-  const pathAaabTransform = compose(
-    translate(-pathAaab.x, -pathAaab.y),
-    rotate(angle),
+  const pathAaabTransform = multiply(
+    multiply(translate(-pathAaab.x, -pathAaab.y), rotate(angle)),
     scale(scaleFactor)
   )
 
@@ -503,7 +543,7 @@ export const computeHBoundsForPath = (
 
   const isRectIntersecting = (
     bounds: Rect,
-    dx = 2
+    dx = 1
   ): 'full' | 'partial' | 'none' => {
     const maxX = bounds.x + bounds.w
     const maxY = bounds.y + bounds.h
@@ -547,7 +587,7 @@ export const computeHBoundsForPath = (
       w: canvas.width,
     },
     isRectIntersecting,
-    4
+    6
   )
   // renderHBounds(ctx, hBounds)
 
