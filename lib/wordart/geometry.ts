@@ -231,47 +231,58 @@ export type HBoundsCollisionInfo = {
   path2?: Rect[]
 }
 
-const id = identity()
-
 export const collideHBounds = (
   hBounds1: HBounds,
   hBounds2: HBounds,
-  padding = 0
-): HBoundsCollisionInfo => {
+  padding1 = 0,
+  padding2 = 0,
+  maxLevel1: number | undefined = undefined,
+  maxLevel2: number | undefined = undefined,
+  minSize: number | undefined = undefined
+): boolean => {
   const check = (
     curHBounds1: HBounds,
     curHBounds2: HBounds,
     transform1: Matrix,
-    transform2: Matrix
-  ): HBoundsCollisionInfo => {
+    transform2: Matrix,
+    level1: number,
+    level2: number
+  ): boolean => {
     if (!curHBounds1.overlapsShape || !curHBounds2.overlapsShape) {
-      return {
-        collides: false,
-        // path1: [...curPath1, curHBounds1.bounds],
-        // path2: [...curPath2, curHBounds2.bounds],
-      }
+      return false
     }
 
+    const bounds1 = curHBounds1.bounds
+    const bounds2 = curHBounds2.bounds
+
+    const hasChildren1 =
+      curHBounds1.children &&
+      (!maxLevel1 || level1 <= maxLevel1) &&
+      (minSize == null || Math.max(bounds1.w, bounds1.h) >= minSize)
+    const hasChildren2 =
+      curHBounds2.children &&
+      (!maxLevel2 || level2 <= maxLevel2) &&
+      (minSize == null || Math.max(bounds2.w, bounds2.h) >= minSize)
+
     // invatiant: both hbounds overlap shape
-    if (!curHBounds1.children && !curHBounds2.children) {
+    if (!hasChildren1 && !hasChildren2) {
       // reached leaves
-      return {
-        collides: true,
-      }
+      return true
     }
 
     if (
       !areRectsIntersecting(
-        transformRect(transform1, curHBounds1.bounds),
-        transformRect(transform2, curHBounds2.bounds),
-        padding
+        transformRect(transform1, bounds1),
+        transformRect(transform2, bounds2),
+        padding1,
+        padding2
       )
     ) {
-      return { collides: false }
+      return false
     }
 
-    if (!curHBounds1.children && curHBounds2.children) {
-      for (let child of curHBounds2.children) {
+    if (!hasChildren1 && hasChildren2) {
+      for (let child of curHBounds2.children!) {
         const child2Transform = child.transform
           ? multiplyNoSkew(transform2, child.transform)
           : transform2
@@ -280,16 +291,18 @@ export const collideHBounds = (
           curHBounds1,
           child,
           transform1,
-          child2Transform
+          child2Transform,
+          level1,
+          level2 + 1
         )
-        if (childCheckResult.collides) {
-          return childCheckResult
+        if (childCheckResult) {
+          return true
         }
       }
     }
 
-    if (curHBounds1.children && !curHBounds2.children) {
-      for (let child of curHBounds1.children) {
+    if (hasChildren1 && !hasChildren2) {
+      for (let child of curHBounds1.children!) {
         const child1Transform = child.transform
           ? multiplyNoSkew(transform1, child.transform)
           : transform1
@@ -298,26 +311,28 @@ export const collideHBounds = (
           child,
           curHBounds2,
           child1Transform,
-          transform2
+          transform2,
+          level1 + 1,
+          level2
         )
-        if (childCheckResult.collides) {
-          return childCheckResult
+        if (childCheckResult) {
+          return true
         }
       }
     }
 
-    if (curHBounds1.children && curHBounds2.children) {
-      const ch1Cnt = curHBounds1.children.length
-      const ch2Cnt = curHBounds2.children.length
+    if (hasChildren1 && hasChildren2) {
+      const ch1Cnt = curHBounds1.children!.length
+      const ch2Cnt = curHBounds2.children!.length
 
       for (let i1 = 0; i1 < ch1Cnt; ++i1) {
-        const child1 = curHBounds1.children[i1]
+        const child1 = curHBounds1.children![i1]
         const child1Transform = child1.transform
           ? multiplyNoSkew(transform1, child1.transform)
           : transform1
 
         for (let i2 = 0; i2 < ch2Cnt; ++i2) {
-          const child2 = curHBounds2.children[i2]
+          const child2 = curHBounds2.children![i2]
           const child2Transform = child2.transform
             ? multiplyNoSkew(transform2, child2.transform)
             : transform2
@@ -326,28 +341,30 @@ export const collideHBounds = (
             child1,
             child2,
             child1Transform,
-            child2Transform
+            child2Transform,
+            level1 + 1,
+            level2 + 1
           )
-          if (childCheckResult.collides) {
-            return childCheckResult
+          if (childCheckResult) {
+            return true
           }
         }
       }
     }
 
-    return {
-      collides: false,
-    }
+    return false
   }
 
-  const t1 = performance.now()
+  // const t1 = performance.now()
   const result = check(
     hBounds1,
     hBounds2,
     hBounds1.transform || identity(),
-    hBounds2.transform || identity()
+    hBounds2.transform || identity(),
+    1,
+    1
   )
-  const t2 = performance.now()
+  // const t2 = performance.now()
   // console.debug(`collideHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`)
   return result
 }
@@ -391,18 +408,23 @@ export const divideBounds = (bounds: Rect): Rect[] => {
   return result
 }
 
-export const areRectsIntersecting = (rect1: Rect, rect2: Rect, padding = 0) => {
-  const minX1 = rect1.x - padding
-  const maxX1 = rect1.x + rect1.w + padding
+export const areRectsIntersecting = (
+  rect1: Rect,
+  rect2: Rect,
+  padding1 = 0,
+  padding2 = 0
+) => {
+  const minX1 = rect1.x - padding1
+  const maxX1 = rect1.x + rect1.w + padding1
 
-  const minX2 = rect2.x - padding
-  const maxX2 = rect2.x + rect2.w + padding
+  const minX2 = rect2.x - padding2
+  const maxX2 = rect2.x + rect2.w + padding2
 
-  const minY1 = rect1.y - padding
-  const maxY1 = rect1.y + rect1.h + padding
+  const minY1 = rect1.y - padding1
+  const maxY1 = rect1.y + rect1.h + padding1
 
-  const minY2 = rect2.y - padding
-  const maxY2 = rect2.y + rect2.h + padding
+  const minY2 = rect2.y - padding2
+  const maxY2 = rect2.y + rect2.h + padding2
 
   // If one rectangle is above other
   if (minY1 >= maxY2 || minY2 >= maxY1) {
@@ -587,7 +609,7 @@ export const computeHBoundsForPath = (
       w: canvas.width,
     },
     isRectIntersecting,
-    6
+    10
   )
   // renderHBounds(ctx, hBounds)
 

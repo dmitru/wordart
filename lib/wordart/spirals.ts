@@ -1,8 +1,9 @@
-export function archimedeanSpiral(width: number, height: number) {
-  const e = width / height
-
+export function archimedeanSpiral(nRotations = 10) {
   return function (t: number) {
-    return { x: e * (t * 0.1) * Math.cos(t), y: t * 0.1 * Math.sin(t) }
+    return {
+      x: t * Math.cos(t * (Math.PI * 2 * nRotations)),
+      y: t * Math.sin(t * Math.PI * 2 * nRotations),
+    }
   }
 }
 
