@@ -30,9 +30,13 @@ import { loadFont } from 'lib/wordart/fonts'
 import { sample } from 'lodash'
 import Bounds from 'superquad/lib/bounds/Bounds'
 
+const fontName = 'mountains-of-christmas_bold.ttf'
+const fontName2 = 'mail-ray-stuff.ttf'
+const fontName3 = 'Verona-Xlight.ttf'
+
 let font: Font
 if (typeof window !== 'undefined') {
-  loadFont('/fonts/mail-ray-stuff.ttf').then((f) => {
+  loadFont(`/fonts/${fontName}`).then((f) => {
     font = f
   })
 }
@@ -113,19 +117,18 @@ export const generateWordArt = (args: {
     'word',
     'cloud',
     'art',
-    // 'universe',
-    // 'love',
-    // 'wind',
-    // 'earth',
-    // 'art',
-    // 'water',
-    // 'fire',
-    // 'words',
-    // 'many',
-    // 'emotion',
-    // 'bliss',
-    // 'lots',
-    // 'fun',
+    'universe',
+    'love',
+    'wind',
+    'earth',
+    'water',
+    'fire',
+    'words',
+    'many',
+    'emotion',
+    'bliss',
+    'lots',
+    'fun',
   ]
   // const words = ['II']
   for (let word of words) {
@@ -143,12 +146,12 @@ export const generateWordArt = (args: {
 
   protoTags.forEach((tag) => console.log(tag.bounds))
 
-  const colors = chroma
-    .scale(['#fafa6e', '#2A4858'])
-    .mode('lch')
-    .colors(10)
-    .slice(3)
-  // const colors = ['#ed390f']
+  // const colors = chroma
+  //   .scale(['#fafa6e', '#2A4858'])
+  //   .mode('lch')
+  //   .colors(10)
+  //   .slice(3)
+  const colors = ['#000']
 
   let lastSucceeded: Point | null = null
 
@@ -160,12 +163,12 @@ export const generateWordArt = (args: {
     enableSticky = false
   ) => {
     const tag = sample(protoTags)!
-    const maxIterations = 60
+    const maxIterations = 5
     const dtMin = 0.0002
     const dtMax = 0.0005
     // const getDt = (nIter: number) => dtMax - (nIter / 1000) * (dtMax - dtMin)
     const getDt = (nIter: number) =>
-      5.5 * (dtMax - (nIter / maxIterations) * (dtMax - dtMin))
+      20.5 * (dtMax - (nIter / maxIterations) * (dtMax - dtMin))
     const getSpiralPoint = archimedeanSpiral(30)
 
     const x1 = 30
@@ -173,7 +176,7 @@ export const generateWordArt = (args: {
     const y1 = 30
     const y2 = viewBox.h - 30
 
-    tag.scale = scale * (1 + 0.3 * Math.random())
+    tag.scale = scale * (1 + 0.4 * 2 * (Math.random() - 0.5))
     // tag.angle = sample([0, Math.PI / 2])!
 
     let placed = false
@@ -295,63 +298,68 @@ export const generateWordArt = (args: {
   }
 
   const countFactor = 2
-  const scaleFactor = 1.4
+  const scaleFactor = 1.2
 
   const configs = [
-    { scale: 0.23, count: 8, maxAttempts: 50, padding: 30 },
+    { scale: 0.65, count: 1, maxAttempts: 50, padding: 30 },
+    { scale: 0.5, count: 3, maxAttempts: 50, padding: 20 },
+    { scale: 0.3, count: 6, maxAttempts: 50, padding: 20 },
+    { scale: 0.23, count: 16, maxAttempts: 50, padding: 30 },
     // { scale: 0.6, count: 8, maxAttempts: 30 },
     // { scale: 0.5, count: 10, maxAttempts: 30 },
     // { scale: 0.45, count: 30, maxAttempts: 10 },
     // { scale: 0.4, count: 60, maxAttempts: 10 },
     // { scale: 0.35, count: 90, maxAttempts: 10 },
     // { scale: 0.3, count: 90, maxAttempts: 10 },
-    { scale: 0.1, count: 30, maxFailsInRow: 5, maxAttempts: 20, padding: 20 },
-    { scale: 0.07, count: 30, maxFailsInRow: 5, maxAttempts: 20, padding: 3 },
-    { scale: 0.06, count: 70, maxFailsInRow: 5, maxAttempts: 20, padding: 3 },
+    { scale: 0.1, count: 120, maxFailsInRow: 5, maxAttempts: 30, padding: 20 },
+    { scale: 0.07, count: 120, maxFailsInRow: 5, maxAttempts: 20, padding: 3 },
+    { scale: 0.06, count: 120, maxFailsInRow: 5, maxAttempts: 20, padding: 3 },
     // { scale: 0.07, count: 300, maxAttempts: 3, padding: 0 },
     {
       scale: 0.05,
-      count: 120,
-      maxFailsInRow: 10,
-      maxAttempts: 5,
+      count: 220,
+      maxFailsInRow: 25,
+      maxAttempts: 16,
       padding: 2,
-    },
-    {
-      scale: 0.038,
-      count: 130,
-      maxFailsInRow: 10,
-      maxAttempts: 5,
-      padding: 1,
-    },
-    {
-      scale: 0.03,
-      count: 200,
-      maxAttempts: 5,
-      maxFailsInRow: 20,
-      padding: 1,
       enableSticky: true,
     },
     {
-      scale: 0.02,
-      count: 300,
-      maxAttempts: 5,
+      scale: 0.038,
+      count: 230,
+      maxFailsInRow: 30,
+      maxAttempts: 16,
+      padding: 2,
+      enableSticky: true,
+    },
+    {
+      scale: 0.03,
+      count: 400,
+      maxAttempts: 10,
       maxFailsInRow: 20,
+      padding: 2,
+      enableSticky: true,
+    },
+    {
+      scale: 0.023,
+      count: 400,
+      maxAttempts: 20,
+      maxFailsInRow: 20,
+      padding: 2,
+      enableSticky: true,
+    },
+    {
+      scale: 0.016,
+      count: 400,
+      maxAttempts: 20,
+      maxFailsInRow: 10,
       padding: 1,
       enableSticky: true,
     },
     {
       scale: 0.013,
-      count: 600,
-      maxAttempts: 5,
-      maxFailsInRow: 15,
-      padding: 1,
-      enableSticky: true,
-    },
-    {
-      scale: 0.01,
       count: 400,
-      maxAttempts: 5,
-      maxFailsInRow: 20,
+      maxAttempts: 20,
+      maxFailsInRow: 10,
       padding: 1,
       enableSticky: true,
     },
@@ -368,7 +376,7 @@ export const generateWordArt = (args: {
         scaleFactor * config.scale,
         false,
         config.maxAttempts,
-        config.padding,
+        scaleFactor * config.padding,
         config.enableSticky || false
       )
         ? 1
@@ -544,6 +552,8 @@ export const generateWordArt = (args: {
 }
 
 const renderScene = (scene: GeneratedScene, ctx: CanvasRenderingContext2D) => {
+  // @ts-ignore
+  window['ctx'] = ctx
   ctx.save()
   for (let tag of scene.tags) {
     // ctx.fillStyle = '#f002'
@@ -595,7 +605,7 @@ export class GeneratedScene {
   checkCollision = (tag: Tag, pad = 0): boolean => {
     const getTagPadding = (tag: Tag) => pad
     const getTagMaxLevel = (tag: Tag) =>
-      tag.scale >= 0.2 ? 8 : tag.scale > 0.05 ? 4 : tag.scale > 0.03 ? 3 : 2
+      tag.scale >= 0.2 ? 10 : tag.scale > 0.05 ? 6 : tag.scale > 0.03 ? 3 : 2
 
     const padding = getTagPadding(tag)
     const candidateTags = this.quad.colliding({
@@ -605,7 +615,7 @@ export class GeneratedScene {
       height: tag.bounds.h + 2 * padding,
     })
 
-    const minSize = 4
+    const minSize = 2
 
     if (this._lastTagChecked === tag && this._lastTagCollided) {
       if (
@@ -768,6 +778,10 @@ export class Tag {
     ctx.restore()
   }
 
+  drawHBounds = (ctx: CanvasRenderingContext2D) => {
+    drawHBounds(ctx, this.hBounds)
+  }
+
   get hBounds(): HBounds {
     if (!this._hBounds) {
       this._hBounds = this._computeHBounds()
@@ -836,7 +850,7 @@ export class Word {
   symbolOffsets: number[]
   fontSize: number
 
-  constructor(id: WordId, text: string, font: Font, fontSize = 200) {
+  constructor(id: WordId, text: string, font: Font, fontSize = 400) {
     this.id = id
     this.font = font
     this.text = text

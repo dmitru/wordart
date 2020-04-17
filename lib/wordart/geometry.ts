@@ -609,7 +609,7 @@ export const computeHBoundsForPath = (
       w: canvas.width,
     },
     isRectIntersecting,
-    10
+    12
   )
   // renderHBounds(ctx, hBounds)
 
