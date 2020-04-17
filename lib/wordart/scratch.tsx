@@ -168,10 +168,10 @@ export const generateWordArt = (args: {
       5.5 * (dtMax - (nIter / maxIterations) * (dtMax - dtMin))
     const getSpiralPoint = archimedeanSpiral(30)
 
-    const x1 = 10
-    const x2 = viewBox.w - 10
-    const y1 = 10
-    const y2 = viewBox.h - 10
+    const x1 = 30
+    const x2 = viewBox.w - 30
+    const y1 = 30
+    const y2 = viewBox.h - 30
 
     tag.scale = scale * (1 + 0.3 * Math.random())
     // tag.angle = sample([0, Math.PI / 2])!
@@ -294,8 +294,8 @@ export const generateWordArt = (args: {
     return placed
   }
 
-  const countFactor = 1.3
-  const scaleFactor = 2
+  const countFactor = 2
+  const scaleFactor = 1.4
 
   const configs = [
     { scale: 0.23, count: 8, maxAttempts: 50, padding: 30 },
