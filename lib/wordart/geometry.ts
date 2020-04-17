@@ -61,6 +61,7 @@ export type HBounds = {
   bounds: Rect
   overlapsShape: boolean
   children?: HBounds[]
+  data?: any
 }
 
 export const mergeHBounds = (hBounds: HBounds[]): HBounds => {
@@ -81,6 +82,7 @@ export const mergeHBounds = (hBounds: HBounds[]): HBounds => {
 export const computeHBounds = (
   bounds: Rect,
   isRectIntersecting: (rect: Rect) => 'full' | 'partial' | 'none',
+  minSize = 4,
   maxLevel = 5
 ): HBounds => {
   // @ts-ignore
@@ -97,14 +99,14 @@ export const computeHBounds = (
       }
     }
 
-    if (intersecting === 'full') {
-      return {
-        count: 1,
-        bounds,
-        level,
-        overlapsShape: true,
-      }
-    }
+    // if (intersecting === 'full') {
+    //   return {
+    //     count: 1,
+    //     bounds,
+    //     level,
+    //     overlapsShape: true,
+    //   }
+    // }
 
     const childrenBounds = divideBounds(bounds)
     const children =
@@ -113,6 +115,7 @@ export const computeHBounds = (
         : childrenBounds.map((childBounds) =>
             computeHBoundsImpl(childBounds, level + 1)
           )
+
     return {
       bounds,
       level,
@@ -247,6 +250,11 @@ export const collideHBounds = (
   maxLevel2: number = 100,
   minSize: number = 1
 ): boolean => {
+  // const canvas = document.createElement('canvas') as HTMLCanvasElement
+  // canvas.width = hBounds1.bounds.w
+  // canvas.height = hBounds1.bounds.h
+  // const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+
   const check = (
     curHBounds1: HBounds,
     curHBounds2: HBounds,
@@ -255,7 +263,9 @@ export const collideHBounds = (
     level1: number,
     level2: number
   ): boolean => {
+    // console.log(level1, level2, maxLevel1, maxLevel2)
     if (!curHBounds1.overlapsShape || !curHBounds2.overlapsShape) {
+      // console.log('ch1: false')
       return false
     }
 
@@ -273,10 +283,29 @@ export const collideHBounds = (
       bounds2.w >= minSize &&
       bounds2.h >= minSize
 
-    // invatiant: both hbounds overlap shape
+    // invariant: both hbounds overlap shape
     if (!hasChildren1 && !hasChildren2) {
-      // reached leaves
-      return true
+      //   // reached leaves
+      //   // console.log(
+      //   //   'ch2: true',
+      //   //   hBounds1,
+      //   //   curHBounds1.overlapsShape,
+      //   //   curHBounds2.overlapsShape,
+      //   //   curHBounds1.data,
+      //   //   curHBounds2.data
+      //   // )
+      //   // ctx.fillStyle = 'lime'
+      //   // ctx.lineWidth = 2
+      //   // ctx.strokeRect(
+      //   //   curHBounds1.bounds.x,
+      //   //   curHBounds1.bounds.y,
+      //   //   curHBounds1.bounds.w,
+      //   //   curHBounds1.bounds.h
+      //   // )
+      //   // drawHBounds(ctx, hBounds1)
+      //   // console.screenshot(ctx.canvas, 0.3)
+      return curHBounds1.overlapsShape && curHBounds2.overlapsShape
+      // return true
     }
 
     if (
@@ -287,6 +316,7 @@ export const collideHBounds = (
         padding2
       )
     ) {
+      // console.log('ch3: false')
       return false
     }
 
@@ -309,6 +339,7 @@ export const collideHBounds = (
           level2 + 1
         )
         if (childCheckResult) {
+          // console.log('ch4: true')
           return true
         }
       }
@@ -333,6 +364,7 @@ export const collideHBounds = (
           level2
         )
         if (childCheckResult) {
+          // console.log('ch5: true')
           return true
         }
       }
@@ -368,12 +400,14 @@ export const collideHBounds = (
             level2 + 1
           )
           if (childCheckResult) {
+            // console.log('ch6: true')
             return true
           }
         }
       }
     }
 
+    // console.log('ch7: false')
     return false
   }
 
@@ -585,10 +619,11 @@ export const computeHBoundsForPath = (
   ctx.restore()
 
   const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
+  // console.screenshot(ctx.canvas, 1)
 
   const isPointIntersecting = (x: number, y: number): boolean => {
     const index = y * imageData.width + x
-    return imageData.data[4 * index + 3] > 0
+    return imageData.data[4 * index + 3] > 128
   }
 
   const isRectIntersecting = (
@@ -611,7 +646,7 @@ export const computeHBoundsForPath = (
       }
     }
 
-    if (overlapping === 0) {
+    if (overlapping === 0 || checked === 0) {
       return 'none'
     }
 
@@ -637,7 +672,8 @@ export const computeHBoundsForPath = (
       w: canvas.width,
     },
     isRectIntersecting,
-    12
+    4,
+    7
   )
   // renderHBounds(ctx, hBounds)
 
@@ -646,4 +682,49 @@ export const computeHBoundsForPath = (
   hBounds.transform = translate(pathAaab.x, pathAaab.y)
 
   return { hBounds }
+}
+
+export const drawHBounds = (
+  ctx: CanvasRenderingContext2D,
+  hBounds: HBounds
+) => {
+  const drawHBoundsImpl = (hBounds: HBounds, level = 0) => {
+    if (level > 9) {
+      return
+    }
+    ctx.save()
+    ctx.lineWidth = 0.5
+
+    ctx.strokeStyle = hBounds.overlapsShape ? 'red' : 'blue'
+
+    if (hBounds.transform) {
+      ctx.transform(
+        hBounds.transform.a,
+        hBounds.transform.b,
+        hBounds.transform.c,
+        hBounds.transform.d,
+        hBounds.transform.e,
+        hBounds.transform.f
+      )
+    }
+
+    // if (hBounds.overlapsShape) {
+    // if (hBounds.overlapsShape) {
+    ctx.strokeRect(
+      hBounds.bounds.x,
+      hBounds.bounds.y,
+      hBounds.bounds.w,
+      hBounds.bounds.h
+    )
+    // }
+    // }
+
+    if (hBounds.children) {
+      hBounds.children.forEach((child) => drawHBoundsImpl(child, level + 1))
+    }
+
+    ctx.restore()
+  }
+
+  drawHBoundsImpl(hBounds)
 }

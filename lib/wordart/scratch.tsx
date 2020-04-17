@@ -25,6 +25,7 @@ import {
   collideHBounds,
   multiply,
   Point,
+  drawHBounds,
 } from 'lib/wordart/geometry'
 import { loadFont } from 'lib/wordart/fonts'
 import { sample } from 'lodash'
@@ -36,26 +37,16 @@ const fontName3 = 'Verona-Xlight.ttf'
 
 let font: Font
 if (typeof window !== 'undefined') {
-  loadFont(`/fonts/${fontName}`).then((f) => {
+  loadFont(`/fonts/${fontName3}`).then((f) => {
     font = f
   })
 }
 
 export const scratch = (canvas: HTMLCanvasElement) => {
   // const tagBg = scene.addTag(scene.words[0], 300, 100, 2, Math.PI / 2)
-  // const tag = scene.addTag(scene.words[0], 0, 0, 1, 0)
+  let tag: Tag | null = null
 
-  // let collides = false
-  // canvas.addEventListener('mousemove', (e) => {
-  //   const x = e.offsetX
-  //   const y = e.offsetY
-  //   tag.left = x
-  //   tag.top = y
-
-  //   collides = collideHBounds(tag.hBounds, tagBg.hBounds).collides
-
-  //   tag.fillStyle = collides ? 'green' : 'black'
-  // })
+  const ctx = canvas.getContext('2d')!
 
   const onKeyDown = (e: KeyboardEvent) => {
     const key = e.key
@@ -63,8 +54,6 @@ export const scratch = (canvas: HTMLCanvasElement) => {
       console.log('font = ', font)
       // @ts-ignore
       window['font'] = font
-
-      const ctx = canvas.getContext('2d')!
 
       const viewBox: Rect = { x: 0, y: 0, w: canvas.width, h: canvas.height }
       const t1 = performance.now()
@@ -74,27 +63,60 @@ export const scratch = (canvas: HTMLCanvasElement) => {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       renderScene(scene, ctx)
 
+      // tag = new Tag(0, sample(scene.words)!, 0, 0, 1)
+
+      let collides = false
+      // canvas.addEventListener('mousemove', (e) => {
+      //   const x = e.offsetX
+      //   const y = e.offsetY
+
+      //   if (tag) {
+      //     tag.left = x
+      //     tag.top = y
+
+      //     collides = scene.checkCollision(tag)
+      //     // console.log('tag = ', tag, collides)
+
+      //     tag.fillStyle = collides ? 'green' : 'black'
+      //   }
+      // })
+
       // @ts-ignore
       window['scene'] = scene
       console.log('scene', scene)
     }
     // if (key === 'w') {
-    //   tag.scale = tag._scale + 0.1
+    //   if (tag) {
+    //     tag.scale = tag._scale + 0.1
+    //   }
     // } else if (key === 's') {
-    //   tag.scale = tag._scale - 0.1
+    //   if (tag) {
+    //     tag.scale = tag._scale - 0.1
+    //   }
     // } else if (key === 'd') {
-    //   tag.angle = tag._angle + 0.03
+    //   if (tag) {
+    //     tag.angle = tag._angle + 0.03
+    //   }
     // } else if (key === 'a') {
-    //   tag.angle = tag._angle - 0.03
+    //   if (tag) {
+    //     tag.angle = tag._angle - 0.03
+    //   }
     // }
   }
   document.addEventListener('keydown', onKeyDown)
 
-  // let raf = -1
+  let raf = -1
 
   // const render = () => {
-  //   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-  //   renderScene(scene, ctx)
+  //   // @ts-ignore
+  //   // @ts-ignore
+  //   if (tag && window['scene']) {
+  //     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+  //     // @ts-ignore
+  //     renderScene(window['scene'], ctx)
+  //     tag.drawHBounds(ctx)
+  //     tag.draw(ctx)
+  //   }
   //   raf = requestAnimationFrame(render)
   // }
 
@@ -114,9 +136,9 @@ export const generateWordArt = (args: {
 
   const scene = new GeneratedScene(font, viewBox)
   const words = [
-    // 'word',
-    'd',
-    // 'art',
+    'word',
+    'Cloud',
+    'art',
     // 'universe',
     // 'love',
     // 'wind',
@@ -177,22 +199,10 @@ export const generateWordArt = (args: {
     const y2 = viewBox.h - 30
 
     tag.scale = scale * (1 + 0.4 * 2 * (Math.random() - 0.5))
-    // tag.angle = sample([0, Math.PI / 2])!
 
     let placed = false
 
     for (let attempt = 0; attempt < maxAttempts; ++attempt) {
-      // let cx0 = lastSucceeded
-      //   ? lastSucceeded.x
-      //   : x1 + Math.random() * (x2 - x1 - tag.bounds.w)
-
-      // let cy0 = lastSucceeded
-      //   ? lastSucceeded.y
-      //   : y1 +
-      //     (y2 - y1) / 2 -
-      //     tag.bounds.h / 2 +
-      //     (Math.random() - 0.5) * (y2 - y1 - tag.bounds.h)
-
       let cx0 =
         x1 +
         (x2 - x1 - tag.bounds.w) / 2 +
@@ -297,30 +307,37 @@ export const generateWordArt = (args: {
     return placed
   }
 
-  const countFactor = 2
-  const scaleFactor = 1.2
+  const countFactor = 3.5
+  const scaleFactor = 1
 
   const configs = [
-    { scale: 0.65, count: 1, maxAttempts: 50, padding: 30 },
-    { scale: 0.5, count: 3, maxAttempts: 50, padding: 20 },
+    {
+      scale: 0.65,
+      count: 1,
+      maxAttempts: 50,
+      padding: 30,
+      enableSticky: false,
+      maxFailsInRow: 5,
+    },
+    {
+      scale: 0.5,
+      count: 3,
+      maxAttempts: 50,
+      padding: 20,
+      enableSticky: false,
+      maxFailsInRow: 5,
+    },
     { scale: 0.3, count: 6, maxAttempts: 50, padding: 20 },
     { scale: 0.23, count: 16, maxAttempts: 50, padding: 30 },
-    // { scale: 0.6, count: 8, maxAttempts: 30 },
-    // { scale: 0.5, count: 10, maxAttempts: 30 },
-    // { scale: 0.45, count: 30, maxAttempts: 10 },
-    // { scale: 0.4, count: 60, maxAttempts: 10 },
-    // { scale: 0.35, count: 90, maxAttempts: 10 },
-    // { scale: 0.3, count: 90, maxAttempts: 10 },
     { scale: 0.1, count: 120, maxFailsInRow: 5, maxAttempts: 30, padding: 20 },
-    { scale: 0.07, count: 120, maxFailsInRow: 5, maxAttempts: 20, padding: 3 },
-    { scale: 0.06, count: 120, maxFailsInRow: 5, maxAttempts: 20, padding: 3 },
-    // { scale: 0.07, count: 300, maxAttempts: 3, padding: 0 },
+    { scale: 0.07, count: 120, maxFailsInRow: 5, maxAttempts: 20, padding: 5 },
+    { scale: 0.06, count: 120, maxFailsInRow: 5, maxAttempts: 20, padding: 5 },
     {
       scale: 0.05,
       count: 220,
       maxFailsInRow: 25,
       maxAttempts: 16,
-      padding: 2,
+      padding: 3,
       enableSticky: true,
     },
     {
@@ -328,7 +345,7 @@ export const generateWordArt = (args: {
       count: 230,
       maxFailsInRow: 30,
       maxAttempts: 16,
-      padding: 2,
+      padding: 3,
       enableSticky: true,
     },
     {
@@ -336,7 +353,7 @@ export const generateWordArt = (args: {
       count: 400,
       maxAttempts: 10,
       maxFailsInRow: 20,
-      padding: 2,
+      padding: 3,
       enableSticky: true,
     },
     {
@@ -344,27 +361,25 @@ export const generateWordArt = (args: {
       count: 400,
       maxAttempts: 20,
       maxFailsInRow: 20,
-      padding: 2,
+      padding: 3,
       enableSticky: true,
     },
-    {
-      scale: 0.016,
-      count: 400,
-      maxAttempts: 20,
-      maxFailsInRow: 10,
-      padding: 1,
-      enableSticky: true,
-    },
-    {
-      scale: 0.013,
-      count: 400,
-      maxAttempts: 20,
-      maxFailsInRow: 10,
-      padding: 1,
-      enableSticky: true,
-    },
-    // { scale: 0.01, count: 900, maxAttempts: 3, padding: 0.2 },
-    // { scale: 0.02, count: 400, maxAttempts: 3 },
+    // {
+    //   scale: 0.016,
+    //   count: 400,
+    //   maxAttempts: 20,
+    //   maxFailsInRow: 10,
+    //   padding: 3,
+    //   enableSticky: true,
+    // },
+    // {
+    //   scale: 0.013,
+    //   count: 400,
+    //   maxAttempts: 20,
+    //   maxFailsInRow: 10,
+    //   padding: 3,
+    //   enableSticky: true,
+    // },
   ]
 
   for (const [index, config] of configs.entries()) {
@@ -376,8 +391,7 @@ export const generateWordArt = (args: {
         scaleFactor * config.scale,
         false,
         config.maxAttempts,
-        0,
-        // scaleFactor * config.padding,
+        scaleFactor * config.padding,
         config.enableSticky || false
       )
         ? 1
@@ -400,147 +414,6 @@ export const generateWordArt = (args: {
       )} seconds, cnt: ${cnt}`
     )
   }
-
-  // let cnt = 0
-  // const t1 = performance.now()
-  // for (let i = 0; i < 6; ++i) {
-  //   cnt += addRandomTag(0.7, false, 1, 100, 100) ? 1 : 0
-  // }
-  // const t2 = performance.now()
-  // console.log(
-  //   `t2: Finished: ${((t2 - t1) / 1000).toFixed(1)} seconds, cnt: ${cnt}`
-  // )
-  // for (let i = 0; i < 3; ++i) {
-  //   addRandomTag(0.8, false, 0.4, 20, 100)
-  // }
-  // for (let i = 0; i < 6; ++i) {
-  //   addRandomTag(0.65, false, 0.2, 20, 100)
-  // }
-  // cnt = 0
-  // for (let i = 0; i < 20; ++i) {
-  //   cnt += addRandomTag(0.6, false, 0.2, 100) ? 1 : 0
-  // }
-  // const t3 = performance.now()
-  // console.log(
-  //   `t3: Finished: ${((t3 - t2) / 1000).toFixed(1)} seconds, cnt: ${cnt}`
-  // )
-  // cnt = 0
-  // for (let i = 0; i < 10 * factor; ++i) {
-  //   cnt += addRandomTag(0.45, true, 0.5, 100, 100, 30) ? 1 : 0
-  // }
-  // const t4 = performance.now()
-  // console.log(
-  //   `t4: Finished: ${((t4 - t3) / 1000).toFixed(1)} seconds, cnt: ${cnt}`
-  // )
-  // cnt = 0
-  // for (let i = 0; i < 16 * factor; ++i) {
-  //   cnt += addRandomTag(0.3, false, 0.5, 100, 100, 40) ? 1 : 0
-  // }
-  // const t5 = performance.now()
-  // console.log(
-  //   `t5: Finished: ${((t5 - t4) / 1000).toFixed(1)} seconds, cnt: ${cnt}`
-  // )
-  // cnt = 0
-  // for (let i = 0; i < 40 * factor; ++i) {
-  //   cnt += addRandomTag(0.24, false, 0.5, 100, 100,520) ? 1 : 0
-  // }
-  // const t6 = performance.now()
-  // console.log(
-  //   `t6: Finished: ${((t6 - t5) / 1000).toFixed(1)} seconds, cnt: ${cnt}`
-  // )
-  // cnt = 0
-  // for (let i = 0; i < 20 * factor; ++i) {
-  //   cnt += addRandomTag(0.3, false, 0.3, 10, 100, 20) ? 1 : 0
-  // }
-  // const t5 = performance.now()
-  // console.log(
-  //   `t5: Finished: ${((t5 - t4) / 1000).toFixed(1)} seconds, cnt: ${cnt}`
-  // )
-  // cnt = 0
-  // for (let i = 0; i < 60 * factor; ++i) {
-  //   cnt += addRandomTag(0.2, false, 0.25, 30, 60, 30) ? 1 : 0
-  // }
-  // const t6 = performance.now()
-  // console.log(
-  //   `t6: Finished: ${((t6 - t5) / 1000).toFixed(1)} seconds, cnt: ${cnt}`
-  // )
-  // cnt = 0
-  // for (let i = 0; i < 160 * factor; ++i) {
-  //   cnt += addRandomTag(0.1, false, 0.72, 5, 80, 40) ? 1 : 0
-  // }
-  // const t7 = performance.now()
-  // console.log(
-  //   `t7: Finished: ${((t7 - t6) / 1000).toFixed(1)} seconds, cnt: ${cnt}`
-  // )
-  // cnt = 0
-  // // for (let i = 0; i < 100; ++i) {
-  // //   addRandomTag(0.08, false, 0.1, 20, 100, 50)
-  // // }
-  // for (let i = 0; i < 100 * factor; ++i) {
-  //   cnt += addRandomTag(0.05, false, 0.22, 5, 160, 30) ? 1 : 0
-  // }
-  // const t8 = performance.now()
-  // console.log(
-  //   `t8: Finished: ${((t8 - t7) / 1000).toFixed(1)} seconds, cnt: ${cnt}`
-  // )
-  // cnt = 0
-  // // for (let i = 0; i < 100; ++i) {
-  // //   addRandomTag(0.08, false, 0.1, 20, 100, 50)
-  // // }
-  // for (let i = 0; i < 400 * factor; ++i) {
-  //   cnt += addRandomTag(0.025, false, 0.22, 5, 160, 30) ? 1 : 0
-  // }
-  // const t9 = performance.now()
-  // console.log(
-  //   `t9: Finished: ${((t9 - t8) / 1000).toFixed(1)} seconds, cnt: ${cnt}`
-  // )
-  // for (let i = 0; i < 100; ++i) {
-  //   addRandomTag(0.03, false, 0.05, 20, 100, 60)
-  // }
-  // for (let i = 0; i < 300; ++i) {
-  //   addRandomTag(0.03, false, 0.05, 30, 500, 60)
-  // }
-
-  // let scale = 0.5
-  // let batchSize = 5
-
-  // let placedCount = 0
-  // let scalesTried = 1
-  // let attemptsAtCurrentScale = 0
-  // // for (const config of configs) {
-  // while (placedCount < 3) {
-  //   // let scale = config.scale
-  //   // let scale = 0.1 + (1 - (i * 0.9) / nWords) * Math.random()
-
-  //   let successCount = 0
-  //   for (let i = 0; i < batchSize / scale; ++i) {
-  //     const placed = addRandomTag(scale, false, 0.05, 10, 200)
-  //     attemptsAtCurrentScale += 1
-  //     if (placed) {
-  //       placedCount += 1
-  //       successCount += 1
-  //     }
-  //   }
-  //   console.log('scale = ', scale, successCount)
-
-  //   if (successCount === 0) {
-  //     attemptsAtCurrentScale += 1
-  //   }
-
-  //   if (successCount === 0 && attemptsAtCurrentScale > 3 / scale) {
-  //     scale /= 1.3
-  //     scalesTried += 1
-  //     attemptsAtCurrentScale = 0
-  //   }
-
-  //   if (scalesTried > 3) {
-  //     break
-  //   }
-
-  //   if (placedCount > 100) {
-  //     break
-  //   }
-  // }
 
   // @ts-ignore
   scene.addRandomTag = (scale: number, visualize = false, maxAttempts = 50) => {
@@ -605,12 +478,18 @@ export class GeneratedScene {
 
   checkCollision = (tag: Tag, pad = 0): boolean => {
     const getTagPadding = (tag: Tag) => {
-      return 0
-      // return pad
+      // return 0
+      return pad
     }
     const getTagMaxLevel = (tag: Tag) => {
-      return 100
-      // return tag.scale >= 0.2 ? 10 : tag.scale > 0.05 ? 6 : tag.scale > 0.03 ? 3 : 2
+      // return 100
+      return tag.scale >= 0.2
+        ? 9
+        : tag.scale > 0.05
+        ? 6
+        : tag.scale > 0.03
+        ? 3
+        : 2
     }
 
     const padding = getTagPadding(tag)
@@ -621,7 +500,7 @@ export class GeneratedScene {
       height: tag.bounds.h + 2 * padding,
     })
 
-    const minSize = 0.1
+    const minSize = 4
 
     if (this._lastTagChecked === tag && this._lastTagCollided) {
       if (
@@ -876,45 +755,6 @@ export class Word {
     }
     ctx.restore()
   }
-}
-
-const drawHBounds = (ctx: CanvasRenderingContext2D, hBounds: HBounds) => {
-  const drawHBoundsImpl = (hBounds: HBounds, level = 0) => {
-    if (level > 9) {
-      return
-    }
-    ctx.save()
-    ctx.lineWidth = 0.5
-    ctx.strokeStyle = hBounds.overlapsShape ? 'red' : 'yellow'
-
-    if (hBounds.transform) {
-      ctx.transform(
-        hBounds.transform.a,
-        hBounds.transform.b,
-        hBounds.transform.c,
-        hBounds.transform.d,
-        hBounds.transform.e,
-        hBounds.transform.f
-      )
-    }
-
-    // if (hBounds.overlapsShape) {
-    ctx.strokeRect(
-      hBounds.bounds.x,
-      hBounds.bounds.y,
-      hBounds.bounds.w,
-      hBounds.bounds.h
-    )
-    // }
-
-    if (hBounds.children) {
-      hBounds.children.forEach((child) => drawHBoundsImpl(child, level + 1))
-    }
-
-    ctx.restore()
-  }
-
-  drawHBoundsImpl(hBounds)
 }
 
 export class Symbol {
