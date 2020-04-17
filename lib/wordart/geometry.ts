@@ -12,6 +12,13 @@ const {
   scale,
 } = tm
 
+export function applyToPointNoSkew(matrix: Matrix, point: Point): Point {
+  return {
+    x: matrix.a * point.x + matrix.e,
+    y: matrix.d * point.y + matrix.f,
+  }
+}
+
 export const multiply = (m1: Matrix, m2: Matrix): Matrix => {
   return {
     a: m1.a * m2.a + m1.c * m2.b,
@@ -57,7 +64,7 @@ export type HBounds = {
 }
 
 export const mergeHBounds = (hBounds: HBounds[]): HBounds => {
-  const bounds = boundsForRects(
+  const bounds = boundsForRectsNoSkew(
     hBounds.map((hb) => hb.bounds),
     hBounds.map((hb) => hb.transform)
   )!
@@ -181,7 +188,7 @@ export const collidePointAndHBounds = (
   hBounds: HBounds
 ): PointAndHBoundsCollision => {
   const pointTranslated = hBounds.transform
-    ? applyToPoint(hBounds.transform, point)
+    ? applyToPointNoSkew(hBounds.transform, point)
     : point
 
   if (!collidePointAndRect(pointTranslated, hBounds.bounds)) {
@@ -236,9 +243,9 @@ export const collideHBounds = (
   hBounds2: HBounds,
   padding1 = 0,
   padding2 = 0,
-  maxLevel1: number | undefined = undefined,
-  maxLevel2: number | undefined = undefined,
-  minSize: number | undefined = undefined
+  maxLevel1: number = 100,
+  maxLevel2: number = 100,
+  minSize: number = 1
 ): boolean => {
   const check = (
     curHBounds1: HBounds,
@@ -257,12 +264,14 @@ export const collideHBounds = (
 
     const hasChildren1 =
       curHBounds1.children &&
-      (!maxLevel1 || level1 <= maxLevel1) &&
-      (minSize == null || Math.max(bounds1.w, bounds1.h) >= minSize)
+      level1 <= maxLevel1 &&
+      bounds1.w >= minSize &&
+      bounds1.h >= minSize
     const hasChildren2 =
       curHBounds2.children &&
-      (!maxLevel2 || level2 <= maxLevel2) &&
-      (minSize == null || Math.max(bounds2.w, bounds2.h) >= minSize)
+      level2 <= maxLevel2 &&
+      bounds2.w >= minSize &&
+      bounds2.h >= minSize
 
     // invatiant: both hbounds overlap shape
     if (!hasChildren1 && !hasChildren2) {
@@ -272,8 +281,8 @@ export const collideHBounds = (
 
     if (
       !areRectsIntersecting(
-        transformRect(transform1, bounds1),
-        transformRect(transform2, bounds2),
+        transformRectNoSkew(transform1, bounds1),
+        transformRectNoSkew(transform2, bounds2),
         padding1,
         padding2
       )
@@ -283,6 +292,10 @@ export const collideHBounds = (
 
     if (!hasChildren1 && hasChildren2) {
       for (let child of curHBounds2.children!) {
+        if (!curHBounds1.overlapsShape || !child.overlapsShape) {
+          continue
+        }
+
         const child2Transform = child.transform
           ? multiplyNoSkew(transform2, child.transform)
           : transform2
@@ -303,6 +316,10 @@ export const collideHBounds = (
 
     if (hasChildren1 && !hasChildren2) {
       for (let child of curHBounds1.children!) {
+        if (!curHBounds2.overlapsShape || !child.overlapsShape) {
+          continue
+        }
+
         const child1Transform = child.transform
           ? multiplyNoSkew(transform1, child.transform)
           : transform1
@@ -333,6 +350,11 @@ export const collideHBounds = (
 
         for (let i2 = 0; i2 < ch2Cnt; ++i2) {
           const child2 = curHBounds2.children![i2]
+
+          if (!child1.overlapsShape || !child2.overlapsShape) {
+            continue
+          }
+
           const child2Transform = child2.transform
             ? multiplyNoSkew(transform2, child2.transform)
             : transform2
@@ -439,15 +461,21 @@ export const areRectsIntersecting = (
   return true
 }
 
+export const transformRectNoSkew = (transform: Matrix, rect: Rect): Rect => {
+  const br = applyToPointNoSkew(transform, {
+    x: rect.x + rect.w,
+    y: rect.y + rect.h,
+  })
+  const tl = applyToPointNoSkew(transform, rect)
+  return { x: tl.x, y: tl.y, w: br.x - tl.x, h: br.y - tl.y }
+}
+
 export const transformRect = (transform: Matrix, rect: Rect): Rect => {
   const br = applyToPoint(transform, {
     x: rect.x + rect.w,
     y: rect.y + rect.h,
   })
-  const tl = applyToPoint(transform, {
-    x: rect.x,
-    y: rect.y,
-  })
+  const tl = applyToPoint(transform, rect)
   return { x: tl.x, y: tl.y, w: br.x - tl.x, h: br.y - tl.y }
 }
 
@@ -481,7 +509,7 @@ export const aabbForRect = (transform: Matrix, rect: Rect): Rect => {
   return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 }
 }
 
-export const boundsForRects = (
+export const boundsForRectsNoSkew = (
   rects: Rect[],
   transforms?: (Matrix | undefined)[]
 ): Rect | undefined => {
@@ -492,7 +520,7 @@ export const boundsForRects = (
   const rectsTransformed = transforms
     ? rects.map((rect, index) =>
         transforms[index] != null
-          ? transformRect(transforms[index]!, rect)
+          ? transformRectNoSkew(transforms[index]!, rect)
           : rect
       )
     : rects

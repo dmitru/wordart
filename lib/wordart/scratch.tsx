@@ -114,21 +114,21 @@ export const generateWordArt = (args: {
 
   const scene = new GeneratedScene(font, viewBox)
   const words = [
-    'word',
-    'cloud',
-    'art',
-    'universe',
-    'love',
-    'wind',
-    'earth',
-    'water',
-    'fire',
-    'words',
-    'many',
-    'emotion',
-    'bliss',
-    'lots',
-    'fun',
+    // 'word',
+    'd',
+    // 'art',
+    // 'universe',
+    // 'love',
+    // 'wind',
+    // 'earth',
+    // 'water',
+    // 'fire',
+    // 'words',
+    // 'many',
+    // 'emotion',
+    // 'bliss',
+    // 'lots',
+    // 'fun',
   ]
   // const words = ['II']
   for (let word of words) {
@@ -376,7 +376,8 @@ export const generateWordArt = (args: {
         scaleFactor * config.scale,
         false,
         config.maxAttempts,
-        scaleFactor * config.padding,
+        0,
+        // scaleFactor * config.padding,
         config.enableSticky || false
       )
         ? 1
@@ -603,9 +604,14 @@ export class GeneratedScene {
   }
 
   checkCollision = (tag: Tag, pad = 0): boolean => {
-    const getTagPadding = (tag: Tag) => pad
-    const getTagMaxLevel = (tag: Tag) =>
-      tag.scale >= 0.2 ? 10 : tag.scale > 0.05 ? 6 : tag.scale > 0.03 ? 3 : 2
+    const getTagPadding = (tag: Tag) => {
+      return 0
+      // return pad
+    }
+    const getTagMaxLevel = (tag: Tag) => {
+      return 100
+      // return tag.scale >= 0.2 ? 10 : tag.scale > 0.05 ? 6 : tag.scale > 0.03 ? 3 : 2
+    }
 
     const padding = getTagPadding(tag)
     const candidateTags = this.quad.colliding({
@@ -615,7 +621,7 @@ export class GeneratedScene {
       height: tag.bounds.h + 2 * padding,
     })
 
-    const minSize = 2
+    const minSize = 0.1
 
     if (this._lastTagChecked === tag && this._lastTagCollided) {
       if (
