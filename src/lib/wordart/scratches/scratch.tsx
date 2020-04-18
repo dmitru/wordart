@@ -50,7 +50,10 @@ export const scratch = (canvas: HTMLCanvasElement) => {
       const t1 = performance.now()
       const { start, cancel } = sceneGen.generate({
         bgImageCtx,
-        ctx,
+        // debug: {
+        //   ctx,
+        //   logWordPlacementImg: false,
+        // },
         font,
         viewBox,
         progressCallback: (percent) => {
@@ -63,6 +66,8 @@ export const scratch = (canvas: HTMLCanvasElement) => {
       console.log(`Finished: ${((t2 - t1) / 1000).toFixed(1)} seconds`)
       console.log('Result: ', result)
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+      //
       renderSceneDebug(sceneGen, ctx)
 
       tag = new Tag(0, sample(sceneGen.words)!, 0, 0, 1)

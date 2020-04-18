@@ -40,7 +40,10 @@ export type WordConfig = {
 
 export type GenerateParams = {
   words: WordConfig[]
-  ctx: CanvasRenderingContext2D
+  debug?: {
+    ctx: CanvasRenderingContext2D
+    logWordPlacementImg: boolean
+  }
   font: opentype.Font
   viewBox: Rect
   bgImageCtx: CanvasRenderingContext2D
@@ -249,7 +252,7 @@ export class SceneGenerator {
     let hasBeenCancelled = false
 
     const startGeneration = async (): Promise<GenerationResult> => {
-      const { words, bgImageCtx, viewBox, ctx } = params
+      const { words, bgImageCtx, viewBox, debug } = params
 
       if (bgImageCtx) {
         this.setBgShape(bgImageCtx)
@@ -277,13 +280,12 @@ export class SceneGenerator {
 
       const tryToPlaceTag = ({
         scale,
-        visualize = false,
         maxAttempts = 50,
         padding = 0,
         enableSticky = false,
       }: {
         scale: number
-        visualize?: boolean
+        debug?: boolean
         maxAttempts?: number
         padding?: number
         enableSticky?: boolean
@@ -338,18 +340,21 @@ export class SceneGenerator {
           let cx = cx0
           let cy = cy0
 
-          if (visualize) {
-            ctx.clearRect(0, 0, viewBox.w, viewBox.h)
-            ctx.fillStyle = '#f001'
-            ctx.fillRect(0, 0, viewBox.w, viewBox.h)
+          if (debug) {
+            const { ctx, logWordPlacementImg } = debug
+            if (logWordPlacementImg) {
+              ctx.clearRect(0, 0, viewBox.w, viewBox.h)
+              ctx.fillStyle = '#f001'
+              ctx.fillRect(0, 0, viewBox.w, viewBox.h)
 
-            renderSceneDebug(this, ctx)
+              renderSceneDebug(this, ctx)
 
-            ctx.fillStyle = 'green'
-            ctx.fillRect(cx0, cy0, 10, 10)
-            tag.left = cx0
-            tag.top = cy0
-            tag.draw(ctx)
+              ctx.fillStyle = 'green'
+              ctx.fillRect(cx0, cy0, 10, 10)
+              tag.left = cx0
+              tag.top = cy0
+              tag.draw(ctx)
+            }
           }
 
           let t = 0
@@ -373,9 +378,12 @@ export class SceneGenerator {
                 tag.fillStyle = sample(colors)!
                 this.addTag(tag)
 
-                if (visualize) {
-                  tag.draw(ctx)
-                  console.screenshot(ctx.canvas, 0.4)
+                if (debug) {
+                  const { ctx, logWordPlacementImg } = debug
+                  if (logWordPlacementImg) {
+                    tag.draw(ctx)
+                    console.screenshot(ctx.canvas, 0.4)
+                  }
                 }
 
                 // console.log('attempt: ', attempt, 'iteration: ', iteration)
@@ -394,16 +402,22 @@ export class SceneGenerator {
               cy0 +
               (((spiralPoint.y * viewBox.h) / 2) * (2 - 1 * (1 - scale))) / 2
 
-            if (visualize) {
-              ctx.fillStyle = 'red'
-              ctx.fillRect(cx, cy, 5, 5)
+            if (debug) {
+              const { ctx, logWordPlacementImg } = debug
+              if (logWordPlacementImg) {
+                ctx.fillStyle = 'red'
+                ctx.fillRect(cx, cy, 5, 5)
+              }
             }
 
             iteration += 1
           }
 
-          if (visualize) {
-            console.screenshot(ctx.canvas, 0.3)
+          if (debug) {
+            const { ctx, logWordPlacementImg } = debug
+            if (logWordPlacementImg) {
+              console.screenshot(ctx.canvas, 0.3)
+            }
           }
 
           if (placed) {
@@ -425,9 +439,16 @@ export class SceneGenerator {
         visualize = false,
         maxAttempts = 50
       ) => {
+        if (!debug) {
+          return
+        }
+        const { ctx, logWordPlacementImg } = debug
+        if (!logWordPlacementImg) {
+          return
+        }
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         renderSceneDebug(this, ctx)
-        tryToPlaceTag({ scale, visualize, maxAttempts })
+        tryToPlaceTag({ scale, debug: visualize, maxAttempts })
       }
 
       const scaleFactor = 2
@@ -459,7 +480,7 @@ export class SceneGenerator {
             maxAttempts: 20,
             padding: 40 * scaleFactor * currentScale,
             enableSticky: false,
-            visualize: false,
+            debug: false,
           })
 
           if (isPlaced) {
