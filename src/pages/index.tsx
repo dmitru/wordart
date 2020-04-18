@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { Layout } from 'components/layout'
-import { scratch } from 'lib/wordart/scratch'
+import { scratch } from 'lib/wordart/scratches/scratch'
 import styled from 'styled-components'
 
 const HomePage = () => {

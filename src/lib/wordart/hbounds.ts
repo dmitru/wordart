@@ -435,10 +435,7 @@ export const computeHBoundsForCanvas = ({
   }
 
   const aaabUnscaled = aabbForRect(rotate(angle), pathBboxRect)
-
   const aaabScaleFactor = imgSize / Math.max(aaabUnscaled.w, aaabUnscaled.h)
-
-  console.log('pathAaabUnscaled', aaabUnscaled, aaabScaleFactor)
 
   const pathAaab = aabbForRect(multiply(rotate(angle), scale(1)), pathBboxRect)
 
