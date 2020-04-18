@@ -41,26 +41,6 @@ export class FabricRenderer {
     const scaleX = c.getWidth() / sceneGen.params.viewBox.w
     const scaleY = c.getHeight() / sceneGen.params.viewBox.h
 
-    if (sceneGen.bgShape) {
-      fabric.Image.fromURL(
-        canvasToDataUri(sceneGen.bgShape.ctx.canvas),
-        (img) => {
-          img.set({
-            width: c.getWidth(),
-            height: c.getHeight(),
-            left: 0,
-            top: 0,
-            opacity: 0.2,
-            selectable: false,
-            hasControls: false,
-            evented: false,
-          })
-
-          c.add(img)
-        }
-      )
-    }
-
     for (let tag of sceneGen.tags) {
       let symbolPaths: fabric.Path[] = []
       let currentOffset = 0
@@ -78,20 +58,43 @@ export class FabricRenderer {
       }
 
       const wordPaths = new fabric.Group(symbolPaths)
+
       wordPaths.originX = 'left'
       wordPaths.originY = 'bottom'
 
-      wordPaths.left = tag.left
-      wordPaths.top = tag.top
+      wordPaths.left = tag.left * scaleX
+      wordPaths.top = tag.top * scaleY
 
       wordPaths.angle = (180 / Math.PI) * tag.angle
-
-      wordPaths.scale(tag.scale)
+      wordPaths.scale(tag.scale * scaleX)
 
       c.add(wordPaths)
     }
 
-    c.renderAll()
+    if (sceneGen.bgShape) {
+      fabric.Image.fromURL(
+        canvasToDataUri(sceneGen.bgShape.ctx.canvas),
+        (img) => {
+          img.set({
+            width: c.getWidth(),
+            height: c.getHeight(),
+            left: 0,
+            top: 0,
+            opacity: 0.2,
+            selectable: false,
+            hasControls: false,
+            evented: false,
+          })
+
+          c.add(img)
+          img.sendToBack()
+
+          c.renderAll()
+        }
+      )
+    } else {
+      c.renderAll()
+    }
   }
 }
 

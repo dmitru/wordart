@@ -452,7 +452,7 @@ export class SceneGenerator {
         tryToPlaceTag({ scale, debug: visualize, maxAttempts, bounds: viewBox })
       }
 
-      const scaleFactor = 6
+      const scaleFactor = 1
 
       const initialScale = 0.15
       const finalScale = 0.01
