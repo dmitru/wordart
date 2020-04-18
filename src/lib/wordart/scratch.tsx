@@ -1,16 +1,12 @@
 import * as opentype from 'opentype.js'
 import { archimedeanSpiral } from './spirals'
 import 'lib/wordart/console-extensions'
-import {
-  Rect,
-  Point,
-  randomPointInsideHbounds,
-  drawHBounds,
-} from 'lib/wordart/geometry'
+import { Rect, Point } from 'lib/wordart/geometry'
 import { loadFont } from 'lib/wordart/fonts'
 import { sample } from 'lodash'
 import { Tag, GeneratedScene } from 'lib/wordart/generator'
 import { loadImageUrlToCanvasCtx } from 'lib/wordart/canvas-utils'
+import { randomPointInsideHbounds } from 'lib/wordart/hbounds'
 
 const fontName = 'mountains-of-christmas_bold.ttf'
 const fontName2 = 'mail-ray-stuff.ttf'
@@ -321,9 +317,7 @@ export const generateWordArt = async (args: {
     return placed
   }
 
-  const earlyExitFactor = 1
-  const countFactor = 1
-  const scaleFactor = 0.5
+  const scaleFactor = 2
 
   const initialScale = 0.15
   const finalScale = 0.01

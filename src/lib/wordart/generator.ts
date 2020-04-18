@@ -1,14 +1,4 @@
-import {
-  Rect,
-  collideHBounds,
-  HBounds,
-  multiply,
-  drawHBounds,
-  transformRect,
-  mergeHBounds,
-  computeHBoundsForPath,
-  computeHBoundsForCanvas,
-} from 'lib/wordart/geometry'
+import { Rect, multiply, transformRect } from 'lib/wordart/geometry'
 import Quadtree from 'quadtree-lib'
 import * as tm from 'transformation-matrix'
 import {
@@ -19,6 +9,14 @@ import {
   identity,
 } from 'transformation-matrix'
 import chroma from 'chroma-js'
+import {
+  HBounds,
+  computeHBoundsForCanvas,
+  collideHBounds,
+  drawHBounds,
+  mergeHBounds,
+  computeHBoundsForPath,
+} from 'lib/wordart/hbounds'
 
 export class GeneratedScene {
   viewBox: Rect
