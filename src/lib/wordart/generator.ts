@@ -18,7 +18,7 @@ import {
   computeHBoundsForPath,
   randomPointInsideHbounds,
 } from 'lib/wordart/hbounds'
-import { sample } from 'lodash'
+import { sample, clamp } from 'lodash'
 import { archimedeanSpiral } from 'lib/wordart/spirals'
 
 export type GeneratorParams = {
@@ -279,11 +279,13 @@ export class SceneGenerator {
       let lastSucceeded: Point | null = null
 
       const tryToPlaceTag = ({
+        bounds,
         scale,
         maxAttempts = 50,
         padding = 0,
         enableSticky = false,
       }: {
+        bounds: Rect
         scale: number
         debug?: boolean
         maxAttempts?: number
@@ -299,11 +301,10 @@ export class SceneGenerator {
           5.5 * (dtMax - (nIter / maxIterations) * (dtMax - dtMin))
         const getSpiralPoint = archimedeanSpiral(30)
 
-        const scenePad = 0
-        const x1 = scenePad
-        const x2 = viewBox.w - scenePad
-        const y1 = scenePad
-        const y2 = viewBox.h - scenePad
+        const x1 = bounds.x
+        const x2 = bounds.x + bounds.w
+        const y1 = bounds.y
+        const y2 = bounds.y + bounds.h
 
         tag.scale = scale * (1 + 0.4 * 2 * (Math.random() - 0.5))
 
@@ -448,7 +449,7 @@ export class SceneGenerator {
         }
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         renderSceneDebug(this, ctx)
-        tryToPlaceTag({ scale, debug: visualize, maxAttempts })
+        tryToPlaceTag({ scale, debug: visualize, maxAttempts, bounds: viewBox })
       }
 
       const scaleFactor = 2
@@ -470,6 +471,12 @@ export class SceneGenerator {
       let scaleCount = 0
 
       while (currentScale > finalScale) {
+        // TODO
+        const currentPercent = clamp(scaleCount / 15, 0, 1)
+        if (params.progressCallback) {
+          params.progressCallback(currentPercent)
+        }
+
         const batchSize = 10
         // Attempt to place a batch of words
 
@@ -481,6 +488,7 @@ export class SceneGenerator {
             padding: 40 * scaleFactor * currentScale,
             enableSticky: false,
             debug: false,
+            bounds: viewBox,
           })
 
           if (isPlaced) {

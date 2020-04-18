@@ -22,6 +22,8 @@ if (typeof window !== 'undefined') {
   })
 }
 
+const ENABLE_INTERACTIVITY = false
+
 export const scratch = (canvas: HTMLCanvasElement) => {
   // const tagBg = scene.addTag(scene.words[0], 300, 100, 2, Math.PI / 2)
   let sceneGen: SceneGenerator | null = null
@@ -40,7 +42,7 @@ export const scratch = (canvas: HTMLCanvasElement) => {
       // @ts-ignore
       window['font'] = font
 
-      const viewBox: Rect = { x: 0, y: 0, w: canvas.width, h: canvas.height }
+      const viewBox: Rect = { x: 0, y: 0, w: 400, h: 400 }
       if (!sceneGen) {
         sceneGen = new SceneGenerator({ font, viewBox })
       } else {
@@ -55,7 +57,7 @@ export const scratch = (canvas: HTMLCanvasElement) => {
         //   logWordPlacementImg: false,
         // },
         font,
-        viewBox,
+        viewBox: { x: 0, y: 0, w: 200, h: 200 },
         progressCallback: (percent) => {
           console.log('Completion: ', percent.toFixed(2))
         },
@@ -70,23 +72,24 @@ export const scratch = (canvas: HTMLCanvasElement) => {
       //
       renderSceneDebug(sceneGen, ctx)
 
-      tag = new Tag(0, sample(sceneGen.words)!, 0, 0, 1)
+      if (ENABLE_INTERACTIVITY) {
+        tag = new Tag(0, sample(sceneGen.words)!, 0, 0, 1)
+        let collides = false
+        canvas.addEventListener('mousemove', (e) => {
+          const x = e.offsetX
+          const y = e.offsetY
 
-      let collides = false
-      // canvas.addEventListener('mousemove', (e) => {
-      //   const x = e.offsetX
-      //   const y = e.offsetY
+          if (tag && sceneGen) {
+            tag.left = x
+            tag.top = y
 
-      //   if (tag && scene) {
-      //     tag.left = x
-      //     tag.top = y
+            collides = sceneGen.checkCollision(tag)
+            // console.log('tag = ', tag, collides)
 
-      //     collides = scene.checkCollision(tag)
-      //     // console.log('tag = ', tag, collides)
-
-      //     tag.fillStyle = collides ? 'green' : 'black'
-      //   }
-      // })
+            tag.fillStyle = collides ? 'green' : 'black'
+          }
+        })
+      }
 
       // @ts-ignore
       window['scene'] = sceneGen
@@ -112,24 +115,26 @@ export const scratch = (canvas: HTMLCanvasElement) => {
   }
   document.addEventListener('keydown', onKeyDown)
 
-  // let raf = -1
+  if (ENABLE_INTERACTIVITY) {
+    let raf = -1
 
-  // const render = () => {
-  //   // @ts-ignore
-  //   // @ts-ignore
-  //   if (tag && window['scene']) {
-  //     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-  //     // @ts-ignore
-  //     renderScene(window['scene'], ctx)
-  //     tag.drawHBounds(ctx)
-  //     tag.draw(ctx)
-  //   }
-  //   raf = requestAnimationFrame(render)
-  // }
+    const render = () => {
+      // @ts-ignore
+      // @ts-ignore
+      if (tag && window['scene']) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        // @ts-ignore
+        renderSceneDebug(window['scene'], ctx)
+        tag.drawHBounds(ctx)
+        tag.draw(ctx)
+      }
+      raf = requestAnimationFrame(render)
+    }
 
-  // raf = requestAnimationFrame(render)
+    raf = requestAnimationFrame(render)
+  }
 
-  // return () => {
-  //   document.removeEventListener('keydown', onKeyDown)
-  // }
+  return () => {
+    document.removeEventListener('keydown', onKeyDown)
+  }
 }
