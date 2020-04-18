@@ -18,6 +18,7 @@ import {
   scale,
   identity,
 } from 'transformation-matrix'
+import chroma from 'chroma-js'
 
 export class GeneratedScene {
   viewBox: Rect
@@ -35,6 +36,7 @@ export class GeneratedScene {
 
   bgShape: {
     imgData: ImageData
+    imgDataData: Uint8ClampedArray
     ctx: CanvasRenderingContext2D
     hBounds: HBounds
     hBoundsNagative: HBounds
@@ -49,26 +51,31 @@ export class GeneratedScene {
   setBgShape = (ctx: CanvasRenderingContext2D) => {
     const hBoundsNagative = computeHBoundsForCanvas({
       srcCanvas: ctx.canvas,
-      imgSize: 800,
+      imgSize: 400,
       targetSize: this.viewBox,
       invert: true,
       angle: 0,
-      visualize: true,
+      minSize: 1,
+      // visualize: true,
     }).hBounds
 
     const hBounds = computeHBoundsForCanvas({
       srcCanvas: ctx.canvas,
-      imgSize: 800,
+      imgSize: 400,
       targetSize: this.viewBox,
       angle: 0,
-      visualize: true,
+      minSize: 1,
+      // visualize: true,
     }).hBounds
+
+    const imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
 
     this.bgShape = {
       ctx,
       hBoundsNagative,
       hBounds,
-      imgData: ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height),
+      imgData,
+      imgDataData: imgData.data,
     }
   }
 
@@ -114,16 +121,18 @@ export class GeneratedScene {
     }
 
     const padding = getTagPadding(tag)
-    const minSize = 4
+    const minSize = 2
+
+    const bgShapePadding = 1
 
     if (this.bgShape) {
       if (
         collideHBounds(
           this.bgShape.hBoundsNagative,
           tag.hBounds,
-          5,
+          bgShapePadding,
           0,
-          100,
+          7,
           getTagMaxLevel(tag),
           1
           // true
@@ -193,6 +202,19 @@ export class GeneratedScene {
     addedTag._hBounds = tag._hBounds
     this.tags.push(addedTag)
     this.quad.push(addedTag)
+
+    if (this.bgShape) {
+      // sample bg shape for tag color
+      const index =
+        Math.round(tag.y - tag.bounds.h / 2) * this.bgShape.ctx.canvas.width +
+        Math.round(tag.x + tag.bounds.w / 2)
+
+      const r = this.bgShape.imgDataData[4 * index]
+      const g = this.bgShape.imgDataData[4 * index + 1]
+      const b = this.bgShape.imgDataData[4 * index + 2]
+      const color = chroma(r, g, b).hex()
+      addedTag.fillStyle = color
+    }
   }
 }
 

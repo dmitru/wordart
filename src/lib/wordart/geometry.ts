@@ -609,15 +609,19 @@ export const computeHBoundsForCanvas = ({
   srcCanvas,
   targetSize,
   invert = false,
-  imgSize = 800,
+  imgSize = 400,
   angle = 0,
   visualize = false,
+  minSize = 4,
+  maxLevel = 9,
 }: {
   srcCanvas: HTMLCanvasElement
   targetSize: Rect
   invert?: boolean
   imgSize?: number
   angle?: number
+  maxLevel?: number
+  minSize?: number
   visualize?: boolean
 }) => {
   const pathBboxRect = {
@@ -735,8 +739,8 @@ export const computeHBoundsForCanvas = ({
       w: canvas.width,
     },
     isRectIntersecting,
-    2,
-    10
+    minSize,
+    maxLevel
   )
 
   if (visualize) {

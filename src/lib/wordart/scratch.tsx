@@ -38,7 +38,7 @@ export const scratch = (canvas: HTMLCanvasElement) => {
   const onKeyDown = async (e: KeyboardEvent) => {
     const key = e.key
 
-    const bgImageCtx = await loadImageUrlToCanvasCtx(BG_SHAPE, 800, 800)
+    const bgImageCtx = await loadImageUrlToCanvasCtx(BG_SHAPE, 400, 400)
     console.screenshot(bgImageCtx.canvas)
 
     if (key === 'g') {
@@ -48,7 +48,7 @@ export const scratch = (canvas: HTMLCanvasElement) => {
 
       const viewBox: Rect = { x: 0, y: 0, w: canvas.width, h: canvas.height }
       const t1 = performance.now()
-      scene = generateWordArt({ ctx, font, viewBox, bgImageCtx })
+      scene = await generateWordArt({ ctx, font, viewBox, bgImageCtx })
       const t2 = performance.now()
       console.log(`Finished: ${((t2 - t1) / 1000).toFixed(1)} seconds`)
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
@@ -118,17 +118,17 @@ export const scratch = (canvas: HTMLCanvasElement) => {
   // }
 }
 
-export const generateWordArt = (args: {
+export const generateWordArt = async (args: {
   ctx: CanvasRenderingContext2D
   font: opentype.Font
   viewBox: Rect
   oldScene?: GeneratedScene
   bgImageCtx: CanvasRenderingContext2D
-}): GeneratedScene => {
+}): Promise<GeneratedScene> => {
   const { font, viewBox, ctx, oldScene, bgImageCtx } = args
 
   const scene = new GeneratedScene(font, viewBox)
-  scene.setBgShape(bgImageCtx)
+  // scene.setBgShape(bgImageCtx)
 
   if (oldScene) {
     scene.symbols = oldScene.symbols
@@ -139,6 +139,13 @@ export const generateWordArt = (args: {
     'word',
     'Cloud',
     'art',
+    'beatles',
+    'submarine',
+    // 'lucy',
+    // 'paul',
+    'yellow',
+    'music',
+    // 'ringo',
     // 'universe',
     // 'love',
     // 'wind',
@@ -157,13 +164,10 @@ export const generateWordArt = (args: {
     scene.addWord(word)
   }
 
-  const doesCollideOtherTags = (tag: Tag, padding = 0) =>
-    scene.checkCollision(tag, padding)
-
   // Precompute all hbounds
   let protoTags = [
     ...scene.words.map((word) => new Tag(0, word, 0, 0, 1, 0)),
-    ...scene.words.map((word) => new Tag(0, word, 0, 0, 1, -Math.PI / 2)),
+    // ...scene.words.map((word) => new Tag(0, word, 0, 0, 1, -Math.PI / 2)),
   ]
 
   protoTags.forEach((tag) => console.log(tag.bounds))
@@ -191,7 +195,7 @@ export const generateWordArt = (args: {
     enableSticky?: boolean
   }) => {
     const tag = sample(protoTags)!
-    const maxIterations = 10
+    const maxIterations = 1
     const dtMin = 0.0002
     const dtMax = 0.0005
 
@@ -269,7 +273,7 @@ export const generateWordArt = (args: {
             bounds.y + bounds.h > y2
           )
         ) {
-          if (!doesCollideOtherTags(tag, padding)) {
+          if (!scene.checkCollision(tag, padding)) {
             tag.fillStyle = sample(colors)!
             scene.addTag(tag)
 
@@ -319,112 +323,75 @@ export const generateWordArt = (args: {
 
   const earlyExitFactor = 1
   const countFactor = 1
-  const scaleFactor = 0.8
+  const scaleFactor = 0.5
 
-  const configs = [
-    {
-      scale: 0.65,
-      count: 1,
-      maxAttempts: 50,
-      padding: 30,
-      enableSticky: false,
-      maxFailsInRow: 5,
-    },
-    {
-      scale: 0.5,
-      count: 3,
-      maxAttempts: 50,
-      padding: 20,
-      enableSticky: false,
-      maxFailsInRow: 5,
-    },
-    { scale: 0.3, count: 6, maxAttempts: 50, padding: 20 },
-    { scale: 0.23, count: 16, maxAttempts: 50, padding: 30 },
-    { scale: 0.1, count: 120, maxFailsInRow: 5, maxAttempts: 30, padding: 20 },
-    { scale: 0.07, count: 120, maxFailsInRow: 5, maxAttempts: 20, padding: 5 },
-    { scale: 0.06, count: 120, maxFailsInRow: 5, maxAttempts: 20, padding: 5 },
-    {
-      scale: 0.05,
-      count: 220,
-      maxFailsInRow: 25,
-      maxAttempts: 16,
-      padding: 3,
-      enableSticky: true,
-    },
-    {
-      scale: 0.038,
-      count: 230,
-      maxFailsInRow: 30,
-      maxAttempts: 16,
-      padding: 3,
-      enableSticky: true,
-    },
-    {
-      scale: 0.03,
-      count: 400,
-      maxAttempts: 10,
-      maxFailsInRow: 20,
-      padding: 3,
-      enableSticky: true,
-    },
-    {
-      scale: 0.023,
-      count: 400,
-      maxAttempts: 50,
-      maxFailsInRow: 20,
-      padding: 3,
-      enableSticky: true,
-    },
-    {
-      scale: 0.016,
-      count: 400,
-      maxAttempts: 50,
-      maxFailsInRow: 10,
-      padding: 3,
-      enableSticky: true,
-    },
-    {
-      scale: 0.013,
-      count: 400,
-      maxAttempts: 50,
-      maxFailsInRow: 30,
-      padding: 3,
-      enableSticky: true,
-    },
-  ]
+  const initialScale = 0.15
+  const finalScale = 0.01
+  const scaleStep = 0.15
+  let timeout = 1500
+  let maxTimeout = 3000
+  let timeoutStep = 300
+  const maxTagsCount = 1300
 
-  for (const [index, config] of configs.entries()) {
-    let cnt = 0
-    let failsInRow = 0
-    const t1 = performance.now()
-    for (let i = 0; i < countFactor * config.count; ++i) {
+  let currentScale = initialScale
+
+  let t0 = performance.now()
+
+  let placedCountTotal = 0
+  let placedCountAtCurrentScale = 0
+  let scaleCount = 0
+
+  while (currentScale > finalScale) {
+    const batchSize = 10
+    // Attempt to place a batch of words
+
+    let successCount = 0
+    for (let i = 0; i < batchSize; ++i) {
       const isPlaced = addRandomTag({
-        scale: scaleFactor * config.scale,
+        scale: scaleFactor * currentScale,
+        maxAttempts: 20,
+        padding: 40 * scaleFactor * currentScale,
+        enableSticky: false,
         visualize: false,
-        maxAttempts: config.maxAttempts,
-        padding: scaleFactor * config.padding,
-        enableSticky: config.enableSticky || false,
       })
-        ? 1
-        : 0
 
       if (isPlaced) {
-        cnt += 1
-        failsInRow = 0
-      } else {
-        failsInRow += 1
+        placedCountAtCurrentScale += 1
+        placedCountTotal += 1
+        successCount += 1
       }
-      if (failsInRow > earlyExitFactor * (config.maxFailsInRow || 3)) {
-        console.log('early exit')
+
+      let t1 = performance.now()
+      if (t1 - t0 > timeout) {
         break
       }
     }
-    const t2 = performance.now()
-    console.log(
-      `${index + 1}: Finished: ${((t2 - t1) / 1000).toFixed(
-        1
-      )} seconds, cnt: ${cnt}`
-    )
+
+    if (placedCountTotal > maxTagsCount) {
+      break
+    }
+
+    let t1 = performance.now()
+
+    if (successCount === 0 || t1 - t0 > timeout) {
+      currentScale -= scaleStep * currentScale
+      scaleCount += 1
+      timeout += Math.min(maxTimeout, timeout + timeoutStep)
+      console.log(
+        `Scale: ${currentScale.toFixed(
+          3
+        )}, ${placedCountAtCurrentScale} words in ${((t1 - t0) / 1000).toFixed(
+          2
+        )} seconds`
+      )
+      placedCountAtCurrentScale = 0
+      t0 = performance.now()
+
+      await new Promise((resolve) => setTimeout(() => resolve(), 100))
+
+      // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+      // renderScene(scene, ctx)
+    }
   }
 
   // @ts-ignore
@@ -443,7 +410,7 @@ const renderScene = (scene: GeneratedScene, ctx: CanvasRenderingContext2D) => {
   ctx.save()
 
   if (scene.bgShape) {
-    ctx.globalAlpha = 0
+    ctx.globalAlpha = 0.1
     ctx.drawImage(
       scene.bgShape.ctx.canvas,
       0,
