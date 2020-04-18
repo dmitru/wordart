@@ -15,7 +15,6 @@ import * as fermat from '@mathigon/fermat'
 import 'lib/wordart/console-extensions'
 import {
   Rect,
-  renderHBounds,
   Transform,
   HBounds,
   mkTransform,
@@ -364,22 +363,22 @@ export const generateWordArt = (args: {
       padding: 3,
       enableSticky: true,
     },
-    // {
-    //   scale: 0.016,
-    //   count: 400,
-    //   maxAttempts: 20,
-    //   maxFailsInRow: 10,
-    //   padding: 3,
-    //   enableSticky: true,
-    // },
-    // {
-    //   scale: 0.013,
-    //   count: 400,
-    //   maxAttempts: 20,
-    //   maxFailsInRow: 10,
-    //   padding: 3,
-    //   enableSticky: true,
-    // },
+    {
+      scale: 0.016,
+      count: 400,
+      maxAttempts: 20,
+      maxFailsInRow: 10,
+      padding: 3,
+      enableSticky: true,
+    },
+    {
+      scale: 0.013,
+      count: 400,
+      maxAttempts: 20,
+      maxFailsInRow: 10,
+      padding: 3,
+      enableSticky: true,
+    },
   ]
 
   for (const [index, config] of configs.entries()) {

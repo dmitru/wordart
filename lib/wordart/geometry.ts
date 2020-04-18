@@ -99,22 +99,26 @@ export const computeHBounds = (
       }
     }
 
-    // if (intersecting === 'full') {
-    //   return {
-    //     count: 1,
-    //     bounds,
-    //     level,
-    //     overlapsShape: true,
-    //   }
-    // }
+    if (intersecting === 'full') {
+      return {
+        count: 1,
+        bounds,
+        level,
+        overlapsShape: true,
+      }
+    }
 
     const childrenBounds = divideBounds(bounds)
-    const children =
+    let children =
       level >= maxLevel
         ? undefined
         : childrenBounds.map((childBounds) =>
             computeHBoundsImpl(childBounds, level + 1)
           )
+
+    // if (level > 1 && children && !children.find((ch) => !ch.overlapsShape)) {
+    //   children = undefined
+    // }
 
     return {
       bounds,
@@ -132,34 +136,6 @@ export const computeHBounds = (
   // console.debug(`computeHierarchicalBounds: ${(t2 - t1).toFixed(2)}ms`)
 
   return result
-}
-
-export const renderHBounds = (
-  ctx: CanvasRenderingContext2D,
-  hBounds: HBounds
-) => {
-  ctx.save()
-  ctx.lineWidth = 1
-  ctx.strokeStyle = hBounds.children ? 'red' : 'yellow'
-
-  if (hBounds.transform) {
-    ctx.setTransform(hBounds.transform)
-  }
-
-  if (hBounds.overlapsShape) {
-    ctx.strokeRect(
-      hBounds.bounds.x,
-      hBounds.bounds.y,
-      hBounds.bounds.w,
-      hBounds.bounds.h
-    )
-  }
-
-  if (hBounds.children) {
-    hBounds.children.forEach((child) => renderHBounds(ctx, child))
-  }
-
-  ctx.restore()
 }
 
 export type Point = { x: number; y: number }
@@ -587,7 +563,9 @@ export const boundsForRectsNoSkew = (
 export const computeHBoundsForPath = (
   path: opentype.Path,
   angle = 0,
-  scaleFactor = 1
+  pathScale = 1,
+  imgSize = 300,
+  visualize = false
 ) => {
   // console.log('transform = ', angle, scaleFactor)
 
@@ -599,10 +577,18 @@ export const computeHBoundsForPath = (
     h: pathBbox.y2 - pathBbox.y1,
   }
 
-  const pathAaab = aabbForRect(
-    multiply(rotate(angle), scale(scaleFactor)),
+  const pathAaabUnscaled = aabbForRect(
+    multiply(rotate(angle), scale(pathScale)),
     pathBboxRect
   )
+  const pathAaabScaleFactor =
+    imgSize / Math.max(pathAaabUnscaled.w, pathAaabUnscaled.h)
+  const pathAaab = aabbForRect(
+    multiply(rotate(angle), scale(pathScale * pathAaabScaleFactor)),
+    pathBboxRect
+  )
+
+  const scaleFactor = pathScale * pathAaabScaleFactor
 
   const pathAaabTransform = multiply(
     multiply(translate(-pathAaab.x, -pathAaab.y), rotate(angle)),
@@ -626,10 +612,9 @@ export const computeHBoundsForPath = (
     return imageData.data[4 * index + 3] > 128
   }
 
-  const isRectIntersecting = (
-    bounds: Rect,
-    dx = 1
-  ): 'full' | 'partial' | 'none' => {
+  const dx = 1
+
+  const isRectIntersecting = (bounds: Rect): 'full' | 'partial' | 'none' => {
     const maxX = bounds.x + bounds.w
     const maxY = bounds.y + bounds.h
 
@@ -654,15 +639,17 @@ export const computeHBoundsForPath = (
   }
 
   // Visualize sample points
-  // for (let x = 0; x < imageData.width; x += 5) {
-  //   for (let y = 0; y < imageData.height; y += 5) {
-  //     const intersecting = isPointIntersecting(x, y)
-  //     if (intersecting) {
-  //       ctx.fillStyle = 'yellow'
-  //       ctx.fillRect(x, y, 2, 2)
-  //     }
-  //   }
-  // }
+  if (visualize) {
+    for (let x = 0; x < imageData.width; x += dx) {
+      for (let y = 0; y < imageData.height; y += dx) {
+        const intersecting = isPointIntersecting(x, y)
+        if (intersecting) {
+          ctx.fillStyle = 'yellow'
+          ctx.fillRect(x, y, 2, 2)
+        }
+      }
+    }
+  }
 
   const hBounds = computeHBounds(
     {
@@ -675,11 +662,16 @@ export const computeHBoundsForPath = (
     4,
     7
   )
-  // renderHBounds(ctx, hBounds)
 
-  // console.screenshot(ctx.canvas)
+  if (visualize) {
+    drawHBounds(ctx, hBounds)
+    console.screenshot(ctx.canvas)
+  }
 
-  hBounds.transform = translate(pathAaab.x, pathAaab.y)
+  hBounds.transform = multiply(
+    scale(1 / pathAaabScaleFactor),
+    translate(pathAaab.x, pathAaab.y)
+  )
 
   return { hBounds }
 }
@@ -709,13 +701,14 @@ export const drawHBounds = (
     }
 
     // if (hBounds.overlapsShape) {
-    // if (hBounds.overlapsShape) {
-    ctx.strokeRect(
-      hBounds.bounds.x,
-      hBounds.bounds.y,
-      hBounds.bounds.w,
-      hBounds.bounds.h
-    )
+    if (!hBounds.children) {
+      ctx.strokeRect(
+        hBounds.bounds.x,
+        hBounds.bounds.y,
+        hBounds.bounds.w,
+        hBounds.bounds.h
+      )
+    }
     // }
     // }
 
