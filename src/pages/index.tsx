@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Layout } from 'components/layout'
 import { scratch } from 'lib/wordart/scratch'
 import styled from 'styled-components'

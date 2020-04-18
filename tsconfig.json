@@ -13,13 +13,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "baseUrl": "./",
+    "baseUrl": "./src",
     "downlevelIteration": true,
-    "rootDirs": ["./"]
+    "rootDirs": ["./src"]
   },
   "exclude": ["node_modules"],
   "include": [
-    "./",
+    "./src",
     "next-env.d.ts",
     "**/*.d.ts",
     "**/*.ts",
