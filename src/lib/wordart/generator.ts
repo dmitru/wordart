@@ -153,7 +153,7 @@ export class SceneGenerator {
     if (this.bgShape) {
       // sample bg shape for tag color
       const index =
-        Math.round(tag.y - tag.bounds.h / 2) * this.bgShape.ctx.canvas.width +
+        Math.round(tag.y + tag.bounds.h / 2) * this.bgShape.ctx.canvas.width +
         Math.round(tag.x + tag.bounds.w / 2)
 
       const r = this.bgShape.imgDataData[4 * index]
@@ -265,7 +265,7 @@ export class SceneGenerator {
       // Precompute all hbounds
       const protoTags = [
         ...this.words.map((word) => new Tag(0, word, 0, 0, 1, 0)),
-        // ...scene.words.map((word) => new Tag(0, word, 0, 0, 1, -Math.PI / 2)),
+        ...this.words.map((word) => new Tag(0, word, 0, 0, 1, -Math.PI / 2)),
       ]
       protoTags.forEach((tag) => console.log(tag.bounds))
 
@@ -452,7 +452,7 @@ export class SceneGenerator {
         tryToPlaceTag({ scale, debug: visualize, maxAttempts, bounds: viewBox })
       }
 
-      const scaleFactor = 2
+      const scaleFactor = 6
 
       const initialScale = 0.15
       const finalScale = 0.01
@@ -477,7 +477,7 @@ export class SceneGenerator {
           params.progressCallback(currentPercent)
         }
 
-        const batchSize = 10
+        const batchSize = 20
         // Attempt to place a batch of words
 
         let successCount = 0
@@ -657,9 +657,9 @@ export class Tag {
     this._bounds = null
   }
 
-  draw = (ctx: CanvasRenderingContext2D) => {
+  draw = (ctx: CanvasRenderingContext2D, transform: Matrix = identity()) => {
     ctx.save()
-    ctx.setTransform(this.transform)
+    ctx.setTransform(multiply(transform, this.transform))
     ctx.fillStyle = this.fillStyle
     this.word.draw(ctx)
     ctx.restore()
@@ -805,22 +805,35 @@ export type TagId = number
 export type SymbolId = string
 
 export const renderSceneDebug = (
-  generator: SceneGenerator,
+  sceneGen: SceneGenerator,
   ctx: CanvasRenderingContext2D
 ) => {
   // @ts-ignore
   window['ctx'] = ctx
   ctx.save()
 
-  if (generator.bgShape) {
+  const scaleX = ctx.canvas.width / sceneGen.params.viewBox.w
+  const scaleY = ctx.canvas.height / sceneGen.params.viewBox.h
+
+  console.log('scaleX', scaleX, scaleY)
+
+  if (sceneGen.bgShape) {
     ctx.globalAlpha = 0.1
+
+    console.log('sceneGen.bgShape.ctx.canvas', sceneGen.bgShape.ctx.canvas)
+
     ctx.drawImage(
-      generator.bgShape.ctx.canvas,
+      sceneGen.bgShape.ctx.canvas,
       0,
       0,
-      ctx.canvas.width - 0,
-      ctx.canvas.height - 0
+      sceneGen.bgShape.ctx.canvas.width,
+      sceneGen.bgShape.ctx.canvas.height,
+      0,
+      0,
+      ctx.canvas.width,
+      ctx.canvas.height
     )
+
     ctx.globalAlpha = 1
   }
 
@@ -828,12 +841,10 @@ export const renderSceneDebug = (
   //   drawHBounds(ctx, scene.bgShape.hBoundsNagative)
   // }
 
-  for (let tag of generator.tags) {
+  for (let tag of sceneGen.tags) {
     // ctx.fillStyle = '#f002'
     // ctx.fillRect(tag.bounds.x, tag.bounds.y, tag.bounds.w, tag.bounds.h)
-
-    tag.draw(ctx)
-
+    tag.draw(ctx, scale(scaleX, scaleY))
     // drawHBounds(ctx, tag.hBounds)
   }
   ctx.restore()

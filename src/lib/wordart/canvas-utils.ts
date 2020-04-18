@@ -65,6 +65,11 @@ export const createOffscreenCanvasCtx = (size: Dimensions): CanvasCtx => {
   return ctx
 }
 
+export const canvasToDataUri = (
+  canvas: HTMLCanvasElement,
+  { format = 'image/jpeg', quality = 0.8 } = {}
+): string => canvas.toDataURL(format, quality)
+
 export type ProgressCallback = (
   percentage: number,
   loaded?: number,

@@ -5,16 +5,18 @@ import styled from 'styled-components'
 
 const HomePage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const canvasRef2 = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    if (canvasRef.current) {
-      return scratch(canvasRef.current)
+    if (canvasRef.current && canvasRef2.current) {
+      return scratch(canvasRef.current, canvasRef2.current)
     }
-  }, [canvasRef.current])
+  }, [canvasRef.current, canvasRef2.current])
 
   return (
     <Layout>
       <Canvas width={400} height={400} ref={canvasRef} id="scene" />
+      <Canvas width={400} height={400} ref={canvasRef2} id="scene2" />
     </Layout>
   )
 }
