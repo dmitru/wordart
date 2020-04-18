@@ -7,22 +7,23 @@ import { Tag, SceneGenerator, renderSceneDebug } from 'lib/wordart/generator'
 import { loadImageUrlToCanvasCtx } from 'lib/wordart/canvas-utils'
 
 const fontName = 'mountains-of-christmas_bold.ttf'
-const fontName2 = 'mail-ray-stuff.ttf'
-const fontName3 = 'Verona-Xlight.ttf'
+// const fontName = 'mail-ray-stuff.ttf'
+// const fontName = 'Verona-Xlight.ttf'
 
 // const BG_SHAPE = '/images/cat.png'
 // const BG_SHAPE = '/images/number_six.png'
 // const BG_SHAPE = '/images/darth_vader.jpg'
 const BG_SHAPE = '/images/beatles.jpg'
 
+const WORDS = ['art', 'word', 'cloud']
+const ENABLE_INTERACTIVITY = false
+
 let font: opentype.Font
 if (typeof window !== 'undefined') {
-  loadFont(`/fonts/${fontName3}`).then((f) => {
+  loadFont(`/fonts/${fontName}`).then((f) => {
     font = f
   })
 }
-
-const ENABLE_INTERACTIVITY = false
 
 export const scratch = (canvas: HTMLCanvasElement) => {
   // const tagBg = scene.addTag(scene.words[0], 300, 100, 2, Math.PI / 2)
@@ -61,7 +62,7 @@ export const scratch = (canvas: HTMLCanvasElement) => {
         progressCallback: (percent) => {
           console.log('Completion: ', percent.toFixed(2))
         },
-        words: ['art', 'word', 'cloud'].map((text) => ({ text })),
+        words: WORDS.map((text) => ({ text })),
       })
       const result = await start()
       const t2 = performance.now()
