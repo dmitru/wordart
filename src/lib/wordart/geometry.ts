@@ -1,6 +1,7 @@
 import { sum, min, max } from 'lodash'
 import * as tm from 'transformation-matrix'
 import { Matrix } from 'transformation-matrix'
+import { createCanvasCtx } from 'lib/wordart/canvas-utils'
 
 const {
   applyToPoint,
@@ -224,7 +225,8 @@ export const collideHBounds = (
   padding2 = 0,
   maxLevel1: number = 100,
   maxLevel2: number = 100,
-  minSize: number = 1
+  minSize: number = 1,
+  debug = false
 ): boolean => {
   // const canvas = document.createElement('canvas') as HTMLCanvasElement
   // canvas.width = hBounds1.bounds.w
@@ -248,42 +250,6 @@ export const collideHBounds = (
     const bounds1 = curHBounds1.bounds
     const bounds2 = curHBounds2.bounds
 
-    const hasChildren1 =
-      curHBounds1.children &&
-      level1 <= maxLevel1 &&
-      bounds1.w >= minSize &&
-      bounds1.h >= minSize
-    const hasChildren2 =
-      curHBounds2.children &&
-      level2 <= maxLevel2 &&
-      bounds2.w >= minSize &&
-      bounds2.h >= minSize
-
-    // invariant: both hbounds overlap shape
-    if (!hasChildren1 && !hasChildren2) {
-      //   // reached leaves
-      //   // console.log(
-      //   //   'ch2: true',
-      //   //   hBounds1,
-      //   //   curHBounds1.overlapsShape,
-      //   //   curHBounds2.overlapsShape,
-      //   //   curHBounds1.data,
-      //   //   curHBounds2.data
-      //   // )
-      //   // ctx.fillStyle = 'lime'
-      //   // ctx.lineWidth = 2
-      //   // ctx.strokeRect(
-      //   //   curHBounds1.bounds.x,
-      //   //   curHBounds1.bounds.y,
-      //   //   curHBounds1.bounds.w,
-      //   //   curHBounds1.bounds.h
-      //   // )
-      //   // drawHBounds(ctx, hBounds1)
-      //   // console.screenshot(ctx.canvas, 0.3)
-      return curHBounds1.overlapsShape && curHBounds2.overlapsShape
-      // return true
-    }
-
     if (
       !areRectsIntersecting(
         transformRectNoSkew(transform1, bounds1),
@@ -294,6 +260,52 @@ export const collideHBounds = (
     ) {
       // console.log('ch3: false')
       return false
+    }
+
+    const hasChildren1 =
+      curHBounds1.children != null &&
+      level1 <= maxLevel1 &&
+      bounds1.w >= minSize &&
+      bounds1.h >= minSize
+
+    const hasChildren2 =
+      curHBounds2.children != null &&
+      level2 <= maxLevel2 &&
+      bounds2.w >= minSize &&
+      bounds2.h >= minSize
+
+    // invariant: both hbounds overlap shape
+    if (!hasChildren1 && !hasChildren2) {
+      //   // reached leaves
+
+      //   // ctx.fillStyle = 'lime'
+      //   // ctx.lineWidth = 2
+      //   // ctx.strokeRect(
+      //   //   curHBounds1.bounds.x,
+      //   //   curHBounds1.bounds.y,
+      //   //   curHBounds1.bounds.w,
+      //   //   curHBounds1.bounds.h
+      //   // )
+      //   // drawHBounds(ctx, hBounds1)
+      //   // console.screenshot(ctx.canvas, 0.3)
+      if (debug) {
+        console.log(
+          'ch2: true',
+          curHBounds1,
+          curHBounds1,
+          level1,
+          level2,
+          maxLevel1,
+          maxLevel2,
+          minSize,
+          curHBounds1.overlapsShape,
+          curHBounds2.overlapsShape,
+          curHBounds1.bounds,
+          curHBounds2.bounds
+        )
+      }
+      return curHBounds1.overlapsShape && curHBounds2.overlapsShape
+      // return true
     }
 
     if (!hasChildren1 && hasChildren2) {
@@ -558,6 +570,186 @@ export const boundsForRectsNoSkew = (
   }
 
   return { x: xMin, y: yMin, w: xMax - xMin, h: yMax - yMin }
+}
+
+export const randomPointInRect = (rect: Rect): Point => {
+  return {
+    x: rect.x + Math.random() * rect.w,
+    y: rect.y + Math.random() * rect.h,
+  }
+}
+
+export const randomPointInsideHbounds = (hBounds: HBounds): Point | null => {
+  const impl = (hBoundsCur: HBounds, level = 0): Point | null => {
+    if (!hBoundsCur.overlapsShape) {
+      return null
+    }
+    if (
+      level > 5 ||
+      !hBoundsCur.children ||
+      hBoundsCur.bounds.w < 10 ||
+      hBoundsCur.bounds.h < 10
+    ) {
+      return randomPointInRect(hBoundsCur.bounds)
+    }
+
+    const candidates = hBoundsCur.children.filter((c) => c.overlapsShape)
+    if (candidates.length === 0) {
+      return null
+    }
+    const childIndex = Math.floor(Math.random() * candidates.length)
+    const child = candidates[childIndex]
+    return impl(child, level + 1)
+  }
+
+  return impl(hBounds)
+}
+
+export const computeHBoundsForCanvas = ({
+  srcCanvas,
+  targetSize,
+  invert = false,
+  imgSize = 800,
+  angle = 0,
+  visualize = false,
+}: {
+  srcCanvas: HTMLCanvasElement
+  targetSize: Rect
+  invert?: boolean
+  imgSize?: number
+  angle?: number
+  visualize?: boolean
+}) => {
+  const pathBboxRect = {
+    x: 0,
+    y: 0,
+    w: srcCanvas.width,
+    h: srcCanvas.height,
+  }
+
+  const aaabUnscaled = aabbForRect(rotate(angle), pathBboxRect)
+
+  const aaabScaleFactor = imgSize / Math.max(aaabUnscaled.w, aaabUnscaled.h)
+
+  console.log('pathAaabUnscaled', aaabUnscaled, aaabScaleFactor)
+
+  const pathAaab = aabbForRect(multiply(rotate(angle), scale(1)), pathBboxRect)
+
+  const scaleFactor = aaabScaleFactor
+
+  const pathAaabTransform = multiply(
+    multiply(translate(-pathAaab.x, -pathAaab.y), rotate(angle)),
+    scale(scaleFactor)
+  )
+
+  const canvas = document.createElement('canvas') as HTMLCanvasElement
+  canvas.width = pathAaab.w
+  canvas.height = pathAaab.h
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+  ctx.save()
+  ctx.setTransform(pathAaabTransform)
+  ctx.drawImage(
+    srcCanvas,
+    0,
+    0,
+    srcCanvas.width,
+    srcCanvas.height,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  )
+  ctx.restore()
+
+  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+  const isPointIntersectingJpg = invert
+    ? (x: number, y: number): boolean => {
+        const index = y * imageData.width + x
+        return imageData.data[4 * index + 1] > 244
+      }
+    : (x: number, y: number): boolean => {
+        const index = y * imageData.width + x
+        return imageData.data[4 * index + 1] < 244
+      }
+
+  const isPointIntersectingPng = invert
+    ? (x: number, y: number): boolean => {
+        const index = y * imageData.width + x
+        return (
+          imageData.data[4 * index + 0] +
+            imageData.data[4 * index + 1] +
+            imageData.data[4 * index + 2] !=
+          255
+        )
+      }
+    : (x: number, y: number): boolean => {
+        const index = y * imageData.width + x
+        return imageData.data[4 * index + 3] > 128
+      }
+
+  const dx = 1
+
+  const isRectIntersecting = (bounds: Rect): 'full' | 'partial' | 'none' => {
+    const maxX = bounds.x + bounds.w
+    const maxY = bounds.y + bounds.h
+
+    let checked = 0
+    let overlapping = 0
+
+    for (let x = Math.ceil(bounds.x); x < Math.floor(maxX); x += dx) {
+      for (let y = Math.ceil(bounds.y); y < Math.floor(maxY); y += dx) {
+        const intersecting = isPointIntersectingJpg(x, y)
+        if (intersecting) {
+          overlapping += 1
+        }
+        checked += 1
+      }
+    }
+
+    if (overlapping === 0 || checked === 0) {
+      return 'none'
+    }
+
+    return checked === overlapping ? 'full' : 'partial'
+  }
+
+  // Visualize sample points
+  if (visualize) {
+    for (let x = 0; x < imageData.width; x += dx) {
+      for (let y = 0; y < imageData.height; y += dx) {
+        const intersecting = isPointIntersectingPng(x, y)
+        if (intersecting) {
+          ctx.fillStyle = 'yellow'
+          ctx.fillRect(x, y, 2, 2)
+        }
+      }
+    }
+  }
+
+  const hBounds = computeHBounds(
+    {
+      x: 0,
+      y: 0,
+      h: canvas.height,
+      w: canvas.width,
+    },
+    isRectIntersecting,
+    2,
+    10
+  )
+
+  if (visualize) {
+    drawHBounds(ctx, hBounds)
+    console.screenshot(ctx.canvas)
+  }
+
+  hBounds.transform = multiply(
+    scale(1 / aaabScaleFactor),
+    translate(pathAaab.x, pathAaab.y)
+  )
+
+  return { hBounds }
 }
 
 export const computeHBoundsForPath = (

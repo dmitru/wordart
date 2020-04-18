@@ -7,6 +7,7 @@ import {
   transformRect,
   mergeHBounds,
   computeHBoundsForPath,
+  computeHBoundsForCanvas,
 } from 'lib/wordart/geometry'
 import Quadtree from 'quadtree-lib'
 import * as tm from 'transformation-matrix'
@@ -32,10 +33,43 @@ export class GeneratedScene {
   _lastTagCollided: Tag | null = null
   _lastTagChecked: Tag | null = null
 
+  bgShape: {
+    imgData: ImageData
+    ctx: CanvasRenderingContext2D
+    hBounds: HBounds
+    hBoundsNagative: HBounds
+  } | null = null
+
   constructor(font: Font, viewBox: Rect) {
     this.font = font
     this.viewBox = viewBox
     this.quad = new Quadtree<Tag>({ width: viewBox.w, height: viewBox.h })
+  }
+
+  setBgShape = (ctx: CanvasRenderingContext2D) => {
+    const hBoundsNagative = computeHBoundsForCanvas({
+      srcCanvas: ctx.canvas,
+      imgSize: 800,
+      targetSize: this.viewBox,
+      invert: true,
+      angle: 0,
+      visualize: true,
+    }).hBounds
+
+    const hBounds = computeHBoundsForCanvas({
+      srcCanvas: ctx.canvas,
+      imgSize: 800,
+      targetSize: this.viewBox,
+      angle: 0,
+      visualize: true,
+    }).hBounds
+
+    this.bgShape = {
+      ctx,
+      hBoundsNagative,
+      hBounds,
+      imgData: ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height),
+    }
   }
 
   clearTags = () => {
@@ -80,14 +114,31 @@ export class GeneratedScene {
     }
 
     const padding = getTagPadding(tag)
+    const minSize = 4
+
+    if (this.bgShape) {
+      if (
+        collideHBounds(
+          this.bgShape.hBoundsNagative,
+          tag.hBounds,
+          5,
+          0,
+          100,
+          getTagMaxLevel(tag),
+          1
+          // true
+        )
+      ) {
+        return true
+      }
+    }
+
     const candidateTags = this.quad.colliding({
       x: tag.bounds.x - padding,
       y: tag.bounds.y - padding,
       width: tag.bounds.w + 2 * padding,
       height: tag.bounds.h + 2 * padding,
     })
-
-    const minSize = 4
 
     if (this._lastTagChecked === tag && this._lastTagCollided) {
       if (

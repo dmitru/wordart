@@ -1,14 +1,25 @@
 import * as opentype from 'opentype.js'
 import { archimedeanSpiral } from './spirals'
 import 'lib/wordart/console-extensions'
-import { Rect, Point } from 'lib/wordart/geometry'
+import {
+  Rect,
+  Point,
+  randomPointInsideHbounds,
+  drawHBounds,
+} from 'lib/wordart/geometry'
 import { loadFont } from 'lib/wordart/fonts'
 import { sample } from 'lodash'
 import { Tag, GeneratedScene } from 'lib/wordart/generator'
+import { loadImageUrlToCanvasCtx } from 'lib/wordart/canvas-utils'
 
 const fontName = 'mountains-of-christmas_bold.ttf'
 const fontName2 = 'mail-ray-stuff.ttf'
 const fontName3 = 'Verona-Xlight.ttf'
+
+// const BG_SHAPE = '/images/cat.png'
+// const BG_SHAPE = '/images/number_six.png'
+// const BG_SHAPE = '/images/darth_vader.jpg'
+const BG_SHAPE = '/images/beatles.jpg'
 
 let font: opentype.Font
 if (typeof window !== 'undefined') {
@@ -20,11 +31,16 @@ if (typeof window !== 'undefined') {
 export const scratch = (canvas: HTMLCanvasElement) => {
   // const tagBg = scene.addTag(scene.words[0], 300, 100, 2, Math.PI / 2)
   let scene: GeneratedScene | null = null
+  let tag: Tag | null = null
 
   const ctx = canvas.getContext('2d')!
 
-  const onKeyDown = (e: KeyboardEvent) => {
+  const onKeyDown = async (e: KeyboardEvent) => {
     const key = e.key
+
+    const bgImageCtx = await loadImageUrlToCanvasCtx(BG_SHAPE, 800, 800)
+    console.screenshot(bgImageCtx.canvas)
+
     if (key === 'g') {
       console.log('font = ', font)
       // @ts-ignore
@@ -32,20 +48,20 @@ export const scratch = (canvas: HTMLCanvasElement) => {
 
       const viewBox: Rect = { x: 0, y: 0, w: canvas.width, h: canvas.height }
       const t1 = performance.now()
-      scene = generateWordArt({ ctx, font, viewBox })
+      scene = generateWordArt({ ctx, font, viewBox, bgImageCtx })
       const t2 = performance.now()
       console.log(`Finished: ${((t2 - t1) / 1000).toFixed(1)} seconds`)
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       renderScene(scene, ctx)
 
-      // tag = new Tag(0, sample(scene.words)!, 0, 0, 1)
+      tag = new Tag(0, sample(scene.words)!, 0, 0, 1)
 
       let collides = false
       // canvas.addEventListener('mousemove', (e) => {
       //   const x = e.offsetX
       //   const y = e.offsetY
 
-      //   if (tag) {
+      //   if (tag && scene) {
       //     tag.left = x
       //     tag.top = y
 
@@ -60,27 +76,27 @@ export const scratch = (canvas: HTMLCanvasElement) => {
       window['scene'] = scene
       console.log('scene', scene)
     }
-    // if (key === 'w') {
-    //   if (tag) {
-    //     tag.scale = tag._scale + 0.1
-    //   }
-    // } else if (key === 's') {
-    //   if (tag) {
-    //     tag.scale = tag._scale - 0.1
-    //   }
-    // } else if (key === 'd') {
-    //   if (tag) {
-    //     tag.angle = tag._angle + 0.03
-    //   }
-    // } else if (key === 'a') {
-    //   if (tag) {
-    //     tag.angle = tag._angle - 0.03
-    //   }
-    // }
+    if (key === 'w') {
+      if (tag) {
+        tag.scale = tag._scale + 0.1
+      }
+    } else if (key === 's') {
+      if (tag) {
+        tag.scale = tag._scale - 0.1
+      }
+    } else if (key === 'd') {
+      if (tag) {
+        tag.angle = tag._angle + 0.03
+      }
+    } else if (key === 'a') {
+      if (tag) {
+        tag.angle = tag._angle - 0.03
+      }
+    }
   }
   document.addEventListener('keydown', onKeyDown)
 
-  let raf = -1
+  // let raf = -1
 
   // const render = () => {
   //   // @ts-ignore
@@ -97,9 +113,9 @@ export const scratch = (canvas: HTMLCanvasElement) => {
 
   // raf = requestAnimationFrame(render)
 
-  return () => {
-    document.removeEventListener('keydown', onKeyDown)
-  }
+  // return () => {
+  //   document.removeEventListener('keydown', onKeyDown)
+  // }
 }
 
 export const generateWordArt = (args: {
@@ -107,10 +123,13 @@ export const generateWordArt = (args: {
   font: opentype.Font
   viewBox: Rect
   oldScene?: GeneratedScene
+  bgImageCtx: CanvasRenderingContext2D
 }): GeneratedScene => {
-  const { font, viewBox, ctx, oldScene } = args
+  const { font, viewBox, ctx, oldScene, bgImageCtx } = args
 
   const scene = new GeneratedScene(font, viewBox)
+  scene.setBgShape(bgImageCtx)
+
   if (oldScene) {
     scene.symbols = oldScene.symbols
     scene.words = oldScene.words
@@ -172,32 +191,46 @@ export const generateWordArt = (args: {
     enableSticky?: boolean
   }) => {
     const tag = sample(protoTags)!
-    const maxIterations = 5
+    const maxIterations = 10
     const dtMin = 0.0002
     const dtMax = 0.0005
 
     const getDt = (nIter: number) =>
-      20.5 * (dtMax - (nIter / maxIterations) * (dtMax - dtMin))
+      5.5 * (dtMax - (nIter / maxIterations) * (dtMax - dtMin))
     const getSpiralPoint = archimedeanSpiral(30)
 
-    const x1 = 30
-    const x2 = viewBox.w - 30
-    const y1 = 30
-    const y2 = viewBox.h - 30
+    const scenePad = 0
+    const x1 = scenePad
+    const x2 = viewBox.w - scenePad
+    const y1 = scenePad
+    const y2 = viewBox.h - scenePad
 
     tag.scale = scale * (1 + 0.4 * 2 * (Math.random() - 0.5))
 
     let placed = false
 
     for (let attempt = 0; attempt < maxAttempts; ++attempt) {
-      let cx0 =
-        x1 +
-        (x2 - x1 - tag.bounds.w) / 2 +
-        (Math.random() - 0.5) * 2 * (x2 - x1 - tag.bounds.w) * 0.5
-      let cy0 =
-        y1 +
-        (y2 - y1 + tag.bounds.h) / 2 +
-        (Math.random() - 0.5) * 2 * (y2 - y1 + tag.bounds.h) * 0.5
+      let cx0 = -1
+      let cy0 = -1
+
+      if (scene.bgShape) {
+        const p0 = randomPointInsideHbounds(scene.bgShape.hBounds)
+        if (p0) {
+          cx0 = p0.x
+          cy0 = p0.y
+        }
+      }
+
+      if (cx0 < 0 || cy0 < 0) {
+        cx0 =
+          x1 +
+          (x2 - x1 - tag.bounds.w) / 2 +
+          (Math.random() - 0.5) * 2 * (x2 - x1 - tag.bounds.w) * 0.5
+        cy0 =
+          y1 +
+          (y2 - y1 + tag.bounds.h) / 2 +
+          (Math.random() - 0.5) * 2 * (y2 - y1 + tag.bounds.h) * 0.5
+      }
 
       if (enableSticky && lastSucceeded) {
         cx0 = lastSucceeded.x + (Math.random() - 0.5) * 2 * tag.bounds.w
@@ -284,8 +317,9 @@ export const generateWordArt = (args: {
     return placed
   }
 
-  const countFactor = 3.5
-  const scaleFactor = 1
+  const earlyExitFactor = 1
+  const countFactor = 1
+  const scaleFactor = 0.8
 
   const configs = [
     {
@@ -336,7 +370,7 @@ export const generateWordArt = (args: {
     {
       scale: 0.023,
       count: 400,
-      maxAttempts: 20,
+      maxAttempts: 50,
       maxFailsInRow: 20,
       padding: 3,
       enableSticky: true,
@@ -344,7 +378,7 @@ export const generateWordArt = (args: {
     {
       scale: 0.016,
       count: 400,
-      maxAttempts: 20,
+      maxAttempts: 50,
       maxFailsInRow: 10,
       padding: 3,
       enableSticky: true,
@@ -352,8 +386,8 @@ export const generateWordArt = (args: {
     {
       scale: 0.013,
       count: 400,
-      maxAttempts: 20,
-      maxFailsInRow: 10,
+      maxAttempts: 50,
+      maxFailsInRow: 30,
       padding: 3,
       enableSticky: true,
     },
@@ -380,7 +414,7 @@ export const generateWordArt = (args: {
       } else {
         failsInRow += 1
       }
-      if (failsInRow > (config.maxFailsInRow || 3)) {
+      if (failsInRow > earlyExitFactor * (config.maxFailsInRow || 3)) {
         console.log('early exit')
         break
       }
@@ -407,6 +441,23 @@ const renderScene = (scene: GeneratedScene, ctx: CanvasRenderingContext2D) => {
   // @ts-ignore
   window['ctx'] = ctx
   ctx.save()
+
+  if (scene.bgShape) {
+    ctx.globalAlpha = 0
+    ctx.drawImage(
+      scene.bgShape.ctx.canvas,
+      0,
+      0,
+      ctx.canvas.width - 0,
+      ctx.canvas.height - 0
+    )
+    ctx.globalAlpha = 1
+  }
+
+  // if (scene.bgShape) {
+  //   drawHBounds(ctx, scene.bgShape.hBoundsNagative)
+  // }
+
   for (let tag of scene.tags) {
     // ctx.fillStyle = '#f002'
     // ctx.fillRect(tag.bounds.x, tag.bounds.y, tag.bounds.w, tag.bounds.h)
