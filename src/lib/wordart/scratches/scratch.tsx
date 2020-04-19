@@ -32,6 +32,9 @@ if (typeof window !== 'undefined') {
 
 export class FabricRenderer {
   constructor(sceneGen: SceneGenerator, canvasId: string) {
+    type Mode = 'edit' | 'view'
+    const mode: Mode = 'view' as Mode
+
     const c = new fabric.Canvas(canvasId, {
       preserveObjectStacking: true,
       imageSmoothingEnabled: false,
@@ -59,6 +62,16 @@ export class FabricRenderer {
 
       const wordPaths = new fabric.Group(symbolPaths)
 
+      const bg = new fabric.Rect({
+        left: -wordPaths.getBoundingRect().width / 2,
+        top: -wordPaths.getBoundingRect().height / 2,
+        width: wordPaths.getBoundingRect().width,
+        height: wordPaths.getBoundingRect().height,
+        fill: '#0000',
+      })
+      wordPaths.add(bg)
+      bg.sendToBack()
+
       wordPaths.originX = 'left'
       wordPaths.originY = 'bottom'
 
@@ -67,6 +80,23 @@ export class FabricRenderer {
 
       wordPaths.angle = (180 / Math.PI) * tag.angle
       wordPaths.scale(tag.scale * scaleX)
+
+      wordPaths.onSelect = () => {
+        if (mode === 'edit') {
+          bg.set({ fill: '#fff5' })
+          c.renderAll()
+          wordPaths.bringToFront()
+          return false
+        }
+        return true
+      }
+
+      wordPaths.onDeselect = () => {
+        bg.set({ fill: '#fff0' })
+        c.renderAll()
+        wordPaths.bringToFront()
+        return false
+      }
 
       c.add(wordPaths)
     }
@@ -95,6 +125,12 @@ export class FabricRenderer {
     } else {
       c.renderAll()
     }
+
+    c.on('mouse:move', (evt) => {
+      console.log('mouse:move', evt)
+      // TODO: when hovered, animate
+      // when out, remove animation
+    })
   }
 }
 
@@ -127,9 +163,10 @@ export const scratch = (
         sceneGen.clearTags()
       }
 
-      const t1 = performance.now()
+      let t1 = -1
       const { start, cancel } = sceneGen.generate({
         bgImageCtx,
+        anglesDeg: [0, -90, -45],
         // debug: {
         //   ctx,
         //   logWordPlacementImg: false,
@@ -137,6 +174,9 @@ export const scratch = (
         font,
         viewBox,
         progressCallback: (percent) => {
+          if (t1 < 0) {
+            t1 = performance.now()
+          }
           console.log('Completion: ', percent.toFixed(2))
         },
         words: WORDS.map((text) => ({ text })),
@@ -145,9 +185,7 @@ export const scratch = (
       const t2 = performance.now()
       console.log(`Finished: ${((t2 - t1) / 1000).toFixed(1)} seconds`)
       console.log('Result: ', result)
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-
-      const renderer = new FabricRenderer(sceneGen, canvas.id)
+      // const renderer = new FabricRenderer(sceneGen, canvas.id)
       renderSceneDebug(sceneGen, ctx2)
 
       if (ENABLE_INTERACTIVITY) {

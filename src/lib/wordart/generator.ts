@@ -1,4 +1,10 @@
-import { Rect, multiply, transformRect, Point } from 'lib/wordart/geometry'
+import {
+  Rect,
+  multiply,
+  transformRect,
+  Point,
+  degToRad,
+} from 'lib/wordart/geometry'
 import Quadtree from 'quadtree-lib'
 import * as tm from 'transformation-matrix'
 import {
@@ -18,7 +24,7 @@ import {
   computeHBoundsForPath,
   randomPointInsideHbounds,
 } from 'lib/wordart/hbounds'
-import { sample, clamp } from 'lodash'
+import { sample, clamp, flatten } from 'lodash'
 import { archimedeanSpiral } from 'lib/wordart/spirals'
 
 export type GeneratorParams = {
@@ -40,13 +46,15 @@ export type WordConfig = {
 
 export type GenerateParams = {
   words: WordConfig[]
+  /** A list of allowed angles in degrees */
+  anglesDeg?: number[]
   debug?: {
     ctx: CanvasRenderingContext2D
     logWordPlacementImg: boolean
   }
   font: opentype.Font
   viewBox: Rect
-  bgImageCtx: CanvasRenderingContext2D
+  bgImageCtx?: CanvasRenderingContext2D
   progressCallback?: (percentage: number) => void
 }
 
@@ -263,10 +271,14 @@ export class SceneGenerator {
       }
 
       // Precompute all hbounds
-      const protoTags = [
-        ...this.words.map((word) => new Tag(0, word, 0, 0, 1, 0)),
-        ...this.words.map((word) => new Tag(0, word, 0, 0, 1, -Math.PI / 2)),
-      ]
+      const { anglesDeg = [0] } = params
+      const protoTags = flatten(
+        anglesDeg.map((angleDeg) =>
+          this.words.map(
+            (word) => new Tag(0, word, 0, 0, 1, degToRad(angleDeg))
+          )
+        )
+      )
       protoTags.forEach((tag) => console.log(tag.bounds))
 
       // const colors = chroma
@@ -455,12 +467,13 @@ export class SceneGenerator {
       const scaleFactor = 1
 
       const initialScale = 0.15
-      const finalScale = 0.01
-      const scaleStep = 0.15
+      const finalScale = 0.003
+      const scaleStepFactor = 0.1
+      const maxScaleStep = 0.005
       let timeout = 1500
       let maxTimeout = 3000
       let timeoutStep = 300
-      const maxTagsCount = 1300
+      const maxTagsCount = 1000
 
       let currentScale = initialScale
 
@@ -470,6 +483,9 @@ export class SceneGenerator {
       let placedCountAtCurrentScale = 0
       let scaleCount = 0
 
+      let failedBatchesCount = 0
+      let maxFailedBatchesCount = 2
+
       while (currentScale > finalScale) {
         // TODO
         const currentPercent = clamp(scaleCount / 15, 0, 1)
@@ -477,7 +493,7 @@ export class SceneGenerator {
           params.progressCallback(currentPercent)
         }
 
-        const batchSize = 20
+        const batchSize = 10
         // Attempt to place a batch of words
 
         let successCount = 0
@@ -485,7 +501,7 @@ export class SceneGenerator {
           const isPlaced = tryToPlaceTag({
             scale: scaleFactor * currentScale,
             maxAttempts: 20,
-            padding: 40 * scaleFactor * currentScale,
+            padding: 50 * scaleFactor * currentScale,
             enableSticky: false,
             debug: false,
             bounds: viewBox,
@@ -515,10 +531,15 @@ export class SceneGenerator {
 
         let t1 = performance.now()
 
-        if (successCount === 0 || t1 - t0 > timeout) {
-          currentScale -= scaleStep * currentScale
+        if (successCount === 0) {
+          failedBatchesCount += 1
+        }
+
+        if (failedBatchesCount >= maxFailedBatchesCount || t1 - t0 > timeout) {
+          currentScale -= Math.min(maxScaleStep, scaleStepFactor * currentScale)
           scaleCount += 1
-          timeout += Math.min(maxTimeout, timeout + timeoutStep)
+          failedBatchesCount = 0
+          timeout = Math.min(maxTimeout, timeout + timeoutStep)
           console.log(
             `Scale: ${currentScale.toFixed(
               3
@@ -811,16 +832,13 @@ export const renderSceneDebug = (
   // @ts-ignore
   window['ctx'] = ctx
   ctx.save()
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
   const scaleX = ctx.canvas.width / sceneGen.params.viewBox.w
   const scaleY = ctx.canvas.height / sceneGen.params.viewBox.h
 
-  console.log('scaleX', scaleX, scaleY)
-
   if (sceneGen.bgShape) {
     ctx.globalAlpha = 0.1
-
-    console.log('sceneGen.bgShape.ctx.canvas', sceneGen.bgShape.ctx.canvas)
 
     ctx.drawImage(
       sceneGen.bgShape.ctx.canvas,

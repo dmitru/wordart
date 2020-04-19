@@ -4,6 +4,8 @@ import { Matrix } from 'transformation-matrix'
 
 const { applyToPoint, applyToPoints } = tm
 
+export const degToRad = (deg: number): number => (deg * Math.PI) / 180
+
 export function applyToPointNoSkew(matrix: Matrix, point: Point): Point {
   return {
     x: matrix.a * point.x + matrix.e,
