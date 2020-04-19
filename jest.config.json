@@ -1,0 +1,13 @@
+{
+  "bail": 1,
+  "verbose": true,
+  "moduleFileExtensions": ["ts", "tsx", "js", "jsx"],
+  "testPathIgnorePatterns": ["/node_modules/", "/.next/"],
+  "transform": {
+    "^.+\\.(ts|tsx)$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^/(.*)$": "<rootDir>/src/$1"
+  },
+  "testMatch": ["**/*.(test|spec).(ts|tsx|js|jsx)"]
+}

@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "format": "NODE_ENV=production prettier --write \"src/**/*.{ts,tsx,js,jsx}\"",
-    "generate": "plop --plopfile tools/generators/index.js"
+    "generate": "plop --plopfile tools/generators/index.js",
+    "test:watch": "jest --watch --config=./jest.config.json"
   },
   "repository": {
     "type": "git",
@@ -38,17 +39,23 @@
     "transformation-matrix": "^2.3.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.5.0",
+    "@testing-library/react": "^10.0.2",
     "@types/chroma-js": "^2.0.0",
     "@types/fabric": "^3.6.2",
+    "@types/jest": "^25.2.1",
     "@types/node": "^13.11.1",
     "@types/opentype.js": "^0.7.2",
     "@types/react": "^16.9.34",
     "@types/styled-components": "^5.0.1",
+    "babel-jest": "^25.3.0",
     "babel-plugin-styled-components": "^1.10.7",
     "husky": "^4.2.5",
+    "jest": "^25.3.0",
     "plop": "^2.6.0",
     "prettier": "^2.0.4",
     "pretty-quick": "^2.0.1",
+    "ts-jest": "^25.4.0",
     "typescript": "^3.8.3"
   }
 }
