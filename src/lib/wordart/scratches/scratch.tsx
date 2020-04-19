@@ -158,7 +158,7 @@ export const scratch = (
 
       const viewBox: Rect = { x: 0, y: 0, w: 400, h: 400 }
       if (!sceneGen) {
-        sceneGen = new SceneGenerator({ font, viewBox })
+        sceneGen = new SceneGenerator({ viewBox, bgImgSize: 800 })
       } else {
         sceneGen.clearTags()
       }
@@ -166,13 +166,17 @@ export const scratch = (
       let t1 = -1
       const { start, cancel } = sceneGen.generate({
         bgImageCtx,
-        anglesDeg: [0, -90, -45],
+        shapeConfigs: [
+          {
+            font,
+            angles: [0, -90, -45],
+            scale: 1,
+          },
+        ],
         // debug: {
         //   ctx,
         //   logWordPlacementImg: false,
         // },
-        font,
-        viewBox,
         progressCallback: (percent) => {
           if (t1 < 0) {
             t1 = performance.now()
@@ -195,11 +199,11 @@ export const scratch = (
           const x = e.offsetX
           const y = e.offsetY
 
-          if (tag && sceneGen) {
+          if (tag && sceneGen?.bgShape) {
             tag.left = x
             tag.top = y
 
-            collides = sceneGen.checkCollision(tag)
+            collides = sceneGen.checkCollision(tag, sceneGen.bgShape.shapes[0])
             // console.log('tag = ', tag, collides)
 
             tag.fillStyle = collides ? 'green' : 'black'

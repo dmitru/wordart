@@ -4,6 +4,7 @@ import {
   transformRect,
   Point,
   degToRad,
+  Size,
 } from 'lib/wordart/geometry'
 import Quadtree from 'quadtree-lib'
 import * as tm from 'transformation-matrix'
@@ -26,13 +27,15 @@ import {
 } from 'lib/wordart/hbounds'
 import { sample, clamp, flatten } from 'lodash'
 import { archimedeanSpiral } from 'lib/wordart/spirals'
+import { computeShapes, Shape } from 'lib/wordart/image-to-shapes'
 
 export type GeneratorParams = {
   viewBox: Rect
-  font: opentype.Font
+  bgImgSize: number
 }
 
 type BgShapeInfo = {
+  shapes: Shape[]
   imgData: ImageData
   imgDataData: Uint8ClampedArray
   ctx: CanvasRenderingContext2D
@@ -44,16 +47,22 @@ export type WordConfig = {
   text: string
 }
 
+export type ShapeConfig = {
+  font: Font
+  words?: WordConfig[]
+  angles?: number[]
+  color?: string
+  scale?: number
+}
+
 export type GenerateParams = {
   words: WordConfig[]
+  shapeConfigs: ShapeConfig[]
   /** A list of allowed angles in degrees */
-  anglesDeg?: number[]
   debug?: {
     ctx: CanvasRenderingContext2D
     logWordPlacementImg: boolean
   }
-  font: opentype.Font
-  viewBox: Rect
   bgImageCtx?: CanvasRenderingContext2D
   progressCallback?: (percentage: number) => void
 }
@@ -93,7 +102,7 @@ export class SceneGenerator {
   setBgShape = (ctx: CanvasRenderingContext2D) => {
     const hBoundsNagative = computeHBoundsForCanvas({
       srcCanvas: ctx.canvas,
-      imgSize: 400,
+      imgSize: this.params.bgImgSize,
       targetSize: this.params.viewBox,
       invert: true,
       angle: 0,
@@ -103,7 +112,7 @@ export class SceneGenerator {
 
     const hBounds = computeHBoundsForCanvas({
       srcCanvas: ctx.canvas,
-      imgSize: 400,
+      imgSize: this.params.bgImgSize,
       targetSize: this.params.viewBox,
       angle: 0,
       minSize: 1,
@@ -112,7 +121,18 @@ export class SceneGenerator {
 
     const imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
 
+    console.log({
+      imgSize: this.params.bgImgSize,
+      originalSize: this.params.viewBox.w,
+    })
+    const shapes = computeShapes({
+      srcCanvas: ctx.canvas,
+      imgSize: this.params.bgImgSize,
+      originalSize: this.params.viewBox.w,
+    })
+
     this.bgShape = {
+      shapes,
       ctx,
       hBoundsNagative,
       hBounds,
@@ -121,10 +141,10 @@ export class SceneGenerator {
     }
   }
 
-  addWord = (text: string) => {
+  addWord = (text: string, font: Font) => {
     const id = (this.nextWordId += 1)
 
-    const word = new Word(id, text, this.params.font)
+    const word = new Word(id, text, font)
     this.words.push(word)
 
     for (let symbol of word.symbols) {
@@ -143,7 +163,7 @@ export class SceneGenerator {
     this.tags = this.tags.filter((t) => t === tag)
   }
 
-  addTag = (tag: Tag) => {
+  addTag = (tag: Tag, sampleColorFromBg = false) => {
     const id = (this.nextTagId += 1)
     const addedTag = new Tag(
       id,
@@ -158,7 +178,7 @@ export class SceneGenerator {
     this.tags.push(addedTag)
     this.quad.push(addedTag)
 
-    if (this.bgShape) {
+    if (this.bgShape && sampleColorFromBg) {
       // sample bg shape for tag color
       const index =
         Math.round(tag.y + tag.bounds.h / 2) * this.bgShape.ctx.canvas.width +
@@ -172,43 +192,44 @@ export class SceneGenerator {
     }
   }
 
-  checkCollision = (tag: Tag, pad = 0): boolean => {
+  checkCollision = (tag: Tag, shape: Shape, pad = 0): boolean => {
     const getTagPadding = (tag: Tag) => {
       // return 0
       return pad
     }
     const getTagMaxLevel = (tag: Tag) => {
       // return 100
-      return tag.scale >= 0.2
-        ? 9
-        : tag.scale > 0.05
-        ? 6
-        : tag.scale > 0.03
-        ? 3
-        : 2
+      return tag.scale >= 0.2 ? 9 : 4
+      // return tag.scale >= 0.2
+      //   ? 9
+      //   : tag.scale > 0.05
+      //   ? 6
+      //   : tag.scale > 0.03
+      //   ? 3
+      //   : 2
     }
 
     const padding = getTagPadding(tag)
-    const minSize = 2
+    const minSize = 1
 
     const bgShapePadding = 1
 
-    if (this.bgShape) {
-      if (
-        collideHBounds(
-          this.bgShape.hBoundsNagative,
-          tag.hBounds,
-          bgShapePadding,
-          0,
-          7,
-          getTagMaxLevel(tag),
-          1
-          // true
-        )
-      ) {
-        return true
-      }
+    // if (this.bgShape) {
+    if (
+      collideHBounds(
+        shape.hBoundsInverted,
+        tag.hBounds,
+        bgShapePadding,
+        0,
+        12,
+        getTagMaxLevel(tag),
+        1
+        // true
+      )
+    ) {
+      return true
     }
+    // }
 
     const candidateTags = this.quad.colliding({
       x: tag.bounds.x - padding,
@@ -260,301 +281,342 @@ export class SceneGenerator {
     let hasBeenCancelled = false
 
     const startGeneration = async (): Promise<GenerationResult> => {
-      const { words, bgImageCtx, viewBox, debug } = params
+      const { bgImageCtx, debug } = params
+      const { viewBox } = this.params
 
       if (bgImageCtx) {
         this.setBgShape(bgImageCtx)
       }
 
-      for (let word of words) {
-        this.addWord(word.text)
+      if (!this.bgShape) {
+        // TODO
+        return { status: 'cancelled' }
       }
+      console.log('shapes: ', this.bgShape.shapes)
 
-      // Precompute all hbounds
-      const { anglesDeg = [0] } = params
-      const protoTags = flatten(
-        anglesDeg.map((angleDeg) =>
-          this.words.map(
-            (word) => new Tag(0, word, 0, 0, 1, degToRad(angleDeg))
+      let shapeConfigIndex = 0
+      for (const shape of this.bgShape.shapes) {
+        console.log('Processing shape: ', shape)
+
+        const shapeConfig = params.shapeConfigs[shapeConfigIndex]
+        shapeConfigIndex = (shapeConfigIndex + 1) % params.shapeConfigs.length
+
+        const words = shapeConfig.words || params.words
+
+        this.words = []
+        for (const word of words) {
+          this.addWord(word.text, shapeConfig.font)
+        }
+
+        // Precompute all hbounds
+        const { angles = [0] } = shapeConfig
+        const protoTags = flatten(
+          angles.map((angleDeg) =>
+            this.words.map(
+              (word) => new Tag(0, word, 0, 0, 1, degToRad(angleDeg))
+            )
           )
         )
-      )
-      protoTags.forEach((tag) => console.log(tag.bounds))
+        protoTags.forEach((tag) => console.log(tag.bounds))
 
-      // const colors = chroma
-      //   .scale(['#fafa6e', '#2A4858'])
-      //   .mode('lch')
-      //   .colors(10)
-      //   .slice(3)
-      const colors = ['#000']
+        // const colors = chroma
+        //   .scale(['#fafa6e', '#2A4858'])
+        //   .mode('lch')
+        //   .colors(10)
+        //   .slice(3)
+        const colors = [shapeConfig.color || '#000']
 
-      let lastSucceeded: Point | null = null
+        let lastSucceeded: Point | null = null
 
-      const tryToPlaceTag = ({
-        bounds,
-        scale,
-        maxAttempts = 50,
-        padding = 0,
-        enableSticky = false,
-      }: {
-        bounds: Rect
-        scale: number
-        debug?: boolean
-        maxAttempts?: number
-        padding?: number
-        enableSticky?: boolean
-      }): boolean => {
-        const tag = sample(protoTags)!
-        const maxIterations = 1
-        const dtMin = 0.0002
-        const dtMax = 0.0005
+        const tryToPlaceTag = ({
+          bounds,
+          scale,
+          maxAttempts = 50,
+          padding = 0,
+          enableSticky = false,
+        }: {
+          bounds: Rect
+          scale: number
+          debug?: boolean
+          maxAttempts?: number
+          padding?: number
+          enableSticky?: boolean
+        }): boolean => {
+          const tag = sample(protoTags)!
+          const maxIterations = 1
+          const dtMin = 0.0002
+          const dtMax = 0.0005
 
-        const getDt = (nIter: number) =>
-          5.5 * (dtMax - (nIter / maxIterations) * (dtMax - dtMin))
-        const getSpiralPoint = archimedeanSpiral(30)
+          const getDt = (nIter: number) =>
+            5.5 * (dtMax - (nIter / maxIterations) * (dtMax - dtMin))
+          const getSpiralPoint = archimedeanSpiral(30)
 
-        const x1 = bounds.x
-        const x2 = bounds.x + bounds.w
-        const y1 = bounds.y
-        const y2 = bounds.y + bounds.h
+          const x1 = bounds.x
+          const x2 = bounds.x + bounds.w
+          const y1 = bounds.y
+          const y2 = bounds.y + bounds.h
 
-        tag.scale = scale * (1 + 0.4 * 2 * (Math.random() - 0.5))
+          tag.scale = scale * (1 + 0.4 * 2 * (Math.random() - 0.5))
 
-        let placed = false
+          let placed = false
 
-        for (let attempt = 0; attempt < maxAttempts; ++attempt) {
-          let cx0 = -1
-          let cy0 = -1
+          for (let attempt = 0; attempt < maxAttempts; ++attempt) {
+            let cx0 = -1
+            let cy0 = -1
 
-          if (this.bgShape) {
-            const p0 = randomPointInsideHbounds(this.bgShape.hBounds)
+            // if (this.bgShape) {
+            const p0 = randomPointInsideHbounds(shape.hBounds)
             if (p0) {
               cx0 = p0.x
               cy0 = p0.y
             }
-          }
+            // }
 
-          if (cx0 < 0 || cy0 < 0) {
-            cx0 =
-              x1 +
-              (x2 - x1 - tag.bounds.w) / 2 +
-              (Math.random() - 0.5) * 2 * (x2 - x1 - tag.bounds.w) * 0.5
-            cy0 =
-              y1 +
-              (y2 - y1 + tag.bounds.h) / 2 +
-              (Math.random() - 0.5) * 2 * (y2 - y1 + tag.bounds.h) * 0.5
-          }
-
-          if (enableSticky && lastSucceeded) {
-            cx0 = lastSucceeded.x + (Math.random() - 0.5) * 2 * tag.bounds.w
-            cy0 = lastSucceeded.y + (Math.random() - 0.5) * 2 * tag.bounds.h
-          }
-
-          let cx = cx0
-          let cy = cy0
-
-          if (debug) {
-            const { ctx, logWordPlacementImg } = debug
-            if (logWordPlacementImg) {
-              ctx.clearRect(0, 0, viewBox.w, viewBox.h)
-              ctx.fillStyle = '#f001'
-              ctx.fillRect(0, 0, viewBox.w, viewBox.h)
-
-              renderSceneDebug(this, ctx)
-
-              ctx.fillStyle = 'green'
-              ctx.fillRect(cx0, cy0, 10, 10)
-              tag.left = cx0
-              tag.top = cy0
-              tag.draw(ctx)
-            }
-          }
-
-          let t = 0
-          let iteration = 0
-
-          while (iteration < maxIterations) {
-            tag.left = cx
-            tag.top = cy
-
-            const bounds = tag.bounds
-
-            if (
-              !(
-                bounds.x < x1 ||
-                bounds.x + bounds.w > x2 ||
-                bounds.y < y1 ||
-                bounds.y + bounds.h > y2
-              )
-            ) {
-              if (!this.checkCollision(tag, padding)) {
-                tag.fillStyle = sample(colors)!
-                this.addTag(tag)
-
-                if (debug) {
-                  const { ctx, logWordPlacementImg } = debug
-                  if (logWordPlacementImg) {
-                    tag.draw(ctx)
-                    console.screenshot(ctx.canvas, 0.4)
-                  }
-                }
-
-                // console.log('attempt: ', attempt, 'iteration: ', iteration)
-                placed = true
-                break
-              }
+            if (cx0 < 0 || cy0 < 0) {
+              cx0 =
+                x1 +
+                (x2 - x1 - tag.bounds.w) / 2 +
+                (Math.random() - 0.5) * 2 * (x2 - x1 - tag.bounds.w) * 0.5
+              cy0 =
+                y1 +
+                (y2 - y1 + tag.bounds.h) / 2 +
+                (Math.random() - 0.5) * 2 * (y2 - y1 + tag.bounds.h) * 0.5
             }
 
-            const spiralPoint = getSpiralPoint(t)
-            t += getDt(iteration)
+            if (enableSticky && lastSucceeded) {
+              cx0 = lastSucceeded.x + (Math.random() - 0.5) * 2 * tag.bounds.w
+              cy0 = lastSucceeded.y + (Math.random() - 0.5) * 2 * tag.bounds.h
+            }
 
-            cx =
-              cx0 +
-              (((spiralPoint.x * viewBox.w) / 2) * (2 - 1 * (1 - scale))) / 2
-            cy =
-              cy0 +
-              (((spiralPoint.y * viewBox.h) / 2) * (2 - 1 * (1 - scale))) / 2
+            let cx = cx0
+            let cy = cy0
 
             if (debug) {
               const { ctx, logWordPlacementImg } = debug
               if (logWordPlacementImg) {
-                ctx.fillStyle = 'red'
-                ctx.fillRect(cx, cy, 5, 5)
+                ctx.clearRect(0, 0, viewBox.w, viewBox.h)
+                ctx.fillStyle = '#f001'
+                ctx.fillRect(0, 0, viewBox.w, viewBox.h)
+
+                renderSceneDebug(this, ctx)
+
+                ctx.fillStyle = 'green'
+                ctx.fillRect(cx0, cy0, 10, 10)
+                tag.left = cx0
+                tag.top = cy0
+                tag.draw(ctx)
               }
             }
 
-            iteration += 1
-          }
+            let t = 0
+            let iteration = 0
 
-          if (debug) {
-            const { ctx, logWordPlacementImg } = debug
-            if (logWordPlacementImg) {
-              console.screenshot(ctx.canvas, 0.3)
+            while (iteration < maxIterations) {
+              tag.left = cx
+              tag.top = cy
+
+              const bounds = tag.bounds
+
+              if (
+                !(
+                  bounds.x < x1 ||
+                  bounds.x + bounds.w > x2 ||
+                  bounds.y < y1 ||
+                  bounds.y + bounds.h > y2
+                )
+              ) {
+                if (!this.checkCollision(tag, shape, padding)) {
+                  let color = sample(colors)!
+                  if (shapeConfig.color) {
+                    color = shapeConfig.color
+                  } else if (shape.color) {
+                    color = shape.color
+                  }
+                  tag.fillStyle = color
+                  this.addTag(tag)
+
+                  if (debug) {
+                    const { ctx, logWordPlacementImg } = debug
+                    if (logWordPlacementImg) {
+                      tag.draw(ctx)
+                      console.screenshot(ctx.canvas, 0.4)
+                    }
+                  }
+
+                  // console.log('attempt: ', attempt, 'iteration: ', iteration)
+                  placed = true
+                  break
+                }
+              }
+
+              const spiralPoint = getSpiralPoint(t)
+              t += getDt(iteration)
+
+              cx =
+                cx0 +
+                (((spiralPoint.x * viewBox.w) / 2) * (2 - 1 * (1 - scale))) / 2
+              cy =
+                cy0 +
+                (((spiralPoint.y * viewBox.h) / 2) * (2 - 1 * (1 - scale))) / 2
+
+              if (debug) {
+                const { ctx, logWordPlacementImg } = debug
+                if (logWordPlacementImg) {
+                  ctx.fillStyle = 'red'
+                  ctx.fillRect(cx, cy, 5, 5)
+                }
+              }
+
+              iteration += 1
             }
+
+            if (debug) {
+              const { ctx, logWordPlacementImg } = debug
+              if (logWordPlacementImg) {
+                console.screenshot(ctx.canvas, 0.3)
+              }
+            }
+
+            if (placed) {
+              lastSucceeded = { x: cx, y: cy }
+              break
+            } else {
+              lastSucceeded = null
+            }
+
+            // scale = Math.max(0.1, scale / 1.2)
           }
 
-          if (placed) {
-            lastSucceeded = { x: cx, y: cy }
-            break
-          } else {
-            lastSucceeded = null
+          return placed
+        }
+
+        ;(this as any).debugAddRandomTag = (
+          scale: number,
+          visualize = false,
+          maxAttempts = 50
+        ) => {
+          if (!debug) {
+            return
           }
-
-          // scale = Math.max(0.1, scale / 1.2)
-        }
-
-        return placed
-      }
-
-      // @ts-ignore
-      this.debugAddRandomTag = (
-        scale: number,
-        visualize = false,
-        maxAttempts = 50
-      ) => {
-        if (!debug) {
-          return
-        }
-        const { ctx, logWordPlacementImg } = debug
-        if (!logWordPlacementImg) {
-          return
-        }
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-        renderSceneDebug(this, ctx)
-        tryToPlaceTag({ scale, debug: visualize, maxAttempts, bounds: viewBox })
-      }
-
-      const scaleFactor = 1
-
-      const initialScale = 0.15
-      const finalScale = 0.003
-      const scaleStepFactor = 0.1
-      const maxScaleStep = 0.005
-      let timeout = 1500
-      let maxTimeout = 3000
-      let timeoutStep = 300
-      const maxTagsCount = 1000
-
-      let currentScale = initialScale
-
-      let t0 = performance.now()
-
-      let placedCountTotal = 0
-      let placedCountAtCurrentScale = 0
-      let scaleCount = 0
-
-      let failedBatchesCount = 0
-      let maxFailedBatchesCount = 2
-
-      while (currentScale > finalScale) {
-        // TODO
-        const currentPercent = clamp(scaleCount / 15, 0, 1)
-        if (params.progressCallback) {
-          params.progressCallback(currentPercent)
-        }
-
-        const batchSize = 10
-        // Attempt to place a batch of words
-
-        let successCount = 0
-        for (let i = 0; i < batchSize; ++i) {
-          const isPlaced = tryToPlaceTag({
-            scale: scaleFactor * currentScale,
-            maxAttempts: 20,
-            padding: 50 * scaleFactor * currentScale,
-            enableSticky: false,
-            debug: false,
+          const { ctx, logWordPlacementImg } = debug
+          if (!logWordPlacementImg) {
+            return
+          }
+          ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+          renderSceneDebug(this, ctx)
+          tryToPlaceTag({
+            scale,
+            debug: visualize,
+            maxAttempts,
             bounds: viewBox,
           })
+        }
 
-          if (isPlaced) {
-            placedCountAtCurrentScale += 1
-            placedCountTotal += 1
-            successCount += 1
+        const scaleFactor = shapeConfig.scale || 1
+
+        const initialScale = 0.7 * scaleFactor
+        // const initialScale = 0.002
+        const finalScale = 0.01 * scaleFactor
+        // const finalScale = 0.05
+        const scaleStepFactor = 0.1
+        const maxScaleStep = 0.005
+        const paddingFactor = 20 * scaleFactor
+        let timeout = 1500
+        let maxTimeout = 3000
+        let timeoutStep = 300
+        // const maxTagsCount = 1000
+        const maxTagsCount = (1000 * shape.percentFilled) / scaleFactor
+
+        let currentScale = initialScale
+
+        let t0 = performance.now()
+
+        let placedCountTotal = 0
+        let placedCountAtCurrentScale = 0
+        let scaleCount = 0
+
+        let failedBatchesCount = 0
+        let maxFailedBatchesCount = 2
+
+        while (currentScale > finalScale) {
+          // TODO
+          const currentPercent = clamp(scaleCount / 30, 0, 1)
+          if (params.progressCallback) {
+            // @ts-ignore
+            params.progressCallback(currentPercent)
           }
 
-          if (hasBeenCancelled) {
-            return {
-              status: 'cancelled',
+          const batchSize = 15
+          // Attempt to place a batch of words
+
+          let successCount = 0
+          for (let i = 0; i < batchSize; ++i) {
+            const isPlaced = tryToPlaceTag({
+              scale: currentScale,
+              maxAttempts: 10,
+              padding: paddingFactor * currentScale,
+              enableSticky: false,
+              debug: false,
+              bounds: viewBox,
+            })
+
+            if (isPlaced) {
+              placedCountAtCurrentScale += 1
+              placedCountTotal += 1
+              successCount += 1
             }
+
+            if (hasBeenCancelled) {
+              return {
+                status: 'cancelled',
+              }
+            }
+
+            let t1 = performance.now()
+            if (t1 - t0 > timeout) {
+              break
+            }
+          }
+
+          if (placedCountTotal > maxTagsCount) {
+            break
           }
 
           let t1 = performance.now()
-          if (t1 - t0 > timeout) {
-            break
+
+          if (successCount === 0) {
+            failedBatchesCount += 1
           }
-        }
 
-        if (placedCountTotal > maxTagsCount) {
-          break
-        }
+          if (
+            failedBatchesCount >= maxFailedBatchesCount ||
+            t1 - t0 > timeout
+          ) {
+            currentScale -= Math.min(
+              maxScaleStep,
+              scaleStepFactor * currentScale
+            )
+            scaleCount += 1
+            failedBatchesCount = 0
+            timeout = Math.min(maxTimeout, timeout + timeoutStep)
+            console.log(
+              `Scale: ${currentScale.toFixed(
+                3
+              )}, ${placedCountAtCurrentScale} words in ${(
+                (t1 - t0) /
+                1000
+              ).toFixed(2)} seconds`
+            )
+            placedCountAtCurrentScale = 0
+            if (t1 - t0 > 300) {
+              await new Promise((resolve) => setTimeout(() => resolve(), 20))
+            }
 
-        let t1 = performance.now()
+            t0 = performance.now()
 
-        if (successCount === 0) {
-          failedBatchesCount += 1
-        }
-
-        if (failedBatchesCount >= maxFailedBatchesCount || t1 - t0 > timeout) {
-          currentScale -= Math.min(maxScaleStep, scaleStepFactor * currentScale)
-          scaleCount += 1
-          failedBatchesCount = 0
-          timeout = Math.min(maxTimeout, timeout + timeoutStep)
-          console.log(
-            `Scale: ${currentScale.toFixed(
-              3
-            )}, ${placedCountAtCurrentScale} words in ${(
-              (t1 - t0) /
-              1000
-            ).toFixed(2)} seconds`
-          )
-          placedCountAtCurrentScale = 0
-          t0 = performance.now()
-
-          await new Promise((resolve) => setTimeout(() => resolve(), 100))
-
-          // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-          // renderScene(scene, ctx)
+            // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+            // renderScene(scene, ctx)
+          }
         }
       }
 
@@ -708,6 +770,7 @@ export class Tag {
       level: this._hBounds.level,
       bounds: this._hBounds.bounds,
       overlapsShape: this._hBounds.overlapsShape,
+      overlappingArea: this._hBounds.overlappingArea,
       children: this._hBounds.children,
       transform: transform,
     }
@@ -807,7 +870,7 @@ export class Symbol {
 
 export const getSymbolId = (glyph: Glyph, font: Font): SymbolId =>
   // @ts-ignore
-  `${glyph.index}`
+  `${font.names.fullName}.${glyph.index}`
 
 export const stringToSymbols = (
   text: string,
@@ -838,7 +901,7 @@ export const renderSceneDebug = (
   const scaleY = ctx.canvas.height / sceneGen.params.viewBox.h
 
   if (sceneGen.bgShape) {
-    ctx.globalAlpha = 0.1
+    ctx.globalAlpha = 0.2
 
     ctx.drawImage(
       sceneGen.bgShape.ctx.canvas,
@@ -855,14 +918,18 @@ export const renderSceneDebug = (
     ctx.globalAlpha = 1
   }
 
-  // if (scene.bgShape) {
-  //   drawHBounds(ctx, scene.bgShape.hBoundsNagative)
-  // }
+  ctx.scale(scaleX, scaleY)
+
+  if (sceneGen.bgShape) {
+    for (const shape of sceneGen.bgShape.shapes) {
+      // drawHBounds(ctx, shape.hBounds)
+    }
+  }
 
   for (let tag of sceneGen.tags) {
     // ctx.fillStyle = '#f002'
     // ctx.fillRect(tag.bounds.x, tag.bounds.y, tag.bounds.w, tag.bounds.h)
-    tag.draw(ctx, scale(scaleX, scaleY))
+    tag.draw(ctx, ctx.getTransform())
     // drawHBounds(ctx, tag.hBounds)
   }
   ctx.restore()

@@ -1,8 +1,17 @@
 import { noop } from 'lodash'
+import { Rect } from 'lib/wordart/geometry'
 
 export type Dimensions = { w: number; h: number }
 
 export type CanvasCtx = CanvasRenderingContext2D
+
+export const clearCanvas = (ctx: CanvasRenderingContext2D, rect?: Rect) => {
+  if (rect) {
+    ctx.clearRect(rect.x, rect.y, rect.w, rect.h)
+  } else {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+  }
+}
 
 export const createCanvas = (
   size: Dimensions,

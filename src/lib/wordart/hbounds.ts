@@ -14,6 +14,7 @@ import {
   Point,
   multiply,
 } from 'lib/wordart/geometry'
+import { weightedSample } from 'lib/wordart/random-utils'
 
 const { identity, translate, rotate, scale } = tm
 
@@ -23,6 +24,7 @@ export type HBounds = {
   count: number
   level: number
   bounds: Rect
+  overlappingArea: number
   overlapsShape: boolean
   children?: HBounds[]
   data?: any
@@ -39,6 +41,7 @@ export const mergeHBounds = (hBounds: HBounds[]): HBounds => {
     bounds,
     children: hBounds,
     overlapsShape: true,
+    overlappingArea: sum(hBounds.map((hb) => hb.overlappingArea)),
     count: sum(hBounds.map((hb) => hb.count)),
   }
 }
@@ -57,6 +60,7 @@ export const computeHBounds = (
         bounds,
         level,
         overlapsShape: false,
+        overlappingArea: 0,
       }
     }
 
@@ -66,6 +70,7 @@ export const computeHBounds = (
         bounds,
         level,
         overlapsShape: true,
+        overlappingArea: bounds.w * bounds.h,
       }
     }
 
@@ -82,6 +87,7 @@ export const computeHBounds = (
       level,
       overlapsShape: true,
       children,
+      overlappingArea: sum(children?.map((child) => child.overlappingArea)),
       count: children ? sum(children.map((child) => child.count)) : 1,
     }
   }
@@ -388,19 +394,18 @@ export const randomPointInsideHbounds = (hBounds: HBounds): Point | null => {
       return null
     }
     if (
-      level > 5 ||
       !hBoundsCur.children ||
-      hBoundsCur.bounds.w < 10 ||
-      hBoundsCur.bounds.h < 10
+      hBoundsCur.bounds.w < 2 ||
+      hBoundsCur.bounds.h < 2
     ) {
       return randomPointInRect(hBoundsCur.bounds)
     }
 
-    const candidates = hBoundsCur.children.filter((c) => c.overlapsShape)
+    const candidates = hBoundsCur.children.filter((c) => c.overlappingArea > 0)
     if (candidates.length === 0) {
       return null
     }
-    const childIndex = Math.floor(Math.random() * candidates.length)
+    const childIndex = weightedSample(candidates.map((c) => c.overlappingArea))
     const child = candidates[childIndex]
     return impl(child, level + 1)
   }
@@ -683,7 +688,7 @@ export const drawHBounds = (
     ctx.save()
     ctx.lineWidth = 0.5
 
-    ctx.strokeStyle = hBounds.overlapsShape ? 'red' : 'blue'
+    ctx.strokeStyle = hBounds.overlapsShape ? '#f003' : '#00f3'
 
     if (hBounds.transform) {
       ctx.transform(
