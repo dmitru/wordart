@@ -449,6 +449,9 @@ export class SceneGenerator {
                 }
               }
 
+              if (maxIterations === 1) {
+                break
+              }
               const spiralPoint = getSpiralPoint(t)
               t += getDt(iteration)
 
@@ -518,9 +521,9 @@ export class SceneGenerator {
         // const initialScale = 0.002
         const finalScale = 0.01 * scaleFactor
         // const finalScale = 0.05
-        const scaleStepFactor = 0.1
+        const scaleStepFactor = 0.2
         const maxScaleStep = 0.005
-        const paddingFactor = 20 * scaleFactor
+        const paddingFactor = 60 * scaleFactor
         let timeout = 1500
         let maxTimeout = 3000
         let timeoutStep = 300

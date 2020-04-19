@@ -17,7 +17,7 @@
     "downlevelIteration": true,
     "rootDirs": ["./src"]
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "./src/lib/wordart/wasm-gen"],
   "include": [
     "./src",
     "next-env.d.ts",

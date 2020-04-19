@@ -39,6 +39,7 @@
     "transformation-matrix": "^2.3.0"
   },
   "devDependencies": {
+    "@babel/plugin-syntax-import-meta": "^7.8.3",
     "@testing-library/jest-dom": "^5.5.0",
     "@testing-library/react": "^10.0.2",
     "@types/chroma-js": "^2.0.0",

@@ -10,6 +10,21 @@ import {
 } from 'lib/wordart/hbounds'
 import { clearCanvas, createCanvasCtx } from 'lib/wordart/canvas-utils'
 
+declare class Wasm {
+  fill_color(
+    img_data: Uint32Array,
+    w: number,
+    h: number,
+    threshold_part: number
+  ): { count: number; r: number; g: number; b: number }[]
+}
+
+let wasm: Wasm | null = null
+import('lib/wordart/wasm-gen/pkg/wasm_gen').then((_wasm) => {
+  console.log('wasm: ', wasm)
+  wasm = _wasm
+})
+
 export const getColorsFromImageData = (
   imgData: ImageData
 ): { color: number; count: number }[] => {
@@ -74,6 +89,10 @@ export const computeShapes = ({
   minSize?: number
   visualize?: boolean
 }): Shape[] => {
+  if (!wasm) {
+    throw new Error('wasm is not loaded')
+  }
+
   const srcBounds = {
     x: 0,
     y: 0,
@@ -113,50 +132,54 @@ export const computeShapes = ({
   )
   ctx.restore()
 
-  console.screenshot(canvas)
-
   const imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
 
-  const colors = getColorsFromImageData(imgData)
+  const colorsFiltered = wasm.fill_color(
+    new Uint32Array(imgData.data.buffer),
+    imgData.width,
+    imgData.height,
+    16
+  )
+  // throw new Error('r')
+  // const colors = getColorsFromImageData(imgData)
 
   const totalPixelCount = imgData.width * imgData.height
-  const thresholdCount = totalPixelCount / 8
-  const colorsFiltered = colors.filter((c) => c.count >= thresholdCount)
+  // const thresholdCount = totalPixelCount / 16
+  // const colorsFiltered = colors.filter((c) => c.count >= thresholdCount)
 
-  console.log('Colors: ', colors, colorsFiltered)
-  const colorsSet = new Set(colorsFiltered.map((c) => c.color))
+  // console.log('Colors: ', colors, colorsFiltered)
+  // const colorsSet = new Set(colorsFiltered.map((c) => c.color))
 
-  for (let x = 0; x < imgData.width; ++x) {
-    for (let y = 0; y < imgData.height; ++y) {
-      const index = 4 * (x + y * imgData.width)
-      const r = imgData.data[index]
-      const g = imgData.data[index + 1]
-      const b = imgData.data[index + 2]
-      const color = (r << 16) + (g << 8) + b
-      if (!colorsSet.has(color)) {
-        const colorHex = colorIntToHex(color)
-        const closestColors = sortBy(colorsFiltered, (c) =>
-          chroma.deltaE(colorHex, colorIntToHex(c.color))
-        )
-        const closestColor = closestColors[0]
-        const closestColorRgb = colorIntToRgb(closestColor.color)
-        imgData.data[index] = closestColorRgb.r
-        imgData.data[index + 1] = closestColorRgb.g
-        imgData.data[index + 2] = closestColorRgb.b
-      }
-    }
-  }
+  // for (let x = 0; x < imgData.width; ++x) {
+  //   for (let y = 0; y < imgData.height; ++y) {
+  //     const index = 4 * (x + y * imgData.width)
+  //     const r = imgData.data[index]
+  //     const g = imgData.data[index + 1]
+  //     const b = imgData.data[index + 2]
+  //     const color = (r << 16) + (g << 8) + b
+  //     if (!colorsSet.has(color)) {
+  //       const colorHex = colorIntToHex(color)
+  //       const closestColors = sortBy(colorsFiltered, (c) =>
+  //         chroma.deltaE(colorHex, colorIntToHex(c.color))
+  //       )
+  //       const closestColor = closestColors[0]
+  //       const closestColorRgb = colorIntToRgb(closestColor.color)
+  //       imgData.data[index] = closestColorRgb.r
+  //       imgData.data[index + 1] = closestColorRgb.g
+  //       imgData.data[index + 2] = closestColorRgb.b
+  //     }
+  //   }
+  // }
 
-  const ctx2 = createCanvasCtx({ w: imgData.width, h: imgData.height })
-  ctx2.putImageData(imgData, 0, 0)
-  console.screenshot(ctx2.canvas, 1)
+  // const ctx2 = createCanvasCtx({ w: imgData.width, h: imgData.height })
+  // ctx2.putImageData(imgData, 0, 0)
 
   const shapes: Shape[] = []
 
-  for (const { color, count: colorPixelCount } of colorsFiltered) {
+  for (const { r, g, b, count: colorPixelCount } of colorsFiltered) {
     clearCanvas(ctx)
 
-    const { r, g, b } = colorIntToRgb(color)
+    console.log('Shape colors: ', { r, g, b })
 
     const isPointIntersectingShape = (x: number, y: number): boolean => {
       const index = 4 * (y * imgData.width + x)
@@ -257,7 +280,7 @@ export const computeShapes = ({
     )
 
     const shape: Shape = {
-      color: colorIntToHex(color),
+      color: chroma(r, g, b).hex(),
       hBounds,
       hBoundsInverted,
       percentFilled: colorPixelCount / totalPixelCount,

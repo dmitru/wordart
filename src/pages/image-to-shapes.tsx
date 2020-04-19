@@ -12,9 +12,9 @@ import {
 } from 'lib/wordart/generator'
 import { loadFont } from 'lib/wordart/fonts'
 
-// const BG_SHAPE = '/images/cat.png'
+const BG_SHAPE = '/images/cat.png'
 // const BG_SHAPE = '/images/number_six.png'
-const BG_SHAPE = '/images/darth_vader.jpg'
+// const BG_SHAPE = '/images/darth_vader.jpg'
 // const BG_SHAPE = '/images/beatles.jpg'
 
 const WORDS = [
@@ -48,7 +48,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
       const bgImageCtx = await loadImageUrlToCanvasCtx(BG_SHAPE, 800, 800)
       console.screenshot(bgImageCtx.canvas)
 
-      const viewBoxSize = 400
+      const viewBoxSize = 300
       const viewBox: Rect = { x: 0, y: 0, w: viewBoxSize, h: viewBoxSize }
       if (!sceneGen) {
         sceneGen = new SceneGenerator({ viewBox, bgImgSize: viewBoxSize })
@@ -65,7 +65,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
       }
       const shapeConfig2: ShapeConfig = {
         font: fonts[1],
-        color: '#000a',
+        // color: '#000a',
         scale: 0.4,
         angles: [15],
         words: ['evil', 'dark'].map((text) => ({ text })),
@@ -74,16 +74,19 @@ const scratch = (canvas: HTMLCanvasElement) => {
         font: fonts[1],
         scale: 0.5,
         angles: [-60],
+        words: ['good', 'light'].map((text) => ({ text })),
       }
       const shapeConfig4: ShapeConfig = {
         font: fonts[1],
         scale: 0.6,
         angles: [60],
+        words: ['good', 'light'].map((text) => ({ text })),
       }
       const shapeConfig5: ShapeConfig = {
         font: fonts[1],
         scale: 0.5,
         angles: [-25],
+        words: ['good', 'light'].map((text) => ({ text })),
       }
 
       const shapeConfigs: ShapeConfig[] = [
