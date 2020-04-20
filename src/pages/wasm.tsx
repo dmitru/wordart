@@ -37,7 +37,7 @@ const FONT_NAMES = [
 // You need to add the functions and properties manually since we want to use wasm as a module.
 // The function definitions are generated into the `pkg` folder when you run `wasm-pack-build`
 declare class Wasm {
-  fill_color(
+  fill_shapes_by_color(
     img_data: Uint32Array,
     w: number,
     h: number,
@@ -71,7 +71,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
       const imageData = bgImageCtx.getImageData(0, 0, size, size)
 
       const t1 = performance.now()
-      const result = wasm.fill_color(
+      const result = wasm.fill_shapes_by_color(
         new Uint32Array(imageData.data.buffer),
         imageData.width,
         imageData.height,

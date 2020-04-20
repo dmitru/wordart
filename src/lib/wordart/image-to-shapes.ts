@@ -11,7 +11,7 @@ import {
 import { clearCanvas, createCanvasCtx } from 'lib/wordart/canvas-utils'
 
 declare class Wasm {
-  fill_color(
+  fill_shapes_by_color(
     img_data: Uint32Array,
     w: number,
     h: number,
@@ -134,7 +134,7 @@ export const computeShapes = ({
 
   const imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
 
-  const colorsFiltered = wasm.fill_color(
+  const colorsFiltered = wasm.fill_shapes_by_color(
     new Uint32Array(imgData.data.buffer),
     imgData.width,
     imgData.height,

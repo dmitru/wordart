@@ -75,7 +75,7 @@ pub struct LabInt {
 }
 
 #[wasm_bindgen]
-pub fn fill_color(img_data: &mut [u32], w: i32, h: i32, threshold_part: i32) -> Box<[JsValue]>  {
+pub fn fill_shapes_by_color(img_data: &mut [u32], w: i32, h: i32, threshold_part: i32) -> Box<[JsValue]>  {
     let mut color_counts = HashMap::new();
 
     for col in 0..w {
