@@ -17,9 +17,29 @@ macro_rules! console_log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
 
-
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
+}
+
+#[macro_export]
+macro_rules! get_ch_b {
+    ( $feature:expr ) => {{
+        (($feature & 0xff0000u32) >> 16)
+    }};
+}
+
+#[macro_export]
+macro_rules! get_ch_g {
+    ( $feature:expr ) => {{
+        (($feature & 0xff00u32) >> 8)
+    }};
+}
+
+#[macro_export]
+macro_rules! get_ch_r {
+    ( $feature:expr ) => {{
+        ($feature & 0xffu32)
+    }};
 }

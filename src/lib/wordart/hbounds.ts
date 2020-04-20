@@ -76,7 +76,7 @@ export const computeHBounds = (
 
     const childrenBounds = divideBounds(bounds)
     let children =
-      level >= maxLevel || bounds.w < minSize || bounds.h < minSize
+      level > maxLevel || bounds.w < minSize || bounds.h < minSize
         ? undefined
         : childrenBounds.map((childBounds) =>
             computeHBoundsImpl(childBounds, level + 1)

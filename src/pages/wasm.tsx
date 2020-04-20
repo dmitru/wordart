@@ -12,6 +12,7 @@ import {
 } from 'lib/wordart/generator'
 import { loadFont } from 'lib/wordart/fonts'
 import { computeShapes } from 'lib/wordart/image-to-shapes'
+import { computeHBoundsForCanvas } from 'lib/wordart/hbounds'
 
 // const BG_SHAPE = '/images/cat.png'
 // const BG_SHAPE = '/images/number_six.png'
@@ -37,12 +38,14 @@ const FONT_NAMES = [
 // You need to add the functions and properties manually since we want to use wasm as a module.
 // The function definitions are generated into the `pkg` folder when you run `wasm-pack-build`
 declare class Wasm {
+  get_hbounds_by_ptr(ptr: number): any
   fill_shapes_by_color(
     img_data: Uint32Array,
     w: number,
     h: number,
     threshold_part: number
   ): any[]
+  create_hbounds(img_data: Uint32Array, w: number, h: number): any
 }
 
 const scratch = (canvas: HTMLCanvasElement) => {
@@ -71,25 +74,43 @@ const scratch = (canvas: HTMLCanvasElement) => {
       const imageData = bgImageCtx.getImageData(0, 0, size, size)
 
       const t1 = performance.now()
-      const result = wasm.fill_shapes_by_color(
+      const result = wasm.create_hbounds(
         new Uint32Array(imageData.data.buffer),
         imageData.width,
-        imageData.height,
-        16
+        imageData.height
       )
+      const result1 = result.getJS()
       const t2 = performance.now()
-      bgImageCtx.putImageData(imageData, 0, 0)
-      console.screenshot(bgImageCtx.canvas)
       console.log(`${t2 - t1}ms`)
-      console.log(
-        'result',
-        result.map((res) => ({
-          r: res.r,
-          g: res.g,
-          b: res.b,
-          count: res.count,
-        }))
-      )
+      console.log('result = ', result, result1)
+
+      const t1js = performance.now()
+      const result2 = computeHBoundsForCanvas({
+        srcCanvas: bgImageCtx.canvas,
+        imgSize: size,
+        targetSize: { x: 0, y: 0, w: size, h: size },
+      })
+      const t2js = performance.now()
+      console.log(`${t2js - t1js}ms`)
+      console.log('result = ', result)
+
+      // const result = wasm.fill_shapes_by_color(
+      //   new Uint32Array(imageData.data.buffer),
+      //   imageData.width,
+      //   imageData.height,
+      //   16
+      // )
+      // bgImageCtx.putImageData(imageData, 0, 0)
+      // console.screenshot(bgImageCtx.canvas)
+      // console.log(
+      //   'result',
+      //   result.map((res) => ({
+      //     r: res.r,
+      //     g: res.g,
+      //     b: res.b,
+      //     count: res.count,
+      //   }))
+      // )
 
       // const viewBoxSize = 400
       // const viewBox: Rect = { x: 0, y: 0, w: viewBoxSize, h: viewBoxSize }

@@ -1,12 +1,15 @@
-
 #[macro_use]
 mod utils;
+mod hbounds;
 mod image_to_shapes;
+mod matrix;
+
+#[macro_use]
+extern crate serde_derive;
 
 extern crate wasm_bindgen;
 
 use wasm_bindgen::prelude::*;
-
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -14,9 +17,8 @@ use wasm_bindgen::prelude::*;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-
 #[wasm_bindgen]
-extern {
+extern "C" {
     fn alert(s: &str);
 }
 
@@ -26,6 +28,6 @@ pub fn greet() {
 }
 
 #[wasm_bindgen]
-pub fn sum(a: i32, b:i32) -> i32 {
+pub fn sum(a: i32, b: i32) -> i32 {
     a + b
 }

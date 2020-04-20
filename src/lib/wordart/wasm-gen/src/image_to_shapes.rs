@@ -1,9 +1,8 @@
-
 use wasm_bindgen::prelude::*;
 
-use std::collections::HashMap;
 use deltae::*;
-use palette::{Srgb, rgb, Lab, FromColor, Lch, IntoColor};
+use palette::{rgb, FromColor, IntoColor, Lab, Lch, Srgb};
+use std::collections::HashMap;
 
 #[wasm_bindgen]
 extern "C" {
@@ -12,31 +11,37 @@ extern "C" {
 }
 
 macro_rules! get_ch_b {
-  ( $feature:expr ) => {{
-      (($feature & 0xff0000u32) >> 16)
-  }};
+    ( $feature:expr ) => {{
+        (($feature & 0xff0000u32) >> 16)
+    }};
 }
 
 macro_rules! get_ch_g {
-  ( $feature:expr ) => {{
-      (($feature & 0xff00u32) >> 8)
-  }};
+    ( $feature:expr ) => {{
+        (($feature & 0xff00u32) >> 8)
+    }};
 }
 
 macro_rules! get_ch_r {
-  ( $feature:expr ) => {{
-      ($feature & 0xffu32)
-  }};
+    ( $feature:expr ) => {{
+        ($feature & 0xffu32)
+    }};
 }
-
 
 pub fn calc_e_diff(lab1: &Lab, lab2: &Lab) -> f32 {
-  let lab_v_1 = LabValue { l: lab1.l, a: lab1.a, b: lab1.b };
-  let lab_v_2 = LabValue { l: lab2.l, a: lab2.a, b: lab2.b };
-  let result = DeltaE::new(&lab_v_1, &lab_v_2, DE2000);
-  return result.value;
+    let lab_v_1 = LabValue {
+        l: lab1.l,
+        a: lab1.a,
+        b: lab1.b,
+    };
+    let lab_v_2 = LabValue {
+        l: lab2.l,
+        a: lab2.a,
+        b: lab2.b,
+    };
+    let result = DeltaE::new(&lab_v_1, &lab_v_2, DE2000);
+    return result.value;
 }
-
 
 #[wasm_bindgen]
 #[derive(Debug, Copy, Clone)]
@@ -46,11 +51,16 @@ pub struct LabInt {
     pub r: u32,
     pub g: u32,
     pub b: u32,
-    lab: Lab
+    lab: Lab,
 }
 
 #[wasm_bindgen]
-pub fn fill_shapes_by_color(img_data: &mut [u32], w: i32, h: i32, threshold_part: i32) -> Box<[JsValue]>  {
+pub fn fill_shapes_by_color(
+    img_data: &mut [u32],
+    w: i32,
+    h: i32,
+    threshold_part: i32,
+) -> Box<[JsValue]> {
     let mut color_counts = HashMap::new();
 
     for col in 0..w {
@@ -78,10 +88,20 @@ pub fn fill_shapes_by_color(img_data: &mut [u32], w: i32, h: i32, threshold_part
         let g = get_ch_g!(color_int);
         let b = get_ch_b!(color_int);
         console_log!("color: {}, {}, {} {} {}", color_int, count, r, g, b);
-        let lab = Lab::from(Srgb::new((r as f32) / 255.0, (g as f32) / 255.0, (b as f32) / 255.0));
-        lab_colors.push(LabInt { lab, r, g, b, color_int: *color_int, count: *count });
+        let lab = Lab::from(Srgb::new(
+            (r as f32) / 255.0,
+            (g as f32) / 255.0,
+            (b as f32) / 255.0,
+        ));
+        lab_colors.push(LabInt {
+            lab,
+            r,
+            g,
+            b,
+            color_int: *color_int,
+            count: *count,
+        });
     }
-    
     lab_colors.sort_by(|a, b| b.count.cmp(&a.count));
 
     for col in 0..w {
@@ -92,7 +112,11 @@ pub fn fill_shapes_by_color(img_data: &mut [u32], w: i32, h: i32, threshold_part
             let g = get_ch_g!(color_int);
             let b = get_ch_b!(color_int);
 
-            let lab1 = Lab::from(Srgb::new((r as f32) / 255.0, (g as f32) / 255.0, (b as f32) / 255.0));
+            let lab1 = Lab::from(Srgb::new(
+                (r as f32) / 255.0,
+                (g as f32) / 255.0,
+                (b as f32) / 255.0,
+            ));
 
             let mut min_e = 1000000f32;
             let mut result: u32 = 0;
@@ -109,7 +133,6 @@ pub fn fill_shapes_by_color(img_data: &mut [u32], w: i32, h: i32, threshold_part
                 img_data[fi] = result;
             }
 
-        
             // console_log!("{}", result);
         }
     }
