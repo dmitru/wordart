@@ -6,7 +6,6 @@ mod matrix;
 
 #[macro_use]
 extern crate serde_derive;
-
 extern crate wasm_bindgen;
 
 use wasm_bindgen::prelude::*;

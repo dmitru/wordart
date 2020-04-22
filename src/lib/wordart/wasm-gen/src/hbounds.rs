@@ -1,5 +1,7 @@
 use wasm_bindgen::prelude::*;
 
+use crate::matrix::Matrix;
+
 #[wasm_bindgen]
 #[derive(PartialEq, Debug, Copy, Clone, Serialize)]
 pub struct Rect {
@@ -15,7 +17,6 @@ impl Rect {
     }
 }
 
-#[wasm_bindgen]
 #[derive(PartialEq, Debug, Serialize)]
 pub struct HBounds {
     pub bounds: Rect,
@@ -23,28 +24,160 @@ pub struct HBounds {
     pub level: i32,
     pub overlapping_area: i32,
     pub overlaps_shape: bool,
-    children: Vec<HBounds>,
+    pub children: Vec<HBounds>,
+    // pub transform: Option<Matrix>,
 }
 
-#[wasm_bindgen]
 impl HBounds {
-    // Given an opaque pointer, returns a full serialized JSON to JS
-    pub fn get_js(&mut self) -> JsValue {
-        JsValue::from_serde(&self).unwrap()
+    pub fn from(img_data: ImgData) -> HBounds {
+        match img_data {
+            ImgData {
+                data,
+                width,
+                height,
+            } => {
+                let is_pixel_intersecting = |row: i32, col: i32| -> bool {
+                    let index = (col + row * width) as usize;
+                    let color_int = data[index];
+                    let r = get_ch_r!(color_int);
+                    return r < 244;
+                };
+                let is_rect_intersecting = |rect: Rect| -> ShapeIntesectionKind {
+                    let x1 = rect.x;
+                    let y1 = rect.y;
+                    let x2 = x1 + rect.w;
+                    let y2 = y1 + rect.h;
+                    let mut checked_cnt = 0;
+                    let mut intersecting_cnt = 0;
+                    for row in y1..y2 {
+                        for col in x1..x2 {
+                            if is_pixel_intersecting(row, col) {
+                                intersecting_cnt += 1;
+                            }
+                            checked_cnt += 1;
+                        }
+                    }
+                    if checked_cnt == 0 || intersecting_cnt == 0 {
+                        return ShapeIntesectionKind::Empty;
+                    }
+                    if checked_cnt == intersecting_cnt {
+                        return ShapeIntesectionKind::Full;
+                    }
+                    return ShapeIntesectionKind::Partial;
+                };
+                let compute_hbounds = |bounds: Rect, min_size: i32, max_level: i32| -> HBounds {
+                    fn compute_hbounds_impl(
+                        bounds: Rect,
+                        level: i32,
+                        min_size: i32,
+                        max_level: i32,
+                        is_rect_intersecting: &dyn Fn(Rect) -> ShapeIntesectionKind,
+                    ) -> HBounds {
+                        let intersection = is_rect_intersecting(bounds);
+                        match intersection {
+                            ShapeIntesectionKind::Empty => {
+                                return HBounds {
+                                    count: 1,
+                                    bounds,
+                                    level,
+                                    overlaps_shape: false,
+                                    overlapping_area: 0,
+                                    children: vec![],
+                                };
+                            }
+                            ShapeIntesectionKind::Full => {
+                                return HBounds {
+                                    count: 1,
+                                    bounds,
+                                    level,
+                                    overlaps_shape: true,
+                                    overlapping_area: bounds.area(),
+                                    children: vec![],
+                                };
+                            }
+                            ShapeIntesectionKind::Partial => {
+                                let has_children = level <= max_level
+                                    && bounds.w >= min_size
+                                    && bounds.h >= min_size;
+                                if !has_children {
+                                    return HBounds {
+                                        count: 1,
+                                        bounds,
+                                        level,
+                                        overlaps_shape: false,
+                                        overlapping_area: bounds.area(),
+                                        children: vec![],
+                                    };
+                                }
+                                let children_bounds = divide_bounds(bounds);
+                                let children: Vec<HBounds> = children_bounds
+                                    .iter()
+                                    .map(|child_bounds| {
+                                        compute_hbounds_impl(
+                                            *child_bounds,
+                                            level + 1,
+                                            min_size,
+                                            max_level,
+                                            &is_rect_intersecting,
+                                        )
+                                    })
+                                    .collect();
+                                return HBounds {
+                                    count: 1,
+                                    bounds,
+                                    level,
+                                    overlaps_shape: true,
+                                    overlapping_area: children
+                                        .iter()
+                                        .map(|child| child.overlapping_area)
+                                        .sum(),
+                                    children,
+                                };
+                            }
+                        }
+                    };
+
+                    return compute_hbounds_impl(
+                        bounds,
+                        1,
+                        min_size,
+                        max_level,
+                        &is_rect_intersecting,
+                    );
+                };
+                compute_hbounds(
+                    Rect {
+                        x: 0,
+                        y: 0,
+                        w: width,
+                        h: height,
+                    },
+                    1,
+                    12,
+                )
+            }
+        }
     }
 }
 
+// impl HBounds {
+//     // Given an opaque pointer, returns a full serialized JSON to JS
+//     pub fn get_js(&mut self) -> JsValue {
+//         JsValue::from_serde(&self).unwrap()
+//     }
+// }
+
 // JS interface
-#[wasm_bindgen]
-pub fn create_hbounds(data: &[u32], width: i32, height: i32) -> HBounds {
-    let hb = mk_hbounds_from_image(ImgData {
-        data,
-        width,
-        height,
-    });
-    hb
-    // JsValue::from_serde(&2).unwrap()
-}
+// #[wasm_bindgen]
+// pub fn create_hbounds(data: &[u32], width: i32, height: i32) -> HBounds {
+//     let hb = HBounds::from(ImgData {
+//         data,
+//         width,
+//         height,
+//     });
+//     hb
+//     // JsValue::from_serde(&2).unwrap()
+// }
 
 enum ShapeIntesectionKind {
     Empty,
@@ -56,143 +189,6 @@ pub struct ImgData<'a> {
     pub data: &'a [u32],
     pub width: i32,
     pub height: i32,
-}
-
-fn mk_hbounds_from_image(img_data: ImgData) -> HBounds {
-    match img_data {
-        ImgData {
-            data,
-            width,
-            height,
-        } => {
-            let is_pixel_intersecting = |row: i32, col: i32| -> bool {
-                let index = (col + row * width) as usize;
-                let color_int = data[index];
-                let r = get_ch_r!(color_int);
-                return r < 244;
-            };
-
-            let is_rect_intersecting = |rect: Rect| -> ShapeIntesectionKind {
-                let x1 = rect.x;
-                let y1 = rect.y;
-                let x2 = x1 + rect.w;
-                let y2 = y1 + rect.h;
-
-                let mut checked_cnt = 0;
-                let mut intersecting_cnt = 0;
-
-                for row in y1..y2 {
-                    for col in x1..x2 {
-                        if is_pixel_intersecting(row, col) {
-                            intersecting_cnt += 1;
-                        }
-                        checked_cnt += 1;
-                    }
-                }
-
-                if checked_cnt == 0 || intersecting_cnt == 0 {
-                    return ShapeIntesectionKind::Empty;
-                }
-
-                if checked_cnt == intersecting_cnt {
-                    return ShapeIntesectionKind::Full;
-                }
-
-                return ShapeIntesectionKind::Partial;
-            };
-
-            let compute_hbounds = |bounds: Rect, min_size: i32, max_level: i32| -> HBounds {
-                fn compute_hbounds_impl(
-                    bounds: Rect,
-                    level: i32,
-                    min_size: i32,
-                    max_level: i32,
-                    is_rect_intersecting: &dyn Fn(Rect) -> ShapeIntesectionKind,
-                ) -> HBounds {
-                    let intersection = is_rect_intersecting(bounds);
-
-                    match intersection {
-                        ShapeIntesectionKind::Empty => {
-                            return HBounds {
-                                count: 1,
-                                bounds,
-                                level,
-                                overlaps_shape: false,
-                                overlapping_area: 0,
-                                children: vec![],
-                            };
-                        }
-
-                        ShapeIntesectionKind::Full => {
-                            return HBounds {
-                                count: 1,
-                                bounds,
-                                level,
-                                overlaps_shape: true,
-                                overlapping_area: bounds.area(),
-                                children: vec![],
-                            };
-                        }
-
-                        ShapeIntesectionKind::Partial => {
-                            let has_children =
-                                level <= max_level && bounds.w >= min_size && bounds.h >= min_size;
-
-                            if !has_children {
-                                return HBounds {
-                                    count: 1,
-                                    bounds,
-                                    level,
-                                    overlaps_shape: false,
-                                    overlapping_area: bounds.area(),
-                                    children: vec![],
-                                };
-                            }
-
-                            let children_bounds = divide_bounds(bounds);
-                            let children: Vec<HBounds> = children_bounds
-                                .iter()
-                                .map(|child_bounds| {
-                                    compute_hbounds_impl(
-                                        *child_bounds,
-                                        level + 1,
-                                        min_size,
-                                        max_level,
-                                        &is_rect_intersecting,
-                                    )
-                                })
-                                .collect();
-
-                            return HBounds {
-                                count: 1,
-                                bounds,
-                                level,
-                                overlaps_shape: true,
-                                overlapping_area: children
-                                    .iter()
-                                    .map(|child| child.overlapping_area)
-                                    .sum(),
-                                children,
-                            };
-                        }
-                    }
-                };
-
-                return compute_hbounds_impl(bounds, 1, min_size, max_level, &is_rect_intersecting);
-            };
-
-            compute_hbounds(
-                Rect {
-                    x: 0,
-                    y: 0,
-                    w: width,
-                    h: height,
-                },
-                1,
-                12,
-            )
-        }
-    }
 }
 
 fn divide_bounds(bounds: Rect) -> Vec<Rect> {
@@ -433,7 +429,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mk_hbounds_from_image_2_x_2_full() {
+    fn test_hbounds_from_2_x_2_full() {
         let img = ImgData {
             data: &[
                 BLACK, BLACK, //
@@ -445,7 +441,7 @@ mod tests {
 
         // TODO: wrap img in ImageData {} type
 
-        let res = mk_hbounds_from_image(img);
+        let res = HBounds::from(img);
         assert_eq!(
             res,
             HBounds {
@@ -465,7 +461,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mk_hbounds_from_image_2_x_2_empty() {
+    fn test_hbounds_from_2_x_2_empty() {
         let img = ImgData {
             data: &[
                 WHITE, WHITE, //
@@ -477,7 +473,7 @@ mod tests {
 
         // TODO: wrap img in ImageData {} type
 
-        let res = mk_hbounds_from_image(img);
+        let res = HBounds::from(img);
         assert_eq!(
             res,
             HBounds {
@@ -497,7 +493,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mk_hbounds_from_image_2_x_2() {
+    fn test_hbounds_from_2_x_2() {
         let img = ImgData {
             data: &[
                 WHITE, WHITE, //
@@ -507,7 +503,7 @@ mod tests {
             height: 2,
         };
 
-        let res = mk_hbounds_from_image(img);
+        let res = HBounds::from(img);
         assert_eq!(
             res,
             HBounds {
@@ -580,7 +576,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mk_hbounds_from_image_3_x_3_triangle() {
+    fn test_hbounds_from_3_x_3_triangle() {
         let img = ImgData {
             data: &[
                 WHITE, WHITE, WHITE, //
@@ -591,7 +587,7 @@ mod tests {
             height: 3,
         };
 
-        let res = mk_hbounds_from_image(img);
+        let res = HBounds::from(img);
         assert_eq!(
             res,
             HBounds {
@@ -717,7 +713,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mk_hbounds_from_image_3_x_3_stripe() {
+    fn test_hbounds_from_3_x_3_stripe() {
         let img = ImgData {
             data: &[
                 WHITE, WHITE, WHITE, //
@@ -728,7 +724,7 @@ mod tests {
             height: 3,
         };
 
-        let res = mk_hbounds_from_image(img);
+        let res = HBounds::from(img);
         assert_eq!(
             res,
             HBounds {
