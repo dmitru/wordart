@@ -1,6 +1,7 @@
 #[macro_use]
 mod utils;
 mod hbounds;
+mod hbounds_cd;
 mod image_to_shapes;
 mod matrix;
 

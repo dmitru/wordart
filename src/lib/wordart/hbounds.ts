@@ -244,9 +244,9 @@ export const collideHBounds = (
       // return true
     }
 
-    if (!hasChildren1 && hasChildren2) {
+    if (curHBounds1.overlapsShape && !hasChildren1 && hasChildren2) {
       for (let child of curHBounds2.children!) {
-        if (!curHBounds1.overlapsShape || !child.overlapsShape) {
+        if (!child.overlapsShape) {
           continue
         }
 
@@ -269,9 +269,9 @@ export const collideHBounds = (
       }
     }
 
-    if (hasChildren1 && !hasChildren2) {
+    if (hasChildren1 && !hasChildren2 && curHBounds2.overlapsShape) {
       for (let child of curHBounds1.children!) {
-        if (!curHBounds2.overlapsShape || !child.overlapsShape) {
+        if (!child.overlapsShape) {
           continue
         }
 
