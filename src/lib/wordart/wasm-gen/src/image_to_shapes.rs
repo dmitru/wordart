@@ -1,5 +1,6 @@
 use wasm_bindgen::prelude::*;
 
+use crate::hbounds::*;
 use deltae::*;
 use palette::{rgb, FromColor, IntoColor, Lab, Lch, Srgb};
 use std::collections::HashMap;
@@ -54,15 +55,11 @@ pub struct LabInt {
     lab: Lab,
 }
 
-#[wasm_bindgen]
-pub fn fill_shapes_by_color(
-    img_data: &mut [u32],
-    w: i32,
-    h: i32,
-    threshold_part: i32,
-) -> Box<[JsValue]> {
+pub fn fill_shapes_by_color(img: &mut ImgDataMut, threshold_percent: f32) -> Vec<LabInt> {
+    let w = img.width;
+    let h = img.height;
+    let img_data = &mut img.data;
     let mut color_counts = HashMap::new();
-
     for col in 0..w {
         for row in 0..h {
             let fi = (row * w + col) as usize;
@@ -77,7 +74,7 @@ pub fn fill_shapes_by_color(
     }
 
     let total_pixels = w * h;
-    let threshold_pixels = total_pixels / threshold_part;
+    let threshold_pixels = ((total_pixels as f32) * threshold_percent).round() as i32;
     color_counts.retain(|_, v| *v >= threshold_pixels);
 
     console_log!("Size: {}", color_counts.len());
@@ -137,6 +134,24 @@ pub fn fill_shapes_by_color(
         }
     }
 
-    let result: Vec<JsValue> = lab_colors.into_iter().map(JsValue::from).collect();
-    result.into_boxed_slice()
+    lab_colors
+}
+
+#[wasm_bindgen]
+pub fn fill_shapes_by_color_js(
+    img_data: &mut [u32],
+    width: i32,
+    height: i32,
+    threshold_percent: f32,
+) -> Box<[JsValue]> {
+    let lab_colors = fill_shapes_by_color(
+        &mut ImgDataMut {
+            data: img_data,
+            width,
+            height,
+        },
+        threshold_percent,
+    );
+    let result_js: Vec<JsValue> = lab_colors.into_iter().map(JsValue::from).collect();
+    result_js.into_boxed_slice()
 }

@@ -1,99 +1,9 @@
 use crate::hbounds::*;
 use crate::matrix::Matrix;
-
-#[derive(PartialEq, Debug, Copy, Clone)]
-pub struct PointF {
-    pub x: f32,
-    pub y: f32,
-}
-
-impl PointF {
-    pub fn transform(&self, m: Matrix) -> PointF {
-        PointF {
-            x: self.x * m.a + m.e,
-            y: self.y * m.d + m.f,
-        }
-    }
-}
-
-#[derive(PartialEq, Debug, Copy, Clone)]
-pub struct RectF {
-    pub x: f32,
-    pub y: f32,
-    pub w: f32,
-    pub h: f32,
-}
-
-impl RectF {
-    pub fn intersect(r1: RectF, r2: RectF) -> bool {
-        let minx1 = r1.x;
-        let maxx1 = r1.x + r1.w;
-        let minx2 = r2.x;
-        let maxx2 = r2.x + r2.w;
-
-        let miny1 = r1.y;
-        let maxy1 = r1.y + r1.h;
-        let miny2 = r2.y;
-        let maxy2 = r2.y + r2.h;
-
-        if miny1 >= maxy2 || miny2 >= maxy1 {
-            return false;
-        }
-
-        if minx1 >= maxx2 || minx2 >= maxx1 {
-            return false;
-        }
-
-        return true;
-    }
-    pub fn from(rect: Rect) -> RectF {
-        RectF {
-            x: rect.x as f32,
-            y: rect.y as f32,
-            w: rect.w as f32,
-            h: rect.h as f32,
-        }
-    }
-    pub fn transform_mut(&mut self, m: Matrix) {
-        let br = PointF {
-            x: self.x + self.w,
-            y: self.y + self.h,
-        };
-        let br_transformed = br.transform(m);
-        let tl = PointF {
-            x: self.x,
-            y: self.y,
-        };
-        let tl_transformed = tl.transform(m);
-
-        self.x = tl_transformed.x;
-        self.y = tl_transformed.y;
-        self.w = br_transformed.x - tl_transformed.x;
-        self.h = br_transformed.y - tl_transformed.y;
-    }
-    pub fn transform(&self, m: Matrix) -> RectF {
-        let br = PointF {
-            x: self.x + self.w,
-            y: self.y + self.h,
-        };
-        let br_transformed = br.transform(m);
-        let tl = PointF {
-            x: self.x,
-            y: self.y,
-        };
-        let tl_transformed = tl.transform(m);
-
-        RectF {
-            x: tl_transformed.x,
-            y: tl_transformed.y,
-            w: br_transformed.x - tl_transformed.x,
-            h: br_transformed.y - tl_transformed.y,
-        }
-    }
-}
+use crate::quadtree_cd::Intersection;
 
 impl HBounds {
-    pub fn collide(hbounds1: &HBounds, hbounds2: &HBounds) -> bool {
+    pub fn intersects(hbounds1: &Self, hbounds2: &Self) -> bool {
         fn collides_rec_impl(
             hbounds1: &HBounds,
             hbounds2: &HBounds,
@@ -274,6 +184,12 @@ impl HBounds {
     }
 }
 
+impl Intersection for HBounds {
+    fn intersects(&self, other: &Self) -> bool {
+        HBounds::intersects(self, other)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -293,7 +209,7 @@ mod tests {
         };
         let hbounds = HBounds::from(img);
 
-        assert_eq!(HBounds::collide(&hbounds, &hbounds), true);
+        assert_eq!(HBounds::intersects(&hbounds, &hbounds), true);
     }
 
     #[test]
@@ -331,23 +247,23 @@ mod tests {
             height: 2,
         });
 
-        assert_eq!(HBounds::collide(&hbounds1, &hbounds2), true);
-        assert_eq!(HBounds::collide(&hbounds2, &hbounds1), true);
+        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2), true);
+        assert_eq!(HBounds::intersects(&hbounds2, &hbounds1), true);
 
-        assert_eq!(HBounds::collide(&hbounds2, &hbounds3), true);
-        assert_eq!(HBounds::collide(&hbounds3, &hbounds2), true);
+        assert_eq!(HBounds::intersects(&hbounds2, &hbounds3), true);
+        assert_eq!(HBounds::intersects(&hbounds3, &hbounds2), true);
 
-        assert_eq!(HBounds::collide(&hbounds3, &hbounds4), true);
-        assert_eq!(HBounds::collide(&hbounds4, &hbounds3), true);
+        assert_eq!(HBounds::intersects(&hbounds3, &hbounds4), true);
+        assert_eq!(HBounds::intersects(&hbounds4, &hbounds3), true);
 
-        assert_eq!(HBounds::collide(&hbounds4, &hbounds1), true);
-        assert_eq!(HBounds::collide(&hbounds1, &hbounds4), true);
+        assert_eq!(HBounds::intersects(&hbounds4, &hbounds1), true);
+        assert_eq!(HBounds::intersects(&hbounds1, &hbounds4), true);
 
-        assert_eq!(HBounds::collide(&hbounds1, &hbounds3), false);
-        assert_eq!(HBounds::collide(&hbounds3, &hbounds1), false);
+        assert_eq!(HBounds::intersects(&hbounds1, &hbounds3), false);
+        assert_eq!(HBounds::intersects(&hbounds3, &hbounds1), false);
 
-        assert_eq!(HBounds::collide(&hbounds2, &hbounds4), false);
-        assert_eq!(HBounds::collide(&hbounds4, &hbounds2), false);
+        assert_eq!(HBounds::intersects(&hbounds2, &hbounds4), false);
+        assert_eq!(HBounds::intersects(&hbounds4, &hbounds2), false);
     }
 
     #[test]
@@ -368,14 +284,14 @@ mod tests {
             width: 2,
             height: 2,
         });
-        assert_eq!(HBounds::collide(&hbounds1, &hbounds2), false);
+        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2), false);
 
         hbounds1.transform = None;
         hbounds2.transform = Some(Matrix::new().translate(-1f32, 1f32));
-        assert_eq!(HBounds::collide(&hbounds1, &hbounds2), true);
+        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2), true);
 
         hbounds1.transform = Some(Matrix::new().translate(1f32, -1f32));
         hbounds2.transform = None;
-        assert_eq!(HBounds::collide(&hbounds1, &hbounds2), true);
+        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2), true);
     }
 }

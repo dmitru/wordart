@@ -38,8 +38,8 @@ const FONT_NAMES = [
 // You need to add the functions and properties manually since we want to use wasm as a module.
 // The function definitions are generated into the `pkg` folder when you run `wasm-pack-build`
 declare class Wasm {
-  get_hbounds_by_ptr(ptr: number): any
-  fill_shapes_by_color(
+  // get_hbounds_by_ptr(ptr: number): any
+  fill_shapes_by_color_js(
     img_data: Uint32Array,
     w: number,
     h: number,
@@ -54,7 +54,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
 
   let wasm: Wasm | null = null
   import('lib/wordart/wasm-gen/pkg/wasm_gen').then((_wasm) => {
-    console.log('wasm: ', wasm)
+    console.log('wasm: ', _wasm)
     wasm = _wasm
   })
 
@@ -79,10 +79,11 @@ const scratch = (canvas: HTMLCanvasElement) => {
         imageData.width,
         imageData.height
       )
-      // const result1 = result.getJS()
+      console.log(result)
+      const result1 = result.get_js()
       const t2 = performance.now()
       console.log(`${t2 - t1}ms`)
-      console.log('result = ', result)
+      console.log('result = ', result, result1)
 
       const t1js = performance.now()
       const result2 = computeHBoundsForCanvas({
