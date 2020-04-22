@@ -68,7 +68,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
       // const fonts = await Promise.all(
       //   FONT_NAMES.map((fontName) => loadFont(`/fonts/${fontName}`))
       // )
-      const size = 400
+      const size = 800
       const bgImageCtx = await loadImageUrlToCanvasCtx(BG_SHAPE, size, size)
       console.screenshot(bgImageCtx.canvas)
       const imageData = bgImageCtx.getImageData(0, 0, size, size)
@@ -79,10 +79,10 @@ const scratch = (canvas: HTMLCanvasElement) => {
         imageData.width,
         imageData.height
       )
-      const result1 = result.getJS()
+      // const result1 = result.getJS()
       const t2 = performance.now()
       console.log(`${t2 - t1}ms`)
-      console.log('result = ', result, result1)
+      console.log('result = ', result)
 
       const t1js = performance.now()
       const result2 = computeHBoundsForCanvas({
