@@ -3,6 +3,7 @@ use wasm_bindgen::prelude::*;
 use crate::hbounds::*;
 use crate::layout_gen::*;
 use crate::matrix::*;
+use std::collections::HashMap;
 
 // Console.log macro
 macro_rules! console_log {

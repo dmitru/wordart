@@ -17,6 +17,7 @@ import { loadFont } from 'lib/wordart/fonts'
 import { computeShapes } from 'lib/wordart/image-to-shapes'
 import { computeHBoundsForCanvas } from 'lib/wordart/hbounds'
 import { LayoutGenJs, Matrix } from 'lib/wordart/wasm-gen/pkg/wasm_gen'
+import { sample } from 'lodash'
 
 // const BG_SHAPE = '/images/cat.png'
 // const BG_SHAPE = '/images/number_six.png'
@@ -74,6 +75,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
   })
 
   let addedHbounds: any[] = []
+  let addedImgCtxs: CanvasRenderingContext2D[] = []
 
   const onKeyDown = async (e: KeyboardEvent) => {
     const key = e.key
@@ -86,9 +88,9 @@ const scratch = (canvas: HTMLCanvasElement) => {
       //   FONT_NAMES.map((fontName) => loadFont(`/fonts/${fontName}`))
       // )
       const size = canvas.height
-      const r = 25
+      const r = 250
 
-      const createImgData = (r = 10, pad = 0) => {
+      const createImgData1 = (r = 10, pad = 0, angle = 0) => {
         const w = r * 2 + 2 * pad
         const h = r * 2 + 2 * pad
         const ctx = createCanvasCtx({ w, h })
@@ -97,15 +99,43 @@ const scratch = (canvas: HTMLCanvasElement) => {
         ctx.fillStyle = '#000'
         ctx.strokeStyle = '#000'
         ctx.beginPath()
-        ctx.arc(r + pad, r + pad, r - 2.5, 0, 2 * Math.PI)
-        ctx.lineWidth = 5
+        const p = 25
+        ctx.lineCap = 'round'
+        ctx.lineJoin = 'round'
+        ctx.moveTo(p, p)
+        ctx.lineTo(w - p, p)
+        ctx.lineTo(w / 2, h - p)
+        ctx.closePath()
+        // ctx.arc(r + pad, r + pad, r - 25, 0, 2 * Math.PI)
+        ctx.lineWidth = 30
 
         ctx.stroke()
         // console.screenshot(ctx.canvas)
         return { imgData: ctx.getImageData(0, 0, w, h), ctx }
       }
 
-      const { imgData, ctx: imgCtx } = createImgData(r)
+      const createImgData2 = (r = 10, pad = 0, angle = 0) => {
+        const w = r * 2 + 2 * pad
+        const h = r * 2 + 2 * pad
+        const ctx = createCanvasCtx({ w, h })
+        // ctx.fillStyle = 'white'
+        // ctx.fillRect(0, 0, w, h)
+        ctx.fillStyle = '#000'
+        ctx.strokeStyle = '#000'
+        ctx.beginPath()
+        const p = 25
+        ctx.lineCap = 'round'
+        ctx.lineJoin = 'round'
+        ctx.arc(r + pad, r + pad, r - 25, 0, 2 * Math.PI)
+        ctx.lineWidth = 30
+
+        ctx.stroke()
+        // console.screenshot(ctx.canvas)
+        return { imgData: ctx.getImageData(0, 0, w, h), ctx }
+      }
+
+      const { imgData: imgData1, ctx: imgCtx } = createImgData1(r)
+      const { imgData: imgData2, ctx: imgCtx2 } = createImgData2(r)
 
       const createHBounds = (imageData: ImageData) =>
         wasm.create_hbounds(
@@ -120,10 +150,11 @@ const scratch = (canvas: HTMLCanvasElement) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.fillStyle = '#000'
         ctx.save()
-        for (let item of addedHbounds) {
+        for (let [index, item] of addedHbounds.entries()) {
           ctx.resetTransform()
           ctx.setTransform(item.transform)
-          ctx.drawImage(imgCtx.canvas, 0, 0)
+          const imageCtx = addedImgCtxs[index]
+          ctx.drawImage(imageCtx.canvas, 0, 0)
           // ctx.beginPath()
           // ctx.arc(r, r, r, 0, 2 * Math.PI)
           ctx.fill()
@@ -162,17 +193,19 @@ const scratch = (canvas: HTMLCanvasElement) => {
         ctx.restore()
       }
 
-      const hbounds = createHBounds(imgData)
-      const hboundsValue = hbounds.get_js()
+      const hbounds1 = createHBounds(imgData1)
+      const hbounds2 = createHBounds(imgData2)
+      const hboundsValue1 = hbounds1.get_js()
+      const hboundsValue2 = hbounds2.get_js()
 
       const t1 = performance.now()
 
       let scaleFactor = 3
-      const initialScale = 0.7 * scaleFactor
+      const initialScale = 0.2 * scaleFactor
       // const initialScale = 0.002
-      const finalScale = 0.01 * scaleFactor
+      const finalScale = 0.002 * scaleFactor
       // const finalScale = 0.05
-      const scaleStepFactor = 0.2
+      const scaleStepFactor = 0.01
       const maxScaleStep = 0.005
       let timeout = 1500
       let maxTimeout = 3000
@@ -185,10 +218,10 @@ const scratch = (canvas: HTMLCanvasElement) => {
       let countScale = 0
 
       while (scale > finalScale && count < maxCount) {
-        const batchSize = 15
+        const batchSize = 50
         let success = false
 
-        console.log('scale = ', scale, r * scale)
+        // console.log('scale = ', scale, r * scale)
 
         for (let i = 0; i < batchSize; ++i) {
           // console.log(imgData.width, imgData.height, imgData.data)
@@ -213,9 +246,14 @@ const scratch = (canvas: HTMLCanvasElement) => {
             f: m.f,
           }
 
+          const { ctx: imaggeCtx, hbounds, hboundsValue } = sample([
+            { ctx: imgCtx, hbounds: hbounds1, hboundsValue: hboundsValue1 },
+            { ctx: imgCtx2, hbounds: hbounds2, hboundsValue: hboundsValue2 },
+          ])!
           const res = layoutGen.add_item(hbounds, m)
           if (res != null) {
             success = true
+            addedImgCtxs.push(imaggeCtx)
             addedHbounds.push({
               ...hboundsValue,
               transform,
@@ -374,7 +412,7 @@ const ImageToShapesScratch = () => {
 
   return (
     <Layout>
-      <Canvas width={900} height={900} ref={canvasRef} id="scene" />
+      <Canvas width={1800} height={1800} ref={canvasRef} id="scene" />
     </Layout>
   )
 }

@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 
 use crate::matrix::Matrix;
@@ -127,23 +128,11 @@ pub struct HBounds {
     pub level: i32,
     pub overlapping_area: i32,
     pub overlaps_shape: bool,
-    pub children: Vec<HBounds>,
+    pub children: Rc<Vec<HBounds>>,
     pub transform: Option<Matrix>,
 }
 
 impl HBounds {
-    pub fn clone(&self) -> HBounds {
-        HBounds {
-            bounds: self.bounds,
-            count: self.count,
-            level: self.level,
-            overlapping_area: self.overlapping_area,
-            overlaps_shape: self.overlaps_shape,
-            children: self.children.clone(),
-            transform: self.transform.clone(),
-        }
-    }
-
     pub fn transform(&self, transform: Matrix) -> HBounds {
         // let _timer = Timer::new("HBounds::transform");
         HBounds {
@@ -226,7 +215,7 @@ impl HBounds {
                                     level,
                                     overlaps_shape: false,
                                     overlapping_area: 0,
-                                    children: vec![],
+                                    children: Rc::new(vec![]),
                                     transform: None,
                                 };
                             }
@@ -238,7 +227,7 @@ impl HBounds {
                                     level,
                                     overlaps_shape: true,
                                     overlapping_area: bounds.area(),
-                                    children: vec![],
+                                    children: Rc::new(vec![]),
                                     transform: None,
                                 };
                             }
@@ -253,7 +242,7 @@ impl HBounds {
                                         level,
                                         overlaps_shape: false,
                                         overlapping_area: bounds.area(),
-                                        children: vec![],
+                                        children: Rc::new(vec![]),
                                         transform: None,
                                     };
                                 }
@@ -279,7 +268,7 @@ impl HBounds {
                                         .iter()
                                         .map(|child| child.overlapping_area)
                                         .sum(),
-                                    children,
+                                    children: Rc::new(children),
                                     transform: None,
                                 };
                             }
@@ -302,7 +291,7 @@ impl HBounds {
                         h: height,
                     },
                     1,
-                    4,
+                    9,
                 )
             }
         }

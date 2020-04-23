@@ -11,7 +11,6 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-serde = "^1.0.59"
 serde_derive = "^1.0.59"
 palette = "0.5"
 deltae = "0.2.1"
@@ -33,6 +32,10 @@ wee_alloc = { version = "0.4.2", optional = true }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.2"
+
+[dependencies.serde]
+version = "^1.0.59"
+features = ["rc"]
 
 [dependencies.web-sys]
 version = "0.3"

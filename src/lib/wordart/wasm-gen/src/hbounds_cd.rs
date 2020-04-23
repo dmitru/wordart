@@ -176,9 +176,9 @@ impl HBounds {
             return false;
         }
 
-        let max_level1 = 4;
-        let max_level2 = 4;
-        let min_size = 8f32;
+        let max_level1 = 7;
+        let max_level2 = 7;
+        let min_size = 2f32;
         let pad1 = 0f32;
         let pad2 = 0f32;
 
