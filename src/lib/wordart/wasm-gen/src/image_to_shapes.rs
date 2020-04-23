@@ -137,7 +137,7 @@ pub fn fill_shapes_by_color(img: &mut ImgDataMut, threshold_percent: f32) -> Vec
     lab_colors
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen(js_name=fill_shapes_by_color)]
 pub fn fill_shapes_by_color_js(
     img_data: &mut [u32],
     width: i32,

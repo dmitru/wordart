@@ -44,7 +44,7 @@ const FONT_NAMES = [
 // The function definitions are generated into the `pkg` folder when you run `wasm-pack-build`
 declare class Wasm {
   // get_hbounds_by_ptr(ptr: number): any
-  fill_shapes_by_color_js(
+  fill_shapes_by_color(
     img_data: Uint32Array,
     w: number,
     h: number,
@@ -218,7 +218,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
       let countScale = 0
 
       while (scale > finalScale && count < maxCount) {
-        const batchSize = 50
+        const batchSize = 30
         let success = false
 
         // console.log('scale = ', scale, r * scale)
@@ -267,7 +267,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
 
         if (!success || t1 - t0 > timeout || count > maxCount) {
           scale -= Math.min(maxScaleStep, scaleStepFactor * scale)
-          console.log('placed ', countScale)
+          // console.log('placed ', countScale)
           countScale = 0
         }
         timeout = Math.min(maxTimeout, timeout + timeoutStep)

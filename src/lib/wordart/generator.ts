@@ -528,7 +528,7 @@ export class SceneGenerator {
         let maxTimeout = 3000
         let timeoutStep = 300
         // const maxTagsCount = 1000
-        const maxTagsCount = (1000 * shape.percentFilled) / scaleFactor
+        const maxTagsCount = (100 * shape.percentFilled) / scaleFactor
 
         let currentScale = initialScale
 

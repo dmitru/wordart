@@ -138,7 +138,7 @@ export const computeShapes = ({
     new Uint32Array(imgData.data.buffer),
     imgData.width,
     imgData.height,
-    16
+    0.03
   )
   // throw new Error('r')
   // const colors = getColorsFromImageData(imgData)
