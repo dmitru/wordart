@@ -17,7 +17,7 @@ extern "C" {
 
 use crate::hbounds::*;
 use crate::matrix::Matrix;
-use crate::quadtree_cd::{BoundingBox, Intersection, Tree};
+use crate::spaceindex::rtree::RTree;
 
 #[derive(PartialEq, Debug, Clone, Serialize)]
 pub struct Item {
@@ -36,13 +36,12 @@ impl Item {
     pub fn bounds(&self) -> RectF {
         return RectF::from(self.hbounds.bounds).transform(self.transform);
     }
-}
 
-impl Intersection for Item {
     fn intersects(&self, other: &Self) -> bool {
         let hb1 = self.hbounds.transform(self.transform);
         let hb2 = other.hbounds.transform(other.transform);
         // console_log!("check1");
+        // let _timer = Timer::new("Item::intersects");
         let result = HBounds::intersects(&hb1, &hb2);
         // console_log!("check2");
         return result;
@@ -54,7 +53,7 @@ pub struct LayoutGen {
     next_id: i32,
 
     #[serde(skip_serializing)]
-    pub quadtree: Tree<Item>,
+    pub rtree: RTree<Item>,
 }
 
 impl LayoutGen {
@@ -62,29 +61,39 @@ impl LayoutGen {
         LayoutGen {
             next_id: 0,
             // items: HashMap::new(),
-            quadtree: Tree::new(width, height),
+            rtree: RTree::new(2),
         }
     }
     pub fn add_item(&mut self, item: Item) -> Option<i32> {
         let rect = item.bounds();
-        let bbox = BoundingBox {
-            x0: rect.x,
-            y0: rect.y,
-            x1: rect.x + rect.w,
-            y1: rect.y + rect.h,
-        };
+        let region = (
+            (rect.x as f64, rect.y as f64),
+            ((rect.x + rect.w) as f64, (rect.y + rect.h) as f64),
+        );
         // console_log!("add 1");
-        let _timer = Timer::new("quadtree::insert_unless_intersecting");
-        let result = self.quadtree.insert_unless_intersecting(item, &bbox);
-        // console_log!("add 2");
-        if result {
-            let item_id = self.next_id;
-            self.next_id += 1;
-            // self.items.insert(item_id, item);
-            return Some(item_id);
+        // let mut _timer = Timer::new("rtree::region_intersection_lookup");
+        let result = self.rtree.region_intersection_lookup(region);
+        // _timer.drop_explicit();
+        // console_log!("candidates: {}", result.len());
+
+        for candidate_index in result.iter() {
+            // let mut _timer = Timer::new("rtree::loop");
+            match self.rtree.get_node(*candidate_index).get_data() {
+                Some(candidate_item) => {
+                    if item.intersects(candidate_item) {
+                        return None;
+                    }
+                }
+                None => {
+                    console_log!("None!");
+                }
+            }
         }
 
-        return None;
+        let item_id = self.next_id;
+        self.next_id += 1;
+        self.rtree.insert(region, item);
+        return Some(item_id);
     }
 }
 

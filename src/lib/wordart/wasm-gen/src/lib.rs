@@ -9,7 +9,7 @@ mod matrix;
 
 #[macro_use]
 extern crate serde_derive;
-extern crate quadtree_cd;
+extern crate spaceindex;
 extern crate wasm_bindgen;
 extern crate web_sys;
 

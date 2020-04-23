@@ -2,7 +2,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::hbounds::*;
 use crate::matrix::Matrix;
-use crate::quadtree_cd::Intersection;
+use crate::utils::*;
 
 // Console.log macro
 macro_rules! console_log {
@@ -17,6 +17,7 @@ extern "C" {
 
 impl HBounds {
     pub fn intersects(hbounds1: &Self, hbounds2: &Self) -> bool {
+        // let _timer = Timer::new("HBounds::intersects");
         fn collides_rec_impl(
             hbounds1: &HBounds,
             hbounds2: &HBounds,
@@ -30,7 +31,7 @@ impl HBounds {
             pad1: f32,
             pad2: f32,
         ) -> bool {
-            console_log!("compute_hbounds_impl: {} {}", level1, level2);
+            // console_log!("compute_hbounds_impl: {} {}", level1, level2);
             if !hbounds1.overlaps_shape || !hbounds2.overlaps_shape {
                 // println!("case 1");
                 return false;
@@ -175,9 +176,9 @@ impl HBounds {
             return false;
         }
 
-        let max_level1 = 1;
-        let max_level2 = 1;
-        let min_size = 0.5f32;
+        let max_level1 = 4;
+        let max_level2 = 4;
+        let min_size = 8f32;
         let pad1 = 0f32;
         let pad2 = 0f32;
 
@@ -195,12 +196,6 @@ impl HBounds {
             hbounds1, hbounds2, transform1, transform2, 1, 1, max_level1, max_level2, min_size,
             pad1, pad2,
         )
-    }
-}
-
-impl Intersection for HBounds {
-    fn intersects(&self, other: &Self) -> bool {
-        HBounds::intersects(self, other)
     }
 }
 

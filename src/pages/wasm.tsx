@@ -86,21 +86,26 @@ const scratch = (canvas: HTMLCanvasElement) => {
       //   FONT_NAMES.map((fontName) => loadFont(`/fonts/${fontName}`))
       // )
       const size = canvas.height
-      const r = 30
+      const r = 25
 
       const createImgData = (r = 10, pad = 0) => {
         const w = r * 2 + 2 * pad
         const h = r * 2 + 2 * pad
         const ctx = createCanvasCtx({ w, h })
-        ctx.fillStyle = 'white'
-        ctx.fillRect(0, 0, w, h)
-        ctx.fillStyle = 'black'
+        // ctx.fillStyle = 'white'
+        // ctx.fillRect(0, 0, w, h)
+        ctx.fillStyle = '#000'
+        ctx.strokeStyle = '#000'
         ctx.beginPath()
-        ctx.arc(r + pad, r + pad, r, 0, 2 * Math.PI)
-        ctx.fill()
+        ctx.arc(r + pad, r + pad, r - 2.5, 0, 2 * Math.PI)
+        ctx.lineWidth = 5
+
+        ctx.stroke()
         // console.screenshot(ctx.canvas)
-        return ctx.getImageData(0, 0, w, h)
+        return { imgData: ctx.getImageData(0, 0, w, h), ctx }
       }
+
+      const { imgData, ctx: imgCtx } = createImgData(r)
 
       const createHBounds = (imageData: ImageData) =>
         wasm.create_hbounds(
@@ -109,19 +114,18 @@ const scratch = (canvas: HTMLCanvasElement) => {
           imageData.height
         )
 
-      const imgData = createImgData(r)
-
       let count = 0
 
       const render = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
-        ctx.fillStyle = '#0007'
+        ctx.fillStyle = '#000'
         ctx.save()
         for (let item of addedHbounds) {
           ctx.resetTransform()
           ctx.setTransform(item.transform)
-          ctx.beginPath()
-          ctx.arc(r, r, r, 0, 2 * Math.PI)
+          ctx.drawImage(imgCtx.canvas, 0, 0)
+          // ctx.beginPath()
+          // ctx.arc(r, r, r, 0, 2 * Math.PI)
           ctx.fill()
         }
         ctx.restore()
@@ -162,12 +166,34 @@ const scratch = (canvas: HTMLCanvasElement) => {
       const hboundsValue = hbounds.get_js()
 
       const t1 = performance.now()
-      for (let j = 0; j < 1; ++j) {
-        for (let i = 0; i < 10; ++i) {
+
+      let scaleFactor = 3
+      const initialScale = 0.7 * scaleFactor
+      // const initialScale = 0.002
+      const finalScale = 0.01 * scaleFactor
+      // const finalScale = 0.05
+      const scaleStepFactor = 0.2
+      const maxScaleStep = 0.005
+      let timeout = 1500
+      let maxTimeout = 3000
+      let timeoutStep = 300
+      let maxCount = 1000
+
+      let scale = initialScale
+
+      let t0 = performance.now()
+      let countScale = 0
+
+      while (scale > finalScale && count < maxCount) {
+        const batchSize = 15
+        let success = false
+
+        console.log('scale = ', scale, r * scale)
+
+        for (let i = 0; i < batchSize; ++i) {
           // console.log(imgData.width, imgData.height, imgData.data)
 
           const m: Matrix = new wasm.Matrix()
-          const scale = rand(0.1, 0.5)
           const rScaled = r * scale
           const pad = 5
           const cx = rand(rScaled + pad, size - rScaled - pad)
@@ -189,13 +215,26 @@ const scratch = (canvas: HTMLCanvasElement) => {
 
           const res = layoutGen.add_item(hbounds, m)
           if (res != null) {
+            success = true
             addedHbounds.push({
               ...hboundsValue,
               transform,
             })
+            countScale++
             count++
           }
         }
+
+        let t1 = performance.now()
+
+        if (!success || t1 - t0 > timeout || count > maxCount) {
+          scale -= Math.min(maxScaleStep, scaleStepFactor * scale)
+          console.log('placed ', countScale)
+          countScale = 0
+        }
+        timeout = Math.min(maxTimeout, timeout + timeoutStep)
+
+        t0 = performance.now()
       }
 
       const t2 = performance.now()
@@ -335,7 +374,7 @@ const ImageToShapesScratch = () => {
 
   return (
     <Layout>
-      <Canvas width={300} height={300} ref={canvasRef} id="scene" />
+      <Canvas width={900} height={900} ref={canvasRef} id="scene" />
     </Layout>
   )
 }

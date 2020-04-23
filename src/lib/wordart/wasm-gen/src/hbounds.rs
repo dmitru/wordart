@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::*;
 
 use crate::matrix::Matrix;
+use crate::utils::*;
 
 // Console.log macro
 macro_rules! console_log {
@@ -144,6 +145,7 @@ impl HBounds {
     }
 
     pub fn transform(&self, transform: Matrix) -> HBounds {
+        // let _timer = Timer::new("HBounds::transform");
         HBounds {
             bounds: self.bounds,
             count: self.count,
@@ -179,8 +181,8 @@ impl HBounds {
                 let is_pixel_intersecting = |row: i32, col: i32| -> bool {
                     let index = (col + row * width) as usize;
                     let color_int = data[index];
-                    let r = get_ch_r!(color_int);
-                    return r < 244;
+                    let a = get_ch_a!(color_int);
+                    return a > 0;
                 };
                 let is_rect_intersecting = |rect: Rect| -> ShapeIntesectionKind {
                     let x1 = rect.x;
@@ -300,7 +302,7 @@ impl HBounds {
                         h: height,
                     },
                     1,
-                    8,
+                    4,
                 )
             }
         }

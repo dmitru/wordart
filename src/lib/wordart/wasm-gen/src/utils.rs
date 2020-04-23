@@ -24,6 +24,13 @@ extern "C" {
 }
 
 #[macro_export]
+macro_rules! get_ch_a {
+    ( $feature:expr ) => {{
+        (($feature & 0xff000000u32) >> 24)
+    }};
+}
+
+#[macro_export]
 macro_rules! get_ch_b {
     ( $feature:expr ) => {{
         (($feature & 0xff0000u32) >> 16)
@@ -54,6 +61,10 @@ impl<'a> Timer<'a> {
     pub fn new(name: &'a str) -> Timer<'a> {
         console::time_with_label(name);
         Timer { name }
+    }
+
+    pub fn drop_explicit(&mut self) {
+        console::time_end_with_label(self.name);
     }
 }
 
