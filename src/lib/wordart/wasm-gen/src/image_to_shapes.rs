@@ -77,14 +77,14 @@ pub fn fill_shapes_by_color(img: &mut ImgDataMut, threshold_percent: f32) -> Vec
     let threshold_pixels = ((total_pixels as f32) * threshold_percent).round() as i32;
     color_counts.retain(|_, v| *v >= threshold_pixels);
 
-    console_log!("Size: {}", color_counts.len());
+    // console_log!("Size: {}", color_counts.len());
 
     let mut lab_colors: Vec<LabInt> = vec![];
     for (color_int, count) in &color_counts {
         let r = get_ch_r!(color_int);
         let g = get_ch_g!(color_int);
         let b = get_ch_b!(color_int);
-        console_log!("color: {}, {}, {} {} {}", color_int, count, r, g, b);
+        // console_log!("color: {}, {}, {} {} {}", color_int, count, r, g, b);
         let lab = Lab::from(Srgb::new(
             (r as f32) / 255.0,
             (g as f32) / 255.0,

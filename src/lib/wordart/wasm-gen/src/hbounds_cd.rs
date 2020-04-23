@@ -1,6 +1,19 @@
+use wasm_bindgen::prelude::*;
+
 use crate::hbounds::*;
 use crate::matrix::Matrix;
 use crate::quadtree_cd::Intersection;
+
+// Console.log macro
+macro_rules! console_log {
+    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
+}
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
 
 impl HBounds {
     pub fn intersects(hbounds1: &Self, hbounds2: &Self) -> bool {
@@ -17,6 +30,7 @@ impl HBounds {
             pad1: f32,
             pad2: f32,
         ) -> bool {
+            console_log!("compute_hbounds_impl: {} {}", level1, level2);
             if !hbounds1.overlaps_shape || !hbounds2.overlaps_shape {
                 // println!("case 1");
                 return false;
@@ -38,11 +52,11 @@ impl HBounds {
                 return false;
             }
 
-            let has_children1 = level1 <= max_level1
+            let has_children1 = level1 < max_level1
                 && bounds1.w >= min_size
                 && bounds1.h >= min_size
                 && hbounds1.children.len() > 0;
-            let has_children2 = level2 <= max_level2
+            let has_children2 = level2 < max_level2
                 && bounds2.w >= min_size
                 && bounds2.h >= min_size
                 && hbounds2.children.len() > 0;
@@ -54,9 +68,40 @@ impl HBounds {
 
             // invariant: at least one hbounds has children
 
-            if hbounds1.overlaps_shape && has_children1 && !has_children2 {
+            if has_children1 && !has_children2 {
                 // println!("case 4");
                 for child in hbounds1.children.iter() {
+                    if !child.overlaps_shape {
+                        continue;
+                    }
+
+                    let child_transform = match child.transform {
+                        Some(t) => transform1.transform(&t),
+                        None => transform1,
+                    };
+                    let child_result = collides_rec_impl(
+                        child,
+                        hbounds1,
+                        child_transform,
+                        transform2,
+                        level1 + 1,
+                        level2,
+                        max_level1,
+                        max_level2,
+                        min_size,
+                        pad1,
+                        pad2,
+                    );
+
+                    if child_result {
+                        return true;
+                    }
+                }
+            }
+
+            if has_children2 && !has_children1 {
+                // println!("case 5");
+                for child in hbounds2.children.iter() {
                     if !child.overlaps_shape {
                         continue;
                     }
@@ -72,37 +117,6 @@ impl HBounds {
                         child_transform,
                         level1,
                         level2 + 1,
-                        max_level1,
-                        max_level2,
-                        min_size,
-                        pad1,
-                        pad2,
-                    );
-
-                    if child_result {
-                        return true;
-                    }
-                }
-            }
-
-            if hbounds2.overlaps_shape && has_children2 && !has_children1 {
-                // println!("case 5");
-                for child in hbounds2.children.iter() {
-                    if !child.overlaps_shape {
-                        continue;
-                    }
-
-                    let child_transform = match child.transform {
-                        Some(t) => transform1.transform(&t),
-                        None => transform1,
-                    };
-                    let child_result = collides_rec_impl(
-                        child,
-                        hbounds2,
-                        child_transform,
-                        transform2,
-                        level1 + 1,
-                        level2,
                         max_level1,
                         max_level2,
                         min_size,
@@ -161,9 +175,9 @@ impl HBounds {
             return false;
         }
 
-        let max_level1 = 12;
-        let max_level2 = 12;
-        let min_size = 1f32;
+        let max_level1 = 1;
+        let max_level2 = 1;
+        let min_size = 0.5f32;
         let pad1 = 0f32;
         let pad2 = 0f32;
 

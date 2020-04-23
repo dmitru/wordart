@@ -2,6 +2,17 @@ use wasm_bindgen::prelude::*;
 
 use crate::matrix::Matrix;
 
+// Console.log macro
+macro_rules! console_log {
+    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
+}
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
+
 #[wasm_bindgen]
 #[derive(PartialEq, Debug, Copy, Clone, Serialize)]
 pub struct Rect {
@@ -120,6 +131,18 @@ pub struct HBounds {
 }
 
 impl HBounds {
+    pub fn clone(&self) -> HBounds {
+        HBounds {
+            bounds: self.bounds,
+            count: self.count,
+            level: self.level,
+            overlapping_area: self.overlapping_area,
+            overlaps_shape: self.overlaps_shape,
+            children: self.children.clone(),
+            transform: self.transform.clone(),
+        }
+    }
+
     pub fn transform(&self, transform: Matrix) -> HBounds {
         HBounds {
             bounds: self.bounds,
@@ -142,6 +165,17 @@ impl HBounds {
                 width,
                 height,
             } => {
+                // console_log!("New!");
+                // for row in 0..width {
+                //     for col in 0..height {
+                //         let fi = (row * width + col) as usize;
+                //         let color = data[fi];
+                //         let r = get_ch_r!(data[fi]);
+                //         let g = get_ch_g!(data[fi]);
+                //         let b = get_ch_b!(data[fi]);
+                //         console_log!("color: {:x?} - {:x?} {:x?} {:x?}", color, r, g, b);
+                //     }
+                // }
                 let is_pixel_intersecting = |row: i32, col: i32| -> bool {
                     let index = (col + row * width) as usize;
                     let color_int = data[index];
@@ -180,8 +214,10 @@ impl HBounds {
                         is_rect_intersecting: &dyn Fn(Rect) -> ShapeIntesectionKind,
                     ) -> HBounds {
                         let intersection = is_rect_intersecting(bounds);
+
                         match intersection {
                             ShapeIntesectionKind::Empty => {
+                                // console_log!("cas 1");
                                 return HBounds {
                                     count: 1,
                                     bounds,
@@ -193,6 +229,7 @@ impl HBounds {
                                 };
                             }
                             ShapeIntesectionKind::Full => {
+                                // console_log!("cas 2");
                                 return HBounds {
                                     count: 1,
                                     bounds,
@@ -262,7 +299,7 @@ impl HBounds {
                         w: width,
                         h: height,
                     },
-                    3,
+                    1,
                     8,
                 )
             }
@@ -613,7 +650,7 @@ mod tests {
                     w: 2,
                     h: 2
                 },
-                count: 1,
+                count: 4,
                 level: 1,
                 overlapping_area: 1,
                 overlaps_shape: true,
@@ -702,7 +739,7 @@ mod tests {
                     w: 3,
                     h: 3
                 },
-                count: 1,
+                count: 7,
                 level: 1,
                 overlapping_area: 3,
                 overlaps_shape: true,
@@ -757,7 +794,7 @@ mod tests {
                             w: 2,
                             h: 2
                         },
-                        count: 1,
+                        count: 4,
                         level: 2,
                         overlapping_area: 3,
                         overlaps_shape: true,
@@ -848,7 +885,7 @@ mod tests {
                     w: 3,
                     h: 3
                 },
-                count: 1,
+                count: 8,
                 level: 1,
                 overlapping_area: 3,
                 overlaps_shape: true,
@@ -889,7 +926,7 @@ mod tests {
                             w: 1,
                             h: 2
                         },
-                        count: 1,
+                        count: 2,
                         level: 2,
                         overlapping_area: 1,
                         overlaps_shape: true,
@@ -932,7 +969,7 @@ mod tests {
                             w: 2,
                             h: 2
                         },
-                        count: 1,
+                        count: 4,
                         level: 2,
                         overlapping_area: 2,
                         overlaps_shape: true,

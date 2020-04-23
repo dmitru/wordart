@@ -1,6 +1,19 @@
 use wasm_bindgen::prelude::*;
 
+use crate::utils::*;
 use std::collections::HashMap;
+
+// Console.log macro
+
+macro_rules! console_log {
+    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
+}
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
 
 use crate::hbounds::*;
 use crate::matrix::Matrix;
@@ -13,9 +26,9 @@ pub struct Item {
 }
 
 impl Item {
-    pub fn new(hbounds: HBounds) -> Self {
+    pub fn new(hbounds: &HBounds) -> Self {
         Item {
-            hbounds,
+            hbounds: hbounds.clone(),
             transform: Matrix::new(),
         }
     }
@@ -29,13 +42,17 @@ impl Intersection for Item {
     fn intersects(&self, other: &Self) -> bool {
         let hb1 = self.hbounds.transform(self.transform);
         let hb2 = other.hbounds.transform(other.transform);
-        HBounds::intersects(&hb1, &hb2)
+        // console_log!("check1");
+        let result = HBounds::intersects(&hb1, &hb2);
+        // console_log!("check2");
+        return result;
     }
 }
 
 #[derive(Serialize)]
 pub struct LayoutGen {
     next_id: i32,
+
     #[serde(skip_serializing)]
     pub quadtree: Tree<Item>,
 }
@@ -56,7 +73,10 @@ impl LayoutGen {
             x1: rect.x + rect.w,
             y1: rect.y + rect.h,
         };
+        // console_log!("add 1");
+        let _timer = Timer::new("quadtree::insert_unless_intersecting");
         let result = self.quadtree.insert_unless_intersecting(item, &bbox);
+        // console_log!("add 2");
         if result {
             let item_id = self.next_id;
             self.next_id += 1;
@@ -81,7 +101,7 @@ mod tests {
         let height = 2;
         let mut layout = LayoutGen::new(width as f32, height as f32);
 
-        let item1 = Item::new(HBounds::from(ImgData {
+        let item1 = Item::new(&HBounds::from(ImgData {
             data: &[
                 BLACK, BLACK, //
                 BLACK, WHITE,
@@ -94,7 +114,7 @@ mod tests {
         assert_eq!(layout.add_item(item1), Some(0));
         assert_eq!(layout.add_item(item2), None);
 
-        let item3 = Item::new(HBounds::from(ImgData {
+        let item3 = Item::new(&HBounds::from(ImgData {
             data: &[
                 WHITE, WHITE, //
                 WHITE, BLACK,

@@ -11,6 +11,7 @@ mod matrix;
 extern crate serde_derive;
 extern crate quadtree_cd;
 extern crate wasm_bindgen;
+extern crate web_sys;
 
 use wasm_bindgen::prelude::*;
 

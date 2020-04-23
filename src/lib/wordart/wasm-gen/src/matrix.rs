@@ -15,7 +15,9 @@ pub enum MatrixTransformError {
   DeterminantIsZero,
 }
 
+#[wasm_bindgen]
 impl Matrix {
+  #[wasm_bindgen(constructor)]
   pub fn new() -> Matrix {
     Matrix {
       a: 1f32,
@@ -147,31 +149,5 @@ impl Matrix {
 
   pub fn det(&self) -> f32 {
     self.a * self.d - self.b * self.c
-  }
-
-  pub fn inverse_mut(&mut self) -> Result<(), MatrixTransformError> {
-    let mut det = self.det();
-    if det == 0f32 {
-      return Err(MatrixTransformError::DeterminantIsZero);
-    }
-    det = 1f32 / det;
-    let a = self.d * det;
-    let b = -self.b * det;
-    let c = -self.c * det;
-    let d = self.a * det;
-    let e = (self.c * self.f - self.e * self.d) * det;
-    let f = (self.e * self.b - self.a * self.f) * det;
-    self.a = a;
-    self.b = b;
-    self.c = c;
-    self.d = d;
-    self.e = e;
-    self.f = f;
-    Ok(())
-  }
-
-  pub fn inverse(mut self) -> Result<Matrix, MatrixTransformError> {
-    self.inverse_mut()?;
-    Ok(self)
   }
 }
