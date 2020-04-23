@@ -8,15 +8,11 @@ import {
   loadImageUrlToCanvasCtx,
   createCanvasCtx,
 } from 'lib/wordart/canvas-utils'
-import {
-  renderSceneDebug,
-  SceneGenerator,
-  ShapeConfig,
-} from 'lib/wordart/generator'
+import { renderSceneDebug, SceneGenJs } from 'lib/wordart/scene-gen-js'
 import { loadFont } from 'lib/wordart/fonts'
-import { computeShapes } from 'lib/wordart/image-to-shapes'
+import { computeShapesWasm } from 'lib/wordart/image-to-shapes'
 import { computeHBoundsForCanvas } from 'lib/wordart/hbounds'
-import { LayoutGenJs, Matrix } from 'lib/wordart/wasm-gen/pkg/wasm_gen'
+import { LayoutGenWasm, Matrix } from 'lib/wordart/wasm-gen/pkg/wasm_gen'
 import { sample } from 'lodash'
 
 // const BG_SHAPE = '/images/cat.png'
@@ -60,16 +56,16 @@ const rand = (from: number, to: number): number => {
 
 const scratch = (canvas: HTMLCanvasElement) => {
   const ctx = canvas.getContext('2d')!
-  let sceneGen: SceneGenerator
+  let sceneGen: SceneGenJs
 
-  let layoutGen: LayoutGenJs | null = null
+  let layoutGen: LayoutGenWasm | null = null
   let wasm: any = null
   import('lib/wordart/wasm-gen/pkg/wasm_gen').then((_wasm) => {
     console.log('wasm: ', _wasm)
     wasm = _wasm
     // @ts-ignore
     window['wasm'] = _wasm
-    layoutGen = new _wasm.LayoutGenJs(400, 400)
+    layoutGen = new _wasm.LayoutGenWasm(400, 400)
     // @ts-ignore
     window['layoutGen'] = layoutGen
   })

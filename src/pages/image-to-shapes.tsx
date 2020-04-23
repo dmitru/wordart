@@ -5,12 +5,9 @@ import styled from 'styled-components'
 import 'lib/wordart/console-extensions'
 import { Rect } from 'lib/wordart/geometry'
 import { loadImageUrlToCanvasCtx } from 'lib/wordart/canvas-utils'
-import {
-  renderSceneDebug,
-  SceneGenerator,
-  ShapeConfig,
-} from 'lib/wordart/generator'
+import { renderSceneDebug, SceneGenJs } from 'lib/wordart/scene-gen-js'
 import { loadFont } from 'lib/wordart/fonts'
+import { ShapeConfig } from 'lib/wordart/scene-gen'
 
 const BG_SHAPE = '/images/cat.png'
 // const BG_SHAPE = '/images/number_six.png'
@@ -35,7 +32,7 @@ const FONT_NAMES = [
 
 const scratch = (canvas: HTMLCanvasElement) => {
   const ctx = canvas.getContext('2d')!
-  let sceneGen: SceneGenerator
+  let sceneGen: SceneGenJs
 
   const onKeyDown = async (e: KeyboardEvent) => {
     const key = e.key
@@ -51,7 +48,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
       const viewBoxSize = 300
       const viewBox: Rect = { x: 0, y: 0, w: viewBoxSize, h: viewBoxSize }
       if (!sceneGen) {
-        sceneGen = new SceneGenerator({ viewBox, bgImgSize: viewBoxSize })
+        sceneGen = new SceneGenJs({ viewBox, bgImgSize: viewBoxSize })
       } else {
         sceneGen.clearTags()
       }

@@ -1,25 +1,22 @@
 import { sortBy } from 'lodash'
 import chroma from 'chroma-js'
-import { rotate, scale, translate, Point } from 'transformation-matrix'
+import { rotate, scale, translate } from 'transformation-matrix'
 import { aabbForRect, Rect, multiply } from 'lib/wordart/geometry'
 import {
   HBounds,
   computeHBounds,
   drawHBounds,
-  randomPointInsideHbounds,
+  drawHBoundsWasm,
+  computeHBoundsForCanvasWasm,
 } from 'lib/wordart/hbounds'
-import { clearCanvas, createCanvasCtx } from 'lib/wordart/canvas-utils'
+import {
+  clearCanvas,
+  createCanvasCtx,
+  createCanvasCtxCopy,
+} from 'lib/wordart/canvas-utils'
+import * as WasmModule from 'lib/wordart/wasm-gen-types'
 
-declare class Wasm {
-  fill_shapes_by_color(
-    img_data: Uint32Array,
-    w: number,
-    h: number,
-    threshold_part: number
-  ): { count: number; r: number; g: number; b: number }[]
-}
-
-let wasm: Wasm | null = null
+let wasm: any | null = null
 import('lib/wordart/wasm-gen/pkg/wasm_gen').then((_wasm) => {
   console.log('wasm: ', wasm)
   wasm = _wasm
@@ -71,15 +68,14 @@ export type Shape = {
   percentFilled: number
 }
 
-export const computeShapes = ({
-  originalSize = 800,
-  srcCanvas,
-  imgSize = 400,
-  angle = 0,
-  visualize = true,
-  minSize = 1,
-  maxLevel = 12,
-}: {
+export type ShapeWasm = {
+  hBounds: WasmModule.HBoundsWasm
+  hBoundsInverted: WasmModule.HBoundsWasm
+  color: string
+  percentFilled: number
+}
+
+export const computeShapesWasm = (params: {
   originalSize: number
   srcCanvas: HTMLCanvasElement
   invert?: boolean
@@ -88,7 +84,18 @@ export const computeShapes = ({
   maxLevel?: number
   minSize?: number
   visualize?: boolean
-}): Shape[] => {
+}): ShapeWasm[] => {
+  const {
+    originalSize = 800,
+    srcCanvas,
+    imgSize = 800,
+    angle = 0,
+    visualize = false,
+    minSize = 1,
+    maxLevel = 12,
+  } = params
+  console.log('computeShapesWasm: ', params)
+
   if (!wasm) {
     throw new Error('wasm is not loaded')
   }
@@ -140,146 +147,62 @@ export const computeShapes = ({
     imgData.height,
     0.03
   )
-  // throw new Error('r')
-  // const colors = getColorsFromImageData(imgData)
 
   const totalPixelCount = imgData.width * imgData.height
-  // const thresholdCount = totalPixelCount / 16
-  // const colorsFiltered = colors.filter((c) => c.count >= thresholdCount)
 
-  // console.log('Colors: ', colors, colorsFiltered)
-  // const colorsSet = new Set(colorsFiltered.map((c) => c.color))
+  const shapes: ShapeWasm[] = []
 
-  // for (let x = 0; x < imgData.width; ++x) {
-  //   for (let y = 0; y < imgData.height; ++y) {
-  //     const index = 4 * (x + y * imgData.width)
-  //     const r = imgData.data[index]
-  //     const g = imgData.data[index + 1]
-  //     const b = imgData.data[index + 2]
-  //     const color = (r << 16) + (g << 8) + b
-  //     if (!colorsSet.has(color)) {
-  //       const colorHex = colorIntToHex(color)
-  //       const closestColors = sortBy(colorsFiltered, (c) =>
-  //         chroma.deltaE(colorHex, colorIntToHex(c.color))
-  //       )
-  //       const closestColor = closestColors[0]
-  //       const closestColorRgb = colorIntToRgb(closestColor.color)
-  //       imgData.data[index] = closestColorRgb.r
-  //       imgData.data[index + 1] = closestColorRgb.g
-  //       imgData.data[index + 2] = closestColorRgb.b
-  //     }
-  //   }
-  // }
-
-  // const ctx2 = createCanvasCtx({ w: imgData.width, h: imgData.height })
-  // ctx2.putImageData(imgData, 0, 0)
-
-  const shapes: Shape[] = []
+  clearCanvas(ctx)
+  ctx.putImageData(imgData, 0, 0)
+  // console.log(colorsFiltered)
+  // console.screenshot(ctx.canvas, 0.3)
+  // console.log(ctx.canvas.height, ctx.canvas.width)
 
   for (const { r, g, b, count: colorPixelCount } of colorsFiltered) {
-    clearCanvas(ctx)
-
-    console.log('Shape colors: ', { r, g, b })
-
-    const isPointIntersectingShape = (x: number, y: number): boolean => {
-      const index = 4 * (y * imgData.width + x)
-      return (
-        imgData.data[index] === r &&
-        imgData.data[index + 1] === g &&
-        imgData.data[index + 2] === b
-      )
-    }
-
-    const dx = 1
-
-    const isRectIntersecting = (bounds: Rect): 'full' | 'partial' | 'none' => {
-      const maxX = bounds.x + bounds.w
-      const maxY = bounds.y + bounds.h
-
-      let checked = 0
-      let overlapping = 0
-
-      for (let x = Math.ceil(bounds.x); x < Math.floor(maxX); x += dx) {
-        for (let y = Math.ceil(bounds.y); y < Math.floor(maxY); y += dx) {
-          const intersecting = isPointIntersectingShape(x, y)
-          if (intersecting) {
-            overlapping += 1
-          }
-          checked += 1
-        }
-      }
-
-      if (overlapping === 0 || checked === 0) {
-        return 'none'
-      }
-
-      return checked === overlapping ? 'full' : 'partial'
-    }
-
-    const isRectIntersectingInverted = (
-      bounds: Rect
-    ): 'full' | 'partial' | 'none' => {
-      const result = isRectIntersecting(bounds)
-      if (result === 'full') {
-        return 'none'
-      }
-      if (result === 'none') {
-        return 'full'
-      }
-      return 'partial'
-    }
-
-    // Visualize sample points
-    // if (visualize) {
-    //   for (let x = 0; x < imgData.width; x += dx) {
-    //     for (let y = 0; y < imgData.height; y += dx) {
-    //       const intersecting = isPointIntersectingShape(x, y)
-    //       if (intersecting) {
-    //         ctx.fillStyle = 'yellow'
-    //         ctx.fillRect(x, y, 2, 2)
-    //       }
-    //     }
-    //   }
-    // }
-
-    const hBounds = computeHBounds(
-      {
-        x: 0,
-        y: 0,
-        h: canvas.height,
-        w: canvas.width,
-      },
-      isRectIntersecting,
+    const hBounds = computeHBoundsForCanvasWasm({
+      srcCanvas: canvas,
+      imgSize,
+      color: { r, g, b },
       minSize,
-      maxLevel
-    )
-    const hBoundsInverted = computeHBounds(
-      {
-        x: 0,
-        y: 0,
-        h: canvas.height,
-        w: canvas.width,
-      },
-      isRectIntersectingInverted,
+      maxLevel,
+      visualize,
+    })
+    const hBoundsInverted = computeHBoundsForCanvasWasm({
+      srcCanvas: canvas,
+      imgSize,
+      color: { r, g, b },
+      invert: true,
       minSize,
-      maxLevel
-    )
-
-    if (visualize) {
-      drawHBounds(ctx, hBounds)
-      console.screenshot(ctx.canvas)
-    }
+      maxLevel,
+      visualize,
+    })
 
     console.log('scaleFactor', scaleFactor, originalSize, imgSize)
-    hBounds.transform = multiply(
+    const transform = multiply(
       scale(1),
       multiply(
         scale(originalSize / imgSize),
         translate(aabbScaled.x, aabbScaled.y)
       )
     )
+    hBounds.set_transform(
+      transform.a,
+      transform.b,
+      transform.c,
+      transform.d,
+      transform.e,
+      transform.f
+    )
+    hBoundsInverted.set_transform(
+      transform.a,
+      transform.b,
+      transform.c,
+      transform.d,
+      transform.e,
+      transform.f
+    )
 
-    const shape: Shape = {
+    const shape: ShapeWasm = {
       color: chroma(r, g, b).hex(),
       hBounds,
       hBoundsInverted,

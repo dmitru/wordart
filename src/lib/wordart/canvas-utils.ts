@@ -34,6 +34,9 @@ export const createCanvas = (
   return canvas
 }
 
+export const createCanvasCtxCopy = (ctx: CanvasCtx): CanvasCtx =>
+  createCanvasCtx({ w: ctx.canvas.width, h: ctx.canvas.height })
+
 export const createCanvasCtx = (
   size: Dimensions,
   elemId?: string

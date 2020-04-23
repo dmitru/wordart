@@ -1,6 +1,19 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+ * @param {Uint32Array} img_data
+ * @param {number} width
+ * @param {number} height
+ * @param {number} threshold_percent
+ * @returns {any[]}
+ */
+export function fill_shapes_by_color(
+  img_data: Uint32Array,
+  width: number,
+  height: number,
+  threshold_percent: number
+): any[]
+/**
  * @param {Uint32Array} data
  * @param {number} width
  * @param {number} height
@@ -11,25 +24,24 @@ export function create_hbounds(
   width: number,
   height: number
 ): HBoundsWasm
-/**
- * @param {Uint32Array} img_data
- * @param {number} width
- * @param {number} height
- * @param {number} threshold_percent
- * @returns {any[]}
- */
-export function fill_shapes_by_color_js(
-  img_data: Uint32Array,
-  width: number,
-  height: number,
-  threshold_percent: number
-): any[]
 export class HBoundsWasm {
   free(): void
+  /**
+   * @returns {HBoundsWasm}
+   */
+  clone(): HBoundsWasm
   /**
    * @returns {any}
    */
   get_js(): any
+  set_transform(
+    a: number,
+    b: number,
+    c: number,
+    d: number,
+    e: number,
+    f: number
+  ): void
 }
 export class LabInt {
   free(): void

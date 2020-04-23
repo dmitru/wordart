@@ -24,6 +24,7 @@
     "**/*.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "tools/generators/index.js"
+    "tools/generators/index.js",
+    "next.config.js"
   ]
 }

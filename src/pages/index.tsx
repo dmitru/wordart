@@ -6,23 +6,20 @@ import 'lib/wordart/console-extensions'
 import { Rect } from 'lib/wordart/geometry'
 import { loadFont } from 'lib/wordart/fonts'
 import { sample } from 'lodash'
-import {
-  Tag,
-  SceneGenerator,
-  renderSceneDebug,
-  ShapeConfig,
-} from 'lib/wordart/generator'
+import { Tag, SceneGenJs, renderSceneDebug } from 'lib/wordart/scene-gen-js'
 import {
   loadImageUrlToCanvasCtx,
   canvasToDataUri,
 } from 'lib/wordart/canvas-utils'
 import { fabric } from 'fabric'
 import { toSVG } from 'transformation-matrix'
+import { ShapeConfig, SceneGen } from 'lib/wordart/scene-gen'
+import { SceneGenWasm, renderSceneWasmDebug } from 'lib/wordart/scene-gen-wasm'
 
-// const BG_SHAPE = '/images/cat.png'
+const BG_SHAPE = '/images/cat.png'
 // const BG_SHAPE = '/images/number_six.png'
 // const BG_SHAPE = '/images/darth_vader.jpg'
-const BG_SHAPE = '/images/beatles.jpg'
+// const BG_SHAPE = '/images/beatles.jpg'
 
 const WORDS = [
   'art',
@@ -43,7 +40,7 @@ const FONT_NAMES = [
 let ENABLE_INTERACTIVITY = false
 
 export class FabricRenderer {
-  constructor(sceneGen: SceneGenerator, canvasId: string) {
+  constructor(sceneGen: SceneGenJs, canvasId: string) {
     type Mode = 'edit' | 'view'
     const mode: Mode = 'view' as Mode
 
@@ -151,7 +148,7 @@ export const scratch = (
   canvas2: HTMLCanvasElement
 ) => {
   // const tagBg = scene.addTag(scene.words[0], 300, 100, 2, Math.PI / 2)
-  let sceneGen: SceneGenerator | null = null
+  let sceneGen: SceneGenWasm | null = null
   let tag: Tag | null = null
 
   const ctx = canvas.getContext('2d')!
@@ -160,7 +157,12 @@ export const scratch = (
   const onKeyDown = async (e: KeyboardEvent) => {
     const key = e.key
 
-    const bgImageCtx = await loadImageUrlToCanvasCtx(BG_SHAPE, 400, 400)
+    const BG_IMG_SIZE = 400
+    const bgImageCtx = await loadImageUrlToCanvasCtx(
+      BG_SHAPE,
+      BG_IMG_SIZE,
+      BG_IMG_SIZE
+    )
     // console.screenshot(bgImageCtx.canvas)
 
     if (key === 'g') {
@@ -208,14 +210,15 @@ export const scratch = (
       // @ts-ignore
       window['fonts'] = fonts
 
-      const viewBox: Rect = { x: 0, y: 0, w: 800, h: 800 }
+      const viewBox: Rect = { x: 0, y: 0, w: BG_IMG_SIZE, h: BG_IMG_SIZE }
       if (!sceneGen) {
-        sceneGen = new SceneGenerator({ viewBox, bgImgSize: 800 })
+        sceneGen = new SceneGenWasm({ viewBox, bgImgSize: BG_IMG_SIZE })
       } else {
         sceneGen.clearTags()
       }
 
       let t1 = -1
+      t1 = performance.now()
       const { start, cancel } = sceneGen.generate({
         bgImageCtx,
         shapeConfigs,
@@ -236,26 +239,26 @@ export const scratch = (
       console.log(`Finished: ${((t2 - t1) / 1000).toFixed(1)} seconds`)
       console.log('Result: ', result)
       // const renderer = new FabricRenderer(sceneGen, canvas.id)
-      renderSceneDebug(sceneGen, ctx2)
+      renderSceneWasmDebug(sceneGen, ctx2)
 
-      if (ENABLE_INTERACTIVITY) {
-        tag = new Tag(0, sample(sceneGen.words)!, 0, 0, 1)
-        let collides = false
-        canvas.addEventListener('mousemove', (e) => {
-          const x = e.offsetX
-          const y = e.offsetY
+      // if (ENABLE_INTERACTIVITY) {
+      //   tag = new Tag(0, sample(sceneGen.words)!, 0, 0, 1)
+      //   let collides = false
+      //   canvas.addEventListener('mousemove', (e) => {
+      //     const x = e.offsetX
+      //     const y = e.offsetY
 
-          if (tag && sceneGen?.bgShape) {
-            tag.left = x
-            tag.top = y
+      //     if (tag && sceneGen?.bgShape) {
+      //       tag.left = x
+      //       tag.top = y
 
-            collides = sceneGen.checkCollision(tag, sceneGen.bgShape.shapes[0])
-            // console.log('tag = ', tag, collides)
+      //       collides = sceneGen.checkCollision(tag, sceneGen.bgShape.shapes[0])
+      //       // console.log('tag = ', tag, collides)
 
-            tag.fillStyle = collides ? 'green' : 'black'
-          }
-        })
-      }
+      //       tag.fillStyle = collides ? 'green' : 'black'
+      //     }
+      //   })
+      // }
 
       // @ts-ignore
       window['scene'] = sceneGen

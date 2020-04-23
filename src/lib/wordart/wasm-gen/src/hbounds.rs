@@ -149,7 +149,7 @@ impl HBounds {
         }
     }
 
-    pub fn from(img_data: ImgData) -> HBounds {
+    pub fn from(img_data: ImgData, invert: bool) -> HBounds {
         match img_data {
             ImgData {
                 data,
@@ -171,7 +171,11 @@ impl HBounds {
                     let index = (col + row * width) as usize;
                     let color_int = data[index];
                     let a = get_ch_a!(color_int);
-                    return a > 0;
+                    if invert {
+                        return a == 0;
+                    } else {
+                        return a > 0;
+                    }
                 };
                 let is_rect_intersecting = |rect: Rect| -> ShapeIntesectionKind {
                     let x1 = rect.x;

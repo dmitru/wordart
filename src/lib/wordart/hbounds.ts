@@ -16,6 +16,15 @@ import {
 } from 'lib/wordart/geometry'
 import { weightedSample } from 'lib/wordart/random-utils'
 
+import * as WasmModule from 'lib/wordart/wasm-gen-types'
+import { createCanvasCtxCopy } from 'lib/wordart/canvas-utils'
+
+let wasm: any | null = null
+import('lib/wordart/wasm-gen/pkg/wasm_gen').then((_wasm) => {
+  console.log('wasm: ', wasm)
+  wasm = _wasm
+})
+
 const { identity, translate, rotate, scale } = tm
 
 export type HBounds = {
@@ -413,6 +422,104 @@ export const randomPointInsideHbounds = (hBounds: HBounds): Point | null => {
   return impl(hBounds)
 }
 
+type Rgb = { r: number; g: number; b: number }
+
+export const computeHBoundsForCanvasWasm = ({
+  srcCanvas,
+  color = null,
+  invert = false,
+  imgSize = 800,
+  angle = 0,
+  visualize = false,
+  minSize = 4,
+  maxLevel = 9,
+}: {
+  srcCanvas: HTMLCanvasElement
+  color?: Rgb | null
+  invert?: boolean
+  imgSize?: number
+  angle?: number
+  maxLevel?: number
+  minSize?: number
+  visualize?: boolean
+}): WasmModule.HBoundsWasm => {
+  console.log('computeHBoundsForCanvasWasm', srcCanvas.width, srcCanvas.height)
+  const pathBboxRect = {
+    x: 0,
+    y: 0,
+    w: srcCanvas.width,
+    h: srcCanvas.height,
+  }
+
+  const aaabUnscaled = aabbForRect(rotate(angle), pathBboxRect)
+  const aaabScaleFactor = imgSize / Math.max(aaabUnscaled.w, aaabUnscaled.h)
+
+  const pathAaab = aabbForRect(multiply(rotate(angle), scale(1)), pathBboxRect)
+
+  const scaleFactor = aaabScaleFactor
+
+  const pathAaabTransform = multiply(
+    multiply(translate(-pathAaab.x, -pathAaab.y), rotate(angle)),
+    scale(scaleFactor)
+  )
+
+  const canvas = document.createElement('canvas') as HTMLCanvasElement
+  canvas.width = pathAaab.w
+  canvas.height = pathAaab.h
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+  ctx.save()
+  ctx.setTransform(pathAaabTransform)
+  ctx.drawImage(
+    srcCanvas,
+    0,
+    0,
+    srcCanvas.width,
+    srcCanvas.height,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  )
+  ctx.restore()
+
+  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+  const create_hbounds = wasm.create_hbounds as (
+    data: Uint32Array,
+    width: number,
+    height: number,
+    invert: boolean
+  ) => WasmModule.HBoundsWasm
+
+  const hboundsWasm = create_hbounds(
+    new Uint32Array(imageData.data.buffer),
+    imageData.width,
+    imageData.height,
+    invert
+  )
+
+  if (visualize) {
+    const ctx2 = createCanvasCtxCopy(ctx)
+    drawHBoundsWasm(ctx2, hboundsWasm)
+    console.screenshot(ctx2.canvas)
+  }
+
+  const transform = multiply(
+    scale(1 / aaabScaleFactor),
+    translate(pathAaab.x, pathAaab.y)
+  )
+  hboundsWasm.set_transform(
+    transform.a,
+    transform.b,
+    transform.c,
+    transform.d,
+    transform.e,
+    transform.f
+  )
+
+  return hboundsWasm
+}
+
 export const computeHBoundsForCanvas = ({
   srcCanvas,
   targetSize,
@@ -721,4 +828,60 @@ export const drawHBounds = (
   }
 
   drawHBoundsImpl(hBounds)
+}
+
+type HBoundsWasmSerialized = {
+  bounds: Rect
+  overlaps_shape: boolean
+  children: HBoundsWasmSerialized[]
+  transform?: Matrix
+}
+
+export const drawHBoundsWasm = (
+  ctx: CanvasRenderingContext2D,
+  hBounds: WasmModule.HBoundsWasm
+) => {
+  const hBoundsSerialized = hBounds.get_js() as HBoundsWasmSerialized
+  console.log('hBoundsSerialized = ', hBoundsSerialized)
+
+  const drawHBoundsImpl = (hBounds: HBoundsWasmSerialized, level = 0) => {
+    if (level > 9) {
+      return
+    }
+    ctx.save()
+    ctx.lineWidth = 0.5
+
+    ctx.strokeStyle = hBounds.overlaps_shape ? '#f003' : '#00f3'
+
+    if (hBounds.transform) {
+      ctx.transform(
+        hBounds.transform.a,
+        hBounds.transform.b,
+        hBounds.transform.c,
+        hBounds.transform.d,
+        hBounds.transform.e,
+        hBounds.transform.f
+      )
+    }
+
+    // if (hBounds.overlapsShape) {
+    // if (!hBounds.children) {
+    ctx.strokeRect(
+      hBounds.bounds.x,
+      hBounds.bounds.y,
+      hBounds.bounds.w,
+      hBounds.bounds.h
+    )
+    // }
+    // }
+    // }
+
+    if (hBounds.children) {
+      hBounds.children.forEach((child) => drawHBoundsImpl(child, level + 1))
+    }
+
+    ctx.restore()
+  }
+
+  drawHBoundsImpl(hBoundsSerialized)
 }
