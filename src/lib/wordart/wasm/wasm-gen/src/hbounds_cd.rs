@@ -17,6 +17,8 @@ extern "C" {
 
 impl HBounds {
     pub fn intersects(hbounds1: &Self, hbounds2: &Self, t2: Option<Matrix>) -> bool {
+        // console_log!("compute_hbounds_impl: {:?} {:?}", hbounds1.bounds, hbounds2);
+
         // let _timer = Timer::new("HBounds::intersects");
         fn collides_rec_impl(
             hbounds1: &HBounds,
@@ -31,9 +33,8 @@ impl HBounds {
             pad1: f32,
             pad2: f32,
         ) -> bool {
-            // console_log!("compute_hbounds_impl: {} {}", level1, level2);
             if !hbounds1.overlaps_shape || !hbounds2.overlaps_shape {
-                // println!("case 1");
+                // console_log!("case 1");
                 return false;
             }
 
@@ -45,11 +46,11 @@ impl HBounds {
             let mut bounds2 = RectF::from(hbounds2.bounds);
             bounds2.transform_mut(transform2);
 
-            // println!("bounds1: {:?}\n{:?}", hbounds1, bounds1);
-            // println!("bounds2: {:?}\n{:?}\n", hbounds2, bounds2);
+            // console_log!("bounds1: \n{:?}", bounds1);
+            // console_log!("bounds2: \n{:?}\n", bounds2);
 
             if !RectF::intersect(bounds1, bounds2, pad1, pad2) {
-                // println!("case 2");
+                // console_log!("case 2");
                 return false;
             }
 
@@ -82,7 +83,7 @@ impl HBounds {
                     };
                     let child_result = collides_rec_impl(
                         child,
-                        hbounds1,
+                        hbounds2,
                         child_transform,
                         transform2,
                         level1 + 1,
@@ -176,9 +177,9 @@ impl HBounds {
             return false;
         }
 
-        let max_level1 = 13;
-        let max_level2 = 13;
-        let min_size = 0.00001f32;
+        let max_level1 = 9;
+        let max_level2 = 9;
+        let min_size = 1f32;
         let pad1 = 0f32;
         let pad2 = 0f32;
 

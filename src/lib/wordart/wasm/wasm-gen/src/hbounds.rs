@@ -338,7 +338,7 @@ impl HBounds {
                     },
                     color,
                     1,
-                    12,
+                    9,
                 )
             }
         }
