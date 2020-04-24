@@ -25,6 +25,7 @@ import { multiply } from 'lib/wordart/geometry'
 
 const IMAGES = [
   '/images/cat.png',
+  '/images/basketball.png',
   '/images/number_six.png',
   '/images/darth_vader.jpg',
   '/images/beatles.jpg',
@@ -33,6 +34,8 @@ const IMAGES = [
 let shapes: ShapeWasm[] | null = null
 
 const scratch = (canvas: HTMLCanvasElement) => {
+  let bgImageCtx: null | CanvasRenderingContext2D = null
+
   const onKeyDown = async (e: KeyboardEvent) => {
     const wasm = await getWasmModule()
     const imageProcessor = new ImageProcessorWasm(wasm)
@@ -40,7 +43,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
     const ctx = canvas.getContext('2d')!
 
     const key = e.key
-    if (['1', '2', '3', '4'].includes(key) && !e.ctrlKey) {
+    if (['1', '2', '3', '4', '5'].includes(key) && !e.ctrlKey) {
       const imageIndex = parseInt(key) - 1
       const imageUrl = IMAGES[imageIndex]
       const imageSize: Dimensions = {
@@ -48,7 +51,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
         h: canvas.height,
       }
 
-      const bgImageCtx = await loadImageUrlToCanvasCtx(
+      bgImageCtx = await loadImageUrlToCanvasCtx(
         imageUrl,
         imageSize.w,
         imageSize.h
@@ -74,7 +77,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
         drawHBoundsWasm(c, shape.hBounds)
         console.screenshot(c.canvas)
       }
-    } else if (['1', '2', '3', '4'].includes(key) && e.ctrlKey) {
+    } else if (['1', '2', '3', '4', '5'].includes(key) && e.ctrlKey) {
       if (!shapes) {
         return
       }
@@ -85,7 +88,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
         return
       }
 
-      fillShapeWithShapes(wasm, ctx, shape)
+      fillShapeWithShapes(wasm, bgImageCtx!, ctx, shape)
     }
   }
   document.addEventListener('keydown', onKeyDown)
@@ -97,6 +100,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
 
 const fillShapeWithShapes = (
   wasm: WasmModule,
+  bgImageCtx: CanvasRenderingContext2D,
   ctx: CanvasRenderingContext2D,
   shape: ShapeWasm
 ) => {
@@ -109,6 +113,17 @@ const fillShapeWithShapes = (
     false
   )
 
+  // const { imgData, imgCtx } = {
+  //   imgCtx: bgImageCtx,
+  //   imgData: bgImageCtx.getImageData(
+  //     0,
+  //     0,
+  //     bgImageCtx.canvas.width,
+  //     bgImageCtx.canvas.height
+  //   ),
+  // }
+  // const hbounds = shape.hBounds
+
   // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
   const collisionDetector = new CollisionDetectorWasm(
@@ -120,11 +135,12 @@ const fillShapeWithShapes = (
   let addedImgCtxs: CanvasRenderingContext2D[] = []
 
   const shapeHBoundsJs = shape.hBounds.get_js()
+  console.log(hbounds.get_js())
 
   const t1 = performance.now()
 
-  let scaleFactor = 1.5
-  const initialScale = 0.8 * scaleFactor
+  let scaleFactor = 1
+  const initialScale = 2 * scaleFactor
   // const initialScale = 0.002
   const finalScale = 0.002 * scaleFactor
   // const finalScale = 0.05
@@ -136,7 +152,7 @@ const fillShapeWithShapes = (
   let maxCount = 1000 * shape.percentArea
 
   let failedBatchesCount = 0
-  const maxFailedBatchesCount = 5
+  const maxFailedBatchesCount = 3
 
   let scale = initialScale
 
@@ -145,8 +161,8 @@ const fillShapeWithShapes = (
   let count = 0
 
   while (scale > finalScale && count < maxCount) {
-    console.log('scale: ', scale)
-    const batchSize = 50
+    // console.log('scale: ', scale)
+    const batchSize = 30
     let success = false
 
     for (let i = 0; i < batchSize; ++i) {
@@ -201,7 +217,7 @@ const fillShapeWithShapes = (
       count > maxCount
     ) {
       scale -= Math.min(maxScaleStep, scaleStepFactor * scale)
-      // console.log('placed ', countScale)
+      console.log('placed ', scale, countScale)
       countScale = 0
       failedBatchesCount = 0
     }
@@ -214,22 +230,88 @@ const fillShapeWithShapes = (
   console.log('done', count, ((t2 - t1) / 1000).toFixed(3))
 
   const render = () => {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-    drawHBoundsWasm(ctx, shape.hBounds)
+    console.log('render)')
+    // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+    // drawHBoundsWasm(ctx, shape.hBounds)
     ctx.fillStyle = '#000'
+    ctx.filter = 'brightness(0.8)'
     ctx.save()
     for (let [index, item] of addedHbounds.entries()) {
       ctx.resetTransform()
       ctx.setTransform(item.transform)
+      // ctx.globalCompositeOperation = 'destination-out'
       const imageCtx = addedImgCtxs[index]
       ctx.drawImage(imageCtx.canvas, 0, 0)
-      drawHBoundsWasm(ctx, hbounds)
-      ctx.fill()
+      // drawHBoundsWasm(ctx, hbounds)
+      // ctx.fill()
     }
     ctx.restore()
   }
 
   render()
+
+  const ENABLE_INTERACTIVITY = false
+
+  if (ENABLE_INTERACTIVITY) {
+    let collides = false
+    let scale = 3
+    // console.log('FISH: ', hbounds.get_js())
+
+    ctx.canvas.addEventListener('mousemove', (e) => {
+      const x = e.offsetX
+      const y = e.offsetY
+
+      const transform: tm.Matrix = multiply(tm.translate(x, y), tm.scale(scale))
+      const transformWasm = new wasm.Matrix()
+      transformWasm.set_mut(
+        transform.a,
+        transform.b,
+        transform.c,
+        transform.d,
+        transform.e,
+        transform.f
+      )
+
+      collides = shape.hBoundsInverted.collides_transformed(
+        hbounds,
+        transformWasm
+      )
+
+      render()
+
+      ctx.save()
+      ctx.setTransform(transform)
+      ctx.globalAlpha = collides ? 1 : 0.5
+      ctx.drawImage(imgCtx.canvas, 0, 0)
+      drawHBoundsWasm(ctx, hbounds)
+      ctx.restore()
+    })
+  }
+
+  return { collisionDetector, render }
+}
+
+const createTextImgData = (r = 10, pad = 0, angle = 0) => {
+  const w = r * 2 + 2 * pad
+  const h = r * 2 + 2 * pad
+  const ctx = createCanvasCtx({ w, h })
+  // ctx.fillStyle = 'white'
+  // ctx.fillRect(0, 0, w, h)
+  ctx.fillStyle = '#0003'
+  ctx.strokeStyle = '#0003'
+  ctx.beginPath()
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+  const lineWidth = r / 3
+  // ctx.fillRect(0, 0, w, h)
+  ctx.font = `bold ${h / 2}px sans-serif`
+  ctx.fillText('CAT', 0, h, w)
+  ctx.fill()
+  // ctx.lineWidth = lineWidth
+  // ctx.stroke()
+
+  // console.screenshot(ctx.canvas)
+  return { imgData: ctx.getImageData(0, 0, w, h), ctx }
 }
 
 const createCircleImgData = (r = 10, pad = 0, angle = 0) => {
@@ -238,12 +320,13 @@ const createCircleImgData = (r = 10, pad = 0, angle = 0) => {
   const ctx = createCanvasCtx({ w, h })
   // ctx.fillStyle = 'white'
   // ctx.fillRect(0, 0, w, h)
-  ctx.fillStyle = '#fff3'
-  ctx.strokeStyle = '#fff3'
+  ctx.fillStyle = '#0003'
+  ctx.strokeStyle = '#0003'
   ctx.beginPath()
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
   const lineWidth = r / 3
+  // ctx.fillRect(0, 0, w, h)
   ctx.arc(r + pad, r + pad, r - lineWidth, 0, 2 * Math.PI)
   // ctx.fill()
   ctx.lineWidth = lineWidth
@@ -287,7 +370,7 @@ const ImageToShapesScratch = () => {
   return (
     <Layout>
       Hit 1, 2, 3 or 4
-      <Canvas width={1200} height={1200} ref={canvasRef} id="scene" />
+      <Canvas width={600} height={600} ref={canvasRef} id="scene" />
     </Layout>
   )
 }
