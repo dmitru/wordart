@@ -1,6 +1,4 @@
 import type * as Wasm from 'lib/wordart/wasm/wasm-gen-types'
-import { Rect } from 'lib/wordart/geometry'
-import { Matrix } from 'transformation-matrix'
 
 export type WasmModule = typeof Wasm
 
@@ -16,15 +14,9 @@ export const getWasmModule = async (): Promise<WasmModule> => {
 
 export type {
   HBoundsWasm,
+  HBoundsWasmSerialized,
   Matrix as MatrixWasm,
   LayoutGenWasm,
   create_hbounds,
   fill_shapes_by_color,
 } from 'lib/wordart/wasm/wasm-gen-types'
-
-export type HBoundsWasmSerialized = {
-  bounds: Rect
-  overlaps_shape: boolean
-  children: HBoundsWasmSerialized[]
-  transform?: Matrix
-}

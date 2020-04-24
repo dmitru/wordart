@@ -9,10 +9,9 @@ import {
   clearCanvas,
   createCanvasCtxCopy,
 } from 'lib/wordart/canvas-utils'
-import { SceneGenJs } from 'lib/wordart/scene-gen-js'
 import { getWasmModule } from 'lib/wordart/wasm/wasm-module'
 import { ImageProcessorWasm } from 'lib/wordart/wasm/image-processor-wasm'
-import { drawHBoundsWasm } from 'lib/wordart/hbounds'
+import { drawHBoundsWasm } from 'lib/wordart/wasm/hbounds'
 
 const IMAGES = [
   '/images/cat.png',
@@ -27,7 +26,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
     const imageProcessor = new ImageProcessorWasm(wasm)
 
     const key = e.key
-    if (['1', '2', '3', '4'].includes(key)) {
+    if (['1', '2', '3', '4'].includes(key) && !e.shiftKey) {
       const imageIndex = parseInt(key) - 1
       const imageUrl = IMAGES[imageIndex]
       const imageSize: Dimensions = {
@@ -86,7 +85,7 @@ const ImageToShapesScratch = () => {
   return (
     <Layout>
       Hit 1, 2, 3 or 4
-      <Canvas width={600} height={600} ref={canvasRef} id="scene" />
+      <Canvas width={800} height={800} ref={canvasRef} id="scene" />
     </Layout>
   )
 }

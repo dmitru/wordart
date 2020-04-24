@@ -17,3 +17,8 @@ export const weightedSample = (weights: number[]): number => {
 
   return -1
 }
+
+export const rand = (from: number, to: number): number => {
+  const range = to - from
+  return from + Math.random() * range
+}

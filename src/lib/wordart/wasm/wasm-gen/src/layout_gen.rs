@@ -42,7 +42,7 @@ impl Item {
         let hb2 = other.hbounds.transform(other.transform);
         // console_log!("check1");
         // let _timer = Timer::new("Item::intersects");
-        let result = HBounds::intersects(&hb1, &hb2);
+        let result = HBounds::intersects(&hb1, &hb2, None);
         // console_log!("check2");
         return result;
     }

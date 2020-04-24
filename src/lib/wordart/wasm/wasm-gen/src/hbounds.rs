@@ -54,16 +54,16 @@ pub struct RectF {
 }
 
 impl RectF {
-    pub fn intersect(r1: Self, r2: Self) -> bool {
-        let minx1 = r1.x;
-        let maxx1 = r1.x + r1.w;
-        let minx2 = r2.x;
-        let maxx2 = r2.x + r2.w;
+    pub fn intersect(r1: Self, r2: Self, pad1: f32, pad2: f32) -> bool {
+        let minx1 = r1.x - pad1;
+        let maxx1 = r1.x + r1.w + 2f32 * pad1;
+        let minx2 = r2.x - pad2;
+        let maxx2 = r2.x + r2.w + 2f32 * pad2;
 
-        let miny1 = r1.y;
-        let maxy1 = r1.y + r1.h;
-        let miny2 = r2.y;
-        let maxy2 = r2.y + r2.h;
+        let miny1 = r1.y - pad1;
+        let maxy1 = r1.y + r1.h + 2f32 * pad1;
+        let miny2 = r2.y - pad2;
+        let maxy2 = r2.y + r2.h + 2f32 * pad2;
 
         if miny1 >= maxy2 || miny2 >= maxy1 {
             return false;
@@ -146,6 +146,19 @@ impl HBounds {
                 Some(t) => t.transform(&transform),
                 None => transform,
             }),
+        }
+    }
+
+    pub fn inverted(&self) -> HBounds {
+        let total_area = self.bounds.w * self.bounds.h;
+        HBounds {
+            bounds: self.bounds,
+            count: self.count,
+            level: self.level,
+            overlapping_area: total_area - self.overlapping_area,
+            overlaps_shape: !self.overlaps_shape,
+            children: Rc::new(self.children.iter().map(|c| c.inverted()).collect()),
+            transform: self.transform,
         }
     }
 
@@ -325,7 +338,7 @@ impl HBounds {
                     },
                     color,
                     1,
-                    9,
+                    12,
                 )
             }
         }

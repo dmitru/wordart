@@ -25,8 +25,6 @@ import {
   computeHBoundsForPath,
   randomPointInsideHbounds,
   computeHBounds,
-  computeHBoundsForCanvasWasm,
-  drawHBoundsWasm,
 } from 'lib/wordart/hbounds'
 import { sample, clamp, flatten, noop } from 'lodash'
 import { archimedeanSpiral } from 'lib/wordart/spirals'
@@ -44,6 +42,7 @@ import {
 import { SceneGen } from 'lib/wordart/scene-gen'
 import * as WasmModule from 'lib/wordart/wasm/wasm-gen-types'
 import { createCanvasCtx } from 'lib/wordart/canvas-utils'
+import { computeHBoundsForCanvasWasm } from 'lib/wordart/wasm/hbounds'
 
 let wasm: any | null = null
 import('lib/wordart/wasm/wasm-gen/pkg/wasm_gen').then((_wasm) => {
@@ -78,17 +77,17 @@ export class SceneGenWasm extends SceneGen {
   }
 
   setBgShape = (ctx: CanvasRenderingContext2D) => {
-    const hBoundsNegative = computeHBoundsForCanvasWasm({
+    const hBoundsNegative = computeHBoundsForCanvasWasm(wasm, {
       srcCanvas: ctx.canvas,
-      imgSize: this.params.bgImgSize,
+      scratchCanvasMaxSize: this.params.bgImgSize,
       invert: true,
       minSize: 1,
       // visualize: true,
     })
 
-    const hBounds = computeHBoundsForCanvasWasm({
+    const hBounds = computeHBoundsForCanvasWasm(wasm, {
       srcCanvas: ctx.canvas,
-      imgSize: this.params.bgImgSize,
+      scratchCanvasMaxSize: this.params.bgImgSize,
       minSize: 1,
       // visualize: true,
     })
@@ -97,7 +96,7 @@ export class SceneGenWasm extends SceneGen {
 
     const shapes = computeShapesWasm({
       srcCanvas: ctx.canvas,
-      imgSize: this.params.bgImgSize,
+      scratchCanvasMaxSize: this.params.bgImgSize,
       originalSize: this.params.viewBox.w,
       // visualize: true,
     })

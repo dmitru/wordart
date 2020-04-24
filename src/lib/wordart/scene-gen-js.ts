@@ -98,7 +98,7 @@ export class SceneGenJs extends SceneGen {
     })
     const shapes = computeShapesWasm({
       srcCanvas: ctx.canvas,
-      imgSize: this.params.bgImgSize,
+      scratchCanvasMaxSize: this.params.bgImgSize,
       originalSize: this.params.viewBox.w,
     })
 

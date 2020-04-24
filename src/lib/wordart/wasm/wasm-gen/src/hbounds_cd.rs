@@ -16,7 +16,7 @@ extern "C" {
 }
 
 impl HBounds {
-    pub fn intersects(hbounds1: &Self, hbounds2: &Self) -> bool {
+    pub fn intersects(hbounds1: &Self, hbounds2: &Self, t2: Option<Matrix>) -> bool {
         // let _timer = Timer::new("HBounds::intersects");
         fn collides_rec_impl(
             hbounds1: &HBounds,
@@ -48,7 +48,7 @@ impl HBounds {
             // println!("bounds1: {:?}\n{:?}", hbounds1, bounds1);
             // println!("bounds2: {:?}\n{:?}\n", hbounds2, bounds2);
 
-            if !RectF::intersect(bounds1, bounds2) {
+            if !RectF::intersect(bounds1, bounds2, pad1, pad2) {
                 // println!("case 2");
                 return false;
             }
@@ -176,9 +176,9 @@ impl HBounds {
             return false;
         }
 
-        let max_level1 = 7;
-        let max_level2 = 7;
-        let min_size = 2f32;
+        let max_level1 = 13;
+        let max_level2 = 13;
+        let min_size = 0.00001f32;
         let pad1 = 0f32;
         let pad2 = 0f32;
 
@@ -187,10 +187,12 @@ impl HBounds {
             None => Matrix::new(),
         };
 
-        let transform2 = match hbounds2.transform {
-            Some(t) => t,
-            None => Matrix::new(),
-        };
+        let mut transform2 = Matrix::new();
+        if t2.is_some() {
+            transform2 = t2.unwrap();
+        } else if hbounds2.transform.is_some() {
+            transform2 = hbounds2.transform.unwrap();
+        }
 
         collides_rec_impl(
             hbounds1, hbounds2, transform1, transform2, 1, 1, max_level1, max_level2, min_size,

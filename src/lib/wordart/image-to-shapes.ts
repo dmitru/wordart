@@ -1,20 +1,11 @@
 import { sortBy } from 'lodash'
 import chroma from 'chroma-js'
 import { rotate, scale, translate } from 'transformation-matrix'
-import { aabbForRect, Rect, multiply } from 'lib/wordart/geometry'
-import {
-  HBounds,
-  computeHBounds,
-  drawHBounds,
-  drawHBoundsWasm,
-  computeHBoundsForCanvasWasm,
-} from 'lib/wordart/hbounds'
-import {
-  clearCanvas,
-  createCanvasCtx,
-  createCanvasCtxCopy,
-} from 'lib/wordart/canvas-utils'
+import { aabbForRect, multiply } from 'lib/wordart/geometry'
+import { HBounds } from 'lib/wordart/hbounds'
+import { clearCanvas } from 'lib/wordart/canvas-utils'
 import * as WasmModule from 'lib/wordart/wasm/wasm-gen-types'
+import { computeHBoundsForCanvasWasm } from 'lib/wordart/wasm/hbounds'
 
 let wasm: any | null = null
 import('lib/wordart/wasm/wasm-gen/pkg/wasm_gen').then((_wasm) => {
@@ -79,7 +70,7 @@ export const computeShapesWasm = (params: {
   originalSize: number
   srcCanvas: HTMLCanvasElement
   invert?: boolean
-  imgSize?: number
+  scratchCanvasMaxSize?: number
   angle?: number
   maxLevel?: number
   minSize?: number
@@ -88,7 +79,7 @@ export const computeShapesWasm = (params: {
   const {
     originalSize = 800,
     srcCanvas,
-    imgSize = 800,
+    scratchCanvasMaxSize = 800,
     angle = 0,
     visualize = false,
     minSize = 1,
@@ -108,7 +99,8 @@ export const computeShapesWasm = (params: {
   }
 
   const srcAaabUnscaled = aabbForRect(rotate(angle), srcBounds)
-  const scaleFactor = imgSize / Math.max(srcAaabUnscaled.w, srcAaabUnscaled.h)
+  const scaleFactor =
+    scratchCanvasMaxSize / Math.max(srcAaabUnscaled.w, srcAaabUnscaled.h)
 
   const aabbScaled = aabbForRect(
     multiply(rotate(angle), scale(scaleFactor)),
@@ -159,17 +151,17 @@ export const computeShapesWasm = (params: {
   // console.log(ctx.canvas.height, ctx.canvas.width)
 
   for (const { r, g, b, a, count: colorPixelCount } of colorsFiltered) {
-    const hBounds = computeHBoundsForCanvasWasm({
+    const hBounds = computeHBoundsForCanvasWasm(wasm, {
       srcCanvas: canvas,
-      imgSize,
+      scratchCanvasMaxSize,
       color: { r, g, b, a },
       minSize,
       maxLevel,
       visualize,
     })
-    const hBoundsInverted = computeHBoundsForCanvasWasm({
+    const hBoundsInverted = computeHBoundsForCanvasWasm(wasm, {
       srcCanvas: canvas,
-      imgSize,
+      scratchCanvasMaxSize,
       color: { r, g, b, a },
       invert: true,
       minSize,
@@ -177,11 +169,11 @@ export const computeShapesWasm = (params: {
       visualize,
     })
 
-    console.log('scaleFactor', scaleFactor, originalSize, imgSize)
+    console.log('scaleFactor', scaleFactor, originalSize, scratchCanvasMaxSize)
     const transform = multiply(
       scale(1),
       multiply(
-        scale(originalSize / imgSize),
+        scale(originalSize / scratchCanvasMaxSize),
         translate(aabbScaled.x, aabbScaled.y)
       )
     )

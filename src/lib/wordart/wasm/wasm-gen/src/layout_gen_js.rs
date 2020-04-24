@@ -46,6 +46,28 @@ impl HBoundsWasm {
         m.f = f;
         self.wrapped.transform = Some(m);
     }
+
+    #[wasm_bindgen]
+    pub fn set_transform_matrix(&mut self, matrix: Matrix) {
+        self.wrapped.transform = Some(matrix);
+    }
+
+    #[wasm_bindgen]
+    pub fn inverted(&self) -> HBoundsWasm {
+        HBoundsWasm {
+            wrapped: self.wrapped.inverted(),
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn collides(&self, other: &HBoundsWasm) -> bool {
+        HBounds::intersects(&self.wrapped, &other.wrapped, None)
+    }
+
+    #[wasm_bindgen]
+    pub fn collides_transformed(&self, other: &HBoundsWasm, matrix: &Matrix) -> bool {
+        HBounds::intersects(&self.wrapped, &other.wrapped, Some(*matrix))
+    }
 }
 
 // JS interface

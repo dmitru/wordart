@@ -14,6 +14,7 @@ import { computeShapesWasm } from 'lib/wordart/image-to-shapes'
 import { computeHBoundsForCanvas } from 'lib/wordart/hbounds'
 import { LayoutGenWasm, Matrix } from 'lib/wordart/wasm/wasm-gen/pkg/wasm_gen'
 import { sample } from 'lodash'
+import { rand } from 'lib/wordart/random-utils'
 
 // const BG_SHAPE = '/images/cat.png'
 // const BG_SHAPE = '/images/number_six.png'
@@ -47,11 +48,6 @@ declare class Wasm {
     threshold_part: number
   ): any[]
   create_hbounds(img_data: Uint32Array, w: number, h: number): any
-}
-
-const rand = (from: number, to: number): number => {
-  const range = to - from
-  return from + Math.random() * range
 }
 
 const scratch = (canvas: HTMLCanvasElement) => {
@@ -155,37 +151,6 @@ const scratch = (canvas: HTMLCanvasElement) => {
           // ctx.arc(r, r, r, 0, 2 * Math.PI)
           ctx.fill()
         }
-        ctx.restore()
-      }
-
-      type HboundsJS = {
-        bounds: Rect
-        children: HboundsJS[]
-        transform?: Matrix
-      }
-
-      const renderHbounds = (hb: HboundsJS) => {
-        const renderHboundsImpl = (hb: HboundsJS) => {
-          if (hb.transform) {
-            ctx.transform(
-              hb.transform.a,
-              hb.transform.b,
-              hb.transform.c,
-              hb.transform.d,
-              hb.transform.e,
-              hb.transform.f
-            )
-          }
-          ctx.strokeStyle = 'blue'
-          ctx.strokeRect(hb.bounds.x, hb.bounds.y, hb.bounds.w, hb.bounds.h)
-          for (let child of hb.children) {
-            renderHboundsImpl(child)
-          }
-        }
-
-        ctx.save()
-        ctx.resetTransform()
-        renderHboundsImpl(hb)
         ctx.restore()
       }
 

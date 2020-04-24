@@ -1,13 +1,9 @@
 import chroma from 'chroma-js'
 import * as tm from 'transformation-matrix'
-import { Rect, scaleRect } from 'lib/wordart/geometry'
-import { computeHBoundsForCanvasWasm } from 'lib/wordart/hbounds'
-import {
-  clearCanvas,
-  createCanvasCtx,
-  Dimensions,
-} from 'lib/wordart/canvas-utils'
+import { Rect } from 'lib/wordart/geometry'
+import { clearCanvas, createCanvasCtx } from 'lib/wordart/canvas-utils'
 import { WasmModule, HBoundsWasm } from 'lib/wordart/wasm/wasm-module'
+import { computeHBoundsForCanvasWasm } from 'lib/wordart/wasm/hbounds'
 
 export class ImageProcessorWasm {
   wasm: WasmModule
@@ -16,6 +12,7 @@ export class ImageProcessorWasm {
     this.wasm = wasm
   }
 
+  /** Processes an image, determine shapesbased on colors, return shape information for each shape, including its hbounds */
   findShapesByColor = (params: ComputeShapesParams) =>
     findShapesByColorWasm(this.wasm, params)
 }
@@ -37,7 +34,6 @@ export type ComputeShapesParams = {
   minSize?: number
 }
 
-/** Processes */
 const findShapesByColorWasm = (
   wasm: WasmModule,
   params: ComputeShapesParams
@@ -64,8 +60,6 @@ const findShapesByColorWasm = (
 
   const scaleFactorX = 1
   const scaleFactorY = 1
-
-  const boundsScaled = scaleRect(bounds, scaleFactorX, scaleFactorY)
 
   const ctx = createCanvasCtx(bounds)
   ctx.save()
@@ -101,17 +95,17 @@ const findShapesByColorWasm = (
   }
 
   for (const { r, g, b, a, count: colorPixelCount } of colorsFiltered) {
-    const hBounds = computeHBoundsForCanvasWasm({
+    const hBounds = computeHBoundsForCanvasWasm(wasm, {
       srcCanvas: ctx.canvas,
-      imgSize: bounds.w,
+      scratchCanvasMaxSize: bounds.w,
       color: { r, g, b, a },
       minSize,
       maxLevel,
       visualize: false,
     })
-    const hBoundsInverted = computeHBoundsForCanvasWasm({
+    const hBoundsInverted = computeHBoundsForCanvasWasm(wasm, {
       srcCanvas: ctx.canvas,
-      imgSize: bounds.w,
+      scratchCanvasMaxSize: bounds.w,
       color: { r, g, b, a },
       invert: true,
       minSize,

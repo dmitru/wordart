@@ -49,10 +49,14 @@ export class HBoundsWasm {
    * @returns {HBoundsWasm}
    */
   clone(): HBoundsWasm
+  collides(other: HBoundsWasm): boolean
+  collides_transformed(other: HBoundsWasm, matrix: Matrix): boolean
+  inverted(): HBoundsWasm
   /**
    * @returns {any}
    */
   get_js(): HBoundsWasmSerialized
+  set_transform_matrix(matrix: Matrix): void
   set_transform(
     a: number,
     b: number,
@@ -62,6 +66,15 @@ export class HBoundsWasm {
     f: number
   ): void
 }
+
+export type HBoundsWasmSerialized = {
+  bounds: Rect
+  overlaps_shape: boolean
+  overlapping_area: number
+  children: HBoundsWasmSerialized[]
+  transform?: Matrix
+}
+
 export class LabInt {
   free(): void
   b: number
@@ -228,3 +241,5 @@ export class Rect {
   x: number
   y: number
 }
+
+export type Rgba = { r: number; g: number; b: number; a: number }
