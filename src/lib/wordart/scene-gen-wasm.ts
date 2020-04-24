@@ -42,11 +42,11 @@ import {
   GenerationResult,
 } from 'lib/wordart/scene-gen'
 import { SceneGen } from 'lib/wordart/scene-gen'
-import * as WasmModule from 'lib/wordart/wasm-gen-types'
+import * as WasmModule from 'lib/wordart/wasm/wasm-gen-types'
 import { createCanvasCtx } from 'lib/wordart/canvas-utils'
 
 let wasm: any | null = null
-import('lib/wordart/wasm-gen/pkg/wasm_gen').then((_wasm) => {
+import('lib/wordart/wasm/wasm-gen/pkg/wasm_gen').then((_wasm) => {
   console.log('wasm: ', wasm)
   wasm = _wasm
 })

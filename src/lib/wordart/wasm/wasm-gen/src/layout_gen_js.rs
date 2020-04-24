@@ -50,20 +50,37 @@ impl HBoundsWasm {
 
 // JS interface
 #[wasm_bindgen]
-pub fn create_hbounds(data: &[u32], width: i32, height: i32, invert: bool) -> HBoundsWasm {
-    // for row in 0..width {
-    //     for col in 0..height {
-    //         let fi = (row * width + col) as usize;
-    //         let color = data[fi];
-    //         // console_log!("color: {}", color);
-    //     }
-    // }
+pub fn create_hbounds_by_color(
+    data: &[u32],
+    width: i32,
+    height: i32,
+    r: u32,
+    g: u32,
+    b: u32,
+    a: u32,
+    invert: bool,
+) -> HBoundsWasm {
     let hb = HBounds::from(
         ImgData {
             data,
             width,
             height,
         },
+        Some(Rgba { r, g, b, a }),
+        invert,
+    );
+    HBoundsWasm { wrapped: hb }
+}
+
+#[wasm_bindgen]
+pub fn create_hbounds(data: &[u32], width: i32, height: i32, invert: bool) -> HBoundsWasm {
+    let hb = HBounds::from(
+        ImgData {
+            data,
+            width,
+            height,
+        },
+        None,
         invert,
     );
     HBoundsWasm { wrapped: hb }

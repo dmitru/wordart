@@ -11,24 +11,6 @@ extern "C" {
     fn log(s: &str);
 }
 
-macro_rules! get_ch_b {
-    ( $feature:expr ) => {{
-        (($feature & 0xff0000u32) >> 16)
-    }};
-}
-
-macro_rules! get_ch_g {
-    ( $feature:expr ) => {{
-        (($feature & 0xff00u32) >> 8)
-    }};
-}
-
-macro_rules! get_ch_r {
-    ( $feature:expr ) => {{
-        ($feature & 0xffu32)
-    }};
-}
-
 pub fn calc_e_diff(lab1: &Lab, lab2: &Lab) -> f32 {
     let lab_v_1 = LabValue {
         l: lab1.l,
@@ -52,6 +34,7 @@ pub struct LabInt {
     pub r: u32,
     pub g: u32,
     pub b: u32,
+    pub a: u32,
     lab: Lab,
 }
 
@@ -84,6 +67,7 @@ pub fn fill_shapes_by_color(img: &mut ImgDataMut, threshold_percent: f32) -> Vec
         let r = get_ch_r!(color_int);
         let g = get_ch_g!(color_int);
         let b = get_ch_b!(color_int);
+        let a = get_ch_a!(color_int);
         // console_log!("color: {}, {}, {} {} {}", color_int, count, r, g, b);
         let lab = Lab::from(Srgb::new(
             (r as f32) / 255.0,
@@ -95,6 +79,7 @@ pub fn fill_shapes_by_color(img: &mut ImgDataMut, threshold_percent: f32) -> Vec
             r,
             g,
             b,
+            a,
             color_int: *color_int,
             count: *count,
         });
@@ -125,7 +110,7 @@ pub fn fill_shapes_by_color(img: &mut ImgDataMut, threshold_percent: f32) -> Vec
                 }
             }
 
-            if min_e > 0.0 {
+            if min_e > 0.0 && get_ch_a!(color_int) > 0 {
                 // console_log!("{} {}: {}", row, col, min_e);
                 img_data[fi] = result;
             }

@@ -16,12 +16,12 @@ import {
 } from 'lib/wordart/geometry'
 import { weightedSample } from 'lib/wordart/random-utils'
 
-import * as WasmModule from 'lib/wordart/wasm-gen-types'
+import * as WasmModule from 'lib/wordart/wasm/wasm-gen-types'
 import { createCanvasCtxCopy } from 'lib/wordart/canvas-utils'
+import { getWasmModule } from 'lib/wordart/wasm/wasm-module'
 
-let wasm: any | null = null
-import('lib/wordart/wasm-gen/pkg/wasm_gen').then((_wasm) => {
-  console.log('wasm: ', wasm)
+let wasm: typeof WasmModule | null = null
+getWasmModule().then((_wasm) => {
   wasm = _wasm
 })
 
@@ -422,11 +422,11 @@ export const randomPointInsideHbounds = (hBounds: HBounds): Point | null => {
   return impl(hBounds)
 }
 
-type Rgb = { r: number; g: number; b: number }
+type Rgba = { r: number; g: number; b: number; a: number }
 
 export const computeHBoundsForCanvasWasm = ({
   srcCanvas,
-  color = null,
+  color = { r: 0, g: 0, b: 0, a: 1 },
   invert = false,
   imgSize = 800,
   angle = 0,
@@ -435,7 +435,7 @@ export const computeHBoundsForCanvasWasm = ({
   maxLevel = 9,
 }: {
   srcCanvas: HTMLCanvasElement
-  color?: Rgb | null
+  color?: Rgba
   invert?: boolean
   imgSize?: number
   angle?: number
@@ -484,17 +484,14 @@ export const computeHBoundsForCanvasWasm = ({
 
   const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
 
-  const create_hbounds = wasm.create_hbounds as (
-    data: Uint32Array,
-    width: number,
-    height: number,
-    invert: boolean
-  ) => WasmModule.HBoundsWasm
-
-  const hboundsWasm = create_hbounds(
+  const hboundsWasm = wasm!.create_hbounds_by_color(
     new Uint32Array(imageData.data.buffer),
     imageData.width,
     imageData.height,
+    color.r,
+    color.g,
+    color.b,
+    color.a,
     invert
   )
 

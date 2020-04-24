@@ -12,7 +12,25 @@ export function fill_shapes_by_color(
   width: number,
   height: number,
   threshold_percent: number
-): any[]
+): FillShapesByColorResult
+
+export type FillShapesByColorResult = {
+  r: number
+  g: number
+  b: number
+  a: number
+  count: number
+}[]
+export function create_hbounds_by_color(
+  data: Uint32Array,
+  width: number,
+  height: number,
+  r: number,
+  g: number,
+  b: number,
+  a: number,
+  invert: boolean
+): HBoundsWasm
 /**
  * @param {Uint32Array} data
  * @param {number} width
@@ -22,7 +40,8 @@ export function fill_shapes_by_color(
 export function create_hbounds(
   data: Uint32Array,
   width: number,
-  height: number
+  height: number,
+  invert: boolean
 ): HBoundsWasm
 export class HBoundsWasm {
   free(): void
@@ -33,7 +52,7 @@ export class HBoundsWasm {
   /**
    * @returns {any}
    */
-  get_js(): any
+  get_js(): HBoundsWasmSerialized
   set_transform(
     a: number,
     b: number,

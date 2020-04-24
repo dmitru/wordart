@@ -168,6 +168,17 @@ export const rectToPoints = (rect: Rect): Point[] => {
   return [tl, tr, bl, br]
 }
 
+export const scaleRect = (
+  rect: Rect,
+  scaleFactorX: number,
+  scaleFactorY?: number
+): Rect => ({
+  x: rect.x * scaleFactorX,
+  y: rect.y * (scaleFactorY || scaleFactorX),
+  w: rect.w * scaleFactorX,
+  h: rect.h * (scaleFactorY || scaleFactorX),
+})
+
 export const aabbForRect = (transform: Matrix, rect: Rect): Rect => {
   const points = rectToPoints(rect)
   const pointsTransformed = applyToPoints(transform, points)

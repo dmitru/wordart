@@ -149,7 +149,7 @@ impl HBounds {
         }
     }
 
-    pub fn from(img_data: ImgData, invert: bool) -> HBounds {
+    pub fn from(img_data: ImgData, color: Option<Rgba>, invert: bool) -> HBounds {
         match img_data {
             ImgData {
                 data,
@@ -167,48 +167,75 @@ impl HBounds {
                 //         console_log!("color: {:x?} - {:x?} {:x?} {:x?}", color, r, g, b);
                 //     }
                 // }
-                let is_pixel_intersecting = |row: i32, col: i32| -> bool {
+                let is_pixel_intersecting = |row: i32, col: i32, color: Option<Rgba>| -> bool {
                     let index = (col + row * width) as usize;
                     let color_int = data[index];
-                    let a = get_ch_a!(color_int);
-                    if invert {
-                        return a == 0;
-                    } else {
-                        return a > 0;
-                    }
-                };
-                let is_rect_intersecting = |rect: Rect| -> ShapeIntesectionKind {
-                    let x1 = rect.x;
-                    let y1 = rect.y;
-                    let x2 = x1 + rect.w;
-                    let y2 = y1 + rect.h;
-                    let mut checked_cnt = 0;
-                    let mut intersecting_cnt = 0;
-                    for row in y1..y2 {
-                        for col in x1..x2 {
-                            if is_pixel_intersecting(row, col) {
-                                intersecting_cnt += 1;
+
+                    match color {
+                        Some(rgba) => {
+                            let r = get_ch_r!(color_int);
+                            let g = get_ch_g!(color_int);
+                            let b = get_ch_b!(color_int);
+                            let a = get_ch_a!(color_int);
+
+                            let matches =
+                                !(r != rgba.r || g != rgba.g || b != rgba.b || a != rgba.a);
+                            if invert {
+                                return !matches;
+                            } else {
+                                return matches;
                             }
-                            checked_cnt += 1;
                         }
-                    }
-                    if checked_cnt == 0 || intersecting_cnt == 0 {
-                        return ShapeIntesectionKind::Empty;
-                    }
-                    if checked_cnt == intersecting_cnt {
-                        return ShapeIntesectionKind::Full;
-                    }
-                    return ShapeIntesectionKind::Partial;
+                        None => {
+                            let a = get_ch_a!(color_int);
+
+                            if invert {
+                                return a == 0;
+                            } else {
+                                return a > 0;
+                            }
+                        }
+                    };
                 };
-                let compute_hbounds = |bounds: Rect, min_size: i32, max_level: i32| -> HBounds {
+
+                let is_rect_intersecting =
+                    |rect: Rect, color: Option<Rgba>| -> ShapeIntesectionKind {
+                        let x1 = rect.x;
+                        let y1 = rect.y;
+                        let x2 = x1 + rect.w;
+                        let y2 = y1 + rect.h;
+                        let mut checked_cnt = 0;
+                        let mut intersecting_cnt = 0;
+                        for row in y1..y2 {
+                            for col in x1..x2 {
+                                if is_pixel_intersecting(row, col, color) {
+                                    intersecting_cnt += 1;
+                                }
+                                checked_cnt += 1;
+                            }
+                        }
+                        if checked_cnt == 0 || intersecting_cnt == 0 {
+                            return ShapeIntesectionKind::Empty;
+                        }
+                        if checked_cnt == intersecting_cnt {
+                            return ShapeIntesectionKind::Full;
+                        }
+                        return ShapeIntesectionKind::Partial;
+                    };
+                let compute_hbounds = |bounds: Rect,
+                                       color: Option<Rgba>,
+                                       min_size: i32,
+                                       max_level: i32|
+                 -> HBounds {
                     fn compute_hbounds_impl(
                         bounds: Rect,
+                        color: Option<Rgba>,
                         level: i32,
                         min_size: i32,
                         max_level: i32,
-                        is_rect_intersecting: &dyn Fn(Rect) -> ShapeIntesectionKind,
+                        is_rect_intersecting: &dyn Fn(Rect, Option<Rgba>) -> ShapeIntesectionKind,
                     ) -> HBounds {
-                        let intersection = is_rect_intersecting(bounds);
+                        let intersection = is_rect_intersecting(bounds, color);
 
                         match intersection {
                             ShapeIntesectionKind::Empty => {
@@ -256,6 +283,7 @@ impl HBounds {
                                     .map(|child_bounds| {
                                         compute_hbounds_impl(
                                             *child_bounds,
+                                            color,
                                             level + 1,
                                             min_size,
                                             max_level,
@@ -281,6 +309,7 @@ impl HBounds {
 
                     return compute_hbounds_impl(
                         bounds,
+                        color,
                         1,
                         min_size,
                         max_level,
@@ -294,6 +323,7 @@ impl HBounds {
                         w: width,
                         h: height,
                     },
+                    color,
                     1,
                     9,
                 )
@@ -312,6 +342,14 @@ pub struct ImgData<'a> {
     pub data: &'a [u32],
     pub width: i32,
     pub height: i32,
+}
+
+#[derive(PartialEq, Debug, Copy, Clone, Serialize)]
+pub struct Rgba {
+    pub r: u32,
+    pub g: u32,
+    pub b: u32,
+    pub a: u32,
 }
 
 pub struct ImgDataMut<'a> {

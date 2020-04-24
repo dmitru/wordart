@@ -12,7 +12,7 @@ import { renderSceneDebug, SceneGenJs } from 'lib/wordart/scene-gen-js'
 import { loadFont } from 'lib/wordart/fonts'
 import { computeShapesWasm } from 'lib/wordart/image-to-shapes'
 import { computeHBoundsForCanvas } from 'lib/wordart/hbounds'
-import { LayoutGenWasm, Matrix } from 'lib/wordart/wasm-gen/pkg/wasm_gen'
+import { LayoutGenWasm, Matrix } from 'lib/wordart/wasm/wasm-gen/pkg/wasm_gen'
 import { sample } from 'lodash'
 
 // const BG_SHAPE = '/images/cat.png'
@@ -60,7 +60,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
 
   let layoutGen: LayoutGenWasm | null = null
   let wasm: any = null
-  import('lib/wordart/wasm-gen/pkg/wasm_gen').then((_wasm) => {
+  import('lib/wordart/wasm/wasm-gen/pkg/wasm_gen').then((_wasm) => {
     console.log('wasm: ', _wasm)
     wasm = _wasm
     // @ts-ignore

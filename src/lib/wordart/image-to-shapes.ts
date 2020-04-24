@@ -14,10 +14,10 @@ import {
   createCanvasCtx,
   createCanvasCtxCopy,
 } from 'lib/wordart/canvas-utils'
-import * as WasmModule from 'lib/wordart/wasm-gen-types'
+import * as WasmModule from 'lib/wordart/wasm/wasm-gen-types'
 
 let wasm: any | null = null
-import('lib/wordart/wasm-gen/pkg/wasm_gen').then((_wasm) => {
+import('lib/wordart/wasm/wasm-gen/pkg/wasm_gen').then((_wasm) => {
   console.log('wasm: ', wasm)
   wasm = _wasm
 })
@@ -158,11 +158,11 @@ export const computeShapesWasm = (params: {
   // console.screenshot(ctx.canvas, 0.3)
   // console.log(ctx.canvas.height, ctx.canvas.width)
 
-  for (const { r, g, b, count: colorPixelCount } of colorsFiltered) {
+  for (const { r, g, b, a, count: colorPixelCount } of colorsFiltered) {
     const hBounds = computeHBoundsForCanvasWasm({
       srcCanvas: canvas,
       imgSize,
-      color: { r, g, b },
+      color: { r, g, b, a },
       minSize,
       maxLevel,
       visualize,
@@ -170,7 +170,7 @@ export const computeShapesWasm = (params: {
     const hBoundsInverted = computeHBoundsForCanvasWasm({
       srcCanvas: canvas,
       imgSize,
-      color: { r, g, b },
+      color: { r, g, b, a },
       invert: true,
       minSize,
       maxLevel,
