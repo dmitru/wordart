@@ -101,7 +101,6 @@ const findShapesByColorWasm = (
   }
 
   for (const { r, g, b, a, count: colorPixelCount } of colorsFiltered) {
-    console.log('A = ', { r, g, b, a })
     const hBounds = computeHBoundsForCanvasWasm({
       srcCanvas: ctx.canvas,
       imgSize: bounds.w,

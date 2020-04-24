@@ -45,7 +45,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
       const t1 = performance.now()
       const result = imageProcessor.findShapesByColor({
         canvas: bgImageCtx.canvas,
-        debug: true,
+        debug: false,
       })
 
       const t2 = performance.now()
