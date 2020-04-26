@@ -106,9 +106,9 @@ const CanvasWrappper = styled.div`
 `
 
 const Canvas = styled.canvas`
-  width: 100%;
-  height: auto;
-  max-height: 100%;
+  /* width: 100%; */
+  /* height: auto; */
+  /* max-height: 100%; */
   margin: auto;
 `
 

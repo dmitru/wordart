@@ -44,6 +44,16 @@ export type PointAndHBoundsCollision = {
   path?: Rect[]
 }
 
+/**
+ * Returns a padded rect - the padding is added to each side of the original rect
+ */
+export const padRect = (rect: Rect, paddingX = 0, paddingY?: number): Rect => ({
+  x: rect.x - paddingX,
+  y: rect.y - (paddingY === undefined ? paddingX : paddingY),
+  w: rect.w + 2 * paddingX,
+  h: rect.h + 2 * (paddingY === undefined ? paddingX : paddingY),
+})
+
 export const collidePointAndRect = (point: Point, rect: Rect): boolean => {
   if (point.x < rect.x) {
     return false

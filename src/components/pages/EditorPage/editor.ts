@@ -3,13 +3,15 @@ import { fetchImage, createCanvasCtx } from 'lib/wordart/canvas-utils'
 import { fabric } from 'fabric'
 import { consoleLoggers } from 'utils/console-logger'
 import { getWasmModule } from 'lib/wordart/wasm/wasm-module'
-import { Rect } from 'lib/wordart/geometry'
+import { Rect, padRect } from 'lib/wordart/geometry'
 import {
   ImageProcessorWasm,
   ShapeWasm,
 } from 'lib/wordart/wasm/image-processor-wasm'
 import { Generator } from 'components/pages/EditorPage/generator'
 import chroma from 'chroma-js'
+import paper from 'paper'
+import { Point } from 'fabric/fabric-impl'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -19,12 +21,17 @@ export type EditorInitParams = {
 export class Editor {
   logger = consoleLoggers.editor
 
-  ctx: CanvasRenderingContext2D
+  // ctx: CanvasRenderingContext2D
   params: EditorInitParams
   store: EditorPageStore
-  fc: fabric.Canvas
+  // fc: fabric.Canvas
   generator: Generator
   shapes?: ShapeWasm[]
+
+  paperItems: {
+    bgRect: paper.Path
+    shape?: paper.Item
+  }
 
   fBgObjs: fabric.Object[] = []
   fItems: fabric.Object[] = []
@@ -35,31 +42,96 @@ export class Editor {
 
     this.generator = new Generator()
 
+    paper.setup(params.canvas)
     // Init Fabric canvas
-    this.fc = new fabric.Canvas(params.canvas.id, {
-      preserveObjectStacking: true,
-      imageSmoothingEnabled: true,
-      enableRetinaScaling: false,
-      renderOnAddRemove: false,
-    })
+    // this.fc = new fabric.Canvas(params.canvas.id, {
+    //   preserveObjectStacking: true,
+    //   imageSmoothingEnabled: true,
+    //   enableRetinaScaling: false,
+    //   renderOnAddRemove: false,
+    // })
 
     this.logger.debug(
-      `Editor: init, ${this.fc.getWidth()} x ${this.fc.getHeight()}`
+      `Editor: init, ${params.canvas.width} x ${params.canvas.height}`
     )
 
     // @ts-ignore
-    window['fc'] = this.fc
-    this.fc.backgroundColor = this.store.bgColor
-    this.ctx = this.fc.getContext()
+    window['paper'] = paper
+    const bgRect = new paper.Path.Rectangle(
+      new paper.Point(0, 0),
+      new paper.Point(params.canvas.width, params.canvas.height)
+    )
+    bgRect.fillColor = new paper.Color(this.store.bgColor)
+    this.paperItems = {
+      bgRect,
+    }
+  }
 
-    this.generateAndRenderAll()
+  setBackgroundColor = (color: string) => {
+    this.paperItems.bgRect.fillColor = new paper.Color(color)
+  }
+
+  setBgShapeColor = (color: string) => {
+    if (this.paperItems.shape) {
+      this.paperItems.shape.fillColor = new paper.Color(color)
+    }
+  }
+
+  updateBgShape = async () => {
+    const shapeConfig = this.store.getSelectedShape()
+    if (this.paperItems.shape) {
+      this.paperItems.shape.remove()
+    }
+
+    let newItem: paper.Item | null = null
+
+    if (shapeConfig.kind === 'svg') {
+      const shapeItemGroup: paper.Group = await new Promise<paper.Group>(
+        (resolve) =>
+          new paper.Item().importSVG(shapeConfig.url, (item: paper.Item) =>
+            resolve(item as paper.Group)
+          )
+      )
+      shapeItemGroup.fillColor = new paper.Color(this.store.bgShapeColor)
+      newItem = shapeItemGroup
+    } else {
+      const shapeItemRaster: paper.Raster = await new Promise<paper.Raster>(
+        (resolve) => {
+          const raster = new paper.Raster(shapeConfig.url)
+          raster.onLoad = () => {
+            resolve(raster)
+          }
+        }
+      )
+      newItem = shapeItemRaster
+    }
+
+    const w = newItem.bounds.width
+    const h = newItem.bounds.height
+
+    const padding = 20
+    const sceneBounds = padRect(this.getSceneBounds(), -padding)
+    if (Math.max(w, h) !== Math.max(sceneBounds.w, sceneBounds.h)) {
+      newItem.scale(Math.max(sceneBounds.w, sceneBounds.h) / Math.max(w, h))
+    }
+
+    const w2 = newItem.bounds.width
+    const h2 = newItem.bounds.height
+
+    newItem.position = new paper.Point(
+      (sceneBounds.w - w2) / 2 + w2 / 2 + padding,
+      (sceneBounds.h - h2) / 2 + h2 / 2 + padding
+    )
+
+    newItem.insertAbove(this.paperItems.bgRect)
+    this.paperItems.shape = newItem
   }
 
   getSceneBounds = (): Rect => ({
     x: 0,
     y: 0,
-    w: this.params.canvas.width,
-    h: this.params.canvas.height,
+    w: paper.view.bounds.width,
+    h: paper.view.bounds.height,
   })
 
   getBgShapeBounds = (): Rect => {
@@ -144,7 +216,7 @@ export class Editor {
           left: item.transform.e,
         })
 
-        this.fc.add(itemImg)
+        // this.fc.add(itemImg)
         this.fItems.push(itemImg)
       }
 
@@ -155,75 +227,68 @@ export class Editor {
   }
 
   clear = async (render = true) => {
-    this.logger.debug('Editor: clear')
-    this.fc.remove(...this.fc.getObjects())
-    if (render) {
-      this.fc.renderAll()
-    }
-    this.fBgObjs = []
-    this.fItems = []
+    // this.logger.debug('Editor: clear')
+    // this.fc.remove(...this.fc.getObjects())
+    // if (render) {
+    //   this.fc.renderAll()
+    // }
+    // this.fBgObjs = []
+    // this.fItems = []
   }
 
   private prepareBgImg = async () => {
-    const shape = this.store.getSelectedShape()
-
-    let fShapeObj: fabric.Object
-
-    if (shape.kind === 'svg') {
-      const svgObjects = await new Promise<fabric.Object[]>((resolve) =>
-        fabric.loadSVGFromURL(shape.url, resolve)
-      )
-      this.logger.debug('Editor: loading BG from SVG:', svgObjects)
-      fShapeObj = svgObjects[0]
-      fShapeObj.fill = this.store.bgShapeColor
-    } else {
-      fShapeObj = await new Promise<fabric.Image>((resolve) =>
-        fabric.Image.fromURL(shape.url, resolve)
-      )
-      this.logger.debug('Editor: loading BG from raster image', fShapeObj)
-    }
-
-    this.fBgObjs = [fShapeObj]
-
-    fShapeObj.set({
-      left: 0,
-      top: 0,
-      opacity: 1,
-      selectable: false,
-      hasControls: false,
-      evented: false,
-    })
-
-    if (
-      fShapeObj.width &&
-      fShapeObj.height &&
-      fShapeObj.width > fShapeObj.height
-    ) {
-      fShapeObj.scaleToWidth(0.9 * this.fc.getWidth(), true)
-      fShapeObj.setCoords()
-    } else {
-      fShapeObj.scaleToHeight(0.9 * this.fc.getHeight(), true)
-    }
-
-    fShapeObj.left = (this.fc.getWidth() - fShapeObj.getScaledWidth()) / 2
-    fShapeObj.top = (this.fc.getHeight() - fShapeObj.getScaledHeight()) / 2
-
-    this.fc.add(fShapeObj)
+    //   const shape = this.store.getSelectedShape()
+    //   let fShapeObj: fabric.Object
+    //   if (shape.kind === 'svg') {
+    //     const svgObjects = await new Promise<fabric.Object[]>((resolve) =>
+    //       fabric.loadSVGFromURL(shape.url, resolve)
+    //     )
+    //     this.logger.debug('Editor: loading BG from SVG:', svgObjects)
+    //     fShapeObj = svgObjects[0]
+    //     fShapeObj.fill = this.store.bgShapeColor
+    //   } else {
+    //     fShapeObj = await new Promise<fabric.Image>((resolve) =>
+    //       fabric.Image.fromURL(shape.url, resolve)
+    //     )
+    //     this.logger.debug('Editor: loading BG from raster image', fShapeObj)
+    //   }
+    //   this.fBgObjs = [fShapeObj]
+    //   fShapeObj.set({
+    //     left: 0,
+    //     top: 0,
+    //     opacity: 1,
+    //     selectable: false,
+    //     hasControls: false,
+    //     evented: false,
+    //   })
+    //   if (
+    //     fShapeObj.width &&
+    //     fShapeObj.height &&
+    //     fShapeObj.width > fShapeObj.height
+    //   ) {
+    //     fShapeObj.scaleToWidth(0.9 * this.fc.getWidth(), true)
+    //     fShapeObj.setCoords()
+    //   } else {
+    //     fShapeObj.scaleToHeight(0.9 * this.fc.getHeight(), true)
+    //   }
+    //   fShapeObj.left = (this.fc.getWidth() - fShapeObj.getScaledWidth()) / 2
+    //   fShapeObj.top = (this.fc.getHeight() - fShapeObj.getScaledHeight()) / 2
+    //   this.fc.add(fShapeObj)
   }
 
   clearAndRenderBgShape = async () => {
-    this.logger.debug('Editor: clearAndRenderBgShape')
-    this.clear(false)
-    await this.prepareBgImg()
-    this.fc.renderAll()
+    // this.logger.debug('Editor: clearAndRenderBgShape')
+    // this.clear(false)
+    // await this.prepareBgImg()
+    // this.fc.renderAll()
   }
 
   generateAndRenderAll = async () => {
-    this.logger.debug('Editor: generateAndRenderAll')
-    this.clear(false)
-    await this.prepareBgImg()
-    await this.generateItems()
-    this.fc.renderAll()
+    // this.logger.debug('Editor: generateAndRenderAll')
+    // this.clear(false)
+    // await this.prepareBgImg()
+    // await this.generateItems()
+    // this.fc.renderAll()
   }
 
   destroy = () => {}

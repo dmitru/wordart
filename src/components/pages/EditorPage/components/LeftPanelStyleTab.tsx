@@ -29,8 +29,7 @@ export const LeftPanelStyleTab: React.FC<LeftPanelStyleTabProps> = observer(
 
                 editorPageStore.bgColor = hex
                 if (editorPageStore.editor) {
-                  editorPageStore.editor.fc.backgroundColor = hex
-                  editorPageStore.editor.fc.renderAll()
+                  editorPageStore.editor.setBackgroundColor(hex)
                 }
               })
             }}
@@ -55,10 +54,7 @@ export const LeftPanelStyleTab: React.FC<LeftPanelStyleTabProps> = observer(
 
                 editorPageStore.bgShapeColor = hex
                 if (editorPageStore.editor) {
-                  editorPageStore.editor.fBgObjs.forEach((obj) => {
-                    obj.set({ fill: hex })
-                  })
-                  editorPageStore.editor.fc.renderAll()
+                  editorPageStore.editor.setBgShapeColor(hex)
                 }
               })
             }}

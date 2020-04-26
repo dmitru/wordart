@@ -32,7 +32,7 @@ export class EditorPageStore {
   @observable activeLeftTab: LeftPanelTab = 'shapes'
 
   @observable bgColor = '#ffffff'
-  @observable bgShapeColor = '#7FCACE'
+  @observable bgShapeColor = '#FF5B5B'
   @observable itemsColor = '#ffffffff'
 
   @observable availableShape: ShapeConfig[] = shapes
@@ -60,12 +60,13 @@ export class EditorPageStore {
       runInAction(() => {
         this.selectedShapeId = shapeId
       })
-      if (true) {
-        this.editor.shapes = undefined
-        await this.editor.clearAndRenderBgShape()
-      }
-      await waitAnimationFrame()
-      await this.editor.generateAndRenderAll()
+      this.editor.updateBgShape()
+      // if (true) {
+      //   this.editor.shapes = undefined
+      //   await this.editor.clearAndRenderBgShape()
+      // }
+      // await waitAnimationFrame()
+      // await this.editor.generateAndRenderAll()
     } else {
       runInAction(() => {
         this.selectedShapeId = shapeId

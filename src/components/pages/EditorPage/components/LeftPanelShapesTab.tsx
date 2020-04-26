@@ -127,6 +127,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
             setQuery(e.target.value)
           }}
         />
+
         <ShapeThumbnails>
           {matchingShapes.map((shape) => (
             <ShapeThumbnailBtn
