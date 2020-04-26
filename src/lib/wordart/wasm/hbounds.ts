@@ -36,7 +36,7 @@ export const computeHBoundsForCanvasWasm = (
     visualize?: boolean
   }
 ): HBoundsWasm => {
-  console.log('computeHBoundsForCanvasWasm', srcCanvas.width, srcCanvas.height)
+  // console.log('computeHBoundsForCanvasWasm', srcCanvas.width, srcCanvas.height)
   const pathBboxRect = {
     x: 0,
     y: 0,

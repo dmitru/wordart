@@ -71,8 +71,8 @@ const findShapesByColorWasm = (
     srcCanvas.height,
     0,
     0,
-    ctx.canvas.width,
-    ctx.canvas.height
+    srcCanvas.width,
+    srcCanvas.height
   )
   ctx.restore()
 
@@ -97,7 +97,7 @@ const findShapesByColorWasm = (
   for (const { r, g, b, a, count: colorPixelCount } of colorsFiltered) {
     const hBounds = computeHBoundsForCanvasWasm(wasm, {
       srcCanvas: ctx.canvas,
-      scratchCanvasMaxSize: bounds.w,
+      scratchCanvasMaxSize: Math.max(bounds.w, bounds.h),
       color: { r, g, b, a },
       minSize,
       maxLevel,
@@ -105,7 +105,7 @@ const findShapesByColorWasm = (
     })
     const hBoundsInverted = computeHBoundsForCanvasWasm(wasm, {
       srcCanvas: ctx.canvas,
-      scratchCanvasMaxSize: bounds.w,
+      scratchCanvasMaxSize: Math.max(bounds.w, bounds.h),
       color: { r, g, b, a },
       invert: true,
       minSize,

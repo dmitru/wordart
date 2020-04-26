@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { Layout } from 'components/layout'
 import styled from 'styled-components'
 import 'lib/wordart/console-extensions'
@@ -11,6 +11,10 @@ import { observer } from 'mobx-react'
 import { observable } from 'mobx'
 import { LeftPanelShapesTab } from 'components/pages/EditorPage/components/LeftPanelShapesTab'
 import { useStore } from 'root-store'
+import { BaseBtn } from 'components/shared/BaseBtn/BaseBtn'
+import { LeftPanelWordsTab } from 'components/pages/EditorPage/components/LeftPanelWordsTab'
+import { Dimensions } from 'lib/wordart/canvas-utils'
+import { Editor } from 'components/pages/EditorPage/editor'
 
 const PageLayoutWrapper = styled.div`
   display: flex;
@@ -50,8 +54,7 @@ const LeftNavbar = styled.div`
   height: 100%;
 `
 
-const LeftNavbarBtn = styled.button<{ active: boolean }>`
-  outline: none;
+const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
   background: white;
   width: 100%;
   height: 60px;
@@ -60,10 +63,8 @@ const LeftNavbarBtn = styled.button<{ active: boolean }>`
   justify-content: center;
   align-items: center;
   font-size: 12px;
-  cursor: pointer;
   background: #eee;
   ${({ active }) => active && `background: #fff;`}
-  -webkit-appearance: none;
 
   color: black;
 
@@ -81,7 +82,7 @@ const LeftNavbarBtn = styled.button<{ active: boolean }>`
 `
 
 const LeftPanel = styled.div`
-  background: lightgray;
+  background: white;
   flex: 1;
   padding: 20px;
   height: 100%;
@@ -95,28 +96,64 @@ const RightWrapper = styled.div`
   padding: 20px;
 `
 
+const CanvasWrappper = styled.div`
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
 const Canvas = styled.canvas`
   width: 100%;
   height: auto;
   max-height: 100%;
   margin: auto;
-  border: 1px solid black;
-  background: white;
+`
+
+const VisualizeBtn = styled(BaseBtn)`
+  background: magenta;
+  color: white;
+  padding: 4px 10px;
+  margin-left: 20px;
+  font-size: 15px;
 `
 
 export const EditorPage = observer(() => {
+  const [canvasSize, setCanvasSize] = useState<Dimensions>({ w: 600, h: 600 })
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { editorPageStore } = useStore()
 
+  useEffect(() => {
+    console.log('editorPageStore.state', editorPageStore.state)
+    if (canvasRef.current && editorPageStore.state !== 'initialized') {
+      editorPageStore.initEditor({
+        canvas: canvasRef.current,
+        store: editorPageStore,
+      })
+    }
+  }, [canvasRef.current])
+
   return (
     <PageLayoutWrapper>
-      <TopNavWrapper>HEADER</TopNavWrapper>
+      <TopNavWrapper>
+        HEADER
+        <VisualizeBtn
+          onClick={() => {
+            editorPageStore.editor?.generateAndRenderAll()
+          }}
+        >
+          Visualize
+        </VisualizeBtn>
+      </TopNavWrapper>
+
       <EditorLayout>
         <LeftWrapper>
           <LeftNavbar>
             <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.activeLeftTab = 'templates'
+                editorPageStore.setLeftPanelTab('templates')
               }}
               active={editorPageStore.activeLeftTab === 'templates'}
             >
@@ -125,7 +162,7 @@ export const EditorPage = observer(() => {
             </LeftNavbarBtn>
             <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.activeLeftTab = 'shapes'
+                editorPageStore.setLeftPanelTab('shapes')
               }}
               active={editorPageStore.activeLeftTab === 'shapes'}
             >
@@ -134,7 +171,7 @@ export const EditorPage = observer(() => {
             </LeftNavbarBtn>
             <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.activeLeftTab = 'words'
+                editorPageStore.setLeftPanelTab('words')
               }}
               active={editorPageStore.activeLeftTab === 'words'}
             >
@@ -143,7 +180,7 @@ export const EditorPage = observer(() => {
             </LeftNavbarBtn>
             <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.activeLeftTab = 'style'
+                editorPageStore.setLeftPanelTab('style')
               }}
               active={editorPageStore.activeLeftTab === 'style'}
             >
@@ -156,16 +193,19 @@ export const EditorPage = observer(() => {
             {editorPageStore.activeLeftTab === 'shapes' && (
               <LeftPanelShapesTab />
             )}
+            {editorPageStore.activeLeftTab === 'words' && <LeftPanelWordsTab />}
           </LeftPanel>
         </LeftWrapper>
 
         <RightWrapper>
-          <Canvas
-            width={1200 / 1.5}
-            height={1040 / 1.5}
-            ref={canvasRef}
-            id="scene"
-          />
+          <CanvasWrappper>
+            <Canvas
+              width={canvasSize.w}
+              height={canvasSize.h}
+              ref={canvasRef}
+              id="scene"
+            />
+          </CanvasWrappper>
         </RightWrapper>
       </EditorLayout>
     </PageLayoutWrapper>
