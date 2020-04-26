@@ -128,6 +128,12 @@ const fillShapeWithShapes = (
 
   const collisionDetector = new CollisionDetectorWasm(
     wasm,
+    {
+      x: 0,
+      y: 0,
+      w: ctx.canvas.width,
+      h: ctx.canvas.height,
+    },
     shape.hBoundsInverted
   )
 
