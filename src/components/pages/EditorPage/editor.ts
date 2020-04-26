@@ -1,5 +1,5 @@
 import { EditorPageStore } from 'components/pages/EditorPage/editor-page-store'
-import { fetchImage } from 'lib/wordart/canvas-utils'
+import { fetchImage, createCanvasCtx } from 'lib/wordart/canvas-utils'
 import { fabric } from 'fabric'
 import { consoleLoggers } from 'utils/console-logger'
 import { getWasmModule } from 'lib/wordart/wasm/wasm-module'
@@ -39,7 +39,7 @@ export class Editor {
     this.fc = new fabric.Canvas(params.canvas.id, {
       preserveObjectStacking: true,
       imageSmoothingEnabled: true,
-      enableRetinaScaling: true,
+      enableRetinaScaling: false,
       renderOnAddRemove: false,
     })
 
@@ -49,7 +49,7 @@ export class Editor {
 
     // @ts-ignore
     window['fc'] = this.fc
-    this.fc.backgroundColor = 'white'
+    this.fc.backgroundColor = this.store.bgColor
     this.ctx = this.fc.getContext()
 
     this.generateAndRenderAll()
@@ -58,8 +58,8 @@ export class Editor {
   getSceneBounds = (): Rect => ({
     x: 0,
     y: 0,
-    w: this.fc.getWidth(),
-    h: this.fc.getHeight(),
+    w: this.params.canvas.width,
+    h: this.params.canvas.height,
   })
 
   getBgShapeBounds = (): Rect => {
@@ -76,14 +76,26 @@ export class Editor {
     this.logger.debug('Editor: generate')
     this.fItems = []
 
+    if (this.fBgObjs.length === 0) {
+      return
+    }
+
     if (!this.shapes) {
-      const imgCanvas = (this.fBgObjs[0].toCanvasElement() as any) as HTMLCanvasElement
+      const ctx = createCanvasCtx(this.getSceneBounds())
+      console.log(this.getSceneBounds(), ctx, this.fBgObjs[0])
+      try {
+        this.fBgObjs[0].render(ctx)
+        console.screenshot(ctx.canvas)
+      } catch (error) {
+        console.error(error)
+        debugger
+      }
 
       const wasm = await getWasmModule()
 
       const imageProcessor = new ImageProcessorWasm(wasm)
       const shapes = imageProcessor.findShapesByColor({
-        canvas: imgCanvas,
+        canvas: ctx.canvas,
         debug: false,
       })
       this.shapes = shapes
@@ -97,6 +109,7 @@ export class Editor {
       .slice(0, 1)
     this.logger.debug(
       'Generator.generate: nonTransparentShapes: ',
+      this.shapes,
       nonTransparentShapes
     )
 
@@ -104,6 +117,7 @@ export class Editor {
       const s = shape.hBounds.get_js()
       const result = await this.generator.generate({
         shape,
+        itemColor: this.store.itemsColor,
         bounds: {
           x: s.bounds.x,
           y: s.bounds.y,
@@ -161,9 +175,7 @@ export class Editor {
       )
       this.logger.debug('Editor: loading BG from SVG:', svgObjects)
       fShapeObj = svgObjects[0]
-      if (shape.fill) {
-        fShapeObj.fill = shape.fill
-      }
+      fShapeObj.fill = this.store.bgShapeColor
     } else {
       fShapeObj = await new Promise<fabric.Image>((resolve) =>
         fabric.Image.fromURL(shape.url, resolve)
@@ -176,7 +188,7 @@ export class Editor {
     fShapeObj.set({
       left: 0,
       top: 0,
-      opacity: 0.3,
+      opacity: 1,
       selectable: false,
       hasControls: false,
       evented: false,
@@ -189,25 +201,25 @@ export class Editor {
     ) {
       fShapeObj.scaleToWidth(0.9 * this.fc.getWidth(), true)
       fShapeObj.setCoords()
-      console.log(
-        'this.fc.getWidth()',
-        this.fc.getWidth(),
-        fShapeObj.getBoundingRect()
-      )
     } else {
       fShapeObj.scaleToHeight(0.9 * this.fc.getHeight(), true)
     }
+
+    fShapeObj.left = (this.fc.getWidth() - fShapeObj.getScaledWidth()) / 2
+    fShapeObj.top = (this.fc.getHeight() - fShapeObj.getScaledHeight()) / 2
 
     this.fc.add(fShapeObj)
   }
 
   clearAndRenderBgShape = async () => {
+    this.logger.debug('Editor: clearAndRenderBgShape')
     this.clear(false)
     await this.prepareBgImg()
     this.fc.renderAll()
   }
 
   generateAndRenderAll = async () => {
+    this.logger.debug('Editor: generateAndRenderAll')
     this.clear(false)
     await this.prepareBgImg()
     await this.generateItems()

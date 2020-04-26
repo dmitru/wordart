@@ -45,14 +45,10 @@ export class Generator {
 
     const circleR = 15
 
-    const color =
-      shape.color === '#ffffff' ||
-      shape.color === '#ffffff00' ||
-      shape.color === '#00000000'
-        ? 'black'
-        : shape.color
-
-    const { imgData, ctx: imgCtx } = createCircleImgData(circleR, color)
+    const { imgData, ctx: imgCtx } = createCircleImgData(
+      circleR,
+      task.itemColor
+    )
     const hbounds = wasm.create_hbounds(
       new Uint32Array(imgData.data.buffer),
       imgData.width,
@@ -180,6 +176,7 @@ export class Generator {
 export type GenerateTask = {
   bounds: Rect
   shape: ShapeWasm
+  itemColor: string
 }
 
 export type GenerateResult = {

@@ -8,13 +8,12 @@ import { Text } from '@styled-icons/evaicons-solid/Text'
 import { Shapes } from '@styled-icons/fa-solid/Shapes'
 import { ColorLens } from '@styled-icons/material-rounded/ColorLens'
 import { observer } from 'mobx-react'
-import { observable } from 'mobx'
 import { LeftPanelShapesTab } from 'components/pages/EditorPage/components/LeftPanelShapesTab'
 import { useStore } from 'root-store'
 import { BaseBtn } from 'components/shared/BaseBtn/BaseBtn'
 import { LeftPanelWordsTab } from 'components/pages/EditorPage/components/LeftPanelWordsTab'
 import { Dimensions } from 'lib/wordart/canvas-utils'
-import { Editor } from 'components/pages/EditorPage/editor'
+import { LeftPanelStyleTab } from 'components/pages/EditorPage/components/LeftPanelStyleTab'
 
 const PageLayoutWrapper = styled.div`
   display: flex;
@@ -42,7 +41,7 @@ const TopNavWrapper = styled.div`
 const LeftWrapper = styled.div`
   height: 100%;
   background: gray;
-  max-width: 350px;
+  max-width: 380px;
   flex: 1;
   display: flex;
   flex-direction: row;
@@ -86,6 +85,7 @@ const LeftPanel = styled.div`
   flex: 1;
   padding: 20px;
   height: 100%;
+  overflow: auto;
 `
 
 const RightWrapper = styled.div`
@@ -194,6 +194,7 @@ export const EditorPage = observer(() => {
               <LeftPanelShapesTab />
             )}
             {editorPageStore.activeLeftTab === 'words' && <LeftPanelWordsTab />}
+            {editorPageStore.activeLeftTab === 'style' && <LeftPanelStyleTab />}
           </LeftPanel>
         </LeftWrapper>
 

@@ -3,18 +3,24 @@ import { useStore } from 'root-store'
 import styled from 'styled-components'
 import { ShapeConfig } from 'components/pages/EditorPage/editor-page-store'
 import { ReactSVG } from 'react-svg'
+import { useState } from 'react'
 
 export type LeftPanelShapesTabProps = {}
 
 const ShapeThumbnailBtn: React.FC<
   {
+    backgroundColor: string
     shape: ShapeConfig
     active: boolean
   } & Omit<React.HTMLProps<HTMLButtonElement>, 'shape'>
-> = ({ shape, active, onClick }) => {
+> = ({ shape, backgroundColor, active, onClick }) => {
   if (shape.kind === 'img') {
     return (
-      <ShapeThumbnailBtnInner active={active} onClick={onClick}>
+      <ShapeThumbnailBtnInner
+        active={active}
+        onClick={onClick}
+        backgroundColor={backgroundColor}
+      >
         <ShapeThumbnailBtnInnerImg src={shape.url} />
       </ShapeThumbnailBtnInner>
     )
@@ -22,13 +28,18 @@ const ShapeThumbnailBtn: React.FC<
 
   if (shape.kind === 'svg') {
     return (
-      <ShapeThumbnailBtnInner active={active} onClick={onClick}>
+      <ShapeThumbnailBtnInner
+        backgroundColor={backgroundColor}
+        active={active}
+        onClick={onClick}
+        fill={shape.fill || 'black'}
+      >
         <ReactSVG
           src={shape.url}
           style={{
             color: shape.fill || 'black',
-            width: `100px`,
-            height: `100px`,
+            width: `78px`,
+            height: `78px`,
           }}
         />
       </ShapeThumbnailBtnInner>
@@ -53,15 +64,18 @@ const ShapeThumbnails = styled.div`
 
 const ShapeThumbnailBtnInner = styled.button<
   {
+    backgroundColor: string
+    fill?: string
     active: boolean
   } & React.HTMLProps<HTMLButtonElement>
 >`
   outline: none;
   background: white;
-  width: 100px;
-  height: 100px;
+  width: 78px;
+  height: 78px;
   display: inline-flex;
-  margin: 10px;
+  padding: 5px;
+  margin: 4px;
   justify-content: center;
   align-items: center;
   font-size: 12px;
@@ -69,10 +83,15 @@ const ShapeThumbnailBtnInner = styled.button<
   flex-direction: column;
   ${({ active }) => active && `outline: 3px solid orange;`}
   -webkit-appearance: none;
+  background-color: ${(p) => p.backgroundColor};
 
   svg {
-    width: 100px;
-    height: 100px;
+    width: 78px;
+    height: 78px;
+
+    * {
+      ${({ fill }) => fill && `fill: ${fill}`};
+    }
   }
 
   color: black;
@@ -93,15 +112,30 @@ const ShapeThumbnailBtnInner = styled.button<
 export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
   () => {
     const { editorPageStore } = useStore()
+    const [query, setQuery] = useState('')
+
+    const matchingShapes = editorPageStore
+      .getAvailableShapes()
+      .filter((s) => s.title.toLowerCase().includes(query.toLowerCase()))
+
     return (
       <>
+        <input
+          placeholder='Try "Heart" or "face"'
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value)
+          }}
+        />
         <ShapeThumbnails>
-          {editorPageStore.getAvailableShapes().map((shape) => (
+          {matchingShapes.map((shape) => (
             <ShapeThumbnailBtn
               key={shape.id}
               onClick={() => {
                 editorPageStore.selectShape(shape.id)
               }}
+              backgroundColor="white"
+              // backgroundColor={editorPageStore.bgColor}
               active={shape.id === editorPageStore.getSelectedShape().id}
               shape={shape}
             />

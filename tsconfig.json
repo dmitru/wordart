@@ -26,6 +26,7 @@
     "**/*.ts",
     "**/*.tsx",
     "tools/generators/index.js",
-    "next.config.js"
+    "next.config.js",
+    "tools/generate-icons.js"
   ]
 }
