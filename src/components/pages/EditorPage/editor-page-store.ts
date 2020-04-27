@@ -33,6 +33,7 @@ export class EditorPageStore {
 
   @observable bgColor = '#ffffff'
   @observable bgShapeColor = '#FF5B5B'
+  // @observable itemsColor = '#ffffffff'
   @observable itemsColor = '#ffffffff'
 
   @observable availableShape: ShapeConfig[] = shapes
@@ -155,13 +156,6 @@ const shapes: ShapeConfig[] = [
     kind: 'img',
     title: 'Darth Vader',
     url: '/images/darth_vader.jpg',
-  },
-  {
-    id: 1,
-    kind: 'svg',
-    title: 'Cloud',
-    url: '/images/cloud.svg',
-    fill: 'navy',
   },
   {
     id: 6,

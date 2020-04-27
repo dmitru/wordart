@@ -3,8 +3,15 @@ import {
   multiply,
   Point,
   randomPointInRect,
+  transformRectNoSkew,
 } from 'lib/wordart/geometry'
-import { rotate, scale, translate } from 'transformation-matrix'
+import {
+  rotate,
+  scale,
+  translate,
+  Matrix,
+  identity,
+} from 'transformation-matrix'
 import { createCanvasCtxCopy } from 'lib/wordart/canvas-utils'
 import {
   HBoundsWasmSerialized,
@@ -114,7 +121,11 @@ export const computeHBoundsForCanvasWasm = (
 export const randomPointInsideHboundsSerialized = (
   hBounds: HBoundsWasmSerialized
 ): Point | null => {
-  const impl = (hBoundsCur: HBoundsWasmSerialized, level = 0): Point | null => {
+  const impl = (
+    hBoundsCur: HBoundsWasmSerialized,
+    transform: Matrix,
+    level = 0
+  ): Point | null => {
     if (!hBoundsCur.overlaps_shape) {
       return null
     }
@@ -123,7 +134,9 @@ export const randomPointInsideHboundsSerialized = (
       hBoundsCur.bounds.w < 2 ||
       hBoundsCur.bounds.h < 2
     ) {
-      return randomPointInRect(hBoundsCur.bounds)
+      return randomPointInRect(
+        transformRectNoSkew(transform, hBoundsCur.bounds)
+      )
     }
 
     const candidates = hBoundsCur.children.filter((c) => c.overlapping_area > 0)
@@ -132,10 +145,14 @@ export const randomPointInsideHboundsSerialized = (
     }
     const childIndex = weightedSample(candidates.map((c) => c.overlapping_area))
     const child = candidates[childIndex]
-    return impl(child, level + 1)
+    return impl(
+      child,
+      multiply(transform, child.transform || identity()),
+      level + 1
+    )
   }
 
-  return impl(hBounds)
+  return impl(hBounds, hBounds.transform || identity())
 }
 
 export const drawHBoundsWasm = (

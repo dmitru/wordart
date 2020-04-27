@@ -11,7 +11,6 @@ import {
 import { Generator } from 'components/pages/EditorPage/generator'
 import chroma from 'chroma-js'
 import paper from 'paper'
-import { Point } from 'fabric/fabric-impl'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -31,10 +30,8 @@ export class Editor {
   paperItems: {
     bgRect: paper.Path
     shape?: paper.Item
+    shapeItemsGroup?: paper.Group
   }
-
-  fBgObjs: fabric.Object[] = []
-  fItems: fabric.Object[] = []
 
   constructor(params: EditorInitParams) {
     this.params = params
@@ -43,13 +40,6 @@ export class Editor {
     this.generator = new Generator()
 
     paper.setup(params.canvas)
-    // Init Fabric canvas
-    // this.fc = new fabric.Canvas(params.canvas.id, {
-    //   preserveObjectStacking: true,
-    //   imageSmoothingEnabled: true,
-    //   enableRetinaScaling: false,
-    //   renderOnAddRemove: false,
-    // })
 
     this.logger.debug(
       `Editor: init, ${params.canvas.width} x ${params.canvas.height}`
@@ -125,6 +115,10 @@ export class Editor {
 
     newItem.insertAbove(this.paperItems.bgRect)
     this.paperItems.shape = newItem
+
+    this.paperItems.shapeItemsGroup?.remove()
+    this.paperItems.shapeItemsGroup = undefined
+    this.shapes = undefined
   }
 
   getSceneBounds = (): Rect => ({
@@ -134,44 +128,58 @@ export class Editor {
     h: paper.view.bounds.height,
   })
 
-  getBgShapeBounds = (): Rect => {
-    const bounds = this.fBgObjs[0].getBoundingRect()
-    return {
-      x: bounds.left,
-      y: bounds.top,
-      w: bounds.width,
-      h: bounds.height,
-    }
-  }
-
   generateItems = async () => {
     this.logger.debug('Editor: generate')
-    this.fItems = []
+    // this.fItems = []
 
-    if (this.fBgObjs.length === 0) {
+    if (!this.paperItems.shape) {
       return
     }
 
+    // if (this.fBgObjs.length === 0) {
+    //   return
+    // }
+
     if (!this.shapes) {
-      const ctx = createCanvasCtx(this.getSceneBounds())
-      console.log(this.getSceneBounds(), ctx, this.fBgObjs[0])
+      // console.log(this.getSceneBounds(), ctx, this.fBgObjs[0])
       try {
-        this.fBgObjs[0].render(ctx)
+        const raster = this.paperItems.shape?.rasterize(80, false)
+        const imgData = raster.getImageData(
+          new paper.Rectangle(0, 0, raster.width, raster.height)
+        )
+        const ctx = createCanvasCtx({ w: raster.width, h: raster.height })
+        ctx.putImageData(imgData, 0, 0)
+        console.log('raster', raster)
         console.screenshot(ctx.canvas)
+
+        const wasm = await getWasmModule()
+
+        const imageProcessor = new ImageProcessorWasm(wasm)
+        const shapes = imageProcessor.findShapesByColor({
+          bounds: {
+            x: this.paperItems.shape.bounds.x,
+            y: this.paperItems.shape.bounds.y,
+            w: this.paperItems.shape.bounds.width,
+            h: this.paperItems.shape.bounds.height,
+          },
+          canvas: ctx.canvas,
+          debug: true,
+        })
+        this.shapes = shapes
       } catch (error) {
         console.error(error)
         debugger
       }
-
-      const wasm = await getWasmModule()
-
-      const imageProcessor = new ImageProcessorWasm(wasm)
-      const shapes = imageProcessor.findShapesByColor({
-        canvas: ctx.canvas,
-        debug: false,
-      })
-      this.shapes = shapes
     }
+
+    if (!this.shapes) {
+      return
+    }
+
+    this.logger.debug(
+      'Shapes: ',
+      this.shapes.map((s) => s.hBounds.get_js())
+    )
 
     const nonTransparentShapes = this.shapes
       .filter((shape) => {
@@ -187,42 +195,66 @@ export class Editor {
 
     for (const shape of nonTransparentShapes) {
       const s = shape.hBounds.get_js()
+      console.log('shape JS: ', s)
       const result = await this.generator.generate({
         shape,
         itemColor: this.store.itemsColor,
-        bounds: {
-          x: s.bounds.x,
-          y: s.bounds.y,
-          w: s.bounds.w,
-          h: s.bounds.h,
-        },
+        bounds: this.getSceneBounds(),
       })
 
       const imgUri = result.items[0].ctx.canvas.toDataURL()
       const img = await fetchImage(imgUri)
 
+      const addedItems: paper.Item[] = []
       for (const item of result.items) {
-        const itemImg = new fabric.Image(img)
-        itemImg.set({
-          width: item.ctx.canvas.width,
-          height: item.ctx.canvas.height,
-          opacity: 1,
-          selectable: true,
-          hasControls: true,
-          hasBorders: true,
-          scaleX: item.transform.a,
-          scaleY: item.transform.d,
-          top: item.transform.f,
-          left: item.transform.e,
-        })
+        const itemImg = new paper.Raster(img)
+        itemImg.scale(item.transform.a)
+        const w = itemImg.bounds.width
+        const h = itemImg.bounds.height
+        itemImg.position = new paper.Point(
+          item.transform.e + w / 2,
+          item.transform.f + h / 2
+        )
+
+        // itemImg.transform(
+        //   new paper.Matrix(
+        //     item.transform.a,
+        //     item.transform.b,
+        //     item.transform.c,
+        //     item.transform.d,
+        //     item.transform.e,
+        //     item.transform.f
+        //   )
+        // )
+        console.log('item = ', itemImg.position.x, itemImg.position.y)
+        addedItems.push(itemImg)
+        // itemImg.set({
+        //   width: item.ctx.canvas.width,
+        //   height: item.ctx.canvas.height,
+        //   opacity: 1,
+        //   selectable: true,
+        //   hasControls: true,
+        //   hasBorders: true,
+        //   scaleX: item.transform.a,
+        //   scaleY: item.transform.d,
+        //   top: item.transform.f,
+        //   left: item.transform.e,
+        // })
 
         // this.fc.add(itemImg)
-        this.fItems.push(itemImg)
+        // this.fItems.push(itemImg)
       }
 
-      for (const fBgShape of this.fBgObjs) {
-        fBgShape.sendToBack()
+      if (this.paperItems.shapeItemsGroup) {
+        this.paperItems.shapeItemsGroup.remove()
       }
+
+      this.paperItems.shapeItemsGroup = new paper.Group(addedItems)
+      this.paperItems.shapeItemsGroup.insertAbove(this.paperItems.shape)
+
+      // for (const fBgShape of this.fBgObjs) {
+      //   fBgShape.sendToBack()
+      // }
     }
   }
 

@@ -63,6 +63,11 @@ export class Generator {
 
     const shapeHBoundsJs = shape.hBounds.get_js()
 
+    const ctx = createCanvasCtx({
+      w: shapeHBoundsJs.bounds.w * (shapeHBoundsJs.transform?.a || 1),
+      h: shapeHBoundsJs.bounds.h * (shapeHBoundsJs.transform?.d || 1),
+    })
+
     let scaleFactor = 1
     const initialScale = 2 * scaleFactor
     // const initialScale = 0.002
@@ -101,8 +106,8 @@ export class Generator {
         const cx = p.x
         const cy = p.y
 
-        // ctx.fillStyle = 'red'
-        // ctx.fillRect(cx, cy, 2, 2)
+        ctx.fillStyle = 'red'
+        ctx.fillRect(cx, cy, 2, 2)
 
         const x = cx - rScaled
         const y = cy - rScaled
@@ -161,6 +166,8 @@ export class Generator {
 
       tBatchStart = performance.now()
     }
+
+    console.screenshot(ctx.canvas)
 
     const tEnded = performance.now()
     this.logger.debug(

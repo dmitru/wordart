@@ -141,7 +141,7 @@ export const EditorPage = observer(() => {
         HEADER
         <VisualizeBtn
           onClick={() => {
-            editorPageStore.editor?.generateAndRenderAll()
+            editorPageStore.editor?.generateItems()
           }}
         >
           Visualize

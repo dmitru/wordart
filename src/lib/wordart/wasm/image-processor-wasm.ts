@@ -26,6 +26,7 @@ export type ShapeWasm = {
 }
 
 export type ComputeShapesParams = {
+  bounds: Rect
   canvas: HTMLCanvasElement
   percentAreaThreshold?: number
   debug?: boolean
@@ -39,6 +40,7 @@ const findShapesByColorWasm = (
   params: ComputeShapesParams
 ): ShapeWasm[] => {
   const {
+    bounds,
     canvas: srcCanvas,
     debug = false,
     minSize = 1,
@@ -51,17 +53,19 @@ const findShapesByColorWasm = (
     throw new Error('wasm is not loaded')
   }
 
-  const bounds: Rect = {
+  const canvasBounds: Rect = {
     x: 0,
     y: 0,
     w: srcCanvas.width,
     h: srcCanvas.height,
   }
 
-  const scaleFactorX = 1
-  const scaleFactorY = 1
+  const scaleFactorX = bounds.w / canvasBounds.w
+  const scaleFactorY = bounds.h / canvasBounds.h
 
-  const ctx = createCanvasCtx(bounds)
+  console.log('scaleFactorX', 'scaleFactory', scaleFactorX, scaleFactorY)
+
+  const ctx = createCanvasCtx(canvasBounds)
   ctx.save()
   ctx.drawImage(
     srcCanvas,
@@ -97,23 +101,26 @@ const findShapesByColorWasm = (
   for (const { r, g, b, a, count: colorPixelCount } of colorsFiltered) {
     const hBounds = computeHBoundsForCanvasWasm(wasm, {
       srcCanvas: ctx.canvas,
-      scratchCanvasMaxSize: Math.max(bounds.w, bounds.h),
+      scratchCanvasMaxSize: Math.max(canvasBounds.w, canvasBounds.h),
       color: { r, g, b, a },
       minSize,
       maxLevel,
-      visualize: false,
+      visualize: true,
     })
     const hBoundsInverted = computeHBoundsForCanvasWasm(wasm, {
       srcCanvas: ctx.canvas,
-      scratchCanvasMaxSize: Math.max(bounds.w, bounds.h),
+      scratchCanvasMaxSize: Math.max(canvasBounds.w, canvasBounds.h),
       color: { r, g, b, a },
       invert: true,
       minSize,
       maxLevel,
-      visualize: false,
+      visualize: true,
     })
 
-    const hboundsTransform = tm.scale(scaleFactorX, scaleFactorY)
+    const hboundsTransform = tm.compose(
+      tm.translate(bounds.x, bounds.y),
+      tm.scale(scaleFactorX, scaleFactorY)
+    )
 
     hBounds.set_transform(
       hboundsTransform.a,
