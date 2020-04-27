@@ -227,11 +227,12 @@ export class Editor {
       })
 
       const addedItems: paper.Item[] = []
+      // @ts-ignore
+      const imgUri = result.items[0].ctx.canvas.toDataURL()
+      const img = await fetchImage(imgUri)
       for (const item of result.items) {
         // TODO: convert result items into paper paths
         if (item.kind === 'img') {
-          const imgUri = item.ctx.canvas.toDataURL()
-          const img = await fetchImage(imgUri)
           const itemImg = new paper.Raster(img)
           itemImg.scale(item.transform.a)
           const w = itemImg.bounds.width
@@ -240,7 +241,7 @@ export class Editor {
             item.transform.e + w / 2,
             item.transform.f + h / 2
           )
-          console.log('item = ', itemImg.position.x, itemImg.position.y)
+          // console.log('item = ', itemImg.position.x, itemImg.position.y)
           addedItems.push(itemImg)
         } else if (item.kind === 'word') {
           const pathItem = new paper.Path(item.word.symbols[0].getPathData())

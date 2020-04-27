@@ -129,17 +129,14 @@ export class Generator {
       `Processed ${words.length} words: ${(t2 - t1).toFixed(2)}ms`
     )
 
-    // const circleR = 15
-    // const { imgData, ctx: imgCtx } = createCircleImgData(
-    //   circleR,
-    //   task
-    // )
-    // const hbounds = this.wasm.create_hbounds(
-    //   new Uint32Array(imgData.data.buffer),
-    //   imgData.width,
-    //   imgData.height,
-    //   false
-    // )
+    const circleR = 80
+    const { imgData, ctx: imgCtx } = createCircleImgData(circleR, 'white')
+    const hbounds = this.wasm.create_hbounds(
+      new Uint32Array(imgData.data.buffer),
+      imgData.width,
+      imgData.height,
+      false
+    )
 
     let currentItemId = 1
     let addedItems: Item[] = []
@@ -178,16 +175,16 @@ export class Generator {
 
     let tBatchStart = performance.now()
     while (scale > finalScale && count < maxCount) {
-      // console.log('scale: ', scale)
+      console.log('scale: ', scale)
       const batchSize = 30
       let success = false
 
       const word = sample(words)!
       const firstSymbol = word.symbols[0]
-      const hbounds = this.symbolHbounds.get(firstSymbol.id)
-      if (!hbounds) {
-        throw new Error(`No hbounds for symbol ${firstSymbol.id}`)
-      }
+      // const hbounds = this.symbolHbounds.get(firstSymbol.id)
+      // if (!hbounds) {
+      //   throw new Error(`No hbounds for symbol ${firstSymbol.id}`)
+      // }
 
       for (let i = 0; i < batchSize; ++i) {
         // const rScaled = Math.max(3, circleR * scale)
@@ -248,12 +245,19 @@ export class Generator {
           // console.log('item = ', item, editor.paperItems.shapeHbounds)
 
           addedItems.push({
-            kind: 'word',
+            kind: 'img',
             id: currentItemId++,
-            word,
-            shapeColor: shape.color,
+            ctx: imgCtx,
             transform,
           })
+
+          // addedItems.push({
+          //   kind: 'word',
+          //   id: currentItemId++,
+          //   word,
+          //   shapeColor: shape.color,
+          //   transform,
+          // })
 
           countScale++
           count++
