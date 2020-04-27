@@ -227,12 +227,15 @@ export class Editor {
       })
 
       const addedItems: paper.Item[] = []
-      // @ts-ignore
-      const imgUri = result.items[0].ctx.canvas.toDataURL()
-      const img = await fetchImage(imgUri)
+      let img: HTMLImageElement | null = null
+
       for (const item of result.items) {
         // TODO: convert result items into paper paths
         if (item.kind === 'img') {
+          if (!img) {
+            const imgUri = item.ctx.canvas.toDataURL()
+            img = await fetchImage(imgUri)
+          }
           const itemImg = new paper.Raster(img)
           itemImg.scale(item.transform.a)
           const w = itemImg.bounds.width

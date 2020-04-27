@@ -160,7 +160,7 @@ export class Generator {
     let timeout = 1500
     let maxTimeout = 3000
     let timeoutStep = 300
-    let maxCount = 2000 * shape.percentArea
+    let maxCount = 200 * shape.percentArea
     // let maxCount = 30
 
     let failedBatchesCount = 0
@@ -235,13 +235,13 @@ export class Generator {
             transform,
           })
 
-          // const hboundsJs = hbounds.get_js()
-          // const item = hBoundsWasmSerializedToPaperGroup({
-          //   ...hboundsJs,
-          //   transform: compose(transform, hboundsJs.transform || tm.identity()),
-          // })
-          // const editor = (window as any)['editor'] as Editor
-          // editor.paperItems.shapeHbounds?.addChild(item)
+          const hboundsJs = hbounds.get_js()
+          const item = hBoundsWasmSerializedToPaperGroup({
+            ...hboundsJs,
+            transform: compose(transform, hboundsJs.transform || tm.identity()),
+          })
+          const editor = (window as any)['editor'] as Editor
+          editor.paperItems.shapeHbounds?.addChild(item)
           // console.log('item = ', item, editor.paperItems.shapeHbounds)
 
           addedItems.push({
