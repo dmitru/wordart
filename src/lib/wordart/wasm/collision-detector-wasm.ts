@@ -34,24 +34,18 @@ export class CollisionDetectorWasm {
   }
 
   addItem = (hbounds: HBoundsWasm, transform?: Matrix): boolean => {
-    let hboundsTransformed = hbounds
     if (this.shapeBoundsInverted) {
       if (transform) {
-        if (
-          this.shapeBoundsInverted.collides_transformed(
-            hboundsTransformed,
-            transform
-          )
-        ) {
+        if (this.shapeBoundsInverted.collides_transformed(hbounds, transform)) {
           return false
         }
       } else {
-        if (this.shapeBoundsInverted.collides(hboundsTransformed)) {
+        if (this.shapeBoundsInverted.collides(hbounds)) {
           return false
         }
       }
     }
-    const itemId = this.layoutGen.add_item(hboundsTransformed, transform)
+    const itemId = this.layoutGen.add_item(hbounds, transform)
     return itemId != null
   }
 }

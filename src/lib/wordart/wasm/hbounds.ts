@@ -157,9 +157,14 @@ export const randomPointInsideHboundsSerialized = (
 
 export const drawHBoundsWasm = (
   ctx: CanvasRenderingContext2D,
-  hBounds: HBoundsWasm
+  hBounds: HBoundsWasm,
+  transform?: Matrix
 ) => {
   const hBoundsSerialized = hBounds.get_js() as HBoundsWasmSerialized
+  // if (transform) {
+  //   // @ts-ignore
+  //   hBoundsSerialized.transform = multiply(hBoundsSerialized.transform || identity(), transform)
+  // }
 
   const drawHBoundsImpl = (hBounds: HBoundsWasmSerialized, level = 0) => {
     if (level > 9) {
@@ -200,5 +205,18 @@ export const drawHBoundsWasm = (
     ctx.restore()
   }
 
+  console.log('transform = ', transform)
+  ctx.save()
+  if (transform) {
+    ctx.transform(
+      transform.a,
+      transform.b,
+      transform.c,
+      transform.d,
+      transform.e,
+      transform.f
+    )
+  }
   drawHBoundsImpl(hBoundsSerialized)
+  ctx.restore()
 }

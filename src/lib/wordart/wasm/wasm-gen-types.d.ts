@@ -72,7 +72,14 @@ export type HBoundsWasmSerialized = {
   overlaps_shape: boolean
   overlapping_area: number
   children: HBoundsWasmSerialized[]
-  transform?: Matrix
+  transform?: {
+    a: number
+    b: number
+    c: number
+    d: number
+    e: number
+    f: number
+  }
 }
 
 export class LabInt {

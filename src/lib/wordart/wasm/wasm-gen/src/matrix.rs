@@ -116,9 +116,17 @@ impl Matrix {
     self.f += b * pe + d * pf;
   }
 
-  pub fn transform(mut self, matrix: &Matrix) -> Matrix {
-    self.transform_mut(matrix);
-    self
+  pub fn transform(&self, matrix: &Matrix) -> Matrix {
+    let mut result = Matrix {
+      a: self.a,
+      b: self.b,
+      c: self.c,
+      d: self.d,
+      e: self.e,
+      f: self.f,
+    };
+    result.transform_mut(matrix);
+    return result;
   }
 
   pub fn transform_values(

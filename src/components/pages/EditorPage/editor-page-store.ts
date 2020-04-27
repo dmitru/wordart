@@ -32,7 +32,7 @@ export class EditorPageStore {
   @observable activeLeftTab: LeftPanelTab = 'shapes'
 
   @observable bgColor = '#ffffff'
-  @observable bgShapeColor = '#FF5B5B'
+  @observable bgShapeColor = '#6C6C6C'
   // @observable itemsColor = '#ffffffff'
   @observable itemsColor = '#ffffffff'
 
@@ -75,7 +75,7 @@ export class EditorPageStore {
     }
   }
 
-  @action deleteWord = (wordId: WordId) => {
+  @action deleteWord = (wordId: WordConfigId) => {
     this.words = this.words.filter((w) => w.id !== wordId)
   }
 
@@ -88,7 +88,7 @@ export class EditorPageStore {
   }
 
   @action updateWord = (
-    wordId: WordId,
+    wordId: WordConfigId,
     update: Partial<Omit<WordConfig, 'id'>>
   ) => {
     const word = this.words.find((w) => w.id === wordId)
@@ -100,11 +100,11 @@ export class EditorPageStore {
 }
 
 export type WordConfig = {
-  id: WordId
+  id: WordConfigId
   text: string
 }
 
-export type WordId = number
+export type WordConfigId = number
 
 const defaultWordsConfig: WordConfig[] = [
   {

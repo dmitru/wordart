@@ -1,8 +1,10 @@
 import { EditorPageStore } from 'components/pages/EditorPage/editor-page-store'
 import { fetchImage, createCanvasCtx } from 'lib/wordart/canvas-utils'
-import { fabric } from 'fabric'
 import { consoleLoggers } from 'utils/console-logger'
-import { getWasmModule } from 'lib/wordart/wasm/wasm-module'
+import {
+  getWasmModule,
+  HBoundsWasmSerialized,
+} from 'lib/wordart/wasm/wasm-module'
 import { Rect, padRect } from 'lib/wordart/geometry'
 import {
   ImageProcessorWasm,
@@ -11,6 +13,16 @@ import {
 import { Generator } from 'components/pages/EditorPage/generator'
 import chroma from 'chroma-js'
 import paper from 'paper'
+import { loadFont } from 'lib/wordart/fonts'
+import { Matrix } from 'lib/wordart/wasm/wasm-gen-types'
+import * as tm from 'transformation-matrix'
+import { hBoundsWasmSerializedToPaperGroup } from 'components/pages/EditorPage/paper-utils'
+
+const FONT_NAMES = [
+  'mountains-of-christmas_bold.ttf',
+  'mail-ray-stuff.ttf',
+  'Verona-Xlight.ttf',
+]
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -20,16 +32,15 @@ export type EditorInitParams = {
 export class Editor {
   logger = consoleLoggers.editor
 
-  // ctx: CanvasRenderingContext2D
   params: EditorInitParams
   store: EditorPageStore
-  // fc: fabric.Canvas
   generator: Generator
   shapes?: ShapeWasm[]
 
   paperItems: {
     bgRect: paper.Path
     shape?: paper.Item
+    shapeHbounds?: paper.Group
     shapeItemsGroup?: paper.Group
   }
 
@@ -69,11 +80,10 @@ export class Editor {
 
   updateBgShape = async () => {
     const shapeConfig = this.store.getSelectedShape()
-    if (this.paperItems.shape) {
-      this.paperItems.shape.remove()
-    }
+    this.paperItems.shape?.remove()
+    this.paperItems.shapeHbounds?.remove()
 
-    let newItem: paper.Item | null = null
+    let shapeItem: paper.Item | null = null
 
     if (shapeConfig.kind === 'svg') {
       const shapeItemGroup: paper.Group = await new Promise<paper.Group>(
@@ -83,7 +93,7 @@ export class Editor {
           )
       )
       shapeItemGroup.fillColor = new paper.Color(this.store.bgShapeColor)
-      newItem = shapeItemGroup
+      shapeItem = shapeItemGroup
     } else {
       const shapeItemRaster: paper.Raster = await new Promise<paper.Raster>(
         (resolve) => {
@@ -93,28 +103,28 @@ export class Editor {
           }
         }
       )
-      newItem = shapeItemRaster
+      shapeItem = shapeItemRaster
     }
 
-    const w = newItem.bounds.width
-    const h = newItem.bounds.height
+    const w = shapeItem.bounds.width
+    const h = shapeItem.bounds.height
 
     const padding = 20
     const sceneBounds = padRect(this.getSceneBounds(), -padding)
     if (Math.max(w, h) !== Math.max(sceneBounds.w, sceneBounds.h)) {
-      newItem.scale(Math.max(sceneBounds.w, sceneBounds.h) / Math.max(w, h))
+      shapeItem.scale(Math.max(sceneBounds.w, sceneBounds.h) / Math.max(w, h))
     }
 
-    const w2 = newItem.bounds.width
-    const h2 = newItem.bounds.height
+    const w2 = shapeItem.bounds.width
+    const h2 = shapeItem.bounds.height
 
-    newItem.position = new paper.Point(
+    shapeItem.position = new paper.Point(
       (sceneBounds.w - w2) / 2 + w2 / 2 + padding,
       (sceneBounds.h - h2) / 2 + h2 / 2 + padding
     )
 
-    newItem.insertAbove(this.paperItems.bgRect)
-    this.paperItems.shape = newItem
+    shapeItem.insertAbove(this.paperItems.bgRect)
+    this.paperItems.shape = shapeItem
 
     this.paperItems.shapeItemsGroup?.remove()
     this.paperItems.shapeItemsGroup = undefined
@@ -130,18 +140,12 @@ export class Editor {
 
   generateItems = async () => {
     this.logger.debug('Editor: generate')
-    // this.fItems = []
 
     if (!this.paperItems.shape) {
       return
     }
 
-    // if (this.fBgObjs.length === 0) {
-    //   return
-    // }
-
     if (!this.shapes) {
-      // console.log(this.getSceneBounds(), ctx, this.fBgObjs[0])
       try {
         const raster = this.paperItems.shape?.rasterize(80, false)
         const imgData = raster.getImageData(
@@ -179,6 +183,8 @@ export class Editor {
       return
     }
 
+    await this.generator.init()
+
     this.logger.debug(
       'Shapes: ',
       this.shapes.map((s) => s.hBounds.get_js())
@@ -196,56 +202,64 @@ export class Editor {
       nonTransparentShapes
     )
 
+    const fonts = await Promise.all(
+      FONT_NAMES.map((fontName) => loadFont(`/fonts/${fontName}`))
+    )
+    // @ts-ignore
+    window['fonts'] = fonts
+
     for (const shape of nonTransparentShapes) {
       const s = shape.hBounds.get_js()
-      console.log('shape JS: ', s)
+
+      // this.paperItems.shapeHbounds = hBoundsWasmSerializedToPaperGroup(s)
+      // this.paperItems.shape?.insertAbove(this.paperItems.bgRect)
+
       const result = await this.generator.generate({
         shape,
-        itemColor: this.store.itemsColor,
         bounds: this.getSceneBounds(),
+        words: this.store.getWords().map((wc) => ({
+          wordConfigId: wc.id,
+          angles: [0],
+          fillColors: ['red'],
+          fonts: [fonts[0]],
+          text: wc.text,
+        })),
       })
-
-      const imgUri = result.items[0].ctx.canvas.toDataURL()
-      const img = await fetchImage(imgUri)
 
       const addedItems: paper.Item[] = []
       for (const item of result.items) {
-        const itemImg = new paper.Raster(img)
-        itemImg.scale(item.transform.a)
-        const w = itemImg.bounds.width
-        const h = itemImg.bounds.height
-        itemImg.position = new paper.Point(
-          item.transform.e + w / 2,
-          item.transform.f + h / 2
-        )
-
-        // itemImg.transform(
-        //   new paper.Matrix(
-        //     item.transform.a,
-        //     item.transform.b,
-        //     item.transform.c,
-        //     item.transform.d,
-        //     item.transform.e,
-        //     item.transform.f
-        //   )
-        // )
-        console.log('item = ', itemImg.position.x, itemImg.position.y)
-        addedItems.push(itemImg)
-        // itemImg.set({
-        //   width: item.ctx.canvas.width,
-        //   height: item.ctx.canvas.height,
-        //   opacity: 1,
-        //   selectable: true,
-        //   hasControls: true,
-        //   hasBorders: true,
-        //   scaleX: item.transform.a,
-        //   scaleY: item.transform.d,
-        //   top: item.transform.f,
-        //   left: item.transform.e,
-        // })
-
-        // this.fc.add(itemImg)
-        // this.fItems.push(itemImg)
+        // TODO: convert result items into paper paths
+        if (item.kind === 'img') {
+          const imgUri = item.ctx.canvas.toDataURL()
+          const img = await fetchImage(imgUri)
+          const itemImg = new paper.Raster(img)
+          itemImg.scale(item.transform.a)
+          const w = itemImg.bounds.width
+          const h = itemImg.bounds.height
+          itemImg.position = new paper.Point(
+            item.transform.e + w / 2,
+            item.transform.f + h / 2
+          )
+          console.log('item = ', itemImg.position.x, itemImg.position.y)
+          addedItems.push(itemImg)
+        } else if (item.kind === 'word') {
+          const pathItem = new paper.Path(item.word.symbols[0].getPathData())
+          pathItem.fillColor = new paper.Color('blue')
+          // console.log(
+          //   'pathItem.bounds',
+          //   pathItem.bounds.width,
+          //   pathItem.bounds.height
+          // )
+          pathItem.scale(item.transform.a)
+          const w = pathItem.bounds.width
+          const h = pathItem.bounds.height
+          // console.log('w, h', w, h, item.transform.a)
+          pathItem.position = new paper.Point(
+            item.transform.e,
+            item.transform.f
+          )
+          addedItems.push(pathItem)
+        }
       }
 
       if (this.paperItems.shapeItemsGroup) {
@@ -254,76 +268,14 @@ export class Editor {
 
       this.paperItems.shapeItemsGroup = new paper.Group(addedItems)
       this.paperItems.shapeItemsGroup.insertAbove(this.paperItems.shape)
-
-      // for (const fBgShape of this.fBgObjs) {
-      //   fBgShape.sendToBack()
-      // }
     }
   }
 
   clear = async (render = true) => {
-    // this.logger.debug('Editor: clear')
-    // this.fc.remove(...this.fc.getObjects())
-    // if (render) {
-    //   this.fc.renderAll()
-    // }
-    // this.fBgObjs = []
-    // this.fItems = []
-  }
-
-  private prepareBgImg = async () => {
-    //   const shape = this.store.getSelectedShape()
-    //   let fShapeObj: fabric.Object
-    //   if (shape.kind === 'svg') {
-    //     const svgObjects = await new Promise<fabric.Object[]>((resolve) =>
-    //       fabric.loadSVGFromURL(shape.url, resolve)
-    //     )
-    //     this.logger.debug('Editor: loading BG from SVG:', svgObjects)
-    //     fShapeObj = svgObjects[0]
-    //     fShapeObj.fill = this.store.bgShapeColor
-    //   } else {
-    //     fShapeObj = await new Promise<fabric.Image>((resolve) =>
-    //       fabric.Image.fromURL(shape.url, resolve)
-    //     )
-    //     this.logger.debug('Editor: loading BG from raster image', fShapeObj)
-    //   }
-    //   this.fBgObjs = [fShapeObj]
-    //   fShapeObj.set({
-    //     left: 0,
-    //     top: 0,
-    //     opacity: 1,
-    //     selectable: false,
-    //     hasControls: false,
-    //     evented: false,
-    //   })
-    //   if (
-    //     fShapeObj.width &&
-    //     fShapeObj.height &&
-    //     fShapeObj.width > fShapeObj.height
-    //   ) {
-    //     fShapeObj.scaleToWidth(0.9 * this.fc.getWidth(), true)
-    //     fShapeObj.setCoords()
-    //   } else {
-    //     fShapeObj.scaleToHeight(0.9 * this.fc.getHeight(), true)
-    //   }
-    //   fShapeObj.left = (this.fc.getWidth() - fShapeObj.getScaledWidth()) / 2
-    //   fShapeObj.top = (this.fc.getHeight() - fShapeObj.getScaledHeight()) / 2
-    //   this.fc.add(fShapeObj)
-  }
-
-  clearAndRenderBgShape = async () => {
-    // this.logger.debug('Editor: clearAndRenderBgShape')
-    // this.clear(false)
-    // await this.prepareBgImg()
-    // this.fc.renderAll()
-  }
-
-  generateAndRenderAll = async () => {
-    // this.logger.debug('Editor: generateAndRenderAll')
-    // this.clear(false)
-    // await this.prepareBgImg()
-    // await this.generateItems()
-    // this.fc.renderAll()
+    this.logger.debug('Editor: clear')
+    this.paperItems.shape?.remove()
+    this.paperItems.shapeHbounds?.remove()
+    this.paperItems.shapeItemsGroup?.remove()
   }
 
   destroy = () => {}

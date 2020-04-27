@@ -72,7 +72,7 @@ export const LeftPanelStyleTab: React.FC<LeftPanelStyleTabProps> = observer(
               runInAction(() => {
                 editorPageStore.itemsColor = color.hex
               })
-              editorPageStore.editor?.generateAndRenderAll()
+              // editorPageStore.editor?.generateAndRenderAll()
             }}
           />
         </div>
