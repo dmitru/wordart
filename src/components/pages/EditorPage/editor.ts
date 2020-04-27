@@ -147,8 +147,11 @@ export class Editor {
         const imgData = raster.getImageData(
           new paper.Rectangle(0, 0, raster.width, raster.height)
         )
-        const ctx = createCanvasCtx({ w: raster.width, h: raster.height })
-        ctx.putImageData(imgData, 0, 0)
+        const ctx = createCanvasCtx({
+          w: raster.width + 4,
+          h: raster.height + 4,
+        })
+        ctx.putImageData(imgData, 2, 2)
         console.log('raster', raster)
         console.screenshot(ctx.canvas)
 

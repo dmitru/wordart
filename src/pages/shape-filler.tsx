@@ -24,7 +24,7 @@ import * as tm from 'transformation-matrix'
 import { multiply } from 'lib/wordart/geometry'
 
 const IMAGES = [
-  '/images/cat.png',
+  '/images/Meiersdorf manor.jpg',
   '/images/basketball.png',
   '/images/number_six.png',
   '/images/darth_vader.jpg',
@@ -54,12 +54,19 @@ const scratch = (canvas: HTMLCanvasElement) => {
       bgImageCtx = await loadImageUrlToCanvasCtx(
         imageUrl,
         imageSize.w,
-        imageSize.h
+        imageSize.h,
+        150
       )
       console.screenshot(bgImageCtx.canvas)
 
       const t1 = performance.now()
       shapes = imageProcessor.findShapesByColor({
+        bounds: {
+          x: 0,
+          y: 0,
+          w: bgImageCtx.canvas.width,
+          h: bgImageCtx.canvas.height,
+        },
         canvas: bgImageCtx.canvas,
         debug: false,
       })
@@ -155,7 +162,7 @@ const fillShapeWithShapes = (
   let timeout = 1500
   let maxTimeout = 3000
   let timeoutStep = 300
-  let maxCount = 1000 * shape.percentArea
+  let maxCount = 10 * shape.percentArea
 
   let failedBatchesCount = 0
   const maxFailedBatchesCount = 3
@@ -237,8 +244,8 @@ const fillShapeWithShapes = (
 
   const render = () => {
     console.log('render)')
-    // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-    // drawHBoundsWasm(ctx, shape.hBounds)
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+    drawHBoundsWasm(ctx, shape.hBounds)
     ctx.fillStyle = '#000'
     ctx.filter = 'brightness(0.8)'
     ctx.save()
@@ -256,11 +263,11 @@ const fillShapeWithShapes = (
 
   render()
 
-  const ENABLE_INTERACTIVITY = false
+  const ENABLE_INTERACTIVITY = true
 
   if (ENABLE_INTERACTIVITY) {
     let collides = false
-    let scale = 3
+    let scale = 1
     // console.log('FISH: ', hbounds.get_js())
 
     ctx.canvas.addEventListener('mousemove', (e) => {

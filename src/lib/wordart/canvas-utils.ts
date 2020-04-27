@@ -134,8 +134,8 @@ export const loadImageUrlToCanvasCtx = async (
     img,
     padding,
     padding,
-    ctx.canvas.width - padding,
-    ctx.canvas.height - padding
+    ctx.canvas.width - 2 * padding,
+    ctx.canvas.height - 2 * padding
   )
   return ctx
 }
