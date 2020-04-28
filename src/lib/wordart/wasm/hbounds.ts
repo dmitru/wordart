@@ -161,13 +161,21 @@ export const drawHBoundsWasm = (
   transform?: Matrix
 ) => {
   const hBoundsSerialized = hBounds.get_js() as HBoundsWasmSerialized
+  drawHBoundsWasmSerialized(ctx, hBoundsSerialized, transform)
+}
+
+export const drawHBoundsWasmSerialized = (
+  ctx: CanvasRenderingContext2D,
+  hBoundsSerialized: HBoundsWasmSerialized,
+  transform?: Matrix
+) => {
   // if (transform) {
   //   // @ts-ignore
   //   hBoundsSerialized.transform = multiply(hBoundsSerialized.transform || identity(), transform)
   // }
 
   const drawHBoundsImpl = (hBounds: HBoundsWasmSerialized, level = 0) => {
-    if (level > 9) {
+    if (level > 7) {
       return
     }
     ctx.save()

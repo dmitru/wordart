@@ -101,8 +101,8 @@ impl LayoutGen {
 mod tests {
     use super::*;
 
-    static BLACK: u32 = 0x000000;
-    static WHITE: u32 = 0xffffff;
+    static BLACK: u32 = 0xff000000;
+    static WHITE: u32 = 0x00ffffff;
 
     #[test]
     fn test_collision_self() {
@@ -110,27 +110,35 @@ mod tests {
         let height = 2;
         let mut layout = LayoutGen::new(width as f32, height as f32);
 
-        let item1 = Item::new(&HBounds::from(ImgData {
-            data: &[
-                BLACK, BLACK, //
-                BLACK, WHITE,
-            ],
-            width,
-            height,
-        }));
+        let item1 = Item::new(&HBounds::from(
+            ImgData {
+                data: &[
+                    BLACK, BLACK, //
+                    BLACK, WHITE,
+                ],
+                width,
+                height,
+            },
+            None,
+            false,
+        ));
         let item2 = item1.clone();
 
         assert_eq!(layout.add_item(item1), Some(0));
         assert_eq!(layout.add_item(item2), None);
 
-        let item3 = Item::new(&HBounds::from(ImgData {
-            data: &[
-                WHITE, WHITE, //
-                WHITE, BLACK,
-            ],
-            width,
-            height,
-        }));
+        let item3 = Item::new(&HBounds::from(
+            ImgData {
+                data: &[
+                    WHITE, WHITE, //
+                    WHITE, BLACK,
+                ],
+                width,
+                height,
+            },
+            None,
+            false,
+        ));
 
         assert_eq!(layout.add_item(item3), Some(1));
     }

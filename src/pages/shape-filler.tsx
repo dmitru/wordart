@@ -18,13 +18,14 @@ import {
 import {
   drawHBoundsWasm,
   randomPointInsideHboundsSerialized,
+  drawHBoundsWasmSerialized,
 } from 'lib/wordart/wasm/hbounds'
 import { CollisionDetectorWasm } from 'lib/wordart/wasm/collision-detector-wasm'
 import * as tm from 'transformation-matrix'
 import { multiply } from 'lib/wordart/geometry'
 
 const IMAGES = [
-  '/images/Meiersdorf manor.jpg',
+  '/images/underline.png',
   '/images/basketball.png',
   '/images/number_six.png',
   '/images/darth_vader.jpg',
@@ -55,7 +56,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
         imageUrl,
         imageSize.w,
         imageSize.h,
-        150
+        40
       )
       console.screenshot(bgImageCtx.canvas)
 
@@ -242,10 +243,13 @@ const fillShapeWithShapes = (
   const t2 = performance.now()
   console.log('done', count, ((t2 - t1) / 1000).toFixed(3))
 
+  const shapeBoundsS = shape.hBounds.get_js()
+
   const render = () => {
     console.log('render)')
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-    drawHBoundsWasm(ctx, shape.hBounds)
+    // ctx.drawImage(bgImageCtx.canvas, 0, 0)
+    drawHBoundsWasmSerialized(ctx, shapeBoundsS)
     ctx.fillStyle = '#000'
     ctx.filter = 'brightness(0.8)'
     ctx.save()
@@ -296,7 +300,7 @@ const fillShapeWithShapes = (
       ctx.setTransform(transform)
       ctx.globalAlpha = collides ? 1 : 0.5
       ctx.drawImage(imgCtx.canvas, 0, 0)
-      drawHBoundsWasm(ctx, hbounds)
+      // drawHBoundsWasm(ctx, hbounds)
       ctx.restore()
     })
   }

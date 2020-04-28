@@ -66,6 +66,8 @@ export class Editor {
     this.paperItems = {
       bgRect,
     }
+
+    // params.canvas.add
   }
 
   setBackgroundColor = (color: string) => {
@@ -211,8 +213,8 @@ export class Editor {
     for (const shape of nonTransparentShapes) {
       const s = shape.hBounds.get_js()
 
-      // this.paperItems.shapeHbounds = hBoundsWasmSerializedToPaperGroup(s)
-      // this.paperItems.shape?.insertAbove(this.paperItems.bgRect)
+      this.paperItems.shapeHbounds = hBoundsWasmSerializedToPaperGroup(s)
+      this.paperItems.shape?.insertAbove(this.paperItems.bgRect)
 
       const result = await this.generator.generate({
         shape,
