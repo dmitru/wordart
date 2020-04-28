@@ -1,10 +1,16 @@
-import { Rect } from 'lib/wordart/geometry'
+import {
+  Rect,
+  areRectsIntersecting,
+  isRectInsideRect,
+  transformRect,
+} from 'lib/wordart/geometry'
 import { WasmModule, HBoundsWasm } from 'lib/wordart/wasm/wasm-module'
 import {
   LayoutGenWasm,
   HBoundsWasmSerialized,
   Matrix,
 } from 'lib/wordart/wasm/wasm-gen-types'
+import * as tm from 'transformation-matrix'
 
 export class CollisionDetectorWasm {
   wasm: WasmModule
@@ -23,17 +29,18 @@ export class CollisionDetectorWasm {
     if (shapeBoundsInverted) {
       this.shapeBoundsInverted = shapeBoundsInverted
       this.shapeBoundsInvertedJs = this.shapeBoundsInverted.get_js()
-      this.bounds = {
-        x: this.shapeBoundsInvertedJs.bounds.x,
-        y: this.shapeBoundsInvertedJs.bounds.y,
-        w: this.shapeBoundsInvertedJs.bounds.w,
-        h: this.shapeBoundsInvertedJs.bounds.h,
-      }
+      this.bounds = shapeBoundsInverted.get_bounds()
     }
     this.layoutGen = new wasm.LayoutGenWasm(this.bounds.w, this.bounds.h)
   }
 
   addItem = (hbounds: HBoundsWasm, transform?: Matrix): boolean => {
+    const bounds = hbounds.get_bounds(transform ? transform.copy() : undefined)
+
+    if (this.bounds && !isRectInsideRect(bounds, this.bounds)) {
+      return false
+    }
+
     if (this.shapeBoundsInverted) {
       if (transform) {
         if (this.shapeBoundsInverted.collides_transformed(hbounds, transform)) {

@@ -109,6 +109,24 @@ export const divideBounds = (bounds: Rect): Rect[] => {
   return result
 }
 
+export const isRectInsideRect = (rect1: Rect, rect2: Rect): boolean => {
+  const padding1 = 0
+  const padding2 = 0
+  const minX1 = rect1.x - padding1
+  const maxX1 = rect1.x + rect1.w + padding1
+
+  const minX2 = rect2.x - padding2
+  const maxX2 = rect2.x + rect2.w + padding2
+
+  const minY1 = rect1.y - padding1
+  const maxY1 = rect1.y + rect1.h + padding1
+
+  const minY2 = rect2.y - padding2
+  const maxY2 = rect2.y + rect2.h + padding2
+
+  return minX1 >= minX2 && maxX1 <= maxX2 && minY1 >= minY2 && maxY1 <= maxY2
+}
+
 export const areRectsIntersecting = (
   rect1: Rect,
   rect2: Rect,

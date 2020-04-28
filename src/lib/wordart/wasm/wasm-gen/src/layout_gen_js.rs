@@ -31,6 +31,20 @@ impl HBoundsWasm {
     }
 
     #[wasm_bindgen]
+    pub fn get_bounds(&self, transform: Option<Matrix>) -> JsValue {
+        let rect = RectF::from(self.wrapped.bounds);
+        let rect = match (self.wrapped.transform) {
+            Some(t) => rect.transform(t),
+            None => rect,
+        };
+        let rect = match (transform) {
+            Some(t) => rect.transform(t),
+            None => rect,
+        };
+        JsValue::from_serde(&rect).unwrap()
+    }
+
+    #[wasm_bindgen]
     pub fn get_js(&self) -> JsValue {
         JsValue::from_serde(&self.wrapped).unwrap()
     }
@@ -116,9 +130,9 @@ pub struct LayoutGenWasm {
 #[wasm_bindgen]
 impl LayoutGenWasm {
     #[wasm_bindgen(constructor)]
-    pub fn new(width: f32, height: f32) -> Self {
+    pub fn new() -> Self {
         LayoutGenWasm {
-            wrapped: LayoutGen::new(width, height),
+            wrapped: LayoutGen::new(),
         }
     }
 

@@ -45,7 +45,8 @@ impl PointF {
     }
 }
 
-#[derive(PartialEq, Debug, Copy, Clone)]
+#[wasm_bindgen]
+#[derive(PartialEq, Debug, Copy, Clone, Serialize)]
 pub struct RectF {
     pub x: f32,
     pub y: f32,

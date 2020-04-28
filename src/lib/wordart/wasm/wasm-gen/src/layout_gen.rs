@@ -57,10 +57,9 @@ pub struct LayoutGen {
 }
 
 impl LayoutGen {
-    pub fn new(width: f32, height: f32) -> Self {
+    pub fn new() -> Self {
         LayoutGen {
             next_id: 0,
-            // items: HashMap::new(),
             rtree: RTree::new(2),
         }
     }
@@ -108,7 +107,7 @@ mod tests {
     fn test_collision_self() {
         let width = 2;
         let height = 2;
-        let mut layout = LayoutGen::new(width as f32, height as f32);
+        let mut layout = LayoutGen::new();
 
         let item1 = Item::new(&HBounds::from(
             ImgData {

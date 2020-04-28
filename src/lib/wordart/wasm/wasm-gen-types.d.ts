@@ -45,6 +45,7 @@ export function create_hbounds(
 ): HBoundsWasm
 export class HBoundsWasm {
   free(): void
+  get_bounds(transform?: Matrix): RectF
   /**
    * @returns {HBoundsWasm}
    */
@@ -108,8 +109,18 @@ export class LayoutGenWasm {
    */
   add_item(hbounds: HBoundsWasm, transform?: Matrix): number | undefined
 }
+
+export class RectF {
+  free(): void
+  h: number
+  w: number
+  x: number
+  y: number
+}
+
 export class Matrix {
   free(): void
+  copy(): Matrix
   /**
    */
   constructor()

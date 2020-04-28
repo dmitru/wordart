@@ -196,8 +196,8 @@ export class Generator {
         const cx = p.x
         const cy = p.y
 
-        ctx.fillStyle = 'red'
-        ctx.fillRect(cx, cy, 2, 2)
+        // ctx.fillStyle = 'red'
+        // ctx.fillRect(cx, cy, 2, 2)
 
         const x = cx
         const y = cy

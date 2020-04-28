@@ -29,6 +29,18 @@ impl Matrix {
     }
   }
 
+  #[wasm_bindgen]
+  pub fn copy(&self) -> Matrix {
+    Matrix {
+      a: self.a,
+      b: self.b,
+      c: self.c,
+      d: self.d,
+      e: self.e,
+      f: self.f,
+    }
+  }
+
   pub fn between(from: &Matrix, to: &Matrix, ratio: f32) -> Matrix {
     Matrix {
       a: from.a + (to.a - from.a) * ratio,
