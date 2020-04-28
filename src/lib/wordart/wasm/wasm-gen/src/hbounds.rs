@@ -324,9 +324,10 @@ impl HBounds {
 
         let mut transform2 = Matrix::new();
         if t2.is_some() {
-            transform2 = t2.unwrap();
-        } else if hbounds2.transform.is_some() {
-            transform2 = hbounds2.transform.unwrap();
+            transform2 = transform2.transform(&t2.unwrap());
+        }
+        if hbounds2.transform.is_some() {
+            transform2 = transform2.transform(&hbounds2.transform.unwrap());
         }
 
         collides_rec_impl(

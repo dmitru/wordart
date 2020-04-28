@@ -80,6 +80,14 @@ export class Editor {
     }
   }
 
+  setShapeItemsColor = (color: string) => {
+    if (this.paperItems.shapeItemsGroup) {
+      this.paperItems.shapeItemsGroup.children.forEach((c) => {
+        c.fillColor = new paper.Color(color)
+      })
+    }
+  }
+
   updateBgShape = async () => {
     const shapeConfig = this.store.getSelectedShape()
     this.paperItems.shape?.remove()
@@ -231,42 +239,42 @@ export class Editor {
       const addedItems: paper.Item[] = []
       let img: HTMLImageElement | null = null
 
-      for (const item of result.items) {
-        // TODO: convert result items into paper paths
-        if (item.kind === 'img') {
-          if (!img) {
-            const imgUri = item.ctx.canvas.toDataURL()
-            img = await fetchImage(imgUri)
-          }
-          const itemImg = new paper.Raster(img)
-          itemImg.scale(item.transform.a)
-          const w = itemImg.bounds.width
-          const h = itemImg.bounds.height
-          itemImg.position = new paper.Point(
-            item.transform.e + w / 2,
-            item.transform.f + h / 2
-          )
-          // console.log('item = ', itemImg.position.x, itemImg.position.y)
-          addedItems.push(itemImg)
-        } else if (item.kind === 'word') {
-          const pathItem = new paper.Path(item.word.symbols[0].getPathData())
-          pathItem.fillColor = new paper.Color('blue')
-          // console.log(
-          //   'pathItem.bounds',
-          //   pathItem.bounds.width,
-          //   pathItem.bounds.height
-          // )
-          pathItem.scale(item.transform.a)
-          const w = pathItem.bounds.width
-          const h = pathItem.bounds.height
-          // console.log('w, h', w, h, item.transform.a)
-          pathItem.position = new paper.Point(
-            item.transform.e,
-            item.transform.f
-          )
-          addedItems.push(pathItem)
-        }
-      }
+      // for (const item of result.items) {
+      //   // TODO: convert result items into paper paths
+      //   if (item.kind === 'img') {
+      //     if (!img) {
+      //       const imgUri = item.ctx.canvas.toDataURL()
+      //       img = await fetchImage(imgUri)
+      //     }
+      //     const itemImg = new paper.Raster(img)
+      //     itemImg.scale(item.transform.a)
+      //     const w = itemImg.bounds.width
+      //     const h = itemImg.bounds.height
+      //     itemImg.position = new paper.Point(
+      //       item.transform.e + w / 2,
+      //       item.transform.f + h / 2
+      //     )
+      //     // console.log('item = ', itemImg.position.x, itemImg.position.y)
+      //     addedItems.push(itemImg)
+      //   } else if (item.kind === 'word') {
+      //     const pathItem = new paper.Path(item.word.symbols[0].getPathData())
+      //     pathItem.fillColor = new paper.Color('blue')
+      //     // console.log(
+      //     //   'pathItem.bounds',
+      //     //   pathItem.bounds.width,
+      //     //   pathItem.bounds.height
+      //     // )
+      //     pathItem.scale(item.transform.a)
+      //     const w = pathItem.bounds.width
+      //     const h = pathItem.bounds.height
+      //     // console.log('w, h', w, h, item.transform.a)
+      //     pathItem.position = new paper.Point(
+      //       item.transform.e,
+      //       item.transform.f
+      //     )
+      //     addedItems.push(pathItem)
+      //   }
+      // }
 
       if (this.paperItems.shapeItemsGroup) {
         this.paperItems.shapeItemsGroup.remove()

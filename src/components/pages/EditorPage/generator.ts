@@ -131,7 +131,7 @@ export class Generator {
 
     const circleR = 80
     const { imgData, ctx: imgCtx } = createCircleImgData(circleR, 'red')
-    const hbounds = this.wasm.create_hbounds(
+    const hboundsCircle = this.wasm.create_hbounds(
       new Uint32Array(imgData.data.buffer),
       imgData.width,
       imgData.height,
@@ -160,7 +160,7 @@ export class Generator {
     let timeout = 1500
     let maxTimeout = 3000
     let timeoutStep = 300
-    let maxCount = 1000 * shape.percentArea
+    let maxCount = 100 * shape.percentArea
     // let maxCount = 30
 
     let failedBatchesCount = 0
@@ -181,10 +181,12 @@ export class Generator {
 
       const word = sample(words)!
       const firstSymbol = word.symbols[0]
-      // const hbounds = this.symbolHbounds.get(firstSymbol.id)
-      // if (!hbounds) {
-      //   throw new Error(`No hbounds for symbol ${firstSymbol.id}`)
-      // }
+      const hboundsWord = this.symbolHbounds.get(firstSymbol.id)
+      if (!hboundsWord) {
+        throw new Error(`No hbounds for symbol ${firstSymbol.id}`)
+      }
+
+      const isCircle = Math.random() > 0.2
 
       for (let i = 0; i < batchSize; ++i) {
         // const rScaled = Math.max(3, circleR * scale)
@@ -216,10 +218,13 @@ export class Generator {
           transform.f
         )
 
-        let hasPlaced = collisionDetector.addItem(hbounds, transformWasm)
+        let hasPlaced = collisionDetector.addItem(
+          isCircle ? hboundsCircle : hboundsWord,
+          transformWasm
+        )
         // hasPlaced = true // TODO: Remove
         if (hasPlaced) {
-          const ctx2 = createCanvasCtx({ w: 1000, h: 1000 })
+          // const ctx2 = createCanvasCtx({ w: 1000, h: 1000 })
 
           // const hbounds2 = hbounds.clone()
 
@@ -231,33 +236,34 @@ export class Generator {
 
           success = true
           addedHbounds.push({
-            ...hbounds,
+            ...(isCircle ? hboundsCircle : hboundsWord),
             transform,
           })
 
-          const hboundsJs = hbounds.get_js()
-          // const item = hBoundsWasmSerializedToPaperGroup({
-          //   ...hboundsJs,
-          //   transform: compose(transform, hboundsJs.transform || tm.identity()),
-          // })
-          // const editor = (window as any)['editor'] as Editor
-          // editor.paperItems.shapeHbounds?.addChild(item)
-          // console.log('item = ', item, editor.paperItems.shapeHbounds)
-
-          addedItems.push({
-            kind: 'img',
-            id: currentItemId++,
-            ctx: imgCtx,
-            transform,
+          const hboundsJs = (isCircle ? hboundsCircle : hboundsWord).get_js()
+          const item = hBoundsWasmSerializedToPaperGroup({
+            ...hboundsJs,
+            transform: compose(transform, hboundsJs.transform || tm.identity()),
           })
+          const editor = (window as any)['editor'] as Editor
+          editor.paperItems.shapeHbounds?.addChild(item)
 
-          // addedItems.push({
-          //   kind: 'word',
-          //   id: currentItemId++,
-          //   word,
-          //   shapeColor: shape.color,
-          //   transform,
-          // })
+          if (isCircle) {
+            addedItems.push({
+              kind: 'img',
+              id: currentItemId++,
+              ctx: imgCtx,
+              transform,
+            })
+          } else {
+            addedItems.push({
+              kind: 'word',
+              id: currentItemId++,
+              word,
+              shapeColor: shape.color,
+              transform,
+            })
+          }
 
           countScale++
           count++
@@ -364,7 +370,10 @@ export class Generator {
     }
 
     const hboundsWasmTransform = multiply(
-      tm.scale(1 / pathAaabScaleFactor),
+      // tm.scale(1 / pathAaabScaleFactor),
+      tm.identity(),
+      // tm.translate(10, 10)
+      // tm.identity()
       tm.translate(pathAaab.x, pathAaab.y)
     )
 

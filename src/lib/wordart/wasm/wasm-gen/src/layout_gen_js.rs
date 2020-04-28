@@ -80,7 +80,7 @@ impl HBoundsWasm {
 
     #[wasm_bindgen]
     pub fn collides_transformed(&self, other: &HBoundsWasm, matrix: &Matrix) -> bool {
-        HBounds::intersects(&self.wrapped, &other.wrapped, Some(*matrix))
+        HBounds::intersects(&self.wrapped, &other.wrapped, Some(matrix.copy()))
     }
 }
 
@@ -143,7 +143,7 @@ impl LayoutGenWasm {
     pub fn add_item(&mut self, hbounds: &HBoundsWasm, transform: Option<Matrix>) -> Option<i32> {
         let mut item = Item::new(&hbounds.wrapped.clone());
         if (transform.is_some()) {
-            item.transform = transform.unwrap().transform(&item.transform);
+            item.transform = transform.unwrap();
         }
         return self.wrapped.add_item(item);
     }

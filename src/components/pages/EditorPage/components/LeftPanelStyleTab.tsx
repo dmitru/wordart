@@ -70,7 +70,17 @@ export const LeftPanelStyleTab: React.FC<LeftPanelStyleTabProps> = observer(
                 return
               }
               runInAction(() => {
-                editorPageStore.itemsColor = color.hex
+                const hex = chroma(
+                  color.rgb.r,
+                  color.rgb.g,
+                  color.rgb.b,
+                  color.rgb.a || 1
+                ).hex()
+
+                editorPageStore.itemsColor = hex
+                if (editorPageStore.editor) {
+                  editorPageStore.editor.setShapeItemsColor(hex)
+                }
               })
               // editorPageStore.editor?.generateAndRenderAll()
             }}

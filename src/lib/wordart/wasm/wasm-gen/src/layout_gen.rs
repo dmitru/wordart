@@ -34,15 +34,20 @@ impl Item {
     }
 
     pub fn bounds(&self) -> RectF {
-        return RectF::from(self.hbounds.bounds).transform(self.transform);
+        let mut rect = RectF::from(self.hbounds.bounds);
+        if (self.hbounds.transform.is_some()) {
+            rect = rect.transform(self.hbounds.transform.unwrap());
+        }
+        rect = rect.transform(self.transform);
+        return rect;
     }
 
     fn intersects(&self, other: &Self) -> bool {
         let hb1 = self.hbounds.transform(self.transform);
-        let hb2 = other.hbounds.transform(other.transform);
+        // let hb2 = other.hbounds.transform(other.transform);
         // console_log!("check1");
         // let _timer = Timer::new("Item::intersects");
-        let result = HBounds::intersects(&hb1, &hb2, None);
+        let result = HBounds::intersects(&hb1, &other.hbounds, Some(other.transform));
         // console_log!("check2");
         return result;
     }
