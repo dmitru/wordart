@@ -195,7 +195,7 @@ export class Editor {
     const nonTransparentShapes = this.shapes
       .filter((shape) => {
         const color = chroma(shape.color)
-        return color.alpha() > 0.01 && color.luminance() < 0.95
+        return !(color.alpha() > 0.01 && color.luminance() < 0.95)
       })
       .slice(0, 1)
     this.logger.debug(

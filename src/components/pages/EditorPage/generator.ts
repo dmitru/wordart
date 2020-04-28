@@ -130,7 +130,7 @@ export class Generator {
     )
 
     const circleR = 80
-    const { imgData, ctx: imgCtx } = createCircleImgData(circleR, 'white')
+    const { imgData, ctx: imgCtx } = createCircleImgData(circleR, 'red')
     const hbounds = this.wasm.create_hbounds(
       new Uint32Array(imgData.data.buffer),
       imgData.width,
@@ -150,7 +150,7 @@ export class Generator {
       h: shapeHBoundsJs.bounds.h * (shapeHBoundsJs.transform?.d || 1),
     })
 
-    let scaleFactor = 0.1
+    let scaleFactor = 0.6
     const initialScale = 2 * scaleFactor
     // const initialScale = 0.002
     const finalScale = 0.002 * scaleFactor
@@ -160,7 +160,7 @@ export class Generator {
     let timeout = 1500
     let maxTimeout = 3000
     let timeoutStep = 300
-    let maxCount = 200 * shape.percentArea
+    let maxCount = 1000 * shape.percentArea
     // let maxCount = 30
 
     let failedBatchesCount = 0
@@ -236,12 +236,12 @@ export class Generator {
           })
 
           const hboundsJs = hbounds.get_js()
-          const item = hBoundsWasmSerializedToPaperGroup({
-            ...hboundsJs,
-            transform: compose(transform, hboundsJs.transform || tm.identity()),
-          })
-          const editor = (window as any)['editor'] as Editor
-          editor.paperItems.shapeHbounds?.addChild(item)
+          // const item = hBoundsWasmSerializedToPaperGroup({
+          //   ...hboundsJs,
+          //   transform: compose(transform, hboundsJs.transform || tm.identity()),
+          // })
+          // const editor = (window as any)['editor'] as Editor
+          // editor.paperItems.shapeHbounds?.addChild(item)
           // console.log('item = ', item, editor.paperItems.shapeHbounds)
 
           addedItems.push({
