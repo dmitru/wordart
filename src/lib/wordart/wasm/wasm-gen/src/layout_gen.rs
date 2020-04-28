@@ -34,22 +34,28 @@ impl Item {
     }
 
     pub fn bounds(&self) -> RectF {
-        let mut rect = RectF::from(self.hbounds.bounds);
-        if (self.hbounds.transform.is_some()) {
-            rect = rect.transform(self.hbounds.transform.unwrap());
-        }
-        rect = rect.transform(self.transform);
+        let rect = RectF::from(self.hbounds.bounds);
+        let rect = rect.transform(self.transform);
+        let rect = match (self.hbounds.transform) {
+            Some(t) => rect.transform(t),
+            None => rect,
+        };
         return rect;
     }
 
     fn intersects(&self, other: &Self) -> bool {
         let hb1 = self.hbounds.transform(self.transform);
-        // let hb2 = other.hbounds.transform(other.transform);
+        let hb2 = other.hbounds.transform(other.transform);
+        // let hb1 = &self.hbounds;
+        // let hb2 = &other.hbounds;
+        // let rect1 = self.bounds();
+        // let rect2 = other.bounds();
+        // return RectF::intersect(rect1, rect2, 10f32, 10f32);
         // console_log!("check1");
         // let _timer = Timer::new("Item::intersects");
-        let result = HBounds::intersects(&hb1, &other.hbounds, Some(other.transform));
+        return HBounds::intersects(&hb1, &hb2, None);
         // console_log!("check2");
-        return result;
+        // return result;
     }
 }
 
@@ -78,7 +84,6 @@ impl LayoutGen {
         // let mut _timer = Timer::new("rtree::region_intersection_lookup");
         let result = self.rtree.region_intersection_lookup(region);
         // _timer.drop_explicit();
-        // console_log!("candidates: {}", result.len());
 
         for candidate_index in result.iter() {
             // let mut _timer = Timer::new("rtree::loop");
@@ -89,10 +94,12 @@ impl LayoutGen {
                     }
                 }
                 None => {
-                    console_log!("None!");
+                    // console_log!("None!");
                 }
             }
         }
+
+        // console_log!("candidates: {}", result.len());
 
         let item_id = self.next_id;
         self.next_id += 1;
@@ -145,5 +152,41 @@ mod tests {
         ));
 
         assert_eq!(layout.add_item(item3), Some(1));
+    }
+
+    #[test]
+    fn test_collision_transform() {
+        let width = 3;
+        let height = 3;
+        let mut layout = LayoutGen::new();
+
+        let mut item1 = Item::new(&HBounds::from(
+            ImgData {
+                data: &[
+                    BLACK, WHITE, WHITE, //
+                    WHITE, WHITE, WHITE, //
+                    WHITE, WHITE, WHITE, //
+                ],
+                width,
+                height,
+            },
+            None,
+            false,
+        ));
+        let mut item2 = item1.clone();
+        let mut item3 = item1.clone();
+        let mut item4 = item1.clone();
+        item1.transform = Matrix::new().scale(3f32, 2f32).translate(-1f32, -1f32);
+        println!("{:?}", item1.bounds());
+        item2.transform = Matrix::new();
+
+        assert_eq!(layout.add_item(item1), Some(0));
+        assert_eq!(layout.add_item(item2), None);
+
+        item3.transform = Matrix::new().translate(1f32, 0f32);
+        assert_eq!(layout.add_item(item3), None);
+
+        item4.transform = Matrix::new().translate(1f32, 1f32);
+        assert_eq!(layout.add_item(item4), Some(1));
     }
 }

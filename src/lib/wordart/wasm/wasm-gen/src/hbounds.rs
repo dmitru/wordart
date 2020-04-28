@@ -134,6 +134,19 @@ pub struct HBounds {
 }
 
 impl HBounds {
+    pub fn get_bounds(&self, transform: Option<Matrix>) -> RectF {
+        let rect = RectF::from(self.bounds);
+        let rect = match (transform) {
+            Some(t) => rect.transform(t),
+            None => rect,
+        };
+        let rect = match (self.transform) {
+            Some(t) => rect.transform(t),
+            None => rect,
+        };
+        return rect;
+    }
+
     pub fn transform(&self, transform: Matrix) -> HBounds {
         // let _timer = Timer::new("HBounds::transform");
         HBounds {
@@ -144,14 +157,17 @@ impl HBounds {
             overlaps_shape: self.overlaps_shape,
             children: self.children.clone(),
             transform: Some(match self.transform {
-                Some(t) => t.transform(&transform),
+                Some(t) => transform.transform(&t),
                 None => transform,
             }),
         }
     }
 
     pub fn intersects(hbounds1: &Self, hbounds2: &Self, t2: Option<Matrix>) -> bool {
-        // println!("compute_hbounds_impl: {:?} {:?}", hbounds1, hbounds2);
+        println!(
+            "compute_hbounds_impl: {:?} {:?}",
+            hbounds1.bounds, hbounds2.bounds
+        );
 
         // let _timer = Timer::new("HBounds::intersects");
         fn collides_rec_impl(
@@ -176,15 +192,13 @@ impl HBounds {
 
             let mut bounds1 = RectF::from(hbounds1.bounds);
             bounds1.transform_mut(transform1);
+            println!("bounds1: \n{:?}", bounds1);
 
             let mut bounds2 = RectF::from(hbounds2.bounds);
             bounds2.transform_mut(transform2);
-
-            // console_log!("bounds1: \n{:?}", bounds1);
-            // console_log!("bounds2: \n{:?}\n", bounds2);
-
+            println!("bounds2: \n{:?}\n", bounds2);
             if !RectF::intersect(bounds1, bounds2, pad1, pad2) {
-                // console_log!("case 2");
+                println!("case 2");
                 return false;
             }
 
@@ -311,9 +325,9 @@ impl HBounds {
             return false;
         }
 
-        let max_level1 = 9;
-        let max_level2 = 9;
-        let min_size = 1f32;
+        let max_level1 = 7;
+        let max_level2 = 7;
+        let min_size = 2f32;
         let pad1 = 0f32;
         let pad2 = 0f32;
 
@@ -1481,5 +1495,51 @@ mod tests {
         hbounds1.transform = Some(Matrix::new().translate(1f32, -1f32));
         hbounds2.transform = None;
         assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
+    }
+
+    #[test]
+    fn test_collision_translate_2() {
+        let mut hbounds1 = HBounds::from(
+            ImgData {
+                data: &[
+                    WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, //
+                    WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, //
+                    WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, //
+                    BLACK, WHITE, WHITE, WHITE, WHITE, WHITE, //
+                ],
+                width: 6,
+                height: 4,
+            },
+            None,
+            false,
+        );
+
+        let mut hbounds2 = HBounds::from(
+            ImgData {
+                data: &[
+                    WHITE, WHITE, BLACK, WHITE, //
+                    WHITE, WHITE, WHITE, WHITE, //
+                    WHITE, WHITE, WHITE, WHITE, //
+                ],
+                width: 4,
+                height: 3,
+            },
+            None,
+            false,
+        );
+
+        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), false);
+
+        hbounds1.transform = Some(Matrix::new().translate(1f32, -2f32));
+        hbounds2.transform = Some(Matrix::new().translate(-1f32, 1f32));
+        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
+
+        hbounds1.transform = Some(Matrix::new().translate(0f32, 0f32));
+        hbounds2.transform = Some(Matrix::new().translate(-2f32, 3f32));
+        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
+
+        // hbounds1.transform = Some(Matrix::new().translate(1f32, -1f32));
+        // hbounds2.transform = None;
+        // assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
     }
 }

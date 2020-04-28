@@ -111,14 +111,14 @@ const defaultWordsConfig: WordConfig[] = [
     id: 1,
     text: 'Word',
   },
-  {
-    id: 2,
-    text: 'Cloud',
-  },
-  {
-    id: 3,
-    text: 'Art',
-  },
+  // {
+  //   id: 2,
+  //   text: 'Cloud',
+  // },
+  // {
+  //   id: 3,
+  //   text: 'Art',
+  // },
 ]
 
 export type ShapeConfig = {

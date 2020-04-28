@@ -48,7 +48,9 @@ export const hBoundsWasmSerializedToPaperGroup = (
     }
   }
 
-  impl(hbounds, hbounds.transform)
+  impl(hbounds, tm.identity())
+
+  group.transform(matrixToPaperTransform(hbounds.transform))
 
   return group
 }

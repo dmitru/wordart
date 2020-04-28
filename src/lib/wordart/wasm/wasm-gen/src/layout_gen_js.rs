@@ -32,15 +32,7 @@ impl HBoundsWasm {
 
     #[wasm_bindgen]
     pub fn get_bounds(&self, transform: Option<Matrix>) -> JsValue {
-        let rect = RectF::from(self.wrapped.bounds);
-        let rect = match (self.wrapped.transform) {
-            Some(t) => rect.transform(t),
-            None => rect,
-        };
-        let rect = match (transform) {
-            Some(t) => rect.transform(t),
-            None => rect,
-        };
+        let rect = self.wrapped.get_bounds(transform);
         JsValue::from_serde(&rect).unwrap()
     }
 
@@ -145,6 +137,15 @@ impl LayoutGenWasm {
         if (transform.is_some()) {
             item.transform = transform.unwrap();
         }
-        return self.wrapped.add_item(item);
+        let bounds = item.bounds();
+        let result = self.wrapped.add_item(item);
+        if (result.is_some()) {
+            console_log!(
+                "Item bounds: {:?} {:?}",
+                hbounds.wrapped.get_bounds(None),
+                bounds
+            );
+        }
+        return result;
     }
 }

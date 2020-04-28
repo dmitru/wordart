@@ -203,7 +203,7 @@ export class Editor {
     const nonTransparentShapes = this.shapes
       .filter((shape) => {
         const color = chroma(shape.color)
-        return !(color.alpha() > 0.01 && color.luminance() < 0.95)
+        return color.alpha() > 0.01 && color.luminance() < 0.95
       })
       .slice(0, 1)
     this.logger.debug(
@@ -235,6 +235,21 @@ export class Editor {
           text: wc.text,
         })),
       })
+
+      const ctx2 = createCanvasCtx({ w: 1000, h: 1000 })
+
+      // for (const item of result.items) {
+      //   if (item.kind === 'text') {
+
+      //   }
+      // }
+      // const hbounds2
+
+      // hbounds2.set_transform_matrix(transformWasm2)
+      // @ts-ignore
+      // drawHBoundsWasm(ctx2, hbounds2, transform)
+      // drawHBoundsWasm(ctx2, shape.hBoundsInverted)
+      // console.screenshot(ctx2.canvas, 0.5)
 
       const addedItems: paper.Item[] = []
       let img: HTMLImageElement | null = null

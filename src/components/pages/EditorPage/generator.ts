@@ -137,6 +137,15 @@ export class Generator {
       imgData.height,
       false
     )
+    // const t: tm.Matrix = multiply(
+    //   // tm.translate(x, y),
+    //   tm.scale(1),
+    //   tm.scale(1.5)
+    // )
+    // const tw = new this.wasm.Matrix()
+    // tw.set_mut(t.a, t.b, t.c, t.d, t.e, t.f)
+
+    // hboundsCircle.set_transform_matrix(tw)
 
     let currentItemId = 1
     let addedItems: Item[] = []
@@ -151,7 +160,7 @@ export class Generator {
     })
 
     let scaleFactor = 0.6
-    const initialScale = 2 * scaleFactor
+    const initialScale = 0.5 * scaleFactor
     // const initialScale = 0.002
     const finalScale = 0.002 * scaleFactor
     // const finalScale = 1.99 * scaleFactor
@@ -160,11 +169,11 @@ export class Generator {
     let timeout = 1500
     let maxTimeout = 3000
     let timeoutStep = 300
-    let maxCount = 100 * shape.percentArea
+    let maxCount = 300 * shape.percentArea
     // let maxCount = 30
 
     let failedBatchesCount = 0
-    const maxFailedBatchesCount = 3
+    const maxFailedBatchesCount = 2
 
     let scale = initialScale
 
@@ -176,7 +185,7 @@ export class Generator {
     let tBatchStart = performance.now()
     while (scale > finalScale && count < maxCount) {
       console.log('scale: ', scale)
-      const batchSize = 30
+      const batchSize = 10
       let success = false
 
       const word = sample(words)!
@@ -186,7 +195,7 @@ export class Generator {
         throw new Error(`No hbounds for symbol ${firstSymbol.id}`)
       }
 
-      const isCircle = Math.random() > 0.2
+      const isCircle = Math.random() > 1
 
       for (let i = 0; i < batchSize; ++i) {
         // const rScaled = Math.max(3, circleR * scale)
@@ -218,6 +227,8 @@ export class Generator {
           transform.f
         )
 
+        // const transformWasm2 = transformWasm.copy()
+
         let hasPlaced = collisionDetector.addItem(
           isCircle ? hboundsCircle : hboundsWord,
           transformWasm
@@ -226,11 +237,11 @@ export class Generator {
         if (hasPlaced) {
           // const ctx2 = createCanvasCtx({ w: 1000, h: 1000 })
 
-          // const hbounds2 = hbounds.clone()
+          // const hbounds2 = isCircle ? hboundsCircle : hboundsWord
 
-          // hbounds2.set_transform_matrix(transformWasm)
-          // @ts-ignore
-          // drawHBoundsWasm(ctx2, hbounds, transform)
+          // hbounds2.set_transform_matrix(transformWasm2)
+          // // @ts-ignore
+          // drawHBoundsWasm(ctx2, hbounds2, transform)
           // drawHBoundsWasm(ctx2, shape.hBoundsInverted)
           // console.screenshot(ctx2.canvas, 0.5)
 
@@ -313,7 +324,7 @@ export class Generator {
     this.logger.debug('computeHboundsForPath: ')
 
     const pathScale = 1
-    const imgSize = 40
+    const imgSize = 100
     const visualize = true
 
     const pathBbox = path.getBoundingBox()
@@ -370,8 +381,8 @@ export class Generator {
     }
 
     const hboundsWasmTransform = multiply(
-      // tm.scale(1 / pathAaabScaleFactor),
-      tm.identity(),
+      tm.scale(1 / pathAaabScaleFactor),
+      // tm.scale(1.5),
       // tm.translate(10, 10)
       // tm.identity()
       tm.translate(pathAaab.x, pathAaab.y)
@@ -379,15 +390,17 @@ export class Generator {
 
     // const hboundsWasmTransform = tm.scale(1 / pathAaabScaleFactor)
 
-    hboundsWasm.set_transform(
-      hboundsWasmTransform.a,
-      hboundsWasmTransform.b,
-      hboundsWasmTransform.c,
-      hboundsWasmTransform.d,
-      hboundsWasmTransform.e,
-      hboundsWasmTransform.f
-    )
+    // console.log('FISH: ', hboundsWasm.get_bounds())
+    // hboundsWasm.set_transform(
+    //   hboundsWasmTransform.a,
+    //   hboundsWasmTransform.b,
+    //   hboundsWasmTransform.c,
+    //   hboundsWasmTransform.d,
+    //   hboundsWasmTransform.e,
+    //   hboundsWasmTransform.f
+    // )
 
+    // console.log('FISH2: ', hboundsWasm.get_bounds())
     return hboundsWasm
   }
 }

@@ -61,7 +61,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
     wasm = _wasm
     // @ts-ignore
     window['wasm'] = _wasm
-    layoutGen = new _wasm.LayoutGenWasm(400, 400)
+    layoutGen = new _wasm.LayoutGenWasm()
     // @ts-ignore
     window['layoutGen'] = layoutGen
   })
