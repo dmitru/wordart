@@ -35,12 +35,11 @@ export class CollisionDetectorWasm {
   }
 
   addItem = (hbounds: HBoundsWasm, transform?: Matrix): boolean => {
-    // TODO: fix this
-    // const bounds = hbounds.get_bounds(transform ? transform.copy() : undefined)
+    const bounds = hbounds.get_bounds(transform ? transform.copy() : undefined)
 
-    // if (this.bounds && !isRectInsideRect(bounds, this.bounds)) {
-    //   return false
-    // }
+    if (this.bounds && !isRectInsideRect(bounds, this.bounds)) {
+      return false
+    }
 
     if (this.shapeBoundsInverted) {
       if (transform) {

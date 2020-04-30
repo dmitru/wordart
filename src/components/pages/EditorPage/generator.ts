@@ -102,7 +102,7 @@ export class Generator {
     //   symbolHbounds,
     //   word.symbolOffsets
     // )
-    const wordPath = word.font.getPath(word.text[1], 0, 0, FONT_SIZE)
+    const wordPath = word.font.getPath(word.text, 0, 0, FONT_SIZE)
     const wordHbounds = await this.computeHboundsForPath(wordPath, angle)
     this.wordPaths.set(wordId, wordPath)
     this.wordHbounds.set(wordId, wordHbounds)
@@ -197,11 +197,11 @@ export class Generator {
     let timeout = 1500
     let maxTimeout = 3000
     let timeoutStep = 300
-    let maxCount = 400 * shape.percentArea
+    let maxCount = 1000 * shape.percentArea
     // let maxCount = 30
 
     let failedBatchesCount = 0
-    const maxFailedBatchesCount = 2
+    const maxFailedBatchesCount = 3
 
     let scale = initialScale
 
@@ -213,7 +213,7 @@ export class Generator {
     let tBatchStart = performance.now()
     while (scale > finalScale && count < maxCount) {
       console.log('scale: ', scale)
-      const batchSize = 15
+      const batchSize = 30
       let success = false
 
       const word = sample(words)!
@@ -234,8 +234,8 @@ export class Generator {
         const cx = p.x
         const cy = p.y
 
-        ctx.fillStyle = 'red'
-        ctx.fillRect(cx, cy, 2, 2)
+        // ctx.fillStyle = 'red'
+        // ctx.fillRect(cx, cy, 2, 2)
 
         const x = cx
         const y = cy
@@ -278,19 +278,19 @@ export class Generator {
             transform,
           })
 
-          const hboundsJs = (isCircle ? hboundsCircle : hboundsWord).get_js()
-          const item = hBoundsWasmSerializedToPaperGroup({
-            ...hboundsJs,
-            // transform: compose(transform, hboundsJs.transform || tm.identity()),
-          })
-          item.transform(matrixToPaperTransform(transform))
-          console.log(
-            'item transform: ',
-            compose(transform, hboundsJs.transform || tm.identity()),
-            hboundsJs.bounds
-          )
-          const editor = (window as any)['editor'] as Editor
-          editor.paperItems.shapeHbounds?.addChild(item)
+          // const hboundsJs = (isCircle ? hboundsCircle : hboundsWord).get_js()
+          // const item = hBoundsWasmSerializedToPaperGroup({
+          //   ...hboundsJs,
+          //   // transform: compose(transform, hboundsJs.transform || tm.identity()),
+          // })
+          // item.transform(matrixToPaperTransform(transform))
+          // console.log(
+          //   'item transform: ',
+          //   compose(transform, hboundsJs.transform || tm.identity()),
+          //   hboundsJs.bounds
+          // )
+          // const editor = (window as any)['editor'] as Editor
+          // editor.paperItems.shapeHbounds?.addChild(item)
 
           if (isCircle) {
             addedItems.push({
@@ -300,11 +300,11 @@ export class Generator {
               transform,
             })
           } else {
-            console.log(
-              'item transform 2: ',
-              compose(transform, hboundsJs.transform || tm.identity()),
-              this.wordPaths.get(word.id)?.getBoundingBox()
-            )
+            // console.log(
+            //   'item transform 2: ',
+            //   compose(transform, hboundsJs.transform || tm.identity()),
+            //   this.wordPaths.get(word.id)?.getBoundingBox()
+            // )
             addedItems.push({
               kind: 'word',
               id: currentItemId++,
@@ -368,7 +368,7 @@ export class Generator {
     this.logger.debug('computeHboundsForPath: ')
 
     const pathScale = 1
-    const imgSize = 100
+    const imgSize = 400
     const visualize = true
 
     const pathBbox = path.getBoundingBox()
@@ -435,7 +435,7 @@ export class Generator {
 
     // const hboundsWasmTransform = tm.scale(1 / pathAaabScaleFactor)
 
-    console.log('FISH: ', pathAaabScaleFactor)
+    // console.log('FISH: ', pathAaabScaleFactor)
     hboundsWasm.set_transform(
       hboundsWasmTransform.a,
       hboundsWasmTransform.b,
@@ -526,6 +526,16 @@ export class Word {
     this.symbolOffsets = this.symbols.map(
       (symbol) => (fontSize * symbol.glyph.advanceWidth) / this.font.unitsPerEm
     )
+  }
+
+  getSymbolPaths =  (): Path[] => {
+    const paths: Path[] = []
+    let currentOffset = 0
+    for (let i = 0; i < this.symbols.length; ++i) {
+      paths.push(this.symbols[i].glyph.getPath(currentOffset, 0, this.fontSize))
+      currentOffset += this.symbolOffsets[i]
+    }
+    return paths
   }
 
   draw = (ctx: CanvasRenderingContext2D) => {

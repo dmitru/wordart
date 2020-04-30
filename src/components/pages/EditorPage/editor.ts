@@ -224,7 +224,7 @@ export class Editor {
     for (const shape of nonTransparentShapes) {
       const s = shape.hBounds.get_js()
 
-      this.paperItems.shapeHbounds = hBoundsWasmSerializedToPaperGroup(s)
+      // this.paperItems.shapeHbounds = hBoundsWasmSerializedToPaperGroup(s)
       this.paperItems.shape?.insertAbove(this.paperItems.bgRect)
 
       const result = await this.generator.generate({
@@ -276,10 +276,24 @@ export class Editor {
           addedItems.push(itemImg)
         } else if (item.kind === 'word') {
           // const pathItem = new paper.Path(item.word.symbols[0].getPathData())
-          const pathItem = new paper.Path(item.wordPath.toPathData(9))
-          pathItem.fillColor = new paper.Color('blue')
+          // const paths = item.word.getSymbolPaths()
+          const paths = item.word.font.getPaths(
+            item.word.text,
+            0,
+            0,
+            item.word.fontSize
+          )
+          // const paths = [item.wordPath]
+          const pathItems = paths.map((path) => {
+            const item = new paper.Path(path.toPathData(6))
+            item.fillColor = new paper.Color(this.store.itemsColor)
+            return item
+          })
+          const pathItemsGroup = new paper.Group(pathItems)
           // console.log('item.transform = ', item.transform)
-          pathItem.transform(matrixToPaperTransform(tm.compose(item.transform)))
+          pathItemsGroup.transform(
+            matrixToPaperTransform(tm.compose(item.transform))
+          )
           // console.log(
           //   'pathItem.bounds',
           //   pathItem.bounds.width,
@@ -293,7 +307,7 @@ export class Editor {
           //   item.transform.e,
           //   item.transform.f
           // )
-          addedItems.push(pathItem)
+          addedItems.push(pathItemsGroup)
         }
       }
 

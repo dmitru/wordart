@@ -34,26 +34,20 @@ impl Item {
     }
 
     pub fn bounds(&self) -> RectF {
-        let rect = RectF::from(self.hbounds.bounds);
-        let rect = match (self.hbounds.transform) {
-            Some(t) => rect.transform(t),
-            None => rect,
-        };
-        let rect = rect.transform(self.transform);
-        return rect;
+        self.hbounds.get_bounds(Some(self.transform))
     }
 
     fn intersects(&self, other: &Self) -> bool {
-        // let hb1 = self.hbounds.transform(self.transform);
-        // let hb2 = other.hbounds.transform(other.transform);
+        let hb1 = self.hbounds.transform(self.transform);
+        let hb2 = other.hbounds.transform(other.transform);
         // let hb1 = &self.hbounds;
         // let hb2 = &other.hbounds;
-        let rect1 = self.bounds();
-        let rect2 = other.bounds();
-        return RectF::intersect(rect1, rect2, 0f32, 0f32);
+        // let rect1 = self.bounds();
+        // let rect2 = other.bounds();
+        // return RectF::intersect(rect1, rect2, 0f32, 0f32);
         // console_log!("check1");
         // let _timer = Timer::new("Item::intersects");
-        // return HBounds::intersects(&hb1, &hb2, None);
+        return HBounds::intersects(&hb1, &hb2, None);
         // console_log!("check2");
         // return result;
     }
@@ -89,7 +83,7 @@ impl LayoutGen {
         //     .region_intersection_lookup(((-100f64, -100f64), (10000f64, 100000f64)));
         // _timer.drop_explicit();
 
-        console_log!("CANDIDATES LEN: {}, rect: {:?}", result.len(), rect);
+        // console_log!("CANDIDATES LEN: {}, rect: {:?}", result.len(), rect);
 
         let mut count = 0;
         for candidate_index in result.iter() {
@@ -99,12 +93,12 @@ impl LayoutGen {
                     if item.intersects(candidate_item) {
                         return true;
                     }
-                    console_log!(
-                        "{}: {:?} {:?}",
-                        count,
-                        item.bounds(),
-                        candidate_item.bounds()
-                    );
+                    // console_log!(
+                    //     "{}: {:?} {:?}",
+                    //     count,
+                    //     item.bounds(),
+                    //     candidate_item.bounds()
+                    // );
                 }
                 None => {
                     // console_log!("{:?} {:?}", item.bounds(), candidate_item.bounds());
@@ -114,7 +108,7 @@ impl LayoutGen {
             count += 1;
         }
 
-        console_log!("\n");
+        // console_log!("\n");
 
         return false;
     }

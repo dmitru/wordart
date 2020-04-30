@@ -137,11 +137,11 @@ pub struct HBounds {
 impl HBounds {
     pub fn get_bounds(&self, transform: Option<Matrix>) -> RectF {
         let rect = RectF::from(self.bounds);
-        let rect = match (transform) {
-            Some(t) => rect.transform(t),
+        let rect = match (self.transform) {
+            Some(selfTransform) => rect.transform(selfTransform),
             None => rect,
         };
-        let rect = match (self.transform) {
+        let rect = match (transform) {
             Some(t) => rect.transform(t),
             None => rect,
         };
@@ -158,7 +158,7 @@ impl HBounds {
             overlaps_shape: self.overlaps_shape,
             children: self.children.clone(),
             transform: Some(match self.transform {
-                Some(t) => transform.transform(&t),
+                Some(selfTransform) => transform.transform(&selfTransform),
                 None => transform,
             }),
         }
@@ -169,6 +169,8 @@ impl HBounds {
         //     "compute_hbounds_impl: {:?} {:?}",
         //     hbounds1.bounds, hbounds2.bounds
         // );
+
+        // console_log!("{:?}", t2);
 
         // let _timer = Timer::new("HBounds::intersects");
         fn collides_rec_impl(
@@ -191,12 +193,12 @@ impl HBounds {
 
             // invariant: at least one hbounds overlaps the shape
 
-            let mut bounds1 = RectF::from(hbounds1.bounds);
-            bounds1.transform_mut(transform1);
+            let mut bounds1 = RectF::from(hbounds1.bounds).transform(transform1);
+            // bounds1.transform_mut(transform1);
             // println!("bounds1: \n{:?}", bounds1);
 
-            let mut bounds2 = RectF::from(hbounds2.bounds);
-            bounds2.transform_mut(transform2);
+            let mut bounds2 = RectF::from(hbounds2.bounds).transform(transform2);
+            // bounds2.transform_mut(transform2);
             // println!("bounds2: \n{:?}\n", bounds2);
             if !RectF::intersect(bounds1, bounds2, pad1, pad2) {
                 // println!("case 2");
@@ -326,8 +328,8 @@ impl HBounds {
             return false;
         }
 
-        let max_level1 = 7;
-        let max_level2 = 7;
+        let max_level1 = 10;
+        let max_level2 = 10;
         let min_size = 2f32;
         let pad1 = 0f32;
         let pad2 = 0f32;
@@ -338,9 +340,11 @@ impl HBounds {
         };
 
         let mut transform2 = Matrix::new();
+
         if t2.is_some() {
             transform2 = transform2.transform(&t2.unwrap());
         }
+
         if hbounds2.transform.is_some() {
             transform2 = transform2.transform(&hbounds2.transform.unwrap());
         }
