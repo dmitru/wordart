@@ -197,7 +197,7 @@ export class Generator {
     let timeout = 1500
     let maxTimeout = 3000
     let timeoutStep = 300
-    let maxCount = 1 * shape.percentArea
+    let maxCount = 400 * shape.percentArea
     // let maxCount = 30
 
     let failedBatchesCount = 0
@@ -234,8 +234,8 @@ export class Generator {
         const cx = p.x
         const cy = p.y
 
-        // ctx.fillStyle = 'red'
-        // ctx.fillRect(cx, cy, 2, 2)
+        ctx.fillStyle = 'red'
+        ctx.fillRect(cx, cy, 2, 2)
 
         const x = cx
         const y = cy
@@ -256,11 +256,11 @@ export class Generator {
 
         // const transformWasm2 = transformWasm.copy()
 
-        // let hasPlaced = collisionDetector.addItem(
-        //   isCircle ? hboundsCircle : hboundsWord,
-        //   transformWasm
-        // )
-        let hasPlaced = true // TODO: Remove
+        let hasPlaced = collisionDetector.addItem(
+          isCircle ? hboundsCircle : hboundsWord,
+          transformWasm
+        )
+        // let hasPlaced = true // TODO: Remove
         if (hasPlaced) {
           // const ctx2 = createCanvasCtx({ w: 1000, h: 1000 })
 
@@ -368,7 +368,7 @@ export class Generator {
     this.logger.debug('computeHboundsForPath: ')
 
     const pathScale = 1
-    const imgSize = 100
+    const imgSize = 300
     const visualize = true
 
     const pathBbox = path.getBoundingBox()
@@ -425,16 +425,17 @@ export class Generator {
     }
 
     const hboundsWasmTransform = multiply(
-      tm.scale(1 / pathAaabScaleFactor),
+      // tm.scale(1 / pathAaabScaleFactor),
       // tm.scale(1.5),
       // tm.translate(10, 10)
-      // tm.identity()
-      tm.translate(pathAaab.x, pathAaab.y)
+      tm.identity(),
+      tm.translate(0, 100)
+      // tm.translate(pathAaab.x, pathAaab.y)
     )
 
     // const hboundsWasmTransform = tm.scale(1 / pathAaabScaleFactor)
 
-    console.log('FISH: ', pathAaabScaleFactor, hboundsWasm.get_bounds())
+    // console.log('FISH: ', pathAaabScaleFactor, hboundsWasm.get_bounds())
     hboundsWasm.set_transform(
       hboundsWasmTransform.a,
       hboundsWasmTransform.b,
@@ -444,7 +445,7 @@ export class Generator {
       hboundsWasmTransform.f
     )
 
-    console.log('FISH2: ', hboundsWasm.get_bounds())
+    // console.log('FISH2: ', hboundsWasm.get_bounds())
     return hboundsWasm
   }
 }

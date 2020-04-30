@@ -102,16 +102,17 @@ impl RectF {
         self.h = br_transformed.y - tl_transformed.y;
     }
     pub fn transform(&self, m: Matrix) -> RectF {
-        let br = PointF {
-            x: self.x + self.w,
-            y: self.y + self.h,
-        };
-        let br_transformed = br.transform(m);
         let tl = PointF {
             x: self.x,
             y: self.y,
         };
         let tl_transformed = tl.transform(m);
+
+        let br = PointF {
+            x: self.x + self.w,
+            y: self.y + self.h,
+        };
+        let br_transformed = br.transform(m);
 
         RectF {
             x: tl_transformed.x,
@@ -1541,5 +1542,144 @@ mod tests {
         // hbounds1.transform = Some(Matrix::new().translate(1f32, -1f32));
         // hbounds2.transform = None;
         // assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
+    }
+
+    #[test]
+    fn test_rect_intersections() {
+        assert_eq!(
+            RectF::intersect(
+                RectF::from(Rect {
+                    x: 0,
+                    y: 0,
+                    w: 1,
+                    h: 1,
+                }),
+                RectF::from(Rect {
+                    x: 1,
+                    y: 0,
+                    w: 1,
+                    h: 1,
+                }),
+                0f32,
+                0f32
+            ),
+            false
+        );
+        assert_eq!(
+            RectF::intersect(
+                RectF::from(Rect {
+                    x: 0,
+                    y: 0,
+                    w: 2,
+                    h: 2,
+                }),
+                RectF::from(Rect {
+                    x: 1,
+                    y: 0,
+                    w: 2,
+                    h: 2,
+                }),
+                0f32,
+                0f32
+            ),
+            true
+        );
+        assert_eq!(
+            RectF::intersect(
+                RectF::from(Rect {
+                    x: 0,
+                    y: 0,
+                    w: 2,
+                    h: 2,
+                }),
+                RectF::from(Rect {
+                    x: 1,
+                    y: 1,
+                    w: 1,
+                    h: 1,
+                }),
+                0f32,
+                0f32
+            ),
+            true
+        );
+        assert_eq!(
+            RectF::intersect(
+                RectF::from(Rect {
+                    x: 1,
+                    y: 1,
+                    w: 1,
+                    h: 1,
+                }),
+                RectF::from(Rect {
+                    x: 0,
+                    y: 0,
+                    w: 2,
+                    h: 2,
+                }),
+                0f32,
+                0f32
+            ),
+            true
+        );
+    }
+
+    #[test]
+    fn test_rect_intersections_transformed() {
+        assert_eq!(
+            RectF::intersect(
+                RectF::from(Rect {
+                    x: 0,
+                    y: 0,
+                    w: 1,
+                    h: 1,
+                }),
+                RectF::from(Rect {
+                    x: 1,
+                    y: 0,
+                    w: 1,
+                    h: 1,
+                })
+                .transform(Matrix::new().translate(-1f32, 0f32)),
+                0f32,
+                0f32
+            ),
+            true
+        );
+    }
+
+    #[test]
+    fn test_point_transforms() {
+        assert_eq!(
+            (PointF { x: 0f32, y: 0f32 }).transform(Matrix::new().translate(1f32, 2f32)),
+            PointF { x: 1f32, y: 2f32 },
+        );
+        assert_eq!(
+            (PointF { x: 1f32, y: 2f32 }).transform(Matrix::new().translate(1f32, 2f32)),
+            PointF { x: 2f32, y: 4f32 },
+        );
+        assert_eq!(
+            (PointF { x: 1f32, y: 2f32 }).transform(Matrix::new().translate(-1f32, -2f32)),
+            PointF { x: 0f32, y: 0f32 },
+        );
+    }
+
+    #[test]
+    fn test_rect_transforms() {
+        assert_eq!(
+            (RectF {
+                x: 0f32,
+                y: 0f32,
+                h: 1f32,
+                w: 1f32
+            })
+            .transform(Matrix::new().translate(1f32, 2f32)),
+            RectF {
+                x: 1f32,
+                y: 2f32,
+                h: 1f32,
+                w: 1f32
+            },
+        );
     }
 }

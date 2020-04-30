@@ -3,6 +3,7 @@ import {
   HBoundsWasmSerialized,
   HBoundsWasm,
 } from 'lib/wordart/wasm/wasm-module'
+import paper from 'paper'
 
 export const matrixToPaperTransform = (m?: tm.Matrix): paper.Matrix =>
   m ? new paper.Matrix([m.a, m.b, m.c, m.d, m.e, m.f]) : new paper.Matrix()
@@ -70,7 +71,7 @@ export const hBoundsWasmSerializedToPaperGroup = (
     transform = tm.identity(),
     level = 0
   ) => {
-    if (level > 7) {
+    if (level > 0) {
       return
     }
     const boundsPath = new paper.Path.Rectangle(
@@ -96,7 +97,7 @@ export const hBoundsWasmSerializedToPaperGroup = (
     }
   }
 
-  impl(hbounds, hbounds.transform)
+  impl(hbounds, hbounds.transform || tm.identity())
 
   console.log('impl / transform = ', hbounds.transform)
   // group.transform(matrixToPaperTransform(hbounds.transform))

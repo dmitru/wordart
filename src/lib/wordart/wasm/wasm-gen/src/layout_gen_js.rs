@@ -132,6 +132,14 @@ impl LayoutGenWasm {
         JsValue::from_serde(&self.wrapped).unwrap()
     }
 
+    pub fn collides(&mut self, hbounds: &HBoundsWasm, transform: Option<Matrix>) -> bool {
+        let mut item = Item::new(&hbounds.wrapped.clone());
+        if (transform.is_some()) {
+            item.transform = transform.unwrap();
+        }
+        return self.wrapped.collides(&item);
+    }
+
     pub fn add_item(&mut self, hbounds: &HBoundsWasm, transform: Option<Matrix>) -> Option<i32> {
         let mut item = Item::new(&hbounds.wrapped.clone());
         if (transform.is_some()) {

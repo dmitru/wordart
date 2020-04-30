@@ -44,16 +44,16 @@ impl Item {
     }
 
     fn intersects(&self, other: &Self) -> bool {
-        let hb1 = self.hbounds.transform(self.transform);
-        let hb2 = other.hbounds.transform(other.transform);
+        // let hb1 = self.hbounds.transform(self.transform);
+        // let hb2 = other.hbounds.transform(other.transform);
         // let hb1 = &self.hbounds;
         // let hb2 = &other.hbounds;
-        // let rect1 = self.bounds();
-        // let rect2 = other.bounds();
-        // return RectF::intersect(rect1, rect2, 10f32, 10f32);
+        let rect1 = self.bounds();
+        let rect2 = other.bounds();
+        return RectF::intersect(rect1, rect2, 10f32, 10f32);
         // console_log!("check1");
         // let _timer = Timer::new("Item::intersects");
-        return HBounds::intersects(&hb1, &hb2, None);
+        // return HBounds::intersects(&hb1, &hb2, None);
         // console_log!("check2");
         // return result;
     }
@@ -74,7 +74,8 @@ impl LayoutGen {
             rtree: RTree::new(2),
         }
     }
-    pub fn add_item(&mut self, item: Item) -> Option<i32> {
+
+    pub fn collides(&mut self, item: &Item) -> bool {
         let rect = item.bounds();
         let region = (
             (rect.x as f64, rect.y as f64),
@@ -90,7 +91,7 @@ impl LayoutGen {
             match self.rtree.get_node(*candidate_index).get_data() {
                 Some(candidate_item) => {
                     if item.intersects(candidate_item) {
-                        return None;
+                        return false;
                     }
                 }
                 None => {
@@ -99,12 +100,27 @@ impl LayoutGen {
             }
         }
 
+        return true;
+    }
+
+    pub fn add_item(&mut self, item: Item) -> Option<i32> {
+        let rect = item.bounds();
+        let region = (
+            (rect.x as f64, rect.y as f64),
+            ((rect.x + rect.w) as f64, (rect.y + rect.h) as f64),
+        );
+        let collides = self.collides(&item);
+
         // console_log!("candidates: {}", result.len());
 
-        let item_id = self.next_id;
-        self.next_id += 1;
-        self.rtree.insert(region, item);
-        return Some(item_id);
+        if collides {
+            let item_id = self.next_id;
+            self.next_id += 1;
+            self.rtree.insert(region, item);
+            return Some(item_id);
+        } else {
+            return None;
+        }
     }
 }
 
@@ -151,7 +167,7 @@ mod tests {
             false,
         ));
 
-        assert_eq!(layout.add_item(item3), Some(1));
+        assert_eq!(layout.collides(&item3), false);
     }
 
     #[test]
