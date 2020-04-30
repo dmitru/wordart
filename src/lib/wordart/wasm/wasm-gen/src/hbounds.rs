@@ -544,7 +544,7 @@ impl HBounds {
                     },
                     color,
                     1,
-                    9,
+                    12,
                 )
             }
         }

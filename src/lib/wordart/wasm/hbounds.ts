@@ -175,7 +175,7 @@ export const drawHBoundsWasmSerialized = (
   // }
 
   const drawHBoundsImpl = (hBounds: HBoundsWasmSerialized, level = 0) => {
-    if (level > 7) {
+    if (level > 9) {
       return
     }
     ctx.save()

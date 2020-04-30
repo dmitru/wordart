@@ -99,7 +99,7 @@ export const hBoundsWasmSerializedToPaperGroup = (
 
   impl(hbounds, hbounds.transform || tm.identity())
 
-  console.log('impl / transform = ', hbounds.transform)
+  // console.log('impl / transform = ', hbounds.transform)
   // group.transform(matrixToPaperTransform(hbounds.transform))
 
   return group

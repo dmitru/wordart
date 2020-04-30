@@ -187,7 +187,7 @@ export class Generator {
       h: 800, //shapeHBoundsJs.bounds.h * (shapeHBoundsJs.transform?.d || 1),
     })
 
-    let scaleFactor = 3.6
+    let scaleFactor = 1.6
     const initialScale = 0.5 * scaleFactor
     // const initialScale = 0.002
     const finalScale = 0.002 * scaleFactor
@@ -212,19 +212,19 @@ export class Generator {
 
     let tBatchStart = performance.now()
     while (scale > finalScale && count < maxCount) {
-      console.log('scale: ', scale)
+      // console.log('scale: ', scale)
       const batchSize = 30
       let success = false
-
-      const word = sample(words)!
-      const hboundsWord = this.wordHbounds.get(word.id)
-      if (!hboundsWord) {
-        throw new Error(`No hbounds for word ${word.id}`)
-      }
 
       const isCircle = Math.random() > 1
 
       for (let i = 0; i < batchSize; ++i) {
+        const word = sample(words)!
+        const hboundsWord = this.wordHbounds.get(word.id)
+        if (!hboundsWord) {
+          throw new Error(`No hbounds for word ${word.id}`)
+        }
+
         // const rScaled = Math.max(3, circleR * scale)
         const p = randomPointInsideHboundsSerialized(shapeHBoundsJs)
         if (!p) {
@@ -284,11 +284,11 @@ export class Generator {
           //   // transform: compose(transform, hboundsJs.transform || tm.identity()),
           // })
           // item.transform(matrixToPaperTransform(transform))
-          // console.log(
-          //   'item transform: ',
-          //   compose(transform, hboundsJs.transform || tm.identity()),
-          //   hboundsJs.bounds
-          // )
+          // // console.log(
+          // //   'item transform: ',
+          // //   compose(transform, hboundsJs.transform || tm.identity()),
+          // //   hboundsJs.bounds
+          // // )
           // const editor = (window as any)['editor'] as Editor
           // editor.paperItems.shapeHbounds?.addChild(item)
 
@@ -368,8 +368,8 @@ export class Generator {
     this.logger.debug('computeHboundsForPath: ')
 
     const pathScale = 1
-    const imgSize = 400
-    const visualize = true
+    const imgSize = 300
+    const visualize = false
 
     const pathBbox = path.getBoundingBox()
     const pathBboxRect = {
@@ -528,7 +528,7 @@ export class Word {
     )
   }
 
-  getSymbolPaths =  (): Path[] => {
+  getSymbolPaths = (): Path[] => {
     const paths: Path[] = []
     let currentOffset = 0
     for (let i = 0; i < this.symbols.length; ++i) {
