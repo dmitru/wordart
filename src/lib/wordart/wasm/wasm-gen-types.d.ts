@@ -108,6 +108,7 @@ export class LayoutGenWasm {
    * @returns {number | undefined}
    */
   add_item(hbounds: HBoundsWasm, transform?: Matrix): number | undefined
+  collides(hbounds: HBoundsWasm, transform?: Matrix): boolean
 }
 
 export class RectF {

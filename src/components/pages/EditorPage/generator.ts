@@ -183,8 +183,8 @@ export class Generator {
     const shapeHBoundsJs = shape.hBounds.get_js()
 
     const ctx = createCanvasCtx({
-      w: shapeHBoundsJs.bounds.w * (shapeHBoundsJs.transform?.a || 1),
-      h: shapeHBoundsJs.bounds.h * (shapeHBoundsJs.transform?.d || 1),
+      w: 800, //shapeHBoundsJs.bounds.w * (shapeHBoundsJs.transform?.a || 1),
+      h: 800, //shapeHBoundsJs.bounds.h * (shapeHBoundsJs.transform?.d || 1),
     })
 
     let scaleFactor = 0.6
@@ -368,7 +368,7 @@ export class Generator {
     this.logger.debug('computeHboundsForPath: ')
 
     const pathScale = 1
-    const imgSize = 300
+    const imgSize = 100
     const visualize = true
 
     const pathBbox = path.getBoundingBox()
@@ -425,17 +425,17 @@ export class Generator {
     }
 
     const hboundsWasmTransform = multiply(
-      // tm.scale(1 / pathAaabScaleFactor),
+      tm.scale(1 / pathAaabScaleFactor),
       // tm.scale(1.5),
       // tm.translate(10, 10)
-      tm.identity(),
-      tm.translate(0, 100)
-      // tm.translate(pathAaab.x, pathAaab.y)
+      // tm.identity(),
+      // tm.translate(0, 100)
+      tm.translate(pathAaab.x, pathAaab.y)
     )
 
     // const hboundsWasmTransform = tm.scale(1 / pathAaabScaleFactor)
 
-    // console.log('FISH: ', pathAaabScaleFactor, hboundsWasm.get_bounds())
+    console.log('FISH: ', pathAaabScaleFactor)
     hboundsWasm.set_transform(
       hboundsWasmTransform.a,
       hboundsWasmTransform.b,
