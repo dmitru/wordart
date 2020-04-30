@@ -16,7 +16,10 @@ import paper from 'paper'
 import { loadFont } from 'lib/wordart/fonts'
 import { Matrix } from 'lib/wordart/wasm/wasm-gen-types'
 import * as tm from 'transformation-matrix'
-import { hBoundsWasmSerializedToPaperGroup } from 'components/pages/EditorPage/paper-utils'
+import {
+  hBoundsWasmSerializedToPaperGroup,
+  matrixToPaperTransform,
+} from 'components/pages/EditorPage/paper-utils'
 
 const FONT_NAMES = [
   'mountains-of-christmas_bold.ttf',
@@ -254,42 +257,45 @@ export class Editor {
       const addedItems: paper.Item[] = []
       let img: HTMLImageElement | null = null
 
-      // for (const item of result.items) {
-      //   // TODO: convert result items into paper paths
-      //   if (item.kind === 'img') {
-      //     if (!img) {
-      //       const imgUri = item.ctx.canvas.toDataURL()
-      //       img = await fetchImage(imgUri)
-      //     }
-      //     const itemImg = new paper.Raster(img)
-      //     itemImg.scale(item.transform.a)
-      //     const w = itemImg.bounds.width
-      //     const h = itemImg.bounds.height
-      //     itemImg.position = new paper.Point(
-      //       item.transform.e + w / 2,
-      //       item.transform.f + h / 2
-      //     )
-      //     // console.log('item = ', itemImg.position.x, itemImg.position.y)
-      //     addedItems.push(itemImg)
-      //   } else if (item.kind === 'word') {
-      //     const pathItem = new paper.Path(item.word.symbols[0].getPathData())
-      //     pathItem.fillColor = new paper.Color('blue')
-      //     // console.log(
-      //     //   'pathItem.bounds',
-      //     //   pathItem.bounds.width,
-      //     //   pathItem.bounds.height
-      //     // )
-      //     pathItem.scale(item.transform.a)
-      //     const w = pathItem.bounds.width
-      //     const h = pathItem.bounds.height
-      //     // console.log('w, h', w, h, item.transform.a)
-      //     pathItem.position = new paper.Point(
-      //       item.transform.e,
-      //       item.transform.f
-      //     )
-      //     addedItems.push(pathItem)
-      //   }
-      // }
+      for (const item of result.items) {
+        // TODO: convert result items into paper paths
+        if (item.kind === 'img') {
+          if (!img) {
+            const imgUri = item.ctx.canvas.toDataURL()
+            img = await fetchImage(imgUri)
+          }
+          const itemImg = new paper.Raster(img)
+          itemImg.scale(item.transform.a)
+          const w = itemImg.bounds.width
+          const h = itemImg.bounds.height
+          itemImg.position = new paper.Point(
+            item.transform.e + w / 2,
+            item.transform.f + h / 2
+          )
+          // console.log('item = ', itemImg.position.x, itemImg.position.y)
+          addedItems.push(itemImg)
+        } else if (item.kind === 'word') {
+          // const pathItem = new paper.Path(item.word.symbols[0].getPathData())
+          const pathItem = new paper.Path(item.wordPath.toPathData(9))
+          pathItem.fillColor = new paper.Color('blue')
+          // console.log('item.transform = ', item.transform)
+          pathItem.transform(matrixToPaperTransform(tm.compose(item.transform)))
+          // console.log(
+          //   'pathItem.bounds',
+          //   pathItem.bounds.width,
+          //   pathItem.bounds.height
+          // )
+          // pathItem.scale(item.transform.a)
+          // const w = pathItem.bounds.width
+          // const h = pathItem.bounds.height
+          // // console.log('w, h', w, h, item.transform.a)
+          // pathItem.position = new paper.Point(
+          //   item.transform.e,
+          //   item.transform.f
+          // )
+          addedItems.push(pathItem)
+        }
+      }
 
       if (this.paperItems.shapeItemsGroup) {
         this.paperItems.shapeItemsGroup.remove()

@@ -139,13 +139,13 @@ impl LayoutGenWasm {
         }
         let bounds = item.bounds();
         let result = self.wrapped.add_item(item);
-        if (result.is_some()) {
-            console_log!(
-                "Item bounds: {:?} {:?}",
-                hbounds.wrapped.get_bounds(None),
-                bounds
-            );
-        }
+        // if (result.is_some()) {
+        // console_log!(
+        //     "Item bounds: {:?} {:?}",
+        //     hbounds.wrapped.get_bounds(None),
+        //     bounds
+        // );
+        // }
         return result;
     }
 }

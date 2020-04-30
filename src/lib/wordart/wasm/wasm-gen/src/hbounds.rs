@@ -164,10 +164,10 @@ impl HBounds {
     }
 
     pub fn intersects(hbounds1: &Self, hbounds2: &Self, t2: Option<Matrix>) -> bool {
-        println!(
-            "compute_hbounds_impl: {:?} {:?}",
-            hbounds1.bounds, hbounds2.bounds
-        );
+        // println!(
+        //     "compute_hbounds_impl: {:?} {:?}",
+        //     hbounds1.bounds, hbounds2.bounds
+        // );
 
         // let _timer = Timer::new("HBounds::intersects");
         fn collides_rec_impl(
@@ -192,13 +192,13 @@ impl HBounds {
 
             let mut bounds1 = RectF::from(hbounds1.bounds);
             bounds1.transform_mut(transform1);
-            println!("bounds1: \n{:?}", bounds1);
+            // println!("bounds1: \n{:?}", bounds1);
 
             let mut bounds2 = RectF::from(hbounds2.bounds);
             bounds2.transform_mut(transform2);
-            println!("bounds2: \n{:?}\n", bounds2);
+            // println!("bounds2: \n{:?}\n", bounds2);
             if !RectF::intersect(bounds1, bounds2, pad1, pad2) {
-                println!("case 2");
+                // println!("case 2");
                 return false;
             }
 

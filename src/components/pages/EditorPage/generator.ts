@@ -29,7 +29,10 @@ import * as tm from 'transformation-matrix'
 import { sleep } from 'utils/async'
 import { Path } from 'opentype.js'
 import { sample } from 'lodash'
-import { hBoundsWasmSerializedToPaperGroup } from 'components/pages/EditorPage/paper-utils'
+import {
+  hBoundsWasmSerializedToPaperGroup,
+  matrixToPaperTransform,
+} from 'components/pages/EditorPage/paper-utils'
 import { Editor } from 'components/pages/EditorPage/editor'
 import { compose } from 'transformation-matrix'
 
@@ -40,6 +43,8 @@ export class Generator {
 
   words: Map<WordId, Word> = new Map()
   symbolHbounds: Map<SymbolAngleId, HBoundsWasm> = new Map()
+  wordHbounds: Map<WordId, HBoundsWasm> = new Map()
+  wordPaths: Map<WordId, Path> = new Map()
   symbols: Map<SymbolId, Symbol> = new Map()
   wasm?: WasmModule
 
@@ -67,27 +72,50 @@ export class Generator {
     const wordId = getWordAngleId(text, font, angle)
     const word = new Word(wordId, wordConfigId, text, font, angle)
 
-    for (const symbol of word.symbols) {
-      this.logger.debug(
-        `processWord: processing "${symbol.glyph.name}", font: ${getFontName(
-          font
-        )}, angle: ${angle}`
-      )
-      if (!this.symbols.has(symbol.id)) {
-        this.symbols.set(symbol.id, symbol)
-      }
-      const symbolAngleId = getSymbolAngleId(symbol.glyph, font, angle)
-      if (!this.symbolHbounds.has(symbolAngleId)) {
-        const hbounds = await this.computeHboundsForPath(
-          symbol.glyph.getPath(0, 0, FONT_SIZE),
-          angle
-        )
-        this.symbolHbounds.set(symbolAngleId, hbounds)
-      }
-    }
+    // for (const symbol of word.symbols) {
+    //   this.logger.debug(
+    //     `processWord: processing "${symbol.glyph.name}", font: ${getFontName(
+    //       font
+    //     )}, angle: ${angle}`
+    //   )
+    //   if (!this.symbols.has(symbol.id)) {
+    //     this.symbols.set(symbol.id, symbol)
+    //   }
+    //   const symbolAngleId = getSymbolAngleId(symbol.glyph, font, angle)
+    //   if (!this.symbolHbounds.has(symbolAngleId)) {
+    //     const wordPath = symbol.font.getPath(word.text, 0, 0, FONT_SIZE)
+    //     const hbounds = await this.computeHboundsForPath(
+    //       wordPath,
+    //       // symbol.glyph.getPath(0, 0, FONT_SIZE),
+    //       angle
+    //     )
+    //     this.symbolHbounds.set(symbolAngleId, hbounds)
+    //   }
+    // }
+
+    // const symbolHbounds = word.symbols.map((s) => {
+    //   const symbolId = getSymbolAngleId(s.glyph, font, angle)
+    //   return this.symbolHbounds.get(symbolId)!
+    // })
+
+    // const wordHbounds = this.mergeHboundsWasmForWord(
+    //   symbolHbounds,
+    //   word.symbolOffsets
+    // )
+    const wordPath = word.font.getPath(word.text, 0, 0, FONT_SIZE)
+    const wordHbounds = await this.computeHboundsForPath(wordPath, angle)
+    this.wordPaths.set(wordId, wordPath)
+    this.wordHbounds.set(wordId, wordHbounds)
 
     return word
   }
+
+  // mergeHboundsWasmForWord = (
+  //   symbolBounds: HBoundsWasm[],
+  //   xOffsets: number[]
+  // ) => {
+  //   return symbolBounds[0]
+  // }
 
   generate = async (task: GenerateTask): Promise<GenerateResult> => {
     if (!this.wasm) {
@@ -169,7 +197,7 @@ export class Generator {
     let timeout = 1500
     let maxTimeout = 3000
     let timeoutStep = 300
-    let maxCount = 300 * shape.percentArea
+    let maxCount = 1 * shape.percentArea
     // let maxCount = 30
 
     let failedBatchesCount = 0
@@ -189,10 +217,9 @@ export class Generator {
       let success = false
 
       const word = sample(words)!
-      const firstSymbol = word.symbols[0]
-      const hboundsWord = this.symbolHbounds.get(firstSymbol.id)
+      const hboundsWord = this.wordHbounds.get(word.id)
       if (!hboundsWord) {
-        throw new Error(`No hbounds for symbol ${firstSymbol.id}`)
+        throw new Error(`No hbounds for word ${word.id}`)
       }
 
       const isCircle = Math.random() > 1
@@ -229,11 +256,11 @@ export class Generator {
 
         // const transformWasm2 = transformWasm.copy()
 
-        let hasPlaced = collisionDetector.addItem(
-          isCircle ? hboundsCircle : hboundsWord,
-          transformWasm
-        )
-        // hasPlaced = true // TODO: Remove
+        // let hasPlaced = collisionDetector.addItem(
+        //   isCircle ? hboundsCircle : hboundsWord,
+        //   transformWasm
+        // )
+        let hasPlaced = true // TODO: Remove
         if (hasPlaced) {
           // const ctx2 = createCanvasCtx({ w: 1000, h: 1000 })
 
@@ -254,8 +281,14 @@ export class Generator {
           const hboundsJs = (isCircle ? hboundsCircle : hboundsWord).get_js()
           const item = hBoundsWasmSerializedToPaperGroup({
             ...hboundsJs,
-            transform: compose(transform, hboundsJs.transform || tm.identity()),
+            // transform: compose(transform, hboundsJs.transform || tm.identity()),
           })
+          item.transform(matrixToPaperTransform(transform))
+          console.log(
+            'item transform: ',
+            compose(transform, hboundsJs.transform || tm.identity()),
+            hboundsJs.bounds
+          )
           const editor = (window as any)['editor'] as Editor
           editor.paperItems.shapeHbounds?.addChild(item)
 
@@ -267,17 +300,28 @@ export class Generator {
               transform,
             })
           } else {
+            console.log(
+              'item transform 2: ',
+              compose(transform, hboundsJs.transform || tm.identity()),
+              this.wordPaths.get(word.id)?.getBoundingBox()
+            )
             addedItems.push({
               kind: 'word',
               id: currentItemId++,
               word,
+              wordPath: this.wordPaths.get(word.id)!,
               shapeColor: shape.color,
-              transform,
+              transform: compose(
+                transform
+                // hboundsJs.transform || tm.identity()
+              ),
             })
           }
 
           countScale++
           count++
+
+          break
         }
       }
 
@@ -390,17 +434,17 @@ export class Generator {
 
     // const hboundsWasmTransform = tm.scale(1 / pathAaabScaleFactor)
 
-    // console.log('FISH: ', hboundsWasm.get_bounds())
-    // hboundsWasm.set_transform(
-    //   hboundsWasmTransform.a,
-    //   hboundsWasmTransform.b,
-    //   hboundsWasmTransform.c,
-    //   hboundsWasmTransform.d,
-    //   hboundsWasmTransform.e,
-    //   hboundsWasmTransform.f
-    // )
+    console.log('FISH: ', pathAaabScaleFactor, hboundsWasm.get_bounds())
+    hboundsWasm.set_transform(
+      hboundsWasmTransform.a,
+      hboundsWasmTransform.b,
+      hboundsWasmTransform.c,
+      hboundsWasmTransform.d,
+      hboundsWasmTransform.e,
+      hboundsWasmTransform.f
+    )
 
-    // console.log('FISH2: ', hboundsWasm.get_bounds())
+    console.log('FISH2: ', hboundsWasm.get_bounds())
     return hboundsWasm
   }
 }
@@ -446,6 +490,7 @@ export type WordItem = {
   transform: tm.Matrix
   /** Color of the shape at the given location */
   shapeColor: string
+  wordPath: Path
 }
 
 export type ItemId = number
