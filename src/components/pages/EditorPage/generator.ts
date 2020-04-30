@@ -102,7 +102,7 @@ export class Generator {
     //   symbolHbounds,
     //   word.symbolOffsets
     // )
-    const wordPath = word.font.getPath(word.text, 0, 0, FONT_SIZE)
+    const wordPath = word.font.getPath(word.text[1], 0, 0, FONT_SIZE)
     const wordHbounds = await this.computeHboundsForPath(wordPath, angle)
     this.wordPaths.set(wordId, wordPath)
     this.wordHbounds.set(wordId, wordHbounds)
@@ -187,7 +187,7 @@ export class Generator {
       h: 800, //shapeHBoundsJs.bounds.h * (shapeHBoundsJs.transform?.d || 1),
     })
 
-    let scaleFactor = 0.6
+    let scaleFactor = 3.6
     const initialScale = 0.5 * scaleFactor
     // const initialScale = 0.002
     const finalScale = 0.002 * scaleFactor
@@ -213,7 +213,7 @@ export class Generator {
     let tBatchStart = performance.now()
     while (scale > finalScale && count < maxCount) {
       console.log('scale: ', scale)
-      const batchSize = 10
+      const batchSize = 15
       let success = false
 
       const word = sample(words)!
