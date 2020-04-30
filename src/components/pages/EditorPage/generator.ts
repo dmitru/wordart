@@ -187,17 +187,17 @@ export class Generator {
       h: 800, //shapeHBoundsJs.bounds.h * (shapeHBoundsJs.transform?.d || 1),
     })
 
-    let scaleFactor = 2.6
-    const initialScale = 0.5 * scaleFactor
+    let scaleFactor = 1
+    const initialScale = 2.7 * scaleFactor
     // const initialScale = 0.002
-    const finalScale = 0.002 * scaleFactor
+    const finalScale = 0.005 * scaleFactor
     // const finalScale = 1.99 * scaleFactor
-    const scaleStepFactor = 0.01
-    const maxScaleStep = 0.005
+    const scaleStepFactor = 0.02
+    const maxScaleStep = 0.02
     let timeout = 1500
     let maxTimeout = 3000
     let timeoutStep = 300
-    let maxCount = 1000 * shape.percentArea
+    let maxCount = 1000 //* shape.percentArea
     // let maxCount = 30
 
     let failedBatchesCount = 0
@@ -231,7 +231,7 @@ export class Generator {
           continue
         }
 
-        const bounds = hboundsWord.get_bounds()
+        // const bounds = hboundsWord.get_bounds()
         const cx = p.x
         const cy = p.y
 
@@ -338,7 +338,9 @@ export class Generator {
         count > maxCount
       ) {
         scale -= Math.min(maxScaleStep, scaleStepFactor * scale)
-        // this.logger.debug('placed ', scale, countScale)
+        if (countScale > 0) {
+          this.logger.debug('placed ', scale, countScale)
+        }
         countScale = 0
         failedBatchesCount = 0
         tBatchStart = performance.now()
@@ -346,7 +348,7 @@ export class Generator {
       timeout = Math.min(maxTimeout, timeout + timeoutStep)
     }
 
-    console.screenshot(ctx.canvas)
+    // console.screenshot(ctx.canvas)
 
     const tEnded = performance.now()
     this.logger.debug(
@@ -420,10 +422,10 @@ export class Generator {
       canvas.height,
       false
     )
-    if (visualize) {
-      drawHBoundsWasm(ctx, hboundsWasm)
-      console.screenshot(ctx.canvas)
-    }
+    // if (visualize) {
+    //   drawHBoundsWasm(ctx, hboundsWasm)
+    //   console.screenshot(ctx.canvas)
+    // }
 
     const hboundsWasmTransform = multiply(
       tm.scale(1 / pathAaabScaleFactor),

@@ -32,9 +32,9 @@ export class EditorPageStore {
   @observable activeLeftTab: LeftPanelTab = 'shapes'
 
   @observable bgColor = '#ffffff'
-  @observable bgShapeColor = '#6C6C6C'
+  @observable bgShapeColor = '#D2D2D2'
   // @observable itemsColor = '#ffffffff'
-  @observable itemsColor = '#000000'
+  @observable itemsColor = '#3F3F3F'
 
   @observable availableShape: ShapeConfig[] = shapes
   @observable selectedShapeId: ShapeId = shapes[5].id

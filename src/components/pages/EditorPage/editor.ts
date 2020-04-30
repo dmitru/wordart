@@ -20,6 +20,7 @@ import {
   hBoundsWasmSerializedToPaperGroup,
   matrixToPaperTransform,
 } from 'components/pages/EditorPage/paper-utils'
+import { range } from 'lodash'
 
 const FONT_NAMES = [
   'mountains-of-christmas_bold.ttf',
@@ -160,7 +161,7 @@ export class Editor {
 
     if (!this.shapes) {
       try {
-        const raster = this.paperItems.shape?.rasterize(40, false)
+        const raster = this.paperItems.shape?.rasterize(100, false)
         const imgData = raster.getImageData(
           new paper.Rectangle(0, 0, raster.width, raster.height)
         )
@@ -169,8 +170,8 @@ export class Editor {
           h: raster.height + 4,
         })
         ctx.putImageData(imgData, 2, 2)
-        console.log('raster', raster)
-        console.screenshot(ctx.canvas)
+        // console.log('raster', raster)
+        // console.screenshot(ctx.canvas)
 
         const wasm = await getWasmModule()
 
@@ -183,7 +184,7 @@ export class Editor {
             h: this.paperItems.shape.bounds.height,
           },
           canvas: ctx.canvas,
-          debug: false,
+          debug: true,
         })
         this.shapes = shapes
       } catch (error) {
@@ -232,9 +233,11 @@ export class Editor {
         bounds: this.getSceneBounds(),
         words: this.store.getWords().map((wc) => ({
           wordConfigId: wc.id,
-          angles: [0, -(90 * Math.PI) / 180],
+          // angles: [0, -(90 * Math.PI) / 180, -(30 * Math.PI) / 180],
+          angles: [0],
+          // angles: range(-90, 90, 5).map((deg) => (-deg * Math.PI) / 180),
           fillColors: ['red'],
-          fonts: [fonts[0]],
+          fonts: [fonts[0], fonts[1], fonts[2]],
           text: wc.text,
         })),
       })
@@ -289,8 +292,16 @@ export class Editor {
           )
           // const paths = [item.wordPath]
           const pathItems = paths.map((path) => {
-            const item = new paper.Path(path.toPathData(6))
+            let pathData = path.toPathData(3)
+            // console.log('pathData = ', pathData)
+            // if (pathData[pathData.length - 1] === 'Z') {
+            //   pathData = pathData.replace(/Z$/, '')
+            // }
+            // console.log('pathData = ', pathData)
+            const item = paper.Path.create(pathData)
+            // item.reorient()
             item.fillColor = new paper.Color(this.store.itemsColor)
+            item.fillRule = 'evenodd'
             return item
           })
           const pathItemsGroup = new paper.Group(pathItems)

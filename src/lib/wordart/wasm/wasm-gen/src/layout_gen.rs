@@ -76,7 +76,7 @@ impl LayoutGen {
             ((rect.x + rect.w) as f64, (rect.y + rect.h) as f64),
         );
         // console_log!("add 1");
-        // let mut _timer = Timer::new("rtree::region_intersection_lookup");
+        // let mut _timer = Timer::new("rtree::collides");
         let result = self.rtree.region_intersection_lookup(region);
         // let result = self
         //     .rtree
