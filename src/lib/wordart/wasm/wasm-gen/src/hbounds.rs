@@ -328,11 +328,11 @@ impl HBounds {
             return false;
         }
 
-        let max_level1 = 10;
-        let max_level2 = 10;
+        let max_level1 = 12;
+        let max_level2 = 12;
         let min_size = 2f32;
-        let pad1 = 0f32;
-        let pad2 = 0f32;
+        let pad1 = 1f32;
+        let pad2 = 1f32;
 
         let transform1 = match hbounds1.transform {
             Some(t) => t,

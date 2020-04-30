@@ -187,7 +187,7 @@ export class Generator {
       h: 800, //shapeHBoundsJs.bounds.h * (shapeHBoundsJs.transform?.d || 1),
     })
 
-    let scaleFactor = 1.6
+    let scaleFactor = 2.6
     const initialScale = 0.5 * scaleFactor
     // const initialScale = 0.002
     const finalScale = 0.002 * scaleFactor
@@ -231,11 +231,12 @@ export class Generator {
           continue
         }
 
+        const bounds = hboundsWord.get_bounds()
         const cx = p.x
         const cy = p.y
 
-        // ctx.fillStyle = 'red'
-        // ctx.fillRect(cx, cy, 2, 2)
+        ctx.fillStyle = 'red'
+        ctx.fillRect(cx, cy, 2, 2)
 
         const x = cx
         const y = cy
@@ -368,7 +369,7 @@ export class Generator {
     this.logger.debug('computeHboundsForPath: ')
 
     const pathScale = 1
-    const imgSize = 300
+    const imgSize = 500
     const visualize = false
 
     const pathBbox = path.getBoundingBox()

@@ -121,7 +121,7 @@ const VisualizeBtn = styled(BaseBtn)`
 `
 
 export const EditorPage = observer(() => {
-  const [canvasSize, setCanvasSize] = useState<Dimensions>({ w: 600, h: 600 })
+  const [canvasSize, setCanvasSize] = useState<Dimensions>({ w: 900, h: 900 })
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { editorPageStore } = useStore()
 

@@ -34,7 +34,7 @@ export class EditorPageStore {
   @observable bgColor = '#ffffff'
   @observable bgShapeColor = '#6C6C6C'
   // @observable itemsColor = '#ffffffff'
-  @observable itemsColor = '#ffffffff'
+  @observable itemsColor = '#000000'
 
   @observable availableShape: ShapeConfig[] = shapes
   @observable selectedShapeId: ShapeId = shapes[5].id

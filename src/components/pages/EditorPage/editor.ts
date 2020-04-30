@@ -45,7 +45,6 @@ export class Editor {
     shape?: paper.Item
     shapeHbounds?: paper.Group
     shapeItemsGroup?: paper.Group
-    addedSymbolDefs?: paper.SymbolDefinition[]
   }
 
   constructor(params: EditorInitParams) {
@@ -85,9 +84,9 @@ export class Editor {
   }
 
   setShapeItemsColor = (color: string) => {
-    if (this.paperItems.addedSymbolDefs) {
-      this.paperItems.addedSymbolDefs.forEach((c) => {
-        c.item.fillColor = new paper.Color(color)
+    if (this.paperItems.shapeItemsGroup) {
+      this.paperItems.shapeItemsGroup.children.forEach((c) => {
+        c.fillColor = new paper.Color(color)
       })
     }
   }
@@ -161,7 +160,7 @@ export class Editor {
 
     if (!this.shapes) {
       try {
-        const raster = this.paperItems.shape?.rasterize(60, false)
+        const raster = this.paperItems.shape?.rasterize(40, false)
         const imgData = raster.getImageData(
           new paper.Rectangle(0, 0, raster.width, raster.height)
         )
@@ -233,8 +232,7 @@ export class Editor {
         bounds: this.getSceneBounds(),
         words: this.store.getWords().map((wc) => ({
           wordConfigId: wc.id,
-          // angles: [0, (90 * Math.PI) / 180],
-          angles: [0],
+          angles: [0, -(90 * Math.PI) / 180],
           fillColors: ['red'],
           fonts: [fonts[0]],
           text: wc.text,
@@ -257,7 +255,6 @@ export class Editor {
       // console.screenshot(ctx2.canvas, 0.5)
 
       const addedItems: paper.Item[] = []
-      const addedSymbolDefs: paper.SymbolDefinition[] = []
       let img: HTMLImageElement | null = null
 
       let wordIdToSymbolDef = new Map<string, paper.SymbolDefinition>()
@@ -280,37 +277,31 @@ export class Editor {
           // console.log('item = ', itemImg.position.x, itemImg.position.y)
           addedItems.push(itemImg)
         } else if (item.kind === 'word') {
-          const wordId = item.word.id
-          if (!wordIdToSymbolDef.has(wordId)) {
-            const paths = item.word.font.getPaths(
-              item.word.text,
-              0,
-              0,
-              item.word.fontSize
-            )
-            // const paths = [item.wordPath]
-            const pathItems = paths.map((path) => {
-              const item = new paper.Path(path.toPathData(6))
-              item.fillColor = new paper.Color(this.store.itemsColor)
-              return item
-            })
-            const pathItemsGroup = new paper.Group(pathItems)
-            const symbolDef = new paper.SymbolDefinition(pathItemsGroup)
-            wordIdToSymbolDef.set(wordId, symbolDef)
-          }
-
-          const symbolDef = wordIdToSymbolDef.get(wordId)!
-          const placed = symbolDef.place(symbolDef.item.position)
+          // const wordId = item.word.id
+          // if
           // const pathItem = new paper.Path(item.word.symbols[0].getPathData())
           // const paths = item.word.getSymbolPaths()
-
+          const paths = item.word.font.getPaths(
+            item.word.text,
+            0,
+            0,
+            item.word.fontSize
+          )
+          // const paths = [item.wordPath]
+          const pathItems = paths.map((path) => {
+            const item = new paper.Path(path.toPathData(6))
+            item.fillColor = new paper.Color(this.store.itemsColor)
+            return item
+          })
+          const pathItemsGroup = new paper.Group(pathItems)
           // console.log('item.transform = ', item.transform)
-          placed.transform(matrixToPaperTransform(tm.compose(item.transform)))
-
-          // placed.rotate(
-          //   (item.word.angle / Math.PI) * 180,
-          //   new paper.Point(placed.bounds.bottomLeft)
-          // )
+          pathItemsGroup.transform(
+            matrixToPaperTransform(tm.compose(item.transform))
+          )
+          pathItemsGroup.rotate(
+            (item.word.angle / Math.PI) * 180,
+            new paper.Point(pathItemsGroup.bounds.bottomLeft)
+          )
           // console.log(
           //   'pathItem.bounds',
           //   pathItem.bounds.width,
@@ -324,8 +315,7 @@ export class Editor {
           //   item.transform.e,
           //   item.transform.f
           // )
-          addedItems.push(placed)
-          addedSymbolDefs.push(symbolDef)
+          addedItems.push(pathItemsGroup)
         }
       }
 
@@ -333,7 +323,6 @@ export class Editor {
         this.paperItems.shapeItemsGroup.remove()
       }
 
-      this.paperItems.addedSymbolDefs = addedSymbolDefs
       this.paperItems.shapeItemsGroup = new paper.Group(addedItems)
       this.paperItems.shapeItemsGroup.insertAbove(this.paperItems.shape)
     }
