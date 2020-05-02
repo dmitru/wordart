@@ -145,11 +145,11 @@ export class Editor {
     this.shapes = undefined
   }
 
-  getSceneBounds = (): Rect => ({
-    x: 0,
-    y: 0,
-    w: paper.view.bounds.width,
-    h: paper.view.bounds.height,
+  getSceneBounds = (pad = 20): Rect => ({
+    x: pad,
+    y: pad,
+    w: paper.view.bounds.width - pad * 2,
+    h: paper.view.bounds.height - pad * 2,
   })
 
   generateItems = async () => {
@@ -166,8 +166,8 @@ export class Editor {
           new paper.Rectangle(0, 0, raster.width, raster.height)
         )
         const ctx = createCanvasCtx({
-          w: raster.width + 4,
-          h: raster.height + 4,
+          w: raster.width,
+          h: raster.height,
         })
         ctx.putImageData(imgData, 2, 2)
         // console.log('raster', raster)
@@ -176,6 +176,20 @@ export class Editor {
         const wasm = await getWasmModule()
 
         const imageProcessor = new ImageProcessorWasm(wasm)
+        console.log(
+          'this.paperItems.shape.bounds = ',
+          this.paperItems.shape.bounds
+        )
+
+        const padding = 20
+        const view = this.paperItems.shape.parent.view
+        const generateBounds: Rect = {
+          x: padding,
+          y: padding,
+          w: view.bounds.width - 2 * padding,
+          h: view.bounds.height - 2 * padding,
+        }
+
         const shapes = imageProcessor.findShapesByColor({
           bounds: {
             x: this.paperItems.shape.bounds.x,
@@ -207,7 +221,7 @@ export class Editor {
     const nonTransparentShapes = this.shapes
       .filter((shape) => {
         const color = chroma(shape.color)
-        return color.alpha() > 0.01 && color.luminance() < 0.95
+        return !(color.alpha() > 0.01 && color.luminance() < 0.95)
       })
       .slice(0, 1)
     this.logger.debug(
@@ -234,7 +248,7 @@ export class Editor {
         words: this.store.getWords().map((wc) => ({
           wordConfigId: wc.id,
           // angles: [0, -(90 * Math.PI) / 180, -(30 * Math.PI) / 180],
-          angles: [0],
+          angles: [0, -(90 * Math.PI) / 180],
           // angles: range(-90, 90, 5).map((deg) => (-deg * Math.PI) / 180),
           fillColors: ['red'],
           // fonts: [fonts[0], fonts[1], fonts[2]],
@@ -281,52 +295,39 @@ export class Editor {
           // console.log('item = ', itemImg.position.x, itemImg.position.y)
           addedItems.push(itemImg)
         } else if (item.kind === 'word') {
-          // const wordId = item.word.id
-          // if
-          // const pathItem = new paper.Path(item.word.symbols[0].getPathData())
-          // const paths = item.word.getSymbolPaths()
-          const paths = item.word.font.getPaths(
-            item.word.text,
-            0,
-            0,
-            item.word.fontSize
+          const wordId = item.word.id
+
+          if (!wordIdToSymbolDef.has(wordId)) {
+            const paths = item.word.font.getPaths(
+              item.word.text,
+              0,
+              0,
+              item.word.fontSize
+            )
+
+            const pathItems = paths.map((path) => {
+              let pathData = path.toPathData(3)
+              const item = paper.Path.create(pathData)
+              item.fillColor = new paper.Color(this.store.itemsColor)
+              item.fillRule = 'evenodd'
+              return item
+            })
+            const pathItemsGroup = new paper.Group(pathItems)
+            const symbolDef = new paper.SymbolDefinition(pathItemsGroup, true)
+            wordIdToSymbolDef.set(wordId, symbolDef)
+          }
+
+          const symbolDef = wordIdToSymbolDef.get(wordId)!
+
+          const pathItemsGroup = symbolDef.place(new paper.Point(0, 0))
+
+          pathItemsGroup.rotate(
+            (item.word.angle / Math.PI) * 180,
+            new paper.Point(0, 0)
           )
-          // const paths = [item.wordPath]
-          const pathItems = paths.map((path) => {
-            let pathData = path.toPathData(3)
-            // console.log('pathData = ', pathData)
-            // if (pathData[pathData.length - 1] === 'Z') {
-            //   pathData = pathData.replace(/Z$/, '')
-            // }
-            // console.log('pathData = ', pathData)
-            const item = paper.Path.create(pathData)
-            // item.reorient()
-            item.fillColor = new paper.Color(this.store.itemsColor)
-            item.fillRule = 'evenodd'
-            return item
-          })
-          const pathItemsGroup = new paper.Group(pathItems)
-          // console.log('item.transform = ', item.transform)
           pathItemsGroup.transform(
             matrixToPaperTransform(tm.compose(item.transform))
           )
-          pathItemsGroup.rotate(
-            (item.word.angle / Math.PI) * 180,
-            new paper.Point(pathItemsGroup.bounds.bottomLeft)
-          )
-          // console.log(
-          //   'pathItem.bounds',
-          //   pathItem.bounds.width,
-          //   pathItem.bounds.height
-          // )
-          // pathItem.scale(item.transform.a)
-          // const w = pathItem.bounds.width
-          // const h = pathItem.bounds.height
-          // // console.log('w, h', w, h, item.transform.a)
-          // pathItem.position = new paper.Point(
-          //   item.transform.e,
-          //   item.transform.f
-          // )
           addedItems.push(pathItemsGroup)
         }
       }

@@ -3,8 +3,6 @@ use wasm_bindgen::prelude::*;
 use crate::utils::*;
 use std::collections::HashMap;
 
-// Console.log macro
-
 macro_rules! console_log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
@@ -87,7 +85,7 @@ impl LayoutGen {
         //     .region_intersection_lookup(((-100f64, -100f64), (10000f64, 100000f64)));
         // _timer.drop_explicit();
 
-        // console_log!("CANDIDATES LEN: {}, rect: {:?}", result.len(), rect);
+        // console_log!("CANDIDATES LEN: {}", result.len());
 
         let mut count = 0;
         for candidate_index in result.iter() {

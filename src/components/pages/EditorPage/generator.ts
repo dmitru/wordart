@@ -176,7 +176,7 @@ export class Generator {
     let timeout = 4000
     let maxTimeout = 3000
     let timeoutStep = 300
-    let maxCount = 1000
+    let maxCount = 600
 
     let failedBatchesCount = 0
     let countPlaced = 0
@@ -290,7 +290,7 @@ export class Generator {
             currentScale,
             wordMaxScalePlaced[wordIndex]
           )
-          const padShape = 2
+          const padShape = 5
 
           const transform: tm.Matrix = multiply(
             tm.translate(x, y),
