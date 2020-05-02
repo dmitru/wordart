@@ -161,7 +161,7 @@ export class Editor {
 
     if (!this.shapes) {
       try {
-        const raster = this.paperItems.shape?.rasterize(100, false)
+        const raster = this.paperItems.shape?.rasterize(40, false)
         const imgData = raster.getImageData(
           new paper.Rectangle(0, 0, raster.width, raster.height)
         )
@@ -243,7 +243,7 @@ export class Editor {
         })),
       })
 
-      const ctx2 = createCanvasCtx({ w: 1000, h: 1000 })
+      // const ctx2 = createCanvasCtx({ w: 1000, h: 1000 })
 
       // for (const item of result.items) {
       //   if (item.kind === 'text') {

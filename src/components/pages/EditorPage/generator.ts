@@ -151,6 +151,11 @@ export class Generator {
         }
       }
     }
+
+    const wordBounds = words.map((word) =>
+      this.wordHbounds.get(word.id)!.get_bounds()
+    )
+
     const t2 = performance.now()
 
     this.logger.debug(
@@ -165,15 +170,13 @@ export class Generator {
 
     const debugCtx = createCanvasCtx({ w: 800, h: 800 })
 
-    let scaleFactor = 1
-
     const wordCurrentScales = words.map(() => 1)
     const wordMaxScalePlaced = words.map(() => -1)
-    const wordMinScale = 0.05 * scaleFactor
+    const wordMinScale = 0.03
     let timeout = 4000
     let maxTimeout = 3000
     let timeoutStep = 300
-    let maxCount = 600
+    let maxCount = 1000
 
     let failedBatchesCount = 0
     let countPlaced = 0
@@ -187,22 +190,23 @@ export class Generator {
       scale: number,
       maxScalePlaced: number | undefined
     ) => {
+      // return 0
       const minDim = Math.min(bounds.h, bounds.w) * scale
       let factor = 0.2
       if (maxScalePlaced != null && scale < maxScalePlaced * 0.5) {
-        factor = 0.1
+        factor = 0.2
       }
       if (maxScalePlaced != null && scale < maxScalePlaced * 0.2) {
-        factor = 0.05
+        factor = 0.1
       }
       if (maxScalePlaced != null && scale < maxScalePlaced * 0.1) {
-        factor = 0.02
+        factor = 0.05
       }
       if (countPlaced > 100) {
-        factor = 0.01
+        factor = 0.02
       }
       const pad = minDim * factor
-      return pad > 1 ? pad : 0
+      return pad > 0.2 ? pad : 0.2
     }
 
     const getBatchSize = (countPlaced: number, maxCount: number) => {
@@ -212,7 +216,7 @@ export class Generator {
       if (countPlaced < 0.2 * maxCount) {
         return 20
       }
-      return 30
+      return 20
     }
 
     const getMaxFailedBatchesCount = (
@@ -231,8 +235,8 @@ export class Generator {
     }
 
     const getNextScale = (scale: number): number => {
-      const scaleStepFactor = 0.02
-      const maxScaleStep = 0.02
+      const scaleStepFactor = 0.03
+      const maxScaleStep = 0.03
       return scale - Math.min(maxScaleStep, scaleStepFactor * scale)
     }
 
@@ -266,26 +270,27 @@ export class Generator {
             continue
           }
 
-          const cx = p.x
-          const cy = p.y
+          const bounds = wordBounds[wordIndex]
 
-          debugCtx.fillStyle = 'red'
-          debugCtx.fillRect(cx, cy, 2, 2)
+          const cx = p.x - (bounds.w / 2) * currentScale
+          const cy = p.y + (bounds.h / 2) * currentScale
+
+          // debugCtx.fillStyle = 'red'
+          // debugCtx.fillRect(cx, cy, 2, 2)
 
           const x = cx
           const y = cy
 
           const scaleRandomized =
             currentScale + currentScale * (Math.random() - 0.5) * 2 * 0.1
-          const padBounds = hboundsWord.get_bounds()
 
           const padItem = getPad(
-            padBounds,
+            bounds,
             countPlaced,
             currentScale,
             wordMaxScalePlaced[wordIndex]
           )
-          const padShape = 0
+          const padShape = 2
 
           const transform: tm.Matrix = multiply(
             tm.translate(x, y),
@@ -337,7 +342,7 @@ export class Generator {
           currentScale = getNextScale(currentScale)
           scalesTried += 1
         } else {
-          // console.log('success', i, currentScale)
+          console.log('success', i, currentScale)
         }
       }
 
