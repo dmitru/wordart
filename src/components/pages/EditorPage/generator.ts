@@ -1,14 +1,5 @@
-import {
-  EditorPageStore,
-  WordConfig,
-  WordConfigId,
-} from 'components/pages/EditorPage/editor-page-store'
-import {
-  loadImageUrlToCanvasCtx,
-  clearCanvas,
-  createCanvasCtx,
-} from 'lib/wordart/canvas-utils'
-import { fabric } from 'fabric'
+import { WordConfigId } from 'components/pages/EditorPage/editor-page-store'
+import { createCanvasCtx } from 'lib/wordart/canvas-utils'
 import { CollisionDetectorWasm } from 'lib/wordart/wasm/collision-detector-wasm'
 import { consoleLoggers } from 'utils/console-logger'
 import {
@@ -17,24 +8,10 @@ import {
   WasmModule,
 } from 'lib/wordart/wasm/wasm-module'
 import { Rect, multiply, aabbForRect } from 'lib/wordart/geometry'
-import {
-  ImageProcessorWasm,
-  ShapeWasm,
-} from 'lib/wordart/wasm/image-processor-wasm'
-import {
-  randomPointInsideHboundsSerialized,
-  drawHBoundsWasm,
-} from 'lib/wordart/wasm/hbounds'
+import { ShapeWasm } from 'lib/wordart/wasm/image-processor-wasm'
+import { randomPointInsideHboundsSerialized } from 'lib/wordart/wasm/hbounds'
 import * as tm from 'transformation-matrix'
-import { sleep } from 'utils/async'
 import { Path } from 'opentype.js'
-import { sample } from 'lodash'
-import {
-  hBoundsWasmSerializedToPaperGroup,
-  matrixToPaperTransform,
-} from 'components/pages/EditorPage/paper-utils'
-import { Editor } from 'components/pages/EditorPage/editor'
-import { compose } from 'transformation-matrix'
 
 const FONT_SIZE = 100
 
@@ -72,36 +49,6 @@ export class Generator {
     const wordId = getWordAngleId(text, font, angle)
     const word = new Word(wordId, wordConfigId, text, font, angle)
 
-    // for (const symbol of word.symbols) {
-    //   this.logger.debug(
-    //     `processWord: processing "${symbol.glyph.name}", font: ${getFontName(
-    //       font
-    //     )}, angle: ${angle}`
-    //   )
-    //   if (!this.symbols.has(symbol.id)) {
-    //     this.symbols.set(symbol.id, symbol)
-    //   }
-    //   const symbolAngleId = getSymbolAngleId(symbol.glyph, font, angle)
-    //   if (!this.symbolHbounds.has(symbolAngleId)) {
-    //     const wordPath = symbol.font.getPath(word.text, 0, 0, FONT_SIZE)
-    //     const hbounds = await this.computeHboundsForPath(
-    //       wordPath,
-    //       // symbol.glyph.getPath(0, 0, FONT_SIZE),
-    //       angle
-    //     )
-    //     this.symbolHbounds.set(symbolAngleId, hbounds)
-    //   }
-    // }
-
-    // const symbolHbounds = word.symbols.map((s) => {
-    //   const symbolId = getSymbolAngleId(s.glyph, font, angle)
-    //   return this.symbolHbounds.get(symbolId)!
-    // })
-
-    // const wordHbounds = this.mergeHboundsWasmForWord(
-    //   symbolHbounds,
-    //   word.symbolOffsets
-    // )
     const wordPath = word.font.getPath(word.text, 0, 0, FONT_SIZE)
     const wordHbounds = await this.computeHboundsForPath(wordPath, angle)
     this.wordPaths.set(wordId, wordPath)
@@ -109,13 +56,6 @@ export class Generator {
 
     return word
   }
-
-  // mergeHboundsWasmForWord = (
-  //   symbolBounds: HBoundsWasm[],
-  //   xOffsets: number[]
-  // ) => {
-  //   return symbolBounds[0]
-  // }
 
   generate = async (task: GenerateTask): Promise<GenerateResult> => {
     if (!this.wasm) {
@@ -168,17 +108,12 @@ export class Generator {
 
     const shapeHBoundsJs = shape.hBounds.get_js()
 
-    const debugCtx = createCanvasCtx({ w: 800, h: 800 })
-
     const wordCurrentScales = words.map(() => 1)
     const wordMaxScalePlaced = words.map(() => -1)
     const wordMinScale = 0.03
     let timeout = 4000
-    let maxTimeout = 3000
-    let timeoutStep = 300
     let maxCount = 600
 
-    let failedBatchesCount = 0
     let countPlaced = 0
 
     const tPrepEnd = performance.now()
@@ -217,21 +152,6 @@ export class Generator {
         return 20
       }
       return 20
-    }
-
-    const getMaxFailedBatchesCount = (
-      countPlaced: number,
-      maxCount: number,
-      scale: number,
-      maxScalePlaced: number | undefined
-    ) => {
-      if (maxScalePlaced == null) {
-        return 3
-      }
-      if (countPlaced < 0.2 * maxCount) {
-        return 20
-      }
-      return 10
     }
 
     const getNextScale = (scale: number): number => {
@@ -362,317 +282,6 @@ export class Generator {
     }
   }
 
-  // generateOld = async (task: GenerateTask): Promise<GenerateResult> => {
-  //   if (!this.wasm) {
-  //     throw new Error('call init() first')
-  //   }
-  //   this.logger.debug('Generator: generate', task)
-  //   const tStarted = performance.now()
-
-  //   const shape = task.shape
-  //   const collisionDetector = new CollisionDetectorWasm(
-  //     this.wasm,
-  //     task.bounds,
-  //     shape.hBoundsInverted
-  //   )
-
-  //   const t1 = performance.now()
-  //   const words: Word[] = []
-  //   for (const wordItem of task.words) {
-  //     for (const font of wordItem.fonts) {
-  //       for (const angle of wordItem.angles) {
-  //         this.logger.debug(
-  //           `Processing word ${wordItem.text}, font ${getFontName(
-  //             font
-  //           )}, angle: ${angle}`
-  //         )
-  //         const word = await this.processWord(
-  //           wordItem.wordConfigId,
-  //           wordItem.text,
-  //           font,
-  //           angle
-  //         )
-  //         words.push(word)
-  //       }
-  //     }
-  //   }
-  //   const t2 = performance.now()
-
-  //   this.logger.debug(
-  //     `Processed ${words.length} words: ${(t2 - t1).toFixed(2)}ms`
-  //   )
-
-  //   const circleR = 80
-  //   const { imgData, ctx: imgCtx } = createCircleImgData(circleR, 'red')
-  //   const hboundsCircle = this.wasm.create_hbounds(
-  //     new Uint32Array(imgData.data.buffer),
-  //     imgData.width,
-  //     imgData.height,
-  //     false
-  //   )
-  //   // const t: tm.Matrix = multiply(
-  //   //   // tm.translate(x, y),
-  //   //   tm.scale(1),
-  //   //   tm.scale(1.5)
-  //   // )
-  //   // const tw = new this.wasm.Matrix()
-  //   // tw.set_mut(t.a, t.b, t.c, t.d, t.e, t.f)
-
-  //   // hboundsCircle.set_transform_matrix(tw)
-
-  //   let currentItemId = 1
-  //   let addedItems: Item[] = []
-  //   let addedHbounds: any[] = []
-  //   let addedImgCtxs: CanvasRenderingContext2D[] = []
-
-  //   const shapeHBoundsJs = shape.hBounds.get_js()
-
-  //   const ctx = createCanvasCtx({
-  //     w: 800, //shapeHBoundsJs.bounds.w * (shapeHBoundsJs.transform?.a || 1),
-  //     h: 800, //shapeHBoundsJs.bounds.h * (shapeHBoundsJs.transform?.d || 1),
-  //   })
-
-  //   let scaleFactor = 1
-  //   const initialScale = 2.7 * scaleFactor
-  //   // const initialScale = 0.002
-  //   const finalScale = 0.05 * scaleFactor
-  //   // const finalScale = 1.99 * scaleFactor
-  //   const scaleStepFactor = 0.02
-  //   const maxScaleStep = 0.02
-  //   let timeout = 1500
-  //   let maxTimeout = 3000
-  //   let timeoutStep = 300
-  //   let maxCount = 300 //* shape.percentArea
-  //   // let maxCount = 30
-
-  //   let failedBatchesCount = 0
-
-  //   let scale = initialScale
-
-  //   const tPrepEnd = performance.now()
-  //   this.logger.debug(`Generator: ${(tPrepEnd - tStarted).toFixed(3)}ms`)
-  //   let countScale = 0
-  //   let countPlaced = 0
-
-  //   let maxScalePlaced: number | undefined
-
-  //   const getPad = (
-  //     bounds: Rect,
-  //     countPlaced: number,
-  //     scale: number,
-  //     maxScalePlaced: number | undefined
-  //   ) => {
-  //     const minDim = Math.min(bounds.h, bounds.w)
-  //     let factor = 0.5
-  //     if (maxScalePlaced != null && scale < maxScalePlaced * 0.5) {
-  //       factor = 0.2
-  //     }
-  //     if (maxScalePlaced != null && scale < maxScalePlaced * 0.2) {
-  //       factor = 0.1
-  //     }
-  //     if (maxScalePlaced != null && scale < maxScalePlaced * 0.1) {
-  //       factor = 0.05
-  //     }
-  //     if (countPlaced > 100) {
-  //       factor = 0.01
-  //     }
-  //     const pad = minDim * factor
-  //     return pad > 1 ? pad : 0
-  //   }
-
-  //   const getBatchSize = (countPlaced: number, maxCount: number) => {
-  //     if (countPlaced < Math.max(0.05 * maxCount, 30)) {
-  //       return 40
-  //     }
-  //     if (countPlaced < 0.2 * maxCount) {
-  //       return 20
-  //     }
-  //     return 50
-  //   }
-
-  //   const getMaxFailedBatchesCount = (
-  //     countPlaced: number,
-  //     maxCount: number,
-  //     scale: number,
-  //     maxScalePlaced: number | undefined
-  //   ) => {
-  //     if (maxScalePlaced == null) {
-  //       return 3
-  //     }
-  //     if (countPlaced < 0.2 * maxCount) {
-  //       return 20
-  //     }
-  //     return 10
-  //   }
-
-  //   let tBatchStart = performance.now()
-  //   while (scale > finalScale && countPlaced < maxCount) {
-  //     // console.log('scale: ', scale)
-  //     const batchSize = getBatchSize(countPlaced, maxCount)
-  //     const maxFailedBatchesCount = getMaxFailedBatchesCount(
-  //       countPlaced,
-  //       maxCount,
-  //       scale,
-  //       maxScalePlaced
-  //     )
-  //     let success = false
-
-  //     const isCircle = Math.random() > 1
-  //     let word = sample(words)!
-
-  //     for (let i = 0; i < batchSize; ++i) {
-  //       const hboundsWord = this.wordHbounds.get(word.id)
-  //       if (!hboundsWord) {
-  //         throw new Error(`No hbounds for word ${word.id}`)
-  //       }
-
-  //       // const rScaled = Math.max(3, circleR * scale)
-  //       const p = randomPointInsideHboundsSerialized(shapeHBoundsJs)
-  //       if (!p) {
-  //         continue
-  //       }
-
-  //       // const bounds = hboundsWord.get_bounds()
-  //       const cx = p.x
-  //       const cy = p.y
-
-  //       ctx.fillStyle = 'red'
-  //       ctx.fillRect(cx, cy, 2, 2)
-
-  //       const x = cx
-  //       const y = cy
-
-  //       const scaleRandomized = scale + scale * (Math.random() - 0.5) * 2 * 0.1
-  //       const padBounds = hboundsWord.get_bounds()
-  //       const padItem = getPad(padBounds, countPlaced, scale, maxScalePlaced)
-  //       const padShape = 0
-
-  //       const transform: tm.Matrix = multiply(
-  //         tm.translate(x, y),
-  //         tm.scale(scaleRandomized)
-  //       )
-  //       const transformWasm = new this.wasm.Matrix()
-  //       transformWasm.set_mut(
-  //         transform.a,
-  //         transform.b,
-  //         transform.c,
-  //         transform.d,
-  //         transform.e,
-  //         transform.f
-  //       )
-
-  //       // const transformWasm2 = transformWasm.copy()
-
-  //       let hasPlaced = collisionDetector.addItem(
-  //         isCircle ? hboundsCircle : hboundsWord,
-  //         transformWasm,
-  //         padShape,
-  //         padItem
-  //       )
-  //       // let hasPlaced = true // TODO: Remove
-  //       if (hasPlaced) {
-  //         if (maxScalePlaced == null) {
-  //           maxScalePlaced = scale
-  //         }
-  //         // const ctx2 = createCanvasCtx({ w: 1000, h: 1000 })
-
-  //         // const hbounds2 = isCircle ? hboundsCircle : hboundsWord
-
-  //         // hbounds2.set_transform_matrix(transformWasm2)
-  //         // // @ts-ignore
-  //         // drawHBoundsWasm(ctx2, hbounds2, transform)
-  //         // drawHBoundsWasm(ctx2, shape.hBoundsInverted)
-  //         // console.screenshot(ctx2.canvas, 0.5)
-
-  //         success = true
-  //         addedHbounds.push({
-  //           ...(isCircle ? hboundsCircle : hboundsWord),
-  //           transform,
-  //         })
-
-  //         // const hboundsJs = (isCircle ? hboundsCircle : hboundsWord).get_js()
-  //         // const item = hBoundsWasmSerializedToPaperGroup({
-  //         //   ...hboundsJs,
-  //         //   // transform: compose(transform, hboundsJs.transform || tm.identity()),
-  //         // })
-  //         // item.transform(matrixToPaperTransform(transform))
-  //         // // console.log(
-  //         // //   'item transform: ',
-  //         // //   compose(transform, hboundsJs.transform || tm.identity()),
-  //         // //   hboundsJs.bounds
-  //         // // )
-  //         // const editor = (window as any)['editor'] as Editor
-  //         // editor.paperItems.shapeHbounds?.addChild(item)
-
-  //         if (isCircle) {
-  //           addedItems.push({
-  //             kind: 'img',
-  //             id: currentItemId++,
-  //             ctx: imgCtx,
-  //             transform,
-  //           })
-  //         } else {
-  //           // console.log(
-  //           //   'item transform 2: ',
-  //           //   compose(transform, hboundsJs.transform || tm.identity()),
-  //           //   this.wordPaths.get(word.id)?.getBoundingBox()
-  //           // )
-  //           addedItems.push({
-  //             kind: 'word',
-  //             id: currentItemId++,
-  //             word,
-  //             wordPath: this.wordPaths.get(word.id)!,
-  //             shapeColor: shape.color,
-  //             transform: compose(
-  //               transform
-  //               // hboundsJs.transform || tm.identity()
-  //             ),
-  //           })
-  //         }
-
-  //         countScale++
-  //         countPlaced++
-
-  //         word = sample(words)!
-
-  //         break
-  //       }
-  //     }
-
-  //     const tBatchEnd = performance.now()
-
-  //     if (!success) {
-  //       failedBatchesCount++
-  //     }
-
-  //     if (
-  //       failedBatchesCount >= maxFailedBatchesCount ||
-  //       tBatchEnd - tBatchStart > timeout ||
-  //       countPlaced > maxCount
-  //     ) {
-  //       scale -= Math.min(maxScaleStep, scaleStepFactor * scale)
-  //       if (countScale > 0) {
-  //         this.logger.debug('placed ', scale, countScale)
-  //       }
-  //       countScale = 0
-  //       failedBatchesCount = 0
-  //       tBatchStart = performance.now()
-  //     }
-  //     timeout = Math.min(maxTimeout, timeout + timeoutStep)
-  //   }
-
-  //   // console.screenshot(ctx.canvas)
-
-  //   const tEnded = performance.now()
-  //   this.logger.debug(
-  //     `Generator: placed ${countPlaced} in ${(tEnded - tStarted).toFixed(3)}ms`
-  //   )
-
-  //   return {
-  //     items: addedItems,
-  //   }
-  // }
-
   computeHboundsForPath = async (
     path: Path,
     angle = 0
@@ -685,7 +294,6 @@ export class Generator {
 
     const pathScale = 1
     const imgSize = 500
-    const visualize = false
 
     const pathBbox = path.getBoundingBox()
     const pathBboxRect = {
@@ -936,26 +544,3 @@ export type Font = opentype.Font
 export type WordId = string
 export type SymbolId = string
 export type SymbolAngleId = string
-
-const createCircleImgData = (r = 10, color = '#0005') => {
-  const pad = 0
-  const w = r * 2 + 2 * pad
-  const h = r * 2 + 2 * pad
-  const ctx = createCanvasCtx({ w, h })
-  // ctx.fillStyle = 'white'
-  // ctx.fillRect(0, 0, w, h)
-  ctx.fillStyle = color
-  ctx.strokeStyle = color
-  ctx.beginPath()
-  ctx.lineCap = 'round'
-  ctx.lineJoin = 'round'
-  const lineWidth = r / 3
-  // ctx.fillRect(0, 0, w, h)
-  ctx.arc(r + pad, r + pad, r - lineWidth, 0, 2 * Math.PI)
-  // ctx.fill()
-  ctx.lineWidth = lineWidth
-  ctx.stroke()
-
-  // console.screenshot(ctx.canvas)
-  return { imgData: ctx.getImageData(0, 0, w, h), ctx }
-}
