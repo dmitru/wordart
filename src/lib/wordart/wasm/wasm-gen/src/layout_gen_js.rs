@@ -66,13 +66,25 @@ impl HBoundsWasm {
     }
 
     #[wasm_bindgen]
-    pub fn collides(&self, other: &HBoundsWasm) -> bool {
-        HBounds::intersects(&self.wrapped, &other.wrapped, None)
+    pub fn collides(&self, other: &HBoundsWasm, pad_self: f32, pad_other: f32) -> bool {
+        HBounds::intersects(&self.wrapped, &other.wrapped, None, pad_self, pad_other)
     }
 
     #[wasm_bindgen]
-    pub fn collides_transformed(&self, other: &HBoundsWasm, matrix: &Matrix) -> bool {
-        HBounds::intersects(&self.wrapped, &other.wrapped, Some(matrix.copy()))
+    pub fn collides_transformed(
+        &self,
+        other: &HBoundsWasm,
+        matrix: &Matrix,
+        pad_self: f32,
+        pad_other: f32,
+    ) -> bool {
+        HBounds::intersects(
+            &self.wrapped,
+            &other.wrapped,
+            Some(matrix.copy()),
+            pad_self,
+            pad_other,
+        )
     }
 }
 
@@ -132,21 +144,33 @@ impl LayoutGenWasm {
         JsValue::from_serde(&self.wrapped).unwrap()
     }
 
-    pub fn collides(&mut self, hbounds: &HBoundsWasm, transform: Option<Matrix>) -> bool {
+    pub fn collides(
+        &mut self,
+        hbounds: &HBoundsWasm,
+        transform: Option<Matrix>,
+        pad_self: f32,
+        pad_others: f32,
+    ) -> bool {
         let mut item = Item::new(&hbounds.wrapped.clone());
         if (transform.is_some()) {
             item.transform = transform.unwrap();
         }
-        return self.wrapped.collides(&item);
+        return self.wrapped.collides(&item, pad_self, pad_others);
     }
 
-    pub fn add_item(&mut self, hbounds: &HBoundsWasm, transform: Option<Matrix>) -> Option<i32> {
+    pub fn add_item(
+        &mut self,
+        hbounds: &HBoundsWasm,
+        transform: Option<Matrix>,
+        pad_self: f32,
+        pad_others: f32,
+    ) -> Option<i32> {
         let mut item = Item::new(&hbounds.wrapped.clone());
         if (transform.is_some()) {
             item.transform = transform.unwrap();
         }
         let bounds = item.bounds();
-        let result = self.wrapped.add_item(item);
+        let result = self.wrapped.add_item(item, pad_self, pad_others);
         // if (result.is_some()) {
         // console_log!(
         //     "Item bounds: {:?} {:?}",

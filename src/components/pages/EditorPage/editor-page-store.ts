@@ -106,20 +106,33 @@ export type WordConfig = {
 
 export type WordConfigId = number
 
+// const defaultWordsConfig: WordConfig[] = [
+//   {
+//     id: 1,
+//     text: 'Word',
+//   },
+//   // {
+//   //   id: 2,
+//   //   text: 'Cloud',
+//   // },
+//   // {
+//   //   id: 3,
+//   //   text: 'Art',
+//   // },
+// ]
+
 const defaultWordsConfig: WordConfig[] = [
-  {
-    id: 1,
-    text: 'Word',
-  },
-  // {
-  //   id: 2,
-  //   text: 'Cloud',
-  // },
-  // {
-  //   id: 3,
-  //   text: 'Art',
-  // },
-]
+  'word',
+  'cloud',
+  'art',
+  'amazing',
+  'beautiful',
+  'drawing',
+  'wow',
+  'impress',
+  'stunning',
+  'creative',
+].map((s, index) => ({ id: index, text: s } as WordConfig))
 
 export type ShapeConfig = {
   id: ShapeId

@@ -50,8 +50,26 @@ export class HBoundsWasm {
    * @returns {HBoundsWasm}
    */
   clone(): HBoundsWasm
-  collides(other: HBoundsWasm): boolean
-  collides_transformed(other: HBoundsWasm, matrix: Matrix): boolean
+  /**
+   * @param {HBoundsWasm} other
+   * @param {number} pad_self
+   * @param {number} pad_other
+   * @returns {boolean}
+   */
+  collides(other: HBoundsWasm, pad_self: number, pad_other: number): boolean
+  /**
+   * @param {HBoundsWasm} other
+   * @param {Matrix} matrix
+   * @param {number} pad_self
+   * @param {number} pad_other
+   * @returns {boolean}
+   */
+  collides_transformed(
+    other: HBoundsWasm,
+    matrix: Matrix,
+    pad_self: number,
+    pad_other: number
+  ): boolean
   inverted(): HBoundsWasm
   /**
    * @returns {any}
@@ -107,8 +125,18 @@ export class LayoutGenWasm {
    * @param {Matrix | undefined} transform
    * @returns {number | undefined}
    */
-  add_item(hbounds: HBoundsWasm, transform?: Matrix): number | undefined
-  collides(hbounds: HBoundsWasm, transform?: Matrix): boolean
+  add_item(
+    hbounds: HBoundsWasm,
+    transform?: Matrix,
+    pad_self: number,
+    pad_others: number
+  ): number | undefined
+  collides(
+    hbounds: HBoundsWasm,
+    transform?: Matrix,
+    pad_self: number,
+    pad_others: number
+  ): boolean
 }
 
 export class RectF {

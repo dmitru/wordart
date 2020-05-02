@@ -237,7 +237,8 @@ export class Editor {
           angles: [0],
           // angles: range(-90, 90, 5).map((deg) => (-deg * Math.PI) / 180),
           fillColors: ['red'],
-          fonts: [fonts[0], fonts[1], fonts[2]],
+          // fonts: [fonts[0], fonts[1], fonts[2]],
+          fonts: [fonts[0]],
           text: wc.text,
         })),
       })

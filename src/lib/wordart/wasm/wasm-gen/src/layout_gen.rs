@@ -37,7 +37,7 @@ impl Item {
         self.hbounds.get_bounds(Some(self.transform))
     }
 
-    fn intersects(&self, other: &Self) -> bool {
+    fn intersects(&self, other: &Self, pad_self: f32, pad_others: f32) -> bool {
         let hb1 = self.hbounds.transform(self.transform);
         let hb2 = other.hbounds.transform(other.transform);
         // let hb1 = &self.hbounds;
@@ -47,7 +47,7 @@ impl Item {
         // return RectF::intersect(rect1, rect2, 0f32, 0f32);
         // console_log!("check1");
         // let _timer = Timer::new("Item::intersects");
-        return HBounds::intersects(&hb1, &hb2, None);
+        return HBounds::intersects(&hb1, &hb2, None, pad_self, pad_others);
         // console_log!("check2");
         // return result;
     }
@@ -69,11 +69,15 @@ impl LayoutGen {
         }
     }
 
-    pub fn collides(&mut self, item: &Item) -> bool {
+    pub fn collides(&mut self, item: &Item, pad_self: f32, pad_others: f32) -> bool {
         let rect = item.bounds();
+        let pad64 = pad_self as f64;
         let region = (
-            (rect.x as f64, rect.y as f64),
-            ((rect.x + rect.w) as f64, (rect.y + rect.h) as f64),
+            (rect.x as f64 - pad64, rect.y as f64 - pad64),
+            (
+                (rect.x + rect.w) as f64 + pad64,
+                (rect.y + rect.h) as f64 + pad64,
+            ),
         );
         // console_log!("add 1");
         // let mut _timer = Timer::new("rtree::collides");
@@ -90,7 +94,7 @@ impl LayoutGen {
             // let mut _timer = Timer::new("rtree::loop");
             match self.rtree.get_node(*candidate_index).get_data() {
                 Some(candidate_item) => {
-                    if item.intersects(candidate_item) {
+                    if item.intersects(candidate_item, pad_self, pad_others) {
                         return true;
                     }
                     // console_log!(
@@ -113,17 +117,18 @@ impl LayoutGen {
         return false;
     }
 
-    pub fn add_item(&mut self, item: Item) -> Option<i32> {
-        let rect = item.bounds();
-        let region = (
-            (rect.x as f64, rect.y as f64),
-            ((rect.x + rect.w) as f64, (rect.y + rect.h) as f64),
-        );
-        let collides = self.collides(&item);
+    pub fn add_item(&mut self, item: Item, pad_self: f32, pad_others: f32) -> Option<i32> {
+        let collides = self.collides(&item, pad_self, pad_others);
 
         // console_log!("candidates: {}", result.len());
 
         if !collides {
+            let rect = item.bounds();
+            let region = (
+                (rect.x as f64, rect.y as f64),
+                ((rect.x + rect.w) as f64, (rect.y + rect.h) as f64),
+            );
+
             let item_id = self.next_id;
             self.next_id += 1;
             self.rtree.insert(region, item);

@@ -164,7 +164,13 @@ impl HBounds {
         }
     }
 
-    pub fn intersects(hbounds1: &Self, hbounds2: &Self, t2: Option<Matrix>) -> bool {
+    pub fn intersects(
+        hbounds1: &Self,
+        hbounds2: &Self,
+        t2: Option<Matrix>,
+        pad1: f32,
+        pad2: f32,
+    ) -> bool {
         // println!(
         //     "compute_hbounds_impl: {:?} {:?}",
         //     hbounds1.bounds, hbounds2.bounds
@@ -331,8 +337,6 @@ impl HBounds {
         let max_level1 = 9;
         let max_level2 = 9;
         let min_size = 1f32;
-        let pad1 = 0f32;
-        let pad2 = 0f32;
 
         let transform1 = match hbounds1.transform {
             Some(t) => t,

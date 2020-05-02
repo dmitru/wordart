@@ -34,7 +34,12 @@ export class CollisionDetectorWasm {
     this.layoutGen = new wasm.LayoutGenWasm(this.bounds.w, this.bounds.h)
   }
 
-  addItem = (hbounds: HBoundsWasm, transform?: Matrix): boolean => {
+  addItem = (
+    hbounds: HBoundsWasm,
+    transform?: Matrix,
+    padShape = 0,
+    padItem = 0
+  ): boolean => {
     const bounds = hbounds.get_bounds(transform ? transform.copy() : undefined)
 
     if (this.bounds && !isRectInsideRect(bounds, this.bounds)) {
@@ -43,16 +48,23 @@ export class CollisionDetectorWasm {
 
     if (this.shapeBoundsInverted) {
       if (transform) {
-        if (this.shapeBoundsInverted.collides_transformed(hbounds, transform)) {
+        if (
+          this.shapeBoundsInverted.collides_transformed(
+            hbounds,
+            transform,
+            padShape,
+            0
+          )
+        ) {
           return false
         }
       } else {
-        if (this.shapeBoundsInverted.collides(hbounds)) {
+        if (this.shapeBoundsInverted.collides(hbounds, padShape, padItem)) {
           return false
         }
       }
     }
-    const itemId = this.layoutGen.add_item(hbounds, transform)
+    const itemId = this.layoutGen.add_item(hbounds, transform, padItem, 0)
     return itemId != null
   }
 }

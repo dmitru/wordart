@@ -157,208 +157,516 @@ export class Generator {
       `Processed ${words.length} words: ${(t2 - t1).toFixed(2)}ms`
     )
 
-    const circleR = 80
-    const { imgData, ctx: imgCtx } = createCircleImgData(circleR, 'red')
-    const hboundsCircle = this.wasm.create_hbounds(
-      new Uint32Array(imgData.data.buffer),
-      imgData.width,
-      imgData.height,
-      false
-    )
-    // const t: tm.Matrix = multiply(
-    //   // tm.translate(x, y),
-    //   tm.scale(1),
-    //   tm.scale(1.5)
-    // )
-    // const tw = new this.wasm.Matrix()
-    // tw.set_mut(t.a, t.b, t.c, t.d, t.e, t.f)
-
-    // hboundsCircle.set_transform_matrix(tw)
-
     let currentItemId = 1
     let addedItems: Item[] = []
     let addedHbounds: any[] = []
-    let addedImgCtxs: CanvasRenderingContext2D[] = []
 
     const shapeHBoundsJs = shape.hBounds.get_js()
 
-    const ctx = createCanvasCtx({
-      w: 800, //shapeHBoundsJs.bounds.w * (shapeHBoundsJs.transform?.a || 1),
-      h: 800, //shapeHBoundsJs.bounds.h * (shapeHBoundsJs.transform?.d || 1),
-    })
+    const debugCtx = createCanvasCtx({ w: 800, h: 800 })
 
     let scaleFactor = 1
-    const initialScale = 2.7 * scaleFactor
-    // const initialScale = 0.002
-    const finalScale = 0.005 * scaleFactor
-    // const finalScale = 1.99 * scaleFactor
-    const scaleStepFactor = 0.02
-    const maxScaleStep = 0.02
-    let timeout = 1500
+
+    const wordCurrentScales = words.map(() => 1)
+    const wordMaxScalePlaced = words.map(() => -1)
+    const wordMinScale = 0.05 * scaleFactor
+    let timeout = 4000
     let maxTimeout = 3000
     let timeoutStep = 300
-    let maxCount = 1000 //* shape.percentArea
-    // let maxCount = 30
+    let maxCount = 600
 
     let failedBatchesCount = 0
-    const maxFailedBatchesCount = 3
-
-    let scale = initialScale
+    let countPlaced = 0
 
     const tPrepEnd = performance.now()
     this.logger.debug(`Generator: ${(tPrepEnd - tStarted).toFixed(3)}ms`)
-    let countScale = 0
-    let count = 0
 
-    let tBatchStart = performance.now()
-    while (scale > finalScale && count < maxCount) {
-      // console.log('scale: ', scale)
-      const batchSize = 30
+    const getPad = (
+      bounds: Rect,
+      countPlaced: number,
+      scale: number,
+      maxScalePlaced: number | undefined
+    ) => {
+      const minDim = Math.min(bounds.h, bounds.w) * scale
+      let factor = 0.2
+      if (maxScalePlaced != null && scale < maxScalePlaced * 0.5) {
+        factor = 0.1
+      }
+      if (maxScalePlaced != null && scale < maxScalePlaced * 0.2) {
+        factor = 0.05
+      }
+      if (maxScalePlaced != null && scale < maxScalePlaced * 0.1) {
+        factor = 0.02
+      }
+      if (countPlaced > 100) {
+        factor = 0.01
+      }
+      const pad = minDim * factor
+      return pad > 1 ? pad : 0
+    }
+
+    const getBatchSize = (countPlaced: number, maxCount: number) => {
+      if (countPlaced < Math.max(0.05 * maxCount, 30)) {
+        return 40
+      }
+      if (countPlaced < 0.2 * maxCount) {
+        return 20
+      }
+      return 30
+    }
+
+    const getMaxFailedBatchesCount = (
+      countPlaced: number,
+      maxCount: number,
+      scale: number,
+      maxScalePlaced: number | undefined
+    ) => {
+      if (maxScalePlaced == null) {
+        return 3
+      }
+      if (countPlaced < 0.2 * maxCount) {
+        return 20
+      }
+      return 10
+    }
+
+    const getNextScale = (scale: number): number => {
+      const scaleStepFactor = 0.02
+      const maxScaleStep = 0.02
+      return scale - Math.min(maxScaleStep, scaleStepFactor * scale)
+    }
+
+    let start = performance.now()
+    let currentTime = performance.now()
+
+    let wordIndex = 0
+
+    while (countPlaced < maxCount && currentTime - start <= timeout) {
+      const word = words[wordIndex]
+      let currentScale = wordCurrentScales[wordIndex]
+
       let success = false
 
-      const isCircle = Math.random() > 1
+      // Try to place the word at the current scale
+      let scalesTried = 0
+      while (!success && currentScale >= wordMinScale) {
+        // console.log('scale: ', word.text, scalesTried, currentScale)
 
-      for (let i = 0; i < batchSize; ++i) {
-        const word = sample(words)!
-        const hboundsWord = this.wordHbounds.get(word.id)
-        if (!hboundsWord) {
-          throw new Error(`No hbounds for word ${word.id}`)
-        }
+        const batchSize = getBatchSize(countPlaced, maxCount)
+        let i = 0
 
-        // const rScaled = Math.max(3, circleR * scale)
-        const p = randomPointInsideHboundsSerialized(shapeHBoundsJs)
-        if (!p) {
-          continue
-        }
+        for (i = 0; i < batchSize; ++i) {
+          const hboundsWord = this.wordHbounds.get(word.id)
+          if (!hboundsWord) {
+            throw new Error(`No hbounds for word ${word.id}`)
+          }
 
-        // const bounds = hboundsWord.get_bounds()
-        const cx = p.x
-        const cy = p.y
+          const p = randomPointInsideHboundsSerialized(shapeHBoundsJs)
+          if (!p) {
+            continue
+          }
 
-        ctx.fillStyle = 'red'
-        ctx.fillRect(cx, cy, 2, 2)
+          const cx = p.x
+          const cy = p.y
 
-        const x = cx
-        const y = cy
+          debugCtx.fillStyle = 'red'
+          debugCtx.fillRect(cx, cy, 2, 2)
 
-        const transform: tm.Matrix = multiply(
-          tm.translate(x, y),
-          tm.scale(scale)
-        )
-        const transformWasm = new this.wasm.Matrix()
-        transformWasm.set_mut(
-          transform.a,
-          transform.b,
-          transform.c,
-          transform.d,
-          transform.e,
-          transform.f
-        )
+          const x = cx
+          const y = cy
 
-        // const transformWasm2 = transformWasm.copy()
+          const scaleRandomized =
+            currentScale + currentScale * (Math.random() - 0.5) * 2 * 0.1
+          const padBounds = hboundsWord.get_bounds()
 
-        let hasPlaced = collisionDetector.addItem(
-          isCircle ? hboundsCircle : hboundsWord,
-          transformWasm
-        )
-        // let hasPlaced = true // TODO: Remove
-        if (hasPlaced) {
-          // const ctx2 = createCanvasCtx({ w: 1000, h: 1000 })
+          const padItem = getPad(
+            padBounds,
+            countPlaced,
+            currentScale,
+            wordMaxScalePlaced[wordIndex]
+          )
+          const padShape = 0
 
-          // const hbounds2 = isCircle ? hboundsCircle : hboundsWord
+          const transform: tm.Matrix = multiply(
+            tm.translate(x, y),
+            tm.scale(scaleRandomized)
+          )
+          const transformWasm = new this.wasm.Matrix()
+          transformWasm.set_mut(
+            transform.a,
+            transform.b,
+            transform.c,
+            transform.d,
+            transform.e,
+            transform.f
+          )
 
-          // hbounds2.set_transform_matrix(transformWasm2)
-          // // @ts-ignore
-          // drawHBoundsWasm(ctx2, hbounds2, transform)
-          // drawHBoundsWasm(ctx2, shape.hBoundsInverted)
-          // console.screenshot(ctx2.canvas, 0.5)
+          const hasPlaced = collisionDetector.addItem(
+            hboundsWord,
+            transformWasm,
+            padShape,
+            padItem
+          )
 
-          success = true
-          addedHbounds.push({
-            ...(isCircle ? hboundsCircle : hboundsWord),
-            transform,
-          })
+          if (hasPlaced) {
+            if (wordMaxScalePlaced[wordIndex] == null) {
+              wordMaxScalePlaced[wordIndex] = currentScale
+            }
 
-          // const hboundsJs = (isCircle ? hboundsCircle : hboundsWord).get_js()
-          // const item = hBoundsWasmSerializedToPaperGroup({
-          //   ...hboundsJs,
-          //   // transform: compose(transform, hboundsJs.transform || tm.identity()),
-          // })
-          // item.transform(matrixToPaperTransform(transform))
-          // // console.log(
-          // //   'item transform: ',
-          // //   compose(transform, hboundsJs.transform || tm.identity()),
-          // //   hboundsJs.bounds
-          // // )
-          // const editor = (window as any)['editor'] as Editor
-          // editor.paperItems.shapeHbounds?.addChild(item)
-
-          if (isCircle) {
-            addedItems.push({
-              kind: 'img',
-              id: currentItemId++,
-              ctx: imgCtx,
+            success = true
+            addedHbounds.push({
+              hboundsWord,
               transform,
             })
-          } else {
-            // console.log(
-            //   'item transform 2: ',
-            //   compose(transform, hboundsJs.transform || tm.identity()),
-            //   this.wordPaths.get(word.id)?.getBoundingBox()
-            // )
+
             addedItems.push({
               kind: 'word',
               id: currentItemId++,
               word,
               wordPath: this.wordPaths.get(word.id)!,
               shapeColor: shape.color,
-              transform: compose(
-                transform
-                // hboundsJs.transform || tm.identity()
-              ),
+              transform: transform,
             })
+
+            countPlaced++
+            break
           }
+        }
 
-          countScale++
-          count++
-
-          break
+        if (!success) {
+          currentScale = getNextScale(currentScale)
+          scalesTried += 1
+        } else {
+          // console.log('success', i, currentScale)
         }
       }
 
-      const tBatchEnd = performance.now()
+      wordCurrentScales[wordIndex] = currentScale
 
-      if (!success) {
-        failedBatchesCount++
-      }
-
-      if (
-        failedBatchesCount >= maxFailedBatchesCount ||
-        tBatchEnd - tBatchStart > timeout ||
-        count > maxCount
-      ) {
-        scale -= Math.min(maxScaleStep, scaleStepFactor * scale)
-        if (countScale > 0) {
-          this.logger.debug('placed ', scale, countScale)
-        }
-        countScale = 0
-        failedBatchesCount = 0
-        tBatchStart = performance.now()
-      }
-      timeout = Math.min(maxTimeout, timeout + timeoutStep)
+      wordIndex = (wordIndex + 1) % words.length
+      currentTime = performance.now()
     }
-
-    // console.screenshot(ctx.canvas)
 
     const tEnded = performance.now()
     this.logger.debug(
-      `Generator: placed ${count} in ${(tEnded - tStarted).toFixed(3)}ms`
+      `Generator: placed ${countPlaced} in ${(tEnded - tPrepEnd).toFixed(3)}ms`
     )
 
     return {
       items: addedItems,
     }
   }
+
+  // generateOld = async (task: GenerateTask): Promise<GenerateResult> => {
+  //   if (!this.wasm) {
+  //     throw new Error('call init() first')
+  //   }
+  //   this.logger.debug('Generator: generate', task)
+  //   const tStarted = performance.now()
+
+  //   const shape = task.shape
+  //   const collisionDetector = new CollisionDetectorWasm(
+  //     this.wasm,
+  //     task.bounds,
+  //     shape.hBoundsInverted
+  //   )
+
+  //   const t1 = performance.now()
+  //   const words: Word[] = []
+  //   for (const wordItem of task.words) {
+  //     for (const font of wordItem.fonts) {
+  //       for (const angle of wordItem.angles) {
+  //         this.logger.debug(
+  //           `Processing word ${wordItem.text}, font ${getFontName(
+  //             font
+  //           )}, angle: ${angle}`
+  //         )
+  //         const word = await this.processWord(
+  //           wordItem.wordConfigId,
+  //           wordItem.text,
+  //           font,
+  //           angle
+  //         )
+  //         words.push(word)
+  //       }
+  //     }
+  //   }
+  //   const t2 = performance.now()
+
+  //   this.logger.debug(
+  //     `Processed ${words.length} words: ${(t2 - t1).toFixed(2)}ms`
+  //   )
+
+  //   const circleR = 80
+  //   const { imgData, ctx: imgCtx } = createCircleImgData(circleR, 'red')
+  //   const hboundsCircle = this.wasm.create_hbounds(
+  //     new Uint32Array(imgData.data.buffer),
+  //     imgData.width,
+  //     imgData.height,
+  //     false
+  //   )
+  //   // const t: tm.Matrix = multiply(
+  //   //   // tm.translate(x, y),
+  //   //   tm.scale(1),
+  //   //   tm.scale(1.5)
+  //   // )
+  //   // const tw = new this.wasm.Matrix()
+  //   // tw.set_mut(t.a, t.b, t.c, t.d, t.e, t.f)
+
+  //   // hboundsCircle.set_transform_matrix(tw)
+
+  //   let currentItemId = 1
+  //   let addedItems: Item[] = []
+  //   let addedHbounds: any[] = []
+  //   let addedImgCtxs: CanvasRenderingContext2D[] = []
+
+  //   const shapeHBoundsJs = shape.hBounds.get_js()
+
+  //   const ctx = createCanvasCtx({
+  //     w: 800, //shapeHBoundsJs.bounds.w * (shapeHBoundsJs.transform?.a || 1),
+  //     h: 800, //shapeHBoundsJs.bounds.h * (shapeHBoundsJs.transform?.d || 1),
+  //   })
+
+  //   let scaleFactor = 1
+  //   const initialScale = 2.7 * scaleFactor
+  //   // const initialScale = 0.002
+  //   const finalScale = 0.05 * scaleFactor
+  //   // const finalScale = 1.99 * scaleFactor
+  //   const scaleStepFactor = 0.02
+  //   const maxScaleStep = 0.02
+  //   let timeout = 1500
+  //   let maxTimeout = 3000
+  //   let timeoutStep = 300
+  //   let maxCount = 300 //* shape.percentArea
+  //   // let maxCount = 30
+
+  //   let failedBatchesCount = 0
+
+  //   let scale = initialScale
+
+  //   const tPrepEnd = performance.now()
+  //   this.logger.debug(`Generator: ${(tPrepEnd - tStarted).toFixed(3)}ms`)
+  //   let countScale = 0
+  //   let countPlaced = 0
+
+  //   let maxScalePlaced: number | undefined
+
+  //   const getPad = (
+  //     bounds: Rect,
+  //     countPlaced: number,
+  //     scale: number,
+  //     maxScalePlaced: number | undefined
+  //   ) => {
+  //     const minDim = Math.min(bounds.h, bounds.w)
+  //     let factor = 0.5
+  //     if (maxScalePlaced != null && scale < maxScalePlaced * 0.5) {
+  //       factor = 0.2
+  //     }
+  //     if (maxScalePlaced != null && scale < maxScalePlaced * 0.2) {
+  //       factor = 0.1
+  //     }
+  //     if (maxScalePlaced != null && scale < maxScalePlaced * 0.1) {
+  //       factor = 0.05
+  //     }
+  //     if (countPlaced > 100) {
+  //       factor = 0.01
+  //     }
+  //     const pad = minDim * factor
+  //     return pad > 1 ? pad : 0
+  //   }
+
+  //   const getBatchSize = (countPlaced: number, maxCount: number) => {
+  //     if (countPlaced < Math.max(0.05 * maxCount, 30)) {
+  //       return 40
+  //     }
+  //     if (countPlaced < 0.2 * maxCount) {
+  //       return 20
+  //     }
+  //     return 50
+  //   }
+
+  //   const getMaxFailedBatchesCount = (
+  //     countPlaced: number,
+  //     maxCount: number,
+  //     scale: number,
+  //     maxScalePlaced: number | undefined
+  //   ) => {
+  //     if (maxScalePlaced == null) {
+  //       return 3
+  //     }
+  //     if (countPlaced < 0.2 * maxCount) {
+  //       return 20
+  //     }
+  //     return 10
+  //   }
+
+  //   let tBatchStart = performance.now()
+  //   while (scale > finalScale && countPlaced < maxCount) {
+  //     // console.log('scale: ', scale)
+  //     const batchSize = getBatchSize(countPlaced, maxCount)
+  //     const maxFailedBatchesCount = getMaxFailedBatchesCount(
+  //       countPlaced,
+  //       maxCount,
+  //       scale,
+  //       maxScalePlaced
+  //     )
+  //     let success = false
+
+  //     const isCircle = Math.random() > 1
+  //     let word = sample(words)!
+
+  //     for (let i = 0; i < batchSize; ++i) {
+  //       const hboundsWord = this.wordHbounds.get(word.id)
+  //       if (!hboundsWord) {
+  //         throw new Error(`No hbounds for word ${word.id}`)
+  //       }
+
+  //       // const rScaled = Math.max(3, circleR * scale)
+  //       const p = randomPointInsideHboundsSerialized(shapeHBoundsJs)
+  //       if (!p) {
+  //         continue
+  //       }
+
+  //       // const bounds = hboundsWord.get_bounds()
+  //       const cx = p.x
+  //       const cy = p.y
+
+  //       ctx.fillStyle = 'red'
+  //       ctx.fillRect(cx, cy, 2, 2)
+
+  //       const x = cx
+  //       const y = cy
+
+  //       const scaleRandomized = scale + scale * (Math.random() - 0.5) * 2 * 0.1
+  //       const padBounds = hboundsWord.get_bounds()
+  //       const padItem = getPad(padBounds, countPlaced, scale, maxScalePlaced)
+  //       const padShape = 0
+
+  //       const transform: tm.Matrix = multiply(
+  //         tm.translate(x, y),
+  //         tm.scale(scaleRandomized)
+  //       )
+  //       const transformWasm = new this.wasm.Matrix()
+  //       transformWasm.set_mut(
+  //         transform.a,
+  //         transform.b,
+  //         transform.c,
+  //         transform.d,
+  //         transform.e,
+  //         transform.f
+  //       )
+
+  //       // const transformWasm2 = transformWasm.copy()
+
+  //       let hasPlaced = collisionDetector.addItem(
+  //         isCircle ? hboundsCircle : hboundsWord,
+  //         transformWasm,
+  //         padShape,
+  //         padItem
+  //       )
+  //       // let hasPlaced = true // TODO: Remove
+  //       if (hasPlaced) {
+  //         if (maxScalePlaced == null) {
+  //           maxScalePlaced = scale
+  //         }
+  //         // const ctx2 = createCanvasCtx({ w: 1000, h: 1000 })
+
+  //         // const hbounds2 = isCircle ? hboundsCircle : hboundsWord
+
+  //         // hbounds2.set_transform_matrix(transformWasm2)
+  //         // // @ts-ignore
+  //         // drawHBoundsWasm(ctx2, hbounds2, transform)
+  //         // drawHBoundsWasm(ctx2, shape.hBoundsInverted)
+  //         // console.screenshot(ctx2.canvas, 0.5)
+
+  //         success = true
+  //         addedHbounds.push({
+  //           ...(isCircle ? hboundsCircle : hboundsWord),
+  //           transform,
+  //         })
+
+  //         // const hboundsJs = (isCircle ? hboundsCircle : hboundsWord).get_js()
+  //         // const item = hBoundsWasmSerializedToPaperGroup({
+  //         //   ...hboundsJs,
+  //         //   // transform: compose(transform, hboundsJs.transform || tm.identity()),
+  //         // })
+  //         // item.transform(matrixToPaperTransform(transform))
+  //         // // console.log(
+  //         // //   'item transform: ',
+  //         // //   compose(transform, hboundsJs.transform || tm.identity()),
+  //         // //   hboundsJs.bounds
+  //         // // )
+  //         // const editor = (window as any)['editor'] as Editor
+  //         // editor.paperItems.shapeHbounds?.addChild(item)
+
+  //         if (isCircle) {
+  //           addedItems.push({
+  //             kind: 'img',
+  //             id: currentItemId++,
+  //             ctx: imgCtx,
+  //             transform,
+  //           })
+  //         } else {
+  //           // console.log(
+  //           //   'item transform 2: ',
+  //           //   compose(transform, hboundsJs.transform || tm.identity()),
+  //           //   this.wordPaths.get(word.id)?.getBoundingBox()
+  //           // )
+  //           addedItems.push({
+  //             kind: 'word',
+  //             id: currentItemId++,
+  //             word,
+  //             wordPath: this.wordPaths.get(word.id)!,
+  //             shapeColor: shape.color,
+  //             transform: compose(
+  //               transform
+  //               // hboundsJs.transform || tm.identity()
+  //             ),
+  //           })
+  //         }
+
+  //         countScale++
+  //         countPlaced++
+
+  //         word = sample(words)!
+
+  //         break
+  //       }
+  //     }
+
+  //     const tBatchEnd = performance.now()
+
+  //     if (!success) {
+  //       failedBatchesCount++
+  //     }
+
+  //     if (
+  //       failedBatchesCount >= maxFailedBatchesCount ||
+  //       tBatchEnd - tBatchStart > timeout ||
+  //       countPlaced > maxCount
+  //     ) {
+  //       scale -= Math.min(maxScaleStep, scaleStepFactor * scale)
+  //       if (countScale > 0) {
+  //         this.logger.debug('placed ', scale, countScale)
+  //       }
+  //       countScale = 0
+  //       failedBatchesCount = 0
+  //       tBatchStart = performance.now()
+  //     }
+  //     timeout = Math.min(maxTimeout, timeout + timeoutStep)
+  //   }
+
+  //   // console.screenshot(ctx.canvas)
+
+  //   const tEnded = performance.now()
+  //   this.logger.debug(
+  //     `Generator: placed ${countPlaced} in ${(tEnded - tStarted).toFixed(3)}ms`
+  //   )
+
+  //   return {
+  //     items: addedItems,
+  //   }
+  // }
 
   computeHboundsForPath = async (
     path: Path,
