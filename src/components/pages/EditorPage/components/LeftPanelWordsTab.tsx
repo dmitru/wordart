@@ -5,7 +5,9 @@ import { BaseBtn } from 'components/shared/BaseBtn/BaseBtn'
 import * as evaicons from '@styled-icons/evaicons-outline'
 import { useState, useCallback, useRef } from 'react'
 
-export type LeftPanelWordsTabProps = {}
+export type LeftPanelWordsTabProps = {
+  type: 'shape' | 'background'
+}
 
 const Toolbar = styled.div``
 
@@ -81,22 +83,18 @@ const WordTitleInlineEditor: React.FC<{
 }
 
 export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
-  () => {
+  (props) => {
     const { editorPageStore } = useStore()
-    const style =
-      editorPageStore.activeStyleTab === 'shape'
-        ? editorPageStore.shapeStyle
-        : editorPageStore.backgroundStyle
+    const style = props.type
+      ? editorPageStore.shapeStyle
+      : editorPageStore.backgroundStyle
     const words = style.words
 
     return (
       <>
+        <h4>WORDS</h4>
         <Toolbar>
-          <AddBtn
-            onClick={() =>
-              editorPageStore.addEmptyWord(editorPageStore.activeStyleTab)
-            }
-          >
+          <AddBtn onClick={() => editorPageStore.addEmptyWord(props.type)}>
             <evaicons.PlusOutline size="20" /> Add
           </AddBtn>
         </Toolbar>
@@ -107,21 +105,14 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               <WordTitleInlineEditor
                 value={word.text}
                 onChange={(value) => {
-                  editorPageStore.updateWord(
-                    editorPageStore.activeStyleTab,
-                    word.id,
-                    { text: value }
-                  )
+                  editorPageStore.updateWord(props.type, word.id, {
+                    text: value,
+                  })
                 }}
               />
 
               <DeleteBtn
-                onClick={() =>
-                  editorPageStore.deleteWord(
-                    editorPageStore.activeStyleTab,
-                    word.id
-                  )
-                }
+                onClick={() => editorPageStore.deleteWord(props.type, word.id)}
               >
                 <evaicons.CloseOutline size="20" />
               </DeleteBtn>

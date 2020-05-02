@@ -5,6 +5,7 @@ import { theme } from 'styles/theme'
 import styled from 'styled-components'
 import { StyledIconBase } from '@styled-icons/styled-icon'
 import 'normalize.css/normalize.css'
+import 'react-rangeslider/lib/index.css'
 
 /**
  * Enables styled-components SSR:

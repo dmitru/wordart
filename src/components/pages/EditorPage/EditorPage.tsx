@@ -14,6 +14,7 @@ import { BaseBtn } from 'components/shared/BaseBtn/BaseBtn'
 import { LeftPanelWordsTab } from 'components/pages/EditorPage/components/LeftPanelWordsTab'
 import { Dimensions } from 'lib/wordart/canvas-utils'
 import { LeftPanelStyleTab } from 'components/pages/EditorPage/components/LeftPanelStyleTab'
+import { observable, runInAction } from 'mobx'
 
 const PageLayoutWrapper = styled.div`
   display: flex;
@@ -120,6 +121,10 @@ const VisualizeBtn = styled(BaseBtn)`
   font-size: 15px;
 `
 
+const state = observable({
+  isVisualizing: false,
+})
+
 export const EditorPage = observer(() => {
   const [canvasSize, setCanvasSize] = useState<Dimensions>({ w: 900, h: 900 })
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -140,36 +145,24 @@ export const EditorPage = observer(() => {
       <TopNavWrapper>
         HEADER
         <VisualizeBtn
-          onClick={() => {
-            editorPageStore.editor?.generateItems('shape')
-            editorPageStore.editor?.generateItems('background')
+          disabled={state.isVisualizing}
+          onClick={async () => {
+            state.isVisualizing = true
+            await Promise.all([
+              editorPageStore.editor?.generateItems('shape'),
+              editorPageStore.editor?.generateItems('background'),
+            ])
+            state.isVisualizing = false
           }}
         >
-          Visualize
+          {state.isVisualizing ? 'Visualizing...' : 'Visualize'}
         </VisualizeBtn>
       </TopNavWrapper>
 
       <EditorLayout>
         <LeftWrapper>
           <LeftNavbar>
-            <LeftNavbarBtn
-              onClick={() => {
-                editorPageStore.setActiveStyleTab('shape')
-              }}
-              active={editorPageStore.activeStyleTab === 'shape'}
-            >
-              Shape
-            </LeftNavbarBtn>
-            <LeftNavbarBtn
-              onClick={() => {
-                editorPageStore.setActiveStyleTab('background')
-              }}
-              active={editorPageStore.activeStyleTab === 'background'}
-            >
-              Background
-            </LeftNavbarBtn>
-
-            <LeftNavbarBtn
+            {/* <LeftNavbarBtn
               onClick={() => {
                 editorPageStore.setLeftPanelTab('templates')
               }}
@@ -177,7 +170,7 @@ export const EditorPage = observer(() => {
             >
               <Rocket className="icon" />
               Templates
-            </LeftNavbarBtn>
+            </LeftNavbarBtn> */}
             <LeftNavbarBtn
               onClick={() => {
                 editorPageStore.setLeftPanelTab('shapes')
@@ -187,23 +180,22 @@ export const EditorPage = observer(() => {
               <Shapes className="icon" />
               Shape
             </LeftNavbarBtn>
+
             <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.setLeftPanelTab('words')
+                editorPageStore.setLeftPanelTab('style:shape')
               }}
-              active={editorPageStore.activeLeftTab === 'words'}
+              active={editorPageStore.activeLeftTab === 'style:shape'}
             >
-              <Text className="icon" />
-              Words
+              Style: Shape
             </LeftNavbarBtn>
             <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.setLeftPanelTab('style')
+                editorPageStore.setLeftPanelTab('style:bg')
               }}
-              active={editorPageStore.activeLeftTab === 'style'}
+              active={editorPageStore.activeLeftTab === 'style:bg'}
             >
-              <ColorLens className="icon" />
-              Style
+              Style: Background
             </LeftNavbarBtn>
           </LeftNavbar>
 
@@ -211,8 +203,24 @@ export const EditorPage = observer(() => {
             {editorPageStore.activeLeftTab === 'shapes' && (
               <LeftPanelShapesTab />
             )}
-            {editorPageStore.activeLeftTab === 'words' && <LeftPanelWordsTab />}
-            {editorPageStore.activeLeftTab === 'style' && <LeftPanelStyleTab />}
+            <div>
+              <LeftPanelStyleTab
+                type={
+                  editorPageStore.activeLeftTab === 'style:bg'
+                    ? 'background'
+                    : 'shape'
+                }
+              />
+            </div>
+            <div>
+              <LeftPanelWordsTab
+                type={
+                  editorPageStore.activeLeftTab === 'style:bg'
+                    ? 'background'
+                    : 'shape'
+                }
+              />
+            </div>
           </LeftPanel>
         </LeftWrapper>
 

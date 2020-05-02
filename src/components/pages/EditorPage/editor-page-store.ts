@@ -5,7 +5,7 @@ import { icons } from 'data/shapes'
 import { Font } from 'components/pages/EditorPage/generator'
 import { range } from 'lodash'
 
-type LeftPanelTab = 'templates' | 'shapes' | 'words' | 'style'
+type LeftPanelTab = 'shapes' | 'style:shape' | 'style:bg'
 
 export type ShapeStyle = {
   bgColor: string
@@ -40,8 +40,6 @@ export class EditorPageStore {
 
   @observable activeLeftTab: LeftPanelTab = 'shapes'
 
-  @observable activeStyleTab: 'shape' | 'background' = 'shape'
-
   @observable shapeStyle: ShapeStyle = {
     bgColor: '#f45b5c33',
     itemsColor: '#f45b5c',
@@ -69,10 +67,6 @@ export class EditorPageStore {
 
   @action setLeftPanelTab = (tabId: LeftPanelTab) => {
     this.activeLeftTab = tabId
-  }
-
-  @action setActiveStyleTab = (tabId: 'shape' | 'background') => {
-    this.activeStyleTab = tabId
   }
 
   @action selectShape = async (shapeId: ShapeId) => {

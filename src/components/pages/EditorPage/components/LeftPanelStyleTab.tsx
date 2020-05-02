@@ -3,37 +3,74 @@ import { useStore } from 'root-store'
 import { ChromePicker } from 'react-color'
 import { runInAction } from 'mobx'
 import chroma from 'chroma-js'
+import { useState } from 'react'
+import styled from 'styled-components'
+import Slider from 'react-rangeslider'
 
-export type LeftPanelStyleTabProps = {}
+export type ColorPickerProps = {
+  value: string
+  onChange?: (hex: string) => void
+  onAfterChange?: (hex: string) => void
+}
+
+const ColorSwatch = styled.button<{ color: string }>`
+  outline: none;
+  padding: 0;
+  margin: 0;
+  display: inline-block;
+  width: 80px;
+  height: 30px;
+  background: ${(p) => p.color};
+`
+
+export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
+  const [isOpen, setIsOpen] = useState(false)
+  return (
+    <>
+      <ColorSwatch onClick={() => setIsOpen(!isOpen)} color={props.value} />
+      {isOpen && (
+        <ChromePicker
+          color={props.value}
+          onChange={(color) => {
+            const hex = chroma(
+              color.rgb.r,
+              color.rgb.g,
+              color.rgb.b,
+              color.rgb.a || 1
+            ).hex()
+            if (props.onChange) {
+              props.onChange(hex)
+            }
+          }}
+        />
+      )}
+    </>
+  )
+}
+
+export type LeftPanelStyleTabProps = {
+  type: 'shape' | 'background'
+}
 
 export const LeftPanelStyleTab: React.FC<LeftPanelStyleTabProps> = observer(
-  () => {
+  (props) => {
     const { editorPageStore } = useStore()
     const style =
-      editorPageStore.activeStyleTab === 'shape'
+      props.type === 'shape'
         ? editorPageStore.shapeStyle
         : editorPageStore.backgroundStyle
+
     return (
       <>
         <div>
           BG:
-          <ChromePicker
-            color={style.bgColor}
-            onChange={(color) => {
-              if (!editorPageStore) {
-                return
-              }
+          <ColorPicker
+            value={style.bgColor}
+            onChange={(hex) => {
               runInAction(() => {
-                const hex = chroma(
-                  color.rgb.r,
-                  color.rgb.g,
-                  color.rgb.b,
-                  color.rgb.a || 1
-                ).hex()
-
                 style.bgColor = hex
                 if (editorPageStore.editor) {
-                  if (editorPageStore.activeStyleTab === 'shape') {
+                  if (props.type === 'shape') {
                     editorPageStore.editor.setBgShapeColor(hex)
                   } else {
                     editorPageStore.editor.setBackgroundColor(hex)
@@ -46,31 +83,33 @@ export const LeftPanelStyleTab: React.FC<LeftPanelStyleTabProps> = observer(
 
         <div>
           Items:
-          <ChromePicker
-            color={style.itemsColor}
-            onChangeComplete={(color) => {
-              if (!editorPageStore) {
-                return
-              }
+          <ColorPicker
+            value={style.itemsColor}
+            onChange={(hex) => {
               runInAction(() => {
-                const hex = chroma(
-                  color.rgb.r,
-                  color.rgb.g,
-                  color.rgb.b,
-                  color.rgb.a || 1
-                ).hex()
-
                 style.itemsColor = hex
                 if (editorPageStore.editor) {
-                  if (editorPageStore.activeStyleTab === 'shape') {
+                  if (props.type === 'shape') {
                     editorPageStore.editor.setShapeItemsColor(hex)
                   } else {
                     editorPageStore.editor.setBgItemsColor(hex)
                   }
                 }
               })
-              // editorPageStore.editor?.generateAndRenderAll()
             }}
+          />
+        </div>
+
+        <div>
+          <Slider
+            value={style.angles[0]}
+            onChange={(value) => {
+              const val = (value as any) as number
+              style.angles = [val]
+            }}
+            min={-90}
+            max={90}
+            step={1}
           />
         </div>
       </>

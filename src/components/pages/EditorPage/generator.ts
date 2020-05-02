@@ -112,7 +112,7 @@ export class Generator {
     const wordMaxScalePlaced = words.map(() => -1)
     const wordMinScale = 0.02
     let timeout = 1500
-    let maxCount = 800
+    let maxCount = 600
 
     let countPlaced = 0
 
