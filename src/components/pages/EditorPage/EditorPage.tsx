@@ -141,7 +141,8 @@ export const EditorPage = observer(() => {
         HEADER
         <VisualizeBtn
           onClick={() => {
-            editorPageStore.editor?.generateItems()
+            editorPageStore.editor?.generateItems('shape')
+            editorPageStore.editor?.generateItems('background')
           }}
         >
           Visualize
@@ -151,6 +152,23 @@ export const EditorPage = observer(() => {
       <EditorLayout>
         <LeftWrapper>
           <LeftNavbar>
+            <LeftNavbarBtn
+              onClick={() => {
+                editorPageStore.setActiveStyleTab('shape')
+              }}
+              active={editorPageStore.activeStyleTab === 'shape'}
+            >
+              Shape
+            </LeftNavbarBtn>
+            <LeftNavbarBtn
+              onClick={() => {
+                editorPageStore.setActiveStyleTab('background')
+              }}
+              active={editorPageStore.activeStyleTab === 'background'}
+            >
+              Background
+            </LeftNavbarBtn>
+
             <LeftNavbarBtn
               onClick={() => {
                 editorPageStore.setLeftPanelTab('templates')

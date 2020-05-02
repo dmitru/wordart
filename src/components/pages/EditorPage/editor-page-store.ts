@@ -1,11 +1,18 @@
 import { observable, action, set, runInAction } from 'mobx'
 import { RootStore } from 'root-store'
-import { without } from 'lodash'
 import { Editor, EditorInitParams } from 'components/pages/EditorPage/editor'
-import { sleep, waitAnimationFrame } from 'utils/async'
 import { icons } from 'data/shapes'
+import { Font } from 'components/pages/EditorPage/generator'
+import { range } from 'lodash'
 
 type LeftPanelTab = 'templates' | 'shapes' | 'words' | 'style'
+
+export type ShapeStyle = {
+  bgColor: string
+  itemsColor: string
+  words: WordConfig[]
+  angles: number[]
+}
 
 export class EditorPageStore {
   rootStore: RootStore
@@ -22,6 +29,8 @@ export class EditorPageStore {
     this.state = 'initialized'
     // @ts-ignore
     window['editor'] = this.editor
+
+    this.selectShape(this.selectedShapeId)
   }
 
   @action destroyEditor = () => {
@@ -31,43 +40,47 @@ export class EditorPageStore {
 
   @observable activeLeftTab: LeftPanelTab = 'shapes'
 
-  @observable bgColor = '#ffffff'
-  @observable bgShapeColor = '#D2D2D2'
-  // @observable itemsColor = '#ffffffff'
-  @observable itemsColor = '#3F3F3F'
+  @observable activeStyleTab: 'shape' | 'background' = 'shape'
 
-  @observable availableShape: ShapeConfig[] = shapes
+  @observable shapeStyle: ShapeStyle = {
+    bgColor: '#f45b5c33',
+    itemsColor: '#f45b5c',
+    words: defaultWordsConfig,
+    angles: [-15],
+    // angles: range(-45, 45, 20),
+  }
+  @observable backgroundStyle: ShapeStyle = {
+    itemsColor: '#bbb',
+    bgColor: '#ffffff',
+    words: defaultWordsConfig2,
+    angles: [20],
+  }
+
+  @observable availableShapes: ShapeConfig[] = shapes
   @observable selectedShapeId: ShapeId = shapes[5].id
 
-  @observable private words: WordConfig[] = defaultWordsConfig
   private nextWordId = defaultWordsConfig.length + 1
 
   getAvailableShapes = (): ShapeConfig[] => shapes
-  getWords = (): WordConfig[] => this.words
 
   getSelectedShape = () => {
-    return this.availableShape.find((s) => s.id === this.selectedShapeId)!
+    return this.availableShapes.find((s) => s.id === this.selectedShapeId)!
   }
 
   @action setLeftPanelTab = (tabId: LeftPanelTab) => {
     this.activeLeftTab = tabId
   }
 
+  @action setActiveStyleTab = (tabId: 'shape' | 'background') => {
+    this.activeStyleTab = tabId
+  }
+
   @action selectShape = async (shapeId: ShapeId) => {
-    if (shapeId === this.selectedShapeId) {
-      return
-    }
     if (this.editor) {
       runInAction(() => {
         this.selectedShapeId = shapeId
       })
       this.editor.updateBgShape()
-      // if (true) {
-      //   this.editor.shapes = undefined
-      //   await this.editor.clearAndRenderBgShape()
-      // }
-      // await waitAnimationFrame()
-      // await this.editor.generateAndRenderAll()
     } else {
       runInAction(() => {
         this.selectedShapeId = shapeId
@@ -75,12 +88,14 @@ export class EditorPageStore {
     }
   }
 
-  @action deleteWord = (wordId: WordConfigId) => {
-    this.words = this.words.filter((w) => w.id !== wordId)
+  @action deleteWord = (type: 'shape' | 'background', wordId: WordConfigId) => {
+    const style = type === 'shape' ? this.shapeStyle : this.backgroundStyle
+    style.words = style.words.filter((w) => w.id !== wordId)
   }
 
-  @action addEmptyWord = () => {
-    this.words.push({
+  @action addEmptyWord = (type: 'shape' | 'background') => {
+    const style = type === 'shape' ? this.shapeStyle : this.backgroundStyle
+    style.words.push({
       id: this.nextWordId,
       text: '',
     })
@@ -88,10 +103,12 @@ export class EditorPageStore {
   }
 
   @action updateWord = (
+    type: 'shape' | 'background',
     wordId: WordConfigId,
     update: Partial<Omit<WordConfig, 'id'>>
   ) => {
-    const word = this.words.find((w) => w.id === wordId)
+    const style = type === 'shape' ? this.shapeStyle : this.backgroundStyle
+    const word = style.words.find((w) => w.id === wordId)
     if (!word) {
       throw new Error(`missing word, id = ${wordId}`)
     }
@@ -106,21 +123,6 @@ export type WordConfig = {
 
 export type WordConfigId = number
 
-// const defaultWordsConfig: WordConfig[] = [
-//   {
-//     id: 1,
-//     text: 'Word',
-//   },
-//   // {
-//   //   id: 2,
-//   //   text: 'Cloud',
-//   // },
-//   // {
-//   //   id: 3,
-//   //   text: 'Art',
-//   // },
-// ]
-
 const defaultWordsConfig: WordConfig[] = [
   'word',
   'cloud',
@@ -132,6 +134,13 @@ const defaultWordsConfig: WordConfig[] = [
   'impress',
   'stunning',
   'creative',
+].map((s, index) => ({ id: index, text: s } as WordConfig))
+
+const defaultWordsConfig2: WordConfig[] = [
+  'vertical',
+  'background',
+  'wall',
+  'art',
 ].map((s, index) => ({ id: index, text: s } as WordConfig))
 
 export type ShapeConfig = {

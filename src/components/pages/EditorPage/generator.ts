@@ -110,9 +110,9 @@ export class Generator {
 
     const wordCurrentScales = words.map(() => 1)
     const wordMaxScalePlaced = words.map(() => -1)
-    const wordMinScale = 0.03
-    let timeout = 4000
-    let maxCount = 600
+    const wordMinScale = 0.02
+    let timeout = 1500
+    let maxCount = 800
 
     let countPlaced = 0
 
@@ -146,12 +146,12 @@ export class Generator {
 
     const getBatchSize = (countPlaced: number, maxCount: number) => {
       if (countPlaced < Math.max(0.05 * maxCount, 30)) {
-        return 40
-      }
-      if (countPlaced < 0.2 * maxCount) {
         return 20
       }
-      return 20
+      if (countPlaced < 0.2 * maxCount) {
+        return 10
+      }
+      return 10
     }
 
     const getNextScale = (scale: number): number => {
@@ -293,7 +293,7 @@ export class Generator {
     this.logger.debug('computeHboundsForPath: ')
 
     const pathScale = 1
-    const imgSize = 500
+    const imgSize = 100
 
     const pathBbox = path.getBoundingBox()
     const pathBboxRect = {
@@ -336,30 +336,19 @@ export class Generator {
       ctx.canvas.width,
       ctx.canvas.height
     )
-    // console.screenshot(ctx.canvas, 1)
+
     const hboundsWasm = this.wasm.create_hbounds(
       new Uint32Array(imageData.data.buffer),
       canvas.width,
       canvas.height,
       false
     )
-    // if (visualize) {
-    //   drawHBoundsWasm(ctx, hboundsWasm)
-    //   console.screenshot(ctx.canvas)
-    // }
 
     const hboundsWasmTransform = multiply(
       tm.scale(1 / pathAaabScaleFactor),
-      // tm.scale(1.5),
-      // tm.translate(10, 10)
-      // tm.identity(),
-      // tm.translate(0, 100)
       tm.translate(pathAaab.x, pathAaab.y)
     )
 
-    // const hboundsWasmTransform = tm.scale(1 / pathAaabScaleFactor)
-
-    // console.log('FISH: ', pathAaabScaleFactor)
     hboundsWasm.set_transform(
       hboundsWasmTransform.a,
       hboundsWasmTransform.b,
@@ -369,7 +358,6 @@ export class Generator {
       hboundsWasmTransform.f
     )
 
-    // console.log('FISH2: ', hboundsWasm.get_bounds())
     return hboundsWasm
   }
 }
@@ -496,14 +484,6 @@ export class Symbol {
     path.fill = ctx.fillStyle
     path.draw(ctx)
   }
-
-  // computeHBounds(angle = 0, scaleFactor = 1): HBounds {
-  //   return computeHBoundsForPath(
-  //     this.glyph.getPath(0, 0, this.fontSize),
-  //     angle,
-  //     scaleFactor
-  //   ).hBounds
-  // }
 }
 
 export const getFontName = (font: Font): string => font.names.fullName.en

@@ -83,25 +83,46 @@ const WordTitleInlineEditor: React.FC<{
 export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
   () => {
     const { editorPageStore } = useStore()
+    const style =
+      editorPageStore.activeStyleTab === 'shape'
+        ? editorPageStore.shapeStyle
+        : editorPageStore.backgroundStyle
+    const words = style.words
+
     return (
       <>
         <Toolbar>
-          <AddBtn onClick={() => editorPageStore.addEmptyWord()}>
+          <AddBtn
+            onClick={() =>
+              editorPageStore.addEmptyWord(editorPageStore.activeStyleTab)
+            }
+          >
             <evaicons.PlusOutline size="20" /> Add
           </AddBtn>
         </Toolbar>
 
         <WordList>
-          {editorPageStore.getWords().map((word) => (
+          {words.map((word) => (
             <WordRow key={word.id}>
               <WordTitleInlineEditor
                 value={word.text}
                 onChange={(value) => {
-                  editorPageStore.updateWord(word.id, { text: value })
+                  editorPageStore.updateWord(
+                    editorPageStore.activeStyleTab,
+                    word.id,
+                    { text: value }
+                  )
                 }}
               />
 
-              <DeleteBtn onClick={() => editorPageStore.deleteWord(word.id)}>
+              <DeleteBtn
+                onClick={() =>
+                  editorPageStore.deleteWord(
+                    editorPageStore.activeStyleTab,
+                    word.id
+                  )
+                }
+              >
                 <evaicons.CloseOutline size="20" />
               </DeleteBtn>
             </WordRow>

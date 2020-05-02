@@ -56,19 +56,18 @@ pub struct RectF {
 
 impl RectF {
     pub fn intersect(r1: Self, r2: Self, pad1: f32, pad2: f32) -> bool {
-        let minx1 = r1.x - pad1;
-        let maxx1 = r1.x + r1.w + 2f32 * pad1;
-        let minx2 = r2.x - pad2;
-        let maxx2 = r2.x + r2.w + 2f32 * pad2;
-
         let miny1 = r1.y - pad1;
-        let maxy1 = r1.y + r1.h + 2f32 * pad1;
         let miny2 = r2.y - pad2;
-        let maxy2 = r2.y + r2.h + 2f32 * pad2;
-
+        let maxy2 = r2.y + r2.h + pad2;
+        let maxy1 = r1.y + r1.h + pad1;
         if miny1 >= maxy2 || miny2 >= maxy1 {
             return false;
         }
+        //
+        let minx1 = r1.x - pad1;
+        let maxx1 = r1.x + r1.w + pad1;
+        let minx2 = r2.x - pad2;
+        let maxx2 = r2.x + r2.w + pad2;
 
         if minx1 >= maxx2 || minx2 >= maxx1 {
             return false;
@@ -336,7 +335,7 @@ impl HBounds {
 
         let max_level1 = 9;
         let max_level2 = 9;
-        let min_size = 1f32;
+        let min_size = 2f32;
 
         let transform1 = match hbounds1.transform {
             Some(t) => t,

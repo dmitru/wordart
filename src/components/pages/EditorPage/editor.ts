@@ -1,10 +1,7 @@
 import { EditorPageStore } from 'components/pages/EditorPage/editor-page-store'
 import { fetchImage, createCanvasCtx } from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
-import {
-  getWasmModule,
-  HBoundsWasmSerialized,
-} from 'lib/wordart/wasm/wasm-module'
+import { getWasmModule } from 'lib/wordart/wasm/wasm-module'
 import { Rect, padRect } from 'lib/wordart/geometry'
 import {
   ImageProcessorWasm,
@@ -14,13 +11,8 @@ import { Generator } from 'components/pages/EditorPage/generator'
 import chroma from 'chroma-js'
 import paper from 'paper'
 import { loadFont } from 'lib/wordart/fonts'
-import { Matrix } from 'lib/wordart/wasm/wasm-gen-types'
 import * as tm from 'transformation-matrix'
-import {
-  hBoundsWasmSerializedToPaperGroup,
-  matrixToPaperTransform,
-} from 'components/pages/EditorPage/paper-utils'
-import { range } from 'lodash'
+import { matrixToPaperTransform } from 'components/pages/EditorPage/paper-utils'
 
 const FONT_NAMES = [
   'mountains-of-christmas_bold.ttf',
@@ -43,8 +35,11 @@ export class Editor {
 
   paperItems: {
     bgRect: paper.Path
+    bgItemsGroup?: paper.Group
+    bgWordIdToSymbolDef: Map<string, paper.SymbolDefinition>
     shape?: paper.Item
     shapeHbounds?: paper.Group
+    shapeWordIdToSymbolDef: Map<string, paper.SymbolDefinition>
     shapeItemsGroup?: paper.Group
   }
 
@@ -66,9 +61,11 @@ export class Editor {
       new paper.Point(0, 0),
       new paper.Point(params.canvas.width, params.canvas.height)
     )
-    bgRect.fillColor = new paper.Color(this.store.bgColor)
+    bgRect.fillColor = new paper.Color(this.store.backgroundStyle.bgColor)
     this.paperItems = {
       bgRect,
+      bgWordIdToSymbolDef: new Map(),
+      shapeWordIdToSymbolDef: new Map(),
     }
 
     // params.canvas.add
@@ -84,12 +81,26 @@ export class Editor {
     }
   }
 
-  setShapeItemsColor = (color: string) => {
-    if (this.paperItems.shapeItemsGroup) {
-      this.paperItems.shapeItemsGroup.children.forEach((c) => {
-        c.fillColor = new paper.Color(color)
-      })
+  setBgItemsColor = (color: string) => {
+    // if (this.paperItems.bgItemsGroup) {
+    for (const symDef of this.paperItems.bgWordIdToSymbolDef.values()) {
+      symDef.item.fillColor = new paper.Color(color)
     }
+    // this.paperItems.bgItemsGroup.children.forEach((c) => {
+    //   c.
+    // })
+    // }
+  }
+
+  setShapeItemsColor = (color: string) => {
+    for (const symDef of this.paperItems.shapeWordIdToSymbolDef.values()) {
+      symDef.item.fillColor = new paper.Color(color)
+    }
+    // if (this.paperItems.shapeItemsGroup) {
+    //   this.paperItems.shapeItemsGroup.children.forEach((c) => {
+    //     c.fillColor = new paper.Color(color)
+    //   })
+    // }
   }
 
   updateBgShape = async () => {
@@ -106,7 +117,7 @@ export class Editor {
             resolve(item as paper.Group)
           )
       )
-      shapeItemGroup.fillColor = new paper.Color(this.store.bgShapeColor)
+      shapeItemGroup.fillColor = new paper.Color(this.store.shapeStyle.bgColor)
       shapeItem = shapeItemGroup
     } else {
       const shapeItemRaster: paper.Raster = await new Promise<paper.Raster>(
@@ -142,6 +153,8 @@ export class Editor {
 
     this.paperItems.shapeItemsGroup?.remove()
     this.paperItems.shapeItemsGroup = undefined
+    this.paperItems.bgItemsGroup?.remove()
+    this.paperItems.bgItemsGroup = undefined
     this.shapes = undefined
   }
 
@@ -152,7 +165,12 @@ export class Editor {
     h: paper.view.bounds.height - pad * 2,
   })
 
-  generateItems = async () => {
+  generateItems = async (type: 'shape' | 'background') => {
+    const isBackground = type === 'background'
+    const style = isBackground
+      ? this.store.backgroundStyle
+      : this.store.shapeStyle
+
     this.logger.debug('Editor: generate')
 
     if (!this.paperItems.shape) {
@@ -166,12 +184,10 @@ export class Editor {
           new paper.Rectangle(0, 0, raster.width, raster.height)
         )
         const ctx = createCanvasCtx({
-          w: raster.width,
-          h: raster.height,
+          w: raster.width + 4,
+          h: raster.height + 2,
         })
         ctx.putImageData(imgData, 2, 2)
-        // console.log('raster', raster)
-        // console.screenshot(ctx.canvas)
 
         const wasm = await getWasmModule()
 
@@ -221,7 +237,8 @@ export class Editor {
     const nonTransparentShapes = this.shapes
       .filter((shape) => {
         const color = chroma(shape.color)
-        return !(color.alpha() > 0.01 && color.luminance() < 0.95)
+        const isEmpty = color.alpha() > 0.01 && color.luminance() < 0.95
+        return isBackground ? !isEmpty : isEmpty
       })
       .slice(0, 1)
     this.logger.debug(
@@ -245,32 +262,16 @@ export class Editor {
       const result = await this.generator.generate({
         shape,
         bounds: this.getSceneBounds(),
-        words: this.store.getWords().map((wc) => ({
+        words: style.words.map((wc) => ({
           wordConfigId: wc.id,
           // angles: [0, -(90 * Math.PI) / 180, -(30 * Math.PI) / 180],
-          angles: [0, -(90 * Math.PI) / 180],
-          // angles: range(-90, 90, 5).map((deg) => (-deg * Math.PI) / 180),
+          angles: style.angles.map((aDeg) => (aDeg * Math.PI) / 180),
           fillColors: ['red'],
           // fonts: [fonts[0], fonts[1], fonts[2]],
-          fonts: [fonts[0]],
+          fonts: isBackground ? [fonts[0]] : [fonts[1]],
           text: wc.text,
         })),
       })
-
-      // const ctx2 = createCanvasCtx({ w: 1000, h: 1000 })
-
-      // for (const item of result.items) {
-      //   if (item.kind === 'text') {
-
-      //   }
-      // }
-      // const hbounds2
-
-      // hbounds2.set_transform_matrix(transformWasm2)
-      // @ts-ignore
-      // drawHBoundsWasm(ctx2, hbounds2, transform)
-      // drawHBoundsWasm(ctx2, shape.hBoundsInverted)
-      // console.screenshot(ctx2.canvas, 0.5)
 
       const addedItems: paper.Item[] = []
       let img: HTMLImageElement | null = null
@@ -292,7 +293,6 @@ export class Editor {
             item.transform.e + w / 2,
             item.transform.f + h / 2
           )
-          // console.log('item = ', itemImg.position.x, itemImg.position.y)
           addedItems.push(itemImg)
         } else if (item.kind === 'word') {
           const wordId = item.word.id
@@ -308,7 +308,7 @@ export class Editor {
             const pathItems = paths.map((path) => {
               let pathData = path.toPathData(3)
               const item = paper.Path.create(pathData)
-              item.fillColor = new paper.Color(this.store.itemsColor)
+              item.fillColor = new paper.Color(style.itemsColor)
               item.fillRule = 'evenodd'
               return item
             })
@@ -332,12 +332,17 @@ export class Editor {
         }
       }
 
-      if (this.paperItems.shapeItemsGroup) {
-        this.paperItems.shapeItemsGroup.remove()
+      if (isBackground) {
+        this.paperItems.bgItemsGroup?.remove()
+        this.paperItems.bgItemsGroup = new paper.Group(addedItems)
+        this.paperItems.bgItemsGroup.insertAbove(this.paperItems.shape)
+        this.paperItems.bgWordIdToSymbolDef = wordIdToSymbolDef
+      } else {
+        this.paperItems.shapeItemsGroup?.remove()
+        this.paperItems.shapeItemsGroup = new paper.Group(addedItems)
+        this.paperItems.shapeItemsGroup.insertAbove(this.paperItems.shape)
+        this.paperItems.shapeWordIdToSymbolDef = wordIdToSymbolDef
       }
-
-      this.paperItems.shapeItemsGroup = new paper.Group(addedItems)
-      this.paperItems.shapeItemsGroup.insertAbove(this.paperItems.shape)
     }
   }
 
@@ -346,6 +351,7 @@ export class Editor {
     this.paperItems.shape?.remove()
     this.paperItems.shapeHbounds?.remove()
     this.paperItems.shapeItemsGroup?.remove()
+    this.paperItems.bgItemsGroup?.remove()
   }
 
   destroy = () => {}
