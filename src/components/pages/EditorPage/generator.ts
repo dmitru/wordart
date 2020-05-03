@@ -110,9 +110,9 @@ export class Generator {
 
     const wordCurrentScales = words.map(() => 1)
     const wordMaxScalePlaced = words.map(() => -1)
-    const wordMinScale = 0.02
+    const wordMinScale = 0.05
     let timeout = 1500
-    let maxCount = 600
+    let maxCount = 300
 
     let countPlaced = 0
 
@@ -155,8 +155,8 @@ export class Generator {
     }
 
     const getNextScale = (scale: number): number => {
-      const scaleStepFactor = 0.03
-      const maxScaleStep = 0.03
+      const scaleStepFactor = 0.02
+      const maxScaleStep = 0.02
       return scale - Math.min(maxScaleStep, scaleStepFactor * scale)
     }
 
@@ -174,7 +174,7 @@ export class Generator {
       // Try to place the word at the current scale
       let scalesTried = 0
       while (!success && currentScale >= wordMinScale) {
-        // console.log('scale: ', word.text, scalesTried, currentScale)
+        console.log('scale: ', word.text, scalesTried, currentScale)
 
         const batchSize = getBatchSize(countPlaced, maxCount)
         let i = 0
