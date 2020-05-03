@@ -101,8 +101,8 @@ export class EditorPageStore {
     bgColor: '#ffffff',
     shapePadding: 3,
     itemPadding: 2,
-    itemScaleMax: 3,
-    itemScaleMin: 0.115,
+    itemScaleMax: 0.7,
+    itemScaleMin: 0.002,
     dimSmallerItems: 50,
     words: defaultWordsConfig2,
     fitWithinShape: true,
@@ -204,10 +204,10 @@ const defaultWordsConfig: WordConfig[] = [
 ].map((s, index) => ({ id: index, text: s } as WordConfig))
 
 const defaultWordsConfig2: WordConfig[] = [
-  'vertical',
-  'background',
-  'wall',
+  'WORD',
   'art',
+  'beautiful',
+  'emotions',
 ].map((s, index) => ({ id: index, text: s } as WordConfig))
 
 export type ShapeConfig = {

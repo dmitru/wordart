@@ -150,7 +150,7 @@ export const EditorPage = observer(() => {
             state.isVisualizing = true
             await Promise.all([
               editorPageStore.editor?.generateItems('shape'),
-              editorPageStore.editor?.generateItems('background'),
+              // editorPageStore.editor?.generateItems('background'),
             ])
             state.isVisualizing = false
           }}
