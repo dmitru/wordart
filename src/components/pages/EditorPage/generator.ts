@@ -118,7 +118,7 @@ export class Generator {
     const wordCurrentScales = words.map(() => task.itemScaleMax)
     const wordMaxScalePlaced = words.map(() => -1)
     const wordMinScale = task.itemScaleMin
-    let timeout = 1500
+    let timeout = 3000
     let maxCount = 600
 
     let countPlaced = 0
@@ -187,20 +187,20 @@ export class Generator {
         const spiralStep = 100
         const nRotations = Math.ceil(task.bounds.w / spiralStep)
         const spiral = archimedeanSpiral(nRotations)
-        const maxSteps = 500
+        const maxSteps = 60
         const size = task.bounds.w
         const p0 = new paper.Point(
-          size / 2 + (size / 5) * (Math.random() - 0.5),
-          task.bounds.h / 2 + (size / 5) * (Math.random() - 0.5)
+          size / 2 + (size / 3) * (Math.random() - 0.5),
+          task.bounds.h / 2 + (size / 3) * (Math.random() - 0.5)
         )
         let curt = 0.01
 
         for (let i = 0; i < maxSteps; ++i) {
           const sp = new paper.Point(spiral(curt))
 
-          curt += 2 / (curt * size) / nRotations
+          curt += 3 / (curt * size) / nRotations
 
-          const p = p0.add(sp.multiply(1.6 * size))
+          const p = p0.add(sp.multiply(2 * size))
           // const path = new paper.Path.Rectangle(p, p.add(new paper.Point(2, 2)))
           // path.fillColor = new paper.Color('blue')
 
@@ -355,7 +355,7 @@ export class Generator {
     const wordCurrentScales = words.map(() => task.itemScaleMax)
     const wordMaxScalePlaced = words.map(() => -1)
     const wordMinScale = task.itemScaleMin
-    let timeout = 1500
+    let timeout = 3000
     let maxCount = 500
 
     let countPlaced = 0

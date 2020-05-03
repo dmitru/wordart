@@ -282,7 +282,7 @@ export class Editor {
           angles: style.angles.map((aDeg) => (aDeg * Math.PI) / 180),
           fillColors: ['red'],
           // fonts: [fonts[0], fonts[1], fonts[2]],
-          fonts: isBackground ? [fonts[1]] : [fonts[2]],
+          fonts: isBackground ? [fonts[1]] : [fonts[0]],
           text: wc.text,
         })),
       })

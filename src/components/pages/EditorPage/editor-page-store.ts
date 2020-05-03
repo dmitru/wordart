@@ -73,8 +73,8 @@ export class EditorPageStore {
   @observable shapeStyle: ShapeStyle = {
     bgColor: '#f45b5c33',
     // bgColor: '#ffffff',
-    itemsColorKind: 'gradient',
-    itemsColor: '#f45b5c',
+    itemsColorKind: 'color',
+    itemsColor: '#970707',
     itemsColorGradient: {
       from: '#f45b5c',
       to: '#ffffaa',
