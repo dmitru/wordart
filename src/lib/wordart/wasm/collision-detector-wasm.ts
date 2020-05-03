@@ -38,29 +38,33 @@ export class CollisionDetectorWasm {
     hbounds: HBoundsWasm,
     transform?: Matrix,
     padShape = 0,
-    padItem = 0
+    padItem = 0,
+    fitWithinShape = true
   ): boolean => {
-    const bounds = hbounds.get_bounds(transform ? transform.copy() : undefined)
+    if (fitWithinShape) {
+      const bounds = hbounds.get_bounds(
+        transform ? transform.copy() : undefined
+      )
+      if (this.bounds && !isRectInsideRect(bounds, this.bounds)) {
+        return false
+      }
 
-    if (this.bounds && !isRectInsideRect(bounds, this.bounds)) {
-      return false
-    }
-
-    if (this.shapeBoundsInverted) {
-      if (transform) {
-        if (
-          this.shapeBoundsInverted.collides_transformed(
-            hbounds,
-            transform,
-            padShape,
-            0
-          )
-        ) {
-          return false
-        }
-      } else {
-        if (this.shapeBoundsInverted.collides(hbounds, padShape, padItem)) {
-          return false
+      if (this.shapeBoundsInverted) {
+        if (transform) {
+          if (
+            this.shapeBoundsInverted.collides_transformed(
+              hbounds,
+              transform,
+              padShape,
+              0
+            )
+          ) {
+            return false
+          }
+        } else {
+          if (this.shapeBoundsInverted.collides(hbounds, padShape, padItem)) {
+            return false
+          }
         }
       }
     }

@@ -2,16 +2,46 @@ import { observable, action, set, runInAction } from 'mobx'
 import { RootStore } from 'root-store'
 import { Editor, EditorInitParams } from 'components/pages/EditorPage/editor'
 import { icons } from 'data/shapes'
-import { Font } from 'components/pages/EditorPage/generator'
-import { range } from 'lodash'
 
 type LeftPanelTab = 'shapes' | 'style:shape' | 'style:bg'
 
 export type ShapeStyle = {
   bgColor: string
+
+  itemsColorKind: 'color' | 'gradient'
   itemsColor: string
+  itemsColorGradient: ItemsColorGradient
+  dimSmallerItems: number
+
   words: WordConfig[]
   angles: number[]
+  shapePadding: number
+  itemPadding: number
+  itemScaleMin: number
+  itemScaleMax: number
+  fitWithinShape: boolean
+}
+
+export type ItemsColorGradient = {
+  from: string
+  to: string
+  assignBy: 'random' | 'size'
+}
+
+export type ItemsColoring = ItemsColoringSingleColor | ItemsColoringGradient
+
+export type ItemsColoringSingleColor = {
+  kind: 'single-color'
+  color: string
+  dimSmallerItems: number
+}
+
+export type ItemsColoringGradient = {
+  kind: 'gradient'
+  colorFrom: string
+  colorTo: string
+  assignColorBy: 'random' | 'size'
+  dimSmallerItems: number
 }
 
 export class EditorPageStore {
@@ -41,18 +71,60 @@ export class EditorPageStore {
   @observable activeLeftTab: LeftPanelTab = 'shapes'
 
   @observable shapeStyle: ShapeStyle = {
-    // bgColor: '#f45b5c33',
-    bgColor: '#ffffff',
+    bgColor: '#f45b5c33',
+    // bgColor: '#ffffff',
+    itemsColorKind: 'gradient',
     itemsColor: '#f45b5c',
+    itemsColorGradient: {
+      from: '#f45b5c',
+      to: '#ffffaa',
+      assignBy: 'random',
+    },
+    dimSmallerItems: 20,
+    shapePadding: 5,
+    itemPadding: 10,
+    itemScaleMax: 2,
+    itemScaleMin: 0.05,
     words: defaultWordsConfig,
+    fitWithinShape: true,
     angles: [-15],
     // angles: range(-45, 45, 20),
   }
   @observable backgroundStyle: ShapeStyle = {
+    itemsColorKind: 'gradient',
     itemsColor: '#bbb',
+    itemsColorGradient: {
+      from: '#bbb',
+      to: '#333',
+      assignBy: 'random',
+    },
     bgColor: '#ffffff',
+    shapePadding: 3,
+    itemPadding: 2,
+    itemScaleMax: 3,
+    itemScaleMin: 0.115,
+    dimSmallerItems: 50,
     words: defaultWordsConfig2,
+    fitWithinShape: true,
     angles: [20],
+  }
+
+  getItemColoring = (type: 'shape' | 'background'): ItemsColoring => {
+    const style = type === 'shape' ? this.shapeStyle : this.backgroundStyle
+    if (style.itemsColorKind === 'color') {
+      return {
+        kind: 'single-color',
+        color: style.itemsColor,
+        dimSmallerItems: style.dimSmallerItems,
+      }
+    }
+    return {
+      kind: 'gradient',
+      colorFrom: style.itemsColorGradient.from,
+      colorTo: style.itemsColorGradient.to,
+      assignColorBy: style.itemsColorGradient.assignBy,
+      dimSmallerItems: style.dimSmallerItems,
+    }
   }
 
   @observable availableShapes: ShapeConfig[] = shapes

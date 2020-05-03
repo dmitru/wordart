@@ -114,11 +114,11 @@ export class Generator {
 
     const shapeHBoundsJs = shape ? shape.hBounds.get_js() : undefined
 
-    const wordCurrentScales = words.map(() => 1)
+    const wordCurrentScales = words.map(() => task.itemScaleMax)
     const wordMaxScalePlaced = words.map(() => -1)
-    const wordMinScale = 0.05
+    const wordMinScale = task.itemScaleMin
     let timeout = 1500
-    let maxCount = 300
+    let maxCount = 500
 
     let countPlaced = 0
 
@@ -131,23 +131,18 @@ export class Generator {
       scale: number,
       maxScalePlaced: number | undefined
     ) => {
-      // return 0
       const minDim = Math.min(bounds.h, bounds.w) * scale
-      let factor = 0.2
+      let factor = 0.5
       if (maxScalePlaced != null && scale < maxScalePlaced * 0.5) {
-        factor = 0.2
+        factor = 0.4
       }
       if (maxScalePlaced != null && scale < maxScalePlaced * 0.2) {
-        factor = 0.1
-      }
-      if (maxScalePlaced != null && scale < maxScalePlaced * 0.1) {
-        factor = 0.05
-      }
-      if (countPlaced > 100) {
-        factor = 0.02
+        factor = 0.2
       }
       const pad = minDim * factor
-      return pad > 0.2 ? pad : 0.2
+      const result = pad
+      const resultAdjusted = (result * task.itemPadding) / 100
+      return resultAdjusted
     }
 
     const getBatchSize = (countPlaced: number, maxCount: number) => {
@@ -162,7 +157,7 @@ export class Generator {
 
     const getNextScale = (scale: number): number => {
       const scaleStepFactor = 0.02
-      const maxScaleStep = 0.02
+      const maxScaleStep = (task.itemScaleMax - task.itemScaleMin) / 30
       return scale - Math.min(maxScaleStep, scaleStepFactor * scale)
     }
 
@@ -179,8 +174,11 @@ export class Generator {
 
       // Try to place the word at the current scale
       let scalesTried = 0
-      while (!success && currentScale >= wordMinScale) {
-        console.log('scale: ', word.text, scalesTried, currentScale)
+      const maxTries = 30
+      let currentTry = 0
+      while (!success && currentTry < maxTries) {
+        // console.log('scale: ', word.text, scalesTried, currentScale)
+        currentTry += 1
 
         const batchSize = getBatchSize(countPlaced, maxCount)
         let i = 0
@@ -193,32 +191,41 @@ export class Generator {
 
           const p = shapeHBoundsJs
             ? randomPointInsideHboundsSerialized(shapeHBoundsJs)
-            : randomPointInRect(task.bounds)
+            : randomPointInRect(
+                task.bounds,
+                task.fitWithinShape
+                  ? 0
+                  : Math.max(task.bounds.w * 0.1, task.bounds.h * 0.1, 100)
+              )
           if (!p) {
             continue
           }
 
           const bounds = wordBounds[wordIndex]
 
-          const cx = p.x - (bounds.w / 2) * currentScale
-          const cy = p.y + (bounds.h / 2) * currentScale
+          const scaleRandomized =
+            currentScale + currentScale * (Math.random() - 0.5) * 2 * 0.3
 
-          // debugCtx.fillStyle = 'red'
-          // debugCtx.fillRect(cx, cy, 2, 2)
+          // const fontHeight =
+          //   (word.font.getPath(word.text, 0, 0, word.fontSize).getBoundingBox()
+          //     .y2 -
+          //     word.font.getPath(word.text, 0, 0, word.fontSize).getBoundingBox()
+          //       .y1) *
+          //   currentScale
+          // console.log('fontHeight = ', fontHeight)
+          const cx = p.x - (bounds.w / 2) * scaleRandomized
+          const cy = p.y // - word.fontSize * currentScale // - (bounds.h / 2) * currentScale
 
           const x = cx
           const y = cy
 
-          const scaleRandomized =
-            currentScale + currentScale * (Math.random() - 0.5) * 2 * 0.1
-
           const padItem = getPad(
             bounds,
             countPlaced,
-            currentScale,
+            scaleRandomized,
             wordMaxScalePlaced[wordIndex]
           )
-          const padShape = 5
+          const padShape = task.shapePadding
 
           const transform: tm.Matrix = multiply(
             tm.translate(x, y),
@@ -238,7 +245,8 @@ export class Generator {
             hboundsWord,
             transformWasm,
             padShape,
-            padItem
+            padItem,
+            task.fitWithinShape
           )
 
           if (hasPlaced) {
@@ -267,10 +275,13 @@ export class Generator {
         }
 
         if (!success) {
-          currentScale = getNextScale(currentScale)
-          scalesTried += 1
+          // console.log('currentScale', currentScale, getNextScale(currentScale))
+          if (getNextScale(currentScale) >= wordMinScale) {
+            currentScale = getNextScale(currentScale)
+            scalesTried += 1
+          }
         } else {
-          console.log('success', i, currentScale)
+          // console.log('success', i, currentScale)
         }
       }
 
@@ -377,9 +388,20 @@ export type GenerateTask = {
   /** Shape to fill */
   // TODO: consider adding an ID to shapes
   shape: ShapeWasm | null
+  /** Padding between shape or bounds and items, in units (?) */
+  shapePadding: number
+  /** Padding between items, in percent (0 - 100) */
+  itemPadding: number
+  /** 1 by default */
+  itemScaleMin: number
+  itemScaleMax: number
   /** Words to use */
   words: GenerateTaskWord[]
+  placementAlgorithm: PlacementAlgorithm
+  fitWithinShape: boolean
 }
+
+export type PlacementAlgorithm = 'random' | 'wordle'
 
 export type GenerateTaskWord = {
   wordConfigId: WordConfigId

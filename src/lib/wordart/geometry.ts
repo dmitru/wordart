@@ -258,9 +258,9 @@ export const boundsForRectsNoSkew = (
   return { x: xMin, y: yMin, w: xMax - xMin, h: yMax - yMin }
 }
 
-export const randomPointInRect = (rect: Rect): Point => {
+export const randomPointInRect = (rect: Rect, pad = 0): Point => {
   return {
-    x: rect.x + Math.random() * rect.w,
-    y: rect.y + Math.random() * rect.h,
+    x: rect.x - pad + Math.random() * (rect.w + 2 * pad),
+    y: rect.y - pad + Math.random() * (rect.h + 2 * pad),
   }
 }

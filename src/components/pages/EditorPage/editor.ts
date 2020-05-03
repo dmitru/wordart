@@ -1,4 +1,8 @@
-import { EditorPageStore } from 'components/pages/EditorPage/editor-page-store'
+import {
+  EditorPageStore,
+  ItemsColorGradient,
+  ItemsColoring,
+} from 'components/pages/EditorPage/editor-page-store'
 import { fetchImage, createCanvasCtx } from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
 import { getWasmModule } from 'lib/wordart/wasm/wasm-module'
@@ -81,26 +85,30 @@ export class Editor {
     }
   }
 
-  setBgItemsColor = (color: string) => {
-    // if (this.paperItems.bgItemsGroup) {
-    for (const symDef of this.paperItems.bgWordIdToSymbolDef.values()) {
-      symDef.item.fillColor = new paper.Color(color)
+  updateItemsColor = (
+    type: 'shape' | 'background',
+    coloring: ItemsColoring
+  ) => {
+    const itemsGroup =
+      type === 'shape'
+        ? this.paperItems.shapeItemsGroup
+        : this.paperItems.bgItemsGroup
+    if (!itemsGroup) {
+      return
     }
-    // this.paperItems.bgItemsGroup.children.forEach((c) => {
-    //   c.
-    // })
-    // }
-  }
+    let colors: string[] = []
+    if (coloring.kind === 'single-color') {
+      colors = [coloring.color]
+    } else {
+      const scale = chroma.scale([coloring.colorFrom, coloring.colorTo])
+      colors = scale.colors(this.paperItems.shapeWordIdToSymbolDef.size)
+    }
 
-  setShapeItemsColor = (color: string) => {
-    for (const symDef of this.paperItems.shapeWordIdToSymbolDef.values()) {
-      symDef.item.fillColor = new paper.Color(color)
+    let index = 0
+    for (const path of itemsGroup.children) {
+      path.fillColor = new paper.Color(colors[index % colors.length])
+      index++
     }
-    // if (this.paperItems.shapeItemsGroup) {
-    //   this.paperItems.shapeItemsGroup.children.forEach((c) => {
-    //     c.fillColor = new paper.Color(color)
-    //   })
-    // }
   }
 
   updateBgShape = async () => {
@@ -260,8 +268,14 @@ export class Editor {
       this.paperItems.shape?.insertAbove(this.paperItems.bgRect)
 
       const result = await this.generator.generate({
-        shape: null,
+        shape,
+        placementAlgorithm: 'random',
+        fitWithinShape: style.fitWithinShape,
         bounds: this.getSceneBounds(),
+        itemScaleMin: style.itemScaleMin,
+        itemScaleMax: style.itemScaleMax,
+        shapePadding: style.shapePadding,
+        itemPadding: style.itemPadding,
         words: style.words.map((wc) => ({
           wordConfigId: wc.id,
           // angles: [0, -(90 * Math.PI) / 180, -(30 * Math.PI) / 180],
@@ -319,16 +333,15 @@ export class Editor {
 
           const symbolDef = wordIdToSymbolDef.get(wordId)!
 
-          const pathItemsGroup = symbolDef.place(new paper.Point(0, 0))
+          // const wordItem = symbolDef.place(new paper.Point(0, 0))
+          const wordItem = symbolDef.item.clone()
 
-          pathItemsGroup.rotate(
+          wordItem.rotate(
             (item.word.angle / Math.PI) * 180,
             new paper.Point(0, 0)
           )
-          pathItemsGroup.transform(
-            matrixToPaperTransform(tm.compose(item.transform))
-          )
-          addedItems.push(pathItemsGroup)
+          wordItem.transform(matrixToPaperTransform(tm.compose(item.transform)))
+          addedItems.push(wordItem)
         }
       }
 
@@ -339,10 +352,21 @@ export class Editor {
         this.paperItems.bgWordIdToSymbolDef = wordIdToSymbolDef
       } else {
         this.paperItems.shapeItemsGroup?.remove()
-        this.paperItems.shapeItemsGroup = new paper.Group(addedItems)
+        const shapeItemsGroup =
+          this.paperItems.shape.children &&
+          this.paperItems.shape.children.length > 1
+            ? new paper.Group([
+                this.paperItems.shape.children[1].clone(),
+                ...addedItems,
+              ])
+            : new paper.Group(addedItems)
+        shapeItemsGroup.clipped = true
+        this.paperItems.shapeItemsGroup = shapeItemsGroup
         this.paperItems.shapeItemsGroup.insertAbove(this.paperItems.shape)
         this.paperItems.shapeWordIdToSymbolDef = wordIdToSymbolDef
       }
+
+      this.updateItemsColor(type, this.store.getItemColoring(type))
     }
   }
 
