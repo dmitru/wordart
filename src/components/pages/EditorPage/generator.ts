@@ -7,7 +7,13 @@ import {
   HBoundsWasm,
   WasmModule,
 } from 'lib/wordart/wasm/wasm-module'
-import { Rect, multiply, aabbForRect } from 'lib/wordart/geometry'
+import {
+  Rect,
+  multiply,
+  aabbForRect,
+  Point,
+  randomPointInRect,
+} from 'lib/wordart/geometry'
 import { ShapeWasm } from 'lib/wordart/wasm/image-processor-wasm'
 import { randomPointInsideHboundsSerialized } from 'lib/wordart/wasm/hbounds'
 import * as tm from 'transformation-matrix'
@@ -68,7 +74,7 @@ export class Generator {
     const collisionDetector = new CollisionDetectorWasm(
       this.wasm,
       task.bounds,
-      shape.hBoundsInverted
+      shape ? shape.hBoundsInverted : undefined
     )
 
     const t1 = performance.now()
@@ -106,7 +112,7 @@ export class Generator {
     let addedItems: Item[] = []
     let addedHbounds: any[] = []
 
-    const shapeHBoundsJs = shape.hBounds.get_js()
+    const shapeHBoundsJs = shape ? shape.hBounds.get_js() : undefined
 
     const wordCurrentScales = words.map(() => 1)
     const wordMaxScalePlaced = words.map(() => -1)
@@ -185,7 +191,9 @@ export class Generator {
             throw new Error(`No hbounds for word ${word.id}`)
           }
 
-          const p = randomPointInsideHboundsSerialized(shapeHBoundsJs)
+          const p = shapeHBoundsJs
+            ? randomPointInsideHboundsSerialized(shapeHBoundsJs)
+            : randomPointInRect(task.bounds)
           if (!p) {
             continue
           }
@@ -249,7 +257,7 @@ export class Generator {
               id: currentItemId++,
               word,
               wordPath: this.wordPaths.get(word.id)!,
-              shapeColor: shape.color,
+              shapeColor: shape ? shape.color : 'black',
               transform: transform,
             })
 
@@ -368,7 +376,7 @@ export type GenerateTask = {
   bounds: Rect
   /** Shape to fill */
   // TODO: consider adding an ID to shapes
-  shape: ShapeWasm
+  shape: ShapeWasm | null
   /** Words to use */
   words: GenerateTaskWord[]
 }

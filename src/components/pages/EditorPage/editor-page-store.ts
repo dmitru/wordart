@@ -41,7 +41,8 @@ export class EditorPageStore {
   @observable activeLeftTab: LeftPanelTab = 'shapes'
 
   @observable shapeStyle: ShapeStyle = {
-    bgColor: '#f45b5c33',
+    // bgColor: '#f45b5c33',
+    bgColor: '#ffffff',
     itemsColor: '#f45b5c',
     words: defaultWordsConfig,
     angles: [-15],

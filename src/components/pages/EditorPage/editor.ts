@@ -260,7 +260,7 @@ export class Editor {
       this.paperItems.shape?.insertAbove(this.paperItems.bgRect)
 
       const result = await this.generator.generate({
-        shape,
+        shape: null,
         bounds: this.getSceneBounds(),
         words: style.words.map((wc) => ({
           wordConfigId: wc.id,
@@ -268,7 +268,7 @@ export class Editor {
           angles: style.angles.map((aDeg) => (aDeg * Math.PI) / 180),
           fillColors: ['red'],
           // fonts: [fonts[0], fonts[1], fonts[2]],
-          fonts: isBackground ? [fonts[0]] : [fonts[1]],
+          fonts: isBackground ? [fonts[1]] : [fonts[2]],
           text: wc.text,
         })),
       })
