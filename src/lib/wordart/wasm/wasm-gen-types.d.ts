@@ -14,6 +14,16 @@ export function fill_shapes_by_color(
   threshold_percent: number
 ): FillShapesByColorResult
 
+export function largest_rect(
+  img_data: Uint8Array,
+  img_width: number,
+  img_height: number,
+  bounds_x: number,
+  bounds_y: number,
+  bounds_width: number,
+  bounds_height: number
+): any
+
 export type FillShapesByColorResult = {
   r: number
   g: number

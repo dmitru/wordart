@@ -15,6 +15,9 @@ export class ImageProcessorWasm {
   /** Processes an image, determine shapesbased on colors, return shape information for each shape, including its hbounds */
   findShapesByColor = (params: ComputeShapesParams) =>
     findShapesByColorWasm(this.wasm, params)
+
+  findLargestRect = (imgData: ImageData, bounds: Rect): Rect =>
+    findLargestRectWasm(this.wasm, imgData, bounds)
 }
 
 export type ShapeWasm = {
@@ -33,6 +36,23 @@ export type ComputeShapesParams = {
   invert?: boolean
   maxLevel?: number
   minSize?: number
+}
+
+const findLargestRectWasm = (
+  wasm: WasmModule,
+  imgData: ImageData,
+  bounds: Rect
+): Rect => {
+  const rect = wasm.largest_rect(
+    new Uint8Array(imgData.data.buffer),
+    imgData.width,
+    imgData.height,
+    bounds.x,
+    bounds.y,
+    bounds.w,
+    bounds.h
+  ) as Rect
+  return rect
 }
 
 const findShapesByColorWasm = (

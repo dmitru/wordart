@@ -2,6 +2,7 @@
 mod utils;
 mod hbounds;
 mod image_to_shapes;
+mod largest_rect;
 mod layout_gen;
 mod layout_gen_js;
 mod matrix;

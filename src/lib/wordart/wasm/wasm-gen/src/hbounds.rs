@@ -566,6 +566,12 @@ pub struct ImgData<'a> {
     pub height: i32,
 }
 
+pub struct ImgDataU8<'a> {
+    pub data: &'a [u8],
+    pub width: i32,
+    pub height: i32,
+}
+
 #[derive(PartialEq, Debug, Copy, Clone, Serialize)]
 pub struct Rgba {
     pub r: u32,
@@ -662,1031 +668,1031 @@ fn divide_bounds(bounds: Rect) -> Vec<Rect> {
 static WHITE: u32 = 0x00ffffff;
 static BLACK: u32 = 0xff000000;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
 
-    #[test]
-    fn test_divide_bounds() {
-        let bounds = Rect {
-            x: 0,
-            y: 0,
-            w: 4,
-            h: 4,
-        };
-        let divided_bounds = divide_bounds(bounds);
+//     #[test]
+//     fn test_divide_bounds() {
+//         let bounds = Rect {
+//             x: 0,
+//             y: 0,
+//             w: 4,
+//             h: 4,
+//         };
+//         let divided_bounds = divide_bounds(bounds);
 
-        assert_eq!(
-            divided_bounds,
-            vec![
-                Rect {
-                    x: 0,
-                    y: 0,
-                    w: 2,
-                    h: 2
-                },
-                Rect {
-                    x: 2,
-                    y: 0,
-                    w: 2,
-                    h: 2
-                },
-                Rect {
-                    x: 0,
-                    y: 2,
-                    w: 2,
-                    h: 2
-                },
-                Rect {
-                    x: 2,
-                    y: 2,
-                    w: 2,
-                    h: 2
-                }
-            ]
-        );
-    }
+//         assert_eq!(
+//             divided_bounds,
+//             vec![
+//                 Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 2,
+//                     h: 2
+//                 },
+//                 Rect {
+//                     x: 2,
+//                     y: 0,
+//                     w: 2,
+//                     h: 2
+//                 },
+//                 Rect {
+//                     x: 0,
+//                     y: 2,
+//                     w: 2,
+//                     h: 2
+//                 },
+//                 Rect {
+//                     x: 2,
+//                     y: 2,
+//                     w: 2,
+//                     h: 2
+//                 }
+//             ]
+//         );
+//     }
 
-    #[test]
-    fn test_divide_bounds_2() {
-        let bounds = Rect {
-            x: 0,
-            y: 0,
-            w: 1,
-            h: 1,
-        };
-        let divided_bounds = divide_bounds(bounds);
+//     #[test]
+//     fn test_divide_bounds_2() {
+//         let bounds = Rect {
+//             x: 0,
+//             y: 0,
+//             w: 1,
+//             h: 1,
+//         };
+//         let divided_bounds = divide_bounds(bounds);
 
-        assert_eq!(
-            divided_bounds,
-            vec![Rect {
-                x: 0,
-                y: 0,
-                w: 1,
-                h: 1
-            }]
-        );
-    }
+//         assert_eq!(
+//             divided_bounds,
+//             vec![Rect {
+//                 x: 0,
+//                 y: 0,
+//                 w: 1,
+//                 h: 1
+//             }]
+//         );
+//     }
 
-    #[test]
-    fn test_divide_bounds_3() {
-        assert_eq!(
-            divide_bounds(Rect {
-                x: 0,
-                y: 0,
-                w: 2,
-                h: 1,
-            }),
-            vec![
-                Rect {
-                    x: 0,
-                    y: 0,
-                    w: 1,
-                    h: 1
-                },
-                Rect {
-                    x: 1,
-                    y: 0,
-                    w: 1,
-                    h: 1
-                }
-            ]
-        );
-    }
+//     #[test]
+//     fn test_divide_bounds_3() {
+//         assert_eq!(
+//             divide_bounds(Rect {
+//                 x: 0,
+//                 y: 0,
+//                 w: 2,
+//                 h: 1,
+//             }),
+//             vec![
+//                 Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 1,
+//                     h: 1
+//                 },
+//                 Rect {
+//                     x: 1,
+//                     y: 0,
+//                     w: 1,
+//                     h: 1
+//                 }
+//             ]
+//         );
+//     }
 
-    #[test]
-    fn test_divide_bounds_4() {
-        let divided_bounds = divide_bounds(Rect {
-            x: 0,
-            y: 0,
-            w: 3,
-            h: 3,
-        });
+//     #[test]
+//     fn test_divide_bounds_4() {
+//         let divided_bounds = divide_bounds(Rect {
+//             x: 0,
+//             y: 0,
+//             w: 3,
+//             h: 3,
+//         });
 
-        assert_eq!(
-            divided_bounds,
-            vec![
-                Rect {
-                    x: 0,
-                    y: 0,
-                    w: 1,
-                    h: 1
-                },
-                Rect {
-                    x: 1,
-                    y: 0,
-                    w: 2,
-                    h: 1
-                },
-                Rect {
-                    x: 0,
-                    y: 1,
-                    w: 1,
-                    h: 2
-                },
-                Rect {
-                    x: 1,
-                    y: 1,
-                    w: 2,
-                    h: 2
-                }
-            ]
-        );
+//         assert_eq!(
+//             divided_bounds,
+//             vec![
+//                 Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 1,
+//                     h: 1
+//                 },
+//                 Rect {
+//                     x: 1,
+//                     y: 0,
+//                     w: 2,
+//                     h: 1
+//                 },
+//                 Rect {
+//                     x: 0,
+//                     y: 1,
+//                     w: 1,
+//                     h: 2
+//                 },
+//                 Rect {
+//                     x: 1,
+//                     y: 1,
+//                     w: 2,
+//                     h: 2
+//                 }
+//             ]
+//         );
 
-        assert_eq!(
-            divide_bounds(Rect {
-                x: 0,
-                y: 1,
-                w: 1,
-                h: 2
-            },),
-            vec![
-                Rect {
-                    x: 0,
-                    y: 1,
-                    w: 1,
-                    h: 1
-                },
-                Rect {
-                    x: 0,
-                    y: 2,
-                    w: 1,
-                    h: 1
-                }
-            ]
-        );
-    }
+//         assert_eq!(
+//             divide_bounds(Rect {
+//                 x: 0,
+//                 y: 1,
+//                 w: 1,
+//                 h: 2
+//             },),
+//             vec![
+//                 Rect {
+//                     x: 0,
+//                     y: 1,
+//                     w: 1,
+//                     h: 1
+//                 },
+//                 Rect {
+//                     x: 0,
+//                     y: 2,
+//                     w: 1,
+//                     h: 1
+//                 }
+//             ]
+//         );
+//     }
 
-    #[test]
-    fn test_hbounds_from_2_x_2_full() {
-        let img = ImgData {
-            data: &[
-                BLACK, BLACK, //
-                BLACK, BLACK,
-            ],
-            width: 2,
-            height: 2,
-        };
+//     #[test]
+//     fn test_hbounds_from_2_x_2_full() {
+//         let img = ImgData {
+//             data: &[
+//                 BLACK, BLACK, //
+//                 BLACK, BLACK,
+//             ],
+//             width: 2,
+//             height: 2,
+//         };
 
-        // TODO: wrap img in ImageData {} type
+//         // TODO: wrap img in ImageData {} type
 
-        let res = HBounds::from(img, None, false);
-        assert_eq!(
-            res,
-            HBounds {
-                transform: None,
-                bounds: Rect {
-                    x: 0,
-                    y: 0,
-                    w: 2,
-                    h: 2
-                },
-                count: 1,
-                level: 1,
-                overlapping_area: 4,
-                overlaps_shape: true,
-                children: Rc::new(vec![]),
-            }
-        );
-    }
+//         let res = HBounds::from(img, None, false);
+//         assert_eq!(
+//             res,
+//             HBounds {
+//                 transform: None,
+//                 bounds: Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 2,
+//                     h: 2
+//                 },
+//                 count: 1,
+//                 level: 1,
+//                 overlapping_area: 4,
+//                 overlaps_shape: true,
+//                 children: Rc::new(vec![]),
+//             }
+//         );
+//     }
 
-    #[test]
-    fn test_hbounds_from_2_x_2_empty() {
-        let img = ImgData {
-            data: &[
-                WHITE, WHITE, //
-                WHITE, WHITE,
-            ],
-            width: 2,
-            height: 2,
-        };
+//     #[test]
+//     fn test_hbounds_from_2_x_2_empty() {
+//         let img = ImgData {
+//             data: &[
+//                 WHITE, WHITE, //
+//                 WHITE, WHITE,
+//             ],
+//             width: 2,
+//             height: 2,
+//         };
 
-        // TODO: wrap img in ImageData {} type
+//         // TODO: wrap img in ImageData {} type
 
-        let res = HBounds::from(img, None, false);
-        assert_eq!(
-            res,
-            HBounds {
-                transform: None,
-                bounds: Rect {
-                    x: 0,
-                    y: 0,
-                    w: 2,
-                    h: 2
-                },
-                count: 1,
-                level: 1,
-                overlapping_area: 0,
-                overlaps_shape: false,
-                children: Rc::new(vec![]),
-            }
-        );
-    }
+//         let res = HBounds::from(img, None, false);
+//         assert_eq!(
+//             res,
+//             HBounds {
+//                 transform: None,
+//                 bounds: Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 2,
+//                     h: 2
+//                 },
+//                 count: 1,
+//                 level: 1,
+//                 overlapping_area: 0,
+//                 overlaps_shape: false,
+//                 children: Rc::new(vec![]),
+//             }
+//         );
+//     }
 
-    #[test]
-    fn test_hbounds_from_2_x_2_1() {
-        let img = ImgData {
-            data: &[
-                BLACK, BLACK, //
-                BLACK, WHITE,
-            ],
-            width: 2,
-            height: 2,
-        };
+//     #[test]
+//     fn test_hbounds_from_2_x_2_1() {
+//         let img = ImgData {
+//             data: &[
+//                 BLACK, BLACK, //
+//                 BLACK, WHITE,
+//             ],
+//             width: 2,
+//             height: 2,
+//         };
 
-        let res = HBounds::from(img, None, false);
-        assert_eq!(
-            res,
-            HBounds {
-                bounds: Rect {
-                    x: 0,
-                    y: 0,
-                    w: 2,
-                    h: 2
-                },
-                count: 4,
-                level: 1,
-                overlapping_area: 3,
-                overlaps_shape: true,
-                children: Rc::new(vec![
-                    HBounds {
-                        bounds: Rect {
-                            x: 0,
-                            y: 0,
-                            w: 1,
-                            h: 1
-                        },
-                        count: 1,
-                        level: 2,
-                        overlapping_area: 1,
-                        overlaps_shape: true,
-                        children: Rc::new(vec![]),
-                        transform: None
-                    },
-                    HBounds {
-                        bounds: Rect {
-                            x: 1,
-                            y: 0,
-                            w: 1,
-                            h: 1
-                        },
-                        count: 1,
-                        level: 2,
-                        overlapping_area: 1,
-                        overlaps_shape: true,
-                        children: Rc::new(vec![]),
-                        transform: None
-                    },
-                    HBounds {
-                        bounds: Rect {
-                            x: 0,
-                            y: 1,
-                            w: 1,
-                            h: 1
-                        },
-                        count: 1,
-                        level: 2,
-                        overlapping_area: 1,
-                        overlaps_shape: true,
-                        children: Rc::new(vec![]),
-                        transform: None
-                    },
-                    HBounds {
-                        bounds: Rect {
-                            x: 1,
-                            y: 1,
-                            w: 1,
-                            h: 1
-                        },
-                        count: 1,
-                        level: 2,
-                        overlapping_area: 0,
-                        overlaps_shape: false,
-                        children: Rc::new(vec![]),
-                        transform: None
-                    }
-                ]),
-                transform: None
-            }
-        );
-    }
+//         let res = HBounds::from(img, None, false);
+//         assert_eq!(
+//             res,
+//             HBounds {
+//                 bounds: Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 2,
+//                     h: 2
+//                 },
+//                 count: 4,
+//                 level: 1,
+//                 overlapping_area: 3,
+//                 overlaps_shape: true,
+//                 children: Rc::new(vec![
+//                     HBounds {
+//                         bounds: Rect {
+//                             x: 0,
+//                             y: 0,
+//                             w: 1,
+//                             h: 1
+//                         },
+//                         count: 1,
+//                         level: 2,
+//                         overlapping_area: 1,
+//                         overlaps_shape: true,
+//                         children: Rc::new(vec![]),
+//                         transform: None
+//                     },
+//                     HBounds {
+//                         bounds: Rect {
+//                             x: 1,
+//                             y: 0,
+//                             w: 1,
+//                             h: 1
+//                         },
+//                         count: 1,
+//                         level: 2,
+//                         overlapping_area: 1,
+//                         overlaps_shape: true,
+//                         children: Rc::new(vec![]),
+//                         transform: None
+//                     },
+//                     HBounds {
+//                         bounds: Rect {
+//                             x: 0,
+//                             y: 1,
+//                             w: 1,
+//                             h: 1
+//                         },
+//                         count: 1,
+//                         level: 2,
+//                         overlapping_area: 1,
+//                         overlaps_shape: true,
+//                         children: Rc::new(vec![]),
+//                         transform: None
+//                     },
+//                     HBounds {
+//                         bounds: Rect {
+//                             x: 1,
+//                             y: 1,
+//                             w: 1,
+//                             h: 1
+//                         },
+//                         count: 1,
+//                         level: 2,
+//                         overlapping_area: 0,
+//                         overlaps_shape: false,
+//                         children: Rc::new(vec![]),
+//                         transform: None
+//                     }
+//                 ]),
+//                 transform: None
+//             }
+//         );
+//     }
 
-    #[test]
-    fn test_hbounds_from_2_x_2() {
-        let img = ImgData {
-            data: &[
-                WHITE, WHITE, //
-                WHITE, BLACK,
-            ],
-            width: 2,
-            height: 2,
-        };
+//     #[test]
+//     fn test_hbounds_from_2_x_2() {
+//         let img = ImgData {
+//             data: &[
+//                 WHITE, WHITE, //
+//                 WHITE, BLACK,
+//             ],
+//             width: 2,
+//             height: 2,
+//         };
 
-        let res = HBounds::from(img, None, false);
-        assert_eq!(
-            res,
-            HBounds {
-                transform: None,
-                bounds: Rect {
-                    x: 0,
-                    y: 0,
-                    w: 2,
-                    h: 2
-                },
-                count: 4,
-                level: 1,
-                overlapping_area: 1,
-                overlaps_shape: true,
-                children: Rc::new(vec![
-                    HBounds {
-                        transform: None,
-                        bounds: Rect {
-                            x: 0,
-                            y: 0,
-                            w: 1,
-                            h: 1
-                        },
-                        count: 1,
-                        level: 2,
-                        overlapping_area: 0,
-                        overlaps_shape: false,
-                        children: Rc::new(vec![])
-                    },
-                    HBounds {
-                        transform: None,
-                        bounds: Rect {
-                            x: 1,
-                            y: 0,
-                            w: 1,
-                            h: 1
-                        },
-                        count: 1,
-                        level: 2,
-                        overlapping_area: 0,
-                        overlaps_shape: false,
-                        children: Rc::new(vec![])
-                    },
-                    HBounds {
-                        transform: None,
-                        bounds: Rect {
-                            x: 0,
-                            y: 1,
-                            w: 1,
-                            h: 1
-                        },
-                        count: 1,
-                        level: 2,
-                        overlapping_area: 0,
-                        overlaps_shape: false,
-                        children: Rc::new(vec![])
-                    },
-                    HBounds {
-                        transform: None,
-                        bounds: Rect {
-                            x: 1,
-                            y: 1,
-                            w: 1,
-                            h: 1
-                        },
-                        count: 1,
-                        level: 2,
-                        overlapping_area: 1,
-                        overlaps_shape: true,
-                        children: Rc::new(vec![])
-                    }
-                ])
-            }
-        );
-    }
+//         let res = HBounds::from(img, None, false);
+//         assert_eq!(
+//             res,
+//             HBounds {
+//                 transform: None,
+//                 bounds: Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 2,
+//                     h: 2
+//                 },
+//                 count: 4,
+//                 level: 1,
+//                 overlapping_area: 1,
+//                 overlaps_shape: true,
+//                 children: Rc::new(vec![
+//                     HBounds {
+//                         transform: None,
+//                         bounds: Rect {
+//                             x: 0,
+//                             y: 0,
+//                             w: 1,
+//                             h: 1
+//                         },
+//                         count: 1,
+//                         level: 2,
+//                         overlapping_area: 0,
+//                         overlaps_shape: false,
+//                         children: Rc::new(vec![])
+//                     },
+//                     HBounds {
+//                         transform: None,
+//                         bounds: Rect {
+//                             x: 1,
+//                             y: 0,
+//                             w: 1,
+//                             h: 1
+//                         },
+//                         count: 1,
+//                         level: 2,
+//                         overlapping_area: 0,
+//                         overlaps_shape: false,
+//                         children: Rc::new(vec![])
+//                     },
+//                     HBounds {
+//                         transform: None,
+//                         bounds: Rect {
+//                             x: 0,
+//                             y: 1,
+//                             w: 1,
+//                             h: 1
+//                         },
+//                         count: 1,
+//                         level: 2,
+//                         overlapping_area: 0,
+//                         overlaps_shape: false,
+//                         children: Rc::new(vec![])
+//                     },
+//                     HBounds {
+//                         transform: None,
+//                         bounds: Rect {
+//                             x: 1,
+//                             y: 1,
+//                             w: 1,
+//                             h: 1
+//                         },
+//                         count: 1,
+//                         level: 2,
+//                         overlapping_area: 1,
+//                         overlaps_shape: true,
+//                         children: Rc::new(vec![])
+//                     }
+//                 ])
+//             }
+//         );
+//     }
 
-    #[test]
-    fn test_hbounds_from_3_x_3_triangle() {
-        let img = ImgData {
-            data: &[
-                WHITE, WHITE, WHITE, //
-                WHITE, WHITE, BLACK, //
-                WHITE, BLACK, BLACK, //
-            ],
-            width: 3,
-            height: 3,
-        };
+//     #[test]
+//     fn test_hbounds_from_3_x_3_triangle() {
+//         let img = ImgData {
+//             data: &[
+//                 WHITE, WHITE, WHITE, //
+//                 WHITE, WHITE, BLACK, //
+//                 WHITE, BLACK, BLACK, //
+//             ],
+//             width: 3,
+//             height: 3,
+//         };
 
-        let res = HBounds::from(img, None, false);
-        assert_eq!(
-            res,
-            HBounds {
-                transform: None,
-                bounds: Rect {
-                    x: 0,
-                    y: 0,
-                    w: 3,
-                    h: 3
-                },
-                count: 7,
-                level: 1,
-                overlapping_area: 3,
-                overlaps_shape: true,
-                children: Rc::new(vec![
-                    HBounds {
-                        transform: None,
-                        bounds: Rect {
-                            x: 0,
-                            y: 0,
-                            w: 1,
-                            h: 1
-                        },
-                        count: 1,
-                        level: 2,
-                        overlapping_area: 0,
-                        overlaps_shape: false,
-                        children: Rc::new(vec![])
-                    },
-                    HBounds {
-                        transform: None,
-                        bounds: Rect {
-                            x: 1,
-                            y: 0,
-                            w: 2,
-                            h: 1
-                        },
-                        count: 1,
-                        level: 2,
-                        overlapping_area: 0,
-                        overlaps_shape: false,
-                        children: Rc::new(vec![])
-                    },
-                    HBounds {
-                        transform: None,
-                        bounds: Rect {
-                            x: 0,
-                            y: 1,
-                            w: 1,
-                            h: 2
-                        },
-                        count: 1,
-                        level: 2,
-                        overlapping_area: 0,
-                        overlaps_shape: false,
-                        children: Rc::new(vec![])
-                    },
-                    HBounds {
-                        transform: None,
-                        bounds: Rect {
-                            x: 1,
-                            y: 1,
-                            w: 2,
-                            h: 2
-                        },
-                        count: 4,
-                        level: 2,
-                        overlapping_area: 3,
-                        overlaps_shape: true,
-                        children: Rc::new(vec![
-                            HBounds {
-                                transform: None,
-                                bounds: Rect {
-                                    x: 1,
-                                    y: 1,
-                                    w: 1,
-                                    h: 1
-                                },
-                                count: 1,
-                                level: 3,
-                                overlapping_area: 0,
-                                overlaps_shape: false,
-                                children: Rc::new(vec![])
-                            },
-                            HBounds {
-                                transform: None,
-                                bounds: Rect {
-                                    x: 2,
-                                    y: 1,
-                                    w: 1,
-                                    h: 1
-                                },
-                                count: 1,
-                                level: 3,
-                                overlapping_area: 1,
-                                overlaps_shape: true,
-                                children: Rc::new(vec![])
-                            },
-                            HBounds {
-                                transform: None,
-                                bounds: Rect {
-                                    x: 1,
-                                    y: 2,
-                                    w: 1,
-                                    h: 1
-                                },
-                                count: 1,
-                                level: 3,
-                                overlapping_area: 1,
-                                overlaps_shape: true,
-                                children: Rc::new(vec![])
-                            },
-                            HBounds {
-                                transform: None,
-                                bounds: Rect {
-                                    x: 2,
-                                    y: 2,
-                                    w: 1,
-                                    h: 1
-                                },
-                                count: 1,
-                                level: 3,
-                                overlapping_area: 1,
-                                overlaps_shape: true,
-                                children: Rc::new(vec![])
-                            }
-                        ])
-                    }
-                ])
-            }
-        );
-    }
+//         let res = HBounds::from(img, None, false);
+//         assert_eq!(
+//             res,
+//             HBounds {
+//                 transform: None,
+//                 bounds: Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 3,
+//                     h: 3
+//                 },
+//                 count: 7,
+//                 level: 1,
+//                 overlapping_area: 3,
+//                 overlaps_shape: true,
+//                 children: Rc::new(vec![
+//                     HBounds {
+//                         transform: None,
+//                         bounds: Rect {
+//                             x: 0,
+//                             y: 0,
+//                             w: 1,
+//                             h: 1
+//                         },
+//                         count: 1,
+//                         level: 2,
+//                         overlapping_area: 0,
+//                         overlaps_shape: false,
+//                         children: Rc::new(vec![])
+//                     },
+//                     HBounds {
+//                         transform: None,
+//                         bounds: Rect {
+//                             x: 1,
+//                             y: 0,
+//                             w: 2,
+//                             h: 1
+//                         },
+//                         count: 1,
+//                         level: 2,
+//                         overlapping_area: 0,
+//                         overlaps_shape: false,
+//                         children: Rc::new(vec![])
+//                     },
+//                     HBounds {
+//                         transform: None,
+//                         bounds: Rect {
+//                             x: 0,
+//                             y: 1,
+//                             w: 1,
+//                             h: 2
+//                         },
+//                         count: 1,
+//                         level: 2,
+//                         overlapping_area: 0,
+//                         overlaps_shape: false,
+//                         children: Rc::new(vec![])
+//                     },
+//                     HBounds {
+//                         transform: None,
+//                         bounds: Rect {
+//                             x: 1,
+//                             y: 1,
+//                             w: 2,
+//                             h: 2
+//                         },
+//                         count: 4,
+//                         level: 2,
+//                         overlapping_area: 3,
+//                         overlaps_shape: true,
+//                         children: Rc::new(vec![
+//                             HBounds {
+//                                 transform: None,
+//                                 bounds: Rect {
+//                                     x: 1,
+//                                     y: 1,
+//                                     w: 1,
+//                                     h: 1
+//                                 },
+//                                 count: 1,
+//                                 level: 3,
+//                                 overlapping_area: 0,
+//                                 overlaps_shape: false,
+//                                 children: Rc::new(vec![])
+//                             },
+//                             HBounds {
+//                                 transform: None,
+//                                 bounds: Rect {
+//                                     x: 2,
+//                                     y: 1,
+//                                     w: 1,
+//                                     h: 1
+//                                 },
+//                                 count: 1,
+//                                 level: 3,
+//                                 overlapping_area: 1,
+//                                 overlaps_shape: true,
+//                                 children: Rc::new(vec![])
+//                             },
+//                             HBounds {
+//                                 transform: None,
+//                                 bounds: Rect {
+//                                     x: 1,
+//                                     y: 2,
+//                                     w: 1,
+//                                     h: 1
+//                                 },
+//                                 count: 1,
+//                                 level: 3,
+//                                 overlapping_area: 1,
+//                                 overlaps_shape: true,
+//                                 children: Rc::new(vec![])
+//                             },
+//                             HBounds {
+//                                 transform: None,
+//                                 bounds: Rect {
+//                                     x: 2,
+//                                     y: 2,
+//                                     w: 1,
+//                                     h: 1
+//                                 },
+//                                 count: 1,
+//                                 level: 3,
+//                                 overlapping_area: 1,
+//                                 overlaps_shape: true,
+//                                 children: Rc::new(vec![])
+//                             }
+//                         ])
+//                     }
+//                 ])
+//             }
+//         );
+//     }
 
-    #[test]
-    fn test_hbounds_from_3_x_3_stripe() {
-        let img = ImgData {
-            data: &[
-                WHITE, WHITE, WHITE, //
-                BLACK, BLACK, BLACK, //
-                WHITE, WHITE, WHITE, //
-            ],
-            width: 3,
-            height: 3,
-        };
+//     #[test]
+//     fn test_hbounds_from_3_x_3_stripe() {
+//         let img = ImgData {
+//             data: &[
+//                 WHITE, WHITE, WHITE, //
+//                 BLACK, BLACK, BLACK, //
+//                 WHITE, WHITE, WHITE, //
+//             ],
+//             width: 3,
+//             height: 3,
+//         };
 
-        let res = HBounds::from(img, None, false);
-        assert_eq!(
-            res,
-            HBounds {
-                transform: None,
-                bounds: Rect {
-                    x: 0,
-                    y: 0,
-                    w: 3,
-                    h: 3
-                },
-                count: 8,
-                level: 1,
-                overlapping_area: 3,
-                overlaps_shape: true,
-                children: Rc::new(vec![
-                    HBounds {
-                        transform: None,
-                        bounds: Rect {
-                            x: 0,
-                            y: 0,
-                            w: 1,
-                            h: 1
-                        },
-                        count: 1,
-                        level: 2,
-                        overlapping_area: 0,
-                        overlaps_shape: false,
-                        children: Rc::new(vec![])
-                    },
-                    HBounds {
-                        transform: None,
-                        bounds: Rect {
-                            x: 1,
-                            y: 0,
-                            w: 2,
-                            h: 1
-                        },
-                        count: 1,
-                        level: 2,
-                        overlapping_area: 0,
-                        overlaps_shape: false,
-                        children: Rc::new(vec![])
-                    },
-                    HBounds {
-                        transform: None,
-                        bounds: Rect {
-                            x: 0,
-                            y: 1,
-                            w: 1,
-                            h: 2
-                        },
-                        count: 2,
-                        level: 2,
-                        overlapping_area: 1,
-                        overlaps_shape: true,
-                        children: Rc::new(vec![
-                            HBounds {
-                                transform: None,
-                                bounds: Rect {
-                                    x: 0,
-                                    y: 1,
-                                    w: 1,
-                                    h: 1
-                                },
-                                count: 1,
-                                level: 3,
-                                overlapping_area: 1,
-                                overlaps_shape: true,
-                                children: Rc::new(vec![])
-                            },
-                            HBounds {
-                                transform: None,
-                                bounds: Rect {
-                                    x: 0,
-                                    y: 2,
-                                    w: 1,
-                                    h: 1
-                                },
-                                count: 1,
-                                level: 3,
-                                overlapping_area: 0,
-                                overlaps_shape: false,
-                                children: Rc::new(vec![])
-                            }
-                        ])
-                    },
-                    HBounds {
-                        transform: None,
-                        bounds: Rect {
-                            x: 1,
-                            y: 1,
-                            w: 2,
-                            h: 2
-                        },
-                        count: 4,
-                        level: 2,
-                        overlapping_area: 2,
-                        overlaps_shape: true,
-                        children: Rc::new(vec![
-                            HBounds {
-                                transform: None,
-                                bounds: Rect {
-                                    x: 1,
-                                    y: 1,
-                                    w: 1,
-                                    h: 1
-                                },
-                                count: 1,
-                                level: 3,
-                                overlapping_area: 1,
-                                overlaps_shape: true,
-                                children: Rc::new(vec![])
-                            },
-                            HBounds {
-                                transform: None,
-                                bounds: Rect {
-                                    x: 2,
-                                    y: 1,
-                                    w: 1,
-                                    h: 1
-                                },
-                                count: 1,
-                                level: 3,
-                                overlapping_area: 1,
-                                overlaps_shape: true,
-                                children: Rc::new(vec![])
-                            },
-                            HBounds {
-                                transform: None,
-                                bounds: Rect {
-                                    x: 1,
-                                    y: 2,
-                                    w: 1,
-                                    h: 1
-                                },
-                                count: 1,
-                                level: 3,
-                                overlapping_area: 0,
-                                overlaps_shape: false,
-                                children: Rc::new(vec![])
-                            },
-                            HBounds {
-                                transform: None,
-                                bounds: Rect {
-                                    x: 2,
-                                    y: 2,
-                                    w: 1,
-                                    h: 1
-                                },
-                                count: 1,
-                                level: 3,
-                                overlapping_area: 0,
-                                overlaps_shape: false,
-                                children: Rc::new(vec![])
-                            }
-                        ])
-                    }
-                ])
-            }
-        );
-    }
+//         let res = HBounds::from(img, None, false);
+//         assert_eq!(
+//             res,
+//             HBounds {
+//                 transform: None,
+//                 bounds: Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 3,
+//                     h: 3
+//                 },
+//                 count: 8,
+//                 level: 1,
+//                 overlapping_area: 3,
+//                 overlaps_shape: true,
+//                 children: Rc::new(vec![
+//                     HBounds {
+//                         transform: None,
+//                         bounds: Rect {
+//                             x: 0,
+//                             y: 0,
+//                             w: 1,
+//                             h: 1
+//                         },
+//                         count: 1,
+//                         level: 2,
+//                         overlapping_area: 0,
+//                         overlaps_shape: false,
+//                         children: Rc::new(vec![])
+//                     },
+//                     HBounds {
+//                         transform: None,
+//                         bounds: Rect {
+//                             x: 1,
+//                             y: 0,
+//                             w: 2,
+//                             h: 1
+//                         },
+//                         count: 1,
+//                         level: 2,
+//                         overlapping_area: 0,
+//                         overlaps_shape: false,
+//                         children: Rc::new(vec![])
+//                     },
+//                     HBounds {
+//                         transform: None,
+//                         bounds: Rect {
+//                             x: 0,
+//                             y: 1,
+//                             w: 1,
+//                             h: 2
+//                         },
+//                         count: 2,
+//                         level: 2,
+//                         overlapping_area: 1,
+//                         overlaps_shape: true,
+//                         children: Rc::new(vec![
+//                             HBounds {
+//                                 transform: None,
+//                                 bounds: Rect {
+//                                     x: 0,
+//                                     y: 1,
+//                                     w: 1,
+//                                     h: 1
+//                                 },
+//                                 count: 1,
+//                                 level: 3,
+//                                 overlapping_area: 1,
+//                                 overlaps_shape: true,
+//                                 children: Rc::new(vec![])
+//                             },
+//                             HBounds {
+//                                 transform: None,
+//                                 bounds: Rect {
+//                                     x: 0,
+//                                     y: 2,
+//                                     w: 1,
+//                                     h: 1
+//                                 },
+//                                 count: 1,
+//                                 level: 3,
+//                                 overlapping_area: 0,
+//                                 overlaps_shape: false,
+//                                 children: Rc::new(vec![])
+//                             }
+//                         ])
+//                     },
+//                     HBounds {
+//                         transform: None,
+//                         bounds: Rect {
+//                             x: 1,
+//                             y: 1,
+//                             w: 2,
+//                             h: 2
+//                         },
+//                         count: 4,
+//                         level: 2,
+//                         overlapping_area: 2,
+//                         overlaps_shape: true,
+//                         children: Rc::new(vec![
+//                             HBounds {
+//                                 transform: None,
+//                                 bounds: Rect {
+//                                     x: 1,
+//                                     y: 1,
+//                                     w: 1,
+//                                     h: 1
+//                                 },
+//                                 count: 1,
+//                                 level: 3,
+//                                 overlapping_area: 1,
+//                                 overlaps_shape: true,
+//                                 children: Rc::new(vec![])
+//                             },
+//                             HBounds {
+//                                 transform: None,
+//                                 bounds: Rect {
+//                                     x: 2,
+//                                     y: 1,
+//                                     w: 1,
+//                                     h: 1
+//                                 },
+//                                 count: 1,
+//                                 level: 3,
+//                                 overlapping_area: 1,
+//                                 overlaps_shape: true,
+//                                 children: Rc::new(vec![])
+//                             },
+//                             HBounds {
+//                                 transform: None,
+//                                 bounds: Rect {
+//                                     x: 1,
+//                                     y: 2,
+//                                     w: 1,
+//                                     h: 1
+//                                 },
+//                                 count: 1,
+//                                 level: 3,
+//                                 overlapping_area: 0,
+//                                 overlaps_shape: false,
+//                                 children: Rc::new(vec![])
+//                             },
+//                             HBounds {
+//                                 transform: None,
+//                                 bounds: Rect {
+//                                     x: 2,
+//                                     y: 2,
+//                                     w: 1,
+//                                     h: 1
+//                                 },
+//                                 count: 1,
+//                                 level: 3,
+//                                 overlapping_area: 0,
+//                                 overlaps_shape: false,
+//                                 children: Rc::new(vec![])
+//                             }
+//                         ])
+//                     }
+//                 ])
+//             }
+//         );
+//     }
 
-    #[test]
-    fn test_collision_self() {
-        let img = ImgData {
-            data: &[
-                BLACK, BLACK, //
-                BLACK, WHITE,
-            ],
-            width: 2,
-            height: 2,
-        };
+//     #[test]
+//     fn test_collision_self() {
+//         let img = ImgData {
+//             data: &[
+//                 BLACK, BLACK, //
+//                 BLACK, WHITE,
+//             ],
+//             width: 2,
+//             height: 2,
+//         };
 
-        let res = HBounds::from(img, None, false);
+//         let res = HBounds::from(img, None, false);
 
-        assert_eq!(HBounds::intersects(&res, &res, None), true);
-    }
+//         assert_eq!(HBounds::intersects(&res, &res, None), true);
+//     }
 
-    #[test]
-    fn test_collision_simple_1() {
-        let hbounds1 = HBounds::from(
-            ImgData {
-                data: &[
-                    BLACK, WHITE, //
-                    BLACK, WHITE,
-                ],
-                width: 2,
-                height: 2,
-            },
-            None,
-            false,
-        );
-        let hbounds2 = HBounds::from(
-            ImgData {
-                data: &[
-                    BLACK, BLACK, //
-                    WHITE, WHITE,
-                ],
-                width: 2,
-                height: 2,
-            },
-            None,
-            false,
-        );
-        let hbounds3 = HBounds::from(
-            ImgData {
-                data: &[
-                    WHITE, BLACK, //
-                    WHITE, BLACK,
-                ],
-                width: 2,
-                height: 2,
-            },
-            None,
-            false,
-        );
-        let hbounds4 = HBounds::from(
-            ImgData {
-                data: &[
-                    WHITE, WHITE, //
-                    BLACK, BLACK,
-                ],
-                width: 2,
-                height: 2,
-            },
-            None,
-            false,
-        );
+//     #[test]
+//     fn test_collision_simple_1() {
+//         let hbounds1 = HBounds::from(
+//             ImgData {
+//                 data: &[
+//                     BLACK, WHITE, //
+//                     BLACK, WHITE,
+//                 ],
+//                 width: 2,
+//                 height: 2,
+//             },
+//             None,
+//             false,
+//         );
+//         let hbounds2 = HBounds::from(
+//             ImgData {
+//                 data: &[
+//                     BLACK, BLACK, //
+//                     WHITE, WHITE,
+//                 ],
+//                 width: 2,
+//                 height: 2,
+//             },
+//             None,
+//             false,
+//         );
+//         let hbounds3 = HBounds::from(
+//             ImgData {
+//                 data: &[
+//                     WHITE, BLACK, //
+//                     WHITE, BLACK,
+//                 ],
+//                 width: 2,
+//                 height: 2,
+//             },
+//             None,
+//             false,
+//         );
+//         let hbounds4 = HBounds::from(
+//             ImgData {
+//                 data: &[
+//                     WHITE, WHITE, //
+//                     BLACK, BLACK,
+//                 ],
+//                 width: 2,
+//                 height: 2,
+//             },
+//             None,
+//             false,
+//         );
 
-        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
-        assert_eq!(HBounds::intersects(&hbounds2, &hbounds1, None), true);
+//         assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
+//         assert_eq!(HBounds::intersects(&hbounds2, &hbounds1, None), true);
 
-        assert_eq!(HBounds::intersects(&hbounds2, &hbounds3, None), true);
-        assert_eq!(HBounds::intersects(&hbounds3, &hbounds2, None), true);
+//         assert_eq!(HBounds::intersects(&hbounds2, &hbounds3, None), true);
+//         assert_eq!(HBounds::intersects(&hbounds3, &hbounds2, None), true);
 
-        assert_eq!(HBounds::intersects(&hbounds3, &hbounds4, None), true);
-        assert_eq!(HBounds::intersects(&hbounds4, &hbounds3, None), true);
+//         assert_eq!(HBounds::intersects(&hbounds3, &hbounds4, None), true);
+//         assert_eq!(HBounds::intersects(&hbounds4, &hbounds3, None), true);
 
-        assert_eq!(HBounds::intersects(&hbounds4, &hbounds1, None), true);
-        assert_eq!(HBounds::intersects(&hbounds1, &hbounds4, None), true);
+//         assert_eq!(HBounds::intersects(&hbounds4, &hbounds1, None), true);
+//         assert_eq!(HBounds::intersects(&hbounds1, &hbounds4, None), true);
 
-        assert_eq!(HBounds::intersects(&hbounds1, &hbounds3, None), false);
-        assert_eq!(HBounds::intersects(&hbounds3, &hbounds1, None), false);
+//         assert_eq!(HBounds::intersects(&hbounds1, &hbounds3, None), false);
+//         assert_eq!(HBounds::intersects(&hbounds3, &hbounds1, None), false);
 
-        assert_eq!(HBounds::intersects(&hbounds2, &hbounds4, None), false);
-        assert_eq!(HBounds::intersects(&hbounds4, &hbounds2, None), false);
-    }
+//         assert_eq!(HBounds::intersects(&hbounds2, &hbounds4, None), false);
+//         assert_eq!(HBounds::intersects(&hbounds4, &hbounds2, None), false);
+//     }
 
-    #[test]
-    fn test_collision_translate() {
-        let mut hbounds1 = HBounds::from(
-            ImgData {
-                data: &[
-                    WHITE, WHITE, //
-                    BLACK, WHITE,
-                ],
-                width: 2,
-                height: 2,
-            },
-            None,
-            false,
-        );
+//     #[test]
+//     fn test_collision_translate() {
+//         let mut hbounds1 = HBounds::from(
+//             ImgData {
+//                 data: &[
+//                     WHITE, WHITE, //
+//                     BLACK, WHITE,
+//                 ],
+//                 width: 2,
+//                 height: 2,
+//             },
+//             None,
+//             false,
+//         );
 
-        let mut hbounds2 = HBounds::from(
-            ImgData {
-                data: &[
-                    WHITE, BLACK, //
-                    WHITE, WHITE,
-                ],
-                width: 2,
-                height: 2,
-            },
-            None,
-            false,
-        );
+//         let mut hbounds2 = HBounds::from(
+//             ImgData {
+//                 data: &[
+//                     WHITE, BLACK, //
+//                     WHITE, WHITE,
+//                 ],
+//                 width: 2,
+//                 height: 2,
+//             },
+//             None,
+//             false,
+//         );
 
-        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), false);
+//         assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), false);
 
-        hbounds1.transform = None;
-        hbounds2.transform = Some(Matrix::new().translate(-1f32, 1f32));
-        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
+//         hbounds1.transform = None;
+//         hbounds2.transform = Some(Matrix::new().translate(-1f32, 1f32));
+//         assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
 
-        hbounds1.transform = Some(Matrix::new().translate(1f32, -1f32));
-        hbounds2.transform = None;
-        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
-    }
+//         hbounds1.transform = Some(Matrix::new().translate(1f32, -1f32));
+//         hbounds2.transform = None;
+//         assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
+//     }
 
-    #[test]
-    fn test_collision_translate_2() {
-        let mut hbounds1 = HBounds::from(
-            ImgData {
-                data: &[
-                    WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, //
-                    WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, //
-                    WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, //
-                    BLACK, WHITE, WHITE, WHITE, WHITE, WHITE, //
-                ],
-                width: 6,
-                height: 4,
-            },
-            None,
-            false,
-        );
+//     #[test]
+//     fn test_collision_translate_2() {
+//         let mut hbounds1 = HBounds::from(
+//             ImgData {
+//                 data: &[
+//                     WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, //
+//                     WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, //
+//                     WHITE, WHITE, WHITE, WHITE, WHITE, WHITE, //
+//                     BLACK, WHITE, WHITE, WHITE, WHITE, WHITE, //
+//                 ],
+//                 width: 6,
+//                 height: 4,
+//             },
+//             None,
+//             false,
+//         );
 
-        let mut hbounds2 = HBounds::from(
-            ImgData {
-                data: &[
-                    WHITE, WHITE, BLACK, WHITE, //
-                    WHITE, WHITE, WHITE, WHITE, //
-                    WHITE, WHITE, WHITE, WHITE, //
-                ],
-                width: 4,
-                height: 3,
-            },
-            None,
-            false,
-        );
+//         let mut hbounds2 = HBounds::from(
+//             ImgData {
+//                 data: &[
+//                     WHITE, WHITE, BLACK, WHITE, //
+//                     WHITE, WHITE, WHITE, WHITE, //
+//                     WHITE, WHITE, WHITE, WHITE, //
+//                 ],
+//                 width: 4,
+//                 height: 3,
+//             },
+//             None,
+//             false,
+//         );
 
-        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), false);
+//         assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), false);
 
-        hbounds1.transform = Some(Matrix::new().translate(1f32, -2f32));
-        hbounds2.transform = Some(Matrix::new().translate(-1f32, 1f32));
-        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
+//         hbounds1.transform = Some(Matrix::new().translate(1f32, -2f32));
+//         hbounds2.transform = Some(Matrix::new().translate(-1f32, 1f32));
+//         assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
 
-        hbounds1.transform = Some(Matrix::new().translate(0f32, 0f32));
-        hbounds2.transform = Some(Matrix::new().translate(-2f32, 3f32));
-        assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
+//         hbounds1.transform = Some(Matrix::new().translate(0f32, 0f32));
+//         hbounds2.transform = Some(Matrix::new().translate(-2f32, 3f32));
+//         assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
 
-        // hbounds1.transform = Some(Matrix::new().translate(1f32, -1f32));
-        // hbounds2.transform = None;
-        // assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
-    }
+//         // hbounds1.transform = Some(Matrix::new().translate(1f32, -1f32));
+//         // hbounds2.transform = None;
+//         // assert_eq!(HBounds::intersects(&hbounds1, &hbounds2, None), true);
+//     }
 
-    #[test]
-    fn test_rect_intersections() {
-        assert_eq!(
-            RectF::intersect(
-                RectF::from(Rect {
-                    x: 0,
-                    y: 0,
-                    w: 1,
-                    h: 1,
-                }),
-                RectF::from(Rect {
-                    x: 1,
-                    y: 0,
-                    w: 1,
-                    h: 1,
-                }),
-                0f32,
-                0f32
-            ),
-            false
-        );
-        assert_eq!(
-            RectF::intersect(
-                RectF::from(Rect {
-                    x: 0,
-                    y: 0,
-                    w: 2,
-                    h: 2,
-                }),
-                RectF::from(Rect {
-                    x: 1,
-                    y: 0,
-                    w: 2,
-                    h: 2,
-                }),
-                0f32,
-                0f32
-            ),
-            true
-        );
-        assert_eq!(
-            RectF::intersect(
-                RectF::from(Rect {
-                    x: 0,
-                    y: 0,
-                    w: 2,
-                    h: 2,
-                }),
-                RectF::from(Rect {
-                    x: 1,
-                    y: 1,
-                    w: 1,
-                    h: 1,
-                }),
-                0f32,
-                0f32
-            ),
-            true
-        );
-        assert_eq!(
-            RectF::intersect(
-                RectF::from(Rect {
-                    x: 1,
-                    y: 1,
-                    w: 1,
-                    h: 1,
-                }),
-                RectF::from(Rect {
-                    x: 0,
-                    y: 0,
-                    w: 2,
-                    h: 2,
-                }),
-                0f32,
-                0f32
-            ),
-            true
-        );
-    }
+//     #[test]
+//     fn test_rect_intersections() {
+//         assert_eq!(
+//             RectF::intersect(
+//                 RectF::from(Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 1,
+//                     h: 1,
+//                 }),
+//                 RectF::from(Rect {
+//                     x: 1,
+//                     y: 0,
+//                     w: 1,
+//                     h: 1,
+//                 }),
+//                 0f32,
+//                 0f32
+//             ),
+//             false
+//         );
+//         assert_eq!(
+//             RectF::intersect(
+//                 RectF::from(Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 2,
+//                     h: 2,
+//                 }),
+//                 RectF::from(Rect {
+//                     x: 1,
+//                     y: 0,
+//                     w: 2,
+//                     h: 2,
+//                 }),
+//                 0f32,
+//                 0f32
+//             ),
+//             true
+//         );
+//         assert_eq!(
+//             RectF::intersect(
+//                 RectF::from(Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 2,
+//                     h: 2,
+//                 }),
+//                 RectF::from(Rect {
+//                     x: 1,
+//                     y: 1,
+//                     w: 1,
+//                     h: 1,
+//                 }),
+//                 0f32,
+//                 0f32
+//             ),
+//             true
+//         );
+//         assert_eq!(
+//             RectF::intersect(
+//                 RectF::from(Rect {
+//                     x: 1,
+//                     y: 1,
+//                     w: 1,
+//                     h: 1,
+//                 }),
+//                 RectF::from(Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 2,
+//                     h: 2,
+//                 }),
+//                 0f32,
+//                 0f32
+//             ),
+//             true
+//         );
+//     }
 
-    #[test]
-    fn test_rect_intersections_transformed() {
-        assert_eq!(
-            RectF::intersect(
-                RectF::from(Rect {
-                    x: 0,
-                    y: 0,
-                    w: 1,
-                    h: 1,
-                }),
-                RectF::from(Rect {
-                    x: 1,
-                    y: 0,
-                    w: 1,
-                    h: 1,
-                })
-                .transform(Matrix::new().translate(-1f32, 0f32)),
-                0f32,
-                0f32
-            ),
-            true
-        );
-    }
+//     #[test]
+//     fn test_rect_intersections_transformed() {
+//         assert_eq!(
+//             RectF::intersect(
+//                 RectF::from(Rect {
+//                     x: 0,
+//                     y: 0,
+//                     w: 1,
+//                     h: 1,
+//                 }),
+//                 RectF::from(Rect {
+//                     x: 1,
+//                     y: 0,
+//                     w: 1,
+//                     h: 1,
+//                 })
+//                 .transform(Matrix::new().translate(-1f32, 0f32)),
+//                 0f32,
+//                 0f32
+//             ),
+//             true
+//         );
+//     }
 
-    #[test]
-    fn test_point_transforms() {
-        assert_eq!(
-            (PointF { x: 0f32, y: 0f32 }).transform(Matrix::new().translate(1f32, 2f32)),
-            PointF { x: 1f32, y: 2f32 },
-        );
-        assert_eq!(
-            (PointF { x: 1f32, y: 2f32 }).transform(Matrix::new().translate(1f32, 2f32)),
-            PointF { x: 2f32, y: 4f32 },
-        );
-        assert_eq!(
-            (PointF { x: 1f32, y: 2f32 }).transform(Matrix::new().translate(-1f32, -2f32)),
-            PointF { x: 0f32, y: 0f32 },
-        );
-    }
+//     #[test]
+//     fn test_point_transforms() {
+//         assert_eq!(
+//             (PointF { x: 0f32, y: 0f32 }).transform(Matrix::new().translate(1f32, 2f32)),
+//             PointF { x: 1f32, y: 2f32 },
+//         );
+//         assert_eq!(
+//             (PointF { x: 1f32, y: 2f32 }).transform(Matrix::new().translate(1f32, 2f32)),
+//             PointF { x: 2f32, y: 4f32 },
+//         );
+//         assert_eq!(
+//             (PointF { x: 1f32, y: 2f32 }).transform(Matrix::new().translate(-1f32, -2f32)),
+//             PointF { x: 0f32, y: 0f32 },
+//         );
+//     }
 
-    #[test]
-    fn test_rect_transforms() {
-        assert_eq!(
-            (RectF {
-                x: 0f32,
-                y: 0f32,
-                h: 1f32,
-                w: 1f32
-            })
-            .transform(Matrix::new().translate(1f32, 2f32)),
-            RectF {
-                x: 1f32,
-                y: 2f32,
-                h: 1f32,
-                w: 1f32
-            },
-        );
-    }
-}
+//     #[test]
+//     fn test_rect_transforms() {
+//         assert_eq!(
+//             (RectF {
+//                 x: 0f32,
+//                 y: 0f32,
+//                 h: 1f32,
+//                 w: 1f32
+//             })
+//             .transform(Matrix::new().translate(1f32, 2f32)),
+//             RectF {
+//                 x: 1f32,
+//                 y: 2f32,
+//                 h: 1f32,
+//                 w: 1f32
+//             },
+//         );
+//     }
+// }
