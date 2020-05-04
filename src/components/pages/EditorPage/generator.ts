@@ -119,7 +119,7 @@ export class Generator {
     const wordMaxScalePlaced = words.map(() => -1)
     const wordMinScale = task.itemScaleMin
     let timeout = 3000
-    let maxCount = 600
+    let maxCount = 1000
 
     let countPlaced = 0
 
@@ -168,7 +168,7 @@ export class Generator {
     let wordIndex = 0
 
     while (countPlaced < maxCount && currentTime - start <= timeout) {
-      console.log('countPlaced: ', countPlaced)
+      // console.log('countPlaced: ', countPlaced)
       const word = words[wordIndex]
       let currentScale = wordCurrentScales[wordIndex]
       const hboundsWord = this.wordHbounds.get(word.id)!
@@ -178,7 +178,7 @@ export class Generator {
       const maxTries = 1
       let currentTry = 0
       while (!success && currentTry < maxTries) {
-        console.log('scale: ', word.text, currentScale)
+        // console.log('scale: ', word.text, currentScale)
         currentTry += 1
 
         // const paper = window['paper'] as paper.PaperScope
@@ -189,10 +189,24 @@ export class Generator {
         const spiral = archimedeanSpiral(nRotations)
         const maxSteps = 60
         const size = task.bounds.w
-        const p0 = new paper.Point(
-          size / 2 + (size / 3) * (Math.random() - 0.5),
-          task.bounds.h / 2 + (size / 3) * (Math.random() - 0.5)
-        )
+        // const p0 = new paper.Point(
+        //   size / 2 + (size / 3) * (Math.random() - 0.5),
+        //   task.bounds.h / 2 + (size / 3) * (Math.random() - 0.5)
+        // )
+        let p0 = shapeHBoundsJs
+          ? randomPointInsideHboundsSerialized(shapeHBoundsJs)
+          : randomPointInRect(
+              task.bounds,
+              task.fitWithinShape
+                ? 0
+                : Math.max(task.bounds.w * 0.1, task.bounds.h * 0.1, 100)
+            )
+        if (!p0) {
+          p0 = {
+            x: size / 2 + (size / 3) * (Math.random() - 0.5),
+            y: task.bounds.h / 2 + (size / 3) * (Math.random() - 0.5),
+          }
+        }
         let curt = 0.01
 
         for (let i = 0; i < maxSteps; ++i) {
@@ -200,7 +214,7 @@ export class Generator {
 
           curt += 3 / (curt * size) / nRotations
 
-          const p = p0.add(sp.multiply(2 * size))
+          const p = new paper.Point(p0).add(sp.multiply(2 * size))
           // const path = new paper.Path.Rectangle(p, p.add(new paper.Point(2, 2)))
           // path.fillColor = new paper.Color('blue')
 
