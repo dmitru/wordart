@@ -141,7 +141,7 @@ pub unsafe fn largest_rect(
             //     imi!(r - 1, c, img_width, bounds_x, bounds_y) + 3
             // );
             let alpha = img[imi!(r - 1, c, img_width, bounds_x, bounds_y) + 3];
-            let is_empty = alpha < 128;
+            let is_empty = alpha < 255;
             img_row[c] = is_empty;
             let dp_i = dpi!(r, c, dp_width);
             let cpdiff = (c as i32 - p as i32);
@@ -233,7 +233,7 @@ pub fn largest_rect_js(
     bounds_y: i32,
     bounds_width: i32,
     bounds_height: i32,
-) -> JsValue {
+) -> Rect {
     unsafe {
         let rect = largest_rect(
             &ImgDataU8 {
@@ -246,7 +246,7 @@ pub fn largest_rect_js(
             bounds_width as usize,
             bounds_height as usize,
         );
-        return JsValue::from_serde(&rect).unwrap();
+        return rect;
     }
 }
 

@@ -8,6 +8,7 @@ import {
   Dimensions,
   clearCanvas,
   createCanvasCtxCopy,
+  createCanvasCtx,
 } from 'lib/wordart/canvas-utils'
 import { getWasmModule } from 'lib/wordart/wasm/wasm-module'
 import { ImageProcessorWasm } from 'lib/wordart/wasm/image-processor-wasm'
@@ -165,7 +166,7 @@ const scratch = (canvas: HTMLCanvasElement) => {
       // }
 
       const word = 'Victory'
-      const wordPath = fonts[2].getPath(word, 0, 0, 100)
+      const wordPath = fonts[0].getPath(word, 0, 0, 100)
       const wordPathBounds = wordPath.getBoundingBox()
 
       type PlacedWord = {
@@ -174,21 +175,34 @@ const scratch = (canvas: HTMLCanvasElement) => {
       }
       const placedWords: PlacedWord[] = []
 
-      const nIter = 600
+      const nIter = 400
       const t1 = performance.now()
+      let scale = 1
+
       for (let i = 0; i < nIter; ++i) {
-        const imgData = shapeCtx.getImageData(
-          0,
-          0,
-          shapeCtx.canvas.width,
-          shapeCtx.canvas.height
-        )
+        let scale = 1 - (0.5 * i) / nIter
+        // let size = 60
+        // if (i < 100) {
+        //   size = 150
+        // }
+        // if (i < 200) {
+        //   size = 220
+        // }
+        // if (i < 300) {
+        //   size = 300
+        // } else {
+        //   size = 360
+        // }
+        let size = imgSize
+        // const scratchCtx = createCanvasCtx({ w: size, h: size })
+        // scratchCtx.drawImage(shapeCtx.canvas, 0, 0, size, size)
+        const imgData = shapeCtx.getImageData(0, 0, size, size)
         // shapeCtx.imageSmoothingEnabled = false
         const imgDataBounds: Rect = {
           x: 0,
           y: 0,
-          w: imgData.width,
-          h: imgData.height,
+          w: size,
+          h: size,
         }
         const largestRect = imageProcessor.findLargestRect(
           imgData,
@@ -197,11 +211,10 @@ const scratch = (canvas: HTMLCanvasElement) => {
         // const largestRect = getLargestRect(imgData, imgDataBounds)
         // console.log(largestRect, getLargestRect(imgData, imgDataBounds))
 
-        const pathScale =
-          Math.min(
-            largestRect.w / (wordPathBounds.x2 - wordPathBounds.x1),
-            largestRect.h / (wordPathBounds.y2 - wordPathBounds.y1)
-          ) * 0.9
+        const pathScale = Math.min(
+          (largestRect.w / (wordPathBounds.x2 - wordPathBounds.x1)) * scale,
+          (largestRect.h / (wordPathBounds.y2 - wordPathBounds.y1)) * scale
+        )
 
         const dx = Math.max(
           largestRect.w - pathScale * (wordPathBounds.x2 - wordPathBounds.x1),
@@ -218,25 +231,25 @@ const scratch = (canvas: HTMLCanvasElement) => {
         shapeCtx.globalCompositeOperation = 'destination-out'
 
         const tx = largestRect.x + Math.random() * dx
-        const ty =
-          largestRect.y +
-          largestRect.h -
-          wordPathBounds.y2 * pathScale -
-          Math.random() * dy
+        const ty = largestRect.y + largestRect.h - Math.random() * dy
+        shapeCtx.scale(imgSize / size, imgSize / size)
         shapeCtx.translate(tx, ty)
         shapeCtx.scale(pathScale, pathScale)
 
-        if (pathScale * Math.max(largestRect.w, largestRect.h) >= 0.5) {
-          wordPath.draw(shapeCtx)
-          wordPath.draw(shapeCtx)
+        if (pathScale * Math.max(largestRect.w, largestRect.h) >= 0.25) {
+          shapeCtx.shadowBlur = 1.1
+          shapeCtx.shadowColor = 'red'
           wordPath.draw(shapeCtx)
 
           placedWords.push({
             path: wordPath,
-            transform: new paper.Matrix().translate(tx, ty).scale(pathScale),
+            transform: new paper.Matrix()
+              .scale(imgSize / size)
+              .translate(tx, ty)
+              .scale(pathScale),
           })
         } else {
-          console.log('i', i)
+          // console.log('i', i)
           shapeCtx.fillRect(
             wordPathBounds.x1,
             wordPathBounds.y1,
@@ -273,7 +286,6 @@ const scratch = (canvas: HTMLCanvasElement) => {
         true
       )
       symDef.item.fillColor = new paper.Color('black')
-      symDef.item.fillRule = 'evenodd'
 
       const placedItems = placedWords.map((w) => {
         const { transform } = w
