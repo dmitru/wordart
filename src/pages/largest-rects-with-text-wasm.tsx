@@ -208,22 +208,21 @@ const scratch = (canvas: HTMLCanvasElement) => {
           imgData,
           imgDataBounds
         )
+
+        const wordPathSize: Dimensions = {
+          w: wordPathBounds.x2 - wordPathBounds.x1,
+          h: wordPathBounds.y2 - wordPathBounds.y1,
+        }
         // const largestRect = getLargestRect(imgData, imgDataBounds)
         // console.log(largestRect, getLargestRect(imgData, imgDataBounds))
 
         const pathScale = Math.min(
-          (largestRect.w / (wordPathBounds.x2 - wordPathBounds.x1)) * scale,
-          (largestRect.h / (wordPathBounds.y2 - wordPathBounds.y1)) * scale
+          (largestRect.w / wordPathSize.w) * scale,
+          (largestRect.h / wordPathSize.h) * scale
         )
 
-        const dx = Math.max(
-          largestRect.w - pathScale * (wordPathBounds.x2 - wordPathBounds.x1),
-          0
-        )
-        const dy = Math.max(
-          largestRect.h - pathScale * (wordPathBounds.y2 - wordPathBounds.y1),
-          0
-        )
+        const dx = Math.max(largestRect.w - pathScale * wordPathSize.w, 0)
+        const dy = Math.max(largestRect.h - pathScale * wordPathSize.h, 0)
 
         shapeCtx.save()
 
@@ -231,7 +230,11 @@ const scratch = (canvas: HTMLCanvasElement) => {
         shapeCtx.globalCompositeOperation = 'destination-out'
 
         const tx = largestRect.x + Math.random() * dx
-        const ty = largestRect.y + largestRect.h - Math.random() * dy
+        const ty =
+          largestRect.y +
+          largestRect.h -
+          pathScale * wordPathBounds.y2 -
+          Math.random() * dy
         shapeCtx.scale(imgSize / size, imgSize / size)
         shapeCtx.translate(tx, ty)
         shapeCtx.scale(pathScale, pathScale)
