@@ -182,78 +182,12 @@ export class Editor {
     this.logger.debug('Editor: generate')
 
     if (!this.paperItems.shape) {
+      console.log('checkpoint1')
       return
     }
-
-    if (!this.shapes) {
-      try {
-        const raster = this.paperItems.shape?.rasterize(40, false)
-        const imgData = raster.getImageData(
-          new paper.Rectangle(0, 0, raster.width, raster.height)
-        )
-        const ctx = createCanvasCtx({
-          w: raster.width + 4,
-          h: raster.height + 2,
-        })
-        ctx.putImageData(imgData, 2, 2)
-
-        const wasm = await getWasmModule()
-
-        const imageProcessor = new ImageProcessorWasm(wasm)
-        console.log(
-          'this.paperItems.shape.bounds = ',
-          this.paperItems.shape.bounds
-        )
-
-        const padding = 20
-        const view = this.paperItems.shape.parent.view
-        const generateBounds: Rect = {
-          x: padding,
-          y: padding,
-          w: view.bounds.width - 2 * padding,
-          h: view.bounds.height - 2 * padding,
-        }
-
-        const shapes = imageProcessor.findShapesByColor({
-          bounds: {
-            x: this.paperItems.shape.bounds.x,
-            y: this.paperItems.shape.bounds.y,
-            w: this.paperItems.shape.bounds.width,
-            h: this.paperItems.shape.bounds.height,
-          },
-          canvas: ctx.canvas,
-          debug: true,
-        })
-        this.shapes = shapes
-      } catch (error) {
-        console.error(error)
-        debugger
-      }
-    }
-
-    if (!this.shapes) {
-      return
-    }
-
+    console.log('checkpoint2')
     await this.generator.init()
-
-    this.logger.debug(
-      'Shapes: ',
-      this.shapes.map((s) => s.hBounds.get_js())
-    )
-
-    const nonTransparentShapes = this.shapes
-      .filter((shape) => {
-        const color = chroma(shape.color)
-        const isEmpty = color.alpha() > 0.01 && color.luminance() < 0.95
-        return isBackground ? !isEmpty : isEmpty
-      })
-      .slice(0, 1)
-    this.logger.debug(
-      'Generator.generate: nonTransparentShapes: ',
-      this.shapes,
-      nonTransparentShapes
-    )
+    console.log('checkpoint3')
 
     const fonts = await Promise.all(
       FONT_NAMES.map((fontName) => loadFont(`/fonts/${fontName}`))
@@ -261,14 +195,14 @@ export class Editor {
     // @ts-ignore
     window['fonts'] = fonts
 
-    for (const shape of nonTransparentShapes) {
-      const s = shape.hBounds.get_js()
+    for (const shape of [1]) {
+      // const s = shape.hBounds.get_js()
 
       // this.paperItems.shapeHbounds = hBoundsWasmSerializedToPaperGroup(s)
       this.paperItems.shape?.insertAbove(this.paperItems.bgRect)
 
       const result = await this.generator.generate({
-        shape,
+        shapeImgUrl: this.store.getSelectedShape().url,
         placementAlgorithm: 'random',
         fitWithinShape: style.fitWithinShape,
         bounds: this.getSceneBounds(),

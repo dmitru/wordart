@@ -224,7 +224,7 @@ export const EditorPage = observer(() => {
               onClick={async () => {
                 state.isVisualizing = true
                 await Promise.all([
-                  editorPageStore.editor?.generateItems('shape'),
+                  // editorPageStore.editor?.generateItems('shape'),
                   editorPageStore.editor?.generateItems('background'),
                 ])
                 state.isVisualizing = false

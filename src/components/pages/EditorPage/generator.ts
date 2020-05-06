@@ -1,5 +1,9 @@
 import { WordConfigId } from 'components/pages/EditorPage/editor-page-store'
-import { createCanvasCtx } from 'lib/wordart/canvas-utils'
+import {
+  createCanvasCtx,
+  Dimensions,
+  loadImageUrlToCanvasCtx,
+} from 'lib/wordart/canvas-utils'
 import { CollisionDetectorWasm } from 'lib/wordart/wasm/collision-detector-wasm'
 import { consoleLoggers } from 'utils/console-logger'
 import {
@@ -14,11 +18,15 @@ import {
   Point,
   randomPointInRect,
 } from 'lib/wordart/geometry'
-import { ShapeWasm } from 'lib/wordart/wasm/image-processor-wasm'
+import {
+  ShapeWasm,
+  ImageProcessorWasm,
+} from 'lib/wordart/wasm/image-processor-wasm'
 import { randomPointInsideHboundsSerialized } from 'lib/wordart/wasm/hbounds'
 import * as tm from 'transformation-matrix'
 import { Path } from 'opentype.js'
 import { archimedeanSpiral } from 'components/pages/EditorPage/spirals'
+import { matrixToPaperTransform } from 'components/pages/EditorPage/paper-utils'
 
 const FONT_SIZE = 100
 
@@ -69,253 +77,146 @@ export class Generator {
       throw new Error('call init() first')
     }
     this.logger.debug('Generator: generate', task)
-    const tStarted = performance.now()
 
-    const shape = task.shape
-    const collisionDetector = new CollisionDetectorWasm(
-      this.wasm,
-      task.bounds,
-      shape ? shape.hBoundsInverted : undefined
-    )
-
-    const t1 = performance.now()
-    const words: Word[] = []
-    for (const wordItem of task.words) {
-      for (const font of wordItem.fonts) {
-        for (const angle of wordItem.angles) {
-          this.logger.debug(
-            `Processing word ${wordItem.text}, font ${getFontName(
-              font
-            )}, angle: ${angle}`
-          )
-          const word = await this.processWord(
-            wordItem.wordConfigId,
-            wordItem.text,
-            font,
-            angle
-          )
-          words.push(word)
-        }
-      }
+    const imgSize = 360
+    const imageSize: Dimensions = {
+      w: imgSize,
+      h: imgSize,
     }
 
-    const wordBounds = words.map((word) =>
-      this.wordHbounds.get(word.id)!.get_bounds()
-    )
+    const imageProcessor = new ImageProcessorWasm(this.wasm)
 
+    console.log('check1')
+    const shapeCtx = await loadImageUrlToCanvasCtx(
+      task.shapeImgUrl,
+      imageSize.w,
+      imageSize.h
+    )
+    console.log('check2')
+
+    const word = new Word('1', 1, task.words[0].text, task.words[0].fonts[0])
+    const wordPath = task.words[0].fonts[0].getPath(word.text, 0, 0, 100)
+    const wordPathBounds = wordPath.getBoundingBox()
+
+    const placedWords: WordItem[] = []
+
+    const nIter = 400
+    const t1 = performance.now()
+    let scale = 1
+
+    for (let i = 0; i < nIter; ++i) {
+      console.log('i = ', i)
+      let scale = 1 - (0.5 * i) / nIter
+      // let size = 60
+      // if (i < 100) {
+      //   size = 150
+      // }
+      // if (i < 200) {
+      //   size = 220
+      // }
+      // if (i < 300) {
+      //   size = 300
+      // } else {
+      //   size = 360
+      // }
+      let size = imgSize
+      // const scratchCtx = createCanvasCtx({ w: size, h: size })
+      // scratchCtx.drawImage(shapeCtx.canvas, 0, 0, size, size)
+      const imgData = shapeCtx.getImageData(0, 0, size, size)
+      // shapeCtx.imageSmoothingEnabled = false
+      const imgDataBounds: Rect = {
+        x: 0,
+        y: 0,
+        w: size,
+        h: size,
+      }
+      const largestRect = imageProcessor.findLargestRect(imgData, imgDataBounds)
+
+      const wordPathSize: Dimensions = {
+        w: wordPathBounds.x2 - wordPathBounds.x1,
+        h: wordPathBounds.y2 - wordPathBounds.y1,
+      }
+      // const largestRect = getLargestRect(imgData, imgDataBounds)
+      // console.log(largestRect, getLargestRect(imgData, imgDataBounds))
+
+      let pathScale = Math.min(
+        (largestRect.w / wordPathSize.w) * scale,
+        (largestRect.h / wordPathSize.h) * scale
+      )
+
+      const maxMinDim = 60
+      const minDim = Math.min(wordPathSize.w, wordPathSize.h) * pathScale
+      if (minDim > maxMinDim) {
+        pathScale *= maxMinDim / minDim
+      }
+
+      const dx = Math.max(largestRect.w - pathScale * wordPathSize.w, 0)
+      const dy = Math.max(largestRect.h - pathScale * wordPathSize.h, 0)
+
+      shapeCtx.save()
+
+      shapeCtx.fillStyle = 'black'
+      shapeCtx.globalCompositeOperation = 'destination-out'
+
+      const tx = largestRect.x + Math.random() * dx
+      const ty =
+        largestRect.y +
+        largestRect.h -
+        pathScale * wordPathBounds.y2 -
+        Math.random() * dy
+      shapeCtx.scale(imgSize / size, imgSize / size)
+      shapeCtx.translate(tx, ty)
+      shapeCtx.scale(pathScale, pathScale)
+
+      if (pathScale * Math.max(largestRect.w, largestRect.h) >= 0.25) {
+        // shapeCtx.shadowBlur = 1.1
+        // shapeCtx.shadowColor = 'red'
+        wordPath.draw(shapeCtx)
+
+        placedWords.push({
+          wordPath,
+          id: i,
+          kind: 'word',
+          shapeColor: 'black',
+          word,
+          transform: tm.compose(
+            tm.scale(task.bounds.w / imgSize, task.bounds.h / imgSize),
+            tm.scale(size / imgSize, size / imgSize),
+            tm.translate(tx, ty),
+            tm.scale(pathScale)
+          ),
+        })
+      } else {
+        // console.log('i', i)
+        shapeCtx.fillRect(
+          wordPathBounds.x1,
+          wordPathBounds.y1,
+          wordPathBounds.x2 - wordPathBounds.x1,
+          wordPathBounds.y2 - wordPathBounds.y1
+        )
+      }
+      // shapeCtx.fillRect(...spreadRect(largestRect))
+
+      shapeCtx.restore()
+    }
     const t2 = performance.now()
 
-    this.logger.debug(
-      `Processed ${words.length} words: ${(t2 - t1).toFixed(2)}ms`
+    console.screenshot(shapeCtx.canvas, 1)
+    console.log(
+      `Placed ${placedWords.length} words; Finished ${nIter} iterations in ${(
+        (t2 - t1) /
+        1000
+      ).toFixed(2)} s, ${((t2 - t1) / nIter).toFixed(3)}ms / iter`
     )
-
-    let currentItemId = 1
-    let addedItems: Item[] = []
-    let addedHbounds: any[] = []
-
-    const shapeHBoundsJs = shape ? shape.hBounds.get_js() : undefined
-
-    const wordCurrentScales = words.map(() => task.itemScaleMax)
-    const wordMaxScalePlaced = words.map(() => -1)
-    const wordMinScale = task.itemScaleMin
-    let timeout = 3000
-    let maxCount = 1000
-
-    let countPlaced = 0
-
-    const tPrepEnd = performance.now()
-    this.logger.debug(`Generator: ${(tPrepEnd - tStarted).toFixed(3)}ms`)
-
-    const getPad = (
-      bounds: Rect,
-      countPlaced: number,
-      scale: number,
-      maxScalePlaced: number | undefined
-    ) => {
-      const minDim = Math.min(bounds.h, bounds.w) * scale
-      let factor = 0.5
-      if (maxScalePlaced != null && scale < maxScalePlaced * 0.5) {
-        factor = 0.4
-      }
-      if (maxScalePlaced != null && scale < maxScalePlaced * 0.2) {
-        factor = 0.2
-      }
-      const pad = minDim * factor
-      const result = pad
-      const resultAdjusted = (result * task.itemPadding) / 100
-      return resultAdjusted
-    }
-
-    const getBatchSize = (countPlaced: number, maxCount: number) => {
-      if (countPlaced < Math.max(0.05 * maxCount, 30)) {
-        return 20
-      }
-      if (countPlaced < 0.2 * maxCount) {
-        return 10
-      }
-      return 10
-    }
-
-    const getNextScale = (scale: number): number => {
-      const scaleStepFactor = 0.02
-      const maxScaleStep = (task.itemScaleMax - task.itemScaleMin) / 30
-      return scale - Math.min(maxScaleStep, scaleStepFactor * scale)
-    }
-
-    let start = performance.now()
-    let currentTime = performance.now()
-
-    let wordIndex = 0
-
-    while (countPlaced < maxCount && currentTime - start <= timeout) {
-      // console.log('countPlaced: ', countPlaced)
-      const word = words[wordIndex]
-      let currentScale = wordCurrentScales[wordIndex]
-      const hboundsWord = this.wordHbounds.get(word.id)!
-
-      let success = false
-
-      const maxTries = 1
-      let currentTry = 0
-      while (!success && currentTry < maxTries) {
-        // console.log('scale: ', word.text, currentScale)
-        currentTry += 1
-
-        // const paper = window['paper'] as paper.PaperScope
-        // paper.project.clear()
-
-        const spiralStep = 100
-        const nRotations = Math.ceil(task.bounds.w / spiralStep)
-        const spiral = archimedeanSpiral(nRotations)
-        const maxSteps = 60
-        const size = task.bounds.w
-        // const p0 = new paper.Point(
-        //   size / 2 + (size / 3) * (Math.random() - 0.5),
-        //   task.bounds.h / 2 + (size / 3) * (Math.random() - 0.5)
-        // )
-        let p0 = shapeHBoundsJs
-          ? randomPointInsideHboundsSerialized(shapeHBoundsJs)
-          : randomPointInRect(
-              task.bounds,
-              task.fitWithinShape
-                ? 0
-                : Math.max(task.bounds.w * 0.1, task.bounds.h * 0.1, 100)
-            )
-        if (!p0) {
-          p0 = {
-            x: size / 2 + (size / 3) * (Math.random() - 0.5),
-            y: task.bounds.h / 2 + (size / 3) * (Math.random() - 0.5),
-          }
-        }
-        let curt = 0.01
-
-        for (let i = 0; i < maxSteps; ++i) {
-          const sp = new paper.Point(spiral(curt))
-
-          curt += 3 / (curt * size) / nRotations
-
-          const p = new paper.Point(p0).add(sp.multiply(2 * size))
-          // const path = new paper.Path.Rectangle(p, p.add(new paper.Point(2, 2)))
-          // path.fillColor = new paper.Color('blue')
-
-          const bounds = wordBounds[wordIndex]
-
-          const scaleRandomized =
-            (currentScale + currentScale * (Math.random() - 0.5) * 2 * 0.3) *
-            (1 - (0.8 * i) / maxSteps)
-
-          const x = p.x - (bounds.w / 2) * scaleRandomized
-          const y = p.y
-
-          const padItem = getPad(
-            bounds,
-            countPlaced,
-            scaleRandomized,
-            wordMaxScalePlaced[wordIndex]
-          )
-          const padShape = task.shapePadding
-
-          const transform: tm.Matrix = multiply(
-            tm.translate(x, y),
-            tm.scale(scaleRandomized)
-          )
-          const transformWasm = new this.wasm.Matrix()
-          transformWasm.set_mut(
-            transform.a,
-            transform.b,
-            transform.c,
-            transform.d,
-            transform.e,
-            transform.f
-          )
-
-          const hasPlaced = collisionDetector.addItem(
-            hboundsWord,
-            transformWasm,
-            padShape,
-            padItem,
-            task.fitWithinShape
-          )
-
-          if (hasPlaced) {
-            console.log('success', i, x, y, currentScale)
-            if (wordMaxScalePlaced[wordIndex] == null) {
-              wordMaxScalePlaced[wordIndex] = currentScale
-            }
-
-            success = true
-            addedHbounds.push({
-              hboundsWord,
-              transform,
-            })
-
-            addedItems.push({
-              kind: 'word',
-              id: currentItemId++,
-              word,
-              wordPath: this.wordPaths.get(word.id)!,
-              shapeColor: shape ? shape.color : 'black',
-              transform,
-            })
-
-            countPlaced++
-            break
-          }
-        }
-
-        if (getNextScale(currentScale) >= wordMinScale) {
-          currentScale = getNextScale(currentScale)
-        }
-
-        // if (!success) {
-        //   // console.log('currentScale', currentScale, getNextScale(currentScale))
-        //   if (getNextScale(currentScale) >= wordMinScale) {
-        //     currentScale = getNextScale(currentScale)
-        //   }
-        // } else {
-        //   // console.log('success', i, currentScale)
-        // }
-      }
-
-      wordCurrentScales[wordIndex] = currentScale
-
-      wordIndex = (wordIndex + 1) % words.length
-      currentTime = performance.now()
-    }
-
-    const tEnded = performance.now()
-    this.logger.debug(
-      `Generator: placed ${countPlaced} in ${(tEnded - tPrepEnd).toFixed(3)}ms`
-    )
-
-    console.log('addedItems', addedItems)
 
     return {
-      items: addedItems,
+      items: placedWords,
     }
   }
 
-  generateRandom = async (task: GenerateTask): Promise<GenerateResult> => {
+  generateRandom = async (
+    task: GenerateRandomTask
+  ): Promise<GenerateResult> => {
     if (!this.wasm) {
       throw new Error('call init() first')
     }
@@ -635,6 +536,24 @@ export class Generator {
 
 /** Describes a task of filling a shape with items (usually words) */
 export type GenerateTask = {
+  /** Bounds of the task, should include the shape */
+  bounds: Rect
+  shapeImgUrl: string
+  /** Padding between shape or bounds and items, in units (?) */
+  shapePadding: number
+  /** Padding between items, in percent (0 - 100) */
+  itemPadding: number
+  /** 1 by default */
+  itemScaleMin: number
+  itemScaleMax: number
+  /** Words to use */
+  words: GenerateTaskWord[]
+  placementAlgorithm: PlacementAlgorithm
+  fitWithinShape: boolean
+}
+
+/** Describes a task of filling a shape with items (usually words) */
+export type GenerateRandomTask = {
   /** Bounds of the task, should include the shape */
   bounds: Rect
   /** Shape to fill */
