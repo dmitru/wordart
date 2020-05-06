@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { Layout } from 'components/layout'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import 'lib/wordart/console-extensions'
 import { Template } from '@styled-icons/heroicons-solid/Template'
 import { Rocket } from '@styled-icons/entypo/Rocket'
@@ -10,11 +10,13 @@ import { ColorLens } from '@styled-icons/material-rounded/ColorLens'
 import { observer } from 'mobx-react'
 import { LeftPanelShapesTab } from 'components/pages/EditorPage/components/LeftPanelShapesTab'
 import { useStore } from 'root-store'
-import { BaseBtn } from 'components/shared/BaseBtn/BaseBtn'
+import { BaseBtn } from 'components/shared/BaseBtn'
 import { LeftPanelWordsTab } from 'components/pages/EditorPage/components/LeftPanelWordsTab'
 import { Dimensions } from 'lib/wordart/canvas-utils'
 import { LeftPanelStyleTab } from 'components/pages/EditorPage/components/LeftPanelStyleTab'
 import { observable, runInAction } from 'mobx'
+import { Button } from 'components/shared/Button'
+import { Box } from 'components/shared/Box'
 
 const PageLayoutWrapper = styled.div`
   display: flex;
@@ -94,13 +96,18 @@ const RightWrapper = styled.div`
   background: #eee;
   flex: 1;
   display: flex;
-  padding: 20px;
+  flex-direction: column;
+`
+
+const TopToolbar = styled.div`
+  background: white;
+  height: 50px;
 `
 
 const CanvasWrappper = styled.div`
-  width: 100%;
-  height: auto;
-  max-height: 100%;
+  flex: 1;
+  height: calc(100vh - 100px);
+  padding: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -108,7 +115,7 @@ const CanvasWrappper = styled.div`
 
 const Canvas = styled.canvas`
   /* width: 100%; */
-  /* height: auto; */
+  height: 100%;
   /* max-height: 100%; */
   margin: auto;
 `
@@ -142,22 +149,7 @@ export const EditorPage = observer(() => {
 
   return (
     <PageLayoutWrapper>
-      <TopNavWrapper>
-        HEADER
-        <VisualizeBtn
-          disabled={state.isVisualizing}
-          onClick={async () => {
-            state.isVisualizing = true
-            await Promise.all([
-              editorPageStore.editor?.generateItems('shape'),
-              editorPageStore.editor?.generateItems('background'),
-            ])
-            state.isVisualizing = false
-          }}
-        >
-          {state.isVisualizing ? 'Visualizing...' : 'Visualize'}
-        </VisualizeBtn>
-      </TopNavWrapper>
+      <TopNavWrapper>HEADER</TopNavWrapper>
 
       <EditorLayout>
         <LeftWrapper>
@@ -225,6 +217,25 @@ export const EditorPage = observer(() => {
         </LeftWrapper>
 
         <RightWrapper>
+          <Box display="flex" alignItems="center" bg="light" p={2} height={50}>
+            <Button
+              primary
+              // disabled={state.isVisualizing}
+              onClick={async () => {
+                state.isVisualizing = true
+                await Promise.all([
+                  editorPageStore.editor?.generateItems('shape'),
+                  editorPageStore.editor?.generateItems('background'),
+                ])
+                state.isVisualizing = false
+              }}
+            >
+              {state.isVisualizing ? 'Visualizing...' : 'Visualize'}
+            </Button>
+
+            <Button ml={3}>Undo</Button>
+            <Button ml={1}>Redo</Button>
+          </Box>
           <CanvasWrappper>
             <Canvas
               width={canvasSize.w}

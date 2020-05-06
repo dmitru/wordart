@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Layout } from 'components/layout'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 
 import 'lib/wordart/console-extensions'
 import {

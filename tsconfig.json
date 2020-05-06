@@ -16,7 +16,10 @@
     "jsx": "preserve",
     "baseUrl": "./src",
     "downlevelIteration": true,
-    "rootDirs": ["./src"]
+    "rootDirs": ["./src"],
+    "paths": {
+      "@src/*": ["src/*"]
+    }
   },
   "exclude": ["node_modules", "src/lib/wordart/wasm/wasm-gen"],
   "include": [

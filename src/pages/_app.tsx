@@ -1,40 +1,27 @@
 import App from 'next/app'
 import React from 'react'
-import { ThemeProvider, createGlobalStyle } from 'styled-components'
 import { theme } from 'styles/theme'
-import styled from 'styled-components'
-import { StyledIconBase } from '@styled-icons/styled-icon'
+import { ThemeProvider, CacheProvider } from '@emotion/react'
+import createCache from '@emotion/cache'
 import 'normalize.css/normalize.css'
 import 'react-rangeslider/lib/index.css'
 
-/**
- * Enables styled-components SSR:
- * https://github.com/zeit/next.js/blob/canary/examples/with-styled-components/pages/_document.js
- */
+import { globalStyles } from 'styles/globalStyles'
 
-const GlobalStyles = createGlobalStyle`
-  * {
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  }
-`
-
-export const IconStyleWrapper = styled.div`
-  ${StyledIconBase} {
-    color: red;
-    width: 20px;
-    height: 20px;
-  }
-`
+const emotionCache = createCache({
+  key: 'css',
+})
 
 export default class MyApp extends App {
   render() {
     const { Component, pageProps } = this.props
     return (
-      <ThemeProvider theme={theme}>
-        <GlobalStyles />
-        <Component {...pageProps} />
-      </ThemeProvider>
+      <CacheProvider value={emotionCache}>
+        <ThemeProvider theme={theme}>
+          {globalStyles}
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </CacheProvider>
     )
   }
 }

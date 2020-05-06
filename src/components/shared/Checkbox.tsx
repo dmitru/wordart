@@ -1,5 +1,7 @@
 import React from 'react'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
+import { Box, BoxProps } from 'components/shared/Box'
+import { opacify } from 'polished'
 
 export type CheckboxProps = {
   value: boolean
@@ -8,19 +10,19 @@ export type CheckboxProps = {
   className?: string
   label?: React.ReactNode
   inputProps?: Omit<React.HTMLProps<HTMLInputElement>, 'as' | 'type' | 'ref'>
-}
+} & BoxProps
 
 export const Checkbox: React.FC<CheckboxProps> = ({
   label,
-  className,
   value,
   onChange,
   id,
   inputProps,
+  ...props
 }) => (
-  <CheckboxContainer className={className}>
-    {label && <label htmlFor={id}>{label}</label>}
-    <HiddenCheckbox
+  <Box display="inline-flex" fontSize={2} alignItems="center" {...props}>
+    <HiddenCheckboxInput
+      type="checkbox"
       {...inputProps}
       id={id}
       checked={value}
@@ -44,17 +46,18 @@ export const Checkbox: React.FC<CheckboxProps> = ({
         <polyline points="20 6 9 17 4 12" />
       </Icon>
     </StyledCheckbox>
-  </CheckboxContainer>
+    {label && <label htmlFor={id}>{label}</label>}
+  </Box>
 )
 
-const HiddenCheckbox = styled.input.attrs({ type: 'checkbox' })<{
+const HiddenCheckboxInput = styled.input<{
   checked: boolean
 }>`
   // Hide checkbox visually but remain accessible to screen readers.
   // Source: https://polished.js.org/docs/#hidevisually
   border: 0;
   clip: rect(0 0 0 0);
-  clippath: inset(50%);
+  clip-path: inset(50%);
   height: 1px;
   margin: -1px;
   overflow: hidden;
@@ -72,22 +75,21 @@ const Icon = styled.svg`
 
 const StyledCheckbox = styled.div<{ checked: boolean }>`
   display: inline-block;
-  width: 16px;
-  height: 16px;
-  background: ${(props) => (props.checked ? 'salmon' : 'papayawhip')};
+  width: 24px;
+  height: 24px;
+  background: ${(p) =>
+    p.checked ? p.theme.colors.primary : p.theme.colors.light};
   border-radius: 3px;
+  border: 2px solid
+    ${(p) => (p.checked ? p.theme.colors.primary : p.theme.colors.primary)};
   transition: all 150ms;
+  margin-right: 5px;
 
-  ${HiddenCheckbox}:focus + & {
-    box-shadow: 0 0 0 3px pink;
+  ${HiddenCheckboxInput}:focus + & {
+    box-shadow: 0 0 0 3px ${(p) => opacify(0.7, p.theme.colors.primary)};
   }
 
   ${Icon} {
     visibility: ${(props) => (props.checked ? 'visible' : 'hidden')};
   }
-`
-
-const CheckboxContainer = styled.div`
-  display: inline-block;
-  vertical-align: middle;
 `

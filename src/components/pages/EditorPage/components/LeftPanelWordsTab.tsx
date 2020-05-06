@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react'
 import { useStore } from 'root-store'
-import styled from 'styled-components'
-import { BaseBtn } from 'components/shared/BaseBtn/BaseBtn'
+import styled from '@emotion/styled'
+import { BaseBtn } from 'components/shared/BaseBtn'
 import * as evaicons from '@styled-icons/evaicons-outline'
 import { useState, useCallback, useRef } from 'react'
 

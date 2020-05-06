@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react'
 import { useStore } from 'root-store'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import { ShapeConfig } from 'components/pages/EditorPage/editor-page-store'
 import { ReactSVG } from 'react-svg'
 import { useState } from 'react'

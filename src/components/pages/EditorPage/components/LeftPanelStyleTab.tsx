@@ -4,9 +4,9 @@ import { ChromePicker } from 'react-color'
 import { runInAction } from 'mobx'
 import chroma from 'chroma-js'
 import { useState } from 'react'
-import styled from 'styled-components'
+import styled from '@emotion/styled'
 import Slider from 'react-rangeslider'
-import { Checkbox } from 'components/shared/BaseBtn/Checkbox'
+import { Checkbox } from 'components/shared/Checkbox'
 
 export type ColorPickerProps = {
   value: string
