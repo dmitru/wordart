@@ -216,10 +216,16 @@ const scratch = (canvas: HTMLCanvasElement) => {
         // const largestRect = getLargestRect(imgData, imgDataBounds)
         // console.log(largestRect, getLargestRect(imgData, imgDataBounds))
 
-        const pathScale = Math.min(
+        let pathScale = Math.min(
           (largestRect.w / wordPathSize.w) * scale,
           (largestRect.h / wordPathSize.h) * scale
         )
+
+        const maxMinDim = 60
+        const minDim = Math.min(wordPathSize.w, wordPathSize.h) * pathScale
+        if (minDim > maxMinDim) {
+          pathScale *= maxMinDim / minDim
+        }
 
         const dx = Math.max(largestRect.w - pathScale * wordPathSize.w, 0)
         const dy = Math.max(largestRect.h - pathScale * wordPathSize.h, 0)
@@ -240,8 +246,8 @@ const scratch = (canvas: HTMLCanvasElement) => {
         shapeCtx.scale(pathScale, pathScale)
 
         if (pathScale * Math.max(largestRect.w, largestRect.h) >= 0.25) {
-          shapeCtx.shadowBlur = 1.1
-          shapeCtx.shadowColor = 'red'
+          // shapeCtx.shadowBlur = 1.1
+          // shapeCtx.shadowColor = 'red'
           wordPath.draw(shapeCtx)
 
           placedWords.push({
