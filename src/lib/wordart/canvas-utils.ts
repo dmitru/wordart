@@ -118,6 +118,27 @@ export const fetchImage = async (
   })
 }
 
+export const imageDataToCanvasCtx = (
+  imgData: ImageData
+): CanvasRenderingContext2D => {
+  const ctx = createCanvasCtx({ w: imgData.width, h: imgData.height })
+  ctx.putImageData(imgData, 0, 0)
+  return ctx
+}
+
+export const removeImageOpacity = (canvas: HTMLCanvasElement) => {
+  const ctx = canvas.getContext('2d')!
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+  for (let r = 0; r < imgData.height; ++r) {
+    for (let c = 0; c < imgData.width; ++c) {
+      if (imgData.data[(r * imgData.width + c) * 4 + 3] > 0) {
+        imgData.data[(r * imgData.width + c) * 4 + 3] = 255
+      }
+    }
+  }
+  ctx.putImageData(imgData, 0, 0)
+}
+
 export const loadImageUrlToCanvasCtx = async (
   url: string,
   width?: number,

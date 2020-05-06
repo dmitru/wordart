@@ -3,7 +3,11 @@ import {
   ItemsColorGradient,
   ItemsColoring,
 } from 'components/pages/EditorPage/editor-page-store'
-import { fetchImage, createCanvasCtx } from 'lib/wordart/canvas-utils'
+import {
+  fetchImage,
+  createCanvasCtx,
+  imageDataToCanvasCtx,
+} from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
 import { getWasmModule } from 'lib/wordart/wasm/wasm-module'
 import { Rect, padRect } from 'lib/wordart/geometry'
@@ -17,6 +21,7 @@ import paper from 'paper'
 import { loadFont } from 'lib/wordart/fonts'
 import * as tm from 'transformation-matrix'
 import { matrixToPaperTransform } from 'components/pages/EditorPage/paper-utils'
+import { Path } from 'opentype.js'
 
 const FONT_NAMES = [
   'mountains-of-christmas_bold.ttf',
@@ -195,113 +200,109 @@ export class Editor {
     // @ts-ignore
     window['fonts'] = fonts
 
-    for (const shape of [1]) {
-      // const s = shape.hBounds.get_js()
-
-      // this.paperItems.shapeHbounds = hBoundsWasmSerializedToPaperGroup(s)
-      this.paperItems.shape?.insertAbove(this.paperItems.bgRect)
-
-      const result = await this.generator.generate({
-        shapeImgUrl: this.store.getSelectedShape().url,
-        placementAlgorithm: 'random',
-        fitWithinShape: style.fitWithinShape,
-        bounds: this.getSceneBounds(),
-        itemScaleMin: style.itemScaleMin,
-        itemScaleMax: style.itemScaleMax,
-        shapePadding: style.shapePadding,
-        itemPadding: style.itemPadding,
-        words: style.words.map((wc) => ({
-          wordConfigId: wc.id,
-          // angles: [0, -(90 * Math.PI) / 180, -(30 * Math.PI) / 180],
-          angles: style.angles.map((aDeg) => (aDeg * Math.PI) / 180),
-          fillColors: ['red'],
-          // fonts: [fonts[0], fonts[1], fonts[2]],
-          fonts: isBackground ? [fonts[1]] : [fonts[0]],
-          text: wc.text,
-        })),
-      })
-
-      const addedItems: paper.Item[] = []
-      let img: HTMLImageElement | null = null
-
-      let wordIdToSymbolDef = new Map<string, paper.SymbolDefinition>()
-
-      for (const item of result.items) {
-        // TODO: convert result items into paper paths
-        if (item.kind === 'img') {
-          if (!img) {
-            const imgUri = item.ctx.canvas.toDataURL()
-            img = await fetchImage(imgUri)
-          }
-          const itemImg = new paper.Raster(img)
-          itemImg.scale(item.transform.a)
-          const w = itemImg.bounds.width
-          const h = itemImg.bounds.height
-          itemImg.position = new paper.Point(
-            item.transform.e + w / 2,
-            item.transform.f + h / 2
-          )
-          addedItems.push(itemImg)
-        } else if (item.kind === 'word') {
-          const wordId = item.word.id
-
-          if (!wordIdToSymbolDef.has(wordId)) {
-            const paths = item.word.font.getPaths(
-              item.word.text,
-              0,
-              0,
-              item.word.fontSize
-            )
-
-            const pathItems = paths.map((path) => {
-              let pathData = path.toPathData(3)
-              const item = paper.Path.create(pathData)
-              item.fillColor = new paper.Color(style.itemsColor)
-              item.fillRule = 'evenodd'
-              return item
-            })
-            const pathItemsGroup = new paper.Group(pathItems)
-            const symbolDef = new paper.SymbolDefinition(pathItemsGroup, true)
-            wordIdToSymbolDef.set(wordId, symbolDef)
-          }
-
-          const symbolDef = wordIdToSymbolDef.get(wordId)!
-
-          // const wordItem = symbolDef.place(new paper.Point(0, 0))
-          const wordItem = symbolDef.item.clone()
-
-          wordItem.rotate(
-            (item.word.angle / Math.PI) * 180,
-            new paper.Point(0, 0)
-          )
-          wordItem.transform(matrixToPaperTransform(tm.compose(item.transform)))
-          addedItems.push(wordItem)
-        }
-      }
-
-      if (isBackground) {
-        this.paperItems.bgItemsGroup?.remove()
-        this.paperItems.bgItemsGroup = new paper.Group(addedItems)
-        this.paperItems.bgItemsGroup.insertAbove(this.paperItems.shape)
-        this.paperItems.bgWordIdToSymbolDef = wordIdToSymbolDef
-      } else {
-        this.paperItems.shapeItemsGroup?.remove()
-        const shapeItemsGroup =
-          this.paperItems.shape.children &&
-          this.paperItems.shape.children.length > 1
-            ? new paper.Group([
-                this.paperItems.shape.children[1].clone(),
-                ...addedItems,
-              ])
-            : new paper.Group(addedItems)
-        shapeItemsGroup.clipped = true
-        this.paperItems.shapeItemsGroup = shapeItemsGroup
-        this.paperItems.shapeItemsGroup.insertAbove(this.paperItems.shape)
-        this.paperItems.shapeWordIdToSymbolDef = wordIdToSymbolDef
-      }
-
-      this.updateItemsColor(type, this.store.getItemColoring(type))
+    if (!this.paperItems.shape) {
+      return
     }
+
+    this.paperItems.shape?.insertAbove(this.paperItems.bgRect)
+
+    const shapeRaster = this.paperItems.shape.rasterize(
+      this.paperItems.shape.view.resolution,
+      false
+    )
+    const shapeCanvas = shapeRaster.getSubCanvas(
+      new paper.Rectangle(0, 0, shapeRaster.width, shapeRaster.height)
+    )
+    shapeRaster.remove()
+
+    const result = await this.generator.fillShape({
+      shape: {
+        canvas: shapeCanvas,
+        bounds: shapeRaster.bounds,
+      },
+      shapePadding: style.shapePadding,
+      itemPadding: style.itemPadding,
+      words: style.words.map((wc) => ({
+        wordConfigId: wc.id,
+        // angles: [0, -(90 * Math.PI) / 180, -(30 * Math.PI) / 180],
+        angles: style.angles.map((aDeg) => (aDeg * Math.PI) / 180),
+        fillColors: ['red'],
+        // fonts: [fonts[0], fonts[1], fonts[2]],
+        fonts: isBackground ? [fonts[1]] : [fonts[0]],
+        text: wc.text,
+      })),
+    })
+
+    const addedItems: paper.Item[] = []
+    let img: HTMLImageElement | null = null
+
+    let wordIdToSymbolDef = new Map<string, paper.SymbolDefinition>()
+
+    for (const item of result.items) {
+      // TODO: convert result items into paper paths
+      if (item.kind === 'img') {
+        if (!img) {
+          const imgUri = item.ctx.canvas.toDataURL()
+          img = await fetchImage(imgUri)
+        }
+        const itemImg = new paper.Raster(img)
+        itemImg.scale(item.transform.a)
+        const w = itemImg.bounds.width
+        const h = itemImg.bounds.height
+        itemImg.position = new paper.Point(
+          item.transform.e + w / 2,
+          item.transform.f + h / 2
+        )
+        addedItems.push(itemImg)
+      } else if (item.kind === 'word') {
+        const wordId = item.word.id
+
+        if (!wordIdToSymbolDef.has(wordId)) {
+          const paths = item.word.font.getPaths(
+            item.word.text,
+            0,
+            0,
+            item.word.fontSize
+          )
+
+          const pathItems = paths.map((path: Path) => {
+            let pathData = path.toPathData(3)
+            const item = paper.Path.create(pathData)
+            item.fillColor = new paper.Color(style.itemsColor)
+            item.fillRule = 'evenodd'
+            return item
+          })
+          const pathItemsGroup = new paper.Group(pathItems)
+          const symbolDef = new paper.SymbolDefinition(pathItemsGroup, true)
+          wordIdToSymbolDef.set(wordId, symbolDef)
+        }
+
+        const symbolDef = wordIdToSymbolDef.get(wordId)!
+
+        // const wordItem = symbolDef.place(new paper.Point(0, 0))
+        const wordItem = symbolDef.item.clone()
+
+        wordItem.rotate(
+          (item.word.angle / Math.PI) * 180,
+          new paper.Point(0, 0)
+        )
+        wordItem.transform(matrixToPaperTransform(item.transform))
+        addedItems.push(wordItem)
+      }
+    }
+
+    this.paperItems.shapeItemsGroup?.remove()
+    const shapeItemsGroup = new paper.Group([
+      // this.paperItems.shape.clone(),
+      ...addedItems,
+    ])
+
+    // shapeItemsGroup.clipped = true
+    this.paperItems.shapeItemsGroup = shapeItemsGroup
+    this.paperItems.shapeItemsGroup.insertAbove(this.paperItems.shape)
+    this.paperItems.shapeWordIdToSymbolDef = wordIdToSymbolDef
+
+    this.updateItemsColor(type, this.store.getItemColoring(type))
   }
 
   clear = async (render = true) => {
