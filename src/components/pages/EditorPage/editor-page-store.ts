@@ -50,6 +50,31 @@ export class EditorPageStore {
     this.rootStore = rootStore
   }
 
+  // for i in range(m):
+
+  //       cur_left, cur_right = 0, n
+  //       # update height
+  //       for j in range(n):
+  //           if matrix[i][j] == '1': height[j] += 1
+  //           else: height[j] = 0
+  //       # update left
+  //       for j in range(n):
+  //           if matrix[i][j] == '1': left[j] = max(left[j], cur_left)
+  //           else:
+  //               left[j] = 0
+  //               cur_left = j + 1
+  //       # update right
+  //       for j in range(n-1, -1, -1):
+  //           if matrix[i][j] == '1': right[j] = min(right[j], cur_right)
+  //           else:
+  //               right[j] = n
+  //               cur_right = j
+  //       # update the area
+  //       for j in range(n):
+  //           maxarea = max(maxarea, height[j] * (right[j] - left[j]))
+
+  //   return maxarea
+
   editor: Editor | null = null
   @observable state: 'initializing' | 'initialized' | 'destroyed' =
     'initializing'
@@ -82,7 +107,7 @@ export class EditorPageStore {
     },
     dimSmallerItems: 20,
     shapePadding: 5,
-    itemPadding: 10,
+    itemPadding: 0,
     itemScaleMax: 2,
     itemScaleMin: 0.05,
     words: defaultWordsConfig,

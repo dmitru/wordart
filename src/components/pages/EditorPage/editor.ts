@@ -131,6 +131,7 @@ export class Editor {
           )
       )
       shapeItemGroup.fillColor = new paper.Color(this.store.shapeStyle.bgColor)
+      console.log('shapeItemGroup', shapeItemGroup)
       shapeItem = shapeItemGroup
     } else {
       const shapeItemRaster: paper.Raster = await new Promise<paper.Raster>(
@@ -206,7 +207,10 @@ export class Editor {
 
     this.paperItems.shape?.insertAbove(this.paperItems.bgRect)
 
-    const shapeRaster = this.paperItems.shape.rasterize(
+    const shapeItem = this.paperItems.shape.children
+      ? this.paperItems.shape.children[1]
+      : this.paperItems.shape
+    const shapeRaster = shapeItem.rasterize(
       this.paperItems.shape.view.resolution,
       false
     )
@@ -224,8 +228,9 @@ export class Editor {
       itemPadding: style.itemPadding,
       words: style.words.map((wc) => ({
         wordConfigId: wc.id,
-        // angles: [0, -(90 * Math.PI) / 180, -(30 * Math.PI) / 180],
-        angles: style.angles.map((aDeg) => (aDeg * Math.PI) / 180),
+        // angles: [0, 90],
+        angles: [0],
+        // angles: style.angles.map((aDeg) => (aDeg * Math.PI) / 180),
         fillColors: ['red'],
         // fonts: [fonts[0], fonts[1], fonts[2]],
         fonts: isBackground ? [fonts[1]] : [fonts[0]],
@@ -286,7 +291,7 @@ export class Editor {
           (item.word.angle / Math.PI) * 180,
           new paper.Point(0, 0)
         )
-        wordItem.transform(matrixToPaperTransform(item.transform))
+        wordItem.transform(item.transform)
         addedItems.push(wordItem)
       }
     }

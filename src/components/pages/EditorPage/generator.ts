@@ -4,16 +4,18 @@ import {
   loadImageUrlToCanvasCtx,
   createCanvasCtx,
   removeImageOpacity,
+  clearCanvas,
 } from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
 import { getWasmModule, WasmModule } from 'lib/wordart/wasm/wasm-module'
-import { Rect, Point } from 'lib/wordart/geometry'
+import { Rect, Point, spreadRect } from 'lib/wordart/geometry'
 import {
   ShapeWasm,
   ImageProcessorWasm,
 } from 'lib/wordart/wasm/image-processor-wasm'
 import * as tm from 'transformation-matrix'
 import { Path } from 'opentype.js'
+import { sample, uniq, flatten } from 'lodash'
 
 const FONT_SIZE = 100
 
@@ -46,6 +48,7 @@ export class Generator {
     // const shapeCanvasMaxPixelCount = shapeCanvasSize * shapeCanvasSize
 
     const shapeCanvas = task.shape.canvas
+    console.screenshot(shapeCanvas, 0.3)
     const shapeCanvasScale =
       shapeCanvasSize / Math.max(shapeCanvas.width, shapeCanvas.height)
     // const shapePixelsCount = shapeCanvas.width * shapeCanvas.height
@@ -87,18 +90,94 @@ export class Generator {
 
     const placedWords: WordItem[] = []
 
-    const nIter = 400
+    const nIter = 100
+    const usePreciseShapesEvery = 10
     const t1 = performance.now()
 
     let wordIndex = 0
 
+    const angles = uniq(flatten(task.words.map((w) => w.angles)))
+    const rotationInfos = new Map<
+      number,
+      {
+        ctx: CanvasRenderingContext2D
+        rotatedCanvasDimensions: Dimensions
+        transform: paper.Matrix
+        inverseTransform: paper.Matrix
+      }
+    >()
+
+    angles.forEach((angle) => {
+      const rotatedCanvasDimensions = shapeCanvasDimensions
+
+      const bounds = new paper.Path.Rectangle(
+        new paper.Rectangle(
+          0,
+          0,
+          shapeCanvasDimensions.w,
+          shapeCanvasDimensions.h
+        )
+      )
+      bounds.rotate(angle)
+      const rotatedBoundsAabb = bounds.bounds
+      const rotatedBoundsScaleX =
+        rotatedCanvasDimensions.w / rotatedBoundsAabb.width
+      const rotatedBoundsScaleY =
+        rotatedCanvasDimensions.h / rotatedBoundsAabb.height
+      const rotatedBoundsScale = Math.min(
+        rotatedBoundsScaleX,
+        rotatedBoundsScaleY
+      )
+
+      bounds.scale(rotatedBoundsScale, rotatedBoundsScale)
+      const rotatedBoundsTransform = new paper.Matrix()
+        .rotate(
+          angle,
+          new paper.Point(
+            shapeCanvasDimensions.w / 2,
+            shapeCanvasDimensions.h / 2
+          )
+        )
+        .scale(rotatedBoundsScale, rotatedBoundsScale)
+
+      const rotatedBoundsTransformInverted = rotatedBoundsTransform.inverted()
+      const rotatedCtx = createCanvasCtx(rotatedCanvasDimensions)
+
+      rotationInfos.set(angle, {
+        ctx: rotatedCtx,
+        rotatedCanvasDimensions,
+        transform: rotatedBoundsTransform,
+        inverseTransform: rotatedBoundsTransformInverted,
+      })
+    })
+
+    shapeCtx.fillStyle = 'black'
+    shapeCtx.globalCompositeOperation = 'destination-out'
+
+    let shouldUpdateRotatedCtx = true
     for (let i = 0; i < nIter; ++i) {
       const word = words[wordIndex]
+      const wordConfig = task.words.find(
+        (wc) => wc.wordConfigId === word.wordConfigId
+      )!
+      const angle = sample(wordConfig.angles)!
+      const rotationInfo = rotationInfos.get(angle)
+      if (!rotationInfo) {
+        throw new Error(`rotation info is missing for angle ${angle}`)
+      }
+      const {
+        ctx: rotatedCtx,
+        rotatedCanvasDimensions,
+        transform: rotatedBoundsTransform,
+        inverseTransform: rotatedBoundsTransformInverted,
+      } = rotationInfo
+      // console.log('i = ', i, angle)
 
       const wordPathBounds = wordPathsBounds[wordIndex]
       const wordPath = wordPaths[wordIndex]
 
-      let scale = 1 - (0.5 * i) / nIter
+      // let scale = 1 - (0.5 * i) / nIter
+      let scale = 1
       // let size = 60
       // if (i < 100) {
       //   size = 150
@@ -111,49 +190,76 @@ export class Generator {
       // } else {
       //   size = 360
       // }
-      let scratchCanvasDimensions = shapeCanvasDimensions
-      const scratchCtx = createCanvasCtx(scratchCanvasDimensions)
-      scratchCtx.drawImage(
-        shapeCtx.canvas,
-        0,
-        0,
-        shapeCanvasDimensions.w,
-        shapeCanvasDimensions.h,
-        0,
-        0,
-        scratchCanvasDimensions.w,
-        scratchCanvasDimensions.h
-      )
 
-      const scratchImgData = shapeCtx.getImageData(
+      // Rotate bounds of the shape and fit the scratchCanvasDimensions
+
+      if (shouldUpdateRotatedCtx) {
+        clearCanvas(rotatedCtx)
+        rotatedCtx.save()
+        rotatedBoundsTransform.applyToContext(rotatedCtx)
+        rotatedCtx.drawImage(
+          shapeCtx.canvas,
+          0,
+          0,
+          shapeCanvasDimensions.w,
+          shapeCanvasDimensions.h,
+          0,
+          0,
+          rotatedCanvasDimensions.w,
+          rotatedCanvasDimensions.h
+        )
+        rotatedCtx.restore()
+        // shouldUpdateRotatedCtx = false
+      }
+
+      // console.screenshot(rotatedCtx.canvas)
+      // console.screenshot(shapeCtx.canvas)
+
+      const scratchImgData = rotatedCtx.getImageData(
         0,
         0,
-        scratchCanvasDimensions.w,
-        scratchCanvasDimensions.h
+        rotatedCanvasDimensions.w,
+        rotatedCanvasDimensions.h
       )
       // shapeCtx.imageSmoothingEnabled = false
       const scratchCanvasBounds: Rect = {
         x: 0,
         y: 0,
-        w: scratchCanvasDimensions.w,
-        h: scratchCanvasDimensions.h,
+        w: rotatedCanvasDimensions.w,
+        h: rotatedCanvasDimensions.h,
       }
-      const largestRect = imageProcessor.findLargestRect(
-        scratchImgData,
-        scratchCanvasBounds
-      )
+      // const largestRectWasm = imageProcessor.findLargestRect(
+      //   scratchImgData,
+      //   scratchCanvasBounds
+      // )
+      // const largestRect: Rect = {
+      //   x: largestRectWasm.x,
+      //   y: largestRectWasm.y,
+      //   w: largestRectWasm.w,
+      //   h: largestRectWasm.h,
+      // }
 
       const wordPathSize: Dimensions = {
         w: wordPathBounds.x2 - wordPathBounds.x1,
         h: wordPathBounds.y2 - wordPathBounds.y1,
       }
-      // const largestRect = getLargestRect(imgData, imgDataBounds)
+      const wordAspect = wordPathSize.w / wordPathSize.h
+      const [largestRect, area] = getLargestRect(
+        scratchImgData,
+        scratchCanvasBounds,
+        wordAspect
+      )
+
+      // shapeCtx.fillRect(...spreadRect(largestRect))
+
+      if (largestRect.w < 1 || largestRect.h < 1) {
+        break
+      }
       // console.log(largestRect, getLargestRect(imgData, imgDataBounds))
 
-      let pathScale = Math.min(
-        (largestRect.w / wordPathSize.w) * scale,
-        (largestRect.h / wordPathSize.h) * scale
-      )
+      let pathScale =
+        scale *
+        Math.min(largestRect.w / wordPathSize.w, largestRect.h / wordPathSize.h)
 
       const maxMinDim = 60
       const minDim = Math.min(wordPathSize.w, wordPathSize.h) * pathScale
@@ -161,34 +267,32 @@ export class Generator {
         pathScale *= maxMinDim / minDim
       }
 
-      const dx = Math.max(largestRect.w - pathScale * wordPathSize.w, 0)
-      const dy = Math.max(largestRect.h - pathScale * wordPathSize.h, 0)
-
       shapeCtx.save()
+      rotatedBoundsTransformInverted.applyToContext(shapeCtx)
 
-      shapeCtx.fillStyle = 'black'
-      shapeCtx.globalCompositeOperation = 'destination-out'
+      if (task.itemPadding > 0) {
+        shapeCtx.shadowBlur = (task.itemPadding / 100) * (shapeCanvasSize / 100)
+        shapeCtx.shadowColor = 'red'
+      } else {
+        shapeCtx.shadowBlur = 0
+      }
 
-      const tx = largestRect.x + Math.random() * dx
-      const ty =
-        largestRect.y +
-        largestRect.h -
-        pathScale * wordPathBounds.y2 -
-        Math.random() * dy
-      shapeCtx.scale(
-        shapeCanvasDimensions.w / scratchCanvasDimensions.w,
-        shapeCanvasDimensions.h / scratchCanvasDimensions.h
-      )
-      shapeCtx.translate(tx, ty)
-      shapeCtx.scale(pathScale, pathScale)
+      if (pathScale * Math.min(largestRect.w, largestRect.h) >= 0.15) {
+        const dx = Math.max(largestRect.w - pathScale * wordPathSize.w, 0)
+        const dy = Math.max(largestRect.h - pathScale * wordPathSize.h, 0)
 
-      if (pathScale * Math.max(largestRect.w, largestRect.h) >= 0.25) {
-        if (task.itemPadding > 0) {
-          shapeCtx.shadowBlur =
-            (task.itemPadding / 100) * (shapeCanvasSize / 100)
-          shapeCtx.shadowColor = 'red'
-        }
+        const tx = largestRect.x + Math.random() * dx
+        const ty =
+          largestRect.y +
+          largestRect.h -
+          pathScale * wordPathBounds.y2 -
+          Math.random() * dy
+        shapeCtx.translate(tx, ty)
+        shapeCtx.scale(pathScale, pathScale)
+
         wordPath.draw(shapeCtx)
+
+        shouldUpdateRotatedCtx = true
 
         placedWords.push({
           wordPath,
@@ -196,27 +300,31 @@ export class Generator {
           kind: 'word',
           shapeColor: 'black',
           word,
-          transform: tm.compose(
-            tm.translate(task.shape.bounds.left, task.shape.bounds.top),
-            tm.scale(
+          transform: new paper.Matrix()
+            .translate(task.shape.bounds.left, task.shape.bounds.top)
+            .scale(
               task.shape.bounds.width / shapeCanvasDimensions.w,
               task.shape.bounds.height / shapeCanvasDimensions.h
-            ),
-            tm.scale(
-              scratchCanvasDimensions.w / shapeCanvasDimensions.w,
-              scratchCanvasDimensions.h / shapeCanvasDimensions.h
-            ),
-            tm.translate(tx, ty),
-            tm.scale(pathScale)
-          ),
+            )
+            .append(rotatedBoundsTransform.inverted())
+            .translate(tx, ty)
+            .scale(pathScale),
         })
       } else {
         // console.log('i', i)
+        console.log(
+          'removing',
+          largestRect.x,
+          largestRect.y,
+          largestRect.w,
+          largestRect.h
+        )
+        shouldUpdateRotatedCtx = true
         shapeCtx.fillRect(
-          wordPathBounds.x1,
-          wordPathBounds.y1,
-          wordPathBounds.x2 - wordPathBounds.x1,
-          wordPathBounds.y2 - wordPathBounds.y1
+          largestRect.x,
+          largestRect.y,
+          Math.max(1.2, largestRect.w),
+          Math.max(1.2, largestRect.h)
         )
       }
       // shapeCtx.fillRect(...spreadRect(largestRect))
@@ -281,7 +389,7 @@ export type WordItem = {
   kind: 'word'
   id: ItemId
   word: Word
-  transform: tm.Matrix
+  transform: paper.Matrix
   /** Color of the shape at the given location */
   shapeColor: string
   wordPath: Path
@@ -405,3 +513,87 @@ export type Font = opentype.Font
 export type WordId = string
 export type SymbolId = string
 export type SymbolAngleId = string
+
+// https://stackoverflow.com/questions/7245/puzzle-find-largest-rectangle-maximal-rectangle-problem
+const getLargestRect = (
+  imgData: ImageData,
+  bounds: Rect,
+  aspectRatio: number
+): [Rect, number] => {
+  const imgWidth = imgData.width
+  const img = imgData.data
+
+  const x1 = bounds.x
+  const y1 = bounds.y
+  const M = bounds.h
+  const N = bounds.w
+
+  const dpH = new Uint32Array(N).fill(0)
+  const dpL = new Uint32Array(N).fill(N)
+  const dpR = new Uint32Array(N).fill(0)
+
+  const imgPixelIndex = (row: number, col: number) =>
+    4 * (x1 + col + (y1 + row) * imgWidth)
+  const isImgPixelEmpty = (row: number, col: number) =>
+    img[imgPixelIndex(row, col) + 3] < 255
+
+  let maxArea = 0
+  let maxRect: Rect = { x: 0, y: 0, w: 0, h: 0 }
+  // Compute DP
+  for (let i = 1; i < M; ++i) {
+    let curLeft = 0
+    let curRight = N
+
+    // Update height
+    for (let j = 0; j < N; ++j) {
+      dpH[j] = isImgPixelEmpty(i, j) ? 0 : dpH[j] + 1
+    }
+
+    // Update left
+    for (let j = 0; j < N; ++j) {
+      if (!isImgPixelEmpty(i, j)) {
+        dpL[j] = Math.max(dpL[j], curLeft)
+      } else {
+        dpL[j] = 0
+        curLeft = j + 1
+      }
+    }
+
+    // Update right
+    for (let j = N - 1; j >= 0; --j) {
+      if (!isImgPixelEmpty(i, j)) {
+        dpR[j] = Math.min(dpR[j], curRight)
+      } else {
+        dpR[j] = N
+        curRight = j
+      }
+    }
+
+    // Update the area
+    for (let j = 0; j < N; ++j) {
+      const h = dpH[j]
+      const w = dpR[j] - dpL[j]
+      let a = h * w
+
+      if (a > 0) {
+        if (w / h > aspectRatio) {
+          a = h * aspectRatio * h
+        } else {
+          a = (w / aspectRatio) * w
+        }
+      }
+
+      if (a > maxArea) {
+        maxArea = a
+        maxRect = {
+          x: dpL[j],
+          y: i - dpH[j],
+          h,
+          w,
+        }
+      }
+    }
+  }
+
+  return [maxRect, maxArea]
+}
