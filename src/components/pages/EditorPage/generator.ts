@@ -90,7 +90,7 @@ export class Generator {
 
     const placedWords: WordItem[] = []
 
-    const nIter = 400
+    const nIter = 5
     const usePreciseShapesEvery = 10
     const t1 = performance.now()
 
@@ -108,8 +108,6 @@ export class Generator {
     >()
 
     angles.forEach((angle) => {
-      const rotatedCanvasDimensions = shapeCanvasDimensions
-
       const bounds = new paper.Path.Rectangle(
         new paper.Rectangle(
           0,
@@ -118,27 +116,34 @@ export class Generator {
           shapeCanvasDimensions.h
         )
       )
-      bounds.rotate(angle)
-      const rotatedBoundsAabb = bounds.bounds
+      const rotatedBounds = bounds.clone()
+      rotatedBounds.rotate(angle, bounds.bounds.center)
+      const rotatedBoundsAabb = rotatedBounds.bounds
+
+      const rotatedCanvasDimensions: Dimensions = {
+        w: rotatedBoundsAabb.width,
+        h: rotatedBoundsAabb.height,
+      }
+
       const rotatedBoundsScaleX =
-        rotatedCanvasDimensions.w / rotatedBoundsAabb.width
+        rotatedCanvasDimensions.w / bounds.bounds.width
       const rotatedBoundsScaleY =
-        rotatedCanvasDimensions.h / rotatedBoundsAabb.height
-      const rotatedBoundsScale = Math.min(
+        rotatedCanvasDimensions.h / bounds.bounds.height
+
+      const rotatedBoundsScale = Math.max(
         rotatedBoundsScaleX,
         rotatedBoundsScaleY
       )
 
-      bounds.scale(rotatedBoundsScale, rotatedBoundsScale)
+      // bounds.scale(rotatedBoundsScale, rotatedBoundsScale)
+
+      console.log('rotatedBoundsAabb = ', rotatedBoundsAabb, bounds.bounds)
+
       const rotatedBoundsTransform = new paper.Matrix()
-        .rotate(
-          angle,
-          new paper.Point(
-            shapeCanvasDimensions.w / 2,
-            shapeCanvasDimensions.h / 2
-          )
-        )
-        .scale(rotatedBoundsScale, rotatedBoundsScale)
+        .rotate(angle, bounds.bounds.center)
+        .translate(rotatedBoundsAabb.left, rotatedBoundsAabb.top)
+        .scale(rotatedBoundsScaleX, rotatedBoundsScaleY, new paper.Point(0, 0))
+      // .scale(rotatedBoundsScale, rotatedBoundsScale)
 
       const rotatedBoundsTransformInverted = rotatedBoundsTransform.inverted()
       const rotatedCtx = createCanvasCtx(rotatedCanvasDimensions)
@@ -193,26 +198,33 @@ export class Generator {
 
       // Rotate bounds of the shape and fit the scratchCanvasDimensions
 
-      if (shouldUpdateRotatedCtx) {
-        clearCanvas(rotatedCtx)
-        rotatedCtx.save()
-        rotatedBoundsTransform.applyToContext(rotatedCtx)
-        rotatedCtx.drawImage(
-          shapeCtx.canvas,
-          0,
-          0,
-          shapeCanvasDimensions.w,
-          shapeCanvasDimensions.h,
-          0,
-          0,
-          rotatedCanvasDimensions.w,
-          rotatedCanvasDimensions.h
-        )
-        rotatedCtx.restore()
-        // shouldUpdateRotatedCtx = false
-      }
+      // if (shouldUpdateRotatedCtx) {
+      clearCanvas(rotatedCtx)
+      rotatedCtx.save()
+      rotatedBoundsTransformInverted.applyToContext(rotatedCtx)
+      rotatedCtx.drawImage(
+        shapeCtx.canvas,
+        0,
+        0,
+        shapeCanvasDimensions.w,
+        shapeCanvasDimensions.h,
+        0,
+        0,
+        rotatedCanvasDimensions.w,
+        rotatedCanvasDimensions.h
+      )
+      rotatedCtx.restore()
+      // shouldUpdateRotatedCtx = false
+      // }
 
-      // console.screenshot(rotatedCtx.canvas)
+      rotatedCtx.fillStyle = '#f002'
+      rotatedCtx.fillRect(
+        0,
+        0,
+        rotatedCtx.canvas.width,
+        rotatedCtx.canvas.height
+      )
+      console.screenshot(rotatedCtx.canvas)
       // console.screenshot(shapeCtx.canvas)
 
       const scratchImgData = rotatedCtx.getImageData(
@@ -264,7 +276,7 @@ export class Generator {
         scale *
         Math.min(largestRect.w / wordPathSize.w, largestRect.h / wordPathSize.h)
 
-      const maxMinDim = 60
+      const maxMinDim = 40
       const minDim = Math.min(wordPathSize.w, wordPathSize.h) * pathScale
       if (minDim > maxMinDim) {
         pathScale *= maxMinDim / minDim
