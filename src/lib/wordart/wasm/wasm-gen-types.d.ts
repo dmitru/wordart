@@ -21,7 +21,8 @@ export function largest_rect(
   bounds_x: number,
   bounds_y: number,
   bounds_width: number,
-  bounds_height: number
+  bounds_height: number,
+  aspect: number
 ): any
 
 export type FillShapesByColorResult = {

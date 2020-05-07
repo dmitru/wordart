@@ -90,7 +90,7 @@ export class Generator {
 
     const placedWords: WordItem[] = []
 
-    const nIter = 100
+    const nIter = 400
     const usePreciseShapesEvery = 10
     const t1 = performance.now()
 
@@ -228,27 +228,30 @@ export class Generator {
         w: rotatedCanvasDimensions.w,
         h: rotatedCanvasDimensions.h,
       }
-      // const largestRectWasm = imageProcessor.findLargestRect(
-      //   scratchImgData,
-      //   scratchCanvasBounds
-      // )
-      // const largestRect: Rect = {
-      //   x: largestRectWasm.x,
-      //   y: largestRectWasm.y,
-      //   w: largestRectWasm.w,
-      //   h: largestRectWasm.h,
-      // }
-
       const wordPathSize: Dimensions = {
         w: wordPathBounds.x2 - wordPathBounds.x1,
         h: wordPathBounds.y2 - wordPathBounds.y1,
       }
       const wordAspect = wordPathSize.w / wordPathSize.h
-      const [largestRect, area] = getLargestRect(
+
+      const largestRectWasm = imageProcessor.findLargestRect(
         scratchImgData,
         scratchCanvasBounds,
         wordAspect
       )
+      const largestRect: Rect = {
+        x: largestRectWasm.x,
+        y: largestRectWasm.y,
+        w: largestRectWasm.w,
+        h: largestRectWasm.h,
+      }
+      // console.log('largestRect ', largestRect)
+
+      // const [largestRect,] = getLargestRect(
+      //   scratchImgData,
+      //   scratchCanvasBounds,
+      //   wordAspect
+      // )
 
       // shapeCtx.fillRect(...spreadRect(largestRect))
 
@@ -312,13 +315,13 @@ export class Generator {
         })
       } else {
         // console.log('i', i)
-        console.log(
-          'removing',
-          largestRect.x,
-          largestRect.y,
-          largestRect.w,
-          largestRect.h
-        )
+        // console.log(
+        //   'removing',
+        //   largestRect.x,
+        //   largestRect.y,
+        //   largestRect.w,
+        //   largestRect.h
+        // )
         shouldUpdateRotatedCtx = true
         shapeCtx.fillRect(
           largestRect.x,
@@ -540,7 +543,7 @@ const getLargestRect = (
   let maxArea = 0
   let maxRect: Rect = { x: 0, y: 0, w: 0, h: 0 }
   // Compute DP
-  for (let i = 1; i < M; ++i) {
+  for (let i = 0; i < M; ++i) {
     let curLeft = 0
     let curRight = N
 

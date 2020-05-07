@@ -204,15 +204,17 @@ const scratch = (canvas: HTMLCanvasElement) => {
           w: size,
           h: size,
         }
-        const largestRect = imageProcessor.findLargestRect(
-          imgData,
-          imgDataBounds
-        )
 
         const wordPathSize: Dimensions = {
           w: wordPathBounds.x2 - wordPathBounds.x1,
           h: wordPathBounds.y2 - wordPathBounds.y1,
         }
+        const wordAspect = wordPathSize.w / wordPathSize.h
+        const largestRect = imageProcessor.findLargestRect(
+          imgData,
+          imgDataBounds,
+          wordAspect
+        )
         // const largestRect = getLargestRect(imgData, imgDataBounds)
         // console.log(largestRect, getLargestRect(imgData, imgDataBounds))
 
