@@ -8,7 +8,7 @@ import {
 } from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
 import { getWasmModule, WasmModule } from 'lib/wordart/wasm/wasm-module'
-import { Rect, Point, spreadRect } from 'lib/wordart/geometry'
+import { Rect, Point, spreadRect, degToRad } from 'lib/wordart/geometry'
 import {
   ShapeWasm,
   ImageProcessorWasm,
@@ -90,7 +90,7 @@ export class Generator {
 
     const placedWords: WordItem[] = []
 
-    const nIter = 5
+    const nIter = 500
     const usePreciseShapesEvery = 10
     const t1 = performance.now()
 
@@ -103,6 +103,7 @@ export class Generator {
         ctx: CanvasRenderingContext2D
         rotatedCanvasDimensions: Dimensions
         transform: paper.Matrix
+        rotatedBounds: paper.Item
         inverseTransform: paper.Matrix
       }
     >()
@@ -117,7 +118,7 @@ export class Generator {
         )
       )
       const rotatedBounds = bounds.clone()
-      rotatedBounds.rotate(angle, bounds.bounds.center)
+      rotatedBounds.rotate(angle, new paper.Point(0, 0))
       const rotatedBoundsAabb = rotatedBounds.bounds
 
       const rotatedCanvasDimensions: Dimensions = {
@@ -126,9 +127,9 @@ export class Generator {
       }
 
       const rotatedBoundsScaleX =
-        rotatedCanvasDimensions.w / bounds.bounds.width
+        rotatedCanvasDimensions.w / rotatedBoundsAabb.width
       const rotatedBoundsScaleY =
-        rotatedCanvasDimensions.h / bounds.bounds.height
+        rotatedCanvasDimensions.h / rotatedBoundsAabb.height
 
       const rotatedBoundsScale = Math.max(
         rotatedBoundsScaleX,
@@ -137,12 +138,25 @@ export class Generator {
 
       // bounds.scale(rotatedBoundsScale, rotatedBoundsScale)
 
-      console.log('rotatedBoundsAabb = ', rotatedBoundsAabb, bounds.bounds)
+      // console.log(
+      //   'rotatedBoundsAabb = ',
+      //   bounds.bounds.left,
+      //   bounds.bounds.top,
+      //   bounds.bounds.width,
+      //   bounds.bounds.height,
+      //   angle,
+      //   rotatedBoundsAabb.left,
+      //   rotatedBoundsAabb.top,
+      //   rotatedBoundsAabb.width,
+      //   rotatedBoundsAabb.height
+      // )
 
       const rotatedBoundsTransform = new paper.Matrix()
-        .rotate(angle, bounds.bounds.center)
-        .translate(rotatedBoundsAabb.left, rotatedBoundsAabb.top)
-        .scale(rotatedBoundsScaleX, rotatedBoundsScaleY, new paper.Point(0, 0))
+        // .translate(rotatedBoundsAabb.center)
+        .rotate(-angle, new paper.Point(0, 0))
+        // .translate(rotatedBoundsAabb.center.multiply(-1))
+        .translate(rotatedBoundsAabb.topLeft)
+      // .scale(rotatedBoundsScaleX, rotatedBoundsScaleY)
       // .scale(rotatedBoundsScale, rotatedBoundsScale)
 
       const rotatedBoundsTransformInverted = rotatedBoundsTransform.inverted()
@@ -151,6 +165,7 @@ export class Generator {
       rotationInfos.set(angle, {
         ctx: rotatedCtx,
         rotatedCanvasDimensions,
+        rotatedBounds,
         transform: rotatedBoundsTransform,
         inverseTransform: rotatedBoundsTransformInverted,
       })
@@ -175,6 +190,7 @@ export class Generator {
         rotatedCanvasDimensions,
         transform: rotatedBoundsTransform,
         inverseTransform: rotatedBoundsTransformInverted,
+        rotatedBounds,
       } = rotationInfo
       // console.log('i = ', i, angle)
 
@@ -201,30 +217,32 @@ export class Generator {
       // if (shouldUpdateRotatedCtx) {
       clearCanvas(rotatedCtx)
       rotatedCtx.save()
+      // console.log(
+      //   'rotatedBoundsTransform = ',
+      //   rotatedBoundsTransform.rotation,
+      //   rotatedBoundsTransform.scaling
+      // )
       rotatedBoundsTransformInverted.applyToContext(rotatedCtx)
-      rotatedCtx.drawImage(
-        shapeCtx.canvas,
-        0,
-        0,
-        shapeCanvasDimensions.w,
-        shapeCanvasDimensions.h,
-        0,
-        0,
-        rotatedCanvasDimensions.w,
-        rotatedCanvasDimensions.h
-      )
+      // rotatedCtx.rotate(degToRad(angle))
+      // rotatedCtx.translate(rotatedBounds.bounds.top, rotatedBounds.bounds.left)
+      // rotatedCtx.scale(
+      //   rotatedCanvasDimensions.w / rotatedBounds.bounds.width,
+      //   rotatedCanvasDimensions.h / rotatedBounds.bounds.height
+      // )
+
+      rotatedCtx.drawImage(shapeCtx.canvas, 0, 0)
       rotatedCtx.restore()
       // shouldUpdateRotatedCtx = false
       // }
 
-      rotatedCtx.fillStyle = '#f002'
-      rotatedCtx.fillRect(
-        0,
-        0,
-        rotatedCtx.canvas.width,
-        rotatedCtx.canvas.height
-      )
-      console.screenshot(rotatedCtx.canvas)
+      // rotatedCtx.fillStyle = '#f002'
+      // rotatedCtx.fillRect(
+      //   0,
+      //   0,
+      //   rotatedCtx.canvas.width,
+      //   rotatedCtx.canvas.height
+      // )
+      // console.screenshot(rotatedCtx.canvas)
       // console.screenshot(shapeCtx.canvas)
 
       const scratchImgData = rotatedCtx.getImageData(
@@ -283,7 +301,7 @@ export class Generator {
       }
 
       shapeCtx.save()
-      rotatedBoundsTransformInverted.applyToContext(shapeCtx)
+      rotatedBoundsTransform.applyToContext(shapeCtx)
 
       if (task.itemPadding > 0) {
         shapeCtx.shadowBlur = (task.itemPadding / 100) * (shapeCanvasSize / 100)
@@ -321,7 +339,7 @@ export class Generator {
               task.shape.bounds.width / shapeCanvasDimensions.w,
               task.shape.bounds.height / shapeCanvasDimensions.h
             )
-            .append(rotatedBoundsTransform.inverted())
+            .append(rotatedBoundsTransform)
             .translate(tx, ty)
             .scale(pathScale),
         })

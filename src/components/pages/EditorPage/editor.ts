@@ -228,7 +228,7 @@ export class Editor {
       itemPadding: style.itemPadding,
       words: style.words.map((wc) => ({
         wordConfigId: wc.id,
-        angles: [0],
+        angles: [45],
         // angles: [0],
         // angles: style.angles.map((aDeg) => (aDeg * Math.PI) / 180),
         fillColors: ['red'],
