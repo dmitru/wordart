@@ -1,9 +1,9 @@
 import { css } from '@emotion/react'
 import * as ss from 'styled-system'
+import { textColor } from 'styles/system'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import styled from '@emotion/styled'
 import { darken } from 'polished'
-import { textColor } from 'styles/system'
 import { BoxProps } from 'components/shared/Box'
 
 export type ButtonProps = StyledButtonProps
@@ -62,10 +62,6 @@ const getButtonStyles = (params: {
 }
 
 const StyledButton = styled(BaseBtn)<StyledButtonProps>(
-  `
-    font-weight: 500;
-    border-radius: 8px;
-  `,
   (p) => {
     const { outline = false } = p
     if (p.secondary) {
@@ -100,6 +96,8 @@ const StyledButton = styled(BaseBtn)<StyledButtonProps>(
 StyledButton.defaultProps = {
   px: 3,
   py: 2,
-  fontWeight: 2,
-  borderRadius: 1,
+  fontWeight: 'semibold',
+  borderRadius: 'default',
+  display: 'flex-inline',
+  alignItems: 'center',
 }

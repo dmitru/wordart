@@ -84,16 +84,13 @@ export class Editor {
     this.paperItems.bgRect.fillColor = new paper.Color(color)
   }
 
-  setBgShapeColor = (color: string) => {
+  setShapeFillColor = (color: string) => {
     if (this.paperItems.shape) {
       this.paperItems.shape.fillColor = new paper.Color(color)
     }
   }
 
-  updateItemsColor = (
-    type: 'shape' | 'background',
-    coloring: ItemsColoring
-  ) => {
+  setItemsColor = (type: 'shape' | 'background', coloring: ItemsColoring) => {
     const itemsGroup =
       type === 'shape'
         ? this.paperItems.shapeItemsGroup
@@ -305,7 +302,7 @@ export class Editor {
     this.paperItems.shapeItemsGroup.insertAbove(this.paperItems.shape)
     this.paperItems.shapeWordIdToSymbolDef = wordIdToSymbolDef
 
-    this.updateItemsColor(type, this.store.getItemColoring(type))
+    this.setItemsColor(type, this.store.getItemColoring(type))
   }
 
   clear = async (render = true) => {

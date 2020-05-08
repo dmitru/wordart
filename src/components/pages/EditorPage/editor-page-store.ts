@@ -3,7 +3,7 @@ import { RootStore } from 'root-store'
 import { Editor, EditorInitParams } from 'components/pages/EditorPage/editor'
 import { icons } from 'data/shapes'
 
-type LeftPanelTab = 'shapes' | 'style:shape' | 'style:bg'
+type LeftPanelTab = 'shapes' | 'words' | 'symbols' | 'colors' | 'layout'
 
 export type ShapeStyle = {
   bgColor: string

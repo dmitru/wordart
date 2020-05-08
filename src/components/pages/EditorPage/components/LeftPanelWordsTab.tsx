@@ -1,44 +1,36 @@
 import { observer } from 'mobx-react'
 import { useStore } from 'root-store'
 import styled from '@emotion/styled'
-import { BaseBtn } from 'components/shared/BaseBtn'
 import * as evaicons from '@styled-icons/evaicons-outline'
 import { useState, useCallback, useRef } from 'react'
+import { Label } from './shared'
+import { Button } from 'components/shared/Button'
+import { Box } from 'components/shared/Box'
+import { BaseBtn } from 'components/shared/BaseBtn'
+import { TextInput } from 'components/shared/TextInput'
 
 export type LeftPanelWordsTabProps = {
   type: 'shape' | 'background'
 }
 
-const Toolbar = styled.div``
+const Toolbar = styled(Box)``
 
-const WordList = styled.div``
+const WordList = styled(Box)``
 
-const WordRow = styled.div`
+const WordRow = styled(Box)`
   width: 100%;
   padding: 4px 0;
   display: flex;
 `
 
-const DeleteBtn = styled(BaseBtn)`
-  padding: 5px;
-  background: red;
-  color: white;
-`
-
-const AddBtn = styled(BaseBtn)`
-  padding: 5px;
-  background: green;
-  color: white;
-`
-
 const WordTitleWrapper = styled(BaseBtn)`
   width: 100%;
-  padding: 3px;
+  text-align: left;
 `
 
-const WordTitleInput = styled.input`
+const WordTitleInput = styled(TextInput)`
   width: 100%;
-  padding: 3px;
+  /* padding: 3px; */
 `
 
 const WordTitleInlineEditor: React.FC<{
@@ -58,22 +50,20 @@ const WordTitleInlineEditor: React.FC<{
     setInputValue(value)
   }, [value])
 
-  const isEditing = inputValue != null
+  const isEditing = value === '' || inputValue != null
 
   return (
     <>
       {!isEditing && (
-        <WordTitleWrapper onClick={startEditing}>
-          {value || <em>Type in word here...</em>}
+        <WordTitleWrapper px={2} onClick={startEditing}>
+          {value || <em>Type word here...</em>}
         </WordTitleWrapper>
       )}
       {isEditing && (
         <WordTitleInput
           autoFocus
-          placeholder="Type in word here..."
-          onChange={(e) => {
-            setInputValue(e.target.value)
-          }}
+          placeholder="Type word here..."
+          onChange={setInputValue}
           value={inputValue || ''}
           onBlur={finishEditing}
         />
@@ -92,14 +82,19 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
     return (
       <>
-        <h4>WORDS</h4>
-        <Toolbar>
-          <AddBtn onClick={() => editorPageStore.addEmptyWord(props.type)}>
+        <Label>Words</Label>
+        <Toolbar mt={2}>
+          <Button
+            px={1}
+            py={1}
+            primary
+            onClick={() => editorPageStore.addEmptyWord(props.type)}
+          >
             <evaicons.PlusOutline size="20" /> Add
-          </AddBtn>
+          </Button>
         </Toolbar>
 
-        <WordList>
+        <WordList mt={2}>
           {words.map((word) => (
             <WordRow key={word.id}>
               <WordTitleInlineEditor
@@ -111,11 +106,15 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                 }}
               />
 
-              <DeleteBtn
+              <Button
+                px={2}
+                py={2}
+                secondary
+                outline
                 onClick={() => editorPageStore.deleteWord(props.type, word.id)}
               >
                 <evaicons.CloseOutline size="20" />
-              </DeleteBtn>
+              </Button>
             </WordRow>
           ))}
         </WordList>

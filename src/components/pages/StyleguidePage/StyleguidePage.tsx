@@ -2,10 +2,10 @@ import React from 'react'
 import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
 import styled from '@emotion/styled'
-import { Box } from 'components/shared/Box'
 import { Button } from 'components/shared/Button'
 import { Checkbox } from 'components/shared/Checkbox'
 import { observable } from 'mobx'
+import { Box } from 'rebass'
 
 const PageLayoutWrapper = styled.div`
   margin: 50px auto;

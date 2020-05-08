@@ -10,13 +10,14 @@ import { ColorLens } from '@styled-icons/material-rounded/ColorLens'
 import { observer } from 'mobx-react'
 import { LeftPanelShapesTab } from 'components/pages/EditorPage/components/LeftPanelShapesTab'
 import { useStore } from 'root-store'
-import { BaseBtn } from 'components/shared/BaseBtn'
 import { LeftPanelWordsTab } from 'components/pages/EditorPage/components/LeftPanelWordsTab'
 import { Dimensions } from 'lib/wordart/canvas-utils'
-import { LeftPanelStyleTab } from 'components/pages/EditorPage/components/LeftPanelStyleTab'
+import { LeftPanelColorsTab } from 'components/pages/EditorPage/components/LeftPanelColorsTab'
 import { observable, runInAction } from 'mobx'
 import { Button } from 'components/shared/Button'
 import { Box } from 'components/shared/Box'
+import { LeftPanelLayoutTab } from 'components/pages/EditorPage/components/LeftPanelLayoutTab'
+import { darken } from 'polished'
 
 const PageLayoutWrapper = styled.div`
   display: flex;
@@ -35,15 +36,16 @@ const EditorLayout = styled.div`
   overflow: hidden;
 `
 
-const TopNavWrapper = styled.div`
+const TopNavWrapper = styled(Box)`
   height: 50px;
   padding: 20px;
-  background: #999;
+  background: #958bf1;
+  color: white;
 `
 
 const LeftWrapper = styled.div`
   height: 100%;
-  background: gray;
+  background: white;
   max-width: 380px;
   flex: 1;
   display: flex;
@@ -51,12 +53,14 @@ const LeftWrapper = styled.div`
 `
 
 const LeftNavbar = styled.div`
-  background: darkgray;
+  padding-top: 20px;
+  background: white;
   width: 65px;
   height: 100%;
+  border-right: 1px solid ${(p) => p.theme.colors.muted};
 `
 
-const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
+const LeftNavbarBtn = styled(Button)<{ active: boolean }>`
   background: white;
   width: 100%;
   height: 60px;
@@ -65,10 +69,18 @@ const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
   justify-content: center;
   align-items: center;
   font-size: 12px;
-  background: #eee;
-  ${({ active }) => active && `background: #fff;`}
-
+  background: ${(p) => p.theme.colors.light};
+  border-radius: 0;
   color: black;
+  outline: none;
+  border: none;
+
+  ${({ theme, active }) =>
+    active &&
+    `
+    background: ${theme.colors.primary};
+    color: ${theme.colors.textLight};
+  `}
 
   .icon {
     width: 20px;
@@ -76,10 +88,17 @@ const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
     margin-bottom: 4px;
   }
 
+  transition: 0.2s background;
+
   &:hover,
   &:focus {
     background: #ddd;
-    ${({ active }) => active && `background: #fff;`}
+    ${({ theme, active }) =>
+      active &&
+      `
+    background: ${darken(0.01, theme.colors.primary)};
+    color: ${theme.colors.textLight};
+    `}
   }
 `
 
@@ -120,7 +139,7 @@ const Canvas = styled.canvas`
   margin: auto;
 `
 
-const VisualizeBtn = styled(BaseBtn)`
+const VisualizeBtn = styled(Button)`
   background: magenta;
   color: white;
   padding: 4px 10px;
@@ -149,7 +168,9 @@ export const EditorPage = observer(() => {
 
   return (
     <PageLayoutWrapper>
-      <TopNavWrapper>HEADER</TopNavWrapper>
+      <TopNavWrapper alignItems="center" display="flex">
+        HEADER
+      </TopNavWrapper>
 
       <EditorLayout>
         <LeftWrapper>
@@ -175,19 +196,37 @@ export const EditorPage = observer(() => {
 
             <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.setLeftPanelTab('style:shape')
+                editorPageStore.setLeftPanelTab('words')
               }}
-              active={editorPageStore.activeLeftTab === 'style:shape'}
+              active={editorPageStore.activeLeftTab === 'words'}
             >
-              Style: Shape
+              Words
             </LeftNavbarBtn>
             <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.setLeftPanelTab('style:bg')
+                editorPageStore.setLeftPanelTab('symbols')
               }}
-              active={editorPageStore.activeLeftTab === 'style:bg'}
+              active={editorPageStore.activeLeftTab === 'symbols'}
             >
-              Style: Background
+              Icons
+            </LeftNavbarBtn>
+
+            <LeftNavbarBtn
+              onClick={() => {
+                editorPageStore.setLeftPanelTab('colors')
+              }}
+              active={editorPageStore.activeLeftTab === 'colors'}
+            >
+              Colors
+            </LeftNavbarBtn>
+
+            <LeftNavbarBtn
+              onClick={() => {
+                editorPageStore.setLeftPanelTab('layout')
+              }}
+              active={editorPageStore.activeLeftTab === 'layout'}
+            >
+              Layout
             </LeftNavbarBtn>
           </LeftNavbar>
 
@@ -195,32 +234,24 @@ export const EditorPage = observer(() => {
             {editorPageStore.activeLeftTab === 'shapes' && (
               <LeftPanelShapesTab />
             )}
-            <div>
-              <LeftPanelStyleTab
-                type={
-                  editorPageStore.activeLeftTab === 'style:bg'
-                    ? 'background'
-                    : 'shape'
-                }
-              />
-            </div>
-            <div>
-              <LeftPanelWordsTab
-                type={
-                  editorPageStore.activeLeftTab === 'style:bg'
-                    ? 'background'
-                    : 'shape'
-                }
-              />
-            </div>
+            {editorPageStore.activeLeftTab === 'words' && (
+              <LeftPanelWordsTab type="shape" />
+            )}
+            {editorPageStore.activeLeftTab === 'colors' && (
+              <LeftPanelColorsTab />
+            )}
+
+            {editorPageStore.activeLeftTab === 'layout' && (
+              <LeftPanelLayoutTab type="shape" />
+            )}
           </LeftPanel>
         </LeftWrapper>
 
         <RightWrapper>
-          <Box display="flex" alignItems="center" bg="light" p={2} height={50}>
+          <Box alignItems="center" bg="light" p={2}>
             <Button
               primary
-              // disabled={state.isVisualizing}
+              disabled={state.isVisualizing}
               onClick={async () => {
                 state.isVisualizing = true
                 await Promise.all([

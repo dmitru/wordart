@@ -4,6 +4,8 @@ import styled from '@emotion/styled'
 import { ShapeConfig } from 'components/pages/EditorPage/editor-page-store'
 import { ReactSVG } from 'react-svg'
 import { useState } from 'react'
+import { TextInput } from 'components/shared/TextInput'
+import { Box } from 'components/shared/Box'
 
 export type LeftPanelShapesTabProps = {}
 
@@ -50,12 +52,13 @@ const ShapeThumbnailBtn: React.FC<
 }
 
 const ShapeThumbnailBtnInnerImg = styled.img`
-  width: 100%;
-  height: 100%;
+  width: 66px;
+  height: 66px;
+  margin: 0;
   object-fit: contain;
 `
 
-const ShapeThumbnails = styled.div`
+const ShapeThumbnails = styled(Box)`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -81,7 +84,8 @@ const ShapeThumbnailBtnInner = styled.button<
   font-size: 12px;
   cursor: pointer;
   flex-direction: column;
-  ${({ active }) => active && `outline: 3px solid orange;`}
+  ${({ theme, active }) =>
+    active && `outline: 3px solid ${theme.colors.primary};`}
   -webkit-appearance: none;
   background-color: ${(p) => p.backgroundColor};
 
@@ -104,8 +108,9 @@ const ShapeThumbnailBtnInner = styled.button<
 
   &:hover,
   &:focus {
-    outline: 3px solid pink;
-    ${({ active }) => active && `outline: 3px solid orange;`}
+    outline: 3px solid ${(p) => p.theme.colors.primary};
+    ${({ theme, active }) =>
+      active && `outline: 3px solid ${theme.colors.primary};`}
   }
 `
 
@@ -120,15 +125,13 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
     return (
       <>
-        <input
+        <TextInput
           placeholder='Try "Heart" or "face"'
           value={query}
-          onChange={(e) => {
-            setQuery(e.target.value)
-          }}
+          onChange={setQuery}
         />
 
-        <ShapeThumbnails>
+        <ShapeThumbnails mt={2}>
           {matchingShapes.map((shape) => (
             <ShapeThumbnailBtn
               key={shape.id}

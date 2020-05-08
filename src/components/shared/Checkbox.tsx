@@ -20,7 +20,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   inputProps,
   ...props
 }) => (
-  <Box display="inline-flex" fontSize={2} alignItems="center" {...props}>
+  <Box display="inline-flex" fontSize={2} alignItems="flex-start" {...props}>
     <HiddenCheckboxInput
       type="checkbox"
       {...inputProps}
@@ -76,6 +76,7 @@ const Icon = styled.svg`
 const StyledCheckbox = styled.div<{ checked: boolean }>`
   display: inline-block;
   width: 24px;
+  min-width: 24px;
   height: 24px;
   background: ${(p) =>
     p.checked ? p.theme.colors.primary : p.theme.colors.light};
@@ -83,7 +84,7 @@ const StyledCheckbox = styled.div<{ checked: boolean }>`
   border: 2px solid
     ${(p) => (p.checked ? p.theme.colors.primary : p.theme.colors.primary)};
   transition: all 150ms;
-  margin-right: 5px;
+  margin-right: 8px;
 
   ${HiddenCheckboxInput}:focus + & {
     box-shadow: 0 0 0 3px ${(p) => opacify(0.7, p.theme.colors.primary)};
