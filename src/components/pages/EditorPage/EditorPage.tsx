@@ -148,21 +148,17 @@ const Canvas = styled.canvas`
   margin: auto;
 `
 
-const state = observable({
-  isVisualizing: false,
-})
-
 export const EditorPage = observer(() => {
   const [canvasSize, setCanvasSize] = useState<Dimensions>({ w: 900, h: 900 })
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const { editorPageStore } = useStore()
+  const { editorPageStore: store } = useStore()
 
   useEffect(() => {
-    console.log('editorPageStore.state', editorPageStore.state)
-    if (canvasRef.current && editorPageStore.state !== 'initialized') {
-      editorPageStore.initEditor({
+    console.log('editorPageStore.state', store.state)
+    if (canvasRef.current && store.state !== 'initialized') {
+      store.initEditor({
         canvas: canvasRef.current,
-        store: editorPageStore,
+        store: store,
       })
     }
   }, [canvasRef.current])
@@ -187,9 +183,9 @@ export const EditorPage = observer(() => {
             </LeftNavbarBtn> */}
             <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.setLeftPanelTab('shapes')
+                store.setLeftPanelTab('shapes')
               }}
-              active={editorPageStore.activeLeftTab === 'shapes'}
+              active={store.activeLeftTab === 'shapes'}
             >
               <Shapes className="icon" />
               Shape
@@ -197,9 +193,9 @@ export const EditorPage = observer(() => {
 
             <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.setLeftPanelTab('words')
+                store.setLeftPanelTab('words')
               }}
-              active={editorPageStore.activeLeftTab === 'words'}
+              active={store.activeLeftTab === 'words'}
             >
               <TextFields className="icon" />
               Words
@@ -215,9 +211,9 @@ export const EditorPage = observer(() => {
 
             <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.setLeftPanelTab('colors')
+                store.setLeftPanelTab('colors')
               }}
-              active={editorPageStore.activeLeftTab === 'colors'}
+              active={store.activeLeftTab === 'colors'}
             >
               <ColorPalette className="icon" />
               Colors
@@ -225,9 +221,9 @@ export const EditorPage = observer(() => {
 
             <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.setLeftPanelTab('layout')
+                store.setLeftPanelTab('layout')
               }}
-              active={editorPageStore.activeLeftTab === 'layout'}
+              active={store.activeLeftTab === 'layout'}
             >
               <LayoutMasonry className="icon" />
               Layout
@@ -235,17 +231,13 @@ export const EditorPage = observer(() => {
           </LeftNavbar>
 
           <LeftPanel>
-            {editorPageStore.activeLeftTab === 'shapes' && (
-              <LeftPanelShapesTab />
-            )}
-            {editorPageStore.activeLeftTab === 'words' && (
+            {store.activeLeftTab === 'shapes' && <LeftPanelShapesTab />}
+            {store.activeLeftTab === 'words' && (
               <LeftPanelWordsTab type="shape" />
             )}
-            {editorPageStore.activeLeftTab === 'colors' && (
-              <LeftPanelColorsTab />
-            )}
+            {store.activeLeftTab === 'colors' && <LeftPanelColorsTab />}
 
-            {editorPageStore.activeLeftTab === 'layout' && (
+            {store.activeLeftTab === 'layout' && (
               <LeftPanelLayoutTab type="shape" />
             )}
           </LeftPanel>
@@ -258,17 +250,12 @@ export const EditorPage = observer(() => {
                 width: 128px;
               `}
               accent
-              disabled={state.isVisualizing}
-              onClick={async () => {
-                state.isVisualizing = true
-                await Promise.all([
-                  editorPageStore.editor?.generateItems('shape'),
-                  // editorPageStore.editor?.generateItems('background'),
-                ])
-                state.isVisualizing = false
+              disabled={store.isVisualizing}
+              onClick={() => {
+                store.editor?.generateItems('shape')
               }}
             >
-              {!state.isVisualizing && (
+              {!store.isVisualizing && (
                 <MagicWand
                   size={24}
                   css={css`
@@ -276,7 +263,7 @@ export const EditorPage = observer(() => {
                   `}
                 />
               )}
-              {state.isVisualizing ? 'Working...' : 'Visualize'}
+              {store.isVisualizing ? 'Working...' : 'Visualize'}
             </Button>
 
             <Button ml={3}>Undo</Button>

@@ -3,8 +3,9 @@ import {
   Dimensions,
   loadImageUrlToCanvasCtx,
   createCanvasCtx,
-  removeImageOpacity,
+  clampPixelOpacityUp,
   clearCanvas,
+  shrinkShape,
 } from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
 import { getWasmModule, WasmModule } from 'lib/wordart/wasm/wasm-module'
@@ -14,7 +15,7 @@ import {
   ImageProcessorWasm,
 } from 'lib/wordart/wasm/image-processor-wasm'
 import * as tm from 'transformation-matrix'
-import { Path } from 'opentype.js'
+import { Path, BoundingBox } from 'opentype.js'
 import { sample, uniq, flatten } from 'lodash'
 
 const FONT_SIZE = 100
@@ -44,7 +45,7 @@ export class Generator {
     }
     this.logger.debug('Generator: generate', task)
 
-    const shapeCanvasSize = 360
+    const shapeCanvasSize = 300
     // const shapeCanvasMaxPixelCount = shapeCanvasSize * shapeCanvasSize
 
     const shapeCanvas = task.shape.canvas
@@ -68,12 +69,16 @@ export class Generator {
       0,
       shapeCanvas.width,
       shapeCanvas.height,
-      0,
-      0,
-      shapeCtx.canvas.width,
-      shapeCtx.canvas.height
+      1,
+      1,
+      shapeCtx.canvas.width - 2,
+      shapeCtx.canvas.height - 2
     )
-    removeImageOpacity(shapeCtx.canvas)
+    clampPixelOpacityUp(shapeCtx.canvas)
+    shrinkShape(
+      shapeCtx.canvas,
+      (task.shapePadding / 100) * 5 * (shapeCanvasSize / 100)
+    )
 
     const imageProcessor = new ImageProcessorWasm(this.wasm)
 
@@ -337,6 +342,7 @@ export class Generator {
           kind: 'word',
           shapeColor: 'black',
           word,
+          wordPathBounds,
           transform: new paper.Matrix()
             .translate(task.shape.bounds.left, task.shape.bounds.top)
             .scale(
@@ -432,6 +438,7 @@ export type WordItem = {
   /** Color of the shape at the given location */
   shapeColor: string
   wordPath: Path
+  wordPathBounds: BoundingBox
 }
 
 export type ItemId = number

@@ -4,7 +4,6 @@ import { theme } from 'styles/theme'
 import { ThemeProvider, CacheProvider } from '@emotion/react'
 import createCache from '@emotion/cache'
 import 'normalize.css/normalize.css'
-import 'react-rangeslider/lib/index.css'
 
 import { globalStyles } from 'styles/globalStyles'
 

@@ -51,6 +51,8 @@ export class EditorPageStore {
     this.rootStore = rootStore
   }
 
+  @observable isVisualizing = false
+
   editor: Editor | null = null
   @observable state: 'initializing' | 'initialized' | 'destroyed' =
     'initializing'
@@ -82,12 +84,13 @@ export class EditorPageStore {
       assignBy: 'random',
     },
     dimSmallerItems: 20,
-    shapePadding: 5,
-    itemDensity: 80,
+    shapePadding: 25,
+    itemDensity: 85,
     itemSize: 70,
     words: defaultWordsConfig,
     fitWithinShape: true,
-    angles: [-15],
+    angles: [0],
+    // angles: [-15, 20, 34, -76, 84, -65, 81],
   }
   @observable backgroundStyle: ShapeStyle = {
     itemsColorKind: 'gradient',

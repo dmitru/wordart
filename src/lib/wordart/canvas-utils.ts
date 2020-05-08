@@ -126,7 +126,8 @@ export const imageDataToCanvasCtx = (
   return ctx
 }
 
-export const removeImageOpacity = (canvas: HTMLCanvasElement) => {
+/** Turns each non fully transparent pixel into a fully opaque pixel */
+export const clampPixelOpacityUp = (canvas: HTMLCanvasElement) => {
   const ctx = canvas.getContext('2d')!
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
   for (let r = 0; r < imgData.height; ++r) {
@@ -137,6 +138,57 @@ export const removeImageOpacity = (canvas: HTMLCanvasElement) => {
     }
   }
   ctx.putImageData(imgData, 0, 0)
+}
+
+export const clampPixelOpacityDown = (canvas: HTMLCanvasElement) => {
+  const ctx = canvas.getContext('2d')!
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+  for (let r = 0; r < imgData.height; ++r) {
+    for (let c = 0; c < imgData.width; ++c) {
+      if (imgData.data[(r * imgData.width + c) * 4 + 3] < 255) {
+        imgData.data[(r * imgData.width + c) * 4 + 3] = 0
+      }
+    }
+  }
+  ctx.putImageData(imgData, 0, 0)
+}
+
+/** Turns each fully transparent pixel into a fully opaque black pixel.
+ * Turns each non-transparent pixel into a fully transparent one.
+ */
+export const invertImageMask = (canvas: HTMLCanvasElement) => {
+  const ctx = canvas.getContext('2d')!
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+  for (let r = 0; r < imgData.height; ++r) {
+    for (let c = 0; c < imgData.width; ++c) {
+      // Fully transparent pixel
+      const imgDataIndex = (r * imgData.width + c) * 4 + 3
+      const isTransparentAtLeastABit = imgData.data[imgDataIndex] < 255
+      if (isTransparentAtLeastABit) {
+        imgData.data[imgDataIndex] = 255
+      } else {
+        imgData.data[imgDataIndex] = 0
+      }
+    }
+  }
+  ctx.putImageData(imgData, 0, 0)
+}
+
+export const shrinkShape = (canvas: HTMLCanvasElement, radius = 10) => {
+  const ctx = canvas.getContext('2d')!
+
+  const scratchCtx = createCanvasCtxCopy(ctx)
+  copyCanvas(ctx, scratchCtx)
+
+  invertImageMask(scratchCtx.canvas)
+
+  ctx.save()
+  ctx.shadowBlur = radius
+  ctx.shadowColor = 'black'
+  copyCanvas(scratchCtx, ctx, undefined, undefined, 'destination-out')
+  ctx.restore()
+
+  clampPixelOpacityDown(ctx.canvas)
 }
 
 export const loadImageUrlToCanvasCtx = async (
@@ -159,4 +211,56 @@ export const loadImageUrlToCanvasCtx = async (
     ctx.canvas.height - 2 * padding
   )
   return ctx
+}
+
+export const copyCanvas = (
+  srcCanvas: CanvasRenderingContext2D,
+  destCanvas: CanvasRenderingContext2D,
+  srcRect?: Rect,
+  destRect?: Rect,
+  globalCompositeOperation = 'source-over'
+) => {
+  destCanvas.save()
+  if (destCanvas.globalCompositeOperation !== globalCompositeOperation) {
+    destCanvas.globalCompositeOperation = globalCompositeOperation
+  }
+  if (srcRect) {
+    // These offsets fix a Safari's bug with drawImage() not working for negative source coordinates
+    // See https://stackoverflow.com/a/35503829
+    const destRectOrDefault = destRect || srcRect
+
+    const xOffset = srcRect.x >= 0 ? 0 : -srcRect.x
+    const yOffset = srcRect.y >= 0 ? 0 : -srcRect.y
+    const xOffset2 =
+      destRectOrDefault.x + destRectOrDefault.w > destCanvas.canvas.width
+        ? destRectOrDefault.x + destRectOrDefault.w - destCanvas.canvas.width
+        : 0
+    const yOffset2 =
+      destRectOrDefault.y + destRectOrDefault.h > destCanvas.canvas.height
+        ? destRectOrDefault.y + destRectOrDefault.h - destCanvas.canvas.height
+        : 0
+
+    // Protect against zero src width/height or negative x, y coords:
+    // https://stackoverflow.com/questions/19338032/canvas-indexsizeerror-index-or-size-is-negative-or-greater-than-the-allowed-a
+    const srcWidth = Math.max(1, srcRect.w - xOffset - xOffset2)
+    const srcHeight = Math.max(1, srcRect.h - yOffset - yOffset2)
+
+    const destWidth = Math.max(1, destRectOrDefault.w - xOffset - xOffset2)
+    const destHeight = Math.max(1, destRectOrDefault.h - yOffset - yOffset2)
+
+    destCanvas.drawImage(
+      srcCanvas.canvas,
+      Math.max(0, srcRect.x + xOffset),
+      Math.max(0, srcRect.y + yOffset),
+      srcWidth,
+      srcHeight,
+      destRectOrDefault.x + xOffset,
+      destRectOrDefault.y + yOffset,
+      destWidth,
+      destHeight
+    )
+  } else {
+    destCanvas.drawImage(srcCanvas.canvas, 0, 0)
+  }
+  destCanvas.restore()
 }

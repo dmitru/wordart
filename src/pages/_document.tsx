@@ -7,11 +7,6 @@ import Document, {
 import { extractCritical } from '@emotion/server'
 import 'lib/wordart/console-extensions'
 
-/**
- * Enables styled-components SSR:
- * https://github.com/zeit/next.js/blob/canary/examples/with-styled-components/pages/_document.js
- */
-
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
     const page = await ctx.renderPage()

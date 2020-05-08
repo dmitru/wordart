@@ -60,6 +60,7 @@
     "react-svg": "^11.0.20",
     "react-use": "^14.2.0",
     "seedrandom": "^3.0.5",
+    "styled-components": "^5.1.0",
     "styled-icons": "^10.2.1",
     "styled-system": "^5.1.5",
     "superquad": "^1.2.1",

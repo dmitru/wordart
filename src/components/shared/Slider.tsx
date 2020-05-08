@@ -18,13 +18,22 @@ export type SliderProps = {
   value: number
   label?: string
   onChange?: (value: number) => void
+  onAfterChange?: (value: number) => void
   min: number
   max: number
   step: number
 }
 
 export const Slider: React.FC<SliderProps> = (props) => {
-  const { min, max, step, value, label, onChange = noop } = props
+  const {
+    min,
+    max,
+    step,
+    value,
+    label,
+    onChange = noop,
+    onAfterChange = noop,
+  } = props
   return (
     <Box
       css={css`
@@ -46,6 +55,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
         values={[value]}
         step={step}
         onUpdate={(value) => onChange(value[0])}
+        onChange={(value) => onAfterChange(value[0])}
         css={css`
           position: relative;
           height: 30px;

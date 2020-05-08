@@ -108,7 +108,7 @@ export class Editor {
       if (item.kind !== 'word') {
         return 0
       }
-      const wordPathBb = item.wordPath.getBoundingBox()
+      const wordPathBb = item.wordPathBounds
       const scaling = item.transform.scaling
       const wordH = (wordPathBb.y2 - wordPathBb.y1) * scaling.y
       const wordW = (wordPathBb.x2 - wordPathBb.x1) * scaling.x
@@ -173,18 +173,13 @@ export class Editor {
     const h = shapeItem.bounds.height
 
     const padding = 20
-    const sceneBounds = padRect(this.getSceneBounds(), -padding)
-    if (Math.max(w, h) !== Math.max(sceneBounds.w, sceneBounds.h)) {
-      shapeItem.scale(Math.max(sceneBounds.w, sceneBounds.h) / Math.max(w, h))
+    const sceneBounds = this.getSceneBounds(padding)
+    if (Math.max(w, h) !== Math.max(sceneBounds.width, sceneBounds.height)) {
+      const scale = Math.min(sceneBounds.width / w, sceneBounds.height / h)
+      shapeItem.scale(scale)
     }
 
-    const w2 = shapeItem.bounds.width
-    const h2 = shapeItem.bounds.height
-
-    shapeItem.position = new paper.Point(
-      (sceneBounds.w - w2) / 2 + w2 / 2 + padding,
-      (sceneBounds.h - h2) / 2 + h2 / 2 + padding
-    )
+    shapeItem.position = sceneBounds.center
 
     shapeItem.insertAbove(this.paperItems.bgRect)
     this.paperItems.shape = shapeItem
@@ -196,14 +191,17 @@ export class Editor {
     this.shapes = undefined
   }
 
-  getSceneBounds = (pad = 20): Rect => ({
-    x: pad,
-    y: pad,
-    w: paper.view.bounds.width - pad * 2,
-    h: paper.view.bounds.height - pad * 2,
-  })
+  getSceneBounds = (pad = 20): paper.Rectangle =>
+    new paper.Rectangle({
+      x: pad,
+      y: pad,
+      width: paper.view.bounds.width - pad * 2,
+      height: paper.view.bounds.height - pad * 2,
+    })
 
   generateItems = async (type: 'shape' | 'background') => {
+    this.store.isVisualizing = true
+
     const isBackground = type === 'background'
     const style = isBackground
       ? this.store.backgroundStyle
@@ -234,10 +232,15 @@ export class Editor {
     const shapeItem = this.paperItems.shape.children
       ? this.paperItems.shape.children[1]
       : this.paperItems.shape
+
+    const color = shapeItem.fillColor
+    shapeItem.fillColor = new paper.Color('black')
     const shapeRaster = shapeItem.rasterize(
       this.paperItems.shape.view.resolution,
       false
     )
+    shapeItem.fillColor = color
+
     const shapeCanvas = shapeRaster.getSubCanvas(
       new paper.Rectangle(0, 0, shapeRaster.width, shapeRaster.height)
     )
@@ -338,6 +341,8 @@ export class Editor {
 
     this.itemIdToPaperItem = itemIdToPaperItem
     this.setItemsColor(type, coloring)
+
+    this.store.isVisualizing = false
   }
 
   clear = async (render = true) => {

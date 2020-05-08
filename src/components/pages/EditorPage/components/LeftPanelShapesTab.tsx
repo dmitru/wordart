@@ -3,7 +3,7 @@ import { useStore } from 'root-store'
 import styled from '@emotion/styled'
 import { ShapeConfig } from 'components/pages/EditorPage/editor-page-store'
 import { ReactSVG } from 'react-svg'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { TextInput } from 'components/shared/TextInput'
 import { Box } from 'components/shared/Box'
 
@@ -119,6 +119,10 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
     const { editorPageStore } = useStore()
     const [query, setQuery] = useState('')
 
+    const visualize = useCallback(() => {
+      editorPageStore.editor?.generateItems('shape')
+    }, [])
+
     const matchingShapes = editorPageStore
       .getAvailableShapes()
       .filter((s) => s.title.toLowerCase().includes(query.toLowerCase()))
@@ -137,6 +141,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
               key={shape.id}
               onClick={() => {
                 editorPageStore.selectShape(shape.id)
+                visualize()
               }}
               backgroundColor="white"
               // backgroundColor={editorPageStore.bgColor}
