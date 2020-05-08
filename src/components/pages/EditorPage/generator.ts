@@ -44,7 +44,7 @@ export class Generator {
     }
     this.logger.debug('Generator: generate', task)
 
-    const shapeCanvasSize = 280
+    const shapeCanvasSize = 360
     // const shapeCanvasMaxPixelCount = shapeCanvasSize * shapeCanvasSize
 
     const shapeCanvas = task.shape.canvas
@@ -294,7 +294,7 @@ export class Generator {
         scale *
         Math.min(largestRect.w / wordPathSize.w, largestRect.h / wordPathSize.h)
 
-      const maxMinDim = 40
+      const maxMinDim = (task.itemSize / 100) * 60
       const minDim = Math.min(wordPathSize.w, wordPathSize.h) * pathScale
       if (minDim > maxMinDim) {
         pathScale *= maxMinDim / minDim
@@ -304,13 +304,17 @@ export class Generator {
       rotatedBoundsTransform.applyToContext(shapeCtx)
 
       if (task.itemPadding > 0) {
-        shapeCtx.shadowBlur = (task.itemPadding / 100) * (shapeCanvasSize / 100)
+        shapeCtx.shadowBlur =
+          (task.itemPadding / 100) * (shapeCanvasSize / 100) * 2
         shapeCtx.shadowColor = 'red'
       } else {
         shapeCtx.shadowBlur = 0
       }
 
-      if (pathScale * Math.min(largestRect.w, largestRect.h) >= 0.15) {
+      if (
+        pathScale * Math.min(largestRect.w, largestRect.h) >=
+        0.05 * (shapeCanvasSize / 360)
+      ) {
         const dx = Math.max(largestRect.w - pathScale * wordPathSize.w, 0)
         const dy = Math.max(largestRect.h - pathScale * wordPathSize.h, 0)
 
@@ -388,10 +392,12 @@ export type FillShapeTask = {
     canvas: HTMLCanvasElement
     bounds: paper.Rectangle
   }
-  /** Padding between shape and items, in percent (0 - 100) */
+  /** Additional padding between shape and items, in percent (0 - 100) */
   shapePadding: number
   /** Padding between items, in percent (0 - 100) */
   itemPadding: number
+  /** 0 - 100 */
+  itemSize: number
   /** Words to use */
   words: FillShapeTaskWordConfig[]
 }

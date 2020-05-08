@@ -35,22 +35,22 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
           <Slider
             label="Size"
-            value={style.itemScaleMin}
+            value={style.itemSize}
             onChange={(value) => {
               const val = (value as any) as number
-              style.itemScaleMin = val
+              style.itemSize = val
             }}
-            min={0.005}
-            max={1}
-            step={0.001}
+            min={20}
+            max={100}
+            step={1}
           />
 
           <Slider
             label="Density"
-            value={style.itemPadding}
+            value={style.itemDensity}
             onChange={(value) => {
               const val = (value as any) as number
-              style.itemPadding = val
+              style.itemDensity = val
             }}
             min={0}
             max={100}

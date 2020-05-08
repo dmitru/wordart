@@ -66,7 +66,7 @@ const LeftWrapper = styled.div`
 const LeftNavbar = styled.div`
   padding-top: 20px;
   background: ${(p) => p.theme.colors.light1};
-  width: 65px;
+  width: 85px;
   height: 100%;
   z-index: 3;
 `

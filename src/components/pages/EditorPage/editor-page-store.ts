@@ -16,9 +16,10 @@ export type ShapeStyle = {
   words: WordConfig[]
   angles: number[]
   shapePadding: number
-  itemPadding: number
-  itemScaleMin: number
-  itemScaleMax: number
+  /** Number: 0 - 100 */
+  itemDensity: number
+  /** Number: 0 - 100 */
+  itemSize: number
   fitWithinShape: boolean
 }
 
@@ -49,31 +50,6 @@ export class EditorPageStore {
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
   }
-
-  // for i in range(m):
-
-  //       cur_left, cur_right = 0, n
-  //       # update height
-  //       for j in range(n):
-  //           if matrix[i][j] == '1': height[j] += 1
-  //           else: height[j] = 0
-  //       # update left
-  //       for j in range(n):
-  //           if matrix[i][j] == '1': left[j] = max(left[j], cur_left)
-  //           else:
-  //               left[j] = 0
-  //               cur_left = j + 1
-  //       # update right
-  //       for j in range(n-1, -1, -1):
-  //           if matrix[i][j] == '1': right[j] = min(right[j], cur_right)
-  //           else:
-  //               right[j] = n
-  //               cur_right = j
-  //       # update the area
-  //       for j in range(n):
-  //           maxarea = max(maxarea, height[j] * (right[j] - left[j]))
-
-  //   return maxarea
 
   editor: Editor | null = null
   @observable state: 'initializing' | 'initialized' | 'destroyed' =
@@ -107,13 +83,11 @@ export class EditorPageStore {
     },
     dimSmallerItems: 20,
     shapePadding: 5,
-    itemPadding: 0,
-    itemScaleMax: 2,
-    itemScaleMin: 0.05,
+    itemDensity: 80,
+    itemSize: 70,
     words: defaultWordsConfig,
     fitWithinShape: true,
     angles: [-15],
-    // angles: range(-45, 45, 20),
   }
   @observable backgroundStyle: ShapeStyle = {
     itemsColorKind: 'gradient',
@@ -125,9 +99,8 @@ export class EditorPageStore {
     },
     bgColor: '#ffffff',
     shapePadding: 3,
-    itemPadding: 2,
-    itemScaleMax: 0.7,
-    itemScaleMin: 0.002,
+    itemDensity: 20,
+    itemSize: 70,
     dimSmallerItems: 50,
     words: defaultWordsConfig2,
     fitWithinShape: true,
@@ -153,7 +126,7 @@ export class EditorPageStore {
   }
 
   @observable availableShapes: ShapeConfig[] = shapes
-  @observable selectedShapeId: ShapeId = shapes[5].id
+  @observable selectedShapeId: ShapeId = shapes[6].id
 
   private nextWordId = defaultWordsConfig.length + 1
 
@@ -251,6 +224,23 @@ export type ShapeConfig = {
 export type ShapeKind = 'img' | 'svg'
 export type ShapeId = number
 
+const svgIcons: ShapeConfig[] = [
+  icons.find((i) => i.title === 'Square full'),
+  ...icons.slice(0, 100),
+]
+  .filter((i) => i != null)
+  .map((icon, index) =>
+    icon
+      ? ({
+          id: 100 + index,
+          kind: 'svg',
+          title: icon.title,
+          url: icon.url,
+        } as ShapeConfig)
+      : null
+  )
+  .filter((x) => x != null) as ShapeConfig[]
+
 const shapes: ShapeConfig[] = [
   {
     id: 2,
@@ -290,13 +280,5 @@ const shapes: ShapeConfig[] = [
     url: '/images/yin-yang.svg',
     fill: 'green',
   },
-  ...icons.slice(0, 100).map(
-    (icon, index) =>
-      ({
-        id: 100 + index,
-        kind: 'svg',
-        title: icon.title,
-        url: icon.url,
-      } as ShapeConfig)
-  ),
+  ...svgIcons,
 ]

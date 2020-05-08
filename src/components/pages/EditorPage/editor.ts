@@ -249,13 +249,14 @@ export class Editor {
         bounds: shapeRaster.bounds,
       },
       shapePadding: style.shapePadding,
-      itemPadding: style.itemPadding,
+      itemPadding: 100 - style.itemDensity,
+      itemSize: style.itemSize,
       words: style.words.map((wc) => ({
         wordConfigId: wc.id,
         angles: style.angles,
         fillColors: ['red'],
         // fonts: [fonts[0], fonts[1], fonts[2]],
-        fonts: isBackground ? [fonts[1]] : [fonts[0]],
+        fonts: isBackground ? [fonts[1]] : [fonts[2]],
         text: wc.text,
       })),
     })
