@@ -19,7 +19,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
     return (
       <>
         <Box>
-          <Label mb={3}>Words & Items</Label>
+          {/* <Label mb={3}>Words & Items</Label> */}
 
           <Slider
             label="Angle"

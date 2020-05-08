@@ -12,7 +12,7 @@ import {
 import { noop } from 'lodash'
 import { Box } from 'components/shared/Box'
 import { css } from '@emotion/react'
-import { lighten } from 'polished'
+import { lighten, darken } from 'polished'
 
 export type SliderProps = {
   value: number
@@ -45,7 +45,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
         domain={[min, max]}
         values={[value]}
         step={step}
-        onChange={(value) => onChange(value[0])}
+        onUpdate={(value) => onChange(value[0])}
         css={css`
           position: relative;
           height: 30px;
@@ -227,9 +227,12 @@ export const KeyboardHandle: React.FC<HandleProps> = ({
         justifyContent: 'center',
         height: 24,
         borderRadius: theme.radii.default,
-        backgroundColor: disabled
-          ? '#666'
-          : lighten(0.05, theme.colors.primary),
+        backgroundColor: disabled ? '#666' : theme.colors.primary,
+        '&:hover, &:focus': {
+          backgroundColor: disabled
+            ? '#666'
+            : darken(0.05, theme.colors.primary),
+        },
       })}
       {...getHandleProps(id)}
     >

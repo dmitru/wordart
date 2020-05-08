@@ -10,6 +10,16 @@ export const globalStyles = (
       * {
         box-sizing: border-box;
       }
+      html {
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+
+      #__next {
+        height: 100vh;
+        overflow: hidden;
+      }
+
       ${typography.toString()}
     `}
   />

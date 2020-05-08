@@ -6,6 +6,9 @@ import { Template } from '@styled-icons/heroicons-solid/Template'
 import { Rocket } from '@styled-icons/entypo/Rocket'
 import { Text } from '@styled-icons/evaicons-solid/Text'
 import { Shapes } from '@styled-icons/fa-solid/Shapes'
+import { TextFields } from '@styled-icons/material/TextFields'
+import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
+import { LayoutMasonry } from '@styled-icons/remix-fill/LayoutMasonry'
 import { ColorLens } from '@styled-icons/material-rounded/ColorLens'
 import { observer } from 'mobx-react'
 import { LeftPanelShapesTab } from 'components/pages/EditorPage/components/LeftPanelShapesTab'
@@ -17,7 +20,9 @@ import { observable, runInAction } from 'mobx'
 import { Button } from 'components/shared/Button'
 import { Box } from 'components/shared/Box'
 import { LeftPanelLayoutTab } from 'components/pages/EditorPage/components/LeftPanelLayoutTab'
-import { darken } from 'polished'
+import { darken, lighten } from 'polished'
+import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
+import { css } from '@emotion/react'
 
 const PageLayoutWrapper = styled.div`
   display: flex;
@@ -29,17 +34,23 @@ const PageLayoutWrapper = styled.div`
 
 const EditorLayout = styled.div`
   display: flex;
-  background: pink;
   height: calc(100% - 50px);
   width: 100%;
   margin: 0 auto;
   overflow: hidden;
 `
 
+const TopToolbar = styled(Box)`
+  z-index: 1;
+  box-shadow: 0 0 5px 0 #00000033;
+`
+
 const TopNavWrapper = styled(Box)`
   height: 50px;
   padding: 20px;
-  background: #958bf1;
+  font-size: 1.5em;
+  font-weight: 400;
+  background: linear-gradient(90deg, #21c5be, #697af5);
   color: white;
 `
 
@@ -54,10 +65,10 @@ const LeftWrapper = styled.div`
 
 const LeftNavbar = styled.div`
   padding-top: 20px;
-  background: white;
+  background: ${(p) => p.theme.colors.light1};
   width: 65px;
   height: 100%;
-  border-right: 1px solid ${(p) => p.theme.colors.muted};
+  z-index: 3;
 `
 
 const LeftNavbarBtn = styled(Button)<{ active: boolean }>`
@@ -69,17 +80,17 @@ const LeftNavbarBtn = styled(Button)<{ active: boolean }>`
   justify-content: center;
   align-items: center;
   font-size: 12px;
-  background: ${(p) => p.theme.colors.light};
+  background: ${(p) => p.theme.colors.light1};
   border-radius: 0;
-  color: black;
+  color: ${(p) => p.theme.colors.dark3};
   outline: none;
   border: none;
 
   ${({ theme, active }) =>
     active &&
     `
-    background: ${theme.colors.primary};
-    color: ${theme.colors.textLight};
+    background: ${theme.colors.light};
+    color: ${theme.colors.text};
   `}
 
   .icon {
@@ -92,12 +103,12 @@ const LeftNavbarBtn = styled(Button)<{ active: boolean }>`
 
   &:hover,
   &:focus {
-    background: #ddd;
+    background: ${(p) => lighten(0.1, p.theme.colors.light1)};
     ${({ theme, active }) =>
       active &&
       `
-    background: ${darken(0.01, theme.colors.primary)};
-    color: ${theme.colors.textLight};
+    background: ${darken(0.01, theme.colors.light)};
+    color: ${theme.colors.text};
     `}
   }
 `
@@ -108,6 +119,9 @@ const LeftPanel = styled.div`
   padding: 20px;
   height: 100%;
   overflow: auto;
+  width: 270px;
+  box-shadow: 0 0 5px 0 #00000033;
+  z-index: 2;
 `
 
 const RightWrapper = styled.div`
@@ -116,11 +130,6 @@ const RightWrapper = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-`
-
-const TopToolbar = styled.div`
-  background: white;
-  height: 50px;
 `
 
 const CanvasWrappper = styled.div`
@@ -137,14 +146,6 @@ const Canvas = styled.canvas`
   height: 100%;
   /* max-height: 100%; */
   margin: auto;
-`
-
-const VisualizeBtn = styled(Button)`
-  background: magenta;
-  color: white;
-  padding: 4px 10px;
-  margin-left: 20px;
-  font-size: 15px;
 `
 
 const state = observable({
@@ -169,7 +170,7 @@ export const EditorPage = observer(() => {
   return (
     <PageLayoutWrapper>
       <TopNavWrapper alignItems="center" display="flex">
-        HEADER
+        Wordcloudy
       </TopNavWrapper>
 
       <EditorLayout>
@@ -200,16 +201,17 @@ export const EditorPage = observer(() => {
               }}
               active={editorPageStore.activeLeftTab === 'words'}
             >
+              <TextFields className="icon" />
               Words
             </LeftNavbarBtn>
-            <LeftNavbarBtn
+            {/* <LeftNavbarBtn
               onClick={() => {
                 editorPageStore.setLeftPanelTab('symbols')
               }}
               active={editorPageStore.activeLeftTab === 'symbols'}
             >
               Icons
-            </LeftNavbarBtn>
+            </LeftNavbarBtn> */}
 
             <LeftNavbarBtn
               onClick={() => {
@@ -217,6 +219,7 @@ export const EditorPage = observer(() => {
               }}
               active={editorPageStore.activeLeftTab === 'colors'}
             >
+              <ColorPalette className="icon" />
               Colors
             </LeftNavbarBtn>
 
@@ -226,6 +229,7 @@ export const EditorPage = observer(() => {
               }}
               active={editorPageStore.activeLeftTab === 'layout'}
             >
+              <LayoutMasonry className="icon" />
               Layout
             </LeftNavbarBtn>
           </LeftNavbar>
@@ -248,9 +252,12 @@ export const EditorPage = observer(() => {
         </LeftWrapper>
 
         <RightWrapper>
-          <Box alignItems="center" bg="light" p={2}>
+          <TopToolbar display="flex" alignItems="center" bg="light" p={2}>
             <Button
-              primary
+              css={css`
+                width: 128px;
+              `}
+              accent
               disabled={state.isVisualizing}
               onClick={async () => {
                 state.isVisualizing = true
@@ -261,12 +268,20 @@ export const EditorPage = observer(() => {
                 state.isVisualizing = false
               }}
             >
-              {state.isVisualizing ? 'Visualizing...' : 'Visualize'}
+              {!state.isVisualizing && (
+                <MagicWand
+                  size={24}
+                  css={css`
+                    margin-right: 4px;
+                  `}
+                />
+              )}
+              {state.isVisualizing ? 'Working...' : 'Visualize'}
             </Button>
 
             <Button ml={3}>Undo</Button>
             <Button ml={1}>Redo</Button>
-          </Box>
+          </TopToolbar>
           <CanvasWrappper>
             <Canvas
               width={canvasSize.w}

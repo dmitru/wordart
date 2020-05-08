@@ -7,12 +7,13 @@ import { Button } from 'components/shared/Button'
 
 export type ColorPickerProps = {
   value: string
+  disableAlpha?: boolean
   onChange?: (hex: string) => void
   onAfterChange?: (hex: string) => void
 }
 
 const ColorSwatch = styled(Button)<{ color: string }>`
-  border: 1px solid #333;
+  border: 1px solid ${(p) => p.theme.colors.dark4};
   cursor: pointer;
   outline: none;
   padding: 0;
@@ -33,10 +34,15 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
   const [isOpen, setIsOpen] = useState(false)
   return (
     <>
-      <ColorSwatch onClick={() => setIsOpen(!isOpen)} color={props.value} />
+      <ColorSwatch
+        borderRadius="none"
+        onClick={() => setIsOpen(!isOpen)}
+        color={props.value}
+      />
       {isOpen && (
         <ChromePicker
           color={props.value}
+          disableAlpha={props.disableAlpha}
           onChange={(color) => {
             const hex = chroma(
               color.rgb.r,
@@ -46,6 +52,17 @@ export const ColorPicker: React.FC<ColorPickerProps> = (props) => {
             ).hex()
             if (props.onChange) {
               props.onChange(hex)
+            }
+          }}
+          onChangeComplete={(color) => {
+            const hex = chroma(
+              color.rgb.r,
+              color.rgb.g,
+              color.rgb.b,
+              color.rgb.a || 1
+            ).hex()
+            if (props.onAfterChange) {
+              props.onAfterChange(hex)
             }
           }}
         />

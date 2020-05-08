@@ -3,7 +3,7 @@ import * as ss from 'styled-system'
 import { textColor } from 'styles/system'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import styled from '@emotion/styled'
-import { darken } from 'polished'
+import { darken, grayscale } from 'polished'
 import { BoxProps } from 'components/shared/Box'
 
 export type ButtonProps = StyledButtonProps
@@ -14,6 +14,7 @@ export const Button: React.FC<ButtonProps> = (props) => {
 
 type StyledButtonProps = {
   primary?: boolean
+  accent?: boolean
   secondary?: boolean
   outline?: boolean
   link?: boolean
@@ -42,6 +43,10 @@ const getButtonStyles = (params: {
       &:active {
         transform: translateY(-1px);
       }
+
+      &[disabled] {
+        cursor: default;
+      }
     `
   } else {
     // Filled
@@ -56,6 +61,11 @@ const getButtonStyles = (params: {
       &:active {
         background: ${darken(0.1, bgColor)};
         transform: translateY(-1px);
+      }
+
+      &[disabled] {
+        cursor: default;
+        background: ${grayscale(bgColor)};
       }
     `
   }
@@ -80,6 +90,14 @@ const StyledButton = styled(BaseBtn)<StyledButtonProps>(
         outline,
       })
     }
+    if (p.accent) {
+      return getButtonStyles({
+        bgColor: outline ? p.theme.colors.light : p.theme.colors.accent,
+        color: outline ? p.theme.colors.accent : p.theme.colors.textLight,
+        borderColor: p.theme.colors.accent,
+        outline,
+      })
+    }
   },
 
   ss.compose(
@@ -100,4 +118,6 @@ StyledButton.defaultProps = {
   borderRadius: 'default',
   display: 'flex-inline',
   alignItems: 'center',
+  justifyContent: 'center',
+  textAlign: 'center',
 }

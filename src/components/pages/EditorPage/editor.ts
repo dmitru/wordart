@@ -15,13 +15,15 @@ import {
   ImageProcessorWasm,
   ShapeWasm,
 } from 'lib/wordart/wasm/image-processor-wasm'
-import { Generator } from 'components/pages/EditorPage/generator'
+import { Generator, ItemId, Item } from 'components/pages/EditorPage/generator'
 import chroma from 'chroma-js'
 import paper from 'paper'
 import { loadFont } from 'lib/wordart/fonts'
 import * as tm from 'transformation-matrix'
 import { matrixToPaperTransform } from 'components/pages/EditorPage/paper-utils'
 import { Path } from 'opentype.js'
+import { sample, max, min } from 'lodash'
+import seedrandom from 'seedrandom'
 
 const FONT_NAMES = [
   'mountains-of-christmas_bold.ttf',
@@ -51,6 +53,8 @@ export class Editor {
     shapeWordIdToSymbolDef: Map<string, paper.SymbolDefinition>
     shapeItemsGroup?: paper.Group
   }
+  itemsShape: Item[] = []
+  itemIdToPaperItem: Map<number, paper.Item> = new Map()
 
   constructor(params: EditorInitParams) {
     this.params = params
@@ -91,25 +95,48 @@ export class Editor {
   }
 
   setItemsColor = (type: 'shape' | 'background', coloring: ItemsColoring) => {
-    const itemsGroup =
-      type === 'shape'
-        ? this.paperItems.shapeItemsGroup
-        : this.paperItems.bgItemsGroup
-    if (!itemsGroup) {
-      return
-    }
     let colors: string[] = []
     if (coloring.kind === 'single-color') {
       colors = [coloring.color]
     } else {
       const scale = chroma.scale([coloring.colorFrom, coloring.colorTo])
-      colors = scale.colors(this.paperItems.shapeWordIdToSymbolDef.size)
+      colors = scale.colors(10)
     }
+    const paperColors = colors.map((color) => new paper.Color(color))
 
-    let index = 0
-    for (const path of itemsGroup.children) {
-      path.fillColor = new paper.Color(colors[index % colors.length])
-      index++
+    const itemAreas = this.itemsShape.map((item) => {
+      if (item.kind !== 'word') {
+        return 0
+      }
+      const wordPathBb = item.wordPath.getBoundingBox()
+      const scaling = item.transform.scaling
+      const wordH = (wordPathBb.y2 - wordPathBb.y1) * scaling.y
+      const wordW = (wordPathBb.x2 - wordPathBb.x1) * scaling.x
+      const wordArea = Math.sqrt(wordH * wordW)
+      return wordArea
+    })
+    const maxArea = max(itemAreas)!
+    const minArea = min(itemAreas)!
+
+    const rng = seedrandom('fill color')
+
+    const dimSmallerFactor = coloring.dimSmallerItems / 100
+    for (let i = 0; i < this.itemsShape.length; ++i) {
+      const item = this.itemsShape[i]
+      const area = itemAreas[i]
+      const path = this.itemIdToPaperItem.get(item.id)
+      if (!path) {
+        continue
+      }
+      if (item.kind !== 'word') {
+        continue
+      }
+
+      const index = Math.floor(rng() * paperColors.length)
+      path.fillColor = paperColors[index]
+      path.opacity =
+        (dimSmallerFactor * (area - minArea)) / (maxArea - minArea) +
+        (1 - dimSmallerFactor)
     }
   }
 
@@ -233,10 +260,15 @@ export class Editor {
       })),
     })
 
+    this.itemsShape = result.items
+
     const addedItems: paper.Item[] = []
     let img: HTMLImageElement | null = null
 
     let wordIdToSymbolDef = new Map<string, paper.SymbolDefinition>()
+    let itemIdToPaperItem = new Map<ItemId, paper.Item>()
+
+    const coloring = this.store.getItemColoring(type)
 
     for (const item of result.items) {
       // TODO: convert result items into paper paths
@@ -279,7 +311,6 @@ export class Editor {
 
         const symbolDef = wordIdToSymbolDef.get(wordId)!
 
-        // const wordItem = symbolDef.place(new paper.Point(0, 0))
         const wordItem = symbolDef.item.clone()
 
         wordItem.rotate(
@@ -288,6 +319,8 @@ export class Editor {
         )
         wordItem.transform(item.transform)
         addedItems.push(wordItem)
+
+        itemIdToPaperItem.set(item.id, wordItem)
       }
     }
 
@@ -302,7 +335,8 @@ export class Editor {
     this.paperItems.shapeItemsGroup.insertAbove(this.paperItems.shape)
     this.paperItems.shapeWordIdToSymbolDef = wordIdToSymbolDef
 
-    this.setItemsColor(type, this.store.getItemColoring(type))
+    this.itemIdToPaperItem = itemIdToPaperItem
+    this.setItemsColor(type, coloring)
   }
 
   clear = async (render = true) => {

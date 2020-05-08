@@ -1,6 +1,7 @@
 export const theme = {
   colors: {
-    primary: '#776af5',
+    primary: '#6a7af5',
+    accent: '#F45B5C',
     secondary: '#575a7b',
     success: '#2cd4a2',
     danger: '#f9655b',
@@ -10,8 +11,13 @@ export const theme = {
     text: '#222',
     //
     light: 'white',
-    'light-100': '#eee',
+    light1: '#eaeaea',
+    light100: '#eee',
     dark: '#222',
+    dark1: '#333',
+    dark2: '#444',
+    dark3: '#555',
+    dark4: '#666',
     muted: '#ccc',
   },
   fonts: {
@@ -36,6 +42,7 @@ export const theme = {
     avatar: 48,
   },
   radii: {
+    none: 0,
     default: 4,
     circle: 99999,
   },

@@ -44,7 +44,7 @@ export class Generator {
     }
     this.logger.debug('Generator: generate', task)
 
-    const shapeCanvasSize = 360
+    const shapeCanvasSize = 280
     // const shapeCanvasMaxPixelCount = shapeCanvasSize * shapeCanvasSize
 
     const shapeCanvas = task.shape.canvas

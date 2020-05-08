@@ -96,13 +96,13 @@ export class EditorPageStore {
   @observable activeLeftTab: LeftPanelTab = 'shapes'
 
   @observable shapeStyle: ShapeStyle = {
-    bgColor: '#f45b5c33',
+    bgColor: '#576DC733',
     // bgColor: '#ffffff',
-    itemsColorKind: 'color',
+    itemsColorKind: 'gradient',
     itemsColor: '#970707',
     itemsColorGradient: {
       from: '#f45b5c',
-      to: '#ffffaa',
+      to: '#2540BF',
       assignBy: 'random',
     },
     dimSmallerItems: 20,
@@ -183,6 +183,11 @@ export class EditorPageStore {
   @action deleteWord = (type: 'shape' | 'background', wordId: WordConfigId) => {
     const style = type === 'shape' ? this.shapeStyle : this.backgroundStyle
     style.words = style.words.filter((w) => w.id !== wordId)
+  }
+
+  @action clearWords = (type: 'shape' | 'background') => {
+    const style = type === 'shape' ? this.shapeStyle : this.backgroundStyle
+    style.words = []
   }
 
   @action addEmptyWord = (type: 'shape' | 'background') => {

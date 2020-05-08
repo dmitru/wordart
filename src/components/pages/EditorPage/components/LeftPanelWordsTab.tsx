@@ -83,14 +83,23 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     return (
       <>
         <Label>Words</Label>
-        <Toolbar mt={2}>
+        <Toolbar mt={2} display="flex" alignItems="center">
           <Button
-            px={1}
+            px={2}
             py={1}
-            primary
+            mr={2}
+            accent
             onClick={() => editorPageStore.addEmptyWord(props.type)}
           >
             <evaicons.PlusOutline size="20" /> Add
+          </Button>
+          <Button
+            px={2}
+            py={1}
+            outline
+            onClick={() => editorPageStore.clearWords(props.type)}
+          >
+            Clear
           </Button>
         </Toolbar>
 
@@ -109,7 +118,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               <Button
                 px={2}
                 py={2}
-                secondary
                 outline
                 onClick={() => editorPageStore.deleteWord(props.type, word.id)}
               >
