@@ -32,7 +32,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
     return (
       <>
         <Box>
-          <Label mb={2}>Words</Label>
+          <Label mb={2}>Words & Icons</Label>
           {/* <Checkbox
             id="gradient"
             label="Gradient"

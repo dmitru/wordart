@@ -222,6 +222,8 @@ export class Generator {
     let wordIndex = 0
     let iconIndex = 0
 
+    let mostLargestRect: Rect | undefined
+
     for (let i = 0; i < nIter; ++i) {
       let type: 'word' | 'icon' = 'word'
 
@@ -256,8 +258,8 @@ export class Generator {
         const wordPathBounds = wordPathsBounds[wordIndex]
         const wordPath = wordPaths[wordIndex]
 
-        let scale = 1 - (0.5 * i) / nIter
-        // let scale = 1
+        // let scale = 1 - (0.5 * i) / nIter
+        let scale = 1
 
         clearCanvas(rotatedCtx)
         rotatedCtx.save()
@@ -306,6 +308,10 @@ export class Generator {
           h: largestRectWasm.h,
         }
 
+        if (!mostLargestRect) {
+          mostLargestRect = largestRect
+        }
+
         // const [largestRect] = getLargestRect(
         //   scratchImgData,
         //   scratchCanvasBounds,
@@ -326,10 +332,13 @@ export class Generator {
             largestRect.h / wordPathSize.h
           )
 
-        const maxMinDim = ((task.itemSize / 100) * shapeCanvasMaxExtent) / 2
-        const minDim = Math.min(wordPathSize.w, wordPathSize.h) * pathScale
-        if (minDim > maxMinDim) {
-          pathScale *= maxMinDim / minDim
+        const maxMaxDim =
+          (task.wordsMaxSize / 100) *
+          Math.max(mostLargestRect.w, mostLargestRect.h)
+
+        const maxDim = Math.max(wordPathSize.w, wordPathSize.h) * pathScale
+        if (maxDim > maxMaxDim) {
+          pathScale *= maxMaxDim / maxDim
         }
 
         shapeCtx.save()
@@ -337,7 +346,8 @@ export class Generator {
 
         if (task.itemPadding > 0) {
           shapeCtx.shadowBlur =
-            (task.itemPadding / 100) * (shapeCanvasMaxExtent / 100) * 2
+            ((task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6) /
+            pathScale
           shapeCtx.shadowColor = 'red'
         } else {
           shapeCtx.shadowBlur = 0
@@ -411,8 +421,8 @@ export class Generator {
         } = rotationInfo
         // console.log('i = ', i, angle)
 
-        let scale = 1 - (0.5 * i) / nIter
-        // let scale = 1
+        // let scale = 1 - (0.5 * i) / nIter
+        let scale = 1
 
         clearCanvas(rotatedCtx)
         rotatedCtx.save()
@@ -462,6 +472,9 @@ export class Generator {
           w: largestRectWasm.w,
           h: largestRectWasm.h,
         }
+        if (!mostLargestRect) {
+          mostLargestRect = largestRect
+        }
 
         // const [largestRect] = getLargestRect(
         //   scratchImgData,
@@ -482,10 +495,12 @@ export class Generator {
           scale *
           Math.min(largestRect.w / iconDims.w, largestRect.h / iconDims.h)
 
-        const maxMinDim = ((task.itemSize / 100) * shapeCanvasMaxExtent) / 2
-        const minDim = Math.min(iconDims.w, iconDims.h) * iconScale
-        if (minDim > maxMinDim) {
-          iconScale *= maxMinDim / minDim
+        const maxMaxDim =
+          (task.iconsMaxSize / 100) *
+          Math.max(mostLargestRect.w, mostLargestRect.h)
+        const maxDim = Math.max(iconDims.w, iconDims.h) * iconScale
+        if (maxDim > maxMaxDim) {
+          iconScale *= maxMaxDim / maxDim
         }
 
         // shapeCtx.strokeStyle = '#f008'
@@ -497,11 +512,19 @@ export class Generator {
 
         if (task.itemPadding > 0) {
           shapeCtx.shadowBlur =
-            (task.itemPadding / 100) * (shapeCanvasMaxExtent / 100) * 2
+            ((task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6) /
+            iconScale
           shapeCtx.shadowColor = 'red'
         } else {
           shapeCtx.shadowBlur = 0
         }
+
+        // console.log(
+        //   'shapeCtx.shadowBlur',
+        //   shapeCtx.shadowBlur,
+        //   (task.itemPadding / 100) * (shapeCanvasMaxExtent / 100) * 1,
+        //   iconScale
+        // )
 
         if (
           iconScale * Math.min(largestRect.w, largestRect.h) >=
@@ -604,11 +627,14 @@ export type FillShapeTask = {
   /** Padding between items, in percent (0 - 100) */
   itemPadding: number
   /** 0 - 100 */
-  itemSize: number
+  wordsMaxSize: number
   /** Words to use */
   words: FillShapeTaskWordConfig[]
   /** Icons to use */
   icons: FillShapeTaskIconConfig[]
+  /** 0 - 100 */
+  iconsMaxSize: number
+  /** 0 - 100 */
   iconProbability: number
 }
 

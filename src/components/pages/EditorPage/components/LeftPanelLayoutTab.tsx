@@ -23,35 +23,79 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
     return (
       <>
-        <Box>
-          {/* <Label mb={3}>Words & Items</Label> */}
+        {style.words.length > 0 && (
+          <Box mb={4}>
+            <Label>Words</Label>
 
-          <Slider
-            label="Angle"
-            value={style.angles[0]}
+            <Slider
+              label="Angle"
+              value={style.angles[0]}
+              onChange={(value) => {
+                const val = (value as any) as number
+                style.angles = [val]
+              }}
+              onAfterChange={visualize}
+              min={-90}
+              max={90}
+              step={1}
+            />
+
+            <Slider
+              label="Size"
+              value={style.wordsMaxSize}
+              onChange={(value) => {
+                const val = (value as any) as number
+                style.wordsMaxSize = val
+              }}
+              onAfterChange={visualize}
+              min={20}
+              max={100}
+              step={1}
+            />
+          </Box>
+        )}
+
+        {style.icons.length > 0 && (
+          <Box mb={4}>
+            <Label>Icons</Label>
+            <Slider
+              label="Size"
+              value={style.iconsMaxSize}
+              onChange={(value) => {
+                const val = (value as any) as number
+                style.iconsMaxSize = val
+              }}
+              onAfterChange={visualize}
+              min={20}
+              max={100}
+              step={1}
+            />
+            <Slider
+              label="Amount"
+              value={style.iconsProportion}
+              onChange={(value) => {
+                const val = (value as any) as number
+                style.iconsProportion = val
+              }}
+              onAfterChange={visualize}
+              min={0}
+              max={100}
+              step={1}
+            />
+          </Box>
+        )}
+
+        <Box mb={4}>
+          <Label>Common</Label>
+          {/* <Checkbox
+            id="fit-shape"
+            label="Allow words to go beyond shape"
+            value={!style.fitWithinShape}
             onChange={(value) => {
-              const val = (value as any) as number
-              style.angles = [val]
+              style.fitWithinShape = !value
             }}
-            onAfterChange={visualize}
-            min={-90}
-            max={90}
-            step={1}
-          />
-
-          <Slider
-            label="Size"
-            value={style.itemSize}
-            onChange={(value) => {
-              const val = (value as any) as number
-              style.itemSize = val
-            }}
-            onAfterChange={visualize}
-            min={20}
-            max={100}
-            step={1}
-          />
-
+            mb={3}
+          /> */}
           <Slider
             label="Density"
             value={style.itemDensity}
@@ -64,18 +108,6 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
             max={100}
             step={1}
           />
-        </Box>
-
-        <Box mt={4}>
-          {/* <Checkbox
-            id="fit-shape"
-            label="Allow words to go beyond shape"
-            value={!style.fitWithinShape}
-            onChange={(value) => {
-              style.fitWithinShape = !value
-            }}
-            mb={3}
-          /> */}
           {style.fitWithinShape && (
             <>
               <Slider

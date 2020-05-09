@@ -267,8 +267,9 @@ export class Editor {
         bounds: shapeRaster.bounds,
       },
       shapePadding: style.shapePadding,
-      itemPadding: 100 - style.itemDensity,
-      itemSize: style.itemSize,
+      itemPadding: Math.max(1, 100 - style.itemDensity),
+      wordsMaxSize: style.wordsMaxSize,
+      iconsMaxSize: style.iconsMaxSize,
       words: style.words.map((wc) => ({
         wordConfigId: wc.id,
         text: wc.text,
@@ -280,7 +281,7 @@ export class Editor {
       icons: style.icons.map((shape) => ({
         shape: this.store.getShapeById(shape.shapeId)!,
       })),
-      iconProbability: 0.2,
+      iconProbability: style.iconsProportion / 100,
     })
 
     this.itemsShape = result.placedItems

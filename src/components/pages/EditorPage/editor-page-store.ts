@@ -20,10 +20,14 @@ export type ShapeStyle = {
   icons: IconConfig[]
   angles: number[]
   shapePadding: number
-  /** Number: 0 - 100 */
+  /** Number: 0 - 100% */
   itemDensity: number
-  /** Number: 0 - 100 */
-  itemSize: number
+  /** Number: 0 - 100% */
+  wordsMaxSize: number
+  /** Number: 0 - 100% */
+  iconsMaxSize: number
+  /** Number: 0 - 100% */
+  iconsProportion: number
   fitWithinShape: boolean
 }
 
@@ -80,6 +84,8 @@ export class EditorPageStore {
   @observable shapeStyle: ShapeStyle = {
     bgColor: '#576DC7',
     bgOpacity: 0.3,
+    iconsMaxSize: 30,
+    iconsProportion: 20,
     // bgColor: '#ffffff',
     itemsColorKind: 'gradient',
     itemsColor: '#970707',
@@ -91,7 +97,7 @@ export class EditorPageStore {
     dimSmallerItems: 20,
     shapePadding: 25,
     itemDensity: 85,
-    itemSize: 70,
+    wordsMaxSize: 70,
     words: defaultWordsConfig,
     icons: range(10).map(() => ({ shapeId: sample(svgIconsOutline)!.id })),
     fitWithinShape: true,
@@ -106,11 +112,13 @@ export class EditorPageStore {
       to: '#333',
       assignBy: 'random',
     },
+    iconsMaxSize: 30,
+    iconsProportion: 20,
     bgColor: '#ffffff',
     bgOpacity: 1,
     shapePadding: 3,
     itemDensity: 20,
-    itemSize: 70,
+    wordsMaxSize: 70,
     dimSmallerItems: 50,
     words: defaultWordsConfig2,
     icons: [],

@@ -214,22 +214,22 @@ export const EditorPage = observer(() => {
 
             <LeftNavbarBtn
               onClick={() => {
-                store.setLeftPanelTab('colors')
-              }}
-              active={store.activeLeftTab === 'colors'}
-            >
-              <ColorPalette className="icon" />
-              Colors
-            </LeftNavbarBtn>
-
-            <LeftNavbarBtn
-              onClick={() => {
                 store.setLeftPanelTab('layout')
               }}
               active={store.activeLeftTab === 'layout'}
             >
               <LayoutMasonry className="icon" />
               Layout
+            </LeftNavbarBtn>
+
+            <LeftNavbarBtn
+              onClick={() => {
+                store.setLeftPanelTab('colors')
+              }}
+              active={store.activeLeftTab === 'colors'}
+            >
+              <ColorPalette className="icon" />
+              Colors
             </LeftNavbarBtn>
           </LeftNavbar>
 
