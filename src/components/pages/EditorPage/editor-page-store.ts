@@ -2,6 +2,7 @@ import { observable, action, set, runInAction } from 'mobx'
 import { RootStore } from 'root-store'
 import { Editor, EditorInitParams } from 'components/pages/EditorPage/editor'
 import { icons } from 'data/shapes'
+import { sample, range } from 'lodash'
 
 type LeftPanelTab = 'shapes' | 'words' | 'symbols' | 'colors' | 'layout'
 
@@ -14,6 +15,7 @@ export type ShapeStyle = {
   dimSmallerItems: number
 
   words: WordConfig[]
+  icons: IconConfig[]
   angles: number[]
   shapePadding: number
   /** Number: 0 - 100 */
@@ -88,6 +90,7 @@ export class EditorPageStore {
     itemDensity: 85,
     itemSize: 70,
     words: defaultWordsConfig,
+    icons: range(5).map(() => ({ shapeId: sample(svgIcons)!.id })),
     fitWithinShape: true,
     // angles: [0],
     angles: [-15, 20, 34, -76, 84, -65, 81],
@@ -106,6 +109,7 @@ export class EditorPageStore {
     itemSize: 70,
     dimSmallerItems: 50,
     words: defaultWordsConfig2,
+    icons: [],
     fitWithinShape: true,
     angles: [20],
   }
@@ -134,6 +138,8 @@ export class EditorPageStore {
   private nextWordId = defaultWordsConfig.length + 1
 
   getAvailableShapes = (): ShapeConfig[] => shapes
+  getShapeById = (shapeId: ShapeId): ShapeConfig | undefined =>
+    shapes.find((s) => s.id === shapeId)
 
   getSelectedShape = () => {
     return this.availableShapes.find((s) => s.id === this.selectedShapeId)!
@@ -192,6 +198,10 @@ export class EditorPageStore {
 export type WordConfig = {
   id: WordConfigId
   text: string
+}
+
+export type IconConfig = {
+  shapeId: ShapeId
 }
 
 export type WordConfigId = number

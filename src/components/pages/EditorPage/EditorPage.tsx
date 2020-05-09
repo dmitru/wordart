@@ -7,6 +7,7 @@ import { Rocket } from '@styled-icons/entypo/Rocket'
 import { Text } from '@styled-icons/evaicons-solid/Text'
 import { Shapes } from '@styled-icons/fa-solid/Shapes'
 import { TextFields } from '@styled-icons/material/TextFields'
+import { Face } from '@styled-icons/material/Face'
 import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
 import { LayoutMasonry } from '@styled-icons/remix-fill/LayoutMasonry'
 import { ColorLens } from '@styled-icons/material-rounded/ColorLens'
@@ -23,6 +24,7 @@ import { LeftPanelLayoutTab } from 'components/pages/EditorPage/components/LeftP
 import { darken, lighten } from 'polished'
 import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
 import { css } from '@emotion/react'
+import { LeftPanelIconsTab } from 'components/pages/EditorPage/components/LeftPanelIconsTab'
 
 const PageLayoutWrapper = styled.div`
   display: flex;
@@ -200,14 +202,15 @@ export const EditorPage = observer(() => {
               <TextFields className="icon" />
               Words
             </LeftNavbarBtn>
-            {/* <LeftNavbarBtn
+            <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.setLeftPanelTab('symbols')
+                store.setLeftPanelTab('symbols')
               }}
-              active={editorPageStore.activeLeftTab === 'symbols'}
+              active={store.activeLeftTab === 'symbols'}
             >
+              <Face className="icon" />
               Icons
-            </LeftNavbarBtn> */}
+            </LeftNavbarBtn>
 
             <LeftNavbarBtn
               onClick={() => {
@@ -234,6 +237,9 @@ export const EditorPage = observer(() => {
             {store.activeLeftTab === 'shapes' && <LeftPanelShapesTab />}
             {store.activeLeftTab === 'words' && (
               <LeftPanelWordsTab type="shape" />
+            )}
+            {store.activeLeftTab === 'symbols' && (
+              <LeftPanelIconsTab type="shape" />
             )}
             {store.activeLeftTab === 'colors' && <LeftPanelColorsTab />}
 
