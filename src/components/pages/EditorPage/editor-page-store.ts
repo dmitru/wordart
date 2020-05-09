@@ -9,6 +9,7 @@ type LeftPanelTab = 'shapes' | 'words' | 'symbols' | 'colors' | 'layout'
 
 export type ShapeStyle = {
   bgColor: string
+  bgOpacity: number
 
   itemsColorKind: 'color' | 'gradient'
   itemsColor: string
@@ -77,7 +78,8 @@ export class EditorPageStore {
   @observable activeLeftTab: LeftPanelTab = 'shapes'
 
   @observable shapeStyle: ShapeStyle = {
-    bgColor: '#576DC733',
+    bgColor: '#576DC7',
+    bgOpacity: 0.3,
     // bgColor: '#ffffff',
     itemsColorKind: 'gradient',
     itemsColor: '#970707',
@@ -105,6 +107,7 @@ export class EditorPageStore {
       assignBy: 'random',
     },
     bgColor: '#ffffff',
+    bgOpacity: 1,
     shapePadding: 3,
     itemDensity: 20,
     itemSize: 70,

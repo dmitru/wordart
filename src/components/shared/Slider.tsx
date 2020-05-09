@@ -55,7 +55,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
         values={[value]}
         step={step}
         onUpdate={(value) => onChange(value[0])}
-        onChange={(value) => onAfterChange(value[0])}
+        onSlideEnd={(value) => onAfterChange(value[0])}
         css={css`
           position: relative;
           height: 30px;

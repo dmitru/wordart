@@ -94,6 +94,12 @@ export class Editor {
     }
   }
 
+  setShapeFillOpacity = (opacity: number) => {
+    if (this.paperItems.shape) {
+      this.paperItems.shape.opacity = opacity
+    }
+  }
+
   setItemsColor = (type: 'shape' | 'background', coloring: ItemsColoring) => {
     let colors: string[] = []
     if (coloring.kind === 'single-color') {
@@ -163,7 +169,6 @@ export class Editor {
           )
       )
       shapeItemGroup.fillColor = new paper.Color(this.store.shapeStyle.bgColor)
-      console.log('shapeItemGroup', shapeItemGroup)
       shapeItem = shapeItemGroup
     } else {
       const shapeItemRaster: paper.Raster = await new Promise<paper.Raster>(
@@ -189,6 +194,7 @@ export class Editor {
 
     shapeItem.position = sceneBounds.center
 
+    shapeItem.opacity = this.store.shapeStyle.bgOpacity
     shapeItem.insertAbove(this.paperItems.bgRect)
     this.paperItems.shape = shapeItem
 
@@ -196,6 +202,7 @@ export class Editor {
     this.paperItems.shapeItemsGroup = undefined
     this.paperItems.bgItemsGroup?.remove()
     this.paperItems.bgItemsGroup = undefined
+
     this.shapes = undefined
   }
 

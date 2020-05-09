@@ -75,8 +75,8 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                 value={style.itemsColor}
                 onChange={(hex) => {
                   style.itemsColor = hex
-                  updateColoring()
                 }}
+                onAfterChange={updateColoring}
               />
             )}
             {style.itemsColorKind === 'gradient' && (
@@ -85,15 +85,15 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   value={style.itemsColorGradient.from}
                   onChange={(hex) => {
                     style.itemsColorGradient.from = hex
-                    updateColoring()
                   }}
+                  onAfterChange={updateColoring}
                 />
                 <ColorPicker
                   value={style.itemsColorGradient.to}
                   onChange={(hex) => {
                     style.itemsColorGradient.to = hex
-                    updateColoring()
                   }}
+                  onAfterChange={updateColoring}
                 />
               </>
             )}
@@ -107,8 +107,8 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             onChange={(value) => {
               const val = (value as any) as number
               style.dimSmallerItems = val
-              updateColoring()
             }}
+            onAfterChange={updateColoring}
             min={0}
             max={100}
             step={1}
@@ -121,22 +121,21 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             disableAlpha
             value={chroma(style.bgColor).alpha(1).hex()}
             onChange={(hex) => {
-              const a = chroma(style.bgColor).alpha()
-              const color = chroma(hex).alpha(a).hex()
-              style.bgColor = color
-              editorPageStore.editor?.setShapeFillColor(color)
+              style.bgColor = chroma(hex).hex()
+            }}
+            onAfterChange={() => {
+              editorPageStore.editor?.setShapeFillColor(style.bgColor)
             }}
           />
           <Box>
             <Slider
-              label="Transparency"
-              value={chroma(style.bgColor).alpha() * 100}
+              label="Opacity"
+              value={100 * style.bgOpacity}
               onChange={(value) => {
-                const color = chroma(style.bgColor)
-                  .alpha(value / 100)
-                  .hex()
-                style.bgColor = color
-                editorPageStore.editor?.setShapeFillColor(color)
+                style.bgOpacity = value / 100
+              }}
+              onAfterChange={(value) => {
+                editorPageStore.editor?.setShapeFillOpacity(value / 100)
               }}
               min={0}
               max={100}
@@ -151,7 +150,11 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             value={backgroundStyle.bgColor}
             onChange={(hex) => {
               backgroundStyle.bgColor = hex
-              editorPageStore.editor?.setBackgroundColor(hex)
+            }}
+            onAfterChange={() => {
+              editorPageStore.editor?.setBackgroundColor(
+                backgroundStyle.bgColor
+              )
             }}
           />
         </Box>
