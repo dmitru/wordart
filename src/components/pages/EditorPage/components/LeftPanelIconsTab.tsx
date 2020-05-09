@@ -49,7 +49,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
     return (
       <>
         <Label>{state.isAdding ? 'Add Icon' : 'Icons'}</Label>
-        <Toolbar mt={2} display="flex" alignItems="center">
+        <Toolbar display="flex" alignItems="center">
           {!state.isAdding && (
             <>
               <Button

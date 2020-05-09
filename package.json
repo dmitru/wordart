@@ -38,6 +38,7 @@
     "@types/seedrandom": "^2.4.28",
     "@types/styled-system__should-forward-prop": "^5.1.1",
     "babel-plugin-module-resolver": "^4.0.0",
+    "canvas": "^2.6.1",
     "chroma-js": "^2.1.0",
     "emotion": "^11.0.0-next.10",
     "emotion-server": "^11.0.0-next.10",

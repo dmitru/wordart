@@ -261,6 +261,15 @@ export class Editor {
     )
     shapeRaster.remove()
 
+    const wordFonts = await Promise.all(
+      style.wordFonts.map((fontId) => {
+        const { style } = this.store.getFontById(fontId)!
+        return loadFont(style.url)
+      })
+    )
+
+    console.log('wordFonts = ', wordFonts)
+
     const result = await this.generator.fillShape({
       shape: {
         canvas: shapeCanvas,
@@ -276,7 +285,7 @@ export class Editor {
         angles: style.angles,
         fillColors: ['red'],
         // fonts: [fonts[0], fonts[1], fonts[2]],
-        fonts: isBackground ? [fonts[1]] : fonts,
+        fonts: wordFonts,
       })),
       icons: style.icons.map((shape) => ({
         shape: this.store.getShapeById(shape.shapeId)!,

@@ -8,19 +8,33 @@ import { Button } from 'components/shared/Button'
 import { Box } from 'components/shared/Box'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import { TextInput } from 'components/shared/TextInput'
+import { css } from '@emotion/react'
+import { observable } from 'mobx'
+import { uniq } from 'lodash'
 
 export type LeftPanelWordsTabProps = {
   type: 'shape' | 'background'
 }
 
-const Toolbar = styled(Box)``
-
 const WordList = styled(Box)``
+
+const WordDeleteButton = styled(Button)``
 
 const WordRow = styled(Box)`
   width: 100%;
   padding: 4px 0;
   display: flex;
+
+  ${WordDeleteButton} {
+    opacity: 0;
+    transition: 0.2s opacity;
+  }
+
+  &:hover {
+    ${WordDeleteButton} {
+      opacity: 1;
+    }
+  }
 `
 
 const WordTitleWrapper = styled(BaseBtn)`
@@ -72,60 +86,225 @@ const WordTitleInlineEditor: React.FC<{
   )
 }
 
+const FontDeleteButton = styled(Button)``
+
+const FontButton = styled(BaseBtn)`
+  border: none;
+  flex: 1;
+  display: inline-flex;
+  height: 38px;
+
+  img {
+    height: 30px;
+    margin: 0;
+    object-fit: contain;
+  }
+`
+FontButton.defaultProps = {
+  px: 2,
+  py: 1,
+}
+
+const FontButtonContainer = styled(Box)`
+  ${FontDeleteButton} {
+    opacity: 0;
+    transition: 0.2s opacity;
+  }
+
+  transition: 0.1s background;
+
+  &:hover {
+    background: ${(p) => p.theme.colors.light1};
+    ${FontDeleteButton} {
+      opacity: 1;
+    }
+  }
+`
+FontButtonContainer.defaultProps = {
+  display: 'flex',
+  alignItems: 'center',
+}
+
+const state = observable({
+  isAddingFont: false,
+  replacingFontIndex: undefined as undefined | number,
+})
+
+const Toolbar = styled(Box)``
+
 export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
   (props) => {
-    const { editorPageStore } = useStore()
-    const style = props.type
-      ? editorPageStore.shapeStyle
-      : editorPageStore.backgroundStyle
+    const { editorPageStore: store } = useStore()
+    const style = props.type ? store.shapeStyle : store.backgroundStyle
     const words = style.words
+
+    const fonts = store.getAvailableFonts()
 
     return (
       <>
-        <Label>Words</Label>
-        <Toolbar mt={2} display="flex" alignItems="center">
-          <Button
-            px={2}
-            py={1}
-            mr={2}
-            accent
-            onClick={() => editorPageStore.addEmptyWord(props.type)}
-          >
-            <evaicons.PlusOutline size="20" /> Add
-          </Button>
-          <Button
-            px={2}
-            py={1}
-            outline
-            onClick={() => editorPageStore.clearWords(props.type)}
-          >
-            Clear
-          </Button>
-        </Toolbar>
+        <Box mb={4}>
+          {state.isAddingFont && (
+            <>
+              <Label>Choose a Font</Label>
+              <Toolbar mb={3} display="flex" alignItems="center">
+                <Button
+                  px={2}
+                  py={1}
+                  mr={2}
+                  onClick={() => {
+                    state.isAddingFont = false
+                    state.replacingFontIndex = undefined
+                  }}
+                >
+                  Cancel
+                </Button>
+              </Toolbar>
+              {fonts.map((font) => {
+                const { style: fontStyle } = font
+                return (
+                  <>
+                    <FontButtonContainer>
+                      <FontButton
+                        onClick={() => {
+                          if (state.replacingFontIndex != null) {
+                            style.wordFonts = uniq(
+                              style.wordFonts.map((f, index) =>
+                                index === state.replacingFontIndex
+                                  ? fontStyle.fontId
+                                  : f
+                              )
+                            )
+                          } else {
+                            style.wordFonts = uniq([
+                              ...style.wordFonts,
+                              fontStyle.fontId,
+                            ])
+                          }
+                          state.isAddingFont = false
+                          state.replacingFontIndex = undefined
+                        }}
+                      >
+                        <img src={fontStyle.thumbnail} />
+                      </FontButton>
+                    </FontButtonContainer>
+                  </>
+                )
+              })}
+            </>
+          )}
+          {!state.isAddingFont && (
+            <>
+              <Label>Fonts</Label>
+              <Toolbar mb={3} display="flex" alignItems="center">
+                <Button
+                  px={2}
+                  py={1}
+                  mr={2}
+                  accent
+                  onClick={() => {
+                    state.isAddingFont = true
+                  }}
+                >
+                  <evaicons.PlusOutline size="20" /> Add
+                </Button>
+                <Button
+                  px={2}
+                  py={1}
+                  outline
+                  onClick={() => {
+                    style.wordFonts = [style.wordFonts[0]]
+                  }}
+                >
+                  Clear
+                </Button>
+              </Toolbar>
 
-        <WordList mt={2}>
-          {words.map((word) => (
-            <WordRow key={word.id}>
-              <WordTitleInlineEditor
-                value={word.text}
-                onChange={(value) => {
-                  editorPageStore.updateWord(props.type, word.id, {
-                    text: value,
-                  })
-                }}
-              />
+              {/* Added fonts */}
+              {style.wordFonts.map((fontId, index) => {
+                const { font, style: fontStyle } = store.getFontById(fontId)!
+                return (
+                  <>
+                    <FontButtonContainer>
+                      <FontButton
+                        onClick={() => {
+                          state.replacingFontIndex = index
+                          state.isAddingFont = true
+                        }}
+                      >
+                        <img src={fontStyle.thumbnail} />
+                      </FontButton>
 
+                      <FontDeleteButton
+                        px={2}
+                        py={0}
+                        ml={3}
+                        secondary
+                        outline
+                        onClick={() => {
+                          style.wordFonts = style.wordFonts.filter(
+                            (fId) => fId !== fontId
+                          )
+                        }}
+                      >
+                        <evaicons.CloseOutline size="20" />
+                      </FontDeleteButton>
+                    </FontButtonContainer>
+                  </>
+                )
+              })}
+            </>
+          )}
+        </Box>
+
+        {!state.isAddingFont && (
+          <Box>
+            <Label>Words</Label>
+            <Toolbar display="flex" alignItems="center">
               <Button
                 px={2}
-                py={2}
-                outline
-                onClick={() => editorPageStore.deleteWord(props.type, word.id)}
+                py={1}
+                mr={2}
+                accent
+                onClick={() => store.addEmptyWord(props.type)}
               >
-                <evaicons.CloseOutline size="20" />
+                <evaicons.PlusOutline size="20" /> Add
               </Button>
-            </WordRow>
-          ))}
-        </WordList>
+              <Button
+                px={2}
+                py={1}
+                outline
+                onClick={() => store.clearWords(props.type)}
+              >
+                Clear
+              </Button>
+            </Toolbar>
+
+            <WordList mt={2}>
+              {words.map((word) => (
+                <WordRow key={word.id}>
+                  <WordTitleInlineEditor
+                    value={word.text}
+                    onChange={(value) => {
+                      store.updateWord(props.type, word.id, {
+                        text: value,
+                      })
+                    }}
+                  />
+
+                  <WordDeleteButton
+                    px={2}
+                    py={2}
+                    secondary
+                    outline
+                    onClick={() => store.deleteWord(props.type, word.id)}
+                  >
+                    <evaicons.CloseOutline size="20" />
+                  </WordDeleteButton>
+                </WordRow>
+              ))}
+            </WordList>
+          </Box>
+        )}
       </>
     )
   }

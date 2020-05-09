@@ -115,9 +115,18 @@ export class Generator {
       })
     )
 
-    const words = task.words.map(
-      (word, index) =>
-        new Word(`${index}`, word.wordConfigId, word.text, word.fonts[0])
+    const words = flatten(
+      task.words.map((word, index) =>
+        word.fonts.map(
+          (font, fontIndex) =>
+            new Word(
+              `${index}-${fontIndex}`,
+              word.wordConfigId,
+              word.text,
+              font
+            )
+        )
+      )
     )
     const wordPaths = words.map((word) =>
       word.font.getPath(word.text, 0, 0, 100)
@@ -129,7 +138,7 @@ export class Generator {
     const placedWordItems: WordItem[] = []
     const placedSymbolItems: SymbolItem[] = []
 
-    const nIter = 400
+    const nIter = 800
     const t1 = performance.now()
 
     const wordAngles = uniq(flatten(task.words.map((w) => w.angles)))

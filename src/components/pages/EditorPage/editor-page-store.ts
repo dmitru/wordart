@@ -4,6 +4,7 @@ import { Editor, EditorInitParams } from 'components/pages/EditorPage/editor'
 import { icons } from 'data/shapes'
 import { sample, range } from 'lodash'
 import { iconsFaRegular } from 'data/shapes-fa-regular'
+import { FontConfig, fonts, FontId, FontStyleConfig } from 'data/fonts'
 
 type LeftPanelTab = 'shapes' | 'words' | 'symbols' | 'colors' | 'layout'
 
@@ -17,6 +18,7 @@ export type ShapeStyle = {
   dimSmallerItems: number
 
   words: WordConfig[]
+  wordFonts: FontId[]
   icons: IconConfig[]
   angles: number[]
   shapePadding: number
@@ -83,7 +85,7 @@ export class EditorPageStore {
 
   @observable shapeStyle: ShapeStyle = {
     bgColor: '#576DC7',
-    bgOpacity: 0.3,
+    bgOpacity: 0.1,
     iconsMaxSize: 30,
     iconsProportion: 20,
     // bgColor: '#ffffff',
@@ -98,11 +100,13 @@ export class EditorPageStore {
     shapePadding: 25,
     itemDensity: 85,
     wordsMaxSize: 70,
+    wordFonts: [fonts[0].styles[0].fontId, fonts[1].styles[0].fontId],
     words: defaultWordsConfig,
-    icons: range(10).map(() => ({ shapeId: sample(svgIconsOutline)!.id })),
+    icons: [],
+    // icons: range(10).map(() => ({ shapeId: sample(svgIconsOutline)!.id })),
     fitWithinShape: true,
-    // angles: [0],
-    angles: [-15, 20, 34, -76, 84, -65, 81],
+    angles: [0],
+    // angles: [-15, 20, 34, -76, 84, -65, 81],
   }
   @observable backgroundStyle: ShapeStyle = {
     itemsColorKind: 'gradient',
@@ -118,6 +122,7 @@ export class EditorPageStore {
     bgOpacity: 1,
     shapePadding: 3,
     itemDensity: 20,
+    wordFonts: [fonts[0].styles[0].fontId],
     wordsMaxSize: 70,
     dimSmallerItems: 50,
     words: defaultWordsConfig2,
@@ -152,6 +157,28 @@ export class EditorPageStore {
   getAvailableShapes = (): ShapeConfig[] => shapes
   getShapeById = (shapeId: ShapeId): ShapeConfig | undefined =>
     shapes.find((s) => s.id === shapeId)
+
+  getAvailableFonts = (): { font: FontConfig; style: FontStyleConfig }[] => {
+    const result: { font: FontConfig; style: FontStyleConfig }[] = []
+    for (const font of fonts) {
+      for (const style of font.styles) {
+        result.push({ font, style })
+      }
+    }
+    return result
+  }
+  getFontById = (
+    fontId: FontId
+  ): { font: FontConfig; style: FontStyleConfig } | undefined => {
+    for (const font of fonts) {
+      for (const style of font.styles) {
+        if (style.fontId === fontId) {
+          return { font, style }
+        }
+      }
+    }
+    return undefined
+  }
 
   getSelectedShape = () => {
     return this.availableShapes.find((s) => s.id === this.selectedShapeId)!
