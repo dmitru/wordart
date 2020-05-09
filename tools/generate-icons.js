@@ -23,7 +23,7 @@ async function processIcons(dirPath) {
 }
 
 async function main() {
-  const solidIcons = await processIcons('shapes/svg/fontawesome/solid/')
+  const solidIcons = await processIcons('shapes/svg/fontawesome/regular/')
 
   const allIcons = [...solidIcons]
 
@@ -38,7 +38,7 @@ async function main() {
     .join(',\n')}]
   `
 
-  const resultFile = path.join(__dirname, '..', 'src/data/shapes.ts')
+  const resultFile = path.join(__dirname, '..', 'src/data/shapes-fa-regular.ts')
   fs.promises.writeFile(resultFile, exportString)
 }
 

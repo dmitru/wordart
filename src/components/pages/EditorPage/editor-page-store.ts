@@ -3,6 +3,7 @@ import { RootStore } from 'root-store'
 import { Editor, EditorInitParams } from 'components/pages/EditorPage/editor'
 import { icons } from 'data/shapes'
 import { sample, range } from 'lodash'
+import { iconsFaRegular } from 'data/shapes-fa-regular'
 
 type LeftPanelTab = 'shapes' | 'words' | 'symbols' | 'colors' | 'layout'
 
@@ -90,7 +91,7 @@ export class EditorPageStore {
     itemDensity: 85,
     itemSize: 70,
     words: defaultWordsConfig,
-    icons: range(5).map(() => ({ shapeId: sample(svgIcons)!.id })),
+    icons: range(10).map(() => ({ shapeId: sample(svgIconsOutline)!.id })),
     fitWithinShape: true,
     // angles: [0],
     angles: [-15, 20, 34, -76, 84, -65, 81],
@@ -207,17 +208,17 @@ export type IconConfig = {
 export type WordConfigId = number
 
 const defaultWordsConfig: WordConfig[] = [
-  'O',
-  '8',
-  // 'cloud',
-  // 'art',
-  // 'amazing',
-  // 'beautiful',
-  // 'drawing',
-  // 'wow',
-  // 'impress',
-  // 'stunning',
-  // 'creative',
+  // 'O',
+  // '8',
+  'cloud',
+  'art',
+  'amazing',
+  'beautiful',
+  'drawing',
+  'wow',
+  'impress',
+  'stunning',
+  'creative',
 ].map((s, index) => ({ id: index, text: s } as WordConfig))
 
 const defaultWordsConfig2: WordConfig[] = [
@@ -247,6 +248,20 @@ const svgIcons: ShapeConfig[] = [
     icon
       ? ({
           id: 100 + index,
+          kind: 'svg',
+          title: icon.title,
+          url: icon.url,
+        } as ShapeConfig)
+      : null
+  )
+  .filter((x) => x != null) as ShapeConfig[]
+
+const svgIconsOutline: ShapeConfig[] = [...iconsFaRegular.slice(0, 200)]
+  .filter((i) => i != null)
+  .map((icon, index) =>
+    icon
+      ? ({
+          id: 1000 + index,
           kind: 'svg',
           title: icon.title,
           url: icon.url,
@@ -295,4 +310,5 @@ const shapes: ShapeConfig[] = [
     fill: 'green',
   },
   ...svgIcons,
+  ...svgIconsOutline,
 ]

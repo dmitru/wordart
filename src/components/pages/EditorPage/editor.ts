@@ -105,15 +105,23 @@ export class Editor {
     const paperColors = colors.map((color) => new paper.Color(color))
 
     const itemAreas = this.itemsShape.map((item) => {
-      if (item.kind !== 'word') {
-        return 0
+      if (item.kind === 'word') {
+        const wordPathBb = item.wordPathBounds
+        const scaling = item.transform.scaling
+        const wordH = (wordPathBb.y2 - wordPathBb.y1) * scaling.y
+        const wordW = (wordPathBb.x2 - wordPathBb.x1) * scaling.x
+        const wordArea = Math.sqrt(wordH * wordW)
+        return wordArea
       }
-      const wordPathBb = item.wordPathBounds
-      const scaling = item.transform.scaling
-      const wordH = (wordPathBb.y2 - wordPathBb.y1) * scaling.y
-      const wordW = (wordPathBb.x2 - wordPathBb.x1) * scaling.x
-      const wordArea = Math.sqrt(wordH * wordW)
-      return wordArea
+
+      if (item.kind === 'symbol') {
+        const bounds = item.symbolDef.item.bounds
+        const w = bounds.width * item.transform.scaling.x
+        const h = bounds.height * item.transform.scaling.y
+        return Math.sqrt(w * h)
+      }
+
+      return 0
     })
     const maxArea = max(itemAreas)!
     const minArea = min(itemAreas)!
@@ -128,7 +136,7 @@ export class Editor {
       if (!path) {
         continue
       }
-      if (item.kind !== 'word') {
+      if (item.kind !== 'word' && item.kind !== 'symbol') {
         continue
       }
 
@@ -256,15 +264,19 @@ export class Editor {
       itemSize: style.itemSize,
       words: style.words.map((wc) => ({
         wordConfigId: wc.id,
+        text: wc.text,
         angles: style.angles,
         fillColors: ['red'],
         // fonts: [fonts[0], fonts[1], fonts[2]],
-        fonts: isBackground ? [fonts[1]] : [fonts[2]],
-        text: wc.text,
+        fonts: isBackground ? [fonts[1]] : fonts,
       })),
+      icons: style.icons.map((shape) => ({
+        shape: this.store.getShapeById(shape.shapeId)!,
+      })),
+      iconProbability: 0.2,
     })
 
-    this.itemsShape = result.items
+    this.itemsShape = result.placedItems
 
     const addedItems: paper.Item[] = []
     let img: HTMLImageElement | null = null
@@ -274,9 +286,14 @@ export class Editor {
 
     const coloring = this.store.getItemColoring(type)
 
-    for (const item of result.items) {
-      // TODO: convert result items into paper paths
-      if (item.kind === 'img') {
+    for (const item of result.placedItems) {
+      if (item.kind === 'symbol') {
+        const itemInstance = item.symbolDef.item.clone()
+        // itemInstance.fillColor = new paper.Color('red')
+        itemInstance.transform(item.transform)
+        addedItems.push(itemInstance)
+        itemIdToPaperItem.set(item.id, itemInstance)
+      } else if (item.kind === 'img') {
         if (!img) {
           const imgUri = item.ctx.canvas.toDataURL()
           img = await fetchImage(imgUri)
@@ -286,10 +303,11 @@ export class Editor {
         const w = itemImg.bounds.width
         const h = itemImg.bounds.height
         itemImg.position = new paper.Point(
-          item.transform.e + w / 2,
-          item.transform.f + h / 2
+          item.transform.tx + w / 2,
+          item.transform.ty + h / 2
         )
         addedItems.push(itemImg)
+        itemIdToPaperItem.set(item.id, itemImg)
       } else if (item.kind === 'word') {
         const wordId = item.word.id
 
