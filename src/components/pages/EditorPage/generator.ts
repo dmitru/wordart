@@ -78,25 +78,42 @@ export class Generator {
     const icons = task.icons
     const iconSymbolDefs: paper.SymbolDefinition[] = []
     const iconRasterCanvases: HTMLCanvasElement[] = []
+    const iconsBounds: Rect[] = []
 
-    for (const icon of icons) {
-      const shapeItemGroup: paper.Group = await new Promise<paper.Group>(
-        (resolve) =>
-          new paper.Item().importSVG(icon.shape.url, (item: paper.Item) =>
-            resolve(item as paper.Group)
-          )
-      )
-      shapeItemGroup.fillColor = new paper.Color('black')
-      const iconSymDef = new paper.SymbolDefinition(shapeItemGroup)
-      iconSymbolDefs.push(iconSymDef)
+    await Promise.all(
+      icons.map(async (icon) => {
+        const shapeItemGroup: paper.Group = await new Promise<paper.Group>(
+          (resolve) =>
+            new paper.Item().importSVG(icon.shape.url, (item: paper.Item) =>
+              resolve(item as paper.Group)
+            )
+        )
+        shapeItemGroup.fillColor = new paper.Color('black')
+        shapeItemGroup.scale(
+          shapeCanvasMaxExtent /
+            Math.max(
+              shapeItemGroup.bounds.width,
+              shapeItemGroup.bounds.height
+            ) /
+            2
+        )
+        const iconSymDef = new paper.SymbolDefinition(shapeItemGroup)
+        iconSymbolDefs.push(iconSymDef)
 
-      const raster = iconSymDef.item.rasterize(40, false)
-      console.log('raster.width', raster.width)
-      const rasterCanvas = raster.getSubCanvas(
-        new paper.Rectangle(0, 0, raster.width, raster.height)
-      )
-      iconRasterCanvases.push(rasterCanvas)
-    }
+        const raster = iconSymDef.item.rasterize(40, false)
+        const rasterCanvas = raster.getSubCanvas(
+          new paper.Rectangle(0, 0, raster.width, raster.height)
+        )
+        iconRasterCanvases.push(rasterCanvas)
+        const iconBounds = iconSymDef.item.bounds
+        iconsBounds.push({
+          x: Math.round(iconBounds.left),
+          y: Math.round(iconBounds.top),
+          h: Math.round(iconBounds.height),
+          w: Math.round(iconBounds.width),
+        })
+      })
+    )
 
     const words = task.words.map(
       (word, index) =>
@@ -112,7 +129,7 @@ export class Generator {
     const placedWordItems: WordItem[] = []
     const placedSymbolItems: SymbolItem[] = []
 
-    const nIter = 100
+    const nIter = 400
     const t1 = performance.now()
 
     const wordAngles = uniq(flatten(task.words.map((w) => w.angles)))
@@ -394,8 +411,6 @@ export class Generator {
         } = rotationInfo
         // console.log('i = ', i, angle)
 
-        const iconBounds = iconSymDef.item.bounds
-
         let scale = 1 - (0.5 * i) / nIter
         // let scale = 1
 
@@ -429,9 +444,10 @@ export class Generator {
           h: rotatedCanvasDimensions.h,
         }
 
+        const iconBounds = iconsBounds[iconIndex]
         const iconDims: Dimensions = {
-          w: iconBounds.width,
-          h: iconBounds.height,
+          w: iconBounds.w,
+          h: iconBounds.h,
         }
         const aspect = iconDims.w / iconDims.h
 
@@ -495,11 +511,11 @@ export class Generator {
           const dy = Math.max(largestRect.h - iconScale * iconDims.h, 0)
 
           const tx =
-            largestRect.x - iconScale * iconBounds.left + Math.random() * dx
+            largestRect.x - iconScale * iconBounds.x + Math.random() * dx
           const ty =
             largestRect.y +
             largestRect.h -
-            iconScale * (iconBounds.top + iconBounds.height) -
+            iconScale * (iconBounds.y + iconBounds.h) -
             Math.random() * dy
           shapeCtx.translate(tx, ty)
           shapeCtx.scale(iconScale, iconScale)
@@ -508,26 +524,26 @@ export class Generator {
           // console.log('rasterCanvas: ', rasterCanvas.width, rasterCanvas.height)
           // console.log(
           //   'iconBounds: ',
-          //   iconBounds.left,
-          //   iconBounds.top,
-          //   iconBounds.width,
-          //   iconBounds.height
+          //   iconBounds.x,
+          //   iconBounds.y,
+          //   iconBounds.w,
+          //   iconBounds.h
           // )
           // console.log('---------------------')
 
-          shapeCtx.imageSmoothingEnabled = false
+          // shapeCtx.imageSmoothingEnabled = false
           shapeCtx.drawImage(
             rasterCanvas,
             0,
             0,
             rasterCanvas.width,
             rasterCanvas.height,
-            iconBounds.left,
-            iconBounds.top,
+            iconBounds.x,
+            iconBounds.y,
             // rasterCanvas.width,
             // rasterCanvas.height
-            iconBounds.width,
-            iconBounds.height
+            iconBounds.w,
+            iconBounds.h
           )
 
           placedSymbolItems.push({
