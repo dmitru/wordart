@@ -126,17 +126,18 @@ export class Generator {
       rotatedBounds.rotate(angle, new paper.Point(0, 0))
       const rotatedBoundsAabb = rotatedBounds.bounds
 
-      const rotatedBoundsScaleX = shapeCanvasMaxExtent / rotatedBoundsAabb.width
-      const rotatedBoundsScaleY =
+      const rotatedBoundsScaleX1 =
+        shapeCanvasMaxExtent / rotatedBoundsAabb.width
+      const rotatedBoundsScaleY1 =
         shapeCanvasMaxExtent / rotatedBoundsAabb.height
-      // const rotatedBoundsScaleX = Math.max(
-      //   rotatedBoundsScaleX1,
-      //   rotatedBoundsScaleY1
-      // )
-      // const rotatedBoundsScaleY = Math.max(
-      //   rotatedBoundsScaleX1,
-      //   rotatedBoundsScaleY1
-      // )
+      const rotatedBoundsScaleX = Math.max(
+        rotatedBoundsScaleX1,
+        rotatedBoundsScaleY1
+      )
+      const rotatedBoundsScaleY = Math.max(
+        rotatedBoundsScaleX1,
+        rotatedBoundsScaleY1
+      )
 
       const rotatedCanvasDimensions: Dimensions = {
         w: Math.round(rotatedBoundsAabb.width * rotatedBoundsScaleX),
