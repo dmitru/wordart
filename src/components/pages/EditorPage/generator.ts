@@ -45,13 +45,13 @@ export class Generator {
     }
     this.logger.debug('Generator: generate', task)
 
-    const shapeCanvasSize = 300
+    const shapeCanvasMaxExtent = 300
     // const shapeCanvasMaxPixelCount = shapeCanvasSize * shapeCanvasSize
 
     const shapeCanvas = task.shape.canvas
     console.screenshot(shapeCanvas, 0.3)
     const shapeCanvasScale =
-      shapeCanvasSize / Math.max(shapeCanvas.width, shapeCanvas.height)
+      shapeCanvasMaxExtent / Math.max(shapeCanvas.width, shapeCanvas.height)
     // const shapePixelsCount = shapeCanvas.width * shapeCanvas.height
     // const shapeCanvasScale = Math.sqrt(
     //   shapeCanvasMaxPixelCount / shapePixelsCount
@@ -77,7 +77,7 @@ export class Generator {
     clampPixelOpacityUp(shapeCtx.canvas)
     shrinkShape(
       shapeCtx.canvas,
-      (task.shapePadding / 100) * 5 * (shapeCanvasSize / 100)
+      (task.shapePadding / 100) * 5 * (shapeCanvasMaxExtent / 100)
     )
 
     const imageProcessor = new ImageProcessorWasm(this.wasm)
@@ -95,7 +95,7 @@ export class Generator {
 
     const placedWords: WordItem[] = []
 
-    const nIter = 500
+    const nIter = 400
     const usePreciseShapesEvery = 10
     const t1 = performance.now()
 
@@ -126,20 +126,32 @@ export class Generator {
       rotatedBounds.rotate(angle, new paper.Point(0, 0))
       const rotatedBoundsAabb = rotatedBounds.bounds
 
-      const rotatedCanvasDimensions: Dimensions = {
-        w: rotatedBoundsAabb.width,
-        h: rotatedBoundsAabb.height,
-      }
-
-      const rotatedBoundsScaleX =
-        rotatedCanvasDimensions.w / rotatedBoundsAabb.width
+      const rotatedBoundsScaleX = shapeCanvasMaxExtent / rotatedBoundsAabb.width
       const rotatedBoundsScaleY =
-        rotatedCanvasDimensions.h / rotatedBoundsAabb.height
+        shapeCanvasMaxExtent / rotatedBoundsAabb.height
+      // const rotatedBoundsScaleX = Math.max(
+      //   rotatedBoundsScaleX1,
+      //   rotatedBoundsScaleY1
+      // )
+      // const rotatedBoundsScaleY = Math.max(
+      //   rotatedBoundsScaleX1,
+      //   rotatedBoundsScaleY1
+      // )
 
-      const rotatedBoundsScale = Math.max(
-        rotatedBoundsScaleX,
-        rotatedBoundsScaleY
-      )
+      const rotatedCanvasDimensions: Dimensions = {
+        w: Math.round(rotatedBoundsAabb.width * rotatedBoundsScaleX),
+        h: Math.round(rotatedBoundsAabb.height * rotatedBoundsScaleY),
+      }
+      // console.log(
+      //   rotatedBoundsScaleX,
+      //   rotatedBoundsScaleY,
+      //   rotatedCanvasDimensions
+      // )
+
+      // const rotatedBoundsScale = Math.max(
+      //   rotatedBoundsScaleX,
+      //   rotatedBoundsScaleY
+      // )
 
       // bounds.scale(rotatedBoundsScale, rotatedBoundsScale)
 
@@ -161,7 +173,11 @@ export class Generator {
         .rotate(-angle, new paper.Point(0, 0))
         // .translate(rotatedBoundsAabb.center.multiply(-1))
         .translate(rotatedBoundsAabb.topLeft)
-      // .scale(rotatedBoundsScaleX, rotatedBoundsScaleY)
+        .scale(
+          1 / (rotatedCanvasDimensions.w / rotatedBoundsAabb.width),
+          1 / (rotatedCanvasDimensions.h / rotatedBoundsAabb.height),
+          new paper.Point(0, 0)
+        )
       // .scale(rotatedBoundsScale, rotatedBoundsScale)
 
       const rotatedBoundsTransformInverted = rotatedBoundsTransform.inverted()
@@ -247,8 +263,8 @@ export class Generator {
       //   rotatedCtx.canvas.width,
       //   rotatedCtx.canvas.height
       // )
+      // console.log(rotatedCanvasDimensions)
       // console.screenshot(rotatedCtx.canvas)
-      // console.screenshot(shapeCtx.canvas)
 
       const scratchImgData = rotatedCtx.getImageData(
         0,
@@ -280,13 +296,13 @@ export class Generator {
         w: largestRectWasm.w,
         h: largestRectWasm.h,
       }
-      // console.log('largestRect ', largestRect)
 
-      // const [largestRect,] = getLargestRect(
+      // const [largestRect] = getLargestRect(
       //   scratchImgData,
       //   scratchCanvasBounds,
       //   wordAspect
       // )
+      // console.log('largestRect ', largestRect)
 
       // shapeCtx.fillRect(...spreadRect(largestRect))
 
@@ -310,7 +326,7 @@ export class Generator {
 
       if (task.itemPadding > 0) {
         shapeCtx.shadowBlur =
-          (task.itemPadding / 100) * (shapeCanvasSize / 100) * 2
+          (task.itemPadding / 100) * (shapeCanvasMaxExtent / 100) * 2
         shapeCtx.shadowColor = 'red'
       } else {
         shapeCtx.shadowBlur = 0
@@ -318,12 +334,13 @@ export class Generator {
 
       if (
         pathScale * Math.min(largestRect.w, largestRect.h) >=
-        0.05 * (shapeCanvasSize / 360)
+        0.05 * (shapeCanvasMaxExtent / 360)
       ) {
         const dx = Math.max(largestRect.w - pathScale * wordPathSize.w, 0)
         const dy = Math.max(largestRect.h - pathScale * wordPathSize.h, 0)
 
-        const tx = largestRect.x + Math.random() * dx
+        const tx =
+          largestRect.x - pathScale * wordPathBounds.x1 + Math.random() * dx
         const ty =
           largestRect.y +
           largestRect.h -
@@ -370,9 +387,13 @@ export class Generator {
           Math.max(1.2, largestRect.h)
         )
       }
-      // shapeCtx.fillRect(...spreadRect(largestRect))
 
       shapeCtx.restore()
+      // shapeCtx.lineWidth = 3
+      // shapeCtx.strokeStyle = '#f009'
+      // shapeCtx.strokeRect(...spreadRect(largestRect))
+
+      // console.screenshot(shapeCtx.canvas)
 
       wordIndex = (wordIndex + 1) % words.length
     }

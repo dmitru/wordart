@@ -89,8 +89,8 @@ export class EditorPageStore {
     itemSize: 70,
     words: defaultWordsConfig,
     fitWithinShape: true,
-    angles: [0],
-    // angles: [-15, 20, 34, -76, 84, -65, 81],
+    // angles: [0],
+    angles: [-15, 20, 34, -76, 84, -65, 81],
   }
   @observable backgroundStyle: ShapeStyle = {
     itemsColorKind: 'gradient',
@@ -197,16 +197,17 @@ export type WordConfig = {
 export type WordConfigId = number
 
 const defaultWordsConfig: WordConfig[] = [
-  'word',
-  'cloud',
-  'art',
-  'amazing',
-  'beautiful',
-  'drawing',
-  'wow',
-  'impress',
-  'stunning',
-  'creative',
+  'O',
+  '8',
+  // 'cloud',
+  // 'art',
+  // 'amazing',
+  // 'beautiful',
+  // 'drawing',
+  // 'wow',
+  // 'impress',
+  // 'stunning',
+  // 'creative',
 ].map((s, index) => ({ id: index, text: s } as WordConfig))
 
 const defaultWordsConfig2: WordConfig[] = [
