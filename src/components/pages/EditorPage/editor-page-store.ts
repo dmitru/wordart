@@ -15,7 +15,7 @@ export type ShapeStyle = {
   bgColors: string[]
   bgOpacity: number
 
-  itemsColorKind: 'color' | 'gradient'
+  itemsColorKind: 'color' | 'gradient' | 'shape'
   itemsColor: string
   itemsColorGradient: ItemsColorGradient
   dimSmallerItems: number
@@ -42,7 +42,15 @@ export type ItemsColorGradient = {
   assignBy: 'random' | 'size'
 }
 
-export type ItemsColoring = ItemsColoringSingleColor | ItemsColoringGradient
+export type ItemsColoring =
+  | ItemsColoringShapeColor
+  | ItemsColoringSingleColor
+  | ItemsColoringGradient
+
+export type ItemsColoringShapeColor = {
+  kind: 'shape'
+  dimSmallerItems: number
+}
 
 export type ItemsColoringSingleColor = {
   kind: 'single-color'
@@ -92,7 +100,7 @@ export class EditorPageStore {
     iconsMaxSize: 30,
     iconsProportion: 20,
     // bgColor: '#ffffff',
-    itemsColorKind: 'gradient',
+    itemsColorKind: 'shape',
     itemsColor: '#970707',
     itemsColorGradient: {
       from: '#f45b5c',
@@ -100,10 +108,10 @@ export class EditorPageStore {
       assignBy: 'random',
     },
     dimSmallerItems: 20,
-    shapePadding: 25,
-    itemDensity: 85,
+    shapePadding: 15,
+    itemDensity: 95,
     wordsMaxSize: 70,
-    wordFonts: [fonts[0].styles[0].fontId, fonts[1].styles[0].fontId],
+    wordFonts: [fonts[3].styles[0].fontId, fonts[2].styles[0].fontId],
     words: defaultWordsConfig,
     icons: [],
     // icons: range(10).map(() => ({ shapeId: sample(svgIconsOutline)!.id })),
@@ -142,18 +150,23 @@ export class EditorPageStore {
         color: style.itemsColor,
         dimSmallerItems: style.dimSmallerItems,
       }
+    } else if (style.itemsColorKind === 'gradient') {
+      return {
+        kind: 'gradient',
+        colorFrom: style.itemsColorGradient.from,
+        colorTo: style.itemsColorGradient.to,
+        assignColorBy: style.itemsColorGradient.assignBy,
+        dimSmallerItems: style.dimSmallerItems,
+      }
     }
     return {
-      kind: 'gradient',
-      colorFrom: style.itemsColorGradient.from,
-      colorTo: style.itemsColorGradient.to,
-      assignColorBy: style.itemsColorGradient.assignBy,
+      kind: 'shape',
       dimSmallerItems: style.dimSmallerItems,
     }
   }
 
   @observable availableShapes: ShapeConfig[] = shapes
-  @observable selectedShapeId: ShapeId = shapes[6].id
+  @observable selectedShapeId: ShapeId = shapes[4].id
   @observable shapeColorsMap: SvgShapeColorsMap | null = null
 
   private nextWordId = defaultWordsConfig.length + 1

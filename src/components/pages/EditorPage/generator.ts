@@ -89,6 +89,7 @@ export class Generator {
             )
         )
         shapeItemGroup.fillColor = new paper.Color('black')
+        shapeItemGroup.strokeColor = new paper.Color('black')
         shapeItemGroup.scale(
           shapeCanvasMaxExtent /
             Math.max(

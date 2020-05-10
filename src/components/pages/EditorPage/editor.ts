@@ -1,36 +1,19 @@
 import {
   EditorPageStore,
-  ItemsColorGradient,
   ItemsColoring,
   ShapeId,
 } from 'components/pages/EditorPage/editor-page-store'
-import {
-  fetchImage,
-  createCanvasCtx,
-  imageDataToCanvasCtx,
-} from 'lib/wordart/canvas-utils'
+import { fetchImage } from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
-import { getWasmModule } from 'lib/wordart/wasm/wasm-module'
-import { Rect, padRect } from 'lib/wordart/geometry'
-import {
-  ImageProcessorWasm,
-  ShapeWasm,
-} from 'lib/wordart/wasm/image-processor-wasm'
+import { ShapeWasm } from 'lib/wordart/wasm/image-processor-wasm'
 import { Generator, ItemId, Item } from 'components/pages/EditorPage/generator'
 import chroma from 'chroma-js'
 import paper from 'paper'
 import { loadFont } from 'lib/wordart/fonts'
-import * as tm from 'transformation-matrix'
-import { matrixToPaperTransform } from 'components/pages/EditorPage/paper-utils'
 import { Path } from 'opentype.js'
-import { sample, max, min, flatten, groupBy, sortBy } from 'lodash'
+import { max, min, flatten, groupBy, sortBy } from 'lodash'
 import seedrandom from 'seedrandom'
-
-const FONT_NAMES = [
-  'mountains-of-christmas_bold.ttf',
-  'mail-ray-stuff.ttf',
-  'Verona-Xlight.ttf',
-]
+import { color } from 'styled-system'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -46,7 +29,7 @@ export class Editor {
   shapes?: ShapeWasm[]
 
   paperItems: {
-    bgRect: paper.Path
+    bgRect?: paper.Path
     bgItemsGroup?: paper.Group
     bgWordIdToSymbolDef: Map<string, paper.SymbolDefinition>
     shape?: paper.Item
@@ -72,26 +55,30 @@ export class Editor {
 
     // @ts-ignore
     window['paper'] = paper
-    const bgRect = new paper.Path.Rectangle(
-      new paper.Point(0, 0),
-      new paper.Point(params.canvas.width, params.canvas.height)
-    )
-    bgRect.fillColor = new paper.Color(this.store.backgroundStyle.bgColors[0])
+
     this.paperItems = {
-      bgRect,
       bgWordIdToSymbolDef: new Map(),
       shapeWordIdToSymbolDef: new Map(),
     }
+
+    this.setBackgroundColor(this.store.backgroundStyle.bgColors[0])
 
     // params.canvas.add
   }
 
   setBackgroundColor = (color: string) => {
-    this.paperItems.bgRect.fillColor = new paper.Color(color)
+    this.paperItems.bgRect?.remove()
+    const bgRect = new paper.Path.Rectangle(
+      new paper.Point(0, 0),
+      new paper.Point(this.params.canvas.width, this.params.canvas.height)
+    )
+    bgRect.fillColor = new paper.Color(color)
+    this.paperItems.bgRect = bgRect
   }
 
   setShapeFillColors = (colors: string[]) => {
-    console.log('setShapeFillColors', colors)
+    console.log('setShapeFillColors', colors, this.shapeColorsMap)
+
     const shapeConfig = this.store.getSelectedShape()
     if (shapeConfig.kind === 'img') {
       return
@@ -99,10 +86,14 @@ export class Editor {
     if (this.paperItems.shape) {
       if (this.shapeColorsMap) {
         this.shapeColorsMap.colors.forEach((colorEntry, entryIndex) => {
+          console.log(
+            `Setting color to ${colors[entryIndex]} for ${colorEntry.paperItems.length} items...`
+          )
           colorEntry.paperItems.forEach((item) => {
             item.fillColor = new paper.Color(
               colors[entryIndex] || colorEntry.originalColor
             )
+            item.strokeColor = item.fillColor
           })
         })
       } else {
@@ -118,14 +109,18 @@ export class Editor {
   }
 
   setItemsColor = (type: 'shape' | 'background', coloring: ItemsColoring) => {
-    let colors: string[] = []
-    if (coloring.kind === 'single-color') {
-      colors = [coloring.color]
-    } else {
-      const scale = chroma.scale([coloring.colorFrom, coloring.colorTo])
-      colors = scale.colors(10)
+    let paperColors: paper.Color[] = []
+
+    if (coloring.kind === 'gradient' || coloring.kind === 'single-color') {
+      let colors: string[] = []
+      if (coloring.kind === 'single-color') {
+        colors = [coloring.color]
+      } else if (coloring.kind === 'gradient') {
+        const scale = chroma.scale([coloring.colorFrom, coloring.colorTo])
+        colors = scale.colors(10)
+      }
+      paperColors = colors.map((color) => new paper.Color(color))
     }
-    const paperColors = colors.map((color) => new paper.Color(color))
 
     const itemAreas = this.itemsShape.map((item) => {
       if (item.kind === 'word') {
@@ -146,10 +141,12 @@ export class Editor {
 
       return 0
     })
+
     const maxArea = max(itemAreas)!
     const minArea = min(itemAreas)!
 
     const rng = seedrandom('fill color')
+    let shapeRaster: paper.Raster | undefined
 
     const dimSmallerFactor = coloring.dimSmallerItems / 100
     for (let i = 0; i < this.itemsShape.length; ++i) {
@@ -163,8 +160,17 @@ export class Editor {
         continue
       }
 
-      const index = Math.floor(rng() * paperColors.length)
-      path.fillColor = paperColors[index]
+      if (coloring.kind === 'gradient' || coloring.kind === 'single-color') {
+        const index = Math.floor(rng() * paperColors.length)
+        path.fillColor = paperColors[index]
+        path.strokeColor = path.fillColor
+      } else {
+        if (!shapeRaster) {
+          shapeRaster = this.paperItems.shape?.rasterize(undefined, false)
+        }
+        path.fillColor = shapeRaster!.getAverageColor(path.position)
+        path.strokeColor = path.fillColor
+      }
       path.opacity =
         (dimSmallerFactor * (area - minArea)) / (maxArea - minArea) +
         (1 - dimSmallerFactor)
@@ -247,8 +253,6 @@ export class Editor {
       colorsMap = { colors: colorEntries }
 
       shapeItem = shapeItemGroup
-
-      this.setShapeFillColors(colorEntries.map((c) => c.originalColor))
     } else {
       const shapeItemRaster: paper.Raster = await new Promise<paper.Raster>(
         (resolve) => {
@@ -271,10 +275,12 @@ export class Editor {
       shapeItem.scale(scale)
     }
 
+    paper.project.clear()
+    this.setBackgroundColor(this.store.backgroundStyle.bgColors[0])
     shapeItem.position = sceneBounds.center
 
     shapeItem.opacity = this.store.shapeStyle.bgOpacity
-    shapeItem.insertAbove(this.paperItems.bgRect)
+    shapeItem.insertAbove(this.paperItems.bgRect!)
     this.paperItems.shape = shapeItem
 
     this.paperItems.shapeItemsGroup?.remove()
@@ -285,6 +291,9 @@ export class Editor {
     this.shapes = undefined
 
     this.shapeColorsMap = colorsMap || null
+    if (colorsMap) {
+      this.setShapeFillColors(colorsMap.colors.map((c) => c.originalColor))
+    }
 
     return { colorsMap }
   }
@@ -308,36 +317,22 @@ export class Editor {
     this.logger.debug('Editor: generate')
 
     if (!this.paperItems.shape) {
-      console.log('checkpoint1')
       return
     }
-    console.log('checkpoint2')
     await this.generator.init()
-    console.log('checkpoint3')
-
-    const fonts = await Promise.all(
-      FONT_NAMES.map((fontName) => loadFont(`/fonts/${fontName}`))
-    )
-    // @ts-ignore
-    window['fonts'] = fonts
 
     if (!this.paperItems.shape) {
       return
     }
 
-    this.paperItems.shape?.insertAbove(this.paperItems.bgRect)
+    this.paperItems.shape?.insertAbove(this.paperItems.bgRect!)
 
-    const shapeItem = this.paperItems.shape.children
-      ? this.paperItems.shape.children[1]
-      : this.paperItems.shape
-
-    const color = shapeItem.fillColor
+    const shapeItem = this.paperItems.shape.clone({ insert: false })
     shapeItem.fillColor = new paper.Color('black')
     const shapeRaster = shapeItem.rasterize(
       this.paperItems.shape.view.resolution,
       false
     )
-    shapeItem.fillColor = color
 
     const shapeCanvas = shapeRaster.getSubCanvas(
       new paper.Rectangle(0, 0, shapeRaster.width, shapeRaster.height)

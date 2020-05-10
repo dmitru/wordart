@@ -46,6 +46,20 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             py={1}
             mr={0}
             borderRadius="none"
+            secondary={style.itemsColorKind === 'shape'}
+            outline={style.itemsColorKind !== 'shape'}
+            onClick={() => {
+              style.itemsColorKind = 'shape'
+              updateColoring()
+            }}
+          >
+            Shape
+          </Button>
+          <Button
+            px={2}
+            py={1}
+            mr={0}
+            borderRadius="none"
             secondary={style.itemsColorKind === 'color'}
             outline={style.itemsColorKind !== 'color'}
             onClick={() => {
