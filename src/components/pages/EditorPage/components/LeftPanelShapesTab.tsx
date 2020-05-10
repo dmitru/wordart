@@ -7,11 +7,14 @@ import { Modal } from 'components/shared/Modal'
 import { Slider } from 'components/shared/Slider'
 import { Box } from 'components/shared/Box'
 import { css } from '@emotion/react'
+import { Checkbox } from 'components/shared/Checkbox'
+import { ColorPicker } from 'components/shared/ColorPicker'
+import chroma from 'chroma-js'
 
 export type LeftPanelShapesTabProps = {}
 
 const state = observable({
-  showCustomize: true,
+  showCustomize: false,
 })
 
 export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
@@ -60,6 +63,26 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                 visualize()
               }}
             />
+
+            <Checkbox
+              label="Invert"
+              id="invert"
+              value={shapeStyle.processing.invert.enabled}
+              onChange={(value) => {
+                shapeStyle.processing.invert.enabled = value
+                visualize()
+              }}
+            />
+
+            {shapeStyle.processing.invert.enabled && (
+              <ColorPicker
+                value={shapeStyle.processing.invert.fillColor}
+                onChange={(color) => {
+                  shapeStyle.processing.invert.fillColor = chroma(color).hex()
+                  visualize()
+                }}
+              />
+            )}
           </Box>
         </Modal>
       </>

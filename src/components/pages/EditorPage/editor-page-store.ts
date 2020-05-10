@@ -117,7 +117,7 @@ export class EditorPageStore {
       },
       invert: {
         enabled: false,
-        fillColor: 'red,',
+        fillColor: 'red',
       },
     },
     // bgColor: '#ffffff',

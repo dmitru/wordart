@@ -10,6 +10,7 @@ import {
   shrinkShape,
   detectEdges,
   invertImageMask,
+  removeLightPixels,
 } from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
 import { getWasmModule, WasmModule } from 'lib/wordart/wasm/wasm-module'
@@ -58,6 +59,8 @@ export class Generator {
     }
 
     const shapeCtx = createCanvasCtx(shapeCanvasDimensions)
+    shapeCtx.fillStyle = '#f002'
+    shapeCtx.fillRect(0, 0, shapeCanvasDimensions.w, shapeCanvasDimensions.h)
     shapeCtx.drawImage(
       shapeCanvas,
       0,
@@ -69,6 +72,13 @@ export class Generator {
       shapeCtx.canvas.width - 2,
       shapeCtx.canvas.height - 2
     )
+
+    if (task.shape.processing.removeWhiteBg.enabled) {
+      removeLightPixels(
+        shapeCtx.canvas,
+        task.shape.processing.removeWhiteBg.lightnessThreshold / 100
+      )
+    }
 
     let edgesCanvas: HTMLCanvasElement | undefined
     if (
@@ -670,6 +680,12 @@ export type FillShapeTask = {
     canvas: HTMLCanvasElement
     bounds: paper.Rectangle
     processing: {
+      /** Pixels with lightness above the threshold will be made transparent */
+      removeWhiteBg: {
+        enabled: boolean
+        /** 0 - 100 */
+        lightnessThreshold: number
+      }
       shrink: {
         enabled: boolean
         /** Additional padding between shape and items, in percent (0 - 100) */

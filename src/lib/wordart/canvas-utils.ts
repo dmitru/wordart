@@ -142,6 +142,31 @@ export const clampPixelOpacityUp = (canvas: HTMLCanvasElement) => {
   ctx.putImageData(imgData, 0, 0)
 }
 
+export const removeLightPixels = (
+  canvas: HTMLCanvasElement,
+  threshold = 0.95
+) => {
+  const ctx = canvas.getContext('2d')!
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+  for (let row = 0; row < imgData.height; ++row) {
+    for (let col = 0; col < imgData.width; ++col) {
+      const r = imgData.data[(row * imgData.width + col) * 4 + 0]
+      const g = imgData.data[(row * imgData.width + col) * 4 + 1]
+      const b = imgData.data[(row * imgData.width + col) * 4 + 2]
+      const value = (r + r + g + g + g + b) / 6
+      // If the pixel isn't dark enough...
+      if (value >= 255 * threshold) {
+        // Make that pixel transparent
+        imgData.data[(row * imgData.width + col) * 4 + 0] = 255
+        imgData.data[(row * imgData.width + col) * 4 + 1] = 255
+        imgData.data[(row * imgData.width + col) * 4 + 2] = 255
+        imgData.data[(row * imgData.width + col) * 4 + 3] = 0
+      }
+    }
+  }
+  ctx.putImageData(imgData, 0, 0)
+}
+
 export const clampPixelOpacityDown = (canvas: HTMLCanvasElement) => {
   const ctx = canvas.getContext('2d')!
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)

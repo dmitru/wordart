@@ -368,11 +368,17 @@ export class Editor {
       })
     )
 
+    const shapeConfig = this.store.getSelectedShape()
+
     const result = await this.generator.fillShape({
       shape: {
         canvas: shapeCanvas,
         bounds: shapeRaster.bounds,
         processing: {
+          removeWhiteBg: {
+            enabled: shapeConfig.kind === 'img',
+            lightnessThreshold: 0.98,
+          },
           shrink: {
             enabled: style.shapePadding > 0,
             amount: style.shapePadding,
