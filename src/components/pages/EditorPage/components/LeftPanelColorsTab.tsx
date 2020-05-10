@@ -117,16 +117,19 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
         <Box mt={4}>
           <Label>Shape</Label>
-          <ColorPicker
-            disableAlpha
-            value={chroma(style.bgColor).alpha(1).hex()}
-            onChange={(hex) => {
-              style.bgColor = chroma(hex).hex()
-            }}
-            onAfterChange={() => {
-              editorPageStore.editor?.setShapeFillColor(style.bgColor)
-            }}
-          />
+          {style.bgColors.map((color, index) => (
+            <ColorPicker
+              key={index}
+              disableAlpha
+              value={chroma(color).alpha(1).hex()}
+              onChange={(hex) => {
+                style.bgColors[index] = chroma(hex).hex()
+              }}
+              onAfterChange={() => {
+                editorPageStore.editor?.setShapeFillColors(style.bgColors)
+              }}
+            />
+          ))}
           <Box>
             <Slider
               label="Opacity"
@@ -147,13 +150,13 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
         <Box mt={4}>
           <Label>Background</Label>
           <ColorPicker
-            value={backgroundStyle.bgColor}
+            value={backgroundStyle.bgColors[0]}
             onChange={(hex) => {
-              backgroundStyle.bgColor = hex
+              backgroundStyle.bgColors[0] = hex
             }}
             onAfterChange={() => {
               editorPageStore.editor?.setBackgroundColor(
-                backgroundStyle.bgColor
+                backgroundStyle.bgColors[0]
               )
             }}
           />

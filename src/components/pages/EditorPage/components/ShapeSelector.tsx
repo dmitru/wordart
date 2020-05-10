@@ -75,12 +75,11 @@ export const ShapeThumbnailBtn: React.FC<
         backgroundColor={backgroundColor}
         active={active}
         onClick={onClick}
-        fill={shape.fill || 'black'}
       >
         <ReactSVG
           src={shape.url}
           style={{
-            color: shape.fill || 'black',
+            color: shape.keepSvgColors ? undefined : shape.fill || 'black',
             width: `78px`,
             height: `78px`,
           }}

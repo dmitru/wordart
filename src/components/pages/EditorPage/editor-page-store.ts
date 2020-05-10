@@ -1,15 +1,18 @@
 import { observable, action, set, runInAction } from 'mobx'
 import { RootStore } from 'root-store'
-import { Editor, EditorInitParams } from 'components/pages/EditorPage/editor'
+import {
+  Editor,
+  EditorInitParams,
+  SvgShapeColorsMap,
+} from 'components/pages/EditorPage/editor'
 import { icons } from 'data/shapes'
-import { sample, range } from 'lodash'
 import { iconsFaRegular } from 'data/shapes-fa-regular'
 import { FontConfig, fonts, FontId, FontStyleConfig } from 'data/fonts'
 
 type LeftPanelTab = 'shapes' | 'words' | 'symbols' | 'colors' | 'layout'
 
 export type ShapeStyle = {
-  bgColor: string
+  bgColors: string[]
   bgOpacity: number
 
   itemsColorKind: 'color' | 'gradient'
@@ -84,7 +87,7 @@ export class EditorPageStore {
   @observable activeLeftTab: LeftPanelTab = 'shapes'
 
   @observable shapeStyle: ShapeStyle = {
-    bgColor: '#576DC7',
+    bgColors: ['#576DC7'],
     bgOpacity: 0.1,
     iconsMaxSize: 30,
     iconsProportion: 20,
@@ -118,7 +121,7 @@ export class EditorPageStore {
     },
     iconsMaxSize: 30,
     iconsProportion: 20,
-    bgColor: '#ffffff',
+    bgColors: ['#ffffff'],
     bgOpacity: 1,
     shapePadding: 3,
     itemDensity: 20,
@@ -151,6 +154,7 @@ export class EditorPageStore {
 
   @observable availableShapes: ShapeConfig[] = shapes
   @observable selectedShapeId: ShapeId = shapes[6].id
+  @observable shapeColorsMap: SvgShapeColorsMap | null = null
 
   private nextWordId = defaultWordsConfig.length + 1
 
@@ -190,14 +194,16 @@ export class EditorPageStore {
 
   @action selectShape = async (shapeId: ShapeId) => {
     if (this.editor) {
-      runInAction(() => {
-        this.selectedShapeId = shapeId
-      })
-      this.editor.updateBgShape()
+      this.selectedShapeId = shapeId
+      const shapeInfo = await this.editor.setBgShape(shapeId)
+      this.shapeColorsMap = shapeInfo.colorsMap || null
+      if (shapeInfo.colorsMap) {
+        this.shapeStyle.bgColors = shapeInfo.colorsMap.colors.map(
+          (cm) => cm.originalColor
+        )
+      }
     } else {
-      runInAction(() => {
-        this.selectedShapeId = shapeId
-      })
+      this.selectedShapeId = shapeId
     }
   }
 
@@ -269,6 +275,7 @@ const defaultWordsConfig2: WordConfig[] = [
 export type ShapeConfig = {
   id: ShapeId
   kind: ShapeKind
+  keepSvgColors?: boolean
   url: string
   title: string
   fill?: string
@@ -309,6 +316,41 @@ const svgIconsOutline: ShapeConfig[] = [...iconsFaRegular.slice(0, 200)]
   .filter((x) => x != null) as ShapeConfig[]
 
 const shapes: ShapeConfig[] = [
+  {
+    id: 1,
+    kind: 'svg',
+    title: 'Cat',
+    url: '/images/cat.svg',
+    keepSvgColors: true,
+  },
+  {
+    id: -1,
+    kind: 'svg',
+    title: 'Apple',
+    url: '/images/apple.svg',
+    keepSvgColors: true,
+  },
+  {
+    id: -2,
+    kind: 'svg',
+    title: 'Bear Face',
+    url: '/images/bear-face.svg',
+    keepSvgColors: true,
+  },
+  {
+    id: -3,
+    kind: 'svg',
+    title: 'Bear Side',
+    url: '/images/bear-side.svg',
+    keepSvgColors: true,
+  },
+  {
+    id: -4,
+    kind: 'svg',
+    title: 'Bear Belly',
+    url: '/images/bear-belly.svg',
+    keepSvgColors: true,
+  },
   {
     id: 2,
     kind: 'img',

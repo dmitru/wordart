@@ -145,7 +145,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         <Box mb={4}>
           {state.isAddingFont && (
             <>
-              <Label>Choose a Font</Label>
+              <Label>Choose Font</Label>
               <Toolbar mb={3} display="flex" alignItems="center">
                 <Button
                   px={2}
@@ -156,7 +156,8 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     state.replacingFontIndex = undefined
                   }}
                 >
-                  Cancel
+                  <evaicons.ArrowIosBackOutline className="icon" size="20" />{' '}
+                  Back
                 </Button>
               </Toolbar>
               {fonts.map((font) => {
