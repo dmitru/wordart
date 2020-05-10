@@ -17,7 +17,8 @@ import { getWasmModule, WasmModule } from 'lib/wordart/wasm/wasm-module'
 import { Rect, spreadRect } from 'lib/wordart/geometry'
 import { ImageProcessorWasm } from 'lib/wordart/wasm/image-processor-wasm'
 import { Path, BoundingBox } from 'opentype.js'
-import { sample, uniq, flatten } from 'lodash'
+import { sample, uniq, flatten, noop } from 'lodash'
+import { sleep } from 'utils/async'
 
 const FONT_SIZE = 100
 
@@ -40,13 +41,16 @@ export class Generator {
     this.items = []
   }
 
-  fillShape = async (task: FillShapeTask): Promise<FillShapeTaskResult> => {
+  fillShape = async (
+    task: FillShapeTask,
+    onProgressCallback: (progress: number) => void = noop
+  ): Promise<FillShapeTaskResult> => {
     if (!this.wasm) {
       throw new Error('call init() first')
     }
     this.logger.debug('Generator: generate', task)
 
-    const shapeCanvasMaxExtent = 320
+    const shapeCanvasMaxExtent = 280
 
     const shapeCanvas = task.shape.canvas
     console.screenshot(shapeCanvas, 0.3)
@@ -280,6 +284,8 @@ export class Generator {
     let iconIndex = 0
 
     let mostLargestRect: Rect | undefined
+
+    let tLastNotified = performance.now()
 
     for (let i = 0; i < nIter; ++i) {
       let type: 'word' | 'icon' = 'word'
@@ -655,7 +661,17 @@ export class Generator {
 
         iconIndex = (iconIndex + 1) % icons.length
       }
+
+      if (i % 30) {
+        const t2 = performance.now()
+        if (t2 - t1 > 50) {
+          tLastNotified = t2
+          // onProgressCallback(i / nIter)
+          // await sleep(10)
+        }
+      }
     }
+
     const t2 = performance.now()
 
     console.screenshot(shapeCtx.canvas, 1)

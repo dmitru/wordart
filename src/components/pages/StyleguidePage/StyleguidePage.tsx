@@ -5,7 +5,7 @@ import styled from '@emotion/styled'
 import { Button } from 'components/shared/Button'
 import { Checkbox } from 'components/shared/Checkbox'
 import { observable } from 'mobx'
-import { Box } from 'rebass'
+import { Box } from 'components/shared/Box'
 
 const PageLayoutWrapper = styled.div`
   margin: 50px auto;

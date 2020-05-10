@@ -12,7 +12,9 @@ import { FontConfig, fonts, FontId, FontStyleConfig } from 'data/fonts'
 type LeftPanelTab = 'shapes' | 'words' | 'symbols' | 'colors' | 'layout'
 
 export type ShapeStyle = {
-  bgColors: string[]
+  bgColorMap: string[]
+  bgColor: string
+  bgColorKind: 'color-map' | 'single-color'
   bgOpacity: number
 
   processing: {
@@ -84,6 +86,7 @@ export class EditorPageStore {
   }
 
   @observable isVisualizing = false
+  @observable visualizingProgress = null as number | null
 
   editor: Editor | null = null
   @observable state: 'initializing' | 'initialized' | 'destroyed' =
@@ -106,7 +109,9 @@ export class EditorPageStore {
   @observable activeLeftTab: LeftPanelTab = 'shapes'
 
   @observable shapeStyle: ShapeStyle = {
-    bgColors: ['#576DC7'],
+    bgColorKind: 'single-color',
+    bgColor: '#576DC7',
+    bgColorMap: ['#576DC7'],
     bgOpacity: 0.1,
     iconsMaxSize: 30,
     iconsProportion: 20,
@@ -160,7 +165,9 @@ export class EditorPageStore {
     },
     iconsMaxSize: 30,
     iconsProportion: 20,
-    bgColors: ['#ffffff'],
+    bgColorKind: 'single-color',
+    bgColor: 'white',
+    bgColorMap: ['#ffffff'],
     bgOpacity: 1,
     shapePadding: 3,
     itemDensity: 20,
@@ -242,8 +249,8 @@ export class EditorPageStore {
       const shapeInfo = await this.editor.setBgShape(shapeId)
       this.shapeColorsMap = shapeInfo.colorsMap || null
       if (shapeInfo.colorsMap) {
-        this.shapeStyle.bgColors = shapeInfo.colorsMap.colors.map(
-          (cm) => cm.originalColor
+        this.shapeStyle.bgColorMap = shapeInfo.colorsMap.colors.map(
+          (cm) => cm.fillColor
         )
       }
     } else {

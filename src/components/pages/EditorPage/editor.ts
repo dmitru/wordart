@@ -32,6 +32,7 @@ export class Editor {
     bgItemsGroup?: paper.Group
     bgWordIdToSymbolDef: Map<string, paper.SymbolDefinition>
     shape?: paper.Item
+    originalShape?: paper.Item
     shapeHbounds?: paper.Group
     shapeWordIdToSymbolDef: Map<string, paper.SymbolDefinition>
     shapeItemsGroup?: paper.Group
@@ -60,7 +61,7 @@ export class Editor {
       shapeWordIdToSymbolDef: new Map(),
     }
 
-    this.setBackgroundColor(this.store.backgroundStyle.bgColors[0])
+    this.setBackgroundColor(this.store.backgroundStyle.bgColorMap[0])
 
     // params.canvas.add
   }
@@ -72,32 +73,39 @@ export class Editor {
       new paper.Point(this.params.canvas.width, this.params.canvas.height)
     )
     bgRect.fillColor = new paper.Color(color)
+    if (this.paperItems.shape) {
+      bgRect.insertBelow(this.paperItems.shape)
+    }
     this.paperItems.bgRect = bgRect
   }
 
-  setShapeFillColors = (colors: string[]) => {
+  setShapeFillColors = (colors: string[], useColorMap = true) => {
     console.log('setShapeFillColors', colors, this.shapeColorsMap)
 
     const shapeConfig = this.store.getSelectedShape()
     if (shapeConfig.kind === 'img') {
       return
     }
-    if (this.paperItems.shape) {
-      if (this.shapeColorsMap) {
-        this.shapeColorsMap.colors.forEach((colorEntry, entryIndex) => {
-          console.log(
-            `Setting color to ${colors[entryIndex]} for ${colorEntry.paperItems.length} items...`
+
+    if (!this.paperItems.shape) {
+      return
+    }
+
+    if (this.shapeColorsMap && useColorMap) {
+      this.shapeColorsMap.colors.forEach((colorEntry, entryIndex) => {
+        console.log(
+          `Setting color to ${colors[entryIndex]}, ${colorEntry.strokeColor} for ${colorEntry.paperItems.length} items...`
+        )
+        colorEntry.paperItems.forEach((item) => {
+          item.fillColor = new paper.Color(
+            colors[entryIndex] || colorEntry.fillColor
           )
-          colorEntry.paperItems.forEach((item) => {
-            item.fillColor = new paper.Color(
-              colors[entryIndex] || colorEntry.originalColor
-            )
-            item.strokeColor = item.fillColor
-          })
+          item.strokeColor = new paper.Color(colorEntry.strokeColor)
         })
-      } else {
-        this.paperItems.shape.fillColor = new paper.Color(colors[0])
-      }
+      })
+    } else {
+      this.paperItems.shape.fillColor = new paper.Color(colors[0])
+      this.paperItems.shape.strokeColor = this.paperItems.shape.fillColor
     }
   }
 
@@ -146,6 +154,7 @@ export class Editor {
 
     const rng = seedrandom('fill color')
     let shapeRaster: paper.Raster | undefined
+    let shapeRasterImgData: ImageData | undefined
 
     const dimSmallerFactor = coloring.dimSmallerItems / 100
     for (let i = 0; i < this.itemsShape.length; ++i) {
@@ -164,10 +173,32 @@ export class Editor {
         path.fillColor = paperColors[index]
         path.strokeColor = path.fillColor
       } else {
-        if (!shapeRaster) {
+        if (!shapeRaster || !shapeRasterImgData) {
           shapeRaster = this.paperItems.shape?.rasterize(undefined, false)
+          shapeRasterImgData = shapeRaster!.getImageData(
+            new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
+          )
         }
-        path.fillColor = shapeRaster!.getAverageColor(path.position)
+        const imgDataPos = path.position.multiply(
+          shapeRasterImgData.width / shapeRaster!.width
+        )
+        imgDataPos.x = Math.round(imgDataPos.x)
+        imgDataPos.y = Math.round(imgDataPos.y)
+
+        const r =
+          shapeRasterImgData.data[
+            4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width)
+          ] / 255
+        const g =
+          shapeRasterImgData.data[
+            4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width) + 1
+          ] / 255
+        const b =
+          shapeRasterImgData.data[
+            4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width) + 2
+          ] / 255
+
+        path.fillColor = new paper.Color(r, g, b, 1)
         path.strokeColor = path.fillColor
       }
       path.opacity =
@@ -249,25 +280,49 @@ export class Editor {
         return undefined
       }
 
+      const getStrokeColor = (
+        items: paper.Item[],
+        level = 0,
+        maxLevel = 6
+      ): paper.Color | undefined => {
+        for (let item of items) {
+          if (item.strokeColor) {
+            return item.strokeColor
+          }
+          if (item.children && level < maxLevel) {
+            const color = getStrokeColor(item.children, level + 1)
+            if (color) {
+              return color
+            }
+          }
+        }
+        return undefined
+      }
+
       const colorEntries: SvgShapeColorsMapEntry[] = []
       if (Object.keys(namedChildrenByColor).length > 0) {
         Object.keys(namedChildrenByColor).forEach((colorKey) => {
           const children = namedChildrenByColor[colorKey]
-          const color = (
+          const fillColor = (
             getFillColor(children.map((c) => c.item)) ||
             new paper.Color('black')
           ).toCSS(true)
+          const strokeColor = (
+            getStrokeColor(children.map((c) => c.item)) ||
+            new paper.Color('black')
+          ).toCSS(true)
+
           colorEntries.push({
             paperItems: children.map((c) => c.item),
-            color,
-            originalColor: color,
+            fillColor,
+            strokeColor,
           })
         })
       } else {
         colorEntries.push({
           paperItems: [shapeItemGroup],
-          originalColor: 'black',
-          color: 'black',
+          strokeColor: 'black',
+          fillColor: 'black',
         })
       }
 
@@ -297,12 +352,14 @@ export class Editor {
     }
 
     paper.project.clear()
-    this.setBackgroundColor(this.store.backgroundStyle.bgColors[0])
+    this.setBackgroundColor(this.store.backgroundStyle.bgColorMap[0])
     shapeItem.position = sceneBounds.center
+
+    this.paperItems.shape = shapeItem
+    this.paperItems.originalShape = shapeItem.clone({ insert: false })
 
     shapeItem.opacity = this.store.shapeStyle.bgOpacity
     shapeItem.insertAbove(this.paperItems.bgRect!)
-    this.paperItems.shape = shapeItem
 
     this.paperItems.shapeItemsGroup?.remove()
     this.paperItems.shapeItemsGroup = undefined
@@ -312,11 +369,21 @@ export class Editor {
     this.shapes = undefined
 
     this.shapeColorsMap = colorsMap || null
-    if (colorsMap) {
-      this.setShapeFillColors(colorsMap.colors.map((c) => c.originalColor))
-    }
+    this.updateShapeColoring()
 
     return { colorsMap }
+  }
+
+  updateShapeColoring = () => {
+    const style = this.store.shapeStyle
+    if (style.bgColorKind === 'single-color') {
+      this.setShapeFillColors([style.bgColor], false)
+    } else {
+      this.setShapeFillColors(style.bgColorMap)
+    }
+    if (this.paperItems.shape) {
+      this.paperItems.shape.opacity = style.bgOpacity
+    }
   }
 
   getSceneBounds = (pad = 20): paper.Rectangle =>
@@ -342,13 +409,15 @@ export class Editor {
     }
     await this.generator.init()
 
-    if (!this.paperItems.shape) {
+    if (!this.paperItems.originalShape) {
       return
     }
 
-    this.paperItems.shape?.insertAbove(this.paperItems.bgRect!)
-
-    const shapeItem = this.paperItems.shape.clone({ insert: false })
+    const shapeItem = this.paperItems.originalShape.clone({ insert: false })
+    if (style.bgColorKind === 'single-color') {
+      shapeItem.fillColor = new paper.Color('black')
+      shapeItem.strokeColor = new paper.Color('black')
+    }
     shapeItem.opacity = 1
     // shapeItem.fillColor = new paper.Color('black')
     const shapeRaster = shapeItem.rasterize(
@@ -370,46 +439,51 @@ export class Editor {
 
     const shapeConfig = this.store.getSelectedShape()
 
-    const result = await this.generator.fillShape({
-      shape: {
-        canvas: shapeCanvas,
-        bounds: shapeRaster.bounds,
-        processing: {
-          removeWhiteBg: {
-            enabled: shapeConfig.kind === 'img',
-            lightnessThreshold: 98,
-          },
-          shrink: {
-            enabled: style.shapePadding > 0,
-            amount: style.shapePadding,
-          },
-          edges: {
-            enabled: style.processing.edges.enabled,
-            blur: 17 * (1 - style.processing.edges.amount / 100),
-            lowThreshold: 30,
-            highThreshold: 100,
-          },
-          invert: {
-            enabled: style.processing.invert.enabled,
+    const result = await this.generator.fillShape(
+      {
+        shape: {
+          canvas: shapeCanvas,
+          bounds: shapeRaster.bounds,
+          processing: {
+            removeWhiteBg: {
+              enabled: shapeConfig.kind === 'img',
+              lightnessThreshold: 98,
+            },
+            shrink: {
+              enabled: style.shapePadding > 0,
+              amount: style.shapePadding,
+            },
+            edges: {
+              enabled: style.processing.edges.enabled,
+              blur: 17 * (1 - style.processing.edges.amount / 100),
+              lowThreshold: 30,
+              highThreshold: 100,
+            },
+            invert: {
+              enabled: style.processing.invert.enabled,
+            },
           },
         },
+        itemPadding: Math.max(1, 100 - style.itemDensity),
+        wordsMaxSize: style.wordsMaxSize,
+        iconsMaxSize: style.iconsMaxSize,
+        words: style.words.map((wc) => ({
+          wordConfigId: wc.id,
+          text: wc.text,
+          angles: style.angles,
+          fillColors: ['red'],
+          // fonts: [fonts[0], fonts[1], fonts[2]],
+          fonts: wordFonts,
+        })),
+        icons: style.icons.map((shape) => ({
+          shape: this.store.getShapeById(shape.shapeId)!,
+        })),
+        iconProbability: style.iconsProportion / 100,
       },
-      itemPadding: Math.max(1, 100 - style.itemDensity),
-      wordsMaxSize: style.wordsMaxSize,
-      iconsMaxSize: style.iconsMaxSize,
-      words: style.words.map((wc) => ({
-        wordConfigId: wc.id,
-        text: wc.text,
-        angles: style.angles,
-        fillColors: ['red'],
-        // fonts: [fonts[0], fonts[1], fonts[2]],
-        fonts: wordFonts,
-      })),
-      icons: style.icons.map((shape) => ({
-        shape: this.store.getShapeById(shape.shapeId)!,
-      })),
-      iconProbability: style.iconsProportion / 100,
-    })
+      (progressPercent) => {
+        this.store.visualizingProgress = progressPercent
+      }
+    )
 
     this.itemsShape = result.placedItems
 
@@ -514,7 +588,7 @@ export type SvgShapeColorsMap = {
 }
 
 export type SvgShapeColorsMapEntry = {
-  color: string
-  originalColor: string
+  fillColor: string
+  strokeColor: string
   paperItems: paper.Item[]
 }

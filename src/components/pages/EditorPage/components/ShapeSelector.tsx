@@ -57,7 +57,7 @@ export const ShapeThumbnailBtn: React.FC<
     active?: boolean
   } & Omit<React.HTMLProps<HTMLButtonElement>, 'shape'>
 > = ({ shape, backgroundColor, active = false, onClick }) => {
-  if (shape.kind === 'img') {
+  if (shape.kind === 'img' || shape.kind === 'svg') {
     return (
       <ShapeThumbnailBtnInner
         active={active}

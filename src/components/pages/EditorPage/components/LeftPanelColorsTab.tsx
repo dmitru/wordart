@@ -131,16 +131,58 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
         <Box mt={4}>
           <Label>Shape</Label>
-          {style.bgColors.map((color, index) => (
+          <Box>
+            <Button
+              px={2}
+              py={1}
+              mr={0}
+              borderRadius="none"
+              secondary={style.bgColorKind === 'color-map'}
+              outline={style.bgColorKind !== 'color-map'}
+              onClick={() => {
+                style.bgColorKind = 'color-map'
+                editorPageStore.editor?.updateShapeColoring()
+                if (style.itemsColorKind === 'shape') {
+                  editorPageStore.editor?.setItemsColor(
+                    'shape',
+                    editorPageStore.getItemColoring('shape')
+                  )
+                }
+              }}
+            >
+              Shape colors
+            </Button>
+            <Button
+              px={2}
+              py={1}
+              mr={0}
+              borderRadius="none"
+              secondary={style.bgColorKind === 'single-color'}
+              outline={style.bgColorKind !== 'single-color'}
+              onClick={() => {
+                style.bgColorKind = 'single-color'
+                editorPageStore.editor?.updateShapeColoring()
+                if (style.itemsColorKind === 'shape') {
+                  editorPageStore.editor?.setItemsColor(
+                    'shape',
+                    editorPageStore.getItemColoring('shape')
+                  )
+                }
+              }}
+            >
+              Single color
+            </Button>
+          </Box>
+
+          {style.bgColorKind === 'single-color' && (
             <ColorPicker
-              key={index}
               disableAlpha
-              value={chroma(color).alpha(1).hex()}
+              value={chroma(style.bgColor).alpha(1).hex()}
               onChange={(hex) => {
-                style.bgColors[index] = chroma(hex).hex()
+                style.bgColor = chroma(hex).hex()
               }}
               onAfterChange={() => {
-                editorPageStore.editor?.setShapeFillColors(style.bgColors)
+                editorPageStore.editor?.updateShapeColoring()
                 if (style.itemsColorKind === 'shape') {
                   editorPageStore.editor?.setItemsColor(
                     'shape',
@@ -149,7 +191,28 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                 }
               }}
             />
-          ))}
+          )}
+
+          {style.bgColorKind === 'color-map' &&
+            style.bgColorMap.map((color, index) => (
+              <ColorPicker
+                key={index}
+                disableAlpha
+                value={chroma(color).alpha(1).hex()}
+                onChange={(hex) => {
+                  style.bgColorMap[index] = chroma(hex).hex()
+                }}
+                onAfterChange={() => {
+                  editorPageStore.editor?.updateShapeColoring()
+                  if (style.itemsColorKind === 'shape') {
+                    editorPageStore.editor?.setItemsColor(
+                      'shape',
+                      editorPageStore.getItemColoring('shape')
+                    )
+                  }
+                }}
+              />
+            ))}
           <Box>
             <Slider
               label="Opacity"
@@ -170,13 +233,13 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
         <Box mt={4}>
           <Label>Background</Label>
           <ColorPicker
-            value={backgroundStyle.bgColors[0]}
+            value={backgroundStyle.bgColorMap[0]}
             onChange={(hex) => {
-              backgroundStyle.bgColors[0] = hex
+              backgroundStyle.bgColorMap[0] = hex
             }}
             onAfterChange={() => {
               editorPageStore.editor?.setBackgroundColor(
-                backgroundStyle.bgColors[0]
+                backgroundStyle.bgColorMap[0]
               )
             }}
           />

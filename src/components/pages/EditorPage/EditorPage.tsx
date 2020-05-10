@@ -269,7 +269,11 @@ export const EditorPage = observer(() => {
                   `}
                 />
               )}
-              {store.isVisualizing ? 'Working...' : 'Visualize'}
+              {store.isVisualizing
+                ? `Working: ${Math.round(
+                    (store.visualizingProgress || 0) * 100
+                  )}%`
+                : 'Visualize'}
             </Button>
 
             <Button ml={3}>Undo</Button>
