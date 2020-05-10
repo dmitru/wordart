@@ -1,5 +1,7 @@
 import { noop } from 'lodash'
 import { Rect } from 'lib/wordart/geometry'
+// @ts-ignore
+import jsfeat from 'jsfeat'
 
 export type Dimensions = { w: number; h: number }
 
@@ -153,7 +155,7 @@ export const clampPixelOpacityDown = (canvas: HTMLCanvasElement) => {
   ctx.putImageData(imgData, 0, 0)
 }
 
-/** Turns each fully transparent pixel into a fully opaque black pixel.
+/** Turns each fully transparent pixel into a fully opaque pixel of the given color.
  * Turns each non-transparent pixel into a fully transparent one.
  */
 export const invertImageMask = (canvas: HTMLCanvasElement) => {
@@ -263,4 +265,46 @@ export const copyCanvas = (
     destCanvas.drawImage(srcCanvas.canvas, 0, 0)
   }
   destCanvas.restore()
+}
+
+export const detectEdges = (
+  canvas: HTMLCanvasElement,
+  blurRadius = 0,
+  thresholdLow: number = 20,
+  thresholdUp: number = 100
+): HTMLCanvasElement => {
+  const w = canvas.width
+  const h = canvas.height
+  const t1 = performance.now()
+
+  const ctx = canvas.getContext('2d')!
+
+  const imgData = ctx.getImageData(0, 0, w, h)
+  const dataU32 = new Uint32Array(imgData.data.buffer)
+
+  console.screenshot(ctx.canvas)
+
+  const jsfeatMatrix = new jsfeat.matrix_t(w, h, jsfeat.U8C1_t)
+  jsfeat.imgproc.grayscale(imgData.data, w, h, jsfeatMatrix)
+  jsfeat.imgproc.gaussian_blur(jsfeatMatrix, jsfeatMatrix, blurRadius << 1, 0)
+  jsfeat.imgproc.canny(jsfeatMatrix, jsfeatMatrix, thresholdLow, thresholdUp)
+
+  let i = w * h
+  while (--i >= 0) {
+    const pixel = jsfeatMatrix.data[i]
+    if (pixel) {
+      dataU32[i] = 0xff000000
+    } else {
+      dataU32[i] = 0
+    }
+  }
+
+  const result = createCanvasCtxCopy(ctx)
+  result.putImageData(imgData, 0, 0)
+  console.screenshot(result.canvas)
+
+  const t2 = performance.now()
+  console.log(`removeEdges: ${(t2 - t1).toFixed(0)}ms`)
+
+  return result.canvas
 }

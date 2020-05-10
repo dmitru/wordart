@@ -8,6 +8,8 @@ import {
   clampPixelOpacityUp,
   clearCanvas,
   shrinkShape,
+  detectEdges,
+  invertImageMask,
 } from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
 import { getWasmModule, WasmModule } from 'lib/wordart/wasm/wasm-module'
@@ -43,7 +45,7 @@ export class Generator {
     }
     this.logger.debug('Generator: generate', task)
 
-    const shapeCanvasMaxExtent = 300
+    const shapeCanvasMaxExtent = 320
 
     const shapeCanvas = task.shape.canvas
     console.screenshot(shapeCanvas, 0.3)
@@ -67,11 +69,47 @@ export class Generator {
       shapeCtx.canvas.width - 2,
       shapeCtx.canvas.height - 2
     )
+
+    let edgesCanvas: HTMLCanvasElement | undefined
+    if (
+      task.shape.processing.edges.enabled &&
+      !task.shape.processing.invert.enabled
+    ) {
+      edgesCanvas = detectEdges(
+        shapeCtx.canvas,
+        (task.shape.processing.edges.blur * shapeCanvasMaxExtent) / 300,
+        task.shape.processing.edges.lowThreshold,
+        task.shape.processing.edges.highThreshold
+      )
+    }
+
     clampPixelOpacityUp(shapeCtx.canvas)
-    shrinkShape(
-      shapeCtx.canvas,
-      (task.shapePadding / 100) * 5 * (shapeCanvasMaxExtent / 100)
-    )
+
+    if (task.shape.processing.invert.enabled) {
+      invertImageMask(shapeCtx.canvas)
+      // Remove a 1px border around the shape to make largest-rect algorithm work correctly
+      shapeCtx.save()
+      shapeCtx.globalCompositeOperation = 'destination-out'
+      shapeCtx.lineWidth = 1
+      shapeCtx.strokeRect(0, 0, shapeCtx.canvas.width, shapeCtx.canvas.height)
+      shapeCtx.restore()
+    }
+
+    if (task.shape.processing.shrink.enabled) {
+      shrinkShape(
+        shapeCtx.canvas,
+        (task.shape.processing.shrink.amount / 100) *
+          5 *
+          (shapeCanvasMaxExtent / 100)
+      )
+    }
+
+    if (edgesCanvas) {
+      shapeCtx.save()
+      shapeCtx.globalCompositeOperation = 'destination-out'
+      shapeCtx.drawImage(edgesCanvas, 0, 0)
+      shapeCtx.restore()
+    }
 
     const imageProcessor = new ImageProcessorWasm(this.wasm)
 
@@ -139,7 +177,7 @@ export class Generator {
     const placedWordItems: WordItem[] = []
     const placedSymbolItems: SymbolItem[] = []
 
-    const nIter = 800
+    const nIter = 400
     const t1 = performance.now()
 
     const wordAngles = uniq(flatten(task.words.map((w) => w.angles)))
@@ -631,9 +669,26 @@ export type FillShapeTask = {
   shape: {
     canvas: HTMLCanvasElement
     bounds: paper.Rectangle
+    processing: {
+      shrink: {
+        enabled: boolean
+        /** Additional padding between shape and items, in percent (0 - 100) */
+        amount: number
+      }
+      invert: {
+        enabled: boolean
+      }
+      edges: {
+        enabled: boolean
+        /** In pixels, normalized to 300 x 300 canvas */
+        blur: number
+        /** 0-100, input for Canny algorithm */
+        lowThreshold: number
+        /** 0-100, input for Canny algorithm */
+        highThreshold: number
+      }
+    }
   }
-  /** Additional padding between shape and items, in percent (0 - 100) */
-  shapePadding: number
   /** Padding between items, in percent (0 - 100) */
   itemPadding: number
   /** 0 - 100 */

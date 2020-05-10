@@ -141,6 +141,12 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               }}
               onAfterChange={() => {
                 editorPageStore.editor?.setShapeFillColors(style.bgColors)
+                if (style.itemsColorKind === 'shape') {
+                  editorPageStore.editor?.setItemsColor(
+                    'shape',
+                    editorPageStore.getItemColoring('shape')
+                  )
+                }
               }}
             />
           ))}

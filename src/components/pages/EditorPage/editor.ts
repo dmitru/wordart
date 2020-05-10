@@ -13,7 +13,6 @@ import { loadFont } from 'lib/wordart/fonts'
 import { Path } from 'opentype.js'
 import { max, min, flatten, groupBy, sortBy } from 'lodash'
 import seedrandom from 'seedrandom'
-import { color } from 'styled-system'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -231,11 +230,33 @@ export class Editor {
         (ch) => ch.name.split('_')[0]
       )
 
+      const getFillColor = (
+        items: paper.Item[],
+        level = 0,
+        maxLevel = 6
+      ): paper.Color | undefined => {
+        for (let item of items) {
+          if (item.fillColor) {
+            return item.fillColor
+          }
+          if (item.children && level < maxLevel) {
+            const color = getFillColor(item.children, level + 1)
+            if (color && color.red * color.green * color.blue > 0) {
+              return color
+            }
+          }
+        }
+        return undefined
+      }
+
       const colorEntries: SvgShapeColorsMapEntry[] = []
       if (Object.keys(namedChildrenByColor).length > 0) {
         Object.keys(namedChildrenByColor).forEach((colorKey) => {
           const children = namedChildrenByColor[colorKey]
-          const color = children[0].item.fillColor?.toCSS(true) || 'black'
+          const color = (
+            getFillColor(children.map((c) => c.item)) ||
+            new paper.Color('black')
+          ).toCSS(true)
           colorEntries.push({
             paperItems: children.map((c) => c.item),
             color,
@@ -328,7 +349,8 @@ export class Editor {
     this.paperItems.shape?.insertAbove(this.paperItems.bgRect!)
 
     const shapeItem = this.paperItems.shape.clone({ insert: false })
-    shapeItem.fillColor = new paper.Color('black')
+    shapeItem.opacity = 1
+    // shapeItem.fillColor = new paper.Color('black')
     const shapeRaster = shapeItem.rasterize(
       this.paperItems.shape.view.resolution,
       false
@@ -346,14 +368,26 @@ export class Editor {
       })
     )
 
-    console.log('wordFonts = ', wordFonts)
-
     const result = await this.generator.fillShape({
       shape: {
         canvas: shapeCanvas,
         bounds: shapeRaster.bounds,
+        processing: {
+          shrink: {
+            enabled: style.shapePadding > 0,
+            amount: style.shapePadding,
+          },
+          edges: {
+            enabled: style.processing.edges.enabled,
+            blur: 17 * (1 - style.processing.edges.amount / 100),
+            lowThreshold: 30,
+            highThreshold: 100,
+          },
+          invert: {
+            enabled: style.processing.invert.enabled,
+          },
+        },
       },
-      shapePadding: style.shapePadding,
       itemPadding: Math.max(1, 100 - style.itemDensity),
       wordsMaxSize: style.wordsMaxSize,
       iconsMaxSize: style.iconsMaxSize,

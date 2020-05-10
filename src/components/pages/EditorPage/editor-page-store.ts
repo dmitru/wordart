@@ -15,6 +15,17 @@ export type ShapeStyle = {
   bgColors: string[]
   bgOpacity: number
 
+  processing: {
+    invert: {
+      enabled: boolean
+      fillColor: string
+    }
+    edges: {
+      enabled: boolean
+      amount: number
+    }
+  }
+
   itemsColorKind: 'color' | 'gradient' | 'shape'
   itemsColor: string
   itemsColorGradient: ItemsColorGradient
@@ -99,6 +110,16 @@ export class EditorPageStore {
     bgOpacity: 0.1,
     iconsMaxSize: 30,
     iconsProportion: 20,
+    processing: {
+      edges: {
+        enabled: true,
+        amount: 80,
+      },
+      invert: {
+        enabled: false,
+        fillColor: 'red,',
+      },
+    },
     // bgColor: '#ffffff',
     itemsColorKind: 'shape',
     itemsColor: '#970707',
@@ -120,6 +141,16 @@ export class EditorPageStore {
     // angles: [-15, 20, 34, -76, 84, -65, 81],
   }
   @observable backgroundStyle: ShapeStyle = {
+    processing: {
+      edges: {
+        enabled: false,
+        amount: 80,
+      },
+      invert: {
+        enabled: false,
+        fillColor: 'red,',
+      },
+    },
     itemsColorKind: 'gradient',
     itemsColor: '#bbb',
     itemsColorGradient: {
@@ -299,7 +330,7 @@ export type ShapeId = number
 
 const svgIcons: ShapeConfig[] = [
   icons.find((i) => i.title === 'Square full'),
-  ...icons.slice(0, 100),
+  ...icons.slice(0, 30),
 ]
   .filter((i) => i != null)
   .map((icon, index) =>
@@ -314,7 +345,7 @@ const svgIcons: ShapeConfig[] = [
   )
   .filter((x) => x != null) as ShapeConfig[]
 
-const svgIconsOutline: ShapeConfig[] = [...iconsFaRegular.slice(0, 200)]
+const svgIconsOutline: ShapeConfig[] = [...iconsFaRegular.slice(0, 30)]
   .filter((i) => i != null)
   .map((icon, index) =>
     icon
