@@ -377,7 +377,7 @@ export class Editor {
         processing: {
           removeWhiteBg: {
             enabled: shapeConfig.kind === 'img',
-            lightnessThreshold: 0.98,
+            lightnessThreshold: 98,
           },
           shrink: {
             enabled: style.shapePadding > 0,
