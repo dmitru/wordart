@@ -59,8 +59,7 @@ export class Generator {
     }
 
     const shapeCtx = createCanvasCtx(shapeCanvasDimensions)
-    shapeCtx.fillStyle = '#f002'
-    shapeCtx.fillRect(0, 0, shapeCanvasDimensions.w, shapeCanvasDimensions.h)
+
     shapeCtx.drawImage(
       shapeCanvas,
       0,
