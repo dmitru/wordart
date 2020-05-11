@@ -145,12 +145,14 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         <Box mb={4}>
           {state.isAddingFont && (
             <>
-              <Label>Choose Font</Label>
               <Toolbar mb={3} display="flex" alignItems="center">
+                <Label flex={1}>Choose Font</Label>
                 <Button
                   px={2}
                   py={1}
                   mr={2}
+                  secondary
+                  outline
                   onClick={() => {
                     state.isAddingFont = false
                     state.replacingFontIndex = undefined
@@ -195,8 +197,8 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
           )}
           {!state.isAddingFont && (
             <>
-              <Label>Fonts</Label>
               <Toolbar mb={3} display="flex" alignItems="center">
+                <Label flex={1}>Fonts</Label>
                 <Button
                   px={2}
                   py={1}
@@ -259,8 +261,8 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
         {!state.isAddingFont && (
           <Box>
-            <Label>Words</Label>
             <Toolbar display="flex" alignItems="center">
+              <Label flex={1}>Words</Label>
               <Button
                 px={2}
                 py={1}

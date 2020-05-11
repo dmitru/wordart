@@ -9,7 +9,8 @@ import { icons } from 'data/shapes'
 import { iconsFaRegular } from 'data/shapes-fa-regular'
 import { FontConfig, fonts, FontId, FontStyleConfig } from 'data/fonts'
 
-type LeftPanelTab = 'shapes' | 'words' | 'symbols' | 'colors' | 'layout'
+type LeftPanelTab = 'foreground' | 'background' | 'colors' | 'settings'
+type LeftPanelSubtab = 'shapes' | 'words' | 'symbols' | 'colors' | 'layout'
 
 export type ShapeStyle = {
   bgColorMap: string[]
@@ -106,7 +107,8 @@ export class EditorPageStore {
     this.state = 'destroyed'
   }
 
-  @observable activeLeftTab: LeftPanelTab = 'shapes'
+  @observable activeLeftTab: LeftPanelTab = 'foreground'
+  @observable activeLeftSubtab: LeftPanelSubtab = 'shapes'
 
   @observable shapeStyle: ShapeStyle = {
     bgColorKind: 'single-color',
@@ -239,8 +241,8 @@ export class EditorPageStore {
     return this.availableShapes.find((s) => s.id === this.selectedShapeId)!
   }
 
-  @action setLeftPanelTab = (tabId: LeftPanelTab) => {
-    this.activeLeftTab = tabId
+  @action setLeftPanelTab = (tabId: LeftPanelSubtab) => {
+    this.activeLeftSubtab = tabId
   }
 
   @action selectShape = async (shapeId: ShapeId) => {

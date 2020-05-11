@@ -7,33 +7,24 @@ import {
 import { ReactSVG } from 'react-svg'
 import { useState } from 'react'
 import { TextInput } from 'components/shared/TextInput'
-import { Box } from 'components/shared/Box'
+import { Box, BoxProps } from 'components/shared/Box'
 import { noop } from 'lodash'
+import Sticky from 'react-stickynode'
+import { css } from '@emotion/react'
+import { darken } from 'polished'
 
 export type ShapeSelectorProps = {
   shapes: ShapeConfig[]
   selectedShapeId?: ShapeId
   onSelected?: (shape: ShapeConfig) => void
-}
+} & BoxProps
 
 export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
-  ({ shapes, selectedShapeId, onSelected = noop }) => {
-    const [query, setQuery] = useState('')
-
-    const matchingShapes = shapes.filter((s) =>
-      s.title.toLowerCase().includes(query.toLowerCase())
-    )
-
+  ({ shapes, selectedShapeId, onSelected = noop, ...rest }) => {
     return (
       <>
-        <TextInput
-          placeholder='Try "Heart" or "face"'
-          value={query}
-          onChange={setQuery}
-        />
-
-        <ShapeThumbnails mt={2}>
-          {matchingShapes.map((shape) => (
+        <ShapeThumbnails mt={2} {...rest}>
+          {shapes.map((shape) => (
             <ShapeThumbnailBtn
               key={shape.id}
               onClick={() => {
@@ -55,11 +46,12 @@ export const ShapeThumbnailBtn: React.FC<
     backgroundColor: string
     shape: ShapeConfig
     active?: boolean
-  } & Omit<React.HTMLProps<HTMLButtonElement>, 'shape'>
-> = ({ shape, backgroundColor, active = false, onClick }) => {
+  } & Omit<React.HTMLProps<HTMLButtonElement>, 'shape' | 'type'>
+> = ({ shape, backgroundColor, active = false, onClick, ...rest }) => {
   if (shape.kind === 'img' || shape.kind === 'svg') {
     return (
       <ShapeThumbnailBtnInner
+        {...rest}
         active={active}
         onClick={onClick}
         backgroundColor={backgroundColor}
@@ -92,8 +84,8 @@ export const ShapeThumbnailBtn: React.FC<
 }
 
 const ShapeThumbnailBtnInnerImg = styled.img`
-  width: 66px;
-  height: 66px;
+  width: 88px;
+  height: 88px;
   margin: 0;
   object-fit: contain;
 `
@@ -114,24 +106,23 @@ const ShapeThumbnailBtnInner = styled.button<
 >`
   outline: none;
   background: white;
-  width: 78px;
-  height: 78px;
+  width: 98px;
+  border: 1px solid #ddd;
+  height: 98px;
   display: inline-flex;
   padding: 5px;
-  margin: 4px;
+  margin: 0;
   justify-content: center;
   align-items: center;
   font-size: 12px;
   cursor: pointer;
   flex-direction: column;
-  ${({ theme, active }) =>
-    active && `outline: 3px solid ${theme.colors.primary};`}
+
   -webkit-appearance: none;
-  background-color: ${(p) => p.backgroundColor};
 
   svg {
-    width: 78px;
-    height: 78px;
+    width: 98px;
+    height: 98px;
 
     * {
       ${({ fill }) => fill && `fill: ${fill}`};
@@ -146,10 +137,26 @@ const ShapeThumbnailBtnInner = styled.button<
     margin-bottom: 4px;
   }
 
+  transition: 0.2s all;
+
+  ${({ theme, active }) =>
+    active &&
+    `
+    border: 1px solid ${theme.colors.accent};
+    background-color: #c8e8ff;
+  `}
+
   &:hover,
   &:focus {
-    outline: 3px solid ${(p) => p.theme.colors.primary};
+    z-index: 1;
+    background: #eee;
+    border: 1px solid ${(p) => p.theme.colors.accent};
     ${({ theme, active }) =>
-      active && `outline: 3px solid ${theme.colors.primary};`}
+      active &&
+      `
+      border: 1px solid ${theme.colors.accent}; 
+      z-index: 2;
+      background: ${darken(0.1, '#c8e8ff')};
+      `}
   }
 `

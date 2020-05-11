@@ -2,26 +2,34 @@ import styled from '@emotion/styled'
 import { noop } from 'lodash'
 import * as ss from 'styled-system'
 import { textColor } from 'styles/system'
-import { BoxProps } from 'components/shared/Box'
+import { BoxProps, Box } from 'components/shared/Box'
+import { css } from '@emotion/react'
 
 export type TextInputProps = Omit<StyledTextInputProps, 'onChange'> & {
   value: string
+  children?: React.ReactNode
   onChange?: (value: string) => void
+  containerProps?: BoxProps & any
 }
 
 export const TextInput: React.FC<TextInputProps> = ({
   value,
+  children = null,
   onChange = noop,
+  containerProps = {},
   ...otherProps
 }) => {
   return (
-    <StyledTextInput
-      px={2}
-      py={1}
-      value={value}
-      {...otherProps}
-      onChange={(e) => onChange(e.target.value)}
-    />
+    <Box {...containerProps}>
+      {children}
+      <StyledTextInput
+        {...otherProps}
+        px={2}
+        py={1}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </Box>
   )
 }
 

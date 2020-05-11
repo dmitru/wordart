@@ -46,21 +46,21 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             py={1}
             mr={0}
             borderRadius="none"
-            secondary={style.itemsColorKind === 'shape'}
+            primary={style.itemsColorKind === 'shape'}
             outline={style.itemsColorKind !== 'shape'}
             onClick={() => {
               style.itemsColorKind = 'shape'
               updateColoring()
             }}
           >
-            Shape
+            Same as Shape
           </Button>
           <Button
             px={2}
             py={1}
             mr={0}
             borderRadius="none"
-            secondary={style.itemsColorKind === 'color'}
+            primary={style.itemsColorKind === 'color'}
             outline={style.itemsColorKind !== 'color'}
             onClick={() => {
               style.itemsColorKind = 'color'
@@ -73,7 +73,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             px={2}
             py={1}
             borderRadius="none"
-            secondary={style.itemsColorKind === 'gradient'}
+            primary={style.itemsColorKind === 'gradient'}
             outline={style.itemsColorKind !== 'gradient'}
             onClick={() => {
               style.itemsColorKind = 'gradient'
@@ -95,20 +95,24 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             )}
             {style.itemsColorKind === 'gradient' && (
               <>
-                <ColorPicker
-                  value={style.itemsColorGradient.from}
-                  onChange={(hex) => {
-                    style.itemsColorGradient.from = hex
-                  }}
-                  onAfterChange={updateColoring}
-                />
-                <ColorPicker
-                  value={style.itemsColorGradient.to}
-                  onChange={(hex) => {
-                    style.itemsColorGradient.to = hex
-                  }}
-                  onAfterChange={updateColoring}
-                />
+                <Box mr={1} display="inline-block">
+                  <ColorPicker
+                    value={style.itemsColorGradient.from}
+                    onChange={(hex) => {
+                      style.itemsColorGradient.from = hex
+                    }}
+                    onAfterChange={updateColoring}
+                  />
+                </Box>
+                <Box mr={1} display="inline-block">
+                  <ColorPicker
+                    value={style.itemsColorGradient.to}
+                    onChange={(hex) => {
+                      style.itemsColorGradient.to = hex
+                    }}
+                    onAfterChange={updateColoring}
+                  />
+                </Box>
               </>
             )}
           </Box>
@@ -129,15 +133,16 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           />
         </Box>
 
-        <Box mt={4}>
-          <Label>Shape</Label>
+        <Box mt={4} mb={3}>
+          <Label mb={2}>Shape</Label>
+
           <Box>
             <Button
               px={2}
               py={1}
               mr={0}
               borderRadius="none"
-              secondary={style.bgColorKind === 'color-map'}
+              primary={style.bgColorKind === 'color-map'}
               outline={style.bgColorKind !== 'color-map'}
               onClick={() => {
                 style.bgColorKind = 'color-map'
@@ -157,7 +162,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               py={1}
               mr={0}
               borderRadius="none"
-              secondary={style.bgColorKind === 'single-color'}
+              primary={style.bgColorKind === 'single-color'}
               outline={style.bgColorKind !== 'single-color'}
               onClick={() => {
                 style.bgColorKind = 'single-color'
@@ -174,33 +179,13 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             </Button>
           </Box>
 
-          {style.bgColorKind === 'single-color' && (
-            <ColorPicker
-              disableAlpha
-              value={chroma(style.bgColor).alpha(1).hex()}
-              onChange={(hex) => {
-                style.bgColor = chroma(hex).hex()
-              }}
-              onAfterChange={() => {
-                editorPageStore.editor?.updateShapeColoring()
-                if (style.itemsColorKind === 'shape') {
-                  editorPageStore.editor?.setItemsColor(
-                    'shape',
-                    editorPageStore.getItemColoring('shape')
-                  )
-                }
-              }}
-            />
-          )}
-
-          {style.bgColorKind === 'color-map' &&
-            style.bgColorMap.map((color, index) => (
+          <Box mt={2}>
+            {style.bgColorKind === 'single-color' && (
               <ColorPicker
-                key={index}
                 disableAlpha
-                value={chroma(color).alpha(1).hex()}
+                value={chroma(style.bgColor).alpha(1).hex()}
                 onChange={(hex) => {
-                  style.bgColorMap[index] = chroma(hex).hex()
+                  style.bgColor = chroma(hex).hex()
                 }}
                 onAfterChange={() => {
                   editorPageStore.editor?.updateShapeColoring()
@@ -212,7 +197,31 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   }
                 }}
               />
-            ))}
+            )}
+
+            {style.bgColorKind === 'color-map' &&
+              style.bgColorMap.map((color, index) => (
+                <Box mr={1} key={index} display="inline-block">
+                  <ColorPicker
+                    disableAlpha
+                    value={chroma(color).alpha(1).hex()}
+                    onChange={(hex) => {
+                      style.bgColorMap[index] = chroma(hex).hex()
+                    }}
+                    onAfterChange={() => {
+                      editorPageStore.editor?.updateShapeColoring()
+                      if (style.itemsColorKind === 'shape') {
+                        editorPageStore.editor?.setItemsColor(
+                          'shape',
+                          editorPageStore.getItemColoring('shape')
+                        )
+                      }
+                    }}
+                  />
+                </Box>
+              ))}
+          </Box>
+
           <Box>
             <Slider
               label="Opacity"
@@ -228,21 +237,6 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               step={1}
             />
           </Box>
-        </Box>
-
-        <Box mt={4}>
-          <Label>Background</Label>
-          <ColorPicker
-            value={backgroundStyle.bgColorMap[0]}
-            onChange={(hex) => {
-              backgroundStyle.bgColorMap[0] = hex
-            }}
-            onAfterChange={() => {
-              editorPageStore.editor?.setBackgroundColor(
-                backgroundStyle.bgColorMap[0]
-              )
-            }}
-          />
         </Box>
       </>
     )

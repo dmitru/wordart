@@ -19,8 +19,10 @@ const ColorSwatch = styled(Button)<{ color: string }>`
   padding: 0;
   margin: 0;
   display: inline-block;
-  width: 80px;
+  width: 60px;
   height: 30px;
+  margin-right: 4px;
+  margin-bottom: 8px;
   background: ${(p) => p.color};
 
   transition: 0.15s background;

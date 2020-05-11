@@ -2,6 +2,9 @@ import React, { useRef, useState, useEffect } from 'react'
 import { Layout } from 'components/layout'
 import styled from '@emotion/styled'
 import 'lib/wordart/console-extensions'
+import { Settings } from '@styled-icons/material/Settings'
+import { HeartSquare } from '@styled-icons/boxicons-solid/HeartSquare'
+import { Heart } from '@styled-icons/boxicons-solid/Heart'
 import { Template } from '@styled-icons/heroicons-solid/Template'
 import { Rocket } from '@styled-icons/entypo/Rocket'
 import { Text } from '@styled-icons/evaicons-solid/Text'
@@ -21,10 +24,12 @@ import { observable, runInAction } from 'mobx'
 import { Button } from 'components/shared/Button'
 import { Box } from 'components/shared/Box'
 import { LeftPanelLayoutTab } from 'components/pages/EditorPage/components/LeftPanelLayoutTab'
-import { darken, lighten } from 'polished'
+import { darken, lighten, desaturate } from 'polished'
 import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
 import { css } from '@emotion/react'
 import { LeftPanelIconsTab } from 'components/pages/EditorPage/components/LeftPanelIconsTab'
+import { BaseBtn } from 'components/shared/BaseBtn'
+import Headroom from 'react-headroom'
 
 const PageLayoutWrapper = styled.div`
   display: flex;
@@ -52,60 +57,157 @@ const TopNavWrapper = styled(Box)`
   padding: 20px;
   font-size: 1.5em;
   font-weight: 400;
-  background: linear-gradient(90deg, #21c5be, #697af5);
+  /* background: linear-gradient(90deg, #21c5be, #697af5); */
+  background: linear-gradient(90deg, #80578e, #3b458c);
   color: white;
 `
 
 const LeftWrapper = styled.div`
   height: 100%;
   background: white;
-  max-width: 380px;
+  max-width: 350px;
+  min-width: 350px;
   flex: 1;
+  z-index: 3;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  box-shadow: 0 0 5px 0 #00000033;
+`
+
+const LeftNavbarTop = styled.div`
+  z-index: 0;
+  background: ${(p) => p.theme.colors.dark2};
+  width: 100%;
+  /* height: 50px; */
+  display: flex;
+  direction: row;
+  background: linear-gradient(90deg,#80578e,#3b458c);
+  /* margin-bottom: 10px; */
+  /* border-bottom: 5px solid ${(p) => p.theme.colors.accent}; */
+`
+
+const LeftNavbarTopBtn = styled(BaseBtn)<{ active: boolean }>`
+  height: 40px;
+  flex: 1;
+  font-weight: 500;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  /* text-transform: uppercase; */
+
+  background: transparent;
+  color: ${(p) => p.theme.colors.textLight};
+  border-radius: 0;
+  outline: none;
+  border: none;
+
+  border-top: 5px solid transparent;
+  padding-bottom: 3px;
+  transition: 0.2s all;
+
+  ${({ theme, active }) =>
+    active &&
+    `
+    // font-weight: 500;
+    background: #f3f3f3;
+    z-index: 1;
+    color: ${theme.colors.text};
+    box-shadow: 0 0 2px 0 #00000033;
+    border-top: 5px solid ${theme.colors.accent};
+  `}
+
+  position: relative;
+  z-index: 0;
+
+  .icon {
+    /* display: none; */
+    width: 20px;
+    height: 20px;
+    /* margin-bottom: 4px; */
+  }
+
+  /* transition: 0.2s background; */
+
+  &:hover,
+  &:focus {
+    background: #0003;
+    ${({ theme, active }) =>
+      active &&
+      `
+      background: #f3f3f3;
+    // color: ${theme.colors.textLight};
+    `}
+  }
 `
 
 const LeftNavbar = styled.div`
-  padding-top: 20px;
-  background: ${(p) => p.theme.colors.light1};
-  width: 85px;
-  height: 100%;
-  z-index: 3;
+  /* background: ${(p) =>
+    darken(0.1, desaturate(0.5, p.theme.colors.dark4))}; */
+  background: #f3f3f3;
+  border-bottom: 1px solid #cecece;
+  padding: 0 10px;
+  width: 100%;
+  /* height: 50px; */
+  display: flex;
+  direction: row;
+  
+  z-index: 1;
 `
 
-const LeftNavbarBtn = styled(Button)<{ active: boolean }>`
+const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
   background: white;
-  width: 100%;
+  min-width: 20%;
+  font-weight: 500;
   height: 60px;
+  padding-top: 8px;
+  padding-bottom: 5px;
+  top: 10px;
+  text-transform: uppercase;
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   font-size: 12px;
-  background: ${(p) => p.theme.colors.light1};
+  /* background: ${(p) => p.theme.colors.light1}; */
+  background: #dedede;
   border-radius: 0;
-  color: ${(p) => p.theme.colors.dark3};
+  color: ${(p) => p.theme.colors.dark1};
   outline: none;
+  /* border: 1px solid #cecece; */
   border: none;
+  border-radius: 0;
+  z-index: 0;
+  border-bottom: 10px solid transparent;
+
+  transition: 0.2s all;
 
   ${({ theme, active }) =>
     active &&
     `
+    z-index: 1;
     background: ${theme.colors.light};
     color: ${theme.colors.text};
+    transform: translateY(-3px);
+    border: 1px solid #cecece;
+    border-bottom: 10px solid ${theme.colors.accent};
+    // box-shadow: 0 0 2px 0 #00000033;
   `}
 
   .icon {
-    width: 20px;
-    height: 20px;
-    margin-bottom: 4px;
+    width: 18px;
+    height: 18px;
+    margin-bottom: 2px;
   }
 
-  transition: 0.2s background;
+  /* transition: 0.2s background; */
 
   &:hover,
   &:focus {
-    background: ${(p) => lighten(0.1, p.theme.colors.light1)};
+    background: ${(p) => darken(0.1, '#ddd')};
     ${({ theme, active }) =>
       active &&
       `
@@ -116,14 +218,13 @@ const LeftNavbarBtn = styled(Button)<{ active: boolean }>`
 `
 
 const LeftPanel = styled.div`
-  background: white;
   flex: 1;
   padding: 20px;
   height: 100%;
   overflow: auto;
-  width: 270px;
-  box-shadow: 0 0 5px 0 #00000033;
+  background: ${(p) => p.theme.colors.light};
   z-index: 2;
+  box-shadow: 0 0 2px 0 #00000033;
 `
 
 const RightWrapper = styled.div`
@@ -132,6 +233,7 @@ const RightWrapper = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 0 5px 0 #00000033;
 `
 
 const CanvasWrappper = styled.div`
@@ -167,12 +269,40 @@ export const EditorPage = observer(() => {
 
   return (
     <PageLayoutWrapper>
-      <TopNavWrapper alignItems="center" display="flex">
-        Wordcloudy
-      </TopNavWrapper>
+      <TopNavWrapper alignItems="center" display="flex"></TopNavWrapper>
 
       <EditorLayout>
         <LeftWrapper>
+          <LeftNavbarTop>
+            <LeftNavbarTopBtn
+              onClick={() => (store.activeLeftTab = 'foreground')}
+              active={store.activeLeftTab === 'foreground'}
+            >
+              {/* <Heart className="icon" /> */}
+              Foreground
+            </LeftNavbarTopBtn>
+            <LeftNavbarTopBtn
+              onClick={() => (store.activeLeftTab = 'background')}
+              active={store.activeLeftTab === 'background'}
+            >
+              {/* <HeartSquare className="icon" /> */}
+              Background
+            </LeftNavbarTopBtn>
+            <LeftNavbarTopBtn
+              onClick={() => (store.activeLeftTab = 'colors')}
+              active={store.activeLeftTab === 'colors'}
+            >
+              {/* <ColorPalette className="icon" /> */}
+              Colors
+            </LeftNavbarTopBtn>
+            <LeftNavbarTopBtn
+              onClick={() => (store.activeLeftTab = 'settings')}
+              active={store.activeLeftTab === 'settings'}
+            >
+              <Settings className="icon" />
+              {/* Settings */}
+            </LeftNavbarTopBtn>
+          </LeftNavbarTop>
           <LeftNavbar>
             {/* <LeftNavbarBtn
               onClick={() => {
@@ -187,7 +317,7 @@ export const EditorPage = observer(() => {
               onClick={() => {
                 store.setLeftPanelTab('shapes')
               }}
-              active={store.activeLeftTab === 'shapes'}
+              active={store.activeLeftSubtab === 'shapes'}
             >
               <Shapes className="icon" />
               Shape
@@ -195,9 +325,19 @@ export const EditorPage = observer(() => {
 
             <LeftNavbarBtn
               onClick={() => {
+                store.setLeftPanelTab('colors')
+              }}
+              active={store.activeLeftSubtab === 'colors'}
+            >
+              <ColorPalette className="icon" />
+              Colors
+            </LeftNavbarBtn>
+
+            <LeftNavbarBtn
+              onClick={() => {
                 store.setLeftPanelTab('words')
               }}
-              active={store.activeLeftTab === 'words'}
+              active={store.activeLeftSubtab === 'words'}
             >
               <TextFields className="icon" />
               Words
@@ -206,7 +346,7 @@ export const EditorPage = observer(() => {
               onClick={() => {
                 store.setLeftPanelTab('symbols')
               }}
-              active={store.activeLeftTab === 'symbols'}
+              active={store.activeLeftSubtab === 'symbols'}
             >
               <Face className="icon" />
               Icons
@@ -216,41 +356,37 @@ export const EditorPage = observer(() => {
               onClick={() => {
                 store.setLeftPanelTab('layout')
               }}
-              active={store.activeLeftTab === 'layout'}
+              active={store.activeLeftSubtab === 'layout'}
             >
               <LayoutMasonry className="icon" />
               Layout
             </LeftNavbarBtn>
-
-            <LeftNavbarBtn
-              onClick={() => {
-                store.setLeftPanelTab('colors')
-              }}
-              active={store.activeLeftTab === 'colors'}
-            >
-              <ColorPalette className="icon" />
-              Colors
-            </LeftNavbarBtn>
           </LeftNavbar>
 
-          <LeftPanel>
-            {store.activeLeftTab === 'shapes' && <LeftPanelShapesTab />}
-            {store.activeLeftTab === 'words' && (
+          <LeftPanel id="left-panel-content">
+            {store.activeLeftSubtab === 'shapes' && <LeftPanelShapesTab />}
+            {store.activeLeftSubtab === 'words' && (
               <LeftPanelWordsTab type="shape" />
             )}
-            {store.activeLeftTab === 'symbols' && (
+            {store.activeLeftSubtab === 'symbols' && (
               <LeftPanelIconsTab type="shape" />
             )}
-            {store.activeLeftTab === 'colors' && <LeftPanelColorsTab />}
+            {store.activeLeftSubtab === 'colors' && <LeftPanelColorsTab />}
 
-            {store.activeLeftTab === 'layout' && (
+            {store.activeLeftSubtab === 'layout' && (
               <LeftPanelLayoutTab type="shape" />
             )}
           </LeftPanel>
         </LeftWrapper>
 
         <RightWrapper>
-          <TopToolbar display="flex" alignItems="center" bg="light" p={2}>
+          <TopToolbar
+            display="flex"
+            alignItems="center"
+            bg="light"
+            p={2}
+            pl={3}
+          >
             <Button
               css={css`
                 width: 128px;
