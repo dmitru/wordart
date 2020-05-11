@@ -179,6 +179,7 @@ export const KeyboardHandle: React.FC<HandleProps> = ({
         cursor: 'pointer',
         transform: 'translate(-50%, 0)',
         zIndex: 2,
+        border: 'none',
         top: 4,
         whiteSpace: 'nowrap',
         color: theme.colors.textLight,

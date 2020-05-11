@@ -248,13 +248,7 @@ export class EditorPageStore {
   @action selectShape = async (shapeId: ShapeId) => {
     if (this.editor) {
       this.selectedShapeId = shapeId
-      const shapeInfo = await this.editor.setBgShape(shapeId)
-      this.shapeColorsMap = shapeInfo.colorsMap || null
-      if (shapeInfo.colorsMap) {
-        this.shapeStyle.bgColorMap = shapeInfo.colorsMap.colors.map(
-          (cm) => cm.fillColor
-        )
-      }
+      await this.editor.setBgShape(shapeId)
     } else {
       this.selectedShapeId = shapeId
     }

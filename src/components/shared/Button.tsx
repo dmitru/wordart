@@ -53,6 +53,7 @@ const getButtonStyles = (params: {
     return css`
       color: ${color};
       background: ${bgColor};
+      border: 2px solid ${bgColor};
 
       &:hover {
         background: ${darken(0.05, bgColor)};
@@ -72,6 +73,10 @@ const getButtonStyles = (params: {
 }
 
 const StyledButton = styled(BaseBtn)<StyledButtonProps>(
+  `
+    border: 2px solid #ddd;
+    white-space: nowrap;
+  `,
   (p) => {
     const { outline = false } = p
     if (p.secondary) {

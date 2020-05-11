@@ -65,8 +65,8 @@ const TopNavWrapper = styled(Box)`
 const LeftWrapper = styled.div`
   height: 100%;
   background: white;
-  max-width: 350px;
-  min-width: 350px;
+  max-width: 380px;
+  min-width: 380px;
   flex: 1;
   z-index: 3;
   display: flex;
@@ -116,7 +116,7 @@ const LeftNavbarTopBtn = styled(BaseBtn)<{ active: boolean }>`
     z-index: 1;
     color: ${theme.colors.text};
     box-shadow: 0 0 2px 0 #00000033;
-    border-top: 5px solid ${theme.colors.accent};
+    border-top: 5px solid ${theme.colors.primary};
   `}
 
   position: relative;
@@ -147,7 +147,7 @@ const LeftNavbar = styled.div`
   /* background: ${(p) =>
     darken(0.1, desaturate(0.5, p.theme.colors.dark4))}; */
   background: #f3f3f3;
-  border-bottom: 1px solid #cecece;
+  /* border-bottom: 1px solid #cecece; */
   padding: 0 10px;
   width: 100%;
   /* height: 50px; */
@@ -161,9 +161,9 @@ const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
   background: white;
   min-width: 20%;
   font-weight: 500;
-  height: 60px;
-  padding-top: 8px;
-  padding-bottom: 5px;
+  height: 70px;
+  padding-top: 15px;
+  padding-bottom: 8px;
   top: 10px;
   text-transform: uppercase;
   position: relative;
@@ -193,7 +193,7 @@ const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
     color: ${theme.colors.text};
     transform: translateY(-3px);
     border: 1px solid #cecece;
-    border-bottom: 10px solid ${theme.colors.accent};
+    border-bottom: 10px solid ${theme.colors.primary};
     // box-shadow: 0 0 2px 0 #00000033;
   `}
 

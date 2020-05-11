@@ -117,12 +117,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                 overflowY="auto"
                 shapes={matchingShapes}
                 onSelected={(shape) => {
-                  if (shape.id === editorPageStore.selectedShapeId) {
-                    // open customize modal
-                    state.showCustomize = true
-                  } else {
-                    editorPageStore.selectShape(shape.id)
-                  }
+                  editorPageStore.selectShape(shape.id)
                 }}
                 selectedShapeId={editorPageStore.getSelectedShape().id}
               />

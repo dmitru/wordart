@@ -203,7 +203,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                   px={2}
                   py={1}
                   mr={2}
-                  accent
+                  primary
                   onClick={() => {
                     state.isAddingFont = true
                   }}
@@ -267,7 +267,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                 px={2}
                 py={1}
                 mr={2}
-                accent
+                primary
                 onClick={() => store.addEmptyWord(props.type)}
               >
                 <evaicons.PlusOutline size="20" /> Add

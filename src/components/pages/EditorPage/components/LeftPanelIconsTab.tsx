@@ -56,7 +56,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 px={2}
                 py={1}
                 mr={2}
-                accent
+                primary
                 onClick={() => {
                   state.isAdding = true
                 }}

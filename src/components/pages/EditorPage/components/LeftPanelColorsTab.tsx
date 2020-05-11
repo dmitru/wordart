@@ -39,7 +39,6 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               px={2}
               py={1}
               mr={0}
-              borderRadius="none"
               primary={style.bgColorKind === 'color-map'}
               outline={style.bgColorKind !== 'color-map'}
               onClick={() => {
@@ -59,7 +58,6 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               px={2}
               py={1}
               mr={0}
-              borderRadius="none"
               primary={style.bgColorKind === 'single-color'}
               outline={style.bgColorKind !== 'single-color'}
               onClick={() => {
@@ -151,7 +149,6 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             px={2}
             py={1}
             mr={0}
-            borderRadius="none"
             primary={style.itemsColorKind === 'shape'}
             outline={style.itemsColorKind !== 'shape'}
             onClick={() => {
@@ -165,7 +162,6 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           <Button
             px={2}
             py={1}
-            borderRadius="none"
             primary={style.itemsColorKind === 'gradient'}
             outline={style.itemsColorKind !== 'gradient'}
             onClick={() => {
@@ -180,7 +176,6 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             px={2}
             py={1}
             mr={0}
-            borderRadius="none"
             primary={style.itemsColorKind === 'color'}
             outline={style.itemsColorKind !== 'color'}
             onClick={() => {

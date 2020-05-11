@@ -369,6 +369,14 @@ export class Editor {
     this.shapes = undefined
 
     this.shapeColorsMap = colorsMap || null
+    if (colorsMap) {
+      this.store.shapeColorsMap = colorsMap || null
+      if (colorsMap) {
+        this.store.shapeStyle.bgColorMap = colorsMap.colors.map(
+          (cm) => cm.fillColor
+        )
+      }
+    }
     this.updateShapeColoring()
 
     return { colorsMap }
