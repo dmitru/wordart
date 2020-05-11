@@ -31,109 +31,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
     return (
       <>
-        <Box>
-          <Label mb={2}>Words & Icons</Label>
-          {/* <Checkbox
-            id="gradient"
-            label="Gradient"
-            value={style.itemsColorKind === 'gradient'}
-            onChange={(value) => {
-              style.itemsColorKind = value ? 'gradient' : 'color'
-            }}
-          /> */}
-          <Button
-            px={2}
-            py={1}
-            mr={0}
-            borderRadius="none"
-            primary={style.itemsColorKind === 'shape'}
-            outline={style.itemsColorKind !== 'shape'}
-            onClick={() => {
-              style.itemsColorKind = 'shape'
-              updateColoring()
-            }}
-          >
-            Same as Shape
-          </Button>
-          <Button
-            px={2}
-            py={1}
-            mr={0}
-            borderRadius="none"
-            primary={style.itemsColorKind === 'color'}
-            outline={style.itemsColorKind !== 'color'}
-            onClick={() => {
-              style.itemsColorKind = 'color'
-              updateColoring()
-            }}
-          >
-            Color
-          </Button>
-          <Button
-            px={2}
-            py={1}
-            borderRadius="none"
-            primary={style.itemsColorKind === 'gradient'}
-            outline={style.itemsColorKind !== 'gradient'}
-            onClick={() => {
-              style.itemsColorKind = 'gradient'
-              updateColoring()
-            }}
-          >
-            Gradient
-          </Button>
-
-          <Box mt={2}>
-            {style.itemsColorKind === 'color' && (
-              <ColorPicker
-                value={style.itemsColor}
-                onChange={(hex) => {
-                  style.itemsColor = hex
-                }}
-                onAfterChange={updateColoring}
-              />
-            )}
-            {style.itemsColorKind === 'gradient' && (
-              <>
-                <Box mr={1} display="inline-block">
-                  <ColorPicker
-                    value={style.itemsColorGradient.from}
-                    onChange={(hex) => {
-                      style.itemsColorGradient.from = hex
-                    }}
-                    onAfterChange={updateColoring}
-                  />
-                </Box>
-                <Box mr={1} display="inline-block">
-                  <ColorPicker
-                    value={style.itemsColorGradient.to}
-                    onChange={(hex) => {
-                      style.itemsColorGradient.to = hex
-                    }}
-                    onAfterChange={updateColoring}
-                  />
-                </Box>
-              </>
-            )}
-          </Box>
-        </Box>
-
-        <Box mt={2}>
-          <Slider
-            label="Emphasize larger words"
-            value={style.dimSmallerItems}
-            onChange={(value) => {
-              const val = (value as any) as number
-              style.dimSmallerItems = val
-            }}
-            onAfterChange={updateColoring}
-            min={0}
-            max={100}
-            step={1}
-          />
-        </Box>
-
-        <Box mt={4} mb={3}>
+        <Box mb={4}>
           <Label mb={2}>Shape</Label>
 
           <Box>
@@ -237,6 +135,110 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               step={1}
             />
           </Box>
+        </Box>
+
+        <Box>
+          <Label mb={2}>Words & Icons</Label>
+          {/* <Checkbox
+            id="gradient"
+            label="Gradient"
+            value={style.itemsColorKind === 'gradient'}
+            onChange={(value) => {
+              style.itemsColorKind = value ? 'gradient' : 'color'
+            }}
+          /> */}
+          <Button
+            px={2}
+            py={1}
+            mr={0}
+            borderRadius="none"
+            primary={style.itemsColorKind === 'shape'}
+            outline={style.itemsColorKind !== 'shape'}
+            onClick={() => {
+              style.itemsColorKind = 'shape'
+              updateColoring()
+            }}
+          >
+            Same as Shape
+          </Button>
+
+          <Button
+            px={2}
+            py={1}
+            borderRadius="none"
+            primary={style.itemsColorKind === 'gradient'}
+            outline={style.itemsColorKind !== 'gradient'}
+            onClick={() => {
+              style.itemsColorKind = 'gradient'
+              updateColoring()
+            }}
+          >
+            Gradient
+          </Button>
+
+          <Button
+            px={2}
+            py={1}
+            mr={0}
+            borderRadius="none"
+            primary={style.itemsColorKind === 'color'}
+            outline={style.itemsColorKind !== 'color'}
+            onClick={() => {
+              style.itemsColorKind = 'color'
+              updateColoring()
+            }}
+          >
+            Color
+          </Button>
+
+          <Box mt={2}>
+            {style.itemsColorKind === 'color' && (
+              <ColorPicker
+                value={style.itemsColor}
+                onChange={(hex) => {
+                  style.itemsColor = hex
+                }}
+                onAfterChange={updateColoring}
+              />
+            )}
+            {style.itemsColorKind === 'gradient' && (
+              <>
+                <Box mr={1} display="inline-block">
+                  <ColorPicker
+                    value={style.itemsColorGradient.from}
+                    onChange={(hex) => {
+                      style.itemsColorGradient.from = hex
+                    }}
+                    onAfterChange={updateColoring}
+                  />
+                </Box>
+                <Box mr={1} display="inline-block">
+                  <ColorPicker
+                    value={style.itemsColorGradient.to}
+                    onChange={(hex) => {
+                      style.itemsColorGradient.to = hex
+                    }}
+                    onAfterChange={updateColoring}
+                  />
+                </Box>
+              </>
+            )}
+          </Box>
+        </Box>
+
+        <Box mt={2}>
+          <Slider
+            label="Emphasize larger words"
+            value={style.dimSmallerItems}
+            onChange={(value) => {
+              const val = (value as any) as number
+              style.dimSmallerItems = val
+            }}
+            onAfterChange={updateColoring}
+            min={0}
+            max={100}
+            step={1}
+          />
         </Box>
       </>
     )

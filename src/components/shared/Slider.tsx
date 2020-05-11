@@ -45,6 +45,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
         <Box
           css={css`
             margin-bottom: -4px;
+            color: #666;
           `}
         >
           {label}
@@ -130,12 +131,12 @@ export const SliderRail: React.FC<SliderRailProps> = ({ getRailProps }) => {
         css={(theme) =>
           css({
             position: 'absolute',
-            top: 10,
+            top: 13,
             width: '100%',
-            height: 14,
+            height: 8,
             borderRadius: theme.radii.default,
             pointerEvents: 'none',
-            backgroundColor: theme.colors.muted,
+            backgroundColor: '#e8e8e8',
           })
         }
       />
@@ -152,54 +153,6 @@ interface HandleProps {
   getHandleProps: GetHandleProps
   disabled?: boolean
   showValue?: boolean
-}
-
-export const Handle: React.FC<HandleProps> = ({
-  domain: [min, max],
-  handle: { id, value, percent },
-  disabled = false,
-  getHandleProps,
-}) => {
-  return (
-    <>
-      <div
-        css={(theme) =>
-          css({
-            left: `${percent}%`,
-            position: 'absolute',
-            transform: 'translate(-50%, 0)',
-            WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-            zIndex: 5,
-            width: 28,
-            height: 30,
-            cursor: 'pointer',
-            backgroundColor: 'none',
-          })
-        }
-        {...getHandleProps(id)}
-      />
-      <div
-        role="slider"
-        aria-valuemin={min}
-        aria-valuemax={max}
-        aria-valuenow={value}
-        css={(theme) =>
-          css({
-            left: `${percent}%`,
-            position: 'absolute',
-            transform: 'translate(-50%, 0)',
-            zIndex: 2,
-            width: 24,
-            height: 24,
-            // borderRadius: '50%',
-            backgroundColor: disabled
-              ? '#666'
-              : lighten(0.1, theme.colors.primary),
-          })
-        }
-      />
-    </>
-  )
 }
 
 // *******************************************************
@@ -236,7 +189,7 @@ export const KeyboardHandle: React.FC<HandleProps> = ({
         alignItems: 'center',
         justifyContent: 'center',
         height: 24,
-        borderRadius: theme.radii.default,
+        borderRadius: 8,
         backgroundColor: disabled ? '#666' : theme.colors.primary,
         '&:hover, &:focus': {
           backgroundColor: disabled
