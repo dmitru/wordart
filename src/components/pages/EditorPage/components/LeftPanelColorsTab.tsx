@@ -32,7 +32,31 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
     return (
       <>
         <Box mb={4}>
-          <Label mb={2}>Shape</Label>
+          <Label mb={2}>Background</Label>
+          <ColorPicker
+            disableAlpha
+            value={chroma(backgroundStyle.bgColor).alpha(1).hex()}
+            onChange={(hex) => {
+              backgroundStyle.bgColor = chroma(hex).hex()
+            }}
+            onAfterChange={() => {
+              editorPageStore.editor?.setBackgroundColor(
+                backgroundStyle.bgColor
+              )
+              if (backgroundStyle.itemsColorKind === 'shape') {
+                editorPageStore.editor?.setItemsColor(
+                  'background',
+                  editorPageStore.getItemColoring('background')
+                )
+              }
+            }}
+          />
+        </Box>
+
+        <Box mb={4}>
+          <Box>
+            <Label mb={2}>Shape</Label>
+          </Box>
 
           <Box>
             <Button
@@ -71,7 +95,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                 }
               }}
             >
-              Single color
+              Color
             </Button>
           </Box>
 
@@ -118,7 +142,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               ))}
           </Box>
 
-          <Box>
+          <Box mt={2}>
             <Slider
               label="Opacity"
               value={100 * style.bgOpacity}
@@ -223,7 +247,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
         <Box mt={2}>
           <Slider
-            label="Emphasize larger words"
+            label="Make larger words brighter"
             value={style.dimSmallerItems}
             onChange={(value) => {
               const val = (value as any) as number

@@ -65,28 +65,27 @@ const TopNavWrapper = styled(Box)`
 const LeftWrapper = styled.div`
   height: 100%;
   background: white;
-  max-width: 380px;
-  min-width: 380px;
+  max-width: 440px;
+  min-width: 440px;
   flex: 1;
   z-index: 3;
   display: flex;
-  flex-direction: column;
-  box-shadow: 0 0 5px 0 #00000033;
+  flex-direction: row;
+  /* box-shadow: 0 0 5px 0 #00000033; */
 `
 
-const LeftNavbarTop = styled.div`
+export const FgBgTab = styled.div`
   z-index: 0;
   background: ${(p) => p.theme.colors.dark2};
   width: 100%;
   /* height: 50px; */
   display: flex;
   direction: row;
-  background: linear-gradient(90deg,#80578e,#3b458c);
   /* margin-bottom: 10px; */
   /* border-bottom: 5px solid ${(p) => p.theme.colors.accent}; */
 `
 
-const LeftNavbarTopBtn = styled(BaseBtn)<{ active: boolean }>`
+export const FbBgTabBtn = styled(BaseBtn)<{ active: boolean }>`
   height: 40px;
   flex: 1;
   font-weight: 500;
@@ -113,10 +112,10 @@ const LeftNavbarTopBtn = styled(BaseBtn)<{ active: boolean }>`
     `
     // font-weight: 500;
     background: #f3f3f3;
+    background: linear-gradient(90deg,#80578e,#3b458c);
     z-index: 1;
-    color: ${theme.colors.text};
-    box-shadow: 0 0 2px 0 #00000033;
-    border-top: 5px solid ${theme.colors.primary};
+    color: ${theme.colors.textLight};
+
   `}
 
   position: relative;
@@ -130,41 +129,44 @@ const LeftNavbarTopBtn = styled(BaseBtn)<{ active: boolean }>`
   }
 
   /* transition: 0.2s background; */
+`
 
-  &:hover,
-  &:focus {
-    background: #0003;
-    ${({ theme, active }) =>
-      active &&
-      `
-      background: #f3f3f3;
-    // color: ${theme.colors.textLight};
-    `}
+const LeftNavbar = styled.div<{ activeIndex: number }>`
+  /* background: ${(p) =>
+    darken(0.1, desaturate(0.5, p.theme.colors.dark4))}; */
+  background: #dedede;
+  /* border-bottom: 1px solid #cecece; */
+  padding: 0;
+  margin: 0;
+  /* height: 50px; */
+  display: flex;
+  flex-direction: column;
+  
+  z-index: 4;
+
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    transition: 0.2s transform;
+    transform: translateY(${(p) => p.activeIndex * 70}px);
+    top: 0;
+    left: 0;
+    position: absolute;
+    height: 70px;
+    width: 100%;
+    z-index: 0;
+    background: ${(p) => p.theme.colors.light};
+    border-left: 8px solid ${(p) => p.theme.colors.primary}; 
   }
 `
 
-const LeftNavbar = styled.div`
-  /* background: ${(p) =>
-    darken(0.1, desaturate(0.5, p.theme.colors.dark4))}; */
-  background: #f3f3f3;
-  /* border-bottom: 1px solid #cecece; */
-  padding: 0 10px;
-  width: 100%;
-  /* height: 50px; */
-  display: flex;
-  direction: row;
-  
-  z-index: 1;
-`
-
 const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
-  background: white;
   min-width: 20%;
   font-weight: 500;
   height: 70px;
-  padding-top: 15px;
-  padding-bottom: 8px;
-  top: 10px;
+  padding: 0 20px 0 20px;
   text-transform: uppercase;
   position: relative;
   display: flex;
@@ -173,15 +175,14 @@ const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
   align-items: center;
   font-size: 12px;
   /* background: ${(p) => p.theme.colors.light1}; */
-  background: #dedede;
+  /* background: #dedede; */
   border-radius: 0;
   color: ${(p) => p.theme.colors.dark1};
   outline: none;
   /* border: 1px solid #cecece; */
   border: none;
   border-radius: 0;
-  z-index: 0;
-  border-bottom: 10px solid transparent;
+  z-index: 1;
 
   transition: 0.2s all;
 
@@ -189,29 +190,28 @@ const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
     active &&
     `
     z-index: 1;
-    background: ${theme.colors.light};
     color: ${theme.colors.text};
-    transform: translateY(-3px);
-    border: 1px solid #cecece;
-    border-bottom: 10px solid ${theme.colors.primary};
+    background: transparent;
+    // transform: translateY(-3px);
+    // border: 1px solid #cecece;
     // box-shadow: 0 0 2px 0 #00000033;
   `}
 
   .icon {
-    width: 18px;
-    height: 18px;
-    margin-bottom: 2px;
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
   }
 
   /* transition: 0.2s background; */
 
   &:hover,
   &:focus {
-    background: ${(p) => darken(0.1, '#ddd')};
+    background: #0001;
     ${({ theme, active }) =>
       active &&
       `
-    background: ${darken(0.01, theme.colors.light)};
+      background: transparent;
     color: ${theme.colors.text};
     `}
   }
@@ -273,37 +273,15 @@ export const EditorPage = observer(() => {
 
       <EditorLayout>
         <LeftWrapper>
-          <LeftNavbarTop>
-            <LeftNavbarTopBtn
-              onClick={() => (store.activeLeftTab = 'foreground')}
-              active={store.activeLeftTab === 'foreground'}
-            >
-              {/* <Heart className="icon" /> */}
-              Foreground
-            </LeftNavbarTopBtn>
-            <LeftNavbarTopBtn
-              onClick={() => (store.activeLeftTab = 'background')}
-              active={store.activeLeftTab === 'background'}
-            >
-              {/* <HeartSquare className="icon" /> */}
-              Background
-            </LeftNavbarTopBtn>
-            <LeftNavbarTopBtn
-              onClick={() => (store.activeLeftTab = 'colors')}
-              active={store.activeLeftTab === 'colors'}
-            >
-              {/* <ColorPalette className="icon" /> */}
-              Colors
-            </LeftNavbarTopBtn>
-            <LeftNavbarTopBtn
-              onClick={() => (store.activeLeftTab = 'settings')}
-              active={store.activeLeftTab === 'settings'}
-            >
-              <Settings className="icon" />
-              {/* Settings */}
-            </LeftNavbarTopBtn>
-          </LeftNavbarTop>
-          <LeftNavbar>
+          <LeftNavbar
+            activeIndex={[
+              'shapes',
+              'colors',
+              'words',
+              'symbols',
+              'layout',
+            ].findIndex((s) => s === store.activeLeftSubtab)}
+          >
             {/* <LeftNavbarBtn
               onClick={() => {
                 editorPageStore.setLeftPanelTab('templates')
@@ -366,7 +344,25 @@ export const EditorPage = observer(() => {
           <LeftPanel id="left-panel-content">
             {store.activeLeftSubtab === 'shapes' && <LeftPanelShapesTab />}
             {store.activeLeftSubtab === 'words' && (
-              <LeftPanelWordsTab type="shape" />
+              <>
+                <FgBgTab>
+                  <FbBgTabBtn
+                    onClick={() => (store.activeLeftTab = 'foreground')}
+                    active={store.activeLeftTab === 'foreground'}
+                  >
+                    {/* <Heart className="icon" /> */}
+                    Foreground
+                  </FbBgTabBtn>
+                  <FbBgTabBtn
+                    onClick={() => (store.activeLeftTab = 'background')}
+                    active={store.activeLeftTab === 'background'}
+                  >
+                    {/* <HeartSquare className="icon" /> */}
+                    Background
+                  </FbBgTabBtn>
+                </FgBgTab>
+                <LeftPanelWordsTab type="shape" />
+              </>
             )}
             {store.activeLeftSubtab === 'symbols' && (
               <LeftPanelIconsTab type="shape" />

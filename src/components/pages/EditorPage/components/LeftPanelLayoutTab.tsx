@@ -23,6 +23,46 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
     return (
       <>
+        <Box mb={4}>
+          {/* <Checkbox
+            id="fit-shape"
+            label="Allow words to go beyond shape"
+            value={!style.fitWithinShape}
+            onChange={(value) => {
+              style.fitWithinShape = !value
+            }}
+            mb={3}
+          /> */}
+          <Slider
+            label="Density"
+            value={style.itemDensity}
+            onChange={(value) => {
+              const val = (value as any) as number
+              style.itemDensity = val
+            }}
+            onAfterChange={visualize}
+            min={0}
+            max={100}
+            step={1}
+          />
+          {style.fitWithinShape && (
+            <>
+              <Slider
+                label="Shape Offset"
+                value={style.shapePadding}
+                onChange={(value) => {
+                  const val = (value as any) as number
+                  style.shapePadding = val
+                }}
+                onAfterChange={visualize}
+                min={0}
+                max={100}
+                step={1}
+              />
+            </>
+          )}
+        </Box>
+
         {style.words.length > 0 && (
           <Box mb={4}>
             <Label>Words</Label>
@@ -84,47 +124,6 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
             />
           </Box>
         )}
-
-        <Box mb={4}>
-          <Label>Common</Label>
-          {/* <Checkbox
-            id="fit-shape"
-            label="Allow words to go beyond shape"
-            value={!style.fitWithinShape}
-            onChange={(value) => {
-              style.fitWithinShape = !value
-            }}
-            mb={3}
-          /> */}
-          <Slider
-            label="Density"
-            value={style.itemDensity}
-            onChange={(value) => {
-              const val = (value as any) as number
-              style.itemDensity = val
-            }}
-            onAfterChange={visualize}
-            min={0}
-            max={100}
-            step={1}
-          />
-          {style.fitWithinShape && (
-            <>
-              <Slider
-                label="Shape Offset"
-                value={style.shapePadding}
-                onChange={(value) => {
-                  const val = (value as any) as number
-                  style.shapePadding = val
-                }}
-                onAfterChange={visualize}
-                min={0}
-                max={100}
-                step={1}
-              />
-            </>
-          )}
-        </Box>
       </>
     )
   }
