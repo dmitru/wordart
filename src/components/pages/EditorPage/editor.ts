@@ -157,6 +157,19 @@ export class Editor {
     let shapeRasterImgData: ImageData | undefined
 
     const dimSmallerFactor = coloring.dimSmallerItems / 100
+
+    if (!shapeRaster || !shapeRasterImgData) {
+      shapeRaster = this.paperItems.shape?.rasterize(undefined, false)
+      shapeRasterImgData = shapeRaster!.getImageData(
+        new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
+      )
+    }
+
+    // const canvas = shapeRaster!.getSubCanvas(
+    //   new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
+    // )
+    // const ctx = canvas.getContext('2d')!
+
     for (let i = 0; i < this.itemsShape.length; ++i) {
       const item = this.itemsShape[i]
       const area = itemAreas[i]
@@ -179,11 +192,15 @@ export class Editor {
             new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
           )
         }
-        const imgDataPos = path.position.multiply(
-          shapeRasterImgData.width / shapeRaster!.width
-        )
+
+        const imgDataPos = path.position
+          .subtract(shapeRaster!.bounds.topLeft)
+          .multiply(shapeRasterImgData.width / shapeRaster!.bounds.width)
         imgDataPos.x = Math.round(imgDataPos.x)
         imgDataPos.y = Math.round(imgDataPos.y)
+
+        // ctx.fillStyle = 'red'
+        // ctx.fillRect(imgDataPos.x, imgDataPos.y, 10, 10)
 
         const r =
           shapeRasterImgData.data[
@@ -198,6 +215,17 @@ export class Editor {
             4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width) + 2
           ] / 255
 
+        // console.log(
+        //   'shapeRasterImgData',
+        //   shapeRasterImgData.width,
+        //   shapeRasterImgData.height,
+        //   imgDataPos.x,
+        //   imgDataPos.y,
+        //   r,
+        //   g,
+        //   b
+        // )
+
         path.fillColor = new paper.Color(r, g, b, 1)
         path.strokeColor = path.fillColor
       }
@@ -205,6 +233,8 @@ export class Editor {
         (dimSmallerFactor * (area - minArea)) / (maxArea - minArea) +
         (1 - dimSmallerFactor)
     }
+
+    // console.screenshot(ctx.canvas, 0.3)
   }
 
   setBgShape = async (
