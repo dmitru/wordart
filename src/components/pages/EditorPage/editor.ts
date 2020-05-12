@@ -3,6 +3,7 @@ import {
   fetchImage,
   removeLightPixels,
   invertImageMask,
+  createCanvas,
 } from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
 import { Generator, ItemId, Item } from 'components/pages/EditorPage/generator'
@@ -443,7 +444,7 @@ export class Editor {
     shapeItem.opacity = 1
 
     let shapeRaster: paper.Raster | undefined = shapeItem.rasterize(
-      this.paperItems.shape.view.resolution,
+      this.paperItems.shape.view.resolution / paper.project.view.pixelRatio,
       false
     )
     shapeRaster.remove()
@@ -451,7 +452,16 @@ export class Editor {
     const shapeCanvas = shapeRaster.getSubCanvas(
       new paper.Rectangle(0, 0, shapeRaster.width, shapeRaster.height)
     )
-    const shapeRasterBounds = shapeRaster.bounds
+
+    const sceneBounds = this.getSceneBounds(0)
+    const sceneCanvas = createCanvas({
+      w: sceneBounds.width,
+      h: sceneBounds.height,
+    })
+
+    sceneCanvas
+      .getContext('2d')!
+      .drawImage(shapeCanvas, shapeRaster.bounds.left, shapeRaster.bounds.top)
 
     shapeRaster = undefined
 
@@ -467,8 +477,8 @@ export class Editor {
     const result = await this.generator.fillShape(
       {
         shape: {
-          canvas: shapeCanvas,
-          bounds: shapeRasterBounds,
+          canvas: sceneCanvas,
+          bounds: sceneBounds,
           processing: {
             removeWhiteBg: {
               enabled: shapeConfig.kind === 'img',
