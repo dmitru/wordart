@@ -2,12 +2,9 @@ import { observer } from 'mobx-react'
 import { useStore } from 'root-store'
 import styled from '@emotion/styled'
 import * as evaicons from '@styled-icons/evaicons-outline'
-import { useState, useCallback, useRef } from 'react'
 import { Label } from './shared'
 import { Button } from 'components/shared/Button'
 import { Box } from 'components/shared/Box'
-import { BaseBtn } from 'components/shared/BaseBtn'
-import { TextInput } from 'components/shared/TextInput'
 import {
   ShapeThumbnails,
   ShapeThumbnailBtn,
@@ -16,31 +13,21 @@ import {
 import { observable } from 'mobx'
 import { uniqBy } from 'lodash'
 
-export type LeftPanelIconsTabProps = {
-  type: 'shape' | 'background'
-}
+export type LeftPanelIconsTabProps = {}
 
 const Toolbar = styled(Box)``
 
 const IconsList = styled(Box)``
-
-const WordRow = styled(Box)`
-  width: 100%;
-  padding: 4px 0;
-  display: flex;
-`
 
 const state = observable({
   isAdding: false,
 })
 
 export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
-  (props) => {
+  () => {
     const { editorPageStore } = useStore()
-    const style = props.type
-      ? editorPageStore.shapeStyle
-      : editorPageStore.backgroundStyle
-    const icons = style.icons
+    const style = editorPageStore.styles.shape
+    const icons = style.icons.iconList
 
     const shapes = editorPageStore
       .getAvailableShapes()
@@ -68,7 +55,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 py={1}
                 outline
                 onClick={() => {
-                  style.icons = []
+                  style.icons.iconList = []
                 }}
               >
                 Clear
@@ -97,8 +84,8 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
           <ShapeSelector
             shapes={shapes}
             onSelected={(shape) => {
-              style.icons = uniqBy(
-                [...style.icons, { shapeId: shape.id }],
+              style.icons.iconList = uniqBy(
+                [...style.icons.iconList, { shapeId: shape.id }],
                 'shapeId'
               )
               state.isAdding = false
@@ -113,7 +100,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 <ShapeThumbnailBtn
                   key={icon.shapeId}
                   onClick={() => {
-                    style.icons = style.icons.filter(
+                    style.icons.iconList = style.icons.iconList.filter(
                       (i) => i.shapeId !== icon.shapeId
                     )
                   }}

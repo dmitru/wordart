@@ -12,10 +12,16 @@ export interface ConsoleLogger extends loglevel.Logger {
 }
 
 const createConsoleLoggers = () => {
+  const editorStore = createConsoleLogger('editorStore')
   const editor = createConsoleLogger('editor')
   const generator = createConsoleLogger('generator')
 
+  editorStore.enable('debug')
+  editor.enable('debug')
+  generator.enable('info')
+
   return {
+    editorStore,
     editor,
     generator,
   }

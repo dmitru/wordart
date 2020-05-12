@@ -2,19 +2,16 @@ import { observer } from 'mobx-react'
 import { useStore } from 'root-store'
 import styled from '@emotion/styled'
 import * as evaicons from '@styled-icons/evaicons-outline'
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback } from 'react'
 import { Label } from './shared'
 import { Button } from 'components/shared/Button'
 import { Box } from 'components/shared/Box'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import { TextInput } from 'components/shared/TextInput'
-import { css } from '@emotion/react'
 import { observable } from 'mobx'
 import { uniq } from 'lodash'
 
-export type LeftPanelWordsTabProps = {
-  type: 'shape' | 'background'
-}
+export type LeftPanelWordsTabProps = {}
 
 const WordList = styled(Box)``
 
@@ -135,7 +132,7 @@ const Toolbar = styled(Box)``
 export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
   (props) => {
     const { editorPageStore: store } = useStore()
-    const style = props.type ? store.shapeStyle : store.backgroundStyle
+    const style = store.styles.shape
     const words = style.words
 
     const fonts = store.getAvailableFonts()
@@ -165,32 +162,30 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               {fonts.map((font) => {
                 const { style: fontStyle } = font
                 return (
-                  <>
-                    <FontButtonContainer>
-                      <FontButton
-                        onClick={() => {
-                          if (state.replacingFontIndex != null) {
-                            style.wordFonts = uniq(
-                              style.wordFonts.map((f, index) =>
-                                index === state.replacingFontIndex
-                                  ? fontStyle.fontId
-                                  : f
-                              )
+                  <FontButtonContainer key={fontStyle.fontId}>
+                    <FontButton
+                      onClick={() => {
+                        if (state.replacingFontIndex != null) {
+                          style.words.fonts = uniq(
+                            style.words.fonts.map((f, index) =>
+                              index === state.replacingFontIndex
+                                ? fontStyle.fontId
+                                : f
                             )
-                          } else {
-                            style.wordFonts = uniq([
-                              ...style.wordFonts,
-                              fontStyle.fontId,
-                            ])
-                          }
-                          state.isAddingFont = false
-                          state.replacingFontIndex = undefined
-                        }}
-                      >
-                        <img src={fontStyle.thumbnail} />
-                      </FontButton>
-                    </FontButtonContainer>
-                  </>
+                          )
+                        } else {
+                          style.words.fonts = uniq([
+                            ...style.words.fonts,
+                            fontStyle.fontId,
+                          ])
+                        }
+                        state.isAddingFont = false
+                        state.replacingFontIndex = undefined
+                      }}
+                    >
+                      <img src={fontStyle.thumbnail} />
+                    </FontButton>
+                  </FontButtonContainer>
                 )
               })}
             </>
@@ -215,7 +210,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                   py={1}
                   outline
                   onClick={() => {
-                    style.wordFonts = [style.wordFonts[0]]
+                    style.words.fonts = [style.words.fonts[0]]
                   }}
                 >
                   Clear
@@ -223,36 +218,34 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               </Toolbar>
 
               {/* Added fonts */}
-              {style.wordFonts.map((fontId, index) => {
-                const { font, style: fontStyle } = store.getFontById(fontId)!
+              {style.words.fonts.map((fontId, index) => {
+                const { style: fontStyle } = store.getFontById(fontId)!
                 return (
-                  <>
-                    <FontButtonContainer>
-                      <FontButton
-                        onClick={() => {
-                          state.replacingFontIndex = index
-                          state.isAddingFont = true
-                        }}
-                      >
-                        <img src={fontStyle.thumbnail} />
-                      </FontButton>
+                  <FontButtonContainer key={fontId}>
+                    <FontButton
+                      onClick={() => {
+                        state.replacingFontIndex = index
+                        state.isAddingFont = true
+                      }}
+                    >
+                      <img src={fontStyle.thumbnail} />
+                    </FontButton>
 
-                      <FontDeleteButton
-                        px={2}
-                        py={0}
-                        ml={3}
-                        secondary
-                        outline
-                        onClick={() => {
-                          style.wordFonts = style.wordFonts.filter(
-                            (fId) => fId !== fontId
-                          )
-                        }}
-                      >
-                        <evaicons.CloseOutline size="20" />
-                      </FontDeleteButton>
-                    </FontButtonContainer>
-                  </>
+                    <FontDeleteButton
+                      px={2}
+                      py={0}
+                      ml={3}
+                      secondary
+                      outline
+                      onClick={() => {
+                        style.words.fonts = style.words.fonts.filter(
+                          (fId) => fId !== fontId
+                        )
+                      }}
+                    >
+                      <evaicons.CloseOutline size="20" />
+                    </FontDeleteButton>
+                  </FontButtonContainer>
                 )
               })}
             </>
@@ -268,7 +261,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                 py={1}
                 mr={2}
                 primary
-                onClick={() => store.addEmptyWord(props.type)}
+                onClick={() => store.addEmptyWord('shape')}
               >
                 <evaicons.PlusOutline size="20" /> Add
               </Button>
@@ -276,19 +269,19 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                 px={2}
                 py={1}
                 outline
-                onClick={() => store.clearWords(props.type)}
+                onClick={() => store.clearWords('shape')}
               >
                 Clear
               </Button>
             </Toolbar>
 
             <WordList mt={2}>
-              {words.map((word) => (
+              {words.wordList.map((word) => (
                 <WordRow key={word.id}>
                   <WordTitleInlineEditor
                     value={word.text}
                     onChange={(value) => {
-                      store.updateWord(props.type, word.id, {
+                      store.updateWord('shape', word.id, {
                         text: value,
                       })
                     }}
@@ -299,7 +292,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     py={2}
                     secondary
                     outline
-                    onClick={() => store.deleteWord(props.type, word.id)}
+                    onClick={() => store.deleteWord('shape', word.id)}
                   >
                     <evaicons.CloseOutline size="20" />
                   </WordDeleteButton>

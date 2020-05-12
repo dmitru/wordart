@@ -1,7 +1,4 @@
-import {
-  WordConfigId,
-  ShapeConfig,
-} from 'components/pages/EditorPage/editor-page-store'
+import { WordConfigId } from 'components/pages/EditorPage/editor-page-store'
 import {
   Dimensions,
   createCanvasCtx,
@@ -14,11 +11,11 @@ import {
 } from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
 import { getWasmModule, WasmModule } from 'lib/wordart/wasm/wasm-module'
-import { Rect, spreadRect } from 'lib/wordart/geometry'
+import { Rect } from 'lib/wordart/geometry'
 import { ImageProcessorWasm } from 'lib/wordart/wasm/image-processor-wasm'
 import { Path, BoundingBox } from 'opentype.js'
 import { sample, uniq, flatten, noop } from 'lodash'
-import { sleep } from 'utils/async'
+import { ShapeConfig } from 'components/pages/EditorPage/style'
 
 const FONT_SIZE = 100
 

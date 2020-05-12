@@ -14,9 +14,6 @@ import { Checkbox } from 'components/shared/Checkbox'
 import { ColorPicker } from 'components/shared/ColorPicker'
 import chroma from 'chroma-js'
 import { Button } from 'components/shared/Button'
-import { Label } from 'components/pages/EditorPage/components/shared'
-import { TextInput } from 'components/shared/TextInput'
-import { Search } from '@styled-icons/material/Search'
 import { SearchInput } from 'components/shared/SearchInput'
 
 export type LeftPanelShapesTabProps = {}
@@ -29,12 +26,12 @@ const state = observable({
 export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
   () => {
     const { editorPageStore } = useStore()
-    const shapeStyle = editorPageStore.shapeStyle
-
-    const { shapeStyle: style } = editorPageStore
+    const style = editorPageStore.styles.shape
 
     const visualize = useCallback(() => {
-      editorPageStore.editor?.generateItems('shape')
+      editorPageStore.editor?.generateShapeItems({
+        style,
+      })
     }, [])
 
     const [query, setQuery] = useState('')
@@ -76,9 +73,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                 <Box flex={1} width={1} mb={2}>
                   <Slider
                     label="Opacity"
-                    value={100 * style.bgOpacity}
+                    value={100 * style.fill.opacity}
                     onChange={(value) => {
-                      style.bgOpacity = value / 100
+                      style.fill.opacity = value / 100
                     }}
                     onAfterChange={(value) => {
                       editorPageStore.editor?.setShapeFillOpacity(value / 100)
@@ -139,9 +136,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                   min={0}
                   max={100}
                   step={1}
-                  value={shapeStyle.processing.edges.amount}
+                  value={style.processing.edges.amount}
                   onAfterChange={(value) => {
-                    shapeStyle.processing.edges.amount = value
+                    style.processing.edges.amount = value
                     visualize()
                   }}
                 />
@@ -149,20 +146,18 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                 <Checkbox
                   label="Invert"
                   id="invert"
-                  value={shapeStyle.processing.invert.enabled}
+                  value={style.processing.invert.enabled}
                   onChange={(value) => {
-                    shapeStyle.processing.invert.enabled = value
+                    style.processing.invert.enabled = value
                     visualize()
                   }}
                 />
 
-                {shapeStyle.processing.invert.enabled && (
+                {style.processing.invert.enabled && (
                   <ColorPicker
-                    value={shapeStyle.processing.invert.fillColor}
+                    value={style.processing.invert.color}
                     onChange={(color) => {
-                      shapeStyle.processing.invert.fillColor = chroma(
-                        color
-                      ).hex()
+                      style.processing.invert.color = chroma(color).hex()
                       visualize()
                     }}
                   />

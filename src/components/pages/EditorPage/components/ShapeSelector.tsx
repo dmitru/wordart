@@ -1,17 +1,10 @@
 import { observer } from 'mobx-react'
 import styled from '@emotion/styled'
-import {
-  ShapeConfig,
-  ShapeId,
-} from 'components/pages/EditorPage/editor-page-store'
 import { ReactSVG } from 'react-svg'
-import { useState } from 'react'
-import { TextInput } from 'components/shared/TextInput'
 import { Box, BoxProps } from 'components/shared/Box'
 import { noop } from 'lodash'
-import Sticky from 'react-stickynode'
-import { css } from '@emotion/react'
 import { darken } from 'polished'
+import { ShapeConfig, ShapeId } from 'components/pages/EditorPage/style'
 
 export type ShapeSelectorProps = {
   shapes: ShapeConfig[]

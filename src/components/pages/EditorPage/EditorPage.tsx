@@ -1,35 +1,26 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { Layout } from 'components/layout'
 import styled from '@emotion/styled'
 import 'lib/wordart/console-extensions'
-import { Settings } from '@styled-icons/material/Settings'
-import { HeartSquare } from '@styled-icons/boxicons-solid/HeartSquare'
-import { Heart } from '@styled-icons/boxicons-solid/Heart'
-import { Template } from '@styled-icons/heroicons-solid/Template'
-import { Rocket } from '@styled-icons/entypo/Rocket'
-import { Text } from '@styled-icons/evaicons-solid/Text'
 import { Shapes } from '@styled-icons/fa-solid/Shapes'
 import { TextFields } from '@styled-icons/material/TextFields'
 import { Face } from '@styled-icons/material/Face'
 import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
 import { LayoutMasonry } from '@styled-icons/remix-fill/LayoutMasonry'
-import { ColorLens } from '@styled-icons/material-rounded/ColorLens'
 import { observer } from 'mobx-react'
 import { LeftPanelShapesTab } from 'components/pages/EditorPage/components/LeftPanelShapesTab'
 import { useStore } from 'root-store'
 import { LeftPanelWordsTab } from 'components/pages/EditorPage/components/LeftPanelWordsTab'
 import { Dimensions } from 'lib/wordart/canvas-utils'
 import { LeftPanelColorsTab } from 'components/pages/EditorPage/components/LeftPanelColorsTab'
-import { observable, runInAction } from 'mobx'
 import { Button } from 'components/shared/Button'
 import { Box } from 'components/shared/Box'
 import { LeftPanelLayoutTab } from 'components/pages/EditorPage/components/LeftPanelLayoutTab'
-import { darken, lighten, desaturate } from 'polished'
+import { darken, desaturate } from 'polished'
 import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
 import { css } from '@emotion/react'
 import { LeftPanelIconsTab } from 'components/pages/EditorPage/components/LeftPanelIconsTab'
 import { BaseBtn } from 'components/shared/BaseBtn'
-import Headroom from 'react-headroom'
+import { observable } from 'mobx'
 
 const PageLayoutWrapper = styled.div`
   display: flex;
@@ -252,13 +243,30 @@ const Canvas = styled.canvas`
   margin: auto;
 `
 
+const state = observable({
+  leftTab: 'shapes' as LeftPanelTab,
+  words: {
+    targetTab: 'shape' as TargetTab,
+  },
+})
+
+export type TargetTab = 'shape' | 'bg'
+export type LeftPanelTab = 'shapes' | 'words' | 'symbols' | 'colors' | 'layout'
+export const leftPanelTabs: LeftPanelTab[] = [
+  'shapes',
+  'words',
+  'symbols',
+  'colors',
+  'layout',
+]
+
 export const EditorPage = observer(() => {
-  const [canvasSize, setCanvasSize] = useState<Dimensions>({ w: 900, h: 900 })
+  const [canvasSize] = useState<Dimensions>({ w: 900, h: 900 })
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { editorPageStore: store } = useStore()
 
   useEffect(() => {
-    console.log('editorPageStore.state', store.state)
+    console.log('useEffect: editorPageStore.state', store.state)
     if (canvasRef.current && store.state !== 'initialized') {
       store.initEditor({
         canvas: canvasRef.current,
@@ -274,17 +282,11 @@ export const EditorPage = observer(() => {
       <EditorLayout>
         <LeftWrapper>
           <LeftNavbar
-            activeIndex={[
-              'shapes',
-              'colors',
-              'words',
-              'symbols',
-              'layout',
-            ].findIndex((s) => s === store.activeLeftSubtab)}
+            activeIndex={leftPanelTabs.findIndex((s) => s === state.leftTab)}
           >
             {/* <LeftNavbarBtn
               onClick={() => {
-                editorPageStore.setLeftPanelTab('templates')
+                editorPagestate.leftTab = ('templates')
               }}
               active={editorPageStore.activeLeftTab === 'templates'}
             >
@@ -293,9 +295,9 @@ export const EditorPage = observer(() => {
             </LeftNavbarBtn> */}
             <LeftNavbarBtn
               onClick={() => {
-                store.setLeftPanelTab('shapes')
+                state.leftTab = 'shapes'
               }}
-              active={store.activeLeftSubtab === 'shapes'}
+              active={state.leftTab === 'shapes'}
             >
               <Shapes className="icon" />
               Shape
@@ -303,28 +305,18 @@ export const EditorPage = observer(() => {
 
             <LeftNavbarBtn
               onClick={() => {
-                store.setLeftPanelTab('colors')
+                state.leftTab = 'words'
               }}
-              active={store.activeLeftSubtab === 'colors'}
-            >
-              <ColorPalette className="icon" />
-              Colors
-            </LeftNavbarBtn>
-
-            <LeftNavbarBtn
-              onClick={() => {
-                store.setLeftPanelTab('words')
-              }}
-              active={store.activeLeftSubtab === 'words'}
+              active={state.leftTab === 'words'}
             >
               <TextFields className="icon" />
               Words
             </LeftNavbarBtn>
             <LeftNavbarBtn
               onClick={() => {
-                store.setLeftPanelTab('symbols')
+                state.leftTab = 'symbols'
               }}
-              active={store.activeLeftSubtab === 'symbols'}
+              active={state.leftTab === 'symbols'}
             >
               <Face className="icon" />
               Icons
@@ -332,9 +324,19 @@ export const EditorPage = observer(() => {
 
             <LeftNavbarBtn
               onClick={() => {
-                store.setLeftPanelTab('layout')
+                state.leftTab = 'colors'
               }}
-              active={store.activeLeftSubtab === 'layout'}
+              active={state.leftTab === 'colors'}
+            >
+              <ColorPalette className="icon" />
+              Colors
+            </LeftNavbarBtn>
+
+            <LeftNavbarBtn
+              onClick={() => {
+                state.leftTab = 'layout'
+              }}
+              active={state.leftTab === 'layout'}
             >
               <LayoutMasonry className="icon" />
               Layout
@@ -342,36 +344,30 @@ export const EditorPage = observer(() => {
           </LeftNavbar>
 
           <LeftPanel id="left-panel-content">
-            {store.activeLeftSubtab === 'shapes' && <LeftPanelShapesTab />}
-            {store.activeLeftSubtab === 'words' && (
+            {state.leftTab === 'shapes' && <LeftPanelShapesTab />}
+            {state.leftTab === 'words' && (
               <>
-                <FgBgTab>
+                {/* <FgBgTab>
                   <FbBgTabBtn
-                    onClick={() => (store.activeLeftTab = 'foreground')}
-                    active={store.activeLeftTab === 'foreground'}
+                    onClick={() => {state.words.targetTab = 'shape'}}
+                    active={state.words.targetTab === 'shape'}
                   >
-                    {/* <Heart className="icon" /> */}
-                    Foreground
+                    Shape
                   </FbBgTabBtn>
                   <FbBgTabBtn
-                    onClick={() => (store.activeLeftTab = 'background')}
-                    active={store.activeLeftTab === 'background'}
+                    onClick={() => {state.words.targetTab = 'bg'}}
+                    active={state.words.targetTab === 'bg'}
                   >
-                    {/* <HeartSquare className="icon" /> */}
                     Background
                   </FbBgTabBtn>
-                </FgBgTab>
-                <LeftPanelWordsTab type="shape" />
+                </FgBgTab> */}
+                <LeftPanelWordsTab />
               </>
             )}
-            {store.activeLeftSubtab === 'symbols' && (
-              <LeftPanelIconsTab type="shape" />
-            )}
-            {store.activeLeftSubtab === 'colors' && <LeftPanelColorsTab />}
+            {state.leftTab === 'symbols' && <LeftPanelIconsTab />}
+            {state.leftTab === 'colors' && <LeftPanelColorsTab />}
 
-            {store.activeLeftSubtab === 'layout' && (
-              <LeftPanelLayoutTab type="shape" />
-            )}
+            {state.leftTab === 'layout' && <LeftPanelLayoutTab />}
           </LeftPanel>
         </LeftWrapper>
 
@@ -390,7 +386,9 @@ export const EditorPage = observer(() => {
               accent
               disabled={store.isVisualizing}
               onClick={() => {
-                store.editor?.generateItems('shape')
+                store.editor?.generateShapeItems({
+                  style: store.styles.shape,
+                })
               }}
             >
               {!store.isVisualizing && (

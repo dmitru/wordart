@@ -1,100 +1,50 @@
-import { observable, action, set, runInAction } from 'mobx'
+import { observable, action, set } from 'mobx'
 import { RootStore } from 'root-store'
-import {
-  Editor,
-  EditorInitParams,
-  SvgShapeColorsMap,
-} from 'components/pages/EditorPage/editor'
-import { icons } from 'data/shapes'
-import { iconsFaRegular } from 'data/shapes-fa-regular'
+import { Editor, EditorInitParams } from 'components/pages/EditorPage/editor'
 import { FontConfig, fonts, FontId, FontStyleConfig } from 'data/fonts'
-
-type LeftPanelTab = 'foreground' | 'background' | 'colors' | 'settings'
-type LeftPanelSubtab = 'shapes' | 'words' | 'symbols' | 'colors' | 'layout'
-
-export type ShapeStyle = {
-  bgColorMap: string[]
-  bgColor: string
-  bgColorKind: 'color-map' | 'single-color'
-  bgOpacity: number
-
-  processing: {
-    invert: {
-      enabled: boolean
-      fillColor: string
-    }
-    edges: {
-      enabled: boolean
-      amount: number
-    }
-  }
-
-  itemsColorKind: 'color' | 'gradient' | 'shape'
-  itemsColor: string
-  itemsColorGradient: ItemsColorGradient
-  dimSmallerItems: number
-
-  words: WordConfig[]
-  wordFonts: FontId[]
-  icons: IconConfig[]
-  angles: number[]
-  shapePadding: number
-  /** Number: 0 - 100% */
-  itemDensity: number
-  /** Number: 0 - 100% */
-  wordsMaxSize: number
-  /** Number: 0 - 100% */
-  iconsMaxSize: number
-  /** Number: 0 - 100% */
-  iconsProportion: number
-  fitWithinShape: boolean
-}
-
-export type ItemsColorGradient = {
-  from: string
-  to: string
-  assignBy: 'random' | 'size'
-}
-
-export type ItemsColoring =
-  | ItemsColoringShapeColor
-  | ItemsColoringSingleColor
-  | ItemsColoringGradient
-
-export type ItemsColoringShapeColor = {
-  kind: 'shape'
-  dimSmallerItems: number
-}
-
-export type ItemsColoringSingleColor = {
-  kind: 'single-color'
-  color: string
-  dimSmallerItems: number
-}
-
-export type ItemsColoringGradient = {
-  kind: 'gradient'
-  colorFrom: string
-  colorTo: string
-  assignColorBy: 'random' | 'size'
-  dimSmallerItems: number
-}
+import { shapes } from 'components/pages/EditorPage/icons'
+import {
+  ShapeConfig,
+  ShapeId,
+  defaultBackgroundStyle,
+  defaultShapeStyle,
+  WordStyleConfig,
+} from 'components/pages/EditorPage/style'
+import { consoleLoggers } from 'utils/console-logger'
 
 export class EditorPageStore {
+  logger = consoleLoggers.editorStore
+
   rootStore: RootStore
-  constructor(rootStore: RootStore) {
-    this.rootStore = rootStore
-  }
+  editor: Editor | null = null
+
+  private nextWordId =
+    defaultBackgroundStyle.words.wordList.length +
+    defaultShapeStyle.words.wordList.length
 
   @observable isVisualizing = false
   @observable visualizingProgress = null as number | null
 
-  editor: Editor | null = null
   @observable state: 'initializing' | 'initialized' | 'destroyed' =
     'initializing'
 
+  @observable styles = {
+    bg: defaultBackgroundStyle,
+    shape: defaultShapeStyle,
+  }
+
+  @observable availableShapes: ShapeConfig[] = shapes
+  @observable selectedShapeId: ShapeId = shapes[4].id
+
+  constructor(rootStore: RootStore) {
+    this.rootStore = rootStore
+  }
+
   @action initEditor = (editorInitParams: EditorInitParams) => {
+    this.logger.debug('initEditor', editorInitParams)
+
     this.editor = new Editor(editorInitParams)
+    this.editor.setBgColor(this.styles.bg.fill)
     this.state = 'initialized'
     // @ts-ignore
     window['editor'] = this.editor
@@ -107,113 +57,9 @@ export class EditorPageStore {
     this.state = 'destroyed'
   }
 
-  @observable activeLeftTab: LeftPanelTab = 'foreground'
-  @observable activeLeftSubtab: LeftPanelSubtab = 'shapes'
-
-  @observable shapeStyle: ShapeStyle = {
-    bgColorKind: 'single-color',
-    bgColor: '#576DC7',
-    bgColorMap: ['#576DC7'],
-    bgOpacity: 0.1,
-    iconsMaxSize: 30,
-    iconsProportion: 20,
-    processing: {
-      edges: {
-        enabled: true,
-        amount: 80,
-      },
-      invert: {
-        enabled: false,
-        fillColor: 'red',
-      },
-    },
-    // bgColor: '#ffffff',
-    itemsColorKind: 'shape',
-    itemsColor: '#970707',
-    itemsColorGradient: {
-      from: '#f45b5c',
-      to: '#2540BF',
-      assignBy: 'random',
-    },
-    dimSmallerItems: 20,
-    shapePadding: 15,
-    itemDensity: 95,
-    wordsMaxSize: 70,
-    wordFonts: [fonts[3].styles[0].fontId, fonts[2].styles[0].fontId],
-    words: defaultWordsConfig,
-    icons: [],
-    // icons: range(10).map(() => ({ shapeId: sample(svgIconsOutline)!.id })),
-    fitWithinShape: true,
-    angles: [0],
-    // angles: [-15, 20, 34, -76, 84, -65, 81],
-  }
-  @observable backgroundStyle: ShapeStyle = {
-    processing: {
-      edges: {
-        enabled: false,
-        amount: 80,
-      },
-      invert: {
-        enabled: false,
-        fillColor: 'red,',
-      },
-    },
-    itemsColorKind: 'gradient',
-    itemsColor: '#bbb',
-    itemsColorGradient: {
-      from: '#bbb',
-      to: '#333',
-      assignBy: 'random',
-    },
-    iconsMaxSize: 30,
-    iconsProportion: 20,
-    bgColorKind: 'single-color',
-    bgColor: 'white',
-    bgColorMap: ['#ffffff'],
-    bgOpacity: 1,
-    shapePadding: 3,
-    itemDensity: 20,
-    wordFonts: [fonts[0].styles[0].fontId],
-    wordsMaxSize: 70,
-    dimSmallerItems: 50,
-    words: defaultWordsConfig2,
-    icons: [],
-    fitWithinShape: true,
-    angles: [20],
-  }
-
-  getItemColoring = (type: 'shape' | 'background'): ItemsColoring => {
-    const style = type === 'shape' ? this.shapeStyle : this.backgroundStyle
-    if (style.itemsColorKind === 'color') {
-      return {
-        kind: 'single-color',
-        color: style.itemsColor,
-        dimSmallerItems: style.dimSmallerItems,
-      }
-    } else if (style.itemsColorKind === 'gradient') {
-      return {
-        kind: 'gradient',
-        colorFrom: style.itemsColorGradient.from,
-        colorTo: style.itemsColorGradient.to,
-        assignColorBy: style.itemsColorGradient.assignBy,
-        dimSmallerItems: style.dimSmallerItems,
-      }
-    }
-    return {
-      kind: 'shape',
-      dimSmallerItems: style.dimSmallerItems,
-    }
-  }
-
-  @observable availableShapes: ShapeConfig[] = shapes
-  @observable selectedShapeId: ShapeId = shapes[4].id
-  @observable shapeColorsMap: SvgShapeColorsMap | null = null
-
-  private nextWordId = defaultWordsConfig.length + 1
-
-  getAvailableShapes = (): ShapeConfig[] => shapes
+  getAvailableShapes = (): ShapeConfig[] => this.availableShapes
   getShapeById = (shapeId: ShapeId): ShapeConfig | undefined =>
-    shapes.find((s) => s.id === shapeId)
+    this.availableShapes.find((s) => s.id === shapeId)
 
   getAvailableFonts = (): { font: FontConfig; style: FontStyleConfig }[] => {
     const result: { font: FontConfig; style: FontStyleConfig }[] = []
@@ -237,36 +83,32 @@ export class EditorPageStore {
     return undefined
   }
 
-  getSelectedShape = () => {
-    return this.availableShapes.find((s) => s.id === this.selectedShapeId)!
-  }
-
-  @action setLeftPanelTab = (tabId: LeftPanelSubtab) => {
-    this.activeLeftSubtab = tabId
-  }
+  getSelectedShape = () =>
+    this.availableShapes.find((s) => s.id === this.selectedShapeId)!
 
   @action selectShape = async (shapeId: ShapeId) => {
-    if (this.editor) {
-      this.selectedShapeId = shapeId
-      await this.editor.setBgShape(shapeId)
-    } else {
-      this.selectedShapeId = shapeId
-    }
+    this.selectedShapeId = shapeId
+    const shape = this.getShapeById(shapeId)!
+    await this.editor?.setShape({
+      shape: shape,
+      bgColors: this.styles.bg.fill,
+      shapeColors: this.styles.shape.fill,
+    })
   }
 
-  @action deleteWord = (type: 'shape' | 'background', wordId: WordConfigId) => {
-    const style = type === 'shape' ? this.shapeStyle : this.backgroundStyle
-    style.words = style.words.filter((w) => w.id !== wordId)
+  @action deleteWord = (target: StyleKind, wordId: WordConfigId) => {
+    const style = this.styles[target]
+    style.words.wordList = style.words.wordList.filter((w) => w.id !== wordId)
   }
 
-  @action clearWords = (type: 'shape' | 'background') => {
-    const style = type === 'shape' ? this.shapeStyle : this.backgroundStyle
-    style.words = []
+  @action clearWords = (target: StyleKind) => {
+    const style = this.styles[target]
+    style.words.wordList = []
   }
 
-  @action addEmptyWord = (type: 'shape' | 'background') => {
-    const style = type === 'shape' ? this.shapeStyle : this.backgroundStyle
-    style.words.push({
+  @action addEmptyWord = (target: StyleKind) => {
+    const style = this.styles[target]
+    style.words.wordList.push({
       id: this.nextWordId,
       text: '',
     })
@@ -274,12 +116,12 @@ export class EditorPageStore {
   }
 
   @action updateWord = (
-    type: 'shape' | 'background',
+    target: StyleKind,
     wordId: WordConfigId,
-    update: Partial<Omit<WordConfig, 'id'>>
+    update: Partial<Omit<WordStyleConfig, 'id'>>
   ) => {
-    const style = type === 'shape' ? this.shapeStyle : this.backgroundStyle
-    const word = style.words.find((w) => w.id === wordId)
+    const style = this.styles[target]
+    const word = style.words.wordList.find((w) => w.id === wordId)
     if (!word) {
       throw new Error(`missing word, id = ${wordId}`)
     }
@@ -287,155 +129,6 @@ export class EditorPageStore {
   }
 }
 
-export type WordConfig = {
-  id: WordConfigId
-  text: string
-}
-
-export type IconConfig = {
-  shapeId: ShapeId
-}
-
 export type WordConfigId = number
 
-const defaultWordsConfig: WordConfig[] = [
-  // 'O',
-  // '8',
-  'cloud',
-  'art',
-  'amazing',
-  'beautiful',
-  'drawing',
-  'wow',
-  'impress',
-  'stunning',
-  'creative',
-].map((s, index) => ({ id: index, text: s } as WordConfig))
-
-const defaultWordsConfig2: WordConfig[] = [
-  'WORD',
-  'art',
-  'beautiful',
-  'emotions',
-].map((s, index) => ({ id: index, text: s } as WordConfig))
-
-export type ShapeConfig = {
-  id: ShapeId
-  kind: ShapeKind
-  keepSvgColors?: boolean
-  url: string
-  title: string
-  fill?: string
-}
-
-export type ShapeKind = 'img' | 'svg'
-export type ShapeId = number
-
-const svgIcons: ShapeConfig[] = [
-  icons.find((i) => i.title === 'Square full'),
-  ...icons.slice(0, 30),
-]
-  .filter((i) => i != null)
-  .map((icon, index) =>
-    icon
-      ? ({
-          id: 100 + index,
-          kind: 'svg',
-          title: icon.title,
-          url: icon.url,
-        } as ShapeConfig)
-      : null
-  )
-  .filter((x) => x != null) as ShapeConfig[]
-
-const svgIconsOutline: ShapeConfig[] = [...iconsFaRegular.slice(0, 30)]
-  .filter((i) => i != null)
-  .map((icon, index) =>
-    icon
-      ? ({
-          id: 1000 + index,
-          kind: 'svg',
-          title: icon.title,
-          url: icon.url,
-        } as ShapeConfig)
-      : null
-  )
-  .filter((x) => x != null) as ShapeConfig[]
-
-const shapes: ShapeConfig[] = [
-  {
-    id: 1,
-    kind: 'svg',
-    title: 'Cat',
-    url: '/images/cat.svg',
-    keepSvgColors: true,
-  },
-  {
-    id: -1,
-    kind: 'svg',
-    title: 'Apple',
-    url: '/images/apple.svg',
-    keepSvgColors: true,
-  },
-  {
-    id: -2,
-    kind: 'svg',
-    title: 'Bear Face',
-    url: '/images/bear-face.svg',
-    keepSvgColors: true,
-  },
-  {
-    id: -3,
-    kind: 'svg',
-    title: 'Bear Side',
-    url: '/images/bear-side.svg',
-    keepSvgColors: true,
-  },
-  {
-    id: -4,
-    kind: 'svg',
-    title: 'Bear Belly',
-    url: '/images/bear-belly.svg',
-    keepSvgColors: true,
-  },
-  {
-    id: 2,
-    kind: 'img',
-    title: 'Cat',
-    url: '/images/cat.png',
-  },
-  {
-    id: 3,
-    kind: 'img',
-    title: 'Beatles',
-    url: '/images/beatles.jpg',
-  },
-  {
-    id: 4,
-    kind: 'img',
-    title: 'Number Six',
-    url: '/images/number_six.png',
-  },
-  {
-    id: 5,
-    kind: 'img',
-    title: 'Darth Vader',
-    url: '/images/darth_vader.jpg',
-  },
-  {
-    id: 6,
-    kind: 'svg',
-    title: 'Flash',
-    url: '/images/flash.svg',
-    fill: 'red',
-  },
-  {
-    id: 7,
-    kind: 'svg',
-    title: 'Yin Yang',
-    url: '/images/yin-yang.svg',
-    fill: 'green',
-  },
-  ...svgIcons,
-  ...svgIconsOutline,
-]
+export type StyleKind = 'shape' | 'bg'

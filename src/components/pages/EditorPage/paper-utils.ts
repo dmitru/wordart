@@ -4,6 +4,7 @@ import {
   HBoundsWasm,
 } from 'lib/wordart/wasm/wasm-module'
 import paper from 'paper'
+import { flatten } from 'lodash'
 
 export const matrixToPaperTransform = (m?: tm.Matrix): paper.Matrix =>
   m ? new paper.Matrix([m.a, m.b, m.c, m.d, m.e, m.f]) : new paper.Matrix()
@@ -103,4 +104,69 @@ export const hBoundsWasmSerializedToPaperGroup = (
   // group.transform(matrixToPaperTransform(hbounds.transform))
 
   return group
+}
+
+/** Recursively finds all fill colors used (ignoring pure black) */
+export const getFillColor = (
+  items: paper.Item[],
+  level = 0,
+  maxLevel = 6
+): paper.Color | undefined => {
+  for (let item of items) {
+    if (item.fillColor) {
+      return item.fillColor
+    }
+    if (item.children && level < maxLevel) {
+      const color = getFillColor(item.children, level + 1)
+      if (color && color.red * color.green * color.blue > 0) {
+        return color
+      }
+    }
+  }
+  return undefined
+}
+
+/** Recursively finds all stroke colors used */
+export const getStrokeColor = (
+  items: paper.Item[],
+  level = 0,
+  maxLevel = 6
+): paper.Color | undefined => {
+  for (let item of items) {
+    if (item.strokeColor) {
+      return item.strokeColor
+    }
+    if (item.children && level < maxLevel) {
+      const color = getStrokeColor(item.children, level + 1)
+      if (color) {
+        return color
+      }
+    }
+  }
+  return undefined
+}
+
+/** Find all children Items with IDs */
+export const findNamedChildren = (
+  item: paper.Item,
+  level = 0,
+  maxLevel = 6
+): { name: string; item: paper.Item }[] => {
+  const namedChildren = (item as any)._namedChildren as
+    | { [key: string]: paper.Item[] }
+    | undefined
+  if (namedChildren && Object.keys(namedChildren).length > 0) {
+    return Object.keys(namedChildren).map((name) => ({
+      name,
+      item: namedChildren[name][0],
+    }))
+  }
+  if (item.children && level < maxLevel) {
+    const resultsForChildren = item.children.map((i) =>
+      findNamedChildren(i, level + 1)
+    )
+    return flatten(resultsForChildren)
+  }
+
+  return []
 }

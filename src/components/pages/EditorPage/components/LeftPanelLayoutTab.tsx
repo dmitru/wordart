@@ -5,20 +5,15 @@ import { Label } from 'components/pages/EditorPage/components/shared'
 import { Box } from 'components/shared/Box'
 import { useCallback } from 'react'
 
-export type LeftPanelLayoutTabProps = {
-  type: 'shape' | 'background'
-}
+export type LeftPanelLayoutTabProps = {}
 
 export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
   (props) => {
     const { editorPageStore } = useStore()
-    const style =
-      props.type === 'shape'
-        ? editorPageStore.shapeStyle
-        : editorPageStore.backgroundStyle
+    const style = editorPageStore.styles.shape
 
     const visualize = useCallback(() => {
-      editorPageStore.editor?.generateItems('shape')
+      editorPageStore.editor?.generateShapeItems({ style })
     }, [])
 
     return (
@@ -35,24 +30,24 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
           /> */}
           <Slider
             label="Density"
-            value={style.itemDensity}
+            value={style.layout.itemDensity}
             onChange={(value) => {
               const val = (value as any) as number
-              style.itemDensity = val
+              style.layout.itemDensity = val
             }}
             onAfterChange={visualize}
             min={0}
             max={100}
             step={1}
           />
-          {style.fitWithinShape && (
+          {style.layout.fitWithinShape && (
             <>
               <Slider
                 label="Shape Offset"
-                value={style.shapePadding}
+                value={style.layout.shapePadding}
                 onChange={(value) => {
                   const val = (value as any) as number
-                  style.shapePadding = val
+                  style.layout.shapePadding = val
                 }}
                 onAfterChange={visualize}
                 min={0}
@@ -63,16 +58,16 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
           )}
         </Box>
 
-        {style.words.length > 0 && (
+        {style.words.wordList.length > 0 && (
           <Box mb={4}>
             <Label>Words</Label>
 
             <Slider
               label="Angle"
-              value={style.angles[0]}
+              value={style.words.angles.angles[0]}
               onChange={(value) => {
                 const val = (value as any) as number
-                style.angles = [val]
+                style.words.angles.angles = [val]
               }}
               onAfterChange={visualize}
               min={-90}
@@ -82,10 +77,10 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
             <Slider
               label="Size"
-              value={style.wordsMaxSize}
+              value={style.layout.wordsMaxSize}
               onChange={(value) => {
                 const val = (value as any) as number
-                style.wordsMaxSize = val
+                style.layout.wordsMaxSize = val
               }}
               onAfterChange={visualize}
               min={20}
@@ -95,15 +90,15 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
           </Box>
         )}
 
-        {style.icons.length > 0 && (
+        {style.icons.iconList.length > 0 && (
           <Box mb={4}>
             <Label>Icons</Label>
             <Slider
               label="Size"
-              value={style.iconsMaxSize}
+              value={style.layout.iconsMaxSize}
               onChange={(value) => {
                 const val = (value as any) as number
-                style.iconsMaxSize = val
+                style.layout.iconsMaxSize = val
               }}
               onAfterChange={visualize}
               min={20}
@@ -112,10 +107,10 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
             />
             <Slider
               label="Amount"
-              value={style.iconsProportion}
+              value={style.layout.iconsProportion}
               onChange={(value) => {
                 const val = (value as any) as number
-                style.iconsProportion = val
+                style.layout.iconsProportion = val
               }}
               onAfterChange={visualize}
               min={0}
