@@ -87,9 +87,13 @@ export class EditorPageStore {
     this.availableShapes.find((s) => s.id === this.selectedShapeId)!
 
   @action selectShape = async (shapeId: ShapeId) => {
+    if (!this.editor) {
+      return
+    }
+
     this.selectedShapeId = shapeId
     const shape = this.getShapeById(shapeId)!
-    await this.editor?.setShape({
+    await this.editor.setShape({
       shape: shape,
       bgColors: this.styles.bg.fill,
       shapeColors: this.styles.shape.fill,

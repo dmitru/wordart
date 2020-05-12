@@ -28,6 +28,20 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
       true
     )
 
+    const updateShapeColoring = useThrottleCallback(
+      () => {
+        editorPageStore.editor?.setShapeFillColors(shapeStyle.fill)
+        if (shapeStyle.itemsColoring.kind === 'shape') {
+          editorPageStore.editor?.setItemsColor(
+            'shape',
+            getItemsColoring(shapeStyle)
+          )
+        }
+      },
+      20,
+      true
+    )
+
     return (
       <>
         <Box mb={4}>
@@ -64,7 +78,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               outline={shapeStyle.fill.kind !== 'color-map'}
               onClick={() => {
                 shapeStyle.fill.kind = 'color-map'
-                updateShapeItemsColoring()
+                updateShapeColoring()
               }}
             >
               Shape colors
@@ -77,7 +91,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               outline={shapeStyle.fill.kind !== 'single-color'}
               onClick={() => {
                 shapeStyle.fill.kind = 'single-color'
-                updateShapeItemsColoring()
+                updateShapeColoring()
               }}
             >
               Color
@@ -93,7 +107,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   shapeStyle.fill.color = chroma(hex).hex()
                 }}
                 onAfterChange={() => {
-                  updateShapeItemsColoring()
+                  updateShapeColoring()
                 }}
               />
             )}
@@ -108,7 +122,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                       shapeStyle.fill.colorMap[index] = chroma(hex).hex()
                     }}
                     onAfterChange={() => {
-                      updateShapeItemsColoring()
+                      updateShapeColoring()
                     }}
                   />
                 </Box>
@@ -186,6 +200,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           <Box mt={2}>
             {shapeStyle.itemsColoring.kind === 'color' && (
               <ColorPicker
+                disableAlpha
                 value={shapeStyle.itemsColoring.color}
                 onChange={(hex) => {
                   shapeStyle.itemsColoring.color = hex
@@ -197,6 +212,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               <>
                 <Box mr={1} display="inline-block">
                   <ColorPicker
+                    disableAlpha
                     value={shapeStyle.itemsColoring.gradient.from}
                     onChange={(hex) => {
                       shapeStyle.itemsColoring.gradient.from = hex
@@ -206,6 +222,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                 </Box>
                 <Box mr={1} display="inline-block">
                   <ColorPicker
+                    disableAlpha
                     value={shapeStyle.itemsColoring.gradient.to}
                     onChange={(hex) => {
                       shapeStyle.itemsColoring.gradient.to = hex

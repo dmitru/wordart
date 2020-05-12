@@ -6,7 +6,7 @@ import chroma from 'chroma-js'
 import paper from 'paper'
 import { loadFont } from 'lib/wordart/fonts'
 import { Path } from 'opentype.js'
-import { max, min, groupBy, sortBy } from 'lodash'
+import { max, min, groupBy, sortBy, flatten } from 'lodash'
 import seedrandom from 'seedrandom'
 import {
   ShapeConfig,
@@ -123,29 +123,47 @@ export class Editor {
       return
     }
 
-    if (!this.paperItems.shape) {
+    if (!this.paperItems.shape || !this.paperItems.originalShape) {
       return
     }
 
-    const { shapeConfig, colorsMap } = this.currentShape
+    if (config.kind === 'color-map') {
+      const shape = this.paperItems.originalShape.clone() as paper.Group
+      const colorsMap = computeColorsMap(shape)
 
-    if (config.kind === 'color-map' && colorsMap) {
-      this.logger.debug('>  Using color map')
+      this.logger.debug('>  Using color map', colorsMap)
       colorsMap.colors.forEach((colorEntry, entryIndex) => {
         this.logger.debug(
-          `>    Setting color to ${config.colorMap[entryIndex]}, ${colorEntry.strokeColor} for ${colorEntry.paperItems.length} items...`
+          `>    Setting color to ${config.colorMap[entryIndex]}, ${colorEntry.color} for ${colorEntry.paperItems.length} items...`
         )
         colorEntry.paperItems.forEach((item) => {
-          item.fillColor = new paper.Color(
-            config.colorMap[entryIndex] || colorEntry.fillColor
-          )
-          item.strokeColor = new paper.Color(colorEntry.strokeColor)
+          const color = config.colorMap[entryIndex] || colorEntry.color
+          if (colorEntry.fill) {
+            item.fillColor = new paper.Color(color)
+          }
+          if (colorEntry.stroke) {
+            item.strokeColor = new paper.Color(color)
+          }
         })
       })
+
+      this.paperItems.shape.remove()
+      paper.project.activeLayer.insertChild(1, shape)
+
+      this.currentShape.colorsMap = colorsMap
+      this.paperItems.shape = shape
     } else {
       this.logger.debug('>  Using single color')
-      this.paperItems.shape.fillColor = new paper.Color(config.color)
-      this.paperItems.shape.strokeColor = this.paperItems.shape.fillColor
+
+      const shape = this.paperItems.originalShape.clone()
+      const color = new paper.Color(config.color)
+      shape.fillColor = color
+      shape.strokeColor = color
+
+      this.paperItems.shape.remove()
+      paper.project.activeLayer.insertChild(1, shape)
+
+      this.paperItems.shape = shape
     }
 
     this.setShapeFillOpacity(config.opacity)
@@ -210,11 +228,14 @@ export class Editor {
 
     const dimSmallerFactor = coloring.dimSmallerItems / 100
 
-    if (!shapeRaster || !shapeRasterImgData) {
-      shapeRaster = this.paperItems.shape?.rasterize(undefined, false)
-      shapeRasterImgData = shapeRaster!.getImageData(
+    if ((!shapeRaster || !shapeRasterImgData) && this.paperItems.shape) {
+      const shapeItemClone = this.paperItems.shape.clone({ insert: false })
+      shapeItemClone.opacity = 1
+      shapeRaster = shapeItemClone.rasterize(undefined, false)
+      shapeRasterImgData = shapeRaster.getImageData(
         new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
       )
+      shapeItemClone.remove()
     }
 
     // const canvas = shapeRaster!.getSubCanvas(
@@ -315,43 +336,7 @@ export class Editor {
           })
       )
 
-      const namedChildren = sortBy(
-        findNamedChildren(shapeItemGroup),
-        (c) => c.name
-      )
-      const namedChildrenByColor = groupBy(
-        namedChildren,
-        (ch) => ch.name.split('_')[0]
-      )
-
-      const colorEntries: SvgShapeColorsMapEntry[] = []
-      if (Object.keys(namedChildrenByColor).length > 0) {
-        Object.keys(namedChildrenByColor).forEach((colorKey) => {
-          const children = namedChildrenByColor[colorKey]
-          const fillColor = (
-            getFillColor(children.map((c) => c.item)) ||
-            new paper.Color('black')
-          ).toCSS(true)
-          const strokeColor = (
-            getStrokeColor(children.map((c) => c.item)) ||
-            new paper.Color('black')
-          ).toCSS(true)
-
-          colorEntries.push({
-            paperItems: children.map((c) => c.item),
-            fillColor,
-            strokeColor,
-          })
-        })
-      } else {
-        colorEntries.push({
-          paperItems: [shapeItemGroup],
-          strokeColor: 'black',
-          fillColor: 'black',
-        })
-      }
-
-      colorsMap = { colors: colorEntries }
+      colorsMap = computeColorsMap(shapeItemGroup)
 
       shapeItem = shapeItemGroup
     } else {
@@ -408,6 +393,9 @@ export class Editor {
       }
     }
 
+    if (colorsMap) {
+      shapeColors.colorMap = colorsMap?.colors.map((c) => c.color)
+    }
     this.setShapeFillColors(shapeColors)
     return { colorsMap }
   }
@@ -615,8 +603,9 @@ export type SvgShapeColorsMap = {
 }
 
 export type SvgShapeColorsMapEntry = {
-  fillColor: string
-  strokeColor: string
+  stroke: boolean
+  fill: boolean
+  color: ColorString
   paperItems: paper.Item[]
 }
 
@@ -649,4 +638,80 @@ export const getItemsColoring = (
     kind: 'shape',
     dimSmallerItems: coloring.dimSmallerItems,
   }
+}
+
+export const computeColorsMap = (
+  shapeItemGroup: paper.Group
+): SvgShapeColorsMap => {
+  const namedChildren = sortBy(findNamedChildren(shapeItemGroup), (c) => c.name)
+  const namedChildrenByColor = groupBy(
+    namedChildren,
+    (ch) => ch.name.split('_')[0]
+  )
+
+  let colorEntries: SvgShapeColorsMapEntry[] = []
+  if (Object.keys(namedChildrenByColor).length > 0) {
+    Object.keys(namedChildrenByColor).forEach((colorKey) => {
+      const children = namedChildrenByColor[colorKey]
+      const fillColor = (
+        getFillColor(children.map((c) => c.item)) || new paper.Color('black')
+      ).toCSS(true)
+      const strokeColor = (
+        getStrokeColor(children.map((c) => c.item)) || new paper.Color('black')
+      ).toCSS(true)
+
+      if (fillColor !== strokeColor) {
+        colorEntries.push({
+          paperItems: children.map((c) => c.item),
+          color: fillColor,
+          fill: true,
+          stroke: false,
+        })
+        colorEntries.push({
+          paperItems: children.map((c) => c.item),
+          color: strokeColor,
+          fill: false,
+          stroke: true,
+        })
+      } else {
+        colorEntries.push({
+          paperItems: children.map((c) => c.item),
+          color: strokeColor,
+          fill: true,
+          stroke: true,
+        })
+      }
+    })
+  } else {
+    colorEntries.push({
+      paperItems: [shapeItemGroup],
+      color: '#333',
+      stroke: true,
+      fill: true,
+    })
+  }
+
+  // Deduplicate color entries
+  const colorEntriesGrouped = groupBy(
+    colorEntries,
+    (e) => `${e.color}:${e.fill}:${e.stroke}`
+  )
+  colorEntries = Object.values(colorEntriesGrouped).map((ceGroup) => {
+    const ce = ceGroup[0]
+    return {
+      fill: ce.fill,
+      stroke: ce.stroke,
+      color: ce.color,
+      paperItems: flatten(ceGroup.map((ce) => ce.paperItems)),
+    } as SvgShapeColorsMapEntry
+  })
+
+  // Sort color entries
+  colorEntries = sortBy(
+    colorEntries,
+    (ce) => -(10 * (ce.fill ? 1 : 0) + (ce.stroke ? 1 : 0))
+  )
+
+  const colorsMap: SvgShapeColorsMap = { colors: colorEntries }
+  return colorsMap
 }

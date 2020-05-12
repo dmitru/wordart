@@ -17,11 +17,11 @@ const defaultWordsList: WordStyleConfig[] = [
 
 export const defaultShapeStyle: ShapeStyleConfig = {
   fill: {
-    kind: 'single-color',
+    kind: 'color-map',
     color: '#576DC7',
     colorMap: ['#576DC7'],
     defaultColorMap: ['#576DC7'],
-    opacity: 0.3,
+    opacity: 0.4,
   },
 
   layout: {

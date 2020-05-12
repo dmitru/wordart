@@ -59,9 +59,9 @@ export class Generator {
       h: Math.floor(shapeCanvasScale * shapeCanvas.height),
     }
 
-    const shapeCtx = createCanvasCtx(shapeCanvasDimensions)
+    const unrotatedCtx = createCanvasCtx(shapeCanvasDimensions)
 
-    shapeCtx.drawImage(
+    unrotatedCtx.drawImage(
       shapeCanvas,
       0,
       0,
@@ -69,13 +69,13 @@ export class Generator {
       shapeCanvas.height,
       1,
       1,
-      shapeCtx.canvas.width - 2,
-      shapeCtx.canvas.height - 2
+      unrotatedCtx.canvas.width - 2,
+      unrotatedCtx.canvas.height - 2
     )
 
     if (task.shape.processing.removeWhiteBg.enabled) {
       removeLightPixels(
-        shapeCtx.canvas,
+        unrotatedCtx.canvas,
         task.shape.processing.removeWhiteBg.lightnessThreshold / 100
       )
     }
@@ -86,28 +86,33 @@ export class Generator {
       !task.shape.processing.invert.enabled
     ) {
       edgesCanvas = detectEdges(
-        shapeCtx.canvas,
+        unrotatedCtx.canvas,
         (task.shape.processing.edges.blur * shapeCanvasMaxExtent) / 300,
         task.shape.processing.edges.lowThreshold,
         task.shape.processing.edges.highThreshold
       )
     }
 
-    clampPixelOpacityUp(shapeCtx.canvas)
+    clampPixelOpacityUp(unrotatedCtx.canvas)
 
     if (task.shape.processing.invert.enabled) {
-      invertImageMask(shapeCtx.canvas)
+      invertImageMask(unrotatedCtx.canvas)
       // Remove a 1px border around the shape to make largest-rect algorithm work correctly
-      shapeCtx.save()
-      shapeCtx.globalCompositeOperation = 'destination-out'
-      shapeCtx.lineWidth = 1
-      shapeCtx.strokeRect(0, 0, shapeCtx.canvas.width, shapeCtx.canvas.height)
-      shapeCtx.restore()
+      unrotatedCtx.save()
+      unrotatedCtx.globalCompositeOperation = 'destination-out'
+      unrotatedCtx.lineWidth = 1
+      unrotatedCtx.strokeRect(
+        0,
+        0,
+        unrotatedCtx.canvas.width,
+        unrotatedCtx.canvas.height
+      )
+      unrotatedCtx.restore()
     }
 
     if (task.shape.processing.shrink.enabled) {
       shrinkShape(
-        shapeCtx.canvas,
+        unrotatedCtx.canvas,
         (task.shape.processing.shrink.amount / 100) *
           5 *
           (shapeCanvasMaxExtent / 100)
@@ -115,10 +120,10 @@ export class Generator {
     }
 
     if (edgesCanvas) {
-      shapeCtx.save()
-      shapeCtx.globalCompositeOperation = 'destination-out'
-      shapeCtx.drawImage(edgesCanvas, 0, 0)
-      shapeCtx.restore()
+      unrotatedCtx.save()
+      unrotatedCtx.globalCompositeOperation = 'destination-out'
+      unrotatedCtx.drawImage(edgesCanvas, 0, 0)
+      unrotatedCtx.restore()
     }
 
     const imageProcessor = new ImageProcessorWasm(this.wasm)
@@ -274,8 +279,8 @@ export class Generator {
       rotationInfos.set(0, computeRotationInfo(0))
     }
 
-    shapeCtx.fillStyle = 'black'
-    shapeCtx.globalCompositeOperation = 'destination-out'
+    unrotatedCtx.fillStyle = 'black'
+    unrotatedCtx.globalCompositeOperation = 'destination-out'
 
     let wordIndex = 0
     let iconIndex = 0
@@ -307,12 +312,27 @@ export class Generator {
         if (!rotationInfo) {
           throw new Error(`rotation info is missing for angle ${angle}`)
         }
-        const {
+        let {
           ctx: rotatedCtx,
           rotatedCanvasDimensions,
           transform: rotatedBoundsTransform,
           inverseTransform: rotatedBoundsTransformInverted,
         } = rotationInfo
+
+        if (wordAngles.length === 1 && wordAngles[0] === 0) {
+          // Optimize for case of just 1 angle
+          rotatedCtx = unrotatedCtx
+          rotatedBoundsTransform = new paper.Matrix()
+          rotatedBoundsTransformInverted = new paper.Matrix()
+        } else {
+          rotatedCtx = rotationInfo.ctx
+          clearCanvas(rotatedCtx)
+          rotatedCtx.save()
+          rotatedBoundsTransformInverted.applyToContext(rotatedCtx)
+
+          rotatedCtx.drawImage(unrotatedCtx.canvas, 0, 0)
+          rotatedCtx.restore()
+        }
         // console.log('i = ', i, angle)
 
         const wordPathBounds = wordPathsBounds[wordIndex]
@@ -320,13 +340,6 @@ export class Generator {
 
         // let scale = 1 - (0.5 * i) / nIter
         let scale = 1
-
-        clearCanvas(rotatedCtx)
-        rotatedCtx.save()
-        rotatedBoundsTransformInverted.applyToContext(rotatedCtx)
-
-        rotatedCtx.drawImage(shapeCtx.canvas, 0, 0)
-        rotatedCtx.restore()
 
         // rotatedCtx.fillStyle = '#f002'
         // rotatedCtx.fillRect(
@@ -338,13 +351,13 @@ export class Generator {
         // console.log(rotatedCanvasDimensions)
         // console.screenshot(rotatedCtx.canvas)
 
-        const scratchImgData = rotatedCtx.getImageData(
+        const rotatedImgData = rotatedCtx.getImageData(
           0,
           0,
           rotatedCanvasDimensions.w,
           rotatedCanvasDimensions.h
         )
-        const scratchCanvasBounds: Rect = {
+        const rotatedCanvasBounds: Rect = {
           x: 0,
           y: 0,
           w: rotatedCanvasDimensions.w,
@@ -357,8 +370,8 @@ export class Generator {
         const wordAspect = wordPathSize.w / wordPathSize.h
 
         const largestRectWasm = imageProcessor.findLargestRect(
-          scratchImgData,
-          scratchCanvasBounds,
+          rotatedImgData,
+          rotatedCanvasBounds,
           wordAspect
         )
         const largestRect: Rect = {
@@ -401,16 +414,16 @@ export class Generator {
           pathScale *= maxMaxDim / maxDim
         }
 
-        shapeCtx.save()
-        rotatedBoundsTransform.applyToContext(shapeCtx)
+        unrotatedCtx.save()
+        rotatedBoundsTransform.applyToContext(unrotatedCtx)
 
         if (task.itemPadding > 0) {
-          shapeCtx.shadowBlur =
+          unrotatedCtx.shadowBlur =
             ((task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6) /
             pathScale
-          shapeCtx.shadowColor = 'red'
+          unrotatedCtx.shadowColor = 'red'
         } else {
-          shapeCtx.shadowBlur = 0
+          unrotatedCtx.shadowBlur = 0
         }
 
         if (
@@ -427,10 +440,10 @@ export class Generator {
             largestRect.h -
             pathScale * wordPathBounds.y2 -
             Math.random() * dy
-          shapeCtx.translate(tx, ty)
-          shapeCtx.scale(pathScale, pathScale)
+          unrotatedCtx.translate(tx, ty)
+          unrotatedCtx.scale(pathScale, pathScale)
 
-          wordPath.draw(shapeCtx)
+          wordPath.draw(unrotatedCtx)
 
           placedWordItems.push({
             wordPath,
@@ -450,7 +463,7 @@ export class Generator {
               .scale(pathScale),
           })
         } else {
-          shapeCtx.fillRect(
+          unrotatedCtx.fillRect(
             largestRect.x,
             largestRect.y,
             Math.max(1.2, largestRect.w),
@@ -458,7 +471,7 @@ export class Generator {
           )
         }
 
-        shapeCtx.restore()
+        unrotatedCtx.restore()
 
         // console.screenshot(shapeCtx.canvas)
 
@@ -473,7 +486,7 @@ export class Generator {
           throw new Error(`rotation info is missing for angle ${angle}`)
         }
 
-        const {
+        let {
           ctx: rotatedCtx,
           rotatedCanvasDimensions,
           transform: rotatedBoundsTransform,
@@ -481,16 +494,23 @@ export class Generator {
         } = rotationInfo
         // console.log('i = ', i, angle)
 
+        if (angle === 0) {
+          // Optimize for case of just 1 angle
+          rotatedCtx = unrotatedCtx
+          rotatedBoundsTransform = new paper.Matrix()
+          rotatedBoundsTransformInverted = new paper.Matrix()
+        } else {
+          rotatedCtx = rotationInfo.ctx
+          clearCanvas(rotatedCtx)
+          rotatedCtx.save()
+          rotatedBoundsTransformInverted.applyToContext(rotatedCtx)
+
+          rotatedCtx.drawImage(unrotatedCtx.canvas, 0, 0)
+          rotatedCtx.restore()
+        }
+
         // let scale = 1 - (0.5 * i) / nIter
         let scale = 1
-
-        clearCanvas(rotatedCtx)
-        rotatedCtx.save()
-        rotatedBoundsTransformInverted.applyToContext(rotatedCtx)
-
-        rotatedCtx.drawImage(shapeCtx.canvas, 0, 0)
-        rotatedCtx.restore()
-
         // rotatedCtx.fillStyle = '#f002'
         // rotatedCtx.fillRect(
         //   0,
@@ -501,13 +521,13 @@ export class Generator {
         // console.log(rotatedCanvasDimensions)
         // console.screenshot(rotatedCtx.canvas)
 
-        const scratchImgData = rotatedCtx.getImageData(
+        const rotatedImgData = rotatedCtx.getImageData(
           0,
           0,
           rotatedCanvasDimensions.w,
           rotatedCanvasDimensions.h
         )
-        const scratchCanvasBounds: Rect = {
+        const rotatedCanvasBounds: Rect = {
           x: 0,
           y: 0,
           w: rotatedCanvasDimensions.w,
@@ -522,8 +542,8 @@ export class Generator {
         const aspect = iconDims.w / iconDims.h
 
         const largestRectWasm = imageProcessor.findLargestRect(
-          scratchImgData,
-          scratchCanvasBounds,
+          rotatedImgData,
+          rotatedCanvasBounds,
           aspect
         )
         const largestRect: Rect = {
@@ -567,16 +587,16 @@ export class Generator {
         // shapeCtx.lineWidth = 2
         // shapeCtx.strokeRect(...spreadRect(largestRect))
 
-        shapeCtx.save()
-        rotatedBoundsTransform.applyToContext(shapeCtx)
+        unrotatedCtx.save()
+        rotatedBoundsTransform.applyToContext(unrotatedCtx)
 
         if (task.itemPadding > 0) {
-          shapeCtx.shadowBlur =
+          unrotatedCtx.shadowBlur =
             ((task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6) /
             iconScale
-          shapeCtx.shadowColor = 'red'
+          unrotatedCtx.shadowColor = 'red'
         } else {
-          shapeCtx.shadowBlur = 0
+          unrotatedCtx.shadowBlur = 0
         }
 
         // console.log(
@@ -600,8 +620,8 @@ export class Generator {
             largestRect.h -
             iconScale * (iconBounds.y + iconBounds.h) -
             Math.random() * dy
-          shapeCtx.translate(tx, ty)
-          shapeCtx.scale(iconScale, iconScale)
+          unrotatedCtx.translate(tx, ty)
+          unrotatedCtx.scale(iconScale, iconScale)
 
           // console.log('iconScale: ', iconScale)
           // console.log('rasterCanvas: ', rasterCanvas.width, rasterCanvas.height)
@@ -615,7 +635,7 @@ export class Generator {
           // console.log('---------------------')
 
           // shapeCtx.imageSmoothingEnabled = false
-          shapeCtx.drawImage(
+          unrotatedCtx.drawImage(
             rasterCanvas,
             0,
             0,
@@ -644,7 +664,7 @@ export class Generator {
               .scale(iconScale),
           })
         } else {
-          shapeCtx.fillRect(
+          unrotatedCtx.fillRect(
             largestRect.x,
             largestRect.y,
             Math.max(1.2, largestRect.w),
@@ -652,7 +672,7 @@ export class Generator {
           )
         }
 
-        shapeCtx.restore()
+        unrotatedCtx.restore()
 
         // console.screenshot(shapeCtx.canvas)
 
@@ -671,7 +691,7 @@ export class Generator {
 
     const t2 = performance.now()
 
-    console.screenshot(shapeCtx.canvas, 1)
+    console.screenshot(unrotatedCtx.canvas, 1)
     console.log(
       `Placed ${
         placedWordItems.length
