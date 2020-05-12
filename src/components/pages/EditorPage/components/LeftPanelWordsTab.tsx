@@ -10,8 +10,11 @@ import { BaseBtn } from 'components/shared/BaseBtn'
 import { TextInput } from 'components/shared/TextInput'
 import { observable } from 'mobx'
 import { uniq } from 'lodash'
+import { TargetKind } from 'components/pages/EditorPage/editor'
 
-export type LeftPanelWordsTabProps = {}
+export type LeftPanelWordsTabProps = {
+  target: TargetKind
+}
 
 const WordList = styled(Box)``
 
@@ -130,9 +133,9 @@ const state = observable({
 const Toolbar = styled(Box)``
 
 export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
-  (props) => {
+  ({ target }) => {
     const { editorPageStore: store } = useStore()
-    const style = store.styles.shape
+    const style = store.styles[target]
     const words = style.words
 
     const fonts = store.getAvailableFonts()
@@ -261,7 +264,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                 py={1}
                 mr={2}
                 primary
-                onClick={() => store.addEmptyWord('shape')}
+                onClick={() => store.addEmptyWord(target)}
               >
                 <evaicons.PlusOutline size="20" /> Add
               </Button>
@@ -269,7 +272,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                 px={2}
                 py={1}
                 outline
-                onClick={() => store.clearWords('shape')}
+                onClick={() => store.clearWords(target)}
               >
                 Clear
               </Button>
@@ -281,7 +284,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                   <WordTitleInlineEditor
                     value={word.text}
                     onChange={(value) => {
-                      store.updateWord('shape', word.id, {
+                      store.updateWord(target, word.id, {
                         text: value,
                       })
                     }}
@@ -292,7 +295,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     py={2}
                     secondary
                     outline
-                    onClick={() => store.deleteWord('shape', word.id)}
+                    onClick={() => store.deleteWord(target, word.id)}
                   >
                     <evaicons.CloseOutline size="20" />
                   </WordDeleteButton>

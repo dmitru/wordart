@@ -77,8 +77,8 @@ export const ShapeThumbnailBtn: React.FC<
 }
 
 const ShapeThumbnailBtnInnerImg = styled.img`
-  width: 88px;
-  height: 88px;
+  width: 96px;
+  height: 96px;
   margin: 0;
   object-fit: contain;
 `
@@ -88,6 +88,7 @@ export const ShapeThumbnails = styled(Box)`
   flex-direction: row;
   flex-wrap: wrap;
   align-content: flex-start;
+  margin-right: -16px;
 `
 
 const ShapeThumbnailBtnInner = styled.button<
@@ -99,9 +100,9 @@ const ShapeThumbnailBtnInner = styled.button<
 >`
   outline: none;
   background: white;
-  width: 98px;
+  width: 106px;
   border: 1px solid #ddd;
-  height: 98px;
+  height: 106px;
   display: inline-flex;
   padding: 5px;
   margin: 0;

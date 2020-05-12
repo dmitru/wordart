@@ -4,16 +4,19 @@ import { Slider } from 'components/shared/Slider'
 import { Label } from 'components/pages/EditorPage/components/shared'
 import { Box } from 'components/shared/Box'
 import { useCallback } from 'react'
+import { TargetKind } from 'components/pages/EditorPage/editor'
 
-export type LeftPanelLayoutTabProps = {}
+export type LeftPanelLayoutTabProps = {
+  target: TargetKind
+}
 
 export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
-  (props) => {
+  ({ target }) => {
     const { editorPageStore } = useStore()
-    const style = editorPageStore.styles.shape
+    const style = editorPageStore.styles[target]
 
     const visualize = useCallback(() => {
-      editorPageStore.editor?.generateShapeItems({ style })
+      // editorPageStore.editor?.generateShapeItems({ style })
     }, [])
 
     return (

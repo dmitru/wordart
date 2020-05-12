@@ -1,5 +1,9 @@
 import { EditorPageStore } from 'components/pages/EditorPage/editor-page-store'
-import { fetchImage } from 'lib/wordart/canvas-utils'
+import {
+  fetchImage,
+  removeLightPixels,
+  invertImageMask,
+} from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
 import { Generator, ItemId, Item } from 'components/pages/EditorPage/generator'
 import chroma from 'chroma-js'
@@ -349,6 +353,14 @@ export class Editor {
           }
         }
       )
+      const canvas = shapeItemRaster.getSubCanvas(
+        new paper.Rectangle(0, 0, shapeItemRaster.width, shapeItemRaster.height)
+      )
+      removeLightPixels(canvas, 0.95)
+      const imgData = canvas
+        .getContext('2d')!
+        .getImageData(0, 0, shapeItemRaster.width, shapeItemRaster.height)
+      shapeItemRaster.setImageData(imgData, new paper.Point(0, 0))
       shapeItem = shapeItemRaster
     }
 
@@ -407,6 +419,183 @@ export class Editor {
       width: paper.view.bounds.width - pad * 2,
       height: paper.view.bounds.height - pad * 2,
     })
+
+  generateBgItems = async (params: { style: BackgroundStyleConfig }) => {
+    const { style } = params
+    const coloring = getItemsColoring(style)
+
+    this.logger.debug('generateShapeItems')
+
+    if (!this.paperItems.shape) {
+      console.error('No paperItems.shape')
+      return
+    }
+    if (!this.paperItems.originalShape) {
+      console.error('No paperItemsoriginal')
+      return
+    }
+
+    this.store.isVisualizing = true
+
+    await this.generator.init()
+
+    const shapeItem = this.paperItems.originalShape.clone({ insert: false })
+    shapeItem.opacity = 1
+
+    let shapeRaster: paper.Raster | undefined = shapeItem.rasterize(
+      this.paperItems.shape.view.resolution,
+      false
+    )
+    shapeRaster.remove()
+
+    const shapeCanvas = shapeRaster.getSubCanvas(
+      new paper.Rectangle(0, 0, shapeRaster.width, shapeRaster.height)
+    )
+    const shapeRasterBounds = shapeRaster.bounds
+
+    shapeRaster = undefined
+
+    const wordFonts = await Promise.all(
+      style.words.fonts.map((fontId) => {
+        const { style } = this.store.getFontById(fontId)!
+        return loadFont(style.url)
+      })
+    )
+
+    const shapeConfig = this.store.getSelectedShape()
+
+    const result = await this.generator.fillShape(
+      {
+        shape: {
+          canvas: shapeCanvas,
+          bounds: shapeRasterBounds,
+          processing: {
+            removeWhiteBg: {
+              enabled: shapeConfig.kind === 'img',
+              lightnessThreshold: 98,
+            },
+            shrink: {
+              enabled: style.layout.shapePadding > 0,
+              amount: style.layout.shapePadding,
+            },
+            edges: {
+              enabled: false,
+              blur: 0,
+              lowThreshold: 30,
+              highThreshold: 100,
+            },
+            invert: {
+              enabled: true,
+            },
+          },
+        },
+        itemPadding: Math.max(1, 100 - style.layout.itemDensity),
+        // Words
+        wordsMaxSize: style.layout.wordsMaxSize,
+        words: style.words.wordList.map((wc) => ({
+          wordConfigId: wc.id,
+          text: wc.text,
+          angles: style.words.angles.angles,
+          fillColors: ['red'],
+          // fonts: [fonts[0], fonts[1], fonts[2]],
+          fonts: wordFonts,
+        })),
+        // Icons
+        icons: style.icons.iconList.map((shape) => ({
+          shape: this.store.getShapeById(shape.shapeId)!,
+        })),
+        iconsMaxSize: style.layout.iconsMaxSize,
+        iconProbability: style.layout.iconsProportion / 100,
+      },
+      (progressPercent) => {
+        this.store.visualizingProgress = progressPercent
+      }
+    )
+
+    const addedItems: paper.Item[] = []
+    let img: HTMLImageElement | null = null
+
+    let wordIdToSymbolDef = new Map<string, paper.SymbolDefinition>()
+    let itemIdToPaperItem = new Map<ItemId, paper.Item>()
+
+    for (const item of result.placedItems) {
+      if (item.kind === 'symbol') {
+        const itemInstance = item.symbolDef.item.clone()
+        // itemInstance.fillColor = new paper.Color('red')
+        itemInstance.transform(item.transform)
+        addedItems.push(itemInstance)
+        itemIdToPaperItem.set(item.id, itemInstance)
+      } else if (item.kind === 'img') {
+        if (!img) {
+          const imgUri = item.ctx.canvas.toDataURL()
+          img = await fetchImage(imgUri)
+        }
+        const itemImg = new paper.Raster(img)
+        itemImg.scale(item.transform.a)
+        const w = itemImg.bounds.width
+        const h = itemImg.bounds.height
+        itemImg.position = new paper.Point(
+          item.transform.tx + w / 2,
+          item.transform.ty + h / 2
+        )
+        addedItems.push(itemImg)
+        itemIdToPaperItem.set(item.id, itemImg)
+      } else if (item.kind === 'word') {
+        const wordId = item.word.id
+
+        if (!wordIdToSymbolDef.has(wordId)) {
+          const paths = item.word.font.getPaths(
+            item.word.text,
+            0,
+            0,
+            item.word.fontSize
+          )
+
+          const pathItems = paths.map((path: Path) => {
+            let pathData = path.toPathData(3)
+            const item = paper.Path.create(pathData)
+            item.fillColor = new paper.Color(style.itemsColoring.color)
+            item.fillRule = 'evenodd'
+            return item
+          })
+          const pathItemsGroup = new paper.Group(pathItems)
+          const symbolDef = new paper.SymbolDefinition(pathItemsGroup, true)
+          wordIdToSymbolDef.set(wordId, symbolDef)
+        }
+
+        const symbolDef = wordIdToSymbolDef.get(wordId)!
+
+        const wordItem = symbolDef.item.clone()
+
+        wordItem.rotate(
+          (item.word.angle / Math.PI) * 180,
+          new paper.Point(0, 0)
+        )
+        wordItem.transform(item.transform)
+        addedItems.push(wordItem)
+
+        itemIdToPaperItem.set(item.id, wordItem)
+      }
+    }
+
+    this.paperItems.bgItemsGroup?.remove()
+    const bgItemsGroup = new paper.Group([
+      // this.paperItems.shape.clone(),
+      ...addedItems,
+    ])
+
+    // shapeItemsGroup.clipped = true
+    this.paperItems.bgItemsGroup = bgItemsGroup
+    this.paperItems.bgItemsGroup.insertAbove(this.paperItems.bgRect!)
+
+    this.generatedItems.bg = {
+      itemIdToPaperItem,
+      items: result.placedItems,
+    }
+    this.setItemsColor('bg', coloring)
+
+    this.store.isVisualizing = false
+  }
 
   generateShapeItems = async (params: { style: ShapeStyleConfig }) => {
     const { style } = params

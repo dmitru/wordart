@@ -41,6 +41,7 @@ const EditorLayout = styled.div`
 const TopToolbar = styled(Box)`
   z-index: 1;
   box-shadow: 0 0 5px 0 #00000033;
+  height: 58px;
 `
 
 const TopNavWrapper = styled(Box)`
@@ -61,74 +62,43 @@ const LeftWrapper = styled.div`
   flex: 1;
   z-index: 3;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   /* box-shadow: 0 0 5px 0 #00000033; */
 `
 
-export const FgBgTab = styled.div`
-  z-index: 0;
-  background: ${(p) => p.theme.colors.dark2};
-  width: 100%;
-  /* height: 50px; */
-  display: flex;
-  direction: row;
-  /* margin-bottom: 10px; */
-  /* border-bottom: 5px solid ${(p) => p.theme.colors.accent}; */
-`
-
-export const FbBgTabBtn = styled(BaseBtn)<{ active: boolean }>`
-  height: 40px;
-  flex: 1;
-  font-weight: 500;
-  padding: 0 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-size: 14px;
-  /* text-transform: uppercase; */
-
-  background: transparent;
-  color: ${(p) => p.theme.colors.textLight};
-  border-radius: 0;
-  outline: none;
-  border: none;
-
-  border-top: 5px solid transparent;
-  padding-bottom: 3px;
-  transition: 0.2s all;
-
-  ${({ theme, active }) =>
-    active &&
-    `
-    // font-weight: 500;
-    background: #f3f3f3;
-    background: linear-gradient(90deg,#80578e,#3b458c);
-    z-index: 1;
-    color: ${theme.colors.textLight};
-
-  `}
-
+const LeftTopWrapper = styled(Box)`
+  height: 58px;
+  background: white;
   position: relative;
-  z-index: 0;
+  z-index: 4;
 
-  .icon {
-    /* display: none; */
-    width: 20px;
-    height: 20px;
-    /* margin-bottom: 4px; */
-  }
-
-  /* transition: 0.2s background; */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  box-shadow: -3px 1px 2px 1px #00000033;
+  /* box-shadow: 0 0 5px 0 #00000033; */
 `
 
-const LeftNavbar = styled.div<{ activeIndex: number }>`
+const LeftBottomWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  background: #606060;
+  /* box-shadow: 0 0 5px 0 #00000033; */
+`
+
+const LeftPanel = styled(Box)`
+  flex: 1;
+`
+
+const SideNavbar = styled.div<{ activeIndex: number }>`
   /* background: ${(p) =>
     darken(0.1, desaturate(0.5, p.theme.colors.dark4))}; */
-  background: #dedede;
   /* border-bottom: 1px solid #cecece; */
   padding: 0;
   margin: 0;
+  margin-top: 58px;
   /* height: 50px; */
   display: flex;
   flex-direction: column;
@@ -168,7 +138,7 @@ const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
   /* background: ${(p) => p.theme.colors.light1}; */
   /* background: #dedede; */
   border-radius: 0;
-  color: ${(p) => p.theme.colors.dark1};
+  color: ${(p) => p.theme.colors.textLight};
   outline: none;
   /* border: 1px solid #cecece; */
   border: none;
@@ -208,14 +178,13 @@ const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
   }
 `
 
-const LeftPanel = styled.div`
+const LeftPanelContent = styled(Box)`
   flex: 1;
-  padding: 20px;
   height: 100%;
   overflow: auto;
   background: ${(p) => p.theme.colors.light};
   z-index: 2;
-  box-shadow: 0 0 2px 0 #00000033;
+  box-shadow: 0 0 5px 0 #00000033;
 `
 
 const RightWrapper = styled.div`
@@ -234,6 +203,7 @@ const CanvasWrappper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  box-shadow: inset 0 0 5px 0 #00000033;
 `
 
 const Canvas = styled.canvas`
@@ -244,21 +214,21 @@ const Canvas = styled.canvas`
 `
 
 const state = observable({
-  leftTab: 'shapes' as LeftPanelTab,
-  words: {
-    targetTab: 'shape' as TargetTab,
-  },
+  leftTabShape: 'shapes' as LeftPanelTab,
+  leftTabBg: 'words' as Omit<LeftPanelTab, 'shapes'>,
+  targetTab: 'shape' as TargetTab,
 })
 
 export type TargetTab = 'shape' | 'bg'
 export type LeftPanelTab = 'shapes' | 'words' | 'symbols' | 'colors' | 'layout'
-export const leftPanelTabs: LeftPanelTab[] = [
+const leftPanelShapeTabs: LeftPanelTab[] = [
   'shapes',
   'words',
   'symbols',
-  'colors',
   'layout',
+  'colors',
 ]
+const leftPanelBgTabs: LeftPanelTab[] = ['words', 'symbols', 'layout', 'colors']
 
 export const EditorPage = observer(() => {
   const [canvasSize] = useState<Dimensions>({ w: 900, h: 900 })
@@ -266,7 +236,7 @@ export const EditorPage = observer(() => {
   const { editorPageStore: store } = useStore()
 
   useEffect(() => {
-    console.log('useEffect: editorPageStore.state', store.state)
+    console.log('useEffect:editorPageStore.state', store.state)
     if (canvasRef.current && store.state !== 'initialized') {
       store.initEditor({
         canvas: canvasRef.current,
@@ -275,100 +245,133 @@ export const EditorPage = observer(() => {
     }
   }, [canvasRef.current])
 
+  const leftTab =
+    state.targetTab === 'bg' ? state.leftTabBg : state.leftTabShape
+
   return (
     <PageLayoutWrapper>
       <TopNavWrapper alignItems="center" display="flex"></TopNavWrapper>
 
       <EditorLayout>
         <LeftWrapper>
-          <LeftNavbar
-            activeIndex={leftPanelTabs.findIndex((s) => s === state.leftTab)}
-          >
-            {/* <LeftNavbarBtn
-              onClick={() => {
-                editorPagestate.leftTab = ('templates')
-              }}
-              active={editorPageStore.activeLeftTab === 'templates'}
+          <LeftBottomWrapper>
+            <SideNavbar
+              activeIndex={
+                state.targetTab === 'shape'
+                  ? leftPanelShapeTabs.findIndex(
+                      (s) => s === state.leftTabShape
+                    )
+                  : leftPanelBgTabs.findIndex((s) => s === state.leftTabBg)
+              }
             >
-              <Rocket className="icon" />
-              Templates
-            </LeftNavbarBtn> */}
-            <LeftNavbarBtn
-              onClick={() => {
-                state.leftTab = 'shapes'
-              }}
-              active={state.leftTab === 'shapes'}
-            >
-              <Shapes className="icon" />
-              Shape
-            </LeftNavbarBtn>
+              {state.targetTab !== 'bg' && (
+                <LeftNavbarBtn
+                  onClick={() => {
+                    state.leftTabShape = 'shapes'
+                  }}
+                  active={state.leftTabShape === 'shapes'}
+                >
+                  <Shapes className="icon" />
+                  Shape
+                </LeftNavbarBtn>
+              )}
 
-            <LeftNavbarBtn
-              onClick={() => {
-                state.leftTab = 'words'
-              }}
-              active={state.leftTab === 'words'}
-            >
-              <TextFields className="icon" />
-              Words
-            </LeftNavbarBtn>
-            <LeftNavbarBtn
-              onClick={() => {
-                state.leftTab = 'symbols'
-              }}
-              active={state.leftTab === 'symbols'}
-            >
-              <Face className="icon" />
-              Icons
-            </LeftNavbarBtn>
+              <LeftNavbarBtn
+                onClick={() => {
+                  state.leftTabBg = 'words'
+                  state.leftTabShape = 'words'
+                }}
+                active={leftTab === 'words'}
+              >
+                <TextFields className="icon" />
+                Words
+              </LeftNavbarBtn>
+              <LeftNavbarBtn
+                onClick={() => {
+                  state.leftTabBg = 'symbols'
+                  state.leftTabShape = 'symbols'
+                }}
+                active={leftTab === 'symbols'}
+              >
+                <Face className="icon" />
+                Icons
+              </LeftNavbarBtn>
 
-            <LeftNavbarBtn
-              onClick={() => {
-                state.leftTab = 'colors'
-              }}
-              active={state.leftTab === 'colors'}
-            >
-              <ColorPalette className="icon" />
-              Colors
-            </LeftNavbarBtn>
+              <LeftNavbarBtn
+                onClick={() => {
+                  state.leftTabBg = 'layout'
+                  state.leftTabShape = 'layout'
+                }}
+                active={leftTab === 'layout'}
+              >
+                <LayoutMasonry className="icon" />
+                Layout
+              </LeftNavbarBtn>
 
-            <LeftNavbarBtn
-              onClick={() => {
-                state.leftTab = 'layout'
-              }}
-              active={state.leftTab === 'layout'}
-            >
-              <LayoutMasonry className="icon" />
-              Layout
-            </LeftNavbarBtn>
-          </LeftNavbar>
+              <LeftNavbarBtn
+                onClick={() => {
+                  state.leftTabBg = 'colors'
+                  state.leftTabShape = 'colors'
+                }}
+                active={leftTab === 'colors'}
+              >
+                <ColorPalette className="icon" />
+                Colors
+              </LeftNavbarBtn>
+            </SideNavbar>
 
-          <LeftPanel id="left-panel-content">
-            {state.leftTab === 'shapes' && <LeftPanelShapesTab />}
-            {state.leftTab === 'words' && (
-              <>
-                {/* <FgBgTab>
-                  <FbBgTabBtn
-                    onClick={() => {state.words.targetTab = 'shape'}}
-                    active={state.words.targetTab === 'shape'}
+            <LeftPanel>
+              <LeftTopWrapper>
+                <Box mr={3} ml={3}>
+                  <Button
+                    css={css`
+                      width: 120px;
+                    `}
+                    py={1}
+                    onClick={() => {
+                      state.targetTab = 'shape'
+                    }}
+                    outline={state.targetTab !== 'shape'}
+                    secondary={state.targetTab === 'shape'}
                   >
                     Shape
-                  </FbBgTabBtn>
-                  <FbBgTabBtn
-                    onClick={() => {state.words.targetTab = 'bg'}}
-                    active={state.words.targetTab === 'bg'}
+                  </Button>
+                  <Button
+                    css={css`
+                      width: 120px;
+                    `}
+                    py={1}
+                    onClick={() => {
+                      state.targetTab = 'bg'
+                    }}
+                    outline={state.targetTab !== 'bg'}
+                    secondary={state.targetTab === 'bg'}
                   >
                     Background
-                  </FbBgTabBtn>
-                </FgBgTab> */}
-                <LeftPanelWordsTab />
-              </>
-            )}
-            {state.leftTab === 'symbols' && <LeftPanelIconsTab />}
-            {state.leftTab === 'colors' && <LeftPanelColorsTab />}
+                  </Button>
+                </Box>
+              </LeftTopWrapper>
 
-            {state.leftTab === 'layout' && <LeftPanelLayoutTab />}
-          </LeftPanel>
+              <LeftPanelContent id="left-panel-content" px={3} py={3}>
+                {leftTab === 'shapes' && <LeftPanelShapesTab />}
+                {leftTab === 'words' && (
+                  <>
+                    <LeftPanelWordsTab target={state.targetTab} />
+                  </>
+                )}
+                {leftTab === 'symbols' && (
+                  <LeftPanelIconsTab target={state.targetTab} />
+                )}
+                {leftTab === 'colors' && (
+                  <LeftPanelColorsTab target={state.targetTab} />
+                )}
+
+                {leftTab === 'layout' && (
+                  <LeftPanelLayoutTab target={state.targetTab} />
+                )}
+              </LeftPanelContent>
+            </LeftPanel>
+          </LeftBottomWrapper>
         </LeftWrapper>
 
         <RightWrapper>
@@ -386,9 +389,15 @@ export const EditorPage = observer(() => {
               accent
               disabled={store.isVisualizing}
               onClick={() => {
-                store.editor?.generateShapeItems({
-                  style: store.styles.shape,
-                })
+                if (state.targetTab === 'shape') {
+                  store.editor?.generateShapeItems({
+                    style: store.styles.shape,
+                  })
+                } else {
+                  store.editor?.generateBgItems({
+                    style: store.styles.bg,
+                  })
+                }
               }}
             >
               {!store.isVisualizing && (

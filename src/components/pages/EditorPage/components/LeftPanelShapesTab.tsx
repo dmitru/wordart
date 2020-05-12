@@ -110,7 +110,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
               </Box>
 
               <ShapeSelector
-                height="calc(100vh - 380px)"
+                height="calc(100vh - 320px)"
                 overflowY="auto"
                 shapes={matchingShapes}
                 onSelected={(shape) => {

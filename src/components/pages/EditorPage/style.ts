@@ -15,6 +15,10 @@ const defaultWordsList: WordStyleConfig[] = [
   'creative',
 ].map((s, index) => ({ id: index, text: s } as WordStyleConfig))
 
+const defaultWordsListBackground: WordStyleConfig[] = ['back'].map(
+  (s, index) => ({ id: index, text: s } as WordStyleConfig)
+)
+
 export const defaultShapeStyle: ShapeStyleConfig = {
   fill: {
     kind: 'color-map',
@@ -95,11 +99,11 @@ export const defaultBackgroundStyle: BackgroundStyleConfig = {
   },
 
   words: {
-    fonts: [fonts[3].styles[0].fontId, fonts[2].styles[0].fontId],
-    wordList: defaultWordsList,
+    fonts: [fonts[0].styles[0].fontId],
+    wordList: defaultWordsListBackground,
     angles: {
       preset: 'horizontal',
-      angles: [0],
+      angles: [60],
     },
   },
   icons: {

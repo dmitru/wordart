@@ -66,6 +66,7 @@ const getButtonStyles = (params: {
 
       &[disabled] {
         cursor: default;
+        border: 2px solid ${grayscale(bgColor)};
         background: ${grayscale(bgColor)};
       }
     `

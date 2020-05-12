@@ -7,22 +7,26 @@ import { Label } from './shared'
 import { Slider } from 'components/shared/Slider'
 import { useThrottleCallback } from '@react-hook/throttle'
 import chroma from 'chroma-js'
-import { getItemsColoring } from 'components/pages/EditorPage/editor'
+import {
+  getItemsColoring,
+  TargetKind,
+} from 'components/pages/EditorPage/editor'
 
-export type LeftPanelColorsTabProps = {}
+export type LeftPanelColorsTabProps = {
+  target: TargetKind
+}
 
 export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
-  () => {
+  ({ target }) => {
     const { editorPageStore } = useStore()
+    const shape = editorPageStore.getSelectedShape()
     const shapeStyle = editorPageStore.styles.shape
     const bgStyle = editorPageStore.styles.bg
+    const style = editorPageStore.styles[target]
 
-    const updateShapeItemsColoring = useThrottleCallback(
+    const updateItemsColoring = useThrottleCallback(
       () => {
-        editorPageStore.editor?.setItemsColor(
-          'shape',
-          getItemsColoring(shapeStyle)
-        )
+        editorPageStore.editor?.setItemsColor(target, getItemsColoring(style))
       },
       20,
       true
@@ -45,89 +49,73 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
     return (
       <>
         <Box mb={4}>
-          <Label mb={2}>Background</Label>
-          <ColorPicker
-            disableAlpha
-            value={chroma(bgStyle.fill.color).alpha(1).hex()}
-            onChange={(hex) => {
-              bgStyle.fill.color = chroma(hex).hex()
-            }}
-            onAfterChange={() => {
-              editorPageStore.editor?.setBgColor(bgStyle.fill)
-              if (bgStyle.itemsColoring.kind === 'shape') {
-                editorPageStore.editor?.setItemsColor(
-                  'bg',
-                  getItemsColoring(bgStyle)
-                )
-              }
-            }}
-          />
-        </Box>
-
-        <Box mb={4}>
           <Box>
             <Label mb={2}>Shape</Label>
           </Box>
 
-          <Box>
-            <Button
-              px={2}
-              py={1}
-              mr={0}
-              primary={shapeStyle.fill.kind === 'color-map'}
-              outline={shapeStyle.fill.kind !== 'color-map'}
-              onClick={() => {
-                shapeStyle.fill.kind = 'color-map'
-                updateShapeColoring()
-              }}
-            >
-              Shape colors
-            </Button>
-            <Button
-              px={2}
-              py={1}
-              mr={0}
-              primary={shapeStyle.fill.kind === 'single-color'}
-              outline={shapeStyle.fill.kind !== 'single-color'}
-              onClick={() => {
-                shapeStyle.fill.kind = 'single-color'
-                updateShapeColoring()
-              }}
-            >
-              Color
-            </Button>
-          </Box>
+          {shape.kind === 'svg' && (
+            <>
+              <Box>
+                <Button
+                  px={2}
+                  py={1}
+                  mr={0}
+                  secondary={shapeStyle.fill.kind === 'color-map'}
+                  outline={shapeStyle.fill.kind !== 'color-map'}
+                  onClick={() => {
+                    shapeStyle.fill.kind = 'color-map'
+                    updateShapeColoring()
+                  }}
+                >
+                  Shape colors
+                </Button>
+                <Button
+                  px={2}
+                  py={1}
+                  mr={0}
+                  secondary={shapeStyle.fill.kind === 'single-color'}
+                  outline={shapeStyle.fill.kind !== 'single-color'}
+                  onClick={() => {
+                    shapeStyle.fill.kind = 'single-color'
+                    updateShapeColoring()
+                  }}
+                >
+                  Color
+                </Button>
+              </Box>
 
-          <Box mt={2}>
-            {shapeStyle.fill.kind === 'single-color' && (
-              <ColorPicker
-                disableAlpha
-                value={chroma(shapeStyle.fill.color).alpha(1).hex()}
-                onChange={(hex) => {
-                  shapeStyle.fill.color = chroma(hex).hex()
-                }}
-                onAfterChange={() => {
-                  updateShapeColoring()
-                }}
-              />
-            )}
-
-            {shapeStyle.fill.kind === 'color-map' &&
-              shapeStyle.fill.colorMap.map((color, index) => (
-                <Box mr={1} key={index} display="inline-block">
+              <Box mt={2}>
+                {shapeStyle.fill.kind === 'single-color' && (
                   <ColorPicker
                     disableAlpha
-                    value={chroma(color).alpha(1).hex()}
+                    value={chroma(shapeStyle.fill.color).alpha(1).hex()}
                     onChange={(hex) => {
-                      shapeStyle.fill.colorMap[index] = chroma(hex).hex()
+                      shapeStyle.fill.color = chroma(hex).hex()
                     }}
                     onAfterChange={() => {
                       updateShapeColoring()
                     }}
                   />
-                </Box>
-              ))}
-          </Box>
+                )}
+
+                {shapeStyle.fill.kind === 'color-map' &&
+                  shapeStyle.fill.colorMap.map((color, index) => (
+                    <Box mr={1} key={index} display="inline-block">
+                      <ColorPicker
+                        disableAlpha
+                        value={chroma(color).alpha(1).hex()}
+                        onChange={(hex) => {
+                          shapeStyle.fill.colorMap[index] = chroma(hex).hex()
+                        }}
+                        onAfterChange={() => {
+                          updateShapeColoring()
+                        }}
+                      />
+                    </Box>
+                  ))}
+              </Box>
+            </>
+          )}
 
           <Box mt={2}>
             <Slider
@@ -146,7 +134,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           </Box>
         </Box>
 
-        <Box>
+        <Box mb={2}>
           <Label mb={2}>Words & Icons</Label>
           {/* <Checkbox
             id="gradient"
@@ -160,11 +148,11 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             px={2}
             py={1}
             mr={0}
-            primary={shapeStyle.itemsColoring.kind === 'shape'}
-            outline={shapeStyle.itemsColoring.kind !== 'shape'}
+            secondary={style.itemsColoring.kind === 'shape'}
+            outline={style.itemsColoring.kind !== 'shape'}
             onClick={() => {
-              shapeStyle.itemsColoring.kind = 'shape'
-              updateShapeItemsColoring()
+              style.itemsColoring.kind = 'shape'
+              updateItemsColoring()
             }}
           >
             Same as Shape
@@ -173,11 +161,11 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           <Button
             px={2}
             py={1}
-            primary={shapeStyle.itemsColoring.kind === 'gradient'}
-            outline={shapeStyle.itemsColoring.kind !== 'gradient'}
+            secondary={style.itemsColoring.kind === 'gradient'}
+            outline={style.itemsColoring.kind !== 'gradient'}
             onClick={() => {
-              shapeStyle.itemsColoring.kind = 'gradient'
-              updateShapeItemsColoring()
+              style.itemsColoring.kind = 'gradient'
+              updateItemsColoring()
             }}
           >
             Gradient
@@ -187,47 +175,47 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             px={2}
             py={1}
             mr={0}
-            primary={shapeStyle.itemsColoring.kind === 'color'}
-            outline={shapeStyle.itemsColoring.kind !== 'color'}
+            secondary={style.itemsColoring.kind === 'color'}
+            outline={style.itemsColoring.kind !== 'color'}
             onClick={() => {
-              shapeStyle.itemsColoring.kind = 'color'
-              updateShapeItemsColoring()
+              style.itemsColoring.kind = 'color'
+              updateItemsColoring()
             }}
           >
             Color
           </Button>
 
           <Box mt={2}>
-            {shapeStyle.itemsColoring.kind === 'color' && (
+            {style.itemsColoring.kind === 'color' && (
               <ColorPicker
                 disableAlpha
-                value={shapeStyle.itemsColoring.color}
+                value={style.itemsColoring.color}
                 onChange={(hex) => {
-                  shapeStyle.itemsColoring.color = hex
+                  style.itemsColoring.color = hex
                 }}
-                onAfterChange={updateShapeItemsColoring}
+                onAfterChange={updateItemsColoring}
               />
             )}
-            {shapeStyle.itemsColoring.kind === 'gradient' && (
+            {style.itemsColoring.kind === 'gradient' && (
               <>
                 <Box mr={1} display="inline-block">
                   <ColorPicker
                     disableAlpha
-                    value={shapeStyle.itemsColoring.gradient.from}
+                    value={style.itemsColoring.gradient.from}
                     onChange={(hex) => {
-                      shapeStyle.itemsColoring.gradient.from = hex
+                      style.itemsColoring.gradient.from = hex
                     }}
-                    onAfterChange={updateShapeItemsColoring}
+                    onAfterChange={updateItemsColoring}
                   />
                 </Box>
                 <Box mr={1} display="inline-block">
                   <ColorPicker
                     disableAlpha
-                    value={shapeStyle.itemsColoring.gradient.to}
+                    value={style.itemsColoring.gradient.to}
                     onChange={(hex) => {
-                      shapeStyle.itemsColoring.gradient.to = hex
+                      style.itemsColoring.gradient.to = hex
                     }}
-                    onAfterChange={updateShapeItemsColoring}
+                    onAfterChange={updateItemsColoring}
                   />
                 </Box>
               </>
@@ -235,18 +223,38 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           </Box>
         </Box>
 
-        <Box mt={2}>
+        <Box mb={4}>
           <Slider
             label="Make larger words brighter"
-            value={shapeStyle.itemsColoring.dimSmallerItems}
+            value={style.itemsColoring.dimSmallerItems}
             onChange={(value) => {
               const val = (value as any) as number
-              shapeStyle.itemsColoring.dimSmallerItems = val
+              style.itemsColoring.dimSmallerItems = val
             }}
-            onAfterChange={updateShapeItemsColoring}
+            onAfterChange={updateItemsColoring}
             min={0}
             max={100}
             step={1}
+          />
+        </Box>
+
+        <Box mb={4}>
+          <Label mb={2}>Background</Label>
+          <ColorPicker
+            disableAlpha
+            value={chroma(bgStyle.fill.color).alpha(1).hex()}
+            onChange={(hex) => {
+              bgStyle.fill.color = chroma(hex).hex()
+            }}
+            onAfterChange={() => {
+              editorPageStore.editor?.setBgColor(bgStyle.fill)
+              if (bgStyle.itemsColoring.kind === 'shape') {
+                editorPageStore.editor?.setItemsColor(
+                  'bg',
+                  getItemsColoring(bgStyle)
+                )
+              }
+            }}
           />
         </Box>
       </>

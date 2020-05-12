@@ -12,8 +12,11 @@ import {
 } from 'components/pages/EditorPage/components/ShapeSelector'
 import { observable } from 'mobx'
 import { uniqBy } from 'lodash'
+import { TargetKind } from 'components/pages/EditorPage/editor'
 
-export type LeftPanelIconsTabProps = {}
+export type LeftPanelIconsTabProps = {
+  target: TargetKind
+}
 
 const Toolbar = styled(Box)``
 
@@ -24,9 +27,9 @@ const state = observable({
 })
 
 export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
-  () => {
+  ({ target }) => {
     const { editorPageStore } = useStore()
-    const style = editorPageStore.styles.shape
+    const style = editorPageStore.styles[target]
     const icons = style.icons.iconList
 
     const shapes = editorPageStore
