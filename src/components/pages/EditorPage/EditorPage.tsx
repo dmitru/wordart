@@ -231,7 +231,7 @@ const leftPanelShapeTabs: LeftPanelTab[] = [
 const leftPanelBgTabs: LeftPanelTab[] = ['words', 'symbols', 'layout', 'colors']
 
 export const EditorPage = observer(() => {
-  const [canvasSize] = useState<Dimensions>({ w: 900, h: 900 })
+  const [canvasSize] = useState<Dimensions>({ w: (900 * 4) / 3, h: 900 })
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { editorPageStore: store } = useStore()
 

@@ -852,33 +852,35 @@ export const computeColorsMap = (
   if (Object.keys(namedChildrenByColor).length > 0) {
     Object.keys(namedChildrenByColor).forEach((colorKey) => {
       const children = namedChildrenByColor[colorKey]
-      const fillColor = (
-        getFillColor(children.map((c) => c.item)) || new paper.Color('black')
-      ).toCSS(true)
-      const strokeColor = (
-        getStrokeColor(children.map((c) => c.item)) || new paper.Color('black')
-      ).toCSS(true)
+      const fillColor = getFillColor(children.map((c) => c.item))
+      const strokeColor = getStrokeColor(children.map((c) => c.item))
 
       if (fillColor !== strokeColor) {
-        colorEntries.push({
-          paperItems: children.map((c) => c.item),
-          color: fillColor,
-          fill: true,
-          stroke: false,
-        })
-        colorEntries.push({
-          paperItems: children.map((c) => c.item),
-          color: strokeColor,
-          fill: false,
-          stroke: true,
-        })
+        if (fillColor) {
+          colorEntries.push({
+            paperItems: children.map((c) => c.item),
+            color: fillColor.toCSS(true),
+            fill: true,
+            stroke: false,
+          })
+        }
+        if (strokeColor) {
+          colorEntries.push({
+            paperItems: children.map((c) => c.item),
+            color: strokeColor.toCSS(true),
+            fill: false,
+            stroke: true,
+          })
+        }
       } else {
-        colorEntries.push({
-          paperItems: children.map((c) => c.item),
-          color: strokeColor,
-          fill: true,
-          stroke: true,
-        })
+        if (strokeColor) {
+          colorEntries.push({
+            paperItems: children.map((c) => c.item),
+            color: strokeColor.toCSS(true),
+            fill: true,
+            stroke: true,
+          })
+        }
       }
     })
   } else {

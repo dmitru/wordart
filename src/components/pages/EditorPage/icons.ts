@@ -38,6 +38,18 @@ export const shapes: ShapeConfig[] = [
   ...[
     {
       kind: 'svg',
+      title: 'Smile',
+      url: '/images/smile.svg',
+      keepSvgColors: true,
+    },
+    {
+      kind: 'svg',
+      title: 'Desert',
+      url: '/images/desert.svg',
+      keepSvgColors: true,
+    },
+    {
+      kind: 'svg',
       title: 'Cat',
       url: '/images/cat.svg',
       keepSvgColors: true,
