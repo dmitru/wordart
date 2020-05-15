@@ -1,5 +1,5 @@
 import { observable, action, set } from 'mobx'
-import { RootStore } from 'root-store'
+import { RootStore } from 'services/root-store'
 import { Editor, EditorInitParams } from 'components/pages/EditorPage/editor'
 import { FontConfig, fonts, FontId, FontStyleConfig } from 'data/fonts'
 import { shapes } from 'components/pages/EditorPage/icons'

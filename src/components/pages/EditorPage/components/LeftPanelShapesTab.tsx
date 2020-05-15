@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react'
-import { useStore } from 'root-store'
+import { useStore } from 'services/root-store'
 import { useCallback, useState } from 'react'
 import {
   ShapeSelector,

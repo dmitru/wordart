@@ -39,6 +39,7 @@
     "@types/react-stickynode": "^2.1.0",
     "@types/seedrandom": "^2.4.28",
     "@types/styled-system__should-forward-prop": "^5.1.1",
+    "axios": "^0.19.2",
     "babel-plugin-module-resolver": "^4.0.0",
     "canvas": "^2.6.1",
     "chroma-js": "^2.1.0",
@@ -46,6 +47,7 @@
     "emotion-server": "^11.0.0-next.10",
     "emotion-theming": "^11.0.0-next.6",
     "fabric": "^3.6.3",
+    "formik": "^2.1.4",
     "jsfeat": "^0.0.8",
     "lodash": "^4.17.15",
     "loglevel": "^1.6.8",
@@ -74,7 +76,8 @@
     "transformation-matrix": "^2.3.0",
     "typography": "^0.16.19",
     "typography-theme-github": "^0.16.19",
-    "use-debounce": "^3.4.2"
+    "use-debounce": "^3.4.2",
+    "yup": "^0.28.5"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.8.3",
@@ -82,6 +85,7 @@
     "@emotion/babel-plugin": "^11.0.0-next.10",
     "@testing-library/jest-dom": "^5.5.0",
     "@testing-library/react": "^10.0.2",
+    "@types/axios": "^0.14.0",
     "@types/chroma-js": "^2.0.0",
     "@types/fabric": "^3.6.2",
     "@types/jest": "^25.2.1",
@@ -94,6 +98,7 @@
     "@types/react-slider": "^1.0.0",
     "@types/styled-system": "^5.1.9",
     "@types/typography": "^0.16.3",
+    "@types/yup": "^0.28.3",
     "babel-jest": "^25.3.0",
     "babel-plugin-polished": "^1.1.0",
     "husky": "^4.2.5",

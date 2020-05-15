@@ -8,7 +8,7 @@ import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
 import { LayoutMasonry } from '@styled-icons/remix-fill/LayoutMasonry'
 import { observer } from 'mobx-react'
 import { LeftPanelShapesTab } from 'components/pages/EditorPage/components/LeftPanelShapesTab'
-import { useStore } from 'root-store'
+import { useStore } from 'services/root-store'
 import { LeftPanelWordsTab } from 'components/pages/EditorPage/components/LeftPanelWordsTab'
 import { Dimensions } from 'lib/wordart/canvas-utils'
 import { LeftPanelColorsTab } from 'components/pages/EditorPage/components/LeftPanelColorsTab'
@@ -21,6 +21,10 @@ import { css } from '@emotion/react'
 import { LeftPanelIconsTab } from 'components/pages/EditorPage/components/LeftPanelIconsTab'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import { observable } from 'mobx'
+import { useRouter } from 'next/dist/client/router'
+import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
+import { Urls } from 'urls'
+import Link from 'next/link'
 
 const PageLayoutWrapper = styled.div`
   display: flex;
@@ -235,22 +239,49 @@ export const EditorPage = observer(() => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const { editorPageStore: store } = useStore()
 
+  const { authStore } = useStore()
+  const router = useRouter()
+
   useEffect(() => {
-    console.log('useEffect:editorPageStore.state', store.state)
-    if (canvasRef.current && store.state !== 'initialized') {
+    if (
+      authStore.hasInitialized &&
+      canvasRef.current &&
+      store.state !== 'initialized'
+    ) {
       store.initEditor({
         canvas: canvasRef.current,
         store: store,
       })
+
+      return store.destroyEditor()
     }
-  }, [canvasRef.current])
+  }, [authStore.hasInitialized, canvasRef.current])
+
+  if (!router || !authStore.hasInitialized) {
+    return <SpinnerSplashScreen />
+  }
+
+  if (authStore.isLoggedIn !== true) {
+    router.replace(Urls.login)
+    return <SpinnerSplashScreen />
+  }
 
   const leftTab =
     state.targetTab === 'bg' ? state.leftTabBg : state.leftTabShape
 
   return (
     <PageLayoutWrapper>
-      <TopNavWrapper alignItems="center" display="flex"></TopNavWrapper>
+      <TopNavWrapper alignItems="center" display="flex">
+        <Link href={Urls.profile} passHref>
+          <a
+            css={css`
+              color: white;
+            `}
+          >
+            Back
+          </a>
+        </Link>
+      </TopNavWrapper>
 
       <EditorLayout>
         <LeftWrapper>

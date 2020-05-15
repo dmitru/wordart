@@ -17,7 +17,6 @@ export const globalStyles = (
 
       #__next {
         height: 100vh;
-        overflow: hidden;
       }
 
       ${typography.toString()}

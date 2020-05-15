@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react'
-import { useStore } from 'root-store'
+import { useStore } from 'services/root-store'
 import { ColorPicker } from 'components/shared/ColorPicker'
 import { Box } from 'components/shared/Box'
 import { Button } from 'components/shared/Button'

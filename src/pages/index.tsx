@@ -1,3 +1,3 @@
-import { EditorPage } from 'components/pages/EditorPage/EditorPage'
+import { LandingPage } from 'components/pages/LandingPage/LandingPage'
 
-export default EditorPage
+export default LandingPage

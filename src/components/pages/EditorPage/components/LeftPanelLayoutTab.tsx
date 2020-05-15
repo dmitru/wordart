@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react'
-import { useStore } from 'root-store'
+import { useStore } from 'services/root-store'
 import { Slider } from 'components/shared/Slider'
 import { Label } from 'components/pages/EditorPage/components/shared'
 import { Box } from 'components/shared/Box'

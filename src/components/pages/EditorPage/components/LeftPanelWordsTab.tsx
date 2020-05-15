@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react'
-import { useStore } from 'root-store'
+import { useStore } from 'services/root-store'
 import styled from '@emotion/styled'
 import * as evaicons from '@styled-icons/evaicons-outline'
 import { useState, useCallback } from 'react'
