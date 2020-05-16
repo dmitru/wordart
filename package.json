@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "next",
-    "build": "next build",
-    "export": "next export",
+    "build": "NODE_ENV=production next build",
+    "export": "NODE_ENV=production next export",
     "start": "next start",
+    "deploy:netlify": "NODE_ENV=production next build && next export",
     "format": "NODE_ENV=production prettier --write \"src/**/*.{ts,tsx,js,jsx}\"",
     "generate": "plop --plopfile tools/generators/index.js",
     "test:watch": "jest --watch --config=./jest.config.json"
