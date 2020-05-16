@@ -5,4 +5,5 @@ module.exports = {
     // Important: return the modified config
     return config
   },
+  env: {},
 }

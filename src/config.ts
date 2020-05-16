@@ -1,5 +1,5 @@
 export const config = {
   api: {
-    baseUrl: 'http://localhost:3003',
+    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL!,
   },
 }
