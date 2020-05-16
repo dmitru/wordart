@@ -1,0 +1,15 @@
+{
+  "name": "wasm-gen",
+  "collaborators": [
+    "Dmitriy Borodiy <dmitriy.borodiy@gmail.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "wasm_gen_bg.wasm",
+    "wasm_gen.js",
+    "wasm_gen.d.ts"
+  ],
+  "module": "wasm_gen.js",
+  "types": "wasm_gen.d.ts",
+  "sideEffects": false
+}
