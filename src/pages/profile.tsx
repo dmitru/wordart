@@ -1,3 +1,4 @@
 import { ProfilePage } from 'components/pages/ProfilePage/ProfilePage'
+import { AuthGuardPage } from 'components/helpers/AuthGuardPage'
 
-export default ProfilePage
+export default AuthGuardPage(ProfilePage)

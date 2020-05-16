@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { Slider } from 'components/shared/Slider'
-import { Label } from 'components/pages/EditorPage/components/shared'
+import { Label } from 'components/Editor/components/shared'
 import { Box } from 'components/shared/Box'
 import { useCallback } from 'react'
-import { TargetKind } from 'components/pages/EditorPage/editor'
+import { TargetKind } from 'components/Editor/lib/editor'
 
 export type LeftPanelLayoutTabProps = {
   target: TargetKind

@@ -4,7 +4,7 @@ import { ReactSVG } from 'react-svg'
 import { Box, BoxProps } from 'components/shared/Box'
 import { noop } from 'lodash'
 import { darken } from 'polished'
-import { ShapeConfig, ShapeId } from 'components/pages/EditorPage/style'
+import { ShapeConfig, ShapeId } from 'components/Editor/style'
 
 export type ShapeSelectorProps = {
   shapes: ShapeConfig[]

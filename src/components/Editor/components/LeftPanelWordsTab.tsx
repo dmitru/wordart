@@ -10,7 +10,7 @@ import { BaseBtn } from 'components/shared/BaseBtn'
 import { TextInput } from 'components/shared/TextInput'
 import { observable } from 'mobx'
 import { uniq } from 'lodash'
-import { TargetKind } from 'components/pages/EditorPage/editor'
+import { TargetKind } from 'components/Editor/lib/editor'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind

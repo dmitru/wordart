@@ -1,5 +1,5 @@
 import { fonts, FontId } from 'data/fonts'
-import { WordConfigId } from 'components/pages/EditorPage/editor-page-store'
+import { WordConfigId } from 'components/Editor/editor-page-store'
 
 const defaultWordsList: WordStyleConfig[] = [
   // 'O',

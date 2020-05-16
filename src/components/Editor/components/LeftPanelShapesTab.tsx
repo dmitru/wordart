@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 import {
   ShapeSelector,
   ShapeThumbnailBtn,
-} from 'components/pages/EditorPage/components/ShapeSelector'
+} from 'components/Editor/components/ShapeSelector'
 import { observable } from 'mobx'
 import { Modal } from 'components/shared/Modal'
 import { Slider } from 'components/shared/Slider'

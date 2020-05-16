@@ -1,12 +1,15 @@
 export const Urls = {
   login: '/login',
-  loginRedirect: '/profile',
+  loginRedirect: '/dashboard',
 
   privacyPolicy: '/legal/privacy',
   termsOfUse: '/legal/terms',
 
   profile: '/profile',
+  dashboard: '/dashboard',
 
-  // Editor
-  create: '/editor',
+  editor: {
+    create: '/create',
+    edit: (id = ':id') => `/edit/${id}`,
+  },
 }

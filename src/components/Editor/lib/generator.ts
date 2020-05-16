@@ -1,4 +1,4 @@
-import { WordConfigId } from 'components/pages/EditorPage/editor-page-store'
+import { WordConfigId } from 'components/Editor/editor-page-store'
 import {
   Dimensions,
   createCanvasCtx,
@@ -15,7 +15,7 @@ import { Rect } from 'lib/wordart/geometry'
 import { ImageProcessorWasm } from 'lib/wordart/wasm/image-processor-wasm'
 import { Path, BoundingBox } from 'opentype.js'
 import { sample, uniq, flatten, noop } from 'lodash'
-import { ShapeConfig } from 'components/pages/EditorPage/style'
+import { ShapeConfig } from 'components/Editor/style'
 
 const FONT_SIZE = 100
 

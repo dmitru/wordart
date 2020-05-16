@@ -1,15 +1,15 @@
 import { observable, action, set } from 'mobx'
 import { RootStore } from 'services/root-store'
-import { Editor, EditorInitParams } from 'components/pages/EditorPage/editor'
+import { Editor, EditorInitParams } from 'components/Editor/lib/editor'
 import { FontConfig, fonts, FontId, FontStyleConfig } from 'data/fonts'
-import { shapes } from 'components/pages/EditorPage/icons'
+import { shapes } from 'components/Editor/icons'
 import {
   ShapeConfig,
   ShapeId,
   defaultBackgroundStyle,
   defaultShapeStyle,
   WordStyleConfig,
-} from 'components/pages/EditorPage/style'
+} from 'components/Editor/style'
 import { consoleLoggers } from 'utils/console-logger'
 
 export class EditorPageStore {

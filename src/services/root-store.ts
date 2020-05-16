@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { configure } from 'mobx'
 import 'mobx-react-lite/batchingForReactDom'
-import { EditorPageStore } from 'components/pages/EditorPage/editor-page-store'
+import { EditorPageStore } from 'components/Editor/editor-page-store'
 import { AuthStore } from 'services/auth-store'
 
 configure({})

@@ -9,10 +9,10 @@ import {
   ShapeThumbnails,
   ShapeThumbnailBtn,
   ShapeSelector,
-} from 'components/pages/EditorPage/components/ShapeSelector'
+} from 'components/Editor/components/ShapeSelector'
 import { observable } from 'mobx'
 import { uniqBy } from 'lodash'
-import { TargetKind } from 'components/pages/EditorPage/editor'
+import { TargetKind } from 'components/Editor/lib/editor'
 
 export type LeftPanelIconsTabProps = {
   target: TargetKind

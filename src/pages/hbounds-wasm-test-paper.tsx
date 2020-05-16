@@ -19,7 +19,7 @@ import paper from 'paper'
 import {
   hBoundsWasmToPaperGroup,
   hBoundsWasmSerializedToPaperGroup,
-} from 'components/pages/EditorPage/paper-utils'
+} from 'components/Editor/lib/paper-utils'
 
 const IMAGES = [
   '/images/cat.png',

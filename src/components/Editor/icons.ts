@@ -1,6 +1,6 @@
 import { icons } from 'data/shapes'
 import { iconsFaRegular } from 'data/shapes-fa-regular'
-import { ShapeConfig } from 'components/pages/EditorPage/style'
+import { ShapeConfig } from 'components/Editor/style'
 
 export const svgIcons: ShapeConfig[] = [
   icons.find((i) => i.title === 'Square full'),

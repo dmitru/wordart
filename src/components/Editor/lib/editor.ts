@@ -1,12 +1,11 @@
-import { EditorPageStore } from 'components/pages/EditorPage/editor-page-store'
+import { EditorPageStore } from 'components/Editor/editor-page-store'
 import {
   fetchImage,
   removeLightPixels,
-  invertImageMask,
   createCanvas,
 } from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
-import { Generator, ItemId, Item } from 'components/pages/EditorPage/generator'
+import { Generator, ItemId, Item } from 'components/Editor/lib/generator'
 import chroma from 'chroma-js'
 import paper from 'paper'
 import { loadFont } from 'lib/wordart/fonts'
@@ -19,12 +18,12 @@ import {
   ShapeStyleConfig,
   ItemsColoring,
   BackgroundStyleConfig,
-} from 'components/pages/EditorPage/style'
+} from 'components/Editor/style'
 import {
   findNamedChildren,
   getFillColor,
   getStrokeColor,
-} from 'components/pages/EditorPage/paper-utils'
+} from 'components/Editor/lib/paper-utils'
 import { toJS } from 'mobx'
 
 export type EditorInitParams = {
