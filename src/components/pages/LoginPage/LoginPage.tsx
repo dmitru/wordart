@@ -6,12 +6,13 @@ import { TextInputField } from 'components/shared/formik/TextInputField'
 import { Form, Formik } from 'formik'
 import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
-import React from 'react'
+import React, { useState } from 'react'
 import { useStore } from 'services/root-store'
 import * as Yup from 'yup'
 import { Urls } from 'urls'
 import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 import { useRouter } from 'next/dist/client/router'
+import { ApiResponseError } from 'services/api/api-client'
 
 export type LoginFormValues = {
   emailOrUsername: string
@@ -32,6 +33,8 @@ export const LoginPage = observer(() => {
   if (authStore.isLoggedIn === true) {
     router.replace(Urls.loginRedirect)
   }
+
+  const [error, setError] = useState('')
 
   return (
     <SiteLayout>
@@ -55,9 +58,26 @@ export const LoginPage = observer(() => {
             initialValues={
               { emailOrUsername: '', password: '' } as LoginFormValues
             }
-            onSubmit={(values) => authStore.loginWithEmailOrUsername(values)}
+            onSubmit={async (values) => {
+              try {
+                await authStore.loginWithEmailOrUsername(values)
+              } catch (error) {
+                if (
+                  error.isAxiosError &&
+                  (error as ApiResponseError).response.status === 401
+                ) {
+                  setError(
+                    'Incorrect email or password, please try another one'
+                  )
+                } else {
+                  setError(
+                    'Could not sign you in at this momen, please try again later'
+                  )
+                }
+              }
+            }}
           >
-            {({ isSubmitting, errors }) => (
+            {({ isSubmitting, dirty }) => (
               <Form>
                 <TextInputField
                   name="emailOrUsername"
@@ -72,6 +92,12 @@ export const LoginPage = observer(() => {
                 <Button mt={4} primary disabled={isSubmitting} type="submit">
                   Log in
                 </Button>
+
+                {error && (
+                  <Box mt={3} color="danger">
+                    {error}
+                  </Box>
+                )}
               </Form>
             )}
           </Formik>

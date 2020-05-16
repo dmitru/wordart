@@ -46,7 +46,7 @@ export class AuthStore {
   loginWithEmailOrUsername = async (params: {
     emailOrUsername: string
     password: string
-  }): Promise<boolean> => {
+  }): Promise<void> => {
     console.log('loginWithEmailOrUsername')
     try {
       const { authToken } = await Api.auth.login(params)
@@ -55,9 +55,8 @@ export class AuthStore {
 
       const profile = await Api.auth.getMyProfile()
       this.profile = profile
-      return true
     } catch (error) {
-      return false
+      throw error
     }
   }
 
