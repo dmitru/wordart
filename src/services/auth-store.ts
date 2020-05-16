@@ -22,6 +22,8 @@ export class AuthStore {
     return this.profile != null
   }
 
+  finishGoogleSignIn = async () => {}
+
   initUsingSavedLocalAuthToken = async () => {
     const authToken = AuthTokenStore.getAuthToken()
     if (authToken) {

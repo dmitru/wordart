@@ -27,8 +27,10 @@ export const FooterWrapper = styled(Box)`
 `
 
 export const ContentContainer = styled(Box)`
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
   padding: 10px 20px;
-  max-width: 1200px;
 `
 
 export const FooterLink = styled.a`

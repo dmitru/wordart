@@ -19,6 +19,10 @@ export const SiteLayout: React.FC<SiteLayoutProps> = ({ children }) => {
 }
 
 const ContentWrapper = styled(Box)`
+  width: 100%;
+  max-width: 1000px;
+  padding: 10px 20px;
+  margin: 0 auto;
   flex: 1 0 auto;
   overflow-y: auto;
 `

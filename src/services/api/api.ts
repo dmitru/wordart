@@ -1,5 +1,5 @@
-import { apiClient } from './api-client'
 import { MyProfile } from 'services/api/types'
+import { apiClient } from './api-client'
 
 export const Api = {
   setAuthToken: apiClient.setAuthToken,

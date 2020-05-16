@@ -47,6 +47,9 @@ export const LoginPage = observer(() => {
         >
           <h1>Log in</h1>
 
+          <a href="http://localhost:3003/auth/google">Google</a>
+          <a href="http://localhost:3003/auth/facebook">Facebook</a>
+
           <Formik
             validationSchema={loginSchema}
             initialValues={

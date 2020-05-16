@@ -64,10 +64,10 @@ export const HeaderWrapper = styled(Box)`
 export const ContentContainer = styled(Box)`
   display: flex;
   width: 100%;
-  padding: 10px 20px;
-  max-width: 1200px;
-  height: 60px;
+  max-width: 1000px;
   margin: 0 auto;
+  padding: 10px 20px;
+  height: 60px;
 `
 
 export const HeaderLink = styled.a`
