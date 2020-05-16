@@ -66,7 +66,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(() => {
   return (
     <PageLayoutWrapper>
       <TopNavWrapper alignItems="center" display="flex">
-        <Link href={Urls.profile} passHref>
+        <Link href={Urls.dashboard} passHref>
           <a
             css={css`
               color: white;

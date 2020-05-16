@@ -1,4 +1,3 @@
-import { css } from '@emotion/react'
 import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
 import { Box } from 'components/shared/Box'
 import 'lib/wordart/console-extensions'
