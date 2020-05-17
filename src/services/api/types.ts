@@ -1,3 +1,9 @@
+import {
+  BackgroundStyleConfig,
+  ShapeStyleConfig,
+  ShapeId,
+} from 'components/Editor/style'
+
 export type MyProfile = {
   id: UserId
   username: string
@@ -24,7 +30,18 @@ export type Wordcloud = {
 
 export type WordcloudEditorData = {
   version: 1
+  data: {
+    bg: {
+      style: BackgroundStyleConfig
+    }
+    shape: {
+      shapeId: ShapeId | null
+      style: ShapeStyleConfig
+    }
+  }
 }
+
+// export type SerializedItem = SerializedWordItem
 
 export type CreateWordcloudDto = {
   title: string

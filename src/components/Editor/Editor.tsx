@@ -28,6 +28,7 @@ import { LeftPanelColorsTab } from 'components/Editor/components/LeftPanelColors
 import { LeftPanelLayoutTab } from 'components/Editor/components/LeftPanelLayoutTab'
 import { WordcloudId } from 'services/api/types'
 import { Api } from 'services/api/api'
+import { EditorInitParams } from 'components/Editor/lib/editor'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -40,19 +41,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const { editorPageStore: store, wordcloudsStore } = useStore()
 
     const isNew = props.wordcloudId == null
-    useEffect(() => {
-      console.log('useEffect, isNew?', isNew)
-      const fetchEditorData = async () => {
-        const editorData = await Api.wordclouds.fetchEditorData(
-          props.wordcloudId!
-        )
-        console.log('editorData: ', editorData)
-      }
-
-      if (!isNew) {
-        fetchEditorData()
-      }
-    }, [])
 
     const { authStore } = useStore()
     const router = useRouter()
@@ -60,13 +48,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const [isSaving, setIsSaving] = useState(false)
     const handleSaveClick = useCallback(() => {
       const save = async () => {
-        if (isSaving) {
+        if (isSaving || !store.editor) {
           return
         }
         setIsSaving(true)
         if (isNew) {
           const wordcloud = await wordcloudsStore.create({
-            editorData: { version: 1 },
+            editorData: store.serialize(),
             title: 'some title',
           })
           router.push(Urls.editor._next, Urls.editor.edit(wordcloud.id), {
@@ -75,7 +63,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         } else {
           await wordcloudsStore.save(props.wordcloudId!, {
             title: 'some title',
-            editorData: { version: 1 },
+            editorData: store.serialize(),
           })
         }
         setIsSaving(false)
@@ -85,19 +73,35 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     }, [isSaving, props.wordcloudId])
 
     useEffect(() => {
-      if (
-        authStore.hasInitialized &&
-        canvasRef.current &&
-        store.state !== 'initialized'
-      ) {
-        store.initEditor({
-          canvas: canvasRef.current,
-          store: store,
-        })
+      const init = async () => {
+        if (
+          authStore.hasInitialized &&
+          canvasRef.current &&
+          store.state !== 'initialized'
+        ) {
+          const editorParams: EditorInitParams = {
+            canvas: canvasRef.current,
+            store: store,
+          }
 
-        return store.destroyEditor()
+          if (props.wordcloudId != null) {
+            const editorData = await Api.wordclouds.fetchEditorData(
+              props.wordcloudId
+            )
+
+            editorParams.serialized = editorData
+          }
+
+          await store.initEditor(editorParams)
+        }
       }
-    }, [authStore.hasInitialized, canvasRef.current])
+
+      init()
+    }, [props.wordcloudId, authStore.hasInitialized, canvasRef.current])
+
+    useEffect(() => {
+      return store.destroyEditor
+    }, [])
 
     if (!router || !authStore.hasInitialized) {
       return <SpinnerSplashScreen />
@@ -232,21 +236,27 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 </LeftTopWrapper>
 
                 <LeftPanelContent id="left-panel-content" px={3} py={3}>
-                  {leftTab === 'shapes' && <LeftPanelShapesTab />}
-                  {leftTab === 'words' && (
+                  {store.state === 'initialized' ? (
                     <>
-                      <LeftPanelWordsTab target={state.targetTab} />
-                    </>
-                  )}
-                  {leftTab === 'symbols' && (
-                    <LeftPanelIconsTab target={state.targetTab} />
-                  )}
-                  {leftTab === 'colors' && (
-                    <LeftPanelColorsTab target={state.targetTab} />
-                  )}
+                      {leftTab === 'shapes' && <LeftPanelShapesTab />}
+                      {leftTab === 'words' && (
+                        <>
+                          <LeftPanelWordsTab target={state.targetTab} />
+                        </>
+                      )}
+                      {leftTab === 'symbols' && (
+                        <LeftPanelIconsTab target={state.targetTab} />
+                      )}
+                      {leftTab === 'colors' && (
+                        <LeftPanelColorsTab target={state.targetTab} />
+                      )}
 
-                  {leftTab === 'layout' && (
-                    <LeftPanelLayoutTab target={state.targetTab} />
+                      {leftTab === 'layout' && (
+                        <LeftPanelLayoutTab target={state.targetTab} />
+                      )}
+                    </>
+                  ) : (
+                    <Box>Loading...</Box>
                   )}
                 </LeftPanelContent>
               </LeftPanel>

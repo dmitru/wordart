@@ -25,10 +25,12 @@ import {
   getStrokeColor,
 } from 'components/Editor/lib/paper-utils'
 import { toJS } from 'mobx'
+import { WordcloudEditorData } from 'services/api/types'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
   store: EditorPageStore
+  serialized?: WordcloudEditorData
 }
 
 export class Editor {

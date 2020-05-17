@@ -1,6 +1,10 @@
-import { observable, action, set } from 'mobx'
+import { observable, action, set, toJS } from 'mobx'
 import { RootStore } from 'services/root-store'
-import { Editor, EditorInitParams } from 'components/Editor/lib/editor'
+import {
+  Editor,
+  EditorInitParams,
+  getItemsColoring,
+} from 'components/Editor/lib/editor'
 import { FontConfig, fonts, FontId, FontStyleConfig } from 'data/fonts'
 import { shapes } from 'components/Editor/icons'
 import {
@@ -11,6 +15,7 @@ import {
   WordStyleConfig,
 } from 'components/Editor/style'
 import { consoleLoggers } from 'utils/console-logger'
+import { WordcloudEditorData } from 'services/api/types'
 
 export class EditorPageStore {
   logger = consoleLoggers.editorStore
@@ -40,19 +45,70 @@ export class EditorPageStore {
     this.rootStore = rootStore
   }
 
-  @action initEditor = (editorInitParams: EditorInitParams) => {
-    this.logger.debug('initEditor', editorInitParams)
+  @action initEditor = async (params: EditorInitParams) => {
+    this.logger.debug('initEditor', params)
 
-    this.editor = new Editor(editorInitParams)
+    this.editor = new Editor(params)
     this.editor.setBgColor(this.styles.bg.fill)
-    this.state = 'initialized'
     // @ts-ignore
     window['editor'] = this.editor
 
-    this.selectShape(this.selectedShapeId)
+    if (params.serialized) {
+      await this.loadSerialized(params.serialized)
+    } else {
+      this.selectShape(shapes[4].id)
+    }
+
+    this.state = 'initialized'
+  }
+
+  @action private loadSerialized = async (serialized: WordcloudEditorData) => {
+    this.logger.debug('loadSerialized', serialized)
+    if (!this.editor) {
+      throw new Error('editor is not initialized')
+    }
+
+    const { data } = serialized
+
+    if (data.shape.shapeId != null) {
+      await this.selectShape(data.shape.shapeId)
+    }
+
+    this.styles.shape = data.shape.style
+    this.styles.bg = data.bg.style
+
+    this.editor.setBgColor(this.styles.bg.fill)
+    this.editor.setShapeFillColors(this.styles.shape.fill)
+    this.editor.setItemsColor('bg', getItemsColoring(this.styles.bg))
+    this.editor.setItemsColor('shape', getItemsColoring(this.styles.shape))
+  }
+
+  serialize = (): WordcloudEditorData => {
+    this.logger.debug('serialize')
+    if (!this.editor) {
+      throw new Error('editor is not initialized')
+    }
+    const serializedData: WordcloudEditorData = {
+      version: 1,
+      data: {
+        bg: {
+          style: toJS(this.styles.bg, { recurseEverything: true }),
+        },
+        shape: {
+          shapeId: this.editor.currentShape?.shapeConfig.id || null,
+          style: toJS(this.styles.shape, { recurseEverything: true }),
+          items: this.editor.generatedItems.shape.items,
+        },
+      },
+    }
+
+    this.logger.debug('serialized: ', serializedData)
+
+    return serializedData
   }
 
   @action destroyEditor = () => {
+    this.logger.debug('destroyEditor')
     this.editor?.destroy()
     this.state = 'destroyed'
   }
