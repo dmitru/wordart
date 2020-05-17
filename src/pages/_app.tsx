@@ -1,11 +1,11 @@
-import App from 'next/app'
-import React from 'react'
-import { theme } from 'styles/theme'
-import { ThemeProvider, CacheProvider } from '@emotion/react'
+import { CSSReset, ThemeProvider } from '@chakra-ui/core'
 import createCache from '@emotion/cache'
+import { CacheProvider } from '@emotion/core'
+import App from 'next/app'
 import 'normalize.css/normalize.css'
-
+import React from 'react'
 import { globalStyles } from 'styles/globalStyles'
+import { theme } from 'styles/theme'
 
 const emotionCache = createCache({
   key: 'css',
@@ -17,6 +17,7 @@ export default class MyApp extends App {
     return (
       <CacheProvider value={emotionCache}>
         <ThemeProvider theme={theme}>
+          <CSSReset />
           {globalStyles}
           <Component {...pageProps} />
         </ThemeProvider>

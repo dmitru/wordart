@@ -1,4 +1,4 @@
-import { css, Global } from '@emotion/react'
+import { css, Global } from '@emotion/core'
 import Typography from 'typography'
 // @ts-ignore
 import typographyTheme from 'typography-theme-github'

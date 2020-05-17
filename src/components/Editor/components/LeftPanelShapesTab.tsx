@@ -8,13 +8,13 @@ import {
 import { observable } from 'mobx'
 import { Modal } from 'components/shared/Modal'
 import { Slider } from 'components/shared/Slider'
-import { Box } from 'components/shared/Box'
-import { css } from '@emotion/react'
+import { css } from '@emotion/core'
 import { Checkbox } from 'components/shared/Checkbox'
 import { ColorPicker } from 'components/shared/ColorPicker'
 import chroma from 'chroma-js'
 import { Button } from 'components/shared/Button'
 import { SearchInput } from 'components/shared/SearchInput'
+import { Box } from '@chakra-ui/core'
 
 export type LeftPanelShapesTabProps = {}
 
@@ -70,7 +70,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                 alignItems="flex-end"
                 justifyContent="flex-end"
               >
-                <Box flex={1} width={1} mb={2}>
+                <Box flex={1} width="100%" mb={2}>
                   <Slider
                     label="Opacity"
                     value={100 * style.fill.opacity}

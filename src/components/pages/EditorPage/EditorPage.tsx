@@ -7,7 +7,6 @@ import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 export const EditorPage = observer(() => {
   const router = useRouter()
   const { id } = router.query
-  console.log('router.query', router.query)
   if (!id) {
     return <SpinnerSplashScreen />
   }

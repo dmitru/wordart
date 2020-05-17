@@ -3,7 +3,7 @@ import { noop } from 'lodash'
 import * as ss from 'styled-system'
 import { textColor } from 'styles/system'
 import { BoxProps, Box } from 'components/shared/Box'
-import { css } from '@emotion/react'
+import { css } from '@emotion/core'
 
 export type TextInputProps = Omit<StyledTextInputProps, 'onChange'> & {
   value: string

@@ -18,6 +18,9 @@ export const Api = {
       const response = await apiClient.post('/wordclouds', data)
       return response.data as Wordcloud
     },
+    async delete(id: WordcloudId): Promise<void> {
+      await apiClient.delete(`/wordclouds/${id}`)
+    },
     async save(id: WordcloudId, data: SaveWordcloudDto): Promise<void> {
       await apiClient.put(`/wordclouds/${id}`, data)
     },

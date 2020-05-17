@@ -1,6 +1,11 @@
-import '@emotion/react'
+import '@emotion/core'
+import 'emotion-theming'
 import { Theme as MyTheme } from 'styles/theme'
 
-declare module '@emotion/react' {
+declare module '@emotion/core' {
+  export interface Theme extends MyTheme {}
+}
+
+declare module 'emotion-theming' {
   export interface Theme extends MyTheme {}
 }

@@ -10,11 +10,10 @@ import { LayoutMasonry } from '@styled-icons/remix-fill/LayoutMasonry'
 import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { Dimensions } from 'lib/wordart/canvas-utils'
-import { Button } from 'components/shared/Button'
 import { Box } from 'components/shared/Box'
 import { darken, desaturate } from 'polished'
 import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
-import { css } from '@emotion/react'
+import { css } from '@emotion/core'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import { observable } from 'mobx'
 import { useRouter } from 'next/dist/client/router'
@@ -29,6 +28,7 @@ import { LeftPanelLayoutTab } from 'components/Editor/components/LeftPanelLayout
 import { WordcloudId } from 'services/api/types'
 import { Api } from 'services/api/api'
 import { EditorInitParams } from 'components/Editor/lib/editor'
+import { Menu, MenuButton, MenuList, MenuItem, Button } from '@chakra-ui/core'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -130,7 +130,17 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               <ChevronLeft size="30px" /> Back
             </a>
           </Link>
-          <Button ml={3} accent onClick={handleSaveClick} disabled={isSaving}>
+          <Menu>
+            <MenuButton as={Button}>Actions</MenuButton>
+            <MenuList>
+              <MenuItem>Download</MenuItem>
+              <MenuItem>Create a Copy</MenuItem>
+              <MenuItem>Mark as Draft</MenuItem>
+              <MenuItem>Delete</MenuItem>
+              <MenuItem>Attend a Workshop</MenuItem>
+            </MenuList>
+          </Menu>
+          <Button ml={3} onClick={handleSaveClick} isDisabled={isSaving}>
             {isSaving ? 'Saving...' : 'Save'}
           </Button>
         </TopNavWrapper>
@@ -214,8 +224,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       onClick={() => {
                         state.targetTab = 'shape'
                       }}
-                      outline={state.targetTab !== 'shape'}
-                      secondary={state.targetTab === 'shape'}
+                      variant={
+                        state.targetTab !== 'shape' ? 'outline' : 'solid'
+                      }
+                      // secondary={state.targetTab === 'shape'}
                     >
                       Shape
                     </Button>
@@ -227,8 +239,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       onClick={() => {
                         state.targetTab = 'bg'
                       }}
-                      outline={state.targetTab !== 'bg'}
-                      secondary={state.targetTab === 'bg'}
+                      variant={state.targetTab !== 'bg' ? 'outline' : 'solid'}
+                      // secondary={state.targetTab === 'bg'}
                     >
                       Background
                     </Button>
@@ -275,8 +287,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 css={css`
                   width: 128px;
                 `}
-                accent
-                disabled={store.isVisualizing}
+                // accent
+                // isDisabled={store.isVisualizing}
                 onClick={() => {
                   if (state.targetTab === 'shape') {
                     store.editor?.generateShapeItems({

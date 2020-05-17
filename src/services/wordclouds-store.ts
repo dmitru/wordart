@@ -36,6 +36,11 @@ export class WordcloudsStore {
     return wordcloud
   }
 
+  delete = async (id: WordcloudId): Promise<void> => {
+    this._myWordclouds = this._myWordclouds.filter((wc) => wc.id !== id)
+    await Api.wordclouds.delete(id)
+  }
+
   save = async (id: WordcloudId, data: SaveWordcloudDto): Promise<void> => {
     const wordcloud = await Api.wordclouds.save(id, data)
     return wordcloud

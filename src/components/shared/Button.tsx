@@ -1,5 +1,5 @@
 import React from 'react'
-import { css } from '@emotion/react'
+import { css } from '@emotion/core'
 import * as ss from 'styled-system'
 import { textColor } from 'styles/system'
 import { BaseBtn } from 'components/shared/BaseBtn'
@@ -81,30 +81,37 @@ const StyledButton = styled(BaseBtn)<StyledButtonProps>(
   `,
   (p) => {
     const { outline = false } = p
-    if (p.secondary) {
-      return getButtonStyles({
-        bgColor: outline ? p.theme.colors.light : p.theme.colors.secondary,
-        color: outline ? p.theme.colors.secondary : p.theme.colors.textLight,
-        borderColor: p.theme.colors.secondary,
-        outline,
-      })
-    }
-    if (p.primary) {
-      return getButtonStyles({
-        bgColor: outline ? p.theme.colors.light : p.theme.colors.primary,
-        color: outline ? p.theme.colors.primary : p.theme.colors.textLight,
-        borderColor: p.theme.colors.primary,
-        outline,
-      })
-    }
-    if (p.accent) {
-      return getButtonStyles({
-        bgColor: outline ? p.theme.colors.light : p.theme.colors.accent,
-        color: outline ? p.theme.colors.accent : p.theme.colors.textLight,
-        borderColor: p.theme.colors.accent,
-        outline,
-      })
-    }
+    return css``
+    // if (p.secondary) {
+    //   return getButtonStyles({
+    //     bgColor: outline
+    //       ? p.theme.colors.light
+    //       : p.theme.colors.secondary['500'],
+    //     color: outline
+    //       ? p.theme.colors.secondary['500']
+    //       : p.theme.colors.textLight,
+    //     borderColor: p.theme.colors.secondary['500'],
+    //     outline,
+    //   })
+    // }
+    // if (p.primary) {
+    //   return getButtonStyles({
+    //     bgColor: outline ? p.theme.colors.light : p.theme.colors.primary['500'],
+    //     color: outline
+    //       ? p.theme.colors.primary['500']
+    //       : p.theme.colors.textLight,
+    //     borderColor: p.theme.colors.primary['500'],
+    //     outline,
+    //   })
+    // }
+    // if (p.accent) {
+    //   return getButtonStyles({
+    //     bgColor: outline ? p.theme.colors.light : p.theme.colors.accent,
+    //     color: outline ? p.theme.colors.accent : p.theme.colors.textLight,
+    //     borderColor: p.theme.colors.accent,
+    //     outline,
+    //   })
+    // }
   },
 
   ss.compose(

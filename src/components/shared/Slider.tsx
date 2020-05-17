@@ -11,7 +11,7 @@ import {
 } from 'react-compound-slider'
 import { noop } from 'lodash'
 import { Box } from 'components/shared/Box'
-import { css } from '@emotion/react'
+import { css } from '@emotion/core'
 import { lighten, darken } from 'polished'
 
 export type SliderProps = {
@@ -191,11 +191,11 @@ export const KeyboardHandle: React.FC<HandleProps> = ({
         justifyContent: 'center',
         height: 24,
         borderRadius: 8,
-        backgroundColor: disabled ? '#666' : theme.colors.primary,
+        backgroundColor: disabled ? '#666' : theme.colors.primary['500'],
         '&:hover, &:focus': {
           backgroundColor: disabled
             ? '#666'
-            : darken(0.05, theme.colors.primary),
+            : darken(0.05, theme.colors.primary['500']),
         },
       })}
       {...getHandleProps(id)}

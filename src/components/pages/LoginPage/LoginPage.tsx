@@ -1,4 +1,4 @@
-import { css } from '@emotion/react'
+import { css } from '@emotion/core'
 import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
 import { Box } from 'components/shared/Box'
 import { Button } from 'components/shared/Button'

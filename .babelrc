@@ -2,7 +2,7 @@
   "presets": ["next/babel", "@emotion/babel-preset-css-prop"],
   "plugins": [
     "polished",
-    ["@emotion", { "sourceMap": false }],
+    ["emotion", { "sourceMap": false }],
     "@babel/plugin-syntax-import-meta",
     ["@babel/plugin-proposal-decorators", { "legacy": true }]
   ]
