@@ -9,7 +9,8 @@ export const Urls = {
   dashboard: '/dashboard',
 
   editor: {
-    create: '/create',
-    edit: (id = ':id') => `/edit/${id}`,
+    _next: '/editor/[...id]',
+    create: '/editor/create',
+    edit: (id = ':id') => `/editor/${id}`,
   },
 }

@@ -1,3 +1,4 @@
+import React from 'react'
 import { css } from '@emotion/react'
 import * as ss from 'styled-system'
 import { textColor } from 'styles/system'
@@ -8,9 +9,9 @@ import { BoxProps } from 'components/shared/Box'
 
 export type ButtonProps = StyledButtonProps
 
-export const Button: React.FC<ButtonProps> = (props) => {
-  return <StyledButton {...props} />
-}
+export const Button = React.forwardRef<any, ButtonProps>((props, ref) => {
+  return <StyledButton ref={ref} {...props} />
+})
 
 type StyledButtonProps = {
   primary?: boolean

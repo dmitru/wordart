@@ -1,15 +1,41 @@
-import { MyProfile } from 'services/api/types'
+import {
+  MyProfile,
+  Wordcloud,
+  EmailLoginParams,
+  CreateWordcloudDto,
+  WordcloudEditorData,
+  WordcloudId,
+  SaveWordcloudDto,
+} from 'services/api/types'
 import { apiClient } from './api-client'
 
 export const Api = {
   setAuthToken: apiClient.setAuthToken,
   clearAuthToken: apiClient.clearAuthToken,
 
+  wordclouds: {
+    async create(data: CreateWordcloudDto): Promise<Wordcloud> {
+      const response = await apiClient.post('/wordclouds', data)
+      return response.data as Wordcloud
+    },
+    async save(id: WordcloudId, data: SaveWordcloudDto): Promise<void> {
+      await apiClient.put(`/wordclouds/${id}`, data)
+    },
+    async fetchMy(): Promise<Wordcloud[]> {
+      const response = await apiClient.get('/wordclouds')
+      return response.data as Wordcloud[]
+    },
+    async fetchEditorData(id: WordcloudId): Promise<WordcloudEditorData> {
+      const response = await apiClient.get(`/wordclouds/${id}/editorData`)
+      return response.data as WordcloudEditorData
+    },
+  },
+
   auth: {
     async login({
       emailOrUsername,
       password,
-    }: LoginParams): Promise<{ authToken: string }> {
+    }: EmailLoginParams): Promise<{ authToken: string }> {
       const response = await apiClient.post('/auth/login', {
         username: emailOrUsername,
         password,
@@ -23,5 +49,3 @@ export const Api = {
     },
   },
 }
-
-export type LoginParams = { emailOrUsername: string; password: string }

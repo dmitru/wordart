@@ -31,7 +31,7 @@ export const Header: React.FC<HeaderProps> = observer(() => {
         >
           {isLoggedIn && (
             <>
-              <Link href={Urls.editor.create} passHref>
+              <Link href={Urls.editor._next} as={Urls.editor.create} passHref>
                 <Button accent>Create</Button>
               </Link>
               <Link href={Urls.dashboard} passHref>

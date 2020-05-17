@@ -1,8 +1,9 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, useCallback } from 'react'
 import styled from '@emotion/styled'
 import 'lib/wordart/console-extensions'
 import { Shapes } from '@styled-icons/fa-solid/Shapes'
 import { TextFields } from '@styled-icons/material/TextFields'
+import { ChevronLeft } from '@styled-icons/material/ChevronLeft'
 import { Face } from '@styled-icons/material/Face'
 import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
 import { LayoutMasonry } from '@styled-icons/remix-fill/LayoutMasonry'
@@ -25,237 +26,291 @@ import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTa
 import { LeftPanelIconsTab } from 'components/Editor/components/LeftPanelIconsTab'
 import { LeftPanelColorsTab } from 'components/Editor/components/LeftPanelColorsTab'
 import { LeftPanelLayoutTab } from 'components/Editor/components/LeftPanelLayoutTab'
+import { WordcloudId } from 'services/api/types'
+import { Api } from 'services/api/api'
 
-export type EditorComponentProps = {}
+export type EditorComponentProps = {
+  wordcloudId?: WordcloudId
+}
 
-export const EditorComponent: React.FC<EditorComponentProps> = observer(() => {
-  const [canvasSize] = useState<Dimensions>({ w: (900 * 4) / 3, h: 900 })
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const { editorPageStore: store } = useStore()
+export const EditorComponent: React.FC<EditorComponentProps> = observer(
+  (props) => {
+    const [canvasSize] = useState<Dimensions>({ w: (900 * 4) / 3, h: 900 })
+    const canvasRef = useRef<HTMLCanvasElement>(null)
+    const { editorPageStore: store, wordcloudsStore } = useStore()
 
-  const { authStore } = useStore()
-  const router = useRouter()
+    const isNew = props.wordcloudId == null
+    useEffect(() => {
+      console.log('useEffect, isNew?', isNew)
+      const fetchEditorData = async () => {
+        const editorData = await Api.wordclouds.fetchEditorData(
+          props.wordcloudId!
+        )
+        console.log('editorData: ', editorData)
+      }
 
-  useEffect(() => {
-    if (
-      authStore.hasInitialized &&
-      canvasRef.current &&
-      store.state !== 'initialized'
-    ) {
-      store.initEditor({
-        canvas: canvasRef.current,
-        store: store,
-      })
+      if (!isNew) {
+        fetchEditorData()
+      }
+    }, [])
 
-      return store.destroyEditor()
+    const { authStore } = useStore()
+    const router = useRouter()
+
+    const [isSaving, setIsSaving] = useState(false)
+    const handleSaveClick = useCallback(() => {
+      const save = async () => {
+        if (isSaving) {
+          return
+        }
+        setIsSaving(true)
+        if (isNew) {
+          const wordcloud = await wordcloudsStore.create({
+            editorData: { version: 1 },
+            title: 'some title',
+          })
+          router.push(Urls.editor._next, Urls.editor.edit(wordcloud.id), {
+            shallow: true,
+          })
+        } else {
+          await wordcloudsStore.save(props.wordcloudId!, {
+            title: 'some title',
+            editorData: { version: 1 },
+          })
+        }
+        setIsSaving(false)
+      }
+
+      save()
+    }, [isSaving, props.wordcloudId])
+
+    useEffect(() => {
+      if (
+        authStore.hasInitialized &&
+        canvasRef.current &&
+        store.state !== 'initialized'
+      ) {
+        store.initEditor({
+          canvas: canvasRef.current,
+          store: store,
+        })
+
+        return store.destroyEditor()
+      }
+    }, [authStore.hasInitialized, canvasRef.current])
+
+    if (!router || !authStore.hasInitialized) {
+      return <SpinnerSplashScreen />
     }
-  }, [authStore.hasInitialized, canvasRef.current])
 
-  if (!router || !authStore.hasInitialized) {
-    return <SpinnerSplashScreen />
-  }
+    if (authStore.isLoggedIn !== true) {
+      router.replace(Urls.login)
+      return <SpinnerSplashScreen />
+    }
 
-  if (authStore.isLoggedIn !== true) {
-    router.replace(Urls.login)
-    return <SpinnerSplashScreen />
-  }
+    const leftTab =
+      state.targetTab === 'bg' ? state.leftTabBg : state.leftTabShape
 
-  const leftTab =
-    state.targetTab === 'bg' ? state.leftTabBg : state.leftTabShape
-
-  return (
-    <PageLayoutWrapper>
-      <TopNavWrapper alignItems="center" display="flex">
-        <Link href={Urls.dashboard} passHref>
-          <a
-            css={css`
-              color: white;
-            `}
-          >
-            Back
-          </a>
-        </Link>
-      </TopNavWrapper>
-
-      <EditorLayout>
-        <LeftWrapper>
-          <LeftBottomWrapper>
-            <SideNavbar
-              activeIndex={
-                state.targetTab === 'shape'
-                  ? leftPanelShapeTabs.findIndex(
-                      (s) => s === state.leftTabShape
-                    )
-                  : leftPanelBgTabs.findIndex((s) => s === state.leftTabBg)
-              }
+    return (
+      <PageLayoutWrapper>
+        <TopNavWrapper alignItems="center" display="flex">
+          <Link href={Urls.dashboard} passHref>
+            <a
+              css={css`
+                color: white;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+              `}
             >
-              {state.targetTab !== 'bg' && (
+              <ChevronLeft size="30px" /> Back
+            </a>
+          </Link>
+          <Button ml={3} accent onClick={handleSaveClick} disabled={isSaving}>
+            {isSaving ? 'Saving...' : 'Save'}
+          </Button>
+        </TopNavWrapper>
+
+        <EditorLayout>
+          <LeftWrapper>
+            <LeftBottomWrapper>
+              <SideNavbar
+                activeIndex={
+                  state.targetTab === 'shape'
+                    ? leftPanelShapeTabs.findIndex(
+                        (s) => s === state.leftTabShape
+                      )
+                    : leftPanelBgTabs.findIndex((s) => s === state.leftTabBg)
+                }
+              >
+                {state.targetTab !== 'bg' && (
+                  <LeftNavbarBtn
+                    onClick={() => {
+                      state.leftTabShape = 'shapes'
+                    }}
+                    active={state.leftTabShape === 'shapes'}
+                  >
+                    <Shapes className="icon" />
+                    Shape
+                  </LeftNavbarBtn>
+                )}
+
                 <LeftNavbarBtn
                   onClick={() => {
-                    state.leftTabShape = 'shapes'
+                    state.leftTabBg = 'words'
+                    state.leftTabShape = 'words'
                   }}
-                  active={state.leftTabShape === 'shapes'}
+                  active={leftTab === 'words'}
                 >
-                  <Shapes className="icon" />
-                  Shape
+                  <TextFields className="icon" />
+                  Words
                 </LeftNavbarBtn>
-              )}
+                <LeftNavbarBtn
+                  onClick={() => {
+                    state.leftTabBg = 'symbols'
+                    state.leftTabShape = 'symbols'
+                  }}
+                  active={leftTab === 'symbols'}
+                >
+                  <Face className="icon" />
+                  Icons
+                </LeftNavbarBtn>
 
-              <LeftNavbarBtn
-                onClick={() => {
-                  state.leftTabBg = 'words'
-                  state.leftTabShape = 'words'
-                }}
-                active={leftTab === 'words'}
-              >
-                <TextFields className="icon" />
-                Words
-              </LeftNavbarBtn>
-              <LeftNavbarBtn
-                onClick={() => {
-                  state.leftTabBg = 'symbols'
-                  state.leftTabShape = 'symbols'
-                }}
-                active={leftTab === 'symbols'}
-              >
-                <Face className="icon" />
-                Icons
-              </LeftNavbarBtn>
+                <LeftNavbarBtn
+                  onClick={() => {
+                    state.leftTabBg = 'layout'
+                    state.leftTabShape = 'layout'
+                  }}
+                  active={leftTab === 'layout'}
+                >
+                  <LayoutMasonry className="icon" />
+                  Layout
+                </LeftNavbarBtn>
 
-              <LeftNavbarBtn
-                onClick={() => {
-                  state.leftTabBg = 'layout'
-                  state.leftTabShape = 'layout'
-                }}
-                active={leftTab === 'layout'}
-              >
-                <LayoutMasonry className="icon" />
-                Layout
-              </LeftNavbarBtn>
+                <LeftNavbarBtn
+                  onClick={() => {
+                    state.leftTabBg = 'colors'
+                    state.leftTabShape = 'colors'
+                  }}
+                  active={leftTab === 'colors'}
+                >
+                  <ColorPalette className="icon" />
+                  Colors
+                </LeftNavbarBtn>
+              </SideNavbar>
 
-              <LeftNavbarBtn
-                onClick={() => {
-                  state.leftTabBg = 'colors'
-                  state.leftTabShape = 'colors'
-                }}
-                active={leftTab === 'colors'}
-              >
-                <ColorPalette className="icon" />
-                Colors
-              </LeftNavbarBtn>
-            </SideNavbar>
+              <LeftPanel>
+                <LeftTopWrapper>
+                  <Box mr={3} ml={3}>
+                    <Button
+                      css={css`
+                        width: 120px;
+                      `}
+                      py={1}
+                      onClick={() => {
+                        state.targetTab = 'shape'
+                      }}
+                      outline={state.targetTab !== 'shape'}
+                      secondary={state.targetTab === 'shape'}
+                    >
+                      Shape
+                    </Button>
+                    <Button
+                      css={css`
+                        width: 120px;
+                      `}
+                      py={1}
+                      onClick={() => {
+                        state.targetTab = 'bg'
+                      }}
+                      outline={state.targetTab !== 'bg'}
+                      secondary={state.targetTab === 'bg'}
+                    >
+                      Background
+                    </Button>
+                  </Box>
+                </LeftTopWrapper>
 
-            <LeftPanel>
-              <LeftTopWrapper>
-                <Box mr={3} ml={3}>
-                  <Button
-                    css={css`
-                      width: 120px;
-                    `}
-                    py={1}
-                    onClick={() => {
-                      state.targetTab = 'shape'
-                    }}
-                    outline={state.targetTab !== 'shape'}
-                    secondary={state.targetTab === 'shape'}
-                  >
-                    Shape
-                  </Button>
-                  <Button
-                    css={css`
-                      width: 120px;
-                    `}
-                    py={1}
-                    onClick={() => {
-                      state.targetTab = 'bg'
-                    }}
-                    outline={state.targetTab !== 'bg'}
-                    secondary={state.targetTab === 'bg'}
-                  >
-                    Background
-                  </Button>
-                </Box>
-              </LeftTopWrapper>
+                <LeftPanelContent id="left-panel-content" px={3} py={3}>
+                  {leftTab === 'shapes' && <LeftPanelShapesTab />}
+                  {leftTab === 'words' && (
+                    <>
+                      <LeftPanelWordsTab target={state.targetTab} />
+                    </>
+                  )}
+                  {leftTab === 'symbols' && (
+                    <LeftPanelIconsTab target={state.targetTab} />
+                  )}
+                  {leftTab === 'colors' && (
+                    <LeftPanelColorsTab target={state.targetTab} />
+                  )}
 
-              <LeftPanelContent id="left-panel-content" px={3} py={3}>
-                {leftTab === 'shapes' && <LeftPanelShapesTab />}
-                {leftTab === 'words' && (
-                  <>
-                    <LeftPanelWordsTab target={state.targetTab} />
-                  </>
-                )}
-                {leftTab === 'symbols' && (
-                  <LeftPanelIconsTab target={state.targetTab} />
-                )}
-                {leftTab === 'colors' && (
-                  <LeftPanelColorsTab target={state.targetTab} />
-                )}
+                  {leftTab === 'layout' && (
+                    <LeftPanelLayoutTab target={state.targetTab} />
+                  )}
+                </LeftPanelContent>
+              </LeftPanel>
+            </LeftBottomWrapper>
+          </LeftWrapper>
 
-                {leftTab === 'layout' && (
-                  <LeftPanelLayoutTab target={state.targetTab} />
-                )}
-              </LeftPanelContent>
-            </LeftPanel>
-          </LeftBottomWrapper>
-        </LeftWrapper>
-
-        <RightWrapper>
-          <TopToolbar
-            display="flex"
-            alignItems="center"
-            bg="light"
-            p={2}
-            pl={3}
-          >
-            <Button
-              css={css`
-                width: 128px;
-              `}
-              accent
-              disabled={store.isVisualizing}
-              onClick={() => {
-                if (state.targetTab === 'shape') {
-                  store.editor?.generateShapeItems({
-                    style: store.styles.shape,
-                  })
-                } else {
-                  store.editor?.generateBgItems({
-                    style: store.styles.bg,
-                  })
-                }
-              }}
+          <RightWrapper>
+            <TopToolbar
+              display="flex"
+              alignItems="center"
+              bg="light"
+              p={2}
+              pl={3}
             >
-              {!store.isVisualizing && (
-                <MagicWand
-                  size={24}
-                  css={css`
-                    margin-right: 4px;
-                  `}
-                />
-              )}
-              {store.isVisualizing
-                ? `Working: ${Math.round(
-                    (store.visualizingProgress || 0) * 100
-                  )}%`
-                : 'Visualize'}
-            </Button>
+              <Button
+                css={css`
+                  width: 128px;
+                `}
+                accent
+                disabled={store.isVisualizing}
+                onClick={() => {
+                  if (state.targetTab === 'shape') {
+                    store.editor?.generateShapeItems({
+                      style: store.styles.shape,
+                    })
+                  } else {
+                    store.editor?.generateBgItems({
+                      style: store.styles.bg,
+                    })
+                  }
+                }}
+              >
+                {!store.isVisualizing && (
+                  <MagicWand
+                    size={24}
+                    css={css`
+                      margin-right: 4px;
+                    `}
+                  />
+                )}
+                {store.isVisualizing
+                  ? `Working: ${Math.round(
+                      (store.visualizingProgress || 0) * 100
+                    )}%`
+                  : 'Visualize'}
+              </Button>
 
-            <Button ml={3}>Undo</Button>
-            <Button ml={1}>Redo</Button>
-          </TopToolbar>
-          <CanvasWrappper>
-            <Canvas
-              width={canvasSize.w}
-              height={canvasSize.h}
-              ref={canvasRef}
-              id="scene"
-            />
-          </CanvasWrappper>
-        </RightWrapper>
-      </EditorLayout>
-    </PageLayoutWrapper>
-  )
-})
+              <Button ml={3}>Undo</Button>
+              <Button ml={1}>Redo</Button>
+            </TopToolbar>
+            <CanvasWrappper>
+              <Canvas
+                width={canvasSize.w}
+                height={canvasSize.h}
+                ref={canvasRef}
+                id="scene"
+              />
+            </CanvasWrappper>
+          </RightWrapper>
+        </EditorLayout>
+      </PageLayoutWrapper>
+    )
+  }
+)
 
 const PageLayoutWrapper = styled.div`
   display: flex;

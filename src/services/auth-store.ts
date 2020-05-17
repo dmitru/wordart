@@ -5,24 +5,29 @@ import { observable, computed } from 'mobx'
 import { MyProfile } from 'services/api/types'
 import { AuthTokenStore } from 'services/auth-token-store'
 
+const IS_SSR = typeof window === 'undefined'
+
 export class AuthStore {
   rootStore: RootStore
 
   @observable hasInitialized = false
   @observable profile: MyProfile | null = null
 
+  afterLogin: Function = () => null
+
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
   }
 
   @computed get isLoggedIn() {
+    if (IS_SSR) {
+      return false
+    }
     if (!this.hasInitialized) {
       return undefined
     }
     return this.profile != null
   }
-
-  finishGoogleSignIn = async () => {}
 
   initUsingSavedLocalAuthToken = async () => {
     const authToken = AuthTokenStore.getAuthToken()
@@ -32,6 +37,7 @@ export class AuthStore {
       try {
         const profile = await Api.auth.getMyProfile()
         this.profile = profile
+        this.afterLogin()
       } catch {
         Api.clearAuthToken()
         AuthTokenStore.clearAuthToken()
@@ -55,6 +61,7 @@ export class AuthStore {
 
       const profile = await Api.auth.getMyProfile()
       this.profile = profile
+      this.afterLogin()
     } catch (error) {
       throw error
     }

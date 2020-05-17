@@ -8,5 +8,30 @@ export type UserProfile = {
   id: UserId
   username: string
 }
+export type EmailLoginParams = { emailOrUsername: string; password: string }
 
 export type UserId = string
+
+export type WordcloudId = string
+
+export type Wordcloud = {
+  id: WordcloudId
+  title: string
+  author: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type WordcloudEditorData = {
+  version: 1
+}
+
+export type CreateWordcloudDto = {
+  title: string
+  editorData: WordcloudEditorData
+}
+
+export type SaveWordcloudDto = {
+  title: string
+  editorData: WordcloudEditorData
+}
