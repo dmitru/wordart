@@ -39,7 +39,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
       css={css`
         //position: relative;
       `}
-      mb={2}
+      mb="2"
     >
       {label && (
         <Box

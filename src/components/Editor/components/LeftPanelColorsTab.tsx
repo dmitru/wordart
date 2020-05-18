@@ -45,18 +45,18 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
     return (
       <>
-        <Box mb={4}>
+        <Box mb="4">
           <Box>
-            <Label mb={2}>Shape</Label>
+            <Label mb="2">Shape</Label>
           </Box>
 
           {shape.kind === 'svg' && (
             <>
               <Box>
                 <Button
-                  px={2}
-                  py={1}
-                  mr={0}
+                  px="2"
+                  py="1"
+                  mr="0"
                   secondary={shapeStyle.fill.kind === 'color-map'}
                   outline={shapeStyle.fill.kind !== 'color-map'}
                   onClick={() => {
@@ -67,9 +67,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   Shape colors
                 </Button>
                 <Button
-                  px={2}
-                  py={1}
-                  mr={0}
+                  px="2"
+                  py="1"
+                  mr="0"
                   secondary={shapeStyle.fill.kind === 'single-color'}
                   outline={shapeStyle.fill.kind !== 'single-color'}
                   onClick={() => {
@@ -81,7 +81,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                 </Button>
               </Box>
 
-              <Box mt={2}>
+              <Box mt="2">
                 {shapeStyle.fill.kind === 'single-color' && (
                   <ColorPicker
                     disableAlpha
@@ -97,7 +97,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
                 {shapeStyle.fill.kind === 'color-map' &&
                   shapeStyle.fill.colorMap.map((color, index) => (
-                    <Box mr={1} key={index} display="inline-block">
+                    <Box mr="1" key={index} display="inline-block">
                       <ColorPicker
                         disableAlpha
                         value={chroma(color).alpha(1).hex()}
@@ -114,7 +114,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             </>
           )}
 
-          <Box mt={2}>
+          <Box mt="2">
             <Slider
               label="Opacity"
               value={100 * shapeStyle.fill.opacity}
@@ -131,8 +131,8 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           </Box>
         </Box>
 
-        <Box mb={2}>
-          <Label mb={2}>Words & Icons</Label>
+        <Box mb="2">
+          <Label mb="2">Words & Icons</Label>
           {/* <Checkbox
             id="gradient"
             label="Gradient"
@@ -142,9 +142,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             }}
           /> */}
           <Button
-            px={2}
-            py={1}
-            mr={0}
+            px="2"
+            py="1"
+            mr="0"
             secondary={style.itemsColoring.kind === 'shape'}
             outline={style.itemsColoring.kind !== 'shape'}
             onClick={() => {
@@ -156,8 +156,8 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           </Button>
 
           <Button
-            px={2}
-            py={1}
+            px="2"
+            py="1"
             secondary={style.itemsColoring.kind === 'gradient'}
             outline={style.itemsColoring.kind !== 'gradient'}
             onClick={() => {
@@ -169,9 +169,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           </Button>
 
           <Button
-            px={2}
-            py={1}
-            mr={0}
+            px="2"
+            py="1"
+            mr="0"
             secondary={style.itemsColoring.kind === 'color'}
             outline={style.itemsColoring.kind !== 'color'}
             onClick={() => {
@@ -182,7 +182,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             Color
           </Button>
 
-          <Box mt={2}>
+          <Box mt="2">
             {style.itemsColoring.kind === 'color' && (
               <ColorPicker
                 disableAlpha
@@ -195,7 +195,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             )}
             {style.itemsColoring.kind === 'gradient' && (
               <>
-                <Box mr={1} display="inline-block">
+                <Box mr="1" display="inline-block">
                   <ColorPicker
                     disableAlpha
                     value={style.itemsColoring.gradient.from}
@@ -205,7 +205,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     onAfterChange={updateItemsColoring}
                   />
                 </Box>
-                <Box mr={1} display="inline-block">
+                <Box mr="1" display="inline-block">
                   <ColorPicker
                     disableAlpha
                     value={style.itemsColoring.gradient.to}
@@ -220,7 +220,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           </Box>
         </Box>
 
-        <Box mb={4}>
+        <Box mb="4">
           <Slider
             label="Make larger words brighter"
             value={style.itemsColoring.dimSmallerItems}
@@ -235,8 +235,8 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           />
         </Box>
 
-        <Box mb={4}>
-          <Label mb={2}>Background</Label>
+        <Box mb="4">
+          <Label mb="2">Background</Label>
           <ColorPicker
             disableAlpha
             value={chroma(bgStyle.fill.color).alpha(1).hex()}

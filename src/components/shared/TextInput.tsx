@@ -24,8 +24,8 @@ export const TextInput: React.FC<TextInputProps> = ({
       {children}
       <StyledTextInput
         {...otherProps}
-        px={2}
-        py={1}
+        px="2"
+        py="1"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />

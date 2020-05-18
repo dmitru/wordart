@@ -93,12 +93,12 @@ export const LoginPage = observer(() => {
                   label="Password"
                 />
 
-                <Button mt={4} primary disabled={isSubmitting} type="submit">
+                <Button mt="4" primary disabled={isSubmitting} type="submit">
                   Log in
                 </Button>
 
                 {error && (
-                  <Box mt={3} color="danger">
+                  <Box mt="3" color="danger">
                     {error}
                   </Box>
                 )}

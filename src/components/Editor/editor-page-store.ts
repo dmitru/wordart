@@ -56,7 +56,7 @@ export class EditorPageStore {
     if (params.serialized) {
       await this.loadSerialized(params.serialized)
     } else {
-      this.selectShape(shapes[4].id)
+      await this.selectShape(shapes[5].id)
     }
 
     this.state = 'initialized'

@@ -24,6 +24,14 @@ export const theme = {
     dark4: '#666',
     muted: '#ccc',
   },
+  zIndices: {
+    ...chakraTheme.zIndices,
+    popover: 100,
+    tooltip: 109,
+    modal: 200,
+    menu: 120,
+    dropdown: 120,
+  },
 }
 
 export type Theme = typeof theme

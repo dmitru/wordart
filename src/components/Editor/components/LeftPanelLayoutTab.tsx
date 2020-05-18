@@ -21,7 +21,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
     return (
       <>
-        <Box mb={4}>
+        <Box mb="4">
           {/* <Checkbox
             id="fit-shape"
             label="Allow words to go beyond shape"
@@ -29,7 +29,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
             onChange={(value) => {
               style.fitWithinShape = !value
             }}
-            mb={3}
+            mb="3"
           /> */}
           <Slider
             label="Density"
@@ -62,7 +62,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
         </Box>
 
         {style.words.wordList.length > 0 && (
-          <Box mb={4}>
+          <Box mb="4">
             <Label>Words</Label>
 
             <Slider
@@ -94,7 +94,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
         )}
 
         {style.icons.iconList.length > 0 && (
-          <Box mb={4}>
+          <Box mb="4">
             <Label>Icons</Label>
             <Slider
               label="Size"

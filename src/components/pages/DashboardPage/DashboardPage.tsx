@@ -1,5 +1,5 @@
 import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
-import { Box } from '@chakra-ui/core'
+import { Box, CloseButton } from '@chakra-ui/core'
 import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
 import React from 'react'
@@ -19,7 +19,7 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
   onDeleteClick,
 }) => {
   return (
-    <Box my={2} p={3}>
+    <Box my="2" p={3}>
       <pre>{JSON.stringify(wordcloud, null, 2)}</pre>
       <Link
         as={Urls.editor.edit(wordcloud.id)}
@@ -30,11 +30,11 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
       </Link>
       <Tooltip hasArrow label="Delete" aria-label="Delete">
         <IconButton
+          isRound
           aria-label="Delete"
-          ml={2}
-          icon="small-close"
+          ml="2"
+          icon="close"
           onClick={onDeleteClick}
-          variant="outline"
           variantColor="gray"
         />
       </Tooltip>

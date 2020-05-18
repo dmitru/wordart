@@ -1,36 +1,44 @@
-import { observer } from 'mobx-react'
-import { useStore } from 'services/root-store'
-import { useCallback, useState } from 'react'
+import {
+  Box,
+  Button,
+  Collapse,
+  Icon,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Stack,
+} from '@chakra-ui/core'
+import { css } from '@emotion/core'
+import { useThrottleCallback } from '@react-hook/throttle'
+import chroma from 'chroma-js'
 import {
   ShapeSelector,
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
-import { observable } from 'mobx'
-import { Modal } from 'components/shared/Modal'
-import { Slider } from 'components/shared/Slider'
-import { css } from '@emotion/core'
-import { Checkbox } from 'components/shared/Checkbox'
+import { getItemsColoring } from 'components/Editor/lib/editor'
 import { ColorPicker } from 'components/shared/ColorPicker'
-import chroma from 'chroma-js'
-import { Button } from 'components/shared/Button'
-import { SearchInput } from 'components/shared/SearchInput'
-import { Box } from '@chakra-ui/core'
+import { Slider } from 'components/shared/Slider'
+import { Tooltip } from 'components/shared/Tooltip'
+import { observable } from 'mobx'
+import { observer } from 'mobx-react'
+import { useCallback, useState } from 'react'
+import { useStore } from 'services/root-store'
 
 export type LeftPanelShapesTabProps = {}
 
 const state = observable({
-  showCustomize: false,
+  isShowingColors: false,
   isSelectingShape: false,
 })
 
 export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
   () => {
     const { editorPageStore } = useStore()
-    const style = editorPageStore.styles.shape
+    const shapeStyle = editorPageStore.styles.shape
 
     const visualize = useCallback(() => {
       editorPageStore.editor?.generateShapeItems({
-        style,
+        style: shapeStyle,
       })
     }, [])
 
@@ -39,11 +47,25 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
       .getAvailableShapes()
       .filter((s) => s.title.toLowerCase().includes(query.toLowerCase()))
 
+    const updateShapeColoring = useThrottleCallback(
+      () => {
+        editorPageStore.editor?.setShapeFillColors(shapeStyle.fill)
+        if (shapeStyle.itemsColoring.kind === 'shape') {
+          editorPageStore.editor?.setItemsColor(
+            'shape',
+            getItemsColoring(shapeStyle)
+          )
+        }
+      },
+      20,
+      true
+    )
+
     return (
       <>
         <Box>
           <>
-            <Box display="flex" alignItems="flex-start" mb={3}>
+            <Box display="flex" alignItems="flex-start" mb="3">
               <ShapeThumbnailBtn
                 css={css`
                   width: 120px;
@@ -64,18 +86,19 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
               />
               <Box
                 flex={1}
-                ml={3}
+                ml="3"
                 display="flex"
                 flexDirection="column"
-                alignItems="flex-end"
-                justifyContent="flex-end"
+                alignItems="flex-start"
+                justifyContent="space-between"
+                height="120px"
               >
-                <Box flex={1} width="100%" mb={2}>
+                <Box flex={1} width="100%" mb="2">
                   <Slider
                     label="Opacity"
-                    value={100 * style.fill.opacity}
+                    value={100 * shapeStyle.fill.opacity}
                     onChange={(value) => {
-                      style.fill.opacity = value / 100
+                      shapeStyle.fill.opacity = value / 100
                     }}
                     onAfterChange={(value) => {
                       editorPageStore.editor?.setShapeFillOpacity(value / 100)
@@ -86,27 +109,125 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                   />
                 </Box>
 
-                <Button
-                  px={2}
-                  py={1}
-                  outline
-                  // secondary
-                  onClick={() => {
-                    state.showCustomize = true
-                  }}
+                <Tooltip
+                  label="Change shape colors"
+                  isDisabled={state.isShowingColors}
                 >
-                  Customize
-                </Button>
+                  <Button
+                    size="sm"
+                    leftIcon="settings"
+                    variant={state.isShowingColors ? 'solid' : 'solid'}
+                    variantColor={state.isShowingColors ? 'primary' : undefined}
+                    onClick={() => {
+                      state.isShowingColors = !state.isShowingColors
+                    }}
+                  >
+                    Colors
+                  </Button>
+                </Tooltip>
               </Box>
             </Box>
 
+            <Collapse isOpen={state.isShowingColors}>
+              <Stack mb="4" p="2">
+                {shapeStyle.fill.colorMap.length > 1 && (
+                  <Box>
+                    <Button
+                      borderTopRightRadius="0"
+                      borderBottomRightRadius="0"
+                      px="2"
+                      py="1"
+                      mr="0"
+                      size="xs"
+                      variantColor="secondary"
+                      variant={
+                        shapeStyle.fill.kind === 'color-map'
+                          ? 'solid'
+                          : 'outline'
+                      }
+                      onClick={() => {
+                        shapeStyle.fill.kind = 'color-map'
+                        updateShapeColoring()
+                      }}
+                    >
+                      Shape colors
+                    </Button>
+                    <Button
+                      borderBottomLeftRadius="0"
+                      borderTopLeftRadius="0"
+                      px="2"
+                      py="1"
+                      mr="0"
+                      size="xs"
+                      variantColor="secondary"
+                      variant={
+                        shapeStyle.fill.kind === 'single-color'
+                          ? 'solid'
+                          : 'outline'
+                      }
+                      onClick={() => {
+                        shapeStyle.fill.kind = 'single-color'
+                        updateShapeColoring()
+                      }}
+                    >
+                      Single color
+                    </Button>
+                  </Box>
+                )}
+
+                {shapeStyle.fill.kind === 'single-color' && (
+                  <ColorPicker
+                    disableAlpha
+                    value={chroma(shapeStyle.fill.color).alpha(1).hex()}
+                    onChange={(hex) => {
+                      shapeStyle.fill.color = chroma(hex).hex()
+                    }}
+                    onAfterChange={() => {
+                      updateShapeColoring()
+                    }}
+                  />
+                )}
+
+                {shapeStyle.fill.kind === 'color-map' && (
+                  <Box>
+                    {shapeStyle.fill.colorMap.map((color, index) => (
+                      <Box mr="1" key={index} display="inline-block">
+                        <ColorPicker
+                          disableAlpha
+                          value={chroma(color).alpha(1).hex()}
+                          onChange={(hex) => {
+                            shapeStyle.fill.colorMap[index] = chroma(hex).hex()
+                          }}
+                          onAfterChange={() => {
+                            updateShapeColoring()
+                          }}
+                        />
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+              </Stack>
+              {shapeStyle.processing.invert.enabled && (
+                <ColorPicker
+                  value={shapeStyle.processing.invert.color}
+                  onChange={(color) => {
+                    shapeStyle.processing.invert.color = chroma(color).hex()
+                    visualize()
+                  }}
+                />
+              )}
+            </Collapse>
+
             <Box>
               <Box>
-                <SearchInput
-                  placeholder="Search shapes..."
-                  value={query}
-                  onChange={setQuery}
-                />
+                <InputGroup>
+                  <InputLeftElement children={<Icon name="search" />} />
+                  <Input
+                    placeholder="Search shapes..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                  />
+                </InputGroup>
               </Box>
 
               <ShapeSelector
@@ -119,51 +240,6 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                 selectedShapeId={editorPageStore.getSelectedShape().id}
               />
             </Box>
-
-            <Modal
-              isOpen={state.showCustomize}
-              onRequestClose={() => {
-                state.showCustomize = false
-              }}
-            >
-              <Box
-                css={css`
-                  min-width: 300px;
-                `}
-              >
-                <Slider
-                  label="Edges"
-                  min={0}
-                  max={100}
-                  step={1}
-                  value={style.processing.edges.amount}
-                  onAfterChange={(value) => {
-                    style.processing.edges.amount = value
-                    visualize()
-                  }}
-                />
-
-                <Checkbox
-                  label="Invert"
-                  id="invert"
-                  value={style.processing.invert.enabled}
-                  onChange={(value) => {
-                    style.processing.invert.enabled = value
-                    visualize()
-                  }}
-                />
-
-                {style.processing.invert.enabled && (
-                  <ColorPicker
-                    value={style.processing.invert.color}
-                    onChange={(color) => {
-                      style.processing.invert.color = chroma(color).hex()
-                      visualize()
-                    }}
-                  />
-                )}
-              </Box>
-            </Modal>
           </>
         </Box>
       </>

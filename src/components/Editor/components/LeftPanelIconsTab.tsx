@@ -43,9 +43,9 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
           {!state.isAdding && (
             <>
               <Button
-                px={2}
-                py={1}
-                mr={2}
+                px="2"
+                py="1"
+                mt="2"
                 primary
                 onClick={() => {
                   state.isAdding = true
@@ -54,8 +54,8 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 <evaicons.PlusOutline size="20" /> Add
               </Button>
               <Button
-                px={2}
-                py={1}
+                px="2"
+                py="1"
                 outline
                 onClick={() => {
                   style.icons.iconList = []
@@ -69,9 +69,9 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
           {state.isAdding && (
             <>
               <Button
-                px={2}
-                py={1}
-                mr={2}
+                px="2"
+                py="1"
+                mt="2"
                 secondary
                 onClick={() => {
                   state.isAdding = false
@@ -97,8 +97,8 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
         )}
 
         {!state.isAdding && (
-          <IconsList mt={2}>
-            <ShapeThumbnails mt={2}>
+          <IconsList mt="2">
+            <ShapeThumbnails mt="2">
               {icons.map((icon) => (
                 <ShapeThumbnailBtn
                   key={icon.shapeId}

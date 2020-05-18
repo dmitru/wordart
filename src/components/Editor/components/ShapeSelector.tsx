@@ -16,7 +16,7 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
   ({ shapes, selectedShapeId, onSelected = noop, ...rest }) => {
     return (
       <>
-        <ShapeThumbnails mt={2} {...rest}>
+        <ShapeThumbnails mt="2" {...rest}>
           {shapes.map((shape) => (
             <ShapeThumbnailBtn
               key={shape.id}

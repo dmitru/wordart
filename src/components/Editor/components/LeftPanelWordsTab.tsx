@@ -1,24 +1,45 @@
-import { observer } from 'mobx-react'
-import { useStore } from 'services/root-store'
+import {
+  Box,
+  Button,
+  Icon,
+  IconButton,
+  Editable,
+  Heading,
+  EditablePreview,
+  EditableInput,
+  InputGroup,
+  InputLeftElement,
+  Input,
+  Stack,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuGroup,
+  MenuDivider,
+} from '@chakra-ui/core'
+import { capitalize } from 'lodash'
+import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import styled from '@emotion/styled'
 import * as evaicons from '@styled-icons/evaicons-outline'
-import { useState, useCallback } from 'react'
-import { Label } from './shared'
-import { Button } from 'components/shared/Button'
-import { Box } from 'components/shared/Box'
-import { BaseBtn } from 'components/shared/BaseBtn'
-import { TextInput } from 'components/shared/TextInput'
-import { observable } from 'mobx'
-import { uniq } from 'lodash'
 import { TargetKind } from 'components/Editor/lib/editor'
+import { observable } from 'mobx'
+import { observer } from 'mobx-react'
+import { useStore } from 'services/root-store'
+import { FiUploadCloud } from 'react-icons/fi'
+import { ColorPicker } from 'components/shared/ColorPicker'
+import { Tooltip } from 'components/shared/Tooltip'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
 }
 
-const WordList = styled(Box)``
+const WordList = styled(Box)`
+  height: calc(100vh - 210px);
+  overflow: auto;
+`
 
-const WordDeleteButton = styled(Button)``
+const WordDeleteButton = styled(IconButton)``
 
 const WordRow = styled(Box)`
   width: 100%;
@@ -31,104 +52,14 @@ const WordRow = styled(Box)`
   }
 
   &:hover {
+    background: #eee;
     ${WordDeleteButton} {
       opacity: 1;
     }
   }
 `
 
-const WordTitleWrapper = styled(BaseBtn)`
-  width: 100%;
-  text-align: left;
-`
-
-const WordTitleInput = styled(TextInput)`
-  width: 100%;
-  /* padding: 3px; */
-`
-
-const WordTitleInlineEditor: React.FC<{
-  value: string
-  onChange: (value: string) => void
-}> = ({ value, onChange }) => {
-  const [inputValue, setInputValue] = useState<string | null>(null)
-
-  const finishEditing = useCallback(() => {
-    if (inputValue != null) {
-      onChange(inputValue)
-    }
-    setInputValue(null)
-  }, [inputValue])
-
-  const startEditing = useCallback(() => {
-    setInputValue(value)
-  }, [value])
-
-  const isEditing = value === '' || inputValue != null
-
-  return (
-    <>
-      {!isEditing && (
-        <WordTitleWrapper px={2} onClick={startEditing}>
-          {value || <em>Type word here...</em>}
-        </WordTitleWrapper>
-      )}
-      {isEditing && (
-        <WordTitleInput
-          autoFocus
-          placeholder="Type word here..."
-          onChange={setInputValue}
-          value={inputValue || ''}
-          onBlur={finishEditing}
-        />
-      )}
-    </>
-  )
-}
-
-const FontDeleteButton = styled(Button)``
-
-const FontButton = styled(BaseBtn)`
-  border: none;
-  flex: 1;
-  display: inline-flex;
-  height: 38px;
-
-  img {
-    height: 30px;
-    margin: 0;
-    object-fit: contain;
-  }
-`
-FontButton.defaultProps = {
-  px: 2,
-  py: 1,
-}
-
-const FontButtonContainer = styled(Box)`
-  ${FontDeleteButton} {
-    opacity: 0;
-    transition: 0.2s opacity;
-  }
-
-  transition: 0.1s background;
-
-  &:hover {
-    background: ${(p) => p.theme.colors.light1};
-    ${FontDeleteButton} {
-      opacity: 1;
-    }
-  }
-`
-FontButtonContainer.defaultProps = {
-  display: 'flex',
-  alignItems: 'center',
-}
-
-const state = observable({
-  isAddingFont: false,
-  replacingFontIndex: undefined as undefined | number,
-})
+const state = observable({})
 
 const Toolbar = styled(Box)``
 
@@ -141,170 +72,130 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     const fonts = store.getAvailableFonts()
 
     return (
-      <>
-        <Box mb={4}>
-          {state.isAddingFont && (
-            <>
-              <Toolbar mb={3} display="flex" alignItems="center">
-                <Label flex={1}>Choose Font</Label>
-                <Button
-                  px={2}
-                  py={1}
-                  mr={2}
-                  secondary
-                  outline
-                  onClick={() => {
-                    state.isAddingFont = false
-                    state.replacingFontIndex = undefined
-                  }}
-                >
-                  <evaicons.ArrowIosBackOutline className="icon" size="20" />{' '}
-                  Back
-                </Button>
-              </Toolbar>
-              {fonts.map((font) => {
-                const { style: fontStyle } = font
-                return (
-                  <FontButtonContainer key={fontStyle.fontId}>
-                    <FontButton
-                      onClick={() => {
-                        if (state.replacingFontIndex != null) {
-                          style.words.fonts = uniq(
-                            style.words.fonts.map((f, index) =>
-                              index === state.replacingFontIndex
-                                ? fontStyle.fontId
-                                : f
-                            )
-                          )
-                        } else {
-                          style.words.fonts = uniq([
-                            ...style.words.fonts,
-                            fontStyle.fontId,
-                          ])
-                        }
-                        state.isAddingFont = false
-                        state.replacingFontIndex = undefined
-                      }}
-                    >
-                      <img src={fontStyle.thumbnail} />
-                    </FontButton>
-                  </FontButtonContainer>
-                )
-              })}
-            </>
-          )}
-          {!state.isAddingFont && (
-            <>
-              <Toolbar mb={3} display="flex" alignItems="center">
-                <Label flex={1}>Fonts</Label>
-                <Button
-                  px={2}
-                  py={1}
-                  mr={2}
-                  primary
-                  onClick={() => {
-                    state.isAddingFont = true
-                  }}
-                >
-                  <evaicons.PlusOutline size="20" /> Add
-                </Button>
-                <Button
-                  px={2}
-                  py={1}
-                  outline
-                  onClick={() => {
-                    style.words.fonts = [style.words.fonts[0]]
-                  }}
-                >
-                  Clear
-                </Button>
-              </Toolbar>
+      <Box mb="5">
+        <Stack spacing="0">
+          <Stack direction="row" spacing="0">
+            <Tooltip label="Open advanced words editor..." showDelay={300}>
+              <Button leftIcon="edit">Open editor...</Button>
+            </Tooltip>
 
-              {/* Added fonts */}
-              {style.words.fonts.map((fontId, index) => {
-                const { style: fontStyle } = store.getFontById(fontId)!
-                return (
-                  <FontButtonContainer key={fontId}>
-                    <FontButton
-                      onClick={() => {
-                        state.replacingFontIndex = index
-                        state.isAddingFont = true
-                      }}
-                    >
-                      <img src={fontStyle.thumbnail} />
-                    </FontButton>
+            <Button ml="2" leftIcon="arrow-up">
+              Import
+            </Button>
 
-                    <FontDeleteButton
-                      px={2}
-                      py={0}
-                      ml={3}
-                      secondary
-                      outline
-                      onClick={() => {
-                        style.words.fonts = style.words.fonts.filter(
-                          (fId) => fId !== fontId
-                        )
-                      }}
-                    >
-                      <evaicons.CloseOutline size="20" />
-                    </FontDeleteButton>
-                  </FontButtonContainer>
-                )
-              })}
-            </>
-          )}
-        </Box>
-
-        {!state.isAddingFont && (
-          <Box>
-            <Toolbar display="flex" alignItems="center">
-              <Label flex={1}>Words</Label>
-              <Button
-                px={2}
-                py={1}
-                mr={2}
-                primary
-                onClick={() => store.addEmptyWord(target)}
+            <Menu>
+              <MenuButton
+                marginLeft="auto"
+                as={Button}
+                outline="none"
+                aria-label="menu"
+                color="black"
+                display="inline-flex"
               >
-                <evaicons.PlusOutline size="20" /> Add
-              </Button>
-              <Button
-                px={2}
-                py={1}
-                outline
-                onClick={() => store.clearWords(target)}
-              >
-                Clear
-              </Button>
-            </Toolbar>
-
-            <WordList mt={2}>
-              {words.wordList.map((word) => (
-                <WordRow key={word.id}>
-                  <WordTitleInlineEditor
-                    value={word.text}
-                    onChange={(value) => {
-                      store.updateWord(target, word.id, {
-                        text: value,
-                      })
+                <DotsThreeVertical size={18} />
+              </MenuButton>
+              <MenuList>
+                <MenuGroup title="Formatting">
+                  <MenuItem
+                    onClick={() => {
+                      words.wordList = words.wordList.map((w) => ({
+                        ...w,
+                        text: capitalize(w.text),
+                      }))
                     }}
-                  />
-
-                  <WordDeleteButton
-                    px={2}
-                    py={2}
-                    secondary
-                    outline
-                    onClick={() => store.deleteWord(target, word.id)}
                   >
-                    <evaicons.CloseOutline size="20" />
-                  </WordDeleteButton>
-                </WordRow>
-              ))}
-            </WordList>
-          </Box>
-        )}
-      </>
+                    Capitalize
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      words.wordList = words.wordList.map((w) => ({
+                        ...w,
+                        text: w.text.toLocaleUpperCase(),
+                      }))
+                    }}
+                  >
+                    UPPERCASE
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      words.wordList = words.wordList.map((w) => ({
+                        ...w,
+                        text: w.text.toLocaleLowerCase(),
+                      }))
+                    }}
+                  >
+                    lowercase
+                  </MenuItem>
+                </MenuGroup>
+
+                <MenuDivider />
+
+                <MenuItem onClick={() => store.clearWords(target)}>
+                  <Icon
+                    name="small-close"
+                    size="20px"
+                    color="gray.500"
+                    mr="2"
+                  />
+                  Clear all
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </Stack>
+
+          <Stack direction="row" mt="3">
+            <Button
+              variantColor="green"
+              leftIcon="add"
+              onClick={() => store.addEmptyWord(target)}
+            >
+              Add
+            </Button>
+
+            <InputGroup flex={1}>
+              <InputLeftElement children={<Icon name="search" />} />
+              <Input placeholder="Filter..." />
+            </InputGroup>
+          </Stack>
+
+          <WordList mt="2">
+            {words.wordList.map((word) => (
+              <WordRow key={word.id}>
+                <Editable
+                  ml="2"
+                  flex={1}
+                  value={word.text}
+                  onChange={(text) => {
+                    store.updateWord(target, word.id, {
+                      text,
+                    })
+                  }}
+                  selectAllOnFocus
+                  placeholder="Type new word here..."
+                >
+                  <EditablePreview flex={1} width="100%" />
+                  <EditableInput placeholder="Type new word here..." />
+                </Editable>
+
+                {/* <ColorPicker value="#ff7777" mb="0" height="26px" /> */}
+
+                <WordDeleteButton
+                  isRound
+                  aria-label="Delete"
+                  ml="2"
+                  mr="2"
+                  icon="close"
+                  size="xs"
+                  onClick={() => store.deleteWord(target, word.id)}
+                  // variantColor="red"
+                >
+                  <Icon name="close" />
+                </WordDeleteButton>
+              </WordRow>
+            ))}
+          </WordList>
+        </Stack>
+      </Box>
     )
   }
 )

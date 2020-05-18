@@ -7,6 +7,7 @@ import { ChevronLeft } from '@styled-icons/material/ChevronLeft'
 import { Face } from '@styled-icons/material/Face'
 import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
 import { LayoutMasonry } from '@styled-icons/remix-fill/LayoutMasonry'
+import { Font } from '@styled-icons/icomoon/Font'
 import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { Dimensions } from 'lib/wordart/canvas-utils'
@@ -18,17 +19,31 @@ import { BaseBtn } from 'components/shared/BaseBtn'
 import { observable } from 'mobx'
 import { useRouter } from 'next/dist/client/router'
 import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
+import { Tooltip } from 'components/shared/Tooltip'
 import { Urls } from 'urls'
 import Link from 'next/link'
 import { LeftPanelShapesTab } from 'components/Editor/components/LeftPanelShapesTab'
 import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTab'
+import { LeftPanelFontsTab } from 'components/Editor/components/LeftPanelFontsTab'
 import { LeftPanelIconsTab } from 'components/Editor/components/LeftPanelIconsTab'
 import { LeftPanelColorsTab } from 'components/Editor/components/LeftPanelColorsTab'
 import { LeftPanelLayoutTab } from 'components/Editor/components/LeftPanelLayoutTab'
 import { WordcloudId } from 'services/api/types'
 import { Api } from 'services/api/api'
 import { EditorInitParams } from 'components/Editor/lib/editor'
-import { Menu, MenuButton, MenuList, MenuItem, Button } from '@chakra-ui/core'
+import {
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Button,
+  useToast,
+  Icon,
+  IconButton,
+  Editable,
+  EditablePreview,
+  EditableInput,
+} from '@chakra-ui/core'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -36,6 +51,7 @@ export type EditorComponentProps = {
 
 export const EditorComponent: React.FC<EditorComponentProps> = observer(
   (props) => {
+    const toast = useToast()
     const [canvasSize] = useState<Dimensions>({ w: (900 * 4) / 3, h: 900 })
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const { editorPageStore: store, wordcloudsStore } = useStore()
@@ -66,6 +82,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             editorData: store.serialize(),
           })
         }
+        toast({
+          title: 'Your work is saved',
+          status: 'success',
+          duration: 2000,
+          position: 'bottom-right',
+          isClosable: true,
+        })
         setIsSaving(false)
       }
 
@@ -93,6 +116,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           }
 
           await store.initEditor(editorParams)
+
+          // store.editor?.generateShapeItems({
+          //   style: store.styles.shape,
+          // })
         }
       }
 
@@ -119,20 +146,22 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       <PageLayoutWrapper>
         <TopNavWrapper alignItems="center" display="flex">
           <Link href={Urls.dashboard} passHref>
-            <a
-              css={css`
-                color: white;
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-              `}
-            >
-              <ChevronLeft size="30px" /> Back
-            </a>
+            <Button color="white" variant="ghost" leftIcon="chevron-left">
+              Back
+            </Button>
           </Link>
+
           <Menu>
-            <MenuButton as={Button}>Actions</MenuButton>
-            <MenuList>
+            <MenuButton
+              ml="4"
+              color="white"
+              as={Button}
+              rightIcon="chevron-down"
+              variant="ghost"
+            >
+              Menu
+            </MenuButton>
+            <MenuList zIndex={4}>
               <MenuItem>Download</MenuItem>
               <MenuItem>Create a Copy</MenuItem>
               <MenuItem>Mark as Draft</MenuItem>
@@ -140,9 +169,29 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               <MenuItem>Attend a Workshop</MenuItem>
             </MenuList>
           </Menu>
-          <Button ml={3} onClick={handleSaveClick} isDisabled={isSaving}>
-            {isSaving ? 'Saving...' : 'Save'}
+          <Button
+            ml="4"
+            color="white"
+            onClick={handleSaveClick}
+            isLoading={isSaving}
+            loadingText="Saving..."
+            variant="ghost"
+          >
+            Save
           </Button>
+
+          <Editable
+            ml="4"
+            defaultValue="Title"
+            placeholder="Enter name..."
+            color="white"
+            fontSize="xl"
+            maxWidth="200px"
+            flex={1}
+          >
+            <EditablePreview width="100%" />
+            <EditableInput />
+          </Editable>
         </TopNavWrapper>
 
         <EditorLayout>
@@ -179,6 +228,18 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   <TextFields className="icon" />
                   Words
                 </LeftNavbarBtn>
+
+                <LeftNavbarBtn
+                  onClick={() => {
+                    state.leftTabBg = 'fonts'
+                    state.leftTabShape = 'fonts'
+                  }}
+                  active={leftTab === 'fonts'}
+                >
+                  <Font className="icon" />
+                  Fonts
+                </LeftNavbarBtn>
+
                 <LeftNavbarBtn
                   onClick={() => {
                     state.leftTabBg = 'symbols'
@@ -215,45 +276,57 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
               <LeftPanel>
                 <LeftTopWrapper>
-                  <Box mr={3} ml={3}>
+                  <Box mr="3" ml="3">
                     <Button
                       css={css`
                         width: 120px;
+                        box-shadow: none !important;
                       `}
-                      py={1}
+                      py="1"
+                      borderTopRightRadius="0"
+                      borderBottomRightRadius="0"
+                      variantColor="secondary"
                       onClick={() => {
                         state.targetTab = 'shape'
                       }}
                       variant={
                         state.targetTab !== 'shape' ? 'outline' : 'solid'
                       }
-                      // secondary={state.targetTab === 'shape'}
                     >
                       Shape
                     </Button>
+
                     <Button
                       css={css`
                         width: 120px;
+                        box-shadow: none !important;
                       `}
-                      py={1}
+                      py="1"
+                      borderTopLeftRadius="0"
+                      borderBottomLeftRadius="0"
+                      variantColor="secondary"
                       onClick={() => {
                         state.targetTab = 'bg'
                       }}
                       variant={state.targetTab !== 'bg' ? 'outline' : 'solid'}
-                      // secondary={state.targetTab === 'bg'}
                     >
                       Background
                     </Button>
                   </Box>
                 </LeftTopWrapper>
 
-                <LeftPanelContent id="left-panel-content" px={3} py={3}>
+                <LeftPanelContent id="left-panel-content" px="3" py="3">
                   {store.state === 'initialized' ? (
                     <>
                       {leftTab === 'shapes' && <LeftPanelShapesTab />}
                       {leftTab === 'words' && (
                         <>
                           <LeftPanelWordsTab target={state.targetTab} />
+                        </>
+                      )}
+                      {leftTab === 'fonts' && (
+                        <>
+                          <LeftPanelFontsTab target={state.targetTab} />
                         </>
                       )}
                       {leftTab === 'symbols' && (
@@ -280,8 +353,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               display="flex"
               alignItems="center"
               bg="light"
-              p={2}
-              pl={3}
+              p="2"
+              pl="3"
             >
               <Button
                 css={css`
@@ -289,6 +362,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 `}
                 // accent
                 // isDisabled={store.isVisualizing}
+                variantColor="accent"
+                loadingText="Working"
+                isLoading={store.isVisualizing}
                 onClick={() => {
                   if (state.targetTab === 'shape') {
                     store.editor?.generateShapeItems({
@@ -301,14 +377,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   }
                 }}
               >
-                {!store.isVisualizing && (
-                  <MagicWand
-                    size={24}
-                    css={css`
-                      margin-right: 4px;
-                    `}
-                  />
-                )}
+                <MagicWand
+                  size={24}
+                  css={css`
+                    margin-right: 4px;
+                  `}
+                />
+
                 {store.isVisualizing
                   ? `Working: ${Math.round(
                       (store.visualizingProgress || 0) * 100
@@ -316,8 +391,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   : 'Visualize'}
               </Button>
 
-              <Button ml={3}>Undo</Button>
-              <Button ml={1}>Redo</Button>
+              <Tooltip label="Undo" aria-label="Undo" hasArrow zIndex={5}>
+                <IconButton ml="3" icon="arrow-back" aria-label="Undo" />
+              </Tooltip>
+              <Tooltip label="Redo" aria-label="Redo" hasArrow zIndex={5}>
+                <IconButton ml="1" icon="arrow-forward" aria-label="Redo" />
+              </Tooltip>
             </TopToolbar>
             <CanvasWrappper>
               <Canvas
@@ -359,11 +438,11 @@ const TopToolbar = styled(Box)`
 const TopNavWrapper = styled(Box)`
   height: 50px;
   padding: 20px;
-  font-size: 1.5em;
-  font-weight: 400;
+  /* font-size: 1.5em; */
+  /* font-weight: 400; */
   /* background: linear-gradient(90deg, #21c5be, #697af5); */
   background: linear-gradient(90deg, #80578e, #3b458c);
-  color: white;
+  /* color: white; */
 `
 
 const LeftWrapper = styled.div`
@@ -402,6 +481,7 @@ const LeftBottomWrapper = styled.div`
 
 const LeftPanel = styled(Box)`
   flex: 1;
+  width: 350px;
 `
 
 const SideNavbar = styled.div<{ activeIndex: number }>`
@@ -532,12 +612,25 @@ const state = observable({
 })
 
 export type TargetTab = 'shape' | 'bg'
-export type LeftPanelTab = 'shapes' | 'words' | 'symbols' | 'colors' | 'layout'
+export type LeftPanelTab =
+  | 'shapes'
+  | 'words'
+  | 'fonts'
+  | 'symbols'
+  | 'colors'
+  | 'layout'
 const leftPanelShapeTabs: LeftPanelTab[] = [
   'shapes',
   'words',
+  'fonts',
   'symbols',
   'layout',
   'colors',
 ]
-const leftPanelBgTabs: LeftPanelTab[] = ['words', 'symbols', 'layout', 'colors']
+const leftPanelBgTabs: LeftPanelTab[] = [
+  'words',
+  'fonts',
+  'symbols',
+  'layout',
+  'colors',
+]
