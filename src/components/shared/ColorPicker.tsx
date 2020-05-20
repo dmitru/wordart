@@ -22,7 +22,7 @@ export type ColorPickerProps = {
   disableAlpha?: boolean
   onChange?: (hex: string) => void
   onAfterChange?: (hex: string) => void
-} & ButtonProps
+} & Omit<ButtonProps, 'children' | 'onChange'>
 
 const ColorSwatch = styled(Button)<{ color: string }>`
   border: 1px solid ${(p) => p.theme.colors.dark4};

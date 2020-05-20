@@ -5,7 +5,7 @@ export const theme = {
   colors: {
     ...chakraTheme.colors,
     primary: chakraTheme.colors.blue,
-    accent: chakraTheme.colors.teal,
+    accent: chakraTheme.colors.pink,
     secondary: chakraTheme.colors.gray,
     success: chakraTheme.colors.green,
     danger: chakraTheme.colors.red,

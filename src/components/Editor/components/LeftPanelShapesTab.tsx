@@ -1,12 +1,26 @@
 import {
   Box,
   Button,
-  Collapse,
+  Flex,
+  Heading,
   Icon,
+  IconButton,
   Input,
   InputGroup,
   InputLeftElement,
+  InputRightElement,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  MenuGroup,
+  MenuDivider,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
 import { useThrottleCallback } from '@react-hook/throttle'
@@ -15,26 +29,53 @@ import {
   ShapeSelector,
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
+import { Label } from 'components/Editor/components/shared'
 import { getItemsColoring } from 'components/Editor/lib/editor'
 import { ColorPicker } from 'components/shared/ColorPicker'
 import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
-import { useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useStore } from 'services/root-store'
 
 export type LeftPanelShapesTabProps = {}
 
 const state = observable({
   isShowingColors: false,
-  isSelectingShape: false,
+  isShowingAdjust: false,
 })
 
 export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
   () => {
     const { editorPageStore } = useStore()
     const shapeStyle = editorPageStore.styles.shape
+
+    const [term, setTerm] = useState('')
+    const allOptions = [
+      'Animals',
+      'Baby',
+      'Birthday',
+      'Christmas',
+      'Clouds',
+      'Geometric Shapes',
+      'Emoji',
+      'Icons',
+      'Love & Wedding',
+      'Nature',
+      'Music',
+      'Money & Business',
+      'People',
+      'Education & School',
+      'Sports',
+      'Transport',
+      'Other',
+    ].map((value) => ({ value, label: value }))
+
+    const [options, setOptions] = useState(allOptions)
+    const [selectedOption, setSelectedOption] = useState<{
+      value: string
+    } | null>(null)
 
     const visualize = useCallback(() => {
       editorPageStore.editor?.generateShapeItems({
@@ -109,136 +150,263 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                   />
                 </Box>
 
-                <Tooltip
-                  label="Change shape colors"
-                  isDisabled={state.isShowingColors}
-                >
-                  <Button
-                    size="sm"
-                    leftIcon="settings"
-                    variant={state.isShowingColors ? 'solid' : 'solid'}
-                    variantColor={state.isShowingColors ? 'primary' : undefined}
-                    onClick={() => {
-                      state.isShowingColors = !state.isShowingColors
-                    }}
+                <Flex>
+                  <Tooltip
+                    label="Customize colors, size and position"
+                    isDisabled={state.isShowingColors}
                   >
-                    Colors
-                  </Button>
-                </Tooltip>
+                    <Button
+                      size="sm"
+                      mr="2"
+                      variant={state.isShowingColors ? 'solid' : 'solid'}
+                      variantColor={
+                        state.isShowingColors ? 'primary' : undefined
+                      }
+                      onClick={() => {
+                        state.isShowingColors = !state.isShowingColors
+                      }}
+                    >
+                      Customize
+                    </Button>
+                  </Tooltip>
+                </Flex>
               </Box>
             </Box>
 
-            <Collapse isOpen={state.isShowingColors}>
-              <Stack mb="4" p="2">
-                {shapeStyle.fill.colorMap.length > 1 && (
-                  <Box>
-                    <Button
-                      borderTopRightRadius="0"
-                      borderBottomRightRadius="0"
-                      px="2"
-                      py="1"
-                      mr="0"
-                      size="xs"
-                      variantColor="secondary"
-                      variant={
-                        shapeStyle.fill.kind === 'color-map'
-                          ? 'solid'
-                          : 'outline'
-                      }
-                      onClick={() => {
-                        shapeStyle.fill.kind = 'color-map'
-                        updateShapeColoring()
-                      }}
-                    >
-                      Shape colors
-                    </Button>
-                    <Button
-                      borderBottomLeftRadius="0"
-                      borderTopLeftRadius="0"
-                      px="2"
-                      py="1"
-                      mr="0"
-                      size="xs"
-                      variantColor="secondary"
-                      variant={
-                        shapeStyle.fill.kind === 'single-color'
-                          ? 'solid'
-                          : 'outline'
-                      }
-                      onClick={() => {
-                        shapeStyle.fill.kind = 'single-color'
-                        updateShapeColoring()
-                      }}
-                    >
-                      Single color
-                    </Button>
-                  </Box>
-                )}
-
-                {shapeStyle.fill.kind === 'single-color' && (
-                  <ColorPicker
-                    disableAlpha
-                    value={chroma(shapeStyle.fill.color).alpha(1).hex()}
-                    onChange={(hex) => {
-                      shapeStyle.fill.color = chroma(hex).hex()
-                    }}
-                    onAfterChange={() => {
-                      updateShapeColoring()
-                    }}
-                  />
-                )}
-
-                {shapeStyle.fill.kind === 'color-map' && (
-                  <Box>
-                    {shapeStyle.fill.colorMap.map((color, index) => (
-                      <Box mr="1" key={index} display="inline-block">
-                        <ColorPicker
-                          disableAlpha
-                          value={chroma(color).alpha(1).hex()}
-                          onChange={(hex) => {
-                            shapeStyle.fill.colorMap[index] = chroma(hex).hex()
-                          }}
-                          onAfterChange={() => {
-                            updateShapeColoring()
-                          }}
-                        />
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-              </Stack>
-              {shapeStyle.processing.invert.enabled && (
-                <ColorPicker
-                  value={shapeStyle.processing.invert.color}
-                  onChange={(color) => {
-                    shapeStyle.processing.invert.color = chroma(color).hex()
-                    visualize()
-                  }}
-                />
-              )}
-            </Collapse>
-
             <Box>
-              <Box>
-                <InputGroup>
-                  <InputLeftElement children={<Icon name="search" />} />
-                  <Input
-                    placeholder="Search shapes..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                  />
-                </InputGroup>
-              </Box>
+              {state.isShowingColors && (
+                <>
+                  <Stack mb="4" p="2">
+                    <Heading size="md" m="0">
+                      Shape colors
+                    </Heading>
+                    {shapeStyle.fill.colorMap.length > 1 && (
+                      <Box>
+                        <Tabs
+                          variantColor="gray"
+                          index={shapeStyle.fill.kind == 'color-map' ? 0 : 1}
+                          variant="enclosed-colored"
+                          size="sm"
+                          onChange={(index) => {
+                            if (index === 0) {
+                              shapeStyle.fill.kind = 'color-map'
+                              updateShapeColoring()
+                            } else {
+                              shapeStyle.fill.kind = 'single-color'
+                              updateShapeColoring()
+                            }
+                          }}
+                        >
+                          <TabList mb="1em">
+                            <Tab>Multiple</Tab>
+                            <Tab>Single</Tab>
+                          </TabList>
+                          <TabPanels>
+                            <TabPanel>
+                              <Box>
+                                {shapeStyle.fill.colorMap.map(
+                                  (color, index) => (
+                                    <Box
+                                      mr="1"
+                                      key={index}
+                                      display="inline-block"
+                                    >
+                                      <ColorPicker
+                                        disableAlpha
+                                        value={chroma(color).alpha(1).hex()}
+                                        onChange={(hex) => {
+                                          shapeStyle.fill.colorMap[
+                                            index
+                                          ] = chroma(hex).hex()
+                                        }}
+                                        onAfterChange={() => {
+                                          updateShapeColoring()
+                                        }}
+                                      />
+                                    </Box>
+                                  )
+                                )}
+                              </Box>
+                            </TabPanel>
+                            <TabPanel>
+                              <ColorPicker
+                                disableAlpha
+                                value={chroma(shapeStyle.fill.color)
+                                  .alpha(1)
+                                  .hex()}
+                                onChange={(hex) => {
+                                  shapeStyle.fill.color = chroma(hex).hex()
+                                }}
+                                onAfterChange={() => {
+                                  updateShapeColoring()
+                                }}
+                              />
+                            </TabPanel>
+                          </TabPanels>
+                        </Tabs>
+                      </Box>
+                    )}
+                    {shapeStyle.fill.colorMap.length === 1 && (
+                      <ColorPicker
+                        disableAlpha
+                        value={chroma(shapeStyle.fill.color).alpha(1).hex()}
+                        onChange={(hex) => {
+                          shapeStyle.fill.kind = 'single-color'
+                          shapeStyle.fill.color = chroma(hex).hex()
+                        }}
+                        onAfterChange={() => {
+                          updateShapeColoring()
+                        }}
+                      />
+                    )}
+                    {shapeStyle.processing.invert.enabled && (
+                      <ColorPicker
+                        value={shapeStyle.processing.invert.color}
+                        onChange={(color) => {
+                          shapeStyle.processing.invert.color = chroma(
+                            color
+                          ).hex()
+                          visualize()
+                        }}
+                      />
+                    )}
 
-              <ShapeSelector
-                height="calc(100vh - 320px)"
-                overflowY="auto"
-                shapes={matchingShapes}
-                onSelected={(shape) => {
-                  editorPageStore.selectShape(shape.id)
-                }}
-                selectedShapeId={editorPageStore.getSelectedShape().id}
-              />
+                    <Box mt="5">
+                      <Heading size="md" m="0">
+                        Size and position
+                      </Heading>
+                    </Box>
+
+                    <Flex mt="4">
+                      <Button
+                        variantColor="green"
+                        onClick={() => {
+                          state.isShowingColors = false
+                        }}
+                      >
+                        Done
+                      </Button>
+                    </Flex>
+                  </Stack>
+                </>
+              )}
+
+              {!state.isShowingColors && !state.isShowingAdjust && (
+                <>
+                  <Flex mt="5">
+                    <Tooltip label="Add custom image...">
+                      <Button
+                        leftIcon="add"
+                        variantColor="green"
+                        size="sm"
+                        mr="2"
+                      >
+                        Image
+                      </Button>
+                    </Tooltip>
+
+                    <Tooltip label="Use text as a shape...">
+                      <Button
+                        leftIcon="add"
+                        variantColor="green"
+                        size="sm"
+                        mr="2"
+                      >
+                        Text
+                      </Button>
+                    </Tooltip>
+
+                    <InputGroup size="sm">
+                      <InputLeftElement children={<Icon name="search" />} />
+                      <Input
+                        _placeholder={{
+                          color: 'red',
+                        }}
+                        placeholder="Search shapes..."
+                        value={term}
+                        onChange={(e: any) => setTerm(e.target.value)}
+                      />
+                      {!!term && (
+                        <InputRightElement
+                          onClick={() => setTerm('')}
+                          children={
+                            <IconButton
+                              aria-label="Clear"
+                              icon="close"
+                              color="gray"
+                              isRound
+                              variant="ghost"
+                              size="sm"
+                            />
+                          }
+                        />
+                      )}
+                    </InputGroup>
+                  </Flex>
+
+                  <Flex align="center" mt="2" mb="1">
+                    <Label mr="2">Category:</Label>
+
+                    <Box flex={1}>
+                      <Menu>
+                        <MenuButton
+                          variant="link"
+                          variantColor="primary"
+                          as={Button}
+                          rightIcon="chevron-down"
+                          py="2"
+                          px="3"
+                        >
+                          {selectedOption ? selectedOption.value : 'All'}
+                        </MenuButton>
+                        <MenuList
+                          as="div"
+                          css={css`
+                            background: white;
+                            position: absolute;
+                            top: 40px;
+                            z-index: 10;
+                            max-height: 300px;
+                            overflow: auto;
+                          `}
+                        >
+                          <MenuItem onClick={() => setSelectedOption(null)}>
+                            Show all
+                          </MenuItem>
+                          <MenuDivider />
+                          {options.map((item, index) => (
+                            <MenuItem onClick={() => setSelectedOption(item)}>
+                              {item.value}
+                            </MenuItem>
+                          ))}
+                        </MenuList>
+                      </Menu>
+                    </Box>
+
+                    {!!selectedOption && (
+                      <Button
+                        ml="3"
+                        variant="link"
+                        onClick={() => {
+                          setSelectedOption(null)
+                        }}
+                      >
+                        Show all
+                      </Button>
+                    )}
+                  </Flex>
+
+                  <ShapeSelector
+                    height="calc(100vh - 350px)"
+                    overflowY="auto"
+                    shapes={matchingShapes}
+                    onSelected={(shape) => {
+                      editorPageStore.selectShape(shape.id)
+                    }}
+                    selectedShapeId={editorPageStore.getSelectedShape().id}
+                  />
+                </>
+              )}
             </Box>
           </>
         </Box>
