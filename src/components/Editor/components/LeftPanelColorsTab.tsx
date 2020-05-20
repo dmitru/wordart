@@ -183,6 +183,22 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           </Button>
 
           <Box mt="2">
+            {style.itemsColoring.kind === 'shape' && (
+              <Box mb="4">
+                <Slider
+                  label="Brightness"
+                  value={style.itemsColoring.shapeBrightness}
+                  onChange={(value) => {
+                    const val = (value as any) as number
+                    style.itemsColoring.shapeBrightness = val
+                  }}
+                  onAfterChange={updateItemsColoring}
+                  min={-100}
+                  max={100}
+                  step={1}
+                />
+              </Box>
+            )}
             {style.itemsColoring.kind === 'color' && (
               <ColorPicker
                 disableAlpha

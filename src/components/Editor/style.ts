@@ -57,6 +57,7 @@ export const defaultShapeStyle: ShapeStyleConfig = {
       assignBy: 'random',
     },
     dimSmallerItems: 20,
+    shapeBrightness: 0,
   },
 
   words: {
@@ -96,6 +97,7 @@ export const defaultBackgroundStyle: BackgroundStyleConfig = {
       assignBy: 'random',
     },
     dimSmallerItems: 20,
+    shapeBrightness: 0,
   },
 
   words: {
@@ -136,6 +138,8 @@ export type BackgroundStyleConfig = {
     color: ColorString
     gradient: ItemsColorGradient
     dimSmallerItems: number
+    /** 0-100, 0 means precisely the shape color */
+    shapeBrightness: number
   }
 
   words: {
@@ -194,6 +198,8 @@ export type ShapeStyleConfig = {
     color: ColorString
     gradient: ItemsColorGradient
     dimSmallerItems: number
+    /** 0-100, 0 means precisely the shape color */
+    shapeBrightness: number
   }
 
   words: {
@@ -249,6 +255,7 @@ export type ItemsColoring =
 export type ItemsColoringShapeColor = {
   kind: 'shape'
   dimSmallerItems: number
+  shapeBrightness: number
 }
 
 export type ItemsColoringSingleColor = {

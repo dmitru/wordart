@@ -265,6 +265,7 @@ export class Editor {
         path.fillColor = paperColors[index]
         path.strokeColor = path.fillColor
       } else {
+        // shape coloring
         if (!shapeRaster || !shapeRasterImgData) {
           shapeRaster = this.paperItems.shape?.rasterize(undefined, false)
           shapeRasterImgData = shapeRaster!.getImageData(
@@ -294,6 +295,12 @@ export class Editor {
             4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width) + 2
           ] / 255
 
+        let color = chroma.rgb(255 * r, 255 * g, 255 * b)
+        if (coloring.shapeBrightness != 0) {
+          color = color.brighten(coloring.shapeBrightness / 100)
+        }
+        const rgb = color.rgb()
+
         // console.log(
         //   'shapeRasterImgData',
         //   shapeRasterImgData.width,
@@ -305,7 +312,12 @@ export class Editor {
         //   b
         // )
 
-        path.fillColor = new paper.Color(r, g, b, 1)
+        path.fillColor = new paper.Color(
+          rgb[0] / 255,
+          rgb[1] / 255,
+          rgb[2] / 255,
+          1
+        )
         path.strokeColor = path.fillColor
       }
       path.opacity =
@@ -837,6 +849,7 @@ export const getItemsColoring = (
   return {
     kind: 'shape',
     dimSmallerItems: coloring.dimSmallerItems,
+    shapeBrightness: coloring.shapeBrightness,
   }
 }
 

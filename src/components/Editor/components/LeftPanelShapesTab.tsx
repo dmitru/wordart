@@ -185,7 +185,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         <Tabs
                           variantColor="gray"
                           index={shapeStyle.fill.kind == 'color-map' ? 0 : 1}
-                          variant="enclosed-colored"
+                          variant="solid-rounded"
                           size="sm"
                           onChange={(index) => {
                             if (index === 0) {
