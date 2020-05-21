@@ -13,9 +13,29 @@ import {
   defaultBackgroundStyle,
   defaultShapeStyle,
   WordStyleConfig,
+  ShapeStyleConfig,
+  BackgroundStyleConfig,
 } from 'components/Editor/style'
 import { consoleLoggers } from 'utils/console-logger'
-import { WordcloudEditorData } from 'services/api/types'
+import { EditorPersistedData } from 'services/api/types'
+import {
+  EditorPersistedItemWordV1,
+  MatrixSerialized,
+  EditorPersistedSymbolV1,
+  EditorPersistedItemV1,
+  EditorPersistedWordV1,
+} from 'services/api/persisted/v1'
+import { notEmpty } from 'utils/not-empty'
+import { roundFloat } from 'utils/round-float'
+import {
+  GeneratedItem,
+  Font,
+  WordInfo,
+  WordGeneratedItem,
+} from 'components/Editor/lib/generator'
+import { flatten, uniq, uniqBy } from 'lodash'
+import { loadFont } from 'lib/wordart/fonts'
+import { Path, BoundingBox } from 'opentype.js'
 
 export class EditorPageStore {
   logger = consoleLoggers.editorStore
@@ -62,7 +82,7 @@ export class EditorPageStore {
     this.state = 'initialized'
   }
 
-  @action private loadSerialized = async (serialized: WordcloudEditorData) => {
+  @action private loadSerialized = async (serialized: EditorPersistedData) => {
     this.logger.debug('loadSerialized', serialized)
     if (!this.editor) {
       throw new Error('editor is not initialized')
@@ -74,8 +94,103 @@ export class EditorPageStore {
       await this.selectShape(data.shape.shapeId)
     }
 
+    const sceneSize = this.editor.getSceneBounds(0)
+    const scale = sceneSize.width / serialized.data.sceneSize.w
+    console.log('sceneSize', scale, sceneSize, serialized.data.sceneSize)
+
     this.styles.shape = data.shape.style
     this.styles.bg = data.bg.style
+
+    const deserializeItems = async ({
+      items,
+      words,
+      fontIds,
+    }: {
+      items: EditorPersistedItemV1[]
+      words: EditorPersistedWordV1[]
+      fontIds: FontId[]
+    }): Promise<GeneratedItem[]> => {
+      console.log('deserializeItems: ', { words, items, fontIds })
+
+      // Fetch all required Fonts
+      const fontsById = new Map<FontId, Font>()
+      for (const fontId of fontIds) {
+        const font = await this.fetchFontById(fontId)
+        if (!font) {
+          throw new Error(`no font ${fontId}`)
+        }
+        fontsById.set(fontId, { font, id: fontId, isCustom: false })
+      }
+
+      const wordsInfoMap = new Map<
+        string,
+        { wordInfo: WordInfo; wordPath: Path; wordPathBounds: BoundingBox }
+      >()
+
+      const result: GeneratedItem[] = []
+      for (const item of items) {
+        if (item.k === 'w') {
+          const word = words[item.wi]
+          const fontId = fontIds[word.fontIndex]
+          const fontEntry = fontsById.get(fontId)
+          if (!fontEntry) {
+            console.error(`No font entry for fontId ${fontId}`)
+            continue
+          }
+          const wordInfoId = `${fontId}-${word.text}`
+          if (!wordsInfoMap.has(wordInfoId)) {
+            const wordInfo = new WordInfo(
+              wordInfoId,
+              item.wcId,
+              word.text,
+              fontEntry
+            )
+            const wordPath = fontEntry.font.getPath(word.text, 0, 0, 100)
+            const wordPathBounds = wordPath.getBoundingBox()
+            wordsInfoMap.set(wordInfoId, {
+              wordInfo,
+              wordPath,
+              wordPathBounds,
+            })
+          }
+
+          const { wordInfo, wordPath, wordPathBounds } = wordsInfoMap.get(
+            wordInfoId
+          )!
+          const wordItem: WordGeneratedItem = {
+            id: item.id,
+            shapeColor: item.sc,
+            kind: 'word',
+            transform: new paper.Matrix(item.t).prepend(
+              new paper.Matrix().scale(scale, new paper.Point(0, 0))
+            ),
+            wordInfo: wordInfo,
+            wordPath,
+            wordPathBounds,
+          }
+
+          result.push(wordItem)
+        }
+        // TODO
+      }
+
+      return result
+    }
+
+    const [shapeItems, bgItems] = await Promise.all([
+      deserializeItems({
+        items: data.shape.items,
+        fontIds: data.shape.fontIds,
+        words: data.shape.words,
+      }),
+      deserializeItems({
+        items: data.bg.items,
+        fontIds: data.bg.fontIds,
+        words: data.bg.words,
+      }),
+    ])
+    await this.editor.setShapeItems(shapeItems)
+    await this.editor.setBgItems(bgItems)
 
     this.editor.setBgColor(this.styles.bg.fill)
     this.editor.setShapeFillColors(this.styles.shape.fill)
@@ -83,21 +198,110 @@ export class EditorPageStore {
     this.editor.setItemsColor('shape', getItemsColoring(this.styles.shape))
   }
 
-  serialize = (): WordcloudEditorData => {
+  serialize = (): EditorPersistedData => {
     this.logger.debug('serialize')
     if (!this.editor) {
       throw new Error('editor is not initialized')
     }
-    const serializedData: WordcloudEditorData = {
+
+    const serializeMatrix = (
+      t: paper.Matrix,
+      precision = 3
+    ): MatrixSerialized => [
+      roundFloat(t.a, precision),
+      roundFloat(t.b, precision),
+      roundFloat(t.c, precision),
+      roundFloat(t.d, precision),
+      roundFloat(t.tx, precision),
+      roundFloat(t.ty, precision),
+    ]
+
+    const serializeItems = (
+      items: GeneratedItem[]
+    ): {
+      fontIds: FontId[]
+      words: EditorPersistedWordV1[]
+      items: EditorPersistedItemV1[]
+    } => {
+      const fontIds: FontId[] = uniq(
+        items
+          .map((item) => {
+            if (item.kind !== 'word') {
+              return null
+            }
+            return item.wordInfo.font.id
+          })
+          .filter(notEmpty)
+      )
+
+      const words: EditorPersistedWordV1[] = items
+        .map((item) => {
+          if (item.kind !== 'word') {
+            return null
+          }
+          const fontIndex = fontIds.findIndex(
+            (fId) => fId === item.wordInfo.font.id
+          )
+          return {
+            fontIndex,
+            text: item.wordInfo.text,
+          }
+        })
+        .filter(notEmpty)
+      const uniqWords: EditorPersistedWordV1[] = uniqBy(
+        words,
+        (w) => `${w.fontIndex}.${w.text}`
+      )
+
+      return {
+        fontIds,
+        words: uniqWords,
+        items: items
+          .map((item, index) => {
+            if (item.kind === 'word') {
+              return {
+                k: 'w',
+                id: item.id,
+                t: serializeMatrix(item.transform),
+                wcId: item.wordInfo.wordConfigId,
+                sc: item.shapeColor,
+                wi: uniqWords.findIndex(
+                  (uw) =>
+                    uw.fontIndex === words[index].fontIndex &&
+                    uw.text === words[index].text
+                ),
+              } as EditorPersistedItemWordV1
+            }
+            if (item.kind === 'symbol') {
+              return {
+                k: 's',
+                id: item.id,
+                t: serializeMatrix(item.transform),
+                sId: item.shapeId,
+              } as EditorPersistedSymbolV1
+            }
+
+            return null
+          })
+          .filter(notEmpty),
+      }
+    }
+
+    const serializedData: EditorPersistedData = {
       version: 1,
       data: {
+        sceneSize: {
+          w: this.editor.getSceneBounds(0).width,
+          h: this.editor.getSceneBounds(0).height,
+        },
         bg: {
           style: toJS(this.styles.bg, { recurseEverything: true }),
+          ...serializeItems(this.editor.generatedItems.bg.items),
         },
         shape: {
           shapeId: this.editor.currentShape?.shapeConfig.id || null,
           style: toJS(this.styles.shape, { recurseEverything: true }),
-          items: this.editor.generatedItems.shape.items,
+          ...serializeItems(this.editor.generatedItems.shape.items),
         },
       },
     }
@@ -138,6 +342,10 @@ export class EditorPageStore {
     }
     return undefined
   }
+  fetchFontById = (fontId: FontId) =>
+    this.getFontById(fontId)
+      ? loadFont(this.getFontById(fontId)!.style.url)
+      : Promise.resolve(null)
 
   getSelectedShape = () =>
     this.availableShapes.find((s) => s.id === this.selectedShapeId)!
@@ -189,6 +397,7 @@ export class EditorPageStore {
   }
 }
 
+// TODO: replace with unique short random string (for word configs can be deleted)
 export type WordConfigId = number
 
 export type StyleKind = 'shape' | 'bg'

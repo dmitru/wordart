@@ -3,7 +3,7 @@ import {
   Wordcloud,
   EmailLoginParams,
   CreateWordcloudDto,
-  WordcloudEditorData,
+  EditorPersistedData,
   WordcloudId,
   SaveWordcloudDto,
 } from 'services/api/types'
@@ -28,9 +28,9 @@ export const Api = {
       const response = await apiClient.get('/wordclouds')
       return response.data as Wordcloud[]
     },
-    async fetchEditorData(id: WordcloudId): Promise<WordcloudEditorData> {
+    async fetchEditorData(id: WordcloudId): Promise<EditorPersistedData> {
       const response = await apiClient.get(`/wordclouds/${id}/editorData`)
-      return response.data as WordcloudEditorData
+      return response.data as EditorPersistedData
     },
   },
 

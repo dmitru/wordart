@@ -1,29 +1,30 @@
 import { WordConfigId } from 'components/Editor/editor-page-store'
+import { ShapeConfig, ShapeId } from 'components/Editor/style'
 import {
-  Dimensions,
-  createCanvasCtx,
   clampPixelOpacityUp,
   clearCanvas,
-  shrinkShape,
+  createCanvasCtx,
   detectEdges,
+  Dimensions,
   invertImageMask,
   removeLightPixels,
+  shrinkShape,
 } from 'lib/wordart/canvas-utils'
-import { consoleLoggers } from 'utils/console-logger'
-import { getWasmModule, WasmModule } from 'lib/wordart/wasm/wasm-module'
 import { Rect } from 'lib/wordart/geometry'
 import { ImageProcessorWasm } from 'lib/wordart/wasm/image-processor-wasm'
-import { Path, BoundingBox } from 'opentype.js'
-import { sample, uniq, flatten, noop } from 'lodash'
-import { ShapeConfig } from 'components/Editor/style'
+import { getWasmModule, WasmModule } from 'lib/wordart/wasm/wasm-module'
+import { flatten, noop, sample, uniq } from 'lodash'
+import { BoundingBox, Path } from 'opentype.js'
+import { consoleLoggers } from 'utils/console-logger'
+import { FontId } from 'data/fonts'
 
 const FONT_SIZE = 100
 
 export class Generator {
   logger = consoleLoggers.generator
 
-  words: Map<WordId, Word> = new Map()
-  wordPaths: Map<WordId, Path> = new Map()
+  words: Map<WordInfoId, WordInfo> = new Map()
+  wordPaths: Map<WordInfoId, Path> = new Map()
   wasm?: WasmModule
 
   constructor() {}
@@ -32,7 +33,7 @@ export class Generator {
     this.wasm = await getWasmModule()
   }
 
-  items: Item[] = []
+  items: GeneratedItem[] = []
 
   clear = () => {
     this.items = []
@@ -170,11 +171,11 @@ export class Generator {
     )
 
     const words = flatten(
-      task.words.map((word, index) =>
+      task.words.map((word) =>
         word.fonts.map(
-          (font, fontIndex) =>
-            new Word(
-              `${index}-${fontIndex}`,
+          (font) =>
+            new WordInfo(
+              `${font.id}-${word.text}`,
               word.wordConfigId,
               word.text,
               font
@@ -183,16 +184,16 @@ export class Generator {
       )
     )
     const wordPaths = words.map((word) =>
-      word.font.getPath(word.text, 0, 0, 100)
+      word.font.font.getPath(word.text, 0, 0, 100)
     )
     const wordPathsBounds = wordPaths.map((wordPath) =>
       wordPath.getBoundingBox()
     )
 
-    const placedWordItems: WordItem[] = []
-    const placedSymbolItems: SymbolItem[] = []
+    const placedWordItems: WordGeneratedItem[] = []
+    const placedSymbolItems: SymbolGeneratedItem[] = []
 
-    const nIter = 600
+    const nIter = 50
     const t1 = performance.now()
 
     const wordAngles = uniq(flatten(task.words.map((w) => w.angles)))
@@ -450,7 +451,7 @@ export class Generator {
             id: i,
             kind: 'word',
             shapeColor: 'black',
-            word,
+            wordInfo: word,
             wordPathBounds,
             transform: new paper.Matrix()
               .translate(task.shape.bounds.left, task.shape.bounds.top)
@@ -477,6 +478,7 @@ export class Generator {
 
         wordIndex = (wordIndex + 1) % words.length
       } else {
+        const icon = icons[iconIndex]
         const iconSymDef = iconSymbolDefs[iconIndex]
         const rasterCanvas = iconRasterCanvases[iconIndex]
 
@@ -653,6 +655,7 @@ export class Generator {
             id: i,
             kind: 'symbol',
             symbolDef: iconSymDef,
+            shapeId: icon.shape.id,
             transform: new paper.Matrix()
               .translate(task.shape.bounds.left, task.shape.bounds.top)
               .scale(
@@ -701,7 +704,7 @@ export class Generator {
     )
 
     return {
-      placedItems: [...placedWordItems, ...placedSymbolItems],
+      generatedItems: [...placedWordItems, ...placedSymbolItems],
     }
   }
 }
@@ -752,7 +755,7 @@ export type FillShapeTask = {
 }
 
 export type FillShapeTaskWordConfig = {
-  wordConfigId: WordConfigId
+  wordConfigId?: WordConfigId
   text: string
   /** Rotation angles in degrees */
   angles: number[]
@@ -765,29 +768,34 @@ export type FillShapeTaskIconConfig = {
 }
 
 export type FillShapeTaskResult = {
-  placedItems: Item[]
+  generatedItems: GeneratedItem[]
 }
 
-export type Item = WordItem | SymbolItem | RasterItem
+export type GeneratedItem =
+  | WordGeneratedItem
+  | SymbolGeneratedItem
+  | RasterGeneratedItem
 
-export type RasterItem = {
+export type RasterGeneratedItem = {
   kind: 'img'
   id: ItemId
   ctx: CanvasRenderingContext2D
   transform: paper.Matrix
 }
 
-export type SymbolItem = {
+export type SymbolGeneratedItem = {
   kind: 'symbol'
   id: ItemId
+  shapeId: ShapeId
   symbolDef: paper.SymbolDefinition
   transform: paper.Matrix
 }
 
-export type WordItem = {
+export type WordGeneratedItem = {
   kind: 'word'
   id: ItemId
-  word: Word
+  wordInfo: WordInfo
+  angle: number
   transform: paper.Matrix
   /** Color of the shape at the given location */
   shapeColor: string
@@ -798,22 +806,20 @@ export type WordItem = {
 export type ItemId = number
 
 // Perhaps it's not needed
-export class Word {
-  id: WordId
-  wordConfigId: WordConfigId
-  font: opentype.Font
+export class WordInfo {
+  id: WordInfoId
+  wordConfigId: WordConfigId | undefined
+  font: Font
   text: string
   symbols: Symbol[]
   symbolOffsets: number[]
   fontSize: number
-  angle: number
 
   constructor(
-    id: WordId,
-    wordConfigId: WordConfigId,
+    id: WordInfoId,
+    wordConfigId: WordConfigId | undefined,
     text: string,
     font: Font,
-    angle = 0,
     fontSize = FONT_SIZE
   ) {
     this.id = id
@@ -821,11 +827,11 @@ export class Word {
     this.font = font
     this.text = text
     this.fontSize = fontSize
-    this.angle = angle
-    this.symbols = stringToSymbols(text, font, angle, fontSize)
+    this.symbols = stringToSymbols(text, font, fontSize)
 
     this.symbolOffsets = this.symbols.map(
-      (symbol) => (fontSize * symbol.glyph.advanceWidth) / this.font.unitsPerEm
+      (symbol) =>
+        (fontSize * symbol.glyph.advanceWidth) / this.font.font.unitsPerEm
     )
   }
 
@@ -854,15 +860,13 @@ export class Symbol {
   font: Font
   id: string
   fontSize: number
-  angle: number
 
   getPathData = (): string =>
     this.glyph.getPath(0, 0, this.fontSize).toPathData(3)
 
-  constructor(font: Font, glyph: Glyph, angle = 0, fontSize = FONT_SIZE) {
+  constructor(font: Font, glyph: Glyph, fontSize = FONT_SIZE) {
     this.font = font
     this.fontSize = fontSize
-    this.angle = angle
     this.id = getSymbolAngleId(glyph, font)
     this.glyph = glyph
   }
@@ -875,7 +879,7 @@ export class Symbol {
   }
 }
 
-export const getFontName = (font: Font): string => font.names.fullName.en
+export const getFontName = (font: Font): string => font.font.names.fullName.en
 
 export const getSymbolId = (glyph: Glyph, font: Font): SymbolId =>
   // @ts-ignore
@@ -900,16 +904,19 @@ export const getWordAngleId = (
 export const stringToSymbols = (
   text: string,
   font: Font,
-  angle: number,
   fontSize: number = FONT_SIZE
 ): Symbol[] =>
-  font
+  font.font
     .stringToGlyphs(text)
-    .map((otGlyph) => new Symbol(font, otGlyph, angle, fontSize))
+    .map((otGlyph) => new Symbol(font, otGlyph, fontSize))
 
 export type Glyph = opentype.Glyph
-export type Font = opentype.Font
+export type Font = {
+  font: opentype.Font
+  id: FontId
+  isCustom: boolean
+}
 
-export type WordId = string
+export type WordInfoId = string
 export type SymbolId = string
 export type SymbolAngleId = string

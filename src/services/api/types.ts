@@ -1,8 +1,4 @@
-import {
-  BackgroundStyleConfig,
-  ShapeStyleConfig,
-  ShapeId,
-} from 'components/Editor/style'
+import { EditorPersistedDataV1 } from 'services/api/persisted/v1'
 
 export type MyProfile = {
   id: UserId
@@ -28,27 +24,16 @@ export type Wordcloud = {
   updatedAt: string
 }
 
-export type WordcloudEditorData = {
-  version: 1
-  data: {
-    bg: {
-      style: BackgroundStyleConfig
-    }
-    shape: {
-      shapeId: ShapeId | null
-      style: ShapeStyleConfig
-    }
-  }
-}
+export type EditorPersistedData = EditorPersistedDataV1
 
 // export type SerializedItem = SerializedWordItem
 
 export type CreateWordcloudDto = {
   title: string
-  editorData: WordcloudEditorData
+  editorData: EditorPersistedData
 }
 
 export type SaveWordcloudDto = {
   title: string
-  editorData: WordcloudEditorData
+  editorData: EditorPersistedData
 }

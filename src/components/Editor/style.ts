@@ -144,7 +144,9 @@ export type BackgroundStyleConfig = {
 
   words: {
     wordList: WordStyleConfig[]
+    /** Default fonts */
     fonts: FontId[]
+    /** Default angles */
     angles: {
       preset: WordAnglesPresetKind
       angles: number[]
@@ -277,6 +279,12 @@ export type ColorString = string
 export type WordStyleConfig = {
   id: WordConfigId
   text: string
+  /** word-specific angle */
+  angle?: number
+  /** word-specific font */
+  fontId?: FontId
+  /** word-specific color */
+  color?: string
 }
 
 export type IconStyleConfig = {

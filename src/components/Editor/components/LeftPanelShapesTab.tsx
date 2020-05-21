@@ -375,7 +375,10 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           </MenuItem>
                           <MenuDivider />
                           {options.map((item, index) => (
-                            <MenuItem onClick={() => setSelectedOption(item)}>
+                            <MenuItem
+                              key={item.value}
+                              onClick={() => setSelectedOption(item)}
+                            >
                               {item.value}
                             </MenuItem>
                           ))}
