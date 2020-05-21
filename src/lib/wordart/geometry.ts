@@ -247,7 +247,7 @@ export const boundsForRectsNoSkew = (
 
   const len = rectsTransformed.length
   for (let i = 1; i < len; ++i) {
-    const { x, y, w, h } = rectsTransformed[i]
+    const { x, y, w: w, h: h } = rectsTransformed[i]
     if (x < xMin) {
       xMin = x
     }

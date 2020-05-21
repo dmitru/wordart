@@ -52,8 +52,10 @@ export type EditorComponentProps = {
 export const EditorComponent: React.FC<EditorComponentProps> = observer(
   (props) => {
     const toast = useToast()
-    const [canvasSize] = useState<Dimensions>({ w: (900 * 4) / 3, h: 900 })
+    const aspectRatio = 4 / 3
+    const [canvasSize] = useState<Dimensions>({ w: 900 * aspectRatio, h: 900 })
     const canvasRef = useRef<HTMLCanvasElement>(null)
+    const canvasWrapperRef = useRef<HTMLDimElement>(null)
     const { editorPageStore: store, wordcloudsStore } = useStore()
 
     const isNew = props.wordcloudId == null
@@ -105,6 +107,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           const editorParams: EditorInitParams = {
             canvas: canvasRef.current,
             store: store,
+            canvasWrapperEl: canvasWrapperRef.current,
+            aspectRatio,
           }
 
           if (props.wordcloudId != null) {
@@ -398,7 +402,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 <IconButton ml="1" icon="arrow-forward" aria-label="Redo" />
               </Tooltip>
             </TopToolbar>
-            <CanvasWrappper>
+
+            <CanvasWrappper ref={canvasWrapperRef}>
               <Canvas
                 width={canvasSize.w}
                 height={canvasSize.h}
@@ -591,6 +596,7 @@ const RightWrapper = styled.div`
 const CanvasWrappper = styled.div`
   flex: 1;
   height: calc(100vh - 100px);
+  width: calc(100vw - 440px);
   padding: 20px;
   display: flex;
   justify-content: center;

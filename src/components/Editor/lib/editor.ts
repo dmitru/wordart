@@ -3,6 +3,7 @@ import {
   fetchImage,
   removeLightPixels,
   createCanvas,
+  Dimensions,
 } from 'lib/wordart/canvas-utils'
 import { consoleLoggers } from 'utils/console-logger'
 import {
@@ -32,10 +33,12 @@ import {
 } from 'components/Editor/lib/paper-utils'
 import { toJS } from 'mobx'
 import { EditorPersistedData } from 'services/api/types'
-import { FontId } from 'data/fonts'
+import { Size } from 'lib/wordart/geometry'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
+  canvasWrapperEl: HTMLElement
+  aspectRatio: number
   store: EditorPageStore
   serialized?: EditorPersistedData
 }
@@ -84,6 +87,8 @@ export class Editor {
       paperItems: Map<number, paper.Item>
     }
   }
+  /** Size of the scene in project coordinates */
+  projectBounds: paper.Rectangle
 
   constructor(params: EditorInitParams) {
     this.params = params
@@ -93,6 +98,13 @@ export class Editor {
     paper.setup(params.canvas)
     // @ts-ignore
     window['paper'] = paper
+
+    this.projectBounds = new paper.Rectangle({
+      x: 0,
+      y: 0,
+      width: 1000,
+      height: 1000 / params.aspectRatio,
+    })
 
     this.logger.debug(
       `Editor: init, ${params.canvas.width} x ${params.canvas.height}`
@@ -104,6 +116,32 @@ export class Editor {
       shape: { items: [], paperItems: new Map() },
       bg: { items: [], paperItems: new Map() },
     }
+
+    window.addEventListener('resize', this.handleResize)
+    this.handleResize()
+  }
+
+  handleResize = () => {
+    const wrapperBounds = this.params.canvasWrapperEl.getBoundingClientRect()
+    wrapperBounds.width -= 40
+    wrapperBounds.height -= 40
+
+    // Update view size
+    if (wrapperBounds.width / wrapperBounds.height > this.params.aspectRatio) {
+      paper.view.viewSize = new paper.Size(
+        this.params.aspectRatio * wrapperBounds.height,
+        wrapperBounds.height
+      )
+    } else {
+      paper.view.viewSize = new paper.Size(
+        wrapperBounds.width,
+        wrapperBounds.width / this.params.aspectRatio
+      )
+    }
+
+    // Update view transform to make sure the viewport includes the entire project bounds
+    paper.view.scale(paper.view.bounds.width / this.projectBounds.width)
+    paper.view.translate(paper.view.bounds.topLeft)
   }
 
   setBgColor = (config: BgFillColorsConfig) => {
@@ -769,7 +807,9 @@ export class Editor {
     this.paperItems = {}
   }
 
-  destroy = () => {}
+  destroy = () => {
+    window.removeEventListener('resize', this.handleResize)
+  }
 }
 
 export type SvgShapeColorsMap = {
