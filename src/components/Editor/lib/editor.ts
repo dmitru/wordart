@@ -33,7 +33,6 @@ import {
 } from 'components/Editor/lib/paper-utils'
 import { toJS } from 'mobx'
 import { EditorPersistedData } from 'services/api/types'
-import { Size } from 'lib/wordart/geometry'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -426,9 +425,9 @@ export class Editor {
     // TODO: configure these
     const w = shapeItem.bounds.width
     const h = shapeItem.bounds.height
-    const padding = 20
+    const defaultPadding = 50
 
-    const sceneBounds = this.getSceneBounds(padding)
+    const sceneBounds = this.getSceneBounds(defaultPadding)
     if (Math.max(w, h) !== Math.max(sceneBounds.width, sceneBounds.height)) {
       const scale = Math.min(sceneBounds.width / w, sceneBounds.height / h)
       shapeItem.scale(scale)

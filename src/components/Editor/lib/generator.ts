@@ -795,7 +795,6 @@ export type WordGeneratedItem = {
   kind: 'word'
   id: ItemId
   wordInfo: WordInfo
-  angle: number
   transform: paper.Matrix
   /** Color of the shape at the given location */
   shapeColor: string

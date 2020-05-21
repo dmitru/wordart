@@ -1,5 +1,6 @@
 import { fonts, FontId } from 'data/fonts'
 import { WordConfigId } from 'components/Editor/editor-page-store'
+import { Rect } from 'lib/wordart/geometry'
 
 const defaultWordsList: WordStyleConfig[] = [
   // 'O',

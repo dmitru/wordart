@@ -55,7 +55,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const aspectRatio = 4 / 3
     const [canvasSize] = useState<Dimensions>({ w: 900 * aspectRatio, h: 900 })
     const canvasRef = useRef<HTMLCanvasElement>(null)
-    const canvasWrapperRef = useRef<HTMLDimElement>(null)
+    const canvasWrapperRef = useRef<HTMLDivElement>(null)
     const { editorPageStore: store, wordcloudsStore } = useStore()
 
     const isNew = props.wordcloudId == null
@@ -107,7 +107,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           const editorParams: EditorInitParams = {
             canvas: canvasRef.current,
             store: store,
-            canvasWrapperEl: canvasWrapperRef.current,
+            canvasWrapperEl: canvasWrapperRef.current!,
             aspectRatio,
           }
 

@@ -4,7 +4,7 @@ import {
   Editor,
   EditorInitParams,
   getItemsColoring,
-} from 'components/Editor/lib/editor'
+} from 'components/Editor/lib/editor-fabric'
 import { FontConfig, fonts, FontId, FontStyleConfig } from 'data/fonts'
 import { shapes } from 'components/Editor/icons'
 import {
@@ -36,6 +36,7 @@ import {
 import { flatten, uniq, uniqBy } from 'lodash'
 import { loadFont } from 'lib/wordart/fonts'
 import { Path, BoundingBox } from 'opentype.js'
+import paper from 'paper'
 
 export class EditorPageStore {
   logger = consoleLoggers.editorStore
@@ -62,6 +63,7 @@ export class EditorPageStore {
   @observable selectedShapeId: ShapeId = shapes[4].id
 
   constructor(rootStore: RootStore) {
+    // paper.setup(new paper.Size({ width: 1, height: 1 }))
     this.rootStore = rootStore
   }
 
@@ -291,8 +293,8 @@ export class EditorPageStore {
       version: 1,
       data: {
         sceneSize: {
-          w: this.editor.getSceneBounds(0).width,
-          h: this.editor.getSceneBounds(0).height,
+          w: roundFloat(this.editor.getSceneBounds(0).width, 3),
+          h: roundFloat(this.editor.getSceneBounds(0).height, 3),
         },
         bg: {
           style: toJS(this.styles.bg, { recurseEverything: true }),
