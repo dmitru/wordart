@@ -25,11 +25,7 @@ import {
   ItemsColoring,
   BackgroundStyleConfig,
 } from 'components/Editor/style'
-import {
-  findNamedChildren,
-  getFillColor,
-  getStrokeColor,
-} from 'components/Editor/lib/paper-utils'
+
 import { toJS } from 'mobx'
 import { EditorPersistedData } from 'services/api/types'
 import { fabric } from 'fabric'
@@ -65,6 +61,7 @@ export class Editor {
 
   fabricObjects: {
     shape?: fabric.Object
+    originalShape?: fabric.Object
   } = {}
 
   // paperItems: {
@@ -144,96 +141,89 @@ export class Editor {
 
     // // Update view transform to make sure the viewport includes the entire project bounds
     this.canvas.setZoom(this.canvas.getWidth() / this.projectBounds.width)
-    // this.canvas.requestRenderAll()
-    // paper.view.scale(paper.view.bounds.width / this.projectBounds.width)
-    // paper.view.translate(paper.view.bounds.topLeft)
   }
 
   setBgColor = (config: BgFillColorsConfig) => {
     this.logger.debug('setBgColor', toJS(config, { recurseEverything: true }))
-
-    // const bgRect = new paper.Path.Rectangle(
-    //   new paper.Point(0, 0),
-    //   new paper.Point(this.params.canvas.width, this.params.canvas.height)
-    // )
-    // bgRect.fillColor = new paper.Color(config.color)
-    // bgRect.opacity = config.kind === 'transparent' ? 0 : 1
-
-    // this.paperItems.bgRect?.remove()
     this.canvas.backgroundColor = config.color
     this.canvas.requestRenderAll()
-    // paper.project.activeLayer.insertChild(0, bgRect)
-    // this.paperItems.bgRect = bgRect
   }
 
-  setShapeFillColors = (config: ShapeFillColorsConfig) => {
-    return
-    // this.logger.debug(
-    //   'setShapeFillColors',
-    //   toJS(config, { recurseEverything: true })
-    // )
+  setShapeFillColors = async (config: ShapeFillColorsConfig) => {
+    this.logger.debug(
+      'setShapeFillColors',
+      toJS(config, { recurseEverything: true })
+    )
 
-    // if (!this.currentShape) {
-    //   this.logger.debug('>  No current shape, early exit')
-    //   return
-    // }
+    if (!this.currentShape) {
+      this.logger.debug('>  No current shape, early exit')
+      return
+    }
 
-    // if (this.currentShape.kind === 'img') {
-    //   return
-    // }
+    if (this.currentShape.kind === 'img') {
+      return
+    }
 
-    // if (!this.paperItems.shape || !this.paperItems.originalShape) {
-    //   return
-    // }
+    if (!this.fabricObjects.shape || !this.fabricObjects.originalShape) {
+      return
+    }
 
-    // if (config.kind === 'color-map') {
-    //   const shape = this.paperItems.originalShape.clone() as paper.Group
-    //   const colorsMap = computeColorsMap(shape)
+    const shape = await new Promise<fabric.Object>((r) =>
+      this.fabricObjects.originalShape!.clone(
+        (copy: fabric.Object) => r(copy),
+        ['id']
+      )
+    )
 
-    //   this.logger.debug('>  Using color map', colorsMap)
-    //   colorsMap.colors.forEach((colorEntry, entryIndex) => {
-    //     this.logger.debug(
-    //       `>    Setting color to ${config.colorMap[entryIndex]}, ${colorEntry.color} for ${colorEntry.paperItems.length} items...`
-    //     )
-    //     colorEntry.paperItems.forEach((item) => {
-    //       const color = config.colorMap[entryIndex] || colorEntry.color
-    //       if (colorEntry.fill) {
-    //         item.fillColor = new paper.Color(color)
-    //       }
-    //       if (colorEntry.stroke) {
-    //         item.strokeColor = new paper.Color(color)
-    //       }
-    //     })
-    //   })
+    if (config.kind === 'color-map') {
+      const colorsMap = computeColorsMap(shape)
 
-    //   this.paperItems.shape.remove()
-    //   paper.project.activeLayer.insertChild(1, shape)
+      this.logger.debug('>  Using color map', colorsMap)
+      colorsMap.colors.forEach((colorEntry, entryIndex) => {
+        this.logger.debug(
+          `>    Setting color to ${config.colorMap[entryIndex]}, ${colorEntry.color} for ${colorEntry.fabricItems.length} items...`
+        )
+        colorEntry.fabricItems.forEach((item) => {
+          const color = config.colorMap[entryIndex] || colorEntry.color
+          if (colorEntry.fill) {
+            item.set({ fill: color })
+          }
+          if (colorEntry.stroke) {
+            item.set({ stroke: color })
+          }
+        })
+      })
 
-    //   this.currentShape.colorsMap = colorsMap
-    //   this.paperItems.shape = shape
-    // } else {
-    //   this.logger.debug('>  Using single color')
+      this.canvas.remove(this.fabricObjects.shape)
+      this.canvas.insertAt(shape, 0, false)
 
-    //   const shape = this.paperItems.originalShape.clone()
-    //   const color = new paper.Color(config.color)
-    //   shape.fillColor = color
-    //   shape.strokeColor = color
+      this.currentShape.colorsMap = colorsMap
+      this.fabricObjects.shape = shape
+    } else {
+      this.logger.debug('>  Using single color')
+      const color = config.color
 
-    //   this.paperItems.shape.remove()
-    //   paper.project.activeLayer.insertChild(1, shape)
+      const objects =
+        shape instanceof fabric.Group ? shape.getObjects() : [shape]
+      objects.forEach((obj) => obj.set({ fill: color, stroke: color }))
 
-    //   this.paperItems.shape = shape
-    // }
+      this.canvas.remove(this.fabricObjects.shape)
+      this.canvas.insertAt(shape, 0, false)
 
-    // this.setShapeFillOpacity(config.opacity)
+      this.fabricObjects.shape = shape
+    }
+
+    this.setShapeFillOpacity(config.opacity)
+    this.canvas.requestRenderAll()
   }
 
   setShapeFillOpacity = (opacity: number) => {
-    // this.logger.debug('setShapeFillOpacity', opacity)
-    // if (!this.paperItems.shape) {
-    //   return
-    // }
-    // this.paperItems.shape.opacity = opacity
+    this.logger.debug('setShapeFillOpacity', opacity)
+    if (!this.fabricObjects.shape) {
+      return
+    }
+    this.fabricObjects.shape.set({ opacity })
+    this.canvas.requestRenderAll()
   }
 
   setItemsColor = (target: TargetKind, coloring: ItemsColoring) => {
@@ -416,7 +406,8 @@ export class Editor {
       //     })
       // )
 
-      // colorsMap = computeColorsMap(shapeItemGroup)
+      colorsMap = computeColorsMap(shapeObj as fabric.Group)
+      console.log('computeColorsMap = ', colorsMap)
 
       // shapeItem = shapeItemGroup
     } else {
@@ -470,21 +461,14 @@ export class Editor {
     if (this.fabricObjects.shape) {
       this.canvas.remove(this.fabricObjects.shape)
     }
+    const shapeCopy = await new Promise<fabric.Object>((r) =>
+      shapeObj!.clone((copy: fabric.Object) => r(copy), ['id'])
+    )
+    shapeObj.set({ opacity: shapeColors.opacity })
     this.canvas.add(shapeObj)
     this.canvas.requestRenderAll()
     this.fabricObjects.shape = shapeObj
-
-    // this.paperItems.shape = shapeItem
-    // this.paperItems.originalShape = shapeItem.clone({ insert: false })
-
-    // shapeItem.opacity = shapeColors.opacity
-    // this.paperItems.shape?.remove()
-    // shapeItem.insertAbove(this.paperItems.bgRect!)
-
-    // this.paperItems.shapeItemsGroup?.remove()
-    // this.paperItems.shapeItemsGroup = undefined
-    // this.paperItems.bgItemsGroup?.remove()
-    // this.paperItems.bgItemsGroup = undefined
+    this.fabricObjects.originalShape = shapeCopy
 
     if (shape.kind === 'svg') {
       this.currentShape = {
@@ -501,6 +485,7 @@ export class Editor {
 
     if (colorsMap) {
       shapeColors.colorMap = colorsMap?.colors.map((c) => c.color)
+      shapeColors.defaultColorMap = colorsMap?.colors.map((c) => c.color)
     }
     this.setShapeFillColors(shapeColors)
     return { colorsMap }
@@ -836,7 +821,7 @@ export type SvgShapeColorsMapEntry = {
   stroke: boolean
   fill: boolean
   color: ColorString
-  paperItems: paper.Item[]
+  fabricItems: fabric.Object[]
 }
 
 export type ShapeFillColorsConfig = ShapeStyleConfig['fill']
@@ -871,14 +856,50 @@ export const getItemsColoring = (
   }
 }
 
-export const computeColorsMap = (
-  shapeItemGroup: paper.Group
-): SvgShapeColorsMap => {
-  const namedChildren = sortBy(findNamedChildren(shapeItemGroup), (c) => c.name)
+export const findNamedChildren = (
+  item: fabric.Object,
+  level = 0,
+  maxLevel = 6
+): { name: string; item: fabric.Object }[] => {
+  const objects = item instanceof fabric.Group ? item.getObjects() : [item]
+  const namedChildren = objects.filter((obj) => (obj as any).id != null)
+  if (namedChildren.length > 0) {
+    return namedChildren.map((child) => ({
+      name: (child as any).id,
+      item: child,
+    }))
+  }
+
+  return []
+}
+
+/** Recursively finds all fill colors used (ignoring pure black) */
+export const getFillColor = (items: fabric.Object[]): string | undefined => {
+  for (let item of items) {
+    if (typeof item.fill === 'string') {
+      return item.fill
+    }
+  }
+  return undefined
+}
+
+/** Recursively finds all stroke colors used */
+export const getStrokeColor = (items: fabric.Object[]): string | undefined => {
+  for (let item of items) {
+    if (typeof item.stroke === 'string') {
+      return item.stroke
+    }
+  }
+  return undefined
+}
+
+export const computeColorsMap = (object: fabric.Object): SvgShapeColorsMap => {
+  const namedChildren = sortBy(findNamedChildren(object), (c) => c.name)
   const namedChildrenByColor = groupBy(
     namedChildren,
     (ch) => ch.name.split('_')[0]
   )
+  console.log('computeColorsMap', object, namedChildren)
 
   let colorEntries: SvgShapeColorsMapEntry[] = []
   if (Object.keys(namedChildrenByColor).length > 0) {
@@ -890,16 +911,16 @@ export const computeColorsMap = (
       if (fillColor !== strokeColor) {
         if (fillColor) {
           colorEntries.push({
-            paperItems: children.map((c) => c.item),
-            color: fillColor.toCSS(true),
+            fabricItems: children.map((c) => c.item),
+            color: fillColor,
             fill: true,
             stroke: false,
           })
         }
         if (strokeColor) {
           colorEntries.push({
-            paperItems: children.map((c) => c.item),
-            color: strokeColor.toCSS(true),
+            fabricItems: children.map((c) => c.item),
+            color: strokeColor,
             fill: false,
             stroke: true,
           })
@@ -907,8 +928,8 @@ export const computeColorsMap = (
       } else {
         if (strokeColor) {
           colorEntries.push({
-            paperItems: children.map((c) => c.item),
-            color: strokeColor.toCSS(true),
+            fabricItems: children.map((c) => c.item),
+            color: strokeColor,
             fill: true,
             stroke: true,
           })
@@ -917,7 +938,8 @@ export const computeColorsMap = (
     })
   } else {
     colorEntries.push({
-      paperItems: [shapeItemGroup],
+      fabricItems:
+        object instanceof fabric.Group ? object.getObjects() : [object],
       color: '#333',
       stroke: true,
       fill: true,
@@ -935,7 +957,7 @@ export const computeColorsMap = (
       fill: ce.fill,
       stroke: ce.stroke,
       color: ce.color,
-      paperItems: flatten(ceGroup.map((ce) => ce.paperItems)),
+      fabricItems: flatten(ceGroup.map((ce) => ce.fabricItems)),
     } as SvgShapeColorsMapEntry
   })
 
