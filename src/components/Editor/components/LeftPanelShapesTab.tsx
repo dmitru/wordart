@@ -46,6 +46,20 @@ const state = observable({
   isShowingAdjust: false,
 })
 
+const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
+  <Slider
+    label="Opacity"
+    value={100 * style.fill.opacity}
+    onChange={(value) => {
+      style.fill.opacity = value / 100
+    }}
+    onAfterChange={onAfterChange}
+    min={0}
+    max={100}
+    step={1}
+  />
+))
+
 export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
   () => {
     const { editorPageStore } = useStore()
@@ -135,18 +149,11 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                 height="120px"
               >
                 <Box flex={1} width="100%" mb="2">
-                  <Slider
-                    label="Opacity"
-                    value={100 * shapeStyle.fill.opacity}
-                    onChange={(value) => {
-                      shapeStyle.fill.opacity = value / 100
-                    }}
-                    onAfterChange={(value) => {
+                  <ShapeOpacitySlider
+                    style={shapeStyle}
+                    onAfterChange={(value: number) => {
                       editorPageStore.editor?.setShapeFillOpacity(value / 100)
                     }}
-                    min={0}
-                    max={100}
-                    step={1}
                   />
                 </Box>
 
