@@ -12,10 +12,11 @@ import {
   GeneratedItem,
   WordInfoId,
   Font,
+  WordGeneratedItem,
 } from 'components/Editor/lib/generator'
 import chroma from 'chroma-js'
 import { loadFont } from 'lib/wordart/fonts'
-import { Path } from 'opentype.js'
+import { Path, Glyph } from 'opentype.js'
 import { max, min, groupBy, sortBy, flatten } from 'lodash'
 import seedrandom from 'seedrandom'
 import {
@@ -30,6 +31,7 @@ import { toJS } from 'mobx'
 import { EditorPersistedData } from 'services/api/types'
 import { fabric } from 'fabric'
 import paper from 'paper'
+import { FontId } from 'data/fonts'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -60,6 +62,7 @@ export class Editor {
       } = null
 
   fabricObjects: {
+    shapeItems?: fabric.Object[]
     shape?: fabric.Object
     originalShape?: fabric.Object
   } = {}
@@ -81,16 +84,34 @@ export class Editor {
   generatedItems: {
     shape: {
       items: GeneratedItem[]
-      paperItems: Map<number, paper.Item>
+      fabricObjects: Map<number, fabric.Object>
+      wordItemsInfo: Map<
+        ItemId,
+        { path: opentype.Path; pathBounds: opentype.BoundingBox }
+      >
     }
     bg: {
       items: GeneratedItem[]
-      paperItems: Map<number, paper.Item>
+      fabricObjects: Map<number, fabric.Object>
+      wordItemsInfo: Map<
+        ItemId,
+        { path: opentype.Path; pathBounds: opentype.BoundingBox }
+      >
     }
   }
   /** Size of the scene in project coordinates */
   projectBounds: paper.Rectangle
   canvas: fabric.Canvas
+  fontsInfo: Map<
+    FontId,
+    {
+      font: Font
+      glyphs: Map<
+        string,
+        { glyph: Glyph; path: opentype.Path; pathData: string }
+      >
+    }
+  > = new Map()
 
   constructor(params: EditorInitParams) {
     this.params = params
@@ -117,8 +138,8 @@ export class Editor {
     // this.paperItems = {}
 
     this.generatedItems = {
-      shape: { items: [], paperItems: new Map() },
-      bg: { items: [], paperItems: new Map() },
+      shape: { items: [], fabricObjects: new Map(), wordItemsInfo: new Map() },
+      bg: { items: [], fabricObjects: new Map(), wordItemsInfo: new Map() },
     }
 
     window.addEventListener('resize', this.handleResize)
@@ -226,150 +247,160 @@ export class Editor {
     this.canvas.requestRenderAll()
   }
 
-  setItemsColor = (target: TargetKind, coloring: ItemsColoring) => {
-    return
-    // const { items, paperItems: itemIdToPaperItem } = this.generatedItems[target]
-    // this.logger.debug(
-    //   'setItemsColor',
-    //   target,
-    //   coloring,
-    //   `${items.length} items`
+  setItemsColor = async (target: TargetKind, coloring: ItemsColoring) => {
+    const { items, fabricObjects, wordItemsInfo } = this.generatedItems[target]
+    this.logger.debug(
+      'setItemsColor',
+      target,
+      coloring,
+      `${items.length} items`
+    )
+
+    let colors: string[] = []
+
+    if (coloring.kind === 'gradient' || coloring.kind === 'single-color') {
+      if (coloring.kind === 'single-color') {
+        colors = [coloring.color]
+      } else if (coloring.kind === 'gradient') {
+        const scale = chroma.scale([coloring.colorFrom, coloring.colorTo])
+        colors = scale.colors(10)
+      }
+    }
+
+    const itemAreas = items.map((item) => {
+      if (item.kind === 'word') {
+        const entry = wordItemsInfo.get(item.id)
+        if (!entry) {
+          console.error('No word info for item id ', item.id)
+          return 0
+        }
+        const wordPathBb = entry.pathBounds
+        const scaling = item.transform.scaling
+        const wordH = (wordPathBb.y2 - wordPathBb.y1) * scaling.y
+        const wordW = (wordPathBb.x2 - wordPathBb.x1) * scaling.x
+        const wordArea = Math.sqrt(wordH * wordW)
+        return wordArea
+      }
+
+      if (item.kind === 'symbol') {
+        const bounds = item.symbolDef.item.bounds
+        const w = bounds.width * item.transform.scaling.x
+        const h = bounds.height * item.transform.scaling.y
+        return Math.sqrt(w * h)
+      }
+
+      return 0
+    })
+
+    const maxArea = max(itemAreas)!
+    const minArea = min(itemAreas)!
+
+    const rng = seedrandom('fill color')
+    let shapeRaster: fabric.Image | undefined
+    let shapeRasterImgData: ImageData | undefined
+
+    const dimSmallerFactor = coloring.dimSmallerItems / 100
+
+    if ((!shapeRaster || !shapeRasterImgData) && this.fabricObjects.shape) {
+      shapeRaster = await new Promise<fabric.Image>((r) =>
+        this.fabricObjects.shape!.cloneAsImage((copy: fabric.Image) => r(copy))
+      )
+      // (shapeItem.toCanvasElement() as any) as HTMLCanvasElement
+      // shapeRaster = shapeItemClone.rasterize(undefined, false)
+      // shapeRasterImgData = shapeRaster.getImageData(
+      //   new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
+      // )
+      // shapeItemClone.remove()
+    }
+
+    // const canvas = shapeRaster!.getSubCanvas(
+    //   new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
     // )
+    // const ctx = canvas.getContext('2d')!
 
-    // let paperColors: paper.Color[] = []
+    for (let i = 0; i < items.length; ++i) {
+      const item = items[i]
+      const area = itemAreas[i]
+      const obj = fabricObjects.get(item.id)
 
-    // if (coloring.kind === 'gradient' || coloring.kind === 'single-color') {
-    //   let colors: string[] = []
-    //   if (coloring.kind === 'single-color') {
-    //     colors = [coloring.color]
-    //   } else if (coloring.kind === 'gradient') {
-    //     const scale = chroma.scale([coloring.colorFrom, coloring.colorTo])
-    //     colors = scale.colors(10)
-    //   }
-    //   paperColors = colors.map((color) => new paper.Color(color))
-    // }
+      if (!obj) {
+        continue
+      }
+      if (item.kind !== 'word' && item.kind !== 'symbol') {
+        continue
+      }
 
-    // const itemAreas = items.map((item) => {
-    //   if (item.kind === 'word') {
-    //     const wordPathBb = item.wordPathBounds
-    //     const scaling = item.transform.scaling
-    //     const wordH = (wordPathBb.y2 - wordPathBb.y1) * scaling.y
-    //     const wordW = (wordPathBb.x2 - wordPathBb.x1) * scaling.x
-    //     const wordArea = Math.sqrt(wordH * wordW)
-    //     return wordArea
-    //   }
+      const objects = obj instanceof fabric.Group ? obj.getObjects() : [obj]
 
-    //   if (item.kind === 'symbol') {
-    //     const bounds = item.symbolDef.item.bounds
-    //     const w = bounds.width * item.transform.scaling.x
-    //     const h = bounds.height * item.transform.scaling.y
-    //     return Math.sqrt(w * h)
-    //   }
-
-    //   return 0
-    // })
-
-    // const maxArea = max(itemAreas)!
-    // const minArea = min(itemAreas)!
-
-    // const rng = seedrandom('fill color')
-    // let shapeRaster: paper.Raster | undefined
-    // let shapeRasterImgData: ImageData | undefined
-
-    // const dimSmallerFactor = coloring.dimSmallerItems / 100
-
-    // if ((!shapeRaster || !shapeRasterImgData) && this.paperItems.shape) {
-    //   const shapeItemClone = this.paperItems.shape.clone({ insert: false })
-    //   shapeItemClone.opacity = 1
-    //   shapeRaster = shapeItemClone.rasterize(undefined, false)
-    //   shapeRasterImgData = shapeRaster.getImageData(
-    //     new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
-    //   )
-    //   shapeItemClone.remove()
-    // }
-
-    // // const canvas = shapeRaster!.getSubCanvas(
-    // //   new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
-    // // )
-    // // const ctx = canvas.getContext('2d')!
-
-    // for (let i = 0; i < items.length; ++i) {
-    //   const item = items[i]
-    //   const area = itemAreas[i]
-    //   const path = itemIdToPaperItem.get(item.id)
-    //   if (!path) {
-    //     continue
-    //   }
-    //   if (item.kind !== 'word' && item.kind !== 'symbol') {
-    //     continue
-    //   }
-
-    //   if (coloring.kind === 'gradient' || coloring.kind === 'single-color') {
-    //     const index = Math.floor(rng() * paperColors.length)
-    //     path.fillColor = paperColors[index]
-    //     path.strokeColor = path.fillColor
-    //   } else {
-    //     // shape coloring
-    //     if (!shapeRaster || !shapeRasterImgData) {
-    //       shapeRaster = this.paperItems.shape?.rasterize(undefined, false)
-    //       shapeRasterImgData = shapeRaster!.getImageData(
-    //         new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
-    //       )
-    //     }
-
-    //     const imgDataPos = path.position
-    //       .subtract(shapeRaster!.bounds.topLeft)
-    //       .multiply(shapeRasterImgData.width / shapeRaster!.bounds.width)
-    //     imgDataPos.x = Math.round(imgDataPos.x)
-    //     imgDataPos.y = Math.round(imgDataPos.y)
-
-    //     // ctx.fillStyle = 'red'
-    //     // ctx.fillRect(imgDataPos.x, imgDataPos.y, 10, 10)
-
-    //     const r =
-    //       shapeRasterImgData.data[
-    //         4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width)
-    //       ] / 255
-    //     const g =
-    //       shapeRasterImgData.data[
-    //         4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width) + 1
-    //       ] / 255
-    //     const b =
-    //       shapeRasterImgData.data[
-    //         4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width) + 2
-    //       ] / 255
-
-    //     let color = chroma.rgb(255 * r, 255 * g, 255 * b)
-    //     if (coloring.shapeBrightness != 0) {
-    //       color = color.brighten(coloring.shapeBrightness / 100)
-    //     }
-    //     const rgb = color.rgb()
-
-    //     // console.log(
-    //     //   'shapeRasterImgData',
-    //     //   shapeRasterImgData.width,
-    //     //   shapeRasterImgData.height,
-    //     //   imgDataPos.x,
-    //     //   imgDataPos.y,
-    //     //   r,
-    //     //   g,
-    //     //   b
-    //     // )
-
-    //     path.fillColor = new paper.Color(
-    //       rgb[0] / 255,
-    //       rgb[1] / 255,
-    //       rgb[2] / 255,
-    //       1
-    //     )
-    //     path.strokeColor = path.fillColor
-    //   }
-    //   path.opacity =
-    //     (dimSmallerFactor * (area - minArea)) / (maxArea - minArea) +
-    //     (1 - dimSmallerFactor)
-    // }
+      if (coloring.kind === 'gradient' || coloring.kind === 'single-color') {
+        const index = Math.floor(rng() * colors.length)
+        objects.forEach((o) =>
+          o.set({ fill: colors[index], stroke: colors[index] })
+        )
+      } else {
+        // shape coloring
+        // if (!shapeRaster || !shapeRasterImgData) {
+        //   shapeRaster = this.paperItems.shape?.rasterize(undefined, false)
+        //   shapeRasterImgData = shapeRaster!.getImageData(
+        //     new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
+        //   )
+        // }
+        // const imgDataPos = path.position
+        //   .subtract(shapeRaster!.bounds.topLeft)
+        //   .multiply(shapeRasterImgData.width / shapeRaster!.bounds.width)
+        // imgDataPos.x = Math.round(imgDataPos.x)
+        // imgDataPos.y = Math.round(imgDataPos.y)
+        // // ctx.fillStyle = 'red'
+        // // ctx.fillRect(imgDataPos.x, imgDataPos.y, 10, 10)
+        // const r =
+        //   shapeRasterImgData.data[
+        //     4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width)
+        //   ] / 255
+        // const g =
+        //   shapeRasterImgData.data[
+        //     4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width) + 1
+        //   ] / 255
+        // const b =
+        //   shapeRasterImgData.data[
+        //     4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width) + 2
+        //   ] / 255
+        const shapeColor = new paper.Color(item.shapeColor)
+        let color = chroma.rgb(
+          255 * shapeColor.red,
+          255 * shapeColor.green,
+          255 * shapeColor.blue
+        )
+        if (coloring.shapeBrightness != 0) {
+          color = color.brighten(coloring.shapeBrightness / 100)
+        }
+        const hex = color.hex()
+        objects.forEach((o) => o.set({ fill: hex, stroke: hex }))
+        // const rgb = color.rgb()
+        // // console.log(
+        // //   'shapeRasterImgData',
+        // //   shapeRasterImgData.width,
+        // //   shapeRasterImgData.height,
+        // //   imgDataPos.x,
+        // //   imgDataPos.y,
+        // //   r,
+        // //   g,
+        // //   b
+        // // )
+        // path.fillColor = new paper.Color(
+        //   rgb[0] / 255,
+        //   rgb[1] / 255,
+        //   rgb[2] / 255,
+        //   1
+        // )
+        // path.strokeColor = path.fillColor
+      }
+      obj.opacity =
+        (dimSmallerFactor * (area - minArea)) / (maxArea - minArea) +
+        (1 - dimSmallerFactor)
+    }
 
     // console.screenshot(ctx.canvas, 0.3)
+    this.canvas.requestRenderAll()
   }
 
   /** Sets the shape, clearing the project */
@@ -626,109 +657,256 @@ export class Editor {
   }
 
   setShapeItems = async (items: GeneratedItem[]) => {
-    // if (!this.paperItems.shape) {
-    //   console.error('No shape')
-    //   return
-    // }
-    // const {
-    //   addedItems,
-    //   itemIdToPaperItem,
-    // } = await this.convertItemsToPaperItems(items)
-    // this.paperItems.shapeItemsGroup?.remove()
-    // const shapeItemsGroup = new paper.Group([
-    //   // this.paperItems.shape.clone(),
-    //   ...addedItems,
-    // ])
-    // // shapeItemsGroup.clipped = true
-    // this.paperItems.shapeItemsGroup = shapeItemsGroup
-    // this.paperItems.shapeItemsGroup.insertAbove(this.paperItems.shape)
-    // this.generatedItems.shape = {
-    //   paperItems: itemIdToPaperItem,
-    //   items,
-    // }
+    if (!this.fabricObjects.shape) {
+      console.error('No shape')
+      return
+    }
+    const {
+      addedItems,
+      itemIdToFabricObject,
+      wordItemsInfo,
+    } = await this.convertItemsToFabricItems(items)
+
+    if (this.fabricObjects.shapeItems) {
+      this.canvas.remove(...this.fabricObjects.shapeItems)
+    }
+    this.canvas.add(...addedItems)
+    this.canvas.requestRenderAll()
+
+    this.fabricObjects.shapeItems = addedItems
+    this.generatedItems.shape = {
+      fabricObjects: itemIdToFabricObject,
+      items,
+      wordItemsInfo,
+    }
   }
 
-  convertItemsToPaperItems = async (items: GeneratedItem[]) => {
-    const addedItems: paper.Item[] = []
+  convertItemsToFabricItems = async (items: GeneratedItem[]) => {
+    const addedItems: fabric.Object[] = []
+    const wordItemsInfo: Map<
+      ItemId,
+      { path: opentype.Path; pathBounds: opentype.BoundingBox }
+    > = new Map()
     let img: HTMLImageElement | null = null
 
-    let wordIdToSymbolDef = new Map<WordInfoId, paper.SymbolDefinition>()
-    let itemIdToPaperItem = new Map<ItemId, paper.Item>()
+    let wordIdToSymbolDef = new Map<WordInfoId, fabric.Path>()
+    let itemIdToFabricObject = new Map<ItemId, fabric.Object>()
 
-    for (const item of items) {
-      if (item.kind === 'symbol') {
-        const itemInstance = item.symbolDef.item.clone()
-        // itemInstance.fillColor = new paper.Color('red')
-        itemInstance.transform(item.transform)
-        addedItems.push(itemInstance)
-        itemIdToPaperItem.set(item.id, itemInstance)
-      } else if (item.kind === 'img') {
-        if (!img) {
-          const imgUri = item.ctx.canvas.toDataURL()
-          img = await fetchImage(imgUri)
-        }
-        const itemImg = new paper.Raster(img)
-        itemImg.scale(item.transform.a)
-        const w = itemImg.bounds.width
-        const h = itemImg.bounds.height
-        itemImg.position = new paper.Point(
-          item.transform.tx + w / 2,
-          item.transform.ty + h / 2
-        )
-        addedItems.push(itemImg)
-        itemIdToPaperItem.set(item.id, itemImg)
-      } else if (item.kind === 'word') {
-        const wordId = item.wordInfo.id
+    const allWordItems = items.filter(
+      (item) => item.kind === 'word'
+    ) as WordGeneratedItem[]
+    const wordItemsByFont = groupBy(allWordItems, 'fontId')
+    const uniqFontIds = Object.keys(wordItemsByFont)
+    await this.fetchFonts(uniqFontIds)
 
-        if (!wordIdToSymbolDef.has(wordId)) {
-          const paths = item.wordInfo.font.font.getPaths(
-            item.wordInfo.text,
-            0,
-            0,
-            item.wordInfo.fontSize
+    // Process all fonts...
+    for (const [fontId, wordItems] of Object.entries(wordItemsByFont)) {
+      const fontInfo = this.fontsInfo.get(fontId)!
+      // Process all glyphs...
+      const uniqGlyphs = [
+        ...new Set(
+          flatten(
+            wordItems.map((wi) => fontInfo.font.otFont.stringToGlyphs(wi.text))
           )
-
-          const pathItems = paths.map((path: Path) => {
-            let pathData = path.toPathData(3)
-            const item = paper.Path.create(pathData)
-            item.fillColor = new paper.Color('black')
-            item.fillRule = 'evenodd'
-            return item
-          })
-          const pathItemsGroup = new paper.Group(pathItems)
-          const symbolDef = new paper.SymbolDefinition(pathItemsGroup, true)
-          wordIdToSymbolDef.set(wordId, symbolDef)
+        ),
+      ]
+      for (const glyph of uniqGlyphs) {
+        if (fontInfo.glyphs.has(glyph.name)) {
+          continue
         }
+        const path = glyph.getPath(0, 0, 100)
+        fontInfo.glyphs.set(glyph.name, {
+          glyph,
+          path,
+          pathData: path.toPathData(3),
+        })
+      }
 
-        const symbolDef = wordIdToSymbolDef.get(wordId)!
+      // Process items...
+      for (const item of wordItems) {
+        // let glyphs: Glyph[] = []
+        // let glyphXs: number[] = []
+        // let glyphYs: number[] = []
+        // fontInfo.font.otFont.forEachGlyph(
+        //   item.text,
+        //   0,
+        //   0,
+        //   100,
+        //   undefined,
+        //   (glyph, gx, gy) => {
+        //     glyphs.push(glyph)
+        //     glyphXs.push(gx)
+        //     glyphYs.push(0)
+        //   }
+        // )
+        // const glyphPaths = fontInfo.font.otFont.getPaths(item.text, 0, 0, 100)
+        // const glyphPathData = glyphs.map(
+        //   (gl) => fontInfo.glyphs.get(gl.name)!.pathData
+        // )
 
-        const wordItem = symbolDef.item.clone()
+        // const pathItems = glyphPaths.map((path, index) => {
+        //   const pathData = glyphPathData[index]
+        //   const item = new fabric.Path(pathData)
+        //   item.set({
+        //     left: glyphXs[index],
+        //     // top: glyphYs[index],
+        //   })
+        //   item.set({ fill: 'black', fillRule: 'evenodd' })
+        //   return item
+        // })
 
-        wordItem.transform(item.transform)
-        addedItems.push(wordItem)
+        // TODO: optimize it with glyph-based paths
+        const wordPath = fontInfo.font.otFont.getPath(item.text, 0, 0, 100)
+        const wordGroup = new fabric.Path(wordPath.toPathData(3))
+        wordItemsInfo.set(item.id, {
+          path: wordPath,
+          pathBounds: wordPath.getBoundingBox(),
+        })
+        wordGroup.set({ fill: 'black' })
 
-        itemIdToPaperItem.set(item.id, wordItem)
+        // const wordItem = new fabric.Group(pathItems)
+        wordGroup.set({
+          selectable: false,
+        })
+        const t = item.transform
+        const m = [t.a, t.b, t.c, t.d, t.tx, t.ty]
+        const md = fabric.util.qrDecompose(m)
+
+        const dy = wordGroup.getBoundingRect().top * md.scaleY
+        const dx = wordGroup.getBoundingRect().left * md.scaleX
+
+        // TODO: fix rotation
+        wordGroup.set({ flipX: false, flipY: false })
+        wordGroup.set({ scaleX: md.scaleX, scaleY: md.scaleY })
+        wordGroup.setCoords()
+        wordGroup.set({
+          left: dx,
+          top: dy,
+        })
+        wordGroup.setCoords()
+        wordGroup.set({
+          angle: md.angle,
+        })
+        wordGroup.setCoords()
+        wordGroup.set({
+          left: md.translateX + dx,
+          top: md.translateY + dy,
+        })
+        // wordItem.setPositionByOrigin(
+        //   new fabric.Point(md.translateX, md.translateY),
+        //   'left',
+        //   'bottom'
+        // )
+        wordGroup.setCoords()
+
+        // wordItem.set({
+        //   scaleX: item.transform.scaling.x,
+        //   scaleY: item.transform.scaling.y,
+        // })
+        // wordItem.setCoords()
+        // wordItem.rotate(item.transform.rotation)
+        // wordItem.setCoords()
+        // console.log(
+        //   fontInfo.font.otFont.unitsPerEm * item.transform.scaling.y,
+        //   item.transform.scaling.y
+        // )
+        // wordItem.set({
+        //   left: item.transform.translation.x,
+        //   top: item.transform.translation.y,
+        // })
+        //
+        // const t = item.transform.inverted()
+        // wordItem.set({
+        //   transformMatrix: [t.a, t.b, t.c, t.d, t.tx, t.ty],
+        // })
+
+        // left: item.transform.translation.x,
+        // top: item.transform.translation.y,
+        // scaleX: item.transform.scaling.x,
+        // scaleY: item.transform.scaling.y,
+        // })
+        wordGroup.setCoords()
+
+        itemIdToFabricObject.set(item.id, wordGroup)
+        addedItems.push(wordGroup)
       }
     }
 
-    return { addedItems, itemIdToPaperItem }
+    for (const item of items) {
+      if (item.kind === 'symbol') {
+        // const itemInstance = item.symbolDef.item.clone()
+        // // itemInstance.fillColor = new paper.Color('red')
+        // itemInstance.transform(item.transform)
+        // addedItems.push(itemInstance)
+        // itemIdToPaperItem.set(item.id, itemInstance)
+      } else if (item.kind === 'img') {
+        // if (!img) {
+        //   const imgUri = item.ctx.canvas.toDataURL()
+        //   img = await fetchImage(imgUri)
+        // }
+        // const itemImg = new paper.Raster(img)
+        // itemImg.scale(item.transform.a)
+        // const w = itemImg.bounds.width
+        // const h = itemImg.bounds.height
+        // itemImg.position = new paper.Point(
+        //   item.transform.tx + w / 2,
+        //   item.transform.ty + h / 2
+        // )
+        // addedItems.push(itemImg)
+        // itemIdToPaperItem.set(item.id, itemImg)
+      } else if (item.kind === 'word') {
+        // These have been processed...
+      }
+    }
+
+    return { addedItems, itemIdToFabricObject, wordItemsInfo }
+  }
+
+  fetchFonts = async (fontIds: FontId[]): Promise<Font[]> => {
+    return Promise.all(
+      fontIds.map(async (fontId) => {
+        if (this.fontsInfo.has(fontId)) {
+          return this.fontsInfo.get(fontId)!.font
+        }
+        const { style } = this.store.getFontById(fontId)!
+        const font: Font = {
+          otFont: await loadFont(style.url),
+          id: fontId,
+          isCustom: false,
+        }
+        this.fontsInfo.set(fontId, { font, glyphs: new Map() })
+        return font
+      })
+    )
   }
 
   generateShapeItems = async (params: { style: ShapeStyleConfig }) => {
-    // const { style } = params
-    // const coloring = getItemsColoring(style)
-    // this.logger.debug('generateShapeItems')
-    // if (!this.paperItems.shape) {
-    //   console.error('No paperItems.shape')
-    //   return
-    // }
-    // if (!this.paperItems.originalShape) {
-    //   console.error('No paperItemsoriginal')
-    //   return
-    // }
-    // this.store.isVisualizing = true
-    // await this.generator.init()
-    // const shapeItem = this.paperItems.originalShape.clone({ insert: false })
+    const { style } = params
+    const coloring = getItemsColoring(style)
+    this.logger.debug('generateShapeItems')
+    if (!this.fabricObjects.shape) {
+      console.error('No paperItems.shape')
+      return
+    }
+    if (!this.fabricObjects.originalShape) {
+      console.error('No paperItemsoriginal')
+      return
+    }
+    this.store.isVisualizing = true
+    await this.generator.init()
+    const shapeClone = await new Promise<fabric.Object>((r) =>
+      this.fabricObjects.shape!.clone((obj: fabric.Object) => r(obj))
+    )
+    shapeClone.set({ opacity: 1 })
+    const shapeImage = await new Promise<fabric.Image>((r) =>
+      shapeClone.cloneAsImage((obj: fabric.Image) => r(obj))
+    )
+
+    // const shapeOriginalImage = await new Promise<fabric.Image>((r) =>
+    //   this.fabricObjects.originalShape!.cloneAsImage((obj: fabric.Image) =>
+    //     r(obj)
+    //   )
+    // )
     // if (style.fill.kind === 'single-color') {
     //   shapeItem.fillColor = new paper.Color('black')
     //   shapeItem.strokeColor = new paper.Color('black')
@@ -739,68 +917,70 @@ export class Editor {
     //   false
     // )
     // shapeRaster.remove()
-    // const shapeCanvas = shapeRaster.getSubCanvas(
-    //   new paper.Rectangle(0, 0, shapeRaster.width, shapeRaster.height)
-    // )
-    // const shapeRasterBounds = shapeRaster.bounds
+    const shapeCanvas = (shapeImage.toCanvasElement() as any) as HTMLCanvasElement
+    const shapeCanvasOriginal = (this.fabricObjects.originalShape.toCanvasElement() as any) as HTMLCanvasElement
+
+    const shapeRasterBounds = new paper.Rectangle(
+      this.fabricObjects.originalShape.left || 0,
+      this.fabricObjects.originalShape.top || 0,
+      shapeCanvas.width,
+      shapeCanvas.height
+    )
     // shapeRaster = undefined
-    // const wordFonts: Font[] = await Promise.all(
-    //   style.words.fonts.map(async (fontId) => {
-    //     const { style } = this.store.getFontById(fontId)!
-    //     return { font: await loadFont(style.url), id: fontId, isCustom: false }
-    //   })
-    // )
-    // const shapeConfig = this.store.getSelectedShape()
-    // const result = await this.generator.fillShape(
-    //   {
-    //     shape: {
-    //       canvas: shapeCanvas,
-    //       bounds: shapeRasterBounds,
-    //       processing: {
-    //         removeWhiteBg: {
-    //           enabled: shapeConfig.kind === 'img',
-    //           lightnessThreshold: 98,
-    //         },
-    //         shrink: {
-    //           enabled: style.layout.shapePadding > 0,
-    //           amount: style.layout.shapePadding,
-    //         },
-    //         edges: {
-    //           enabled: style.processing.edges.enabled,
-    //           blur: 17 * (1 - style.processing.edges.amount / 100),
-    //           lowThreshold: 30,
-    //           highThreshold: 100,
-    //         },
-    //         invert: {
-    //           enabled: style.processing.invert.enabled,
-    //         },
-    //       },
-    //     },
-    //     itemPadding: Math.max(1, 100 - style.layout.itemDensity),
-    //     // Words
-    //     wordsMaxSize: style.layout.wordsMaxSize,
-    //     words: style.words.wordList.map((wc) => ({
-    //       wordConfigId: wc.id,
-    //       text: wc.text,
-    //       angles: style.words.angles.angles,
-    //       fillColors: ['red'],
-    //       // fonts: [fonts[0], fonts[1], fonts[2]],
-    //       fonts: wordFonts,
-    //     })),
-    //     // Icons
-    //     icons: style.icons.iconList.map((shape) => ({
-    //       shape: this.store.getShapeById(shape.shapeId)!,
-    //     })),
-    //     iconsMaxSize: style.layout.iconsMaxSize,
-    //     iconProbability: style.layout.iconsProportion / 100,
-    //   },
-    //   (progressPercent) => {
-    //     this.store.visualizingProgress = progressPercent
-    //   }
-    // )
-    // await this.setShapeItems(result.generatedItems)
-    // this.setItemsColor('shape', coloring)
-    // this.store.isVisualizing = false
+    const wordFonts: Font[] = await this.fetchFonts(style.words.fontIds)
+
+    const shapeConfig = this.store.getSelectedShape()
+    const result = await this.generator.fillShape(
+      {
+        shape: {
+          canvas: shapeCanvas,
+          bounds: shapeRasterBounds,
+          processing: {
+            removeWhiteBg: {
+              enabled: shapeConfig.kind === 'img',
+              lightnessThreshold: 98,
+            },
+            shrink: {
+              enabled: style.layout.shapePadding > 0,
+              amount: style.layout.shapePadding,
+            },
+            edges: {
+              enabled: style.processing.edges.enabled,
+              canvas: shapeCanvasOriginal,
+              blur: 17 * (1 - style.processing.edges.amount / 100),
+              lowThreshold: 30,
+              highThreshold: 100,
+            },
+            invert: {
+              enabled: style.processing.invert.enabled,
+            },
+          },
+        },
+        itemPadding: Math.max(1, 100 - style.layout.itemDensity),
+        // Words
+        wordsMaxSize: style.layout.wordsMaxSize,
+        words: style.words.wordList.map((wc) => ({
+          wordConfigId: wc.id,
+          text: wc.text,
+          angles: style.words.angles.angles,
+          fillColors: ['red'],
+          // fonts: [fonts[0], fonts[1], fonts[2]],
+          fonts: wordFonts,
+        })),
+        // Icons
+        icons: style.icons.iconList.map((shape) => ({
+          shape: this.store.getShapeById(shape.shapeId)!,
+        })),
+        iconsMaxSize: style.layout.iconsMaxSize,
+        iconProbability: style.layout.iconsProportion / 100,
+      },
+      (progressPercent) => {
+        this.store.visualizingProgress = progressPercent
+      }
+    )
+    await this.setShapeItems(result.generatedItems)
+    await this.setItemsColor('shape', coloring)
+    this.store.isVisualizing = false
   }
 
   clear = async () => {

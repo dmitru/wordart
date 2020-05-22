@@ -738,7 +738,7 @@ export class Editor {
     shapeRaster = undefined
 
     const wordFonts: Font[] = await Promise.all(
-      style.words.fonts.map(async (fontId) => {
+      style.words.fontIds.map(async (fontId) => {
         const { style } = this.store.getFontById(fontId)!
         return { font: await loadFont(style.url), id: fontId, isCustom: false }
       })

@@ -4,7 +4,7 @@ import { ShapeConfig } from 'components/Editor/style'
 
 export const svgIcons: ShapeConfig[] = [
   icons.find((i) => i.title === 'Square full'),
-  ...icons.slice(0, 30),
+  ...icons.slice(0, 5),
 ]
   .filter((i) => i != null)
   .map((icon, index) =>
@@ -19,7 +19,7 @@ export const svgIcons: ShapeConfig[] = [
   )
   .filter((x) => x != null) as ShapeConfig[]
 
-export const svgIconsOutline: ShapeConfig[] = [...iconsFaRegular.slice(0, 30)]
+export const svgIconsOutline: ShapeConfig[] = [...iconsFaRegular.slice(0, 5)]
   .filter((i) => i != null)
   .map((icon, index) =>
     icon

@@ -123,7 +123,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
             {fonts.map((font) => {
               const { style: fontStyle } = font
               const isSelected =
-                style.words.fonts.find((f) => f === fontStyle.fontId) != null
+                style.words.fontIds.find((f) => f === fontStyle.fontId) != null
               return (
                 <FontButtonContainer
                   key={fontStyle.fontId}
@@ -133,14 +133,14 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                   <FontButton
                     onClick={(evt) => {
                       if (evt.metaKey) {
-                        style.words.fonts =
-                          isSelected && style.words.fonts.length > 1
-                            ? style.words.fonts.filter(
+                        style.words.fontIds =
+                          isSelected && style.words.fontIds.length > 1
+                            ? style.words.fontIds.filter(
                                 (f) => f !== fontStyle.fontId
                               )
-                            : uniq([...style.words.fonts, fontStyle.fontId])
+                            : uniq([...style.words.fontIds, fontStyle.fontId])
                       } else {
-                        style.words.fonts = [fontStyle.fontId]
+                        style.words.fontIds = [fontStyle.fontId]
                       }
                     }}
                   >

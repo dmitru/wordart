@@ -121,12 +121,12 @@ export class EditorPageStore {
         if (!font) {
           throw new Error(`no font ${fontId}`)
         }
-        fontsById.set(fontId, { font, id: fontId, isCustom: false })
+        fontsById.set(fontId, { otFont: font, id: fontId, isCustom: false })
       }
 
       const wordsInfoMap = new Map<
         string,
-        { wordInfo: WordInfo; wordPath: Path; wordPathBounds: BoundingBox }
+        { fontId: FontId; text: string; wordConfigId?: WordConfigId }
       >()
 
       const result: GeneratedItem[] = []
@@ -141,24 +141,14 @@ export class EditorPageStore {
           }
           const wordInfoId = `${fontId}-${word.text}`
           if (!wordsInfoMap.has(wordInfoId)) {
-            const wordInfo = new WordInfo(
-              wordInfoId,
-              item.wcId,
-              word.text,
-              fontEntry
-            )
-            const wordPath = fontEntry.font.getPath(word.text, 0, 0, 100)
-            const wordPathBounds = wordPath.getBoundingBox()
             wordsInfoMap.set(wordInfoId, {
-              wordInfo,
-              wordPath,
-              wordPathBounds,
+              text: word.text,
+              fontId,
+              wordConfigId: undefined,
             })
           }
 
-          const { wordInfo, wordPath, wordPathBounds } = wordsInfoMap.get(
-            wordInfoId
-          )!
+          const { text, wordConfigId } = wordsInfoMap.get(wordInfoId)!
           const wordItem: WordGeneratedItem = {
             id: item.id,
             shapeColor: item.sc,
@@ -166,9 +156,9 @@ export class EditorPageStore {
             transform: new paper.Matrix(item.t).prepend(
               new paper.Matrix().scale(scale, new paper.Point(0, 0))
             ),
-            wordInfo: wordInfo,
-            wordPath,
-            wordPathBounds,
+            fontId,
+            text,
+            wordConfigId,
           }
 
           result.push(wordItem)
@@ -231,7 +221,7 @@ export class EditorPageStore {
             if (item.kind !== 'word') {
               return null
             }
-            return item.wordInfo.font.id
+            return item.fontId
           })
           .filter(notEmpty)
       )
@@ -241,12 +231,10 @@ export class EditorPageStore {
           if (item.kind !== 'word') {
             return null
           }
-          const fontIndex = fontIds.findIndex(
-            (fId) => fId === item.wordInfo.font.id
-          )
+          const fontIndex = fontIds.findIndex((fId) => fId === item.fontId)
           return {
             fontIndex,
-            text: item.wordInfo.text,
+            text: item.text,
           }
         })
         .filter(notEmpty)
@@ -265,7 +253,7 @@ export class EditorPageStore {
                 k: 'w',
                 id: item.id,
                 t: serializeMatrix(item.transform),
-                wcId: item.wordInfo.wordConfigId,
+                wcId: item.wordConfigId,
                 sc: item.shapeColor,
                 wi: uniqWords.findIndex(
                   (uw) =>

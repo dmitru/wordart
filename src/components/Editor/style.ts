@@ -62,7 +62,7 @@ export const defaultShapeStyle: ShapeStyleConfig = {
   },
 
   words: {
-    fonts: [fonts[3].styles[0].fontId, fonts[2].styles[0].fontId],
+    fontIds: [fonts[3].styles[0].fontId, fonts[2].styles[0].fontId],
     wordList: defaultWordsList,
     angles: {
       preset: 'horizontal',
@@ -207,7 +207,7 @@ export type ShapeStyleConfig = {
 
   words: {
     wordList: WordStyleConfig[]
-    fonts: FontId[]
+    fontIds: FontId[]
     angles: {
       preset: WordAnglesPresetKind
       angles: number[]

@@ -163,17 +163,15 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                     isDisabled={state.isShowingColors}
                   >
                     <Button
-                      size="sm"
+                      // size="sm"
                       mr="2"
                       variant={state.isShowingColors ? 'solid' : 'solid'}
-                      variantColor={
-                        state.isShowingColors ? 'primary' : undefined
-                      }
+                      variantColor={state.isShowingColors ? 'green' : undefined}
                       onClick={() => {
                         state.isShowingColors = !state.isShowingColors
                       }}
                     >
-                      Customize
+                      {state.isShowingColors ? 'Done' : 'Customize'}
                     </Button>
                   </Tooltip>
                 </Flex>
@@ -282,18 +280,12 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                       <Heading size="md" m="0">
                         Size and position
                       </Heading>
+                      <p>
+                        Drag the shape to resize or reposition it. All unlocked
+                        words will be removed.
+                      </p>
+                      <Button variant="ghost">Reset</Button>
                     </Box>
-
-                    <Flex mt="4">
-                      <Button
-                        variantColor="green"
-                        onClick={() => {
-                          state.isShowingColors = false
-                        }}
-                      >
-                        Done
-                      </Button>
-                    </Flex>
                   </Stack>
                 </>
               )}

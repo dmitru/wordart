@@ -9,14 +9,18 @@ import {
   invertImageMask,
   removeLightPixels,
   shrinkShape,
+  createCanvasCtxCopy,
+  copyCanvas,
 } from 'lib/wordart/canvas-utils'
-import { Rect } from 'lib/wordart/geometry'
+import { Rect, Point } from 'lib/wordart/geometry'
 import { ImageProcessorWasm } from 'lib/wordart/wasm/image-processor-wasm'
 import { getWasmModule, WasmModule } from 'lib/wordart/wasm/wasm-module'
 import { flatten, noop, sample, uniq } from 'lodash'
 import { BoundingBox, Path } from 'opentype.js'
 import { consoleLoggers } from 'utils/console-logger'
 import { FontId } from 'data/fonts'
+import paper from 'paper'
+import chroma from 'chroma-js'
 
 const FONT_SIZE = 100
 
@@ -48,7 +52,7 @@ export class Generator {
     }
     this.logger.debug('Generator: generate', task)
 
-    const shapeCanvasMaxExtent = 280
+    const shapeCanvasMaxExtent = 340
 
     const shapeCanvas = task.shape.canvas
     console.screenshot(shapeCanvas, 0.3)
@@ -61,6 +65,7 @@ export class Generator {
     }
 
     const unrotatedCtx = createCanvasCtx(shapeCanvasDimensions)
+    const unrotatedCtxForEdges = createCanvasCtx(shapeCanvasDimensions)
 
     unrotatedCtx.drawImage(
       shapeCanvas,
@@ -68,6 +73,19 @@ export class Generator {
       0,
       shapeCanvas.width,
       shapeCanvas.height,
+      1,
+      1,
+      unrotatedCtx.canvas.width - 2,
+      unrotatedCtx.canvas.height - 2
+    )
+    const canvasSrcForEdges =
+      task.shape.processing.edges.canvas || unrotatedCtx.canvas
+    unrotatedCtxForEdges.drawImage(
+      canvasSrcForEdges,
+      0,
+      0,
+      canvasSrcForEdges.width,
+      canvasSrcForEdges.height,
       1,
       1,
       unrotatedCtx.canvas.width - 2,
@@ -87,7 +105,7 @@ export class Generator {
       !task.shape.processing.invert.enabled
     ) {
       edgesCanvas = detectEdges(
-        unrotatedCtx.canvas,
+        unrotatedCtxForEdges.canvas,
         (task.shape.processing.edges.blur * shapeCanvasMaxExtent) / 300,
         task.shape.processing.edges.lowThreshold,
         task.shape.processing.edges.highThreshold
@@ -119,6 +137,17 @@ export class Generator {
           (shapeCanvasMaxExtent / 100)
       )
     }
+
+    const unrotatedCtxOriginalShape = createCanvasCtxCopy(unrotatedCtx)
+    copyCanvas(unrotatedCtx, unrotatedCtxOriginalShape)
+    const unrotatedCtxOriginalShapeImgData = new Uint8ClampedArray(
+      unrotatedCtxOriginalShape.getImageData(
+        0,
+        0,
+        unrotatedCtxOriginalShape.canvas.width,
+        unrotatedCtxOriginalShape.canvas.height
+      ).data.buffer
+    )
 
     if (edgesCanvas) {
       unrotatedCtx.save()
@@ -184,7 +213,7 @@ export class Generator {
       )
     )
     const wordPaths = words.map((word) =>
-      word.font.font.getPath(word.text, 0, 0, 100)
+      word.font.otFont.getPath(word.text, 0, 0, 100)
     )
     const wordPathsBounds = wordPaths.map((wordPath) =>
       wordPath.getBoundingBox()
@@ -193,7 +222,7 @@ export class Generator {
     const placedWordItems: WordGeneratedItem[] = []
     const placedSymbolItems: SymbolGeneratedItem[] = []
 
-    const nIter = 50
+    const nIter = 500
     const t1 = performance.now()
 
     const wordAngles = uniq(flatten(task.words.map((w) => w.angles)))
@@ -444,15 +473,33 @@ export class Generator {
           unrotatedCtx.translate(tx, ty)
           unrotatedCtx.scale(pathScale, pathScale)
 
+          const wordCenterRotated = new paper.Point(
+            tx + (wordPathSize.w * pathScale) / 2,
+            ty - (wordPathSize.h * pathScale) / 2
+          )
+          // TODO: perhaps the transform is off...
+          const wordCenterUnrotated = rotatedBoundsTransform.transform(
+            wordCenterRotated
+          )
+          const col = Math.round(wordCenterUnrotated.x)
+          const row = Math.round(wordCenterUnrotated.y)
+
+          const colorSamplePixelIndex =
+            4 * (unrotatedCtxOriginalShape.canvas.width * row + col)
+          const r = unrotatedCtxOriginalShapeImgData[colorSamplePixelIndex + 0]
+          const g = unrotatedCtxOriginalShapeImgData[colorSamplePixelIndex + 1]
+          const b = unrotatedCtxOriginalShapeImgData[colorSamplePixelIndex + 2]
+          const shapeColor = chroma.rgb(r, g, b).hex()
+
           wordPath.draw(unrotatedCtx)
 
           placedWordItems.push({
-            wordPath,
             id: i,
             kind: 'word',
-            shapeColor: 'black',
-            wordInfo: word,
-            wordPathBounds,
+            shapeColor,
+            fontId: word.font.id,
+            text: word.text,
+            wordConfigId: word.wordConfigId,
             transform: new paper.Matrix()
               .translate(task.shape.bounds.left, task.shape.bounds.top)
               .scale(
@@ -654,6 +701,7 @@ export class Generator {
           placedSymbolItems.push({
             id: i,
             kind: 'symbol',
+            shapeColor: 'black',
             symbolDef: iconSymDef,
             shapeId: icon.shape.id,
             transform: new paper.Matrix()
@@ -731,6 +779,7 @@ export type FillShapeTask = {
       }
       edges: {
         enabled: boolean
+        canvas?: HTMLCanvasElement
         /** In pixels, normalized to 300 x 300 canvas */
         blur: number
         /** 0-100, input for Canny algorithm */
@@ -755,7 +804,7 @@ export type FillShapeTask = {
 }
 
 export type FillShapeTaskWordConfig = {
-  wordConfigId?: WordConfigId
+  wordConfigId: WordConfigId
   text: string
   /** Rotation angles in degrees */
   angles: number[]
@@ -787,6 +836,7 @@ export type SymbolGeneratedItem = {
   kind: 'symbol'
   id: ItemId
   shapeId: ShapeId
+  shapeColor: string
   symbolDef: paper.SymbolDefinition
   transform: paper.Matrix
 }
@@ -794,12 +844,12 @@ export type SymbolGeneratedItem = {
 export type WordGeneratedItem = {
   kind: 'word'
   id: ItemId
-  wordInfo: WordInfo
+  text: string
+  fontId: FontId
   transform: paper.Matrix
+  wordConfigId?: WordConfigId
   /** Color of the shape at the given location */
   shapeColor: string
-  wordPath: Path
-  wordPathBounds: BoundingBox
 }
 
 export type ItemId = number
@@ -807,16 +857,16 @@ export type ItemId = number
 // Perhaps it's not needed
 export class WordInfo {
   id: WordInfoId
-  wordConfigId: WordConfigId | undefined
+  wordConfigId: WordConfigId
   font: Font
   text: string
-  symbols: Symbol[]
-  symbolOffsets: number[]
+  // symbols: Symbol[]
+  // symbolOffsets: number[]
   fontSize: number
 
   constructor(
     id: WordInfoId,
-    wordConfigId: WordConfigId | undefined,
+    wordConfigId: WordConfigId,
     text: string,
     font: Font,
     fontSize = FONT_SIZE
@@ -826,32 +876,32 @@ export class WordInfo {
     this.font = font
     this.text = text
     this.fontSize = fontSize
-    this.symbols = stringToSymbols(text, font, fontSize)
+    // this.symbols = stringToSymbols(text, font, fontSize)
 
-    this.symbolOffsets = this.symbols.map(
-      (symbol) =>
-        (fontSize * symbol.glyph.advanceWidth) / this.font.font.unitsPerEm
-    )
+    // this.symbolOffsets = this.symbols.map(
+    //   (symbol) =>
+    //     (fontSize * symbol.glyph.advanceWidth) / this.font.otFont.unitsPerEm
+    // )
   }
 
-  getSymbolPaths = (): Path[] => {
-    const paths: Path[] = []
-    let currentOffset = 0
-    for (let i = 0; i < this.symbols.length; ++i) {
-      paths.push(this.symbols[i].glyph.getPath(currentOffset, 0, this.fontSize))
-      currentOffset += this.symbolOffsets[i]
-    }
-    return paths
-  }
+  // getSymbolPaths = (): Path[] => {
+  //   const paths: Path[] = []
+  //   let currentOffset = 0
+  //   for (let i = 0; i < this.symbols.length; ++i) {
+  //     paths.push(this.symbols[i].glyph.getPath(currentOffset, 0, this.fontSize))
+  //     currentOffset += this.symbolOffsets[i]
+  //   }
+  //   return paths
+  // }
 
-  draw = (ctx: CanvasRenderingContext2D) => {
-    ctx.save()
-    for (const [index, symbol] of this.symbols.entries()) {
-      symbol.draw(ctx)
-      ctx.translate(this.symbolOffsets[index], 0)
-    }
-    ctx.restore()
-  }
+  // draw = (ctx: CanvasRenderingContext2D) => {
+  //   ctx.save()
+  //   for (const [index, symbol] of this.symbols.entries()) {
+  //     symbol.draw(ctx)
+  //     ctx.translate(this.symbolOffsets[index], 0)
+  //   }
+  //   ctx.restore()
+  // }
 }
 
 export class Symbol {
@@ -870,15 +920,15 @@ export class Symbol {
     this.glyph = glyph
   }
 
-  draw = (ctx: CanvasRenderingContext2D) => {
-    const path = this.glyph.getPath(0, 0, this.fontSize)
-    // @ts-ignore
-    path.fill = ctx.fillStyle
-    path.draw(ctx)
-  }
+  // draw = (ctx: CanvasRenderingContext2D) => {
+  //   const path = this.glyph.getPath(0, 0, this.fontSize)
+  //   // @ts-ignore
+  //   path.fill = ctx.fillStyle
+  //   path.draw(ctx)
+  // }
 }
 
-export const getFontName = (font: Font): string => font.font.names.fullName.en
+export const getFontName = (font: Font): string => font.otFont.names.fullName.en
 
 export const getSymbolId = (glyph: Glyph, font: Font): SymbolId =>
   // @ts-ignore
@@ -905,13 +955,13 @@ export const stringToSymbols = (
   font: Font,
   fontSize: number = FONT_SIZE
 ): Symbol[] =>
-  font.font
+  font.otFont
     .stringToGlyphs(text)
     .map((otGlyph) => new Symbol(font, otGlyph, fontSize))
 
 export type Glyph = opentype.Glyph
 export type Font = {
-  font: opentype.Font
+  otFont: opentype.Font
   id: FontId
   isCustom: boolean
 }
