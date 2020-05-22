@@ -827,6 +827,7 @@ export type GeneratedItem =
 
 export type RasterGeneratedItem = {
   kind: 'img'
+  locked?: boolean
   id: ItemId
   ctx: CanvasRenderingContext2D
   transform: paper.Matrix
@@ -834,6 +835,7 @@ export type RasterGeneratedItem = {
 
 export type SymbolGeneratedItem = {
   kind: 'symbol'
+  locked?: boolean
   id: ItemId
   shapeId: ShapeId
   shapeColor: string
@@ -843,6 +845,7 @@ export type SymbolGeneratedItem = {
 
 export type WordGeneratedItem = {
   kind: 'word'
+  locked?: boolean
   id: ItemId
   text: string
   fontId: FontId

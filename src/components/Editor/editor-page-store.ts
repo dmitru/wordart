@@ -121,6 +121,10 @@ export class EditorPageStore {
           scaleX: data.shape.bounds.w / this.editor.fabricObjects.shape.width!,
           scaleY: data.shape.bounds.h / this.editor.fabricObjects.shape.height!,
         })
+        this.editor.fabricObjects.shapeOriginalColors.set({
+          originX: 'center',
+          originY: 'center',
+        })
         this.editor.fabricObjects.shapeOriginalColors.setCoords()
       }
     }

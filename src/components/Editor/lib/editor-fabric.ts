@@ -84,7 +84,8 @@ export class Editor {
   generatedItems: {
     shape: {
       items: GeneratedItem[]
-      fabricObjects: Map<number, fabric.Object>
+      fabricObjects: Map<ItemId, fabric.Object>
+      fabricObjectsReverse: Map<fabric.Object, GeneratedItem>
       wordItemsInfo: Map<
         ItemId,
         { path: opentype.Path; pathBounds: opentype.BoundingBox }
@@ -123,19 +124,44 @@ export class Editor {
 
     this.canvas.on('object:modified', (evt) => {
       const target = evt.target
+      if (!target) {
+        return
+      }
 
       if (
-        target &&
         target === this.fabricObjects.shape &&
         this.fabricObjects.shapeOriginalColors
       ) {
+        this.fabricObjects.shapeOriginalColors.set({
+          originX: 'left',
+          originY: 'top',
+        })
         this.fabricObjects.shapeOriginalColors.set({
           left: target.left,
           top: target.top,
           scaleX: target.scaleX,
           scaleY: target.scaleY,
         })
+        this.fabricObjects.shapeOriginalColors.setCoords()
+        this.fabricObjects.shapeOriginalColors.set({
+          originX: 'center',
+          originY: 'center ',
+        })
+        this.fabricObjects.shapeOriginalColors.rotate(target.angle || 0)
+        this.fabricObjects.shapeOriginalColors.setCoords()
+        this.fabricObjects.shapeOriginalColors.set({
+          originX: 'left',
+          originY: 'top',
+        })
+        this.fabricObjects.shapeOriginalColors.setCoords()
+        // this.fabricObjects.shapeOriginalColors.set({ originX: 'center', originY: 'center '})
         this.canvas.requestRenderAll()
+      } else {
+        const item = this.generatedItems.shape.fabricObjectsReverse.get(target)
+        console.log('item = ', item)
+        if (item) {
+          item.locked = true
+        }
       }
     })
     this.canvas.renderOnAddRemove = false
@@ -156,7 +182,12 @@ export class Editor {
     // this.paperItems = {}
 
     this.generatedItems = {
-      shape: { items: [], fabricObjects: new Map(), wordItemsInfo: new Map() },
+      shape: {
+        items: [],
+        fabricObjects: new Map(),
+        wordItemsInfo: new Map(),
+        fabricObjectsReverse: new Map(),
+      },
       bg: { items: [], fabricObjects: new Map(), wordItemsInfo: new Map() },
     }
 
@@ -663,6 +694,7 @@ export class Editor {
     const {
       addedItems,
       itemIdToFabricObject,
+      itemIdToFabricObjectReverse,
       wordItemsInfo,
     } = await this.convertItemsToFabricItems(items)
 
@@ -675,6 +707,7 @@ export class Editor {
     this.fabricObjects.shapeItems = addedItems
     this.generatedItems.shape = {
       fabricObjects: itemIdToFabricObject,
+      fabricObjectsReverse: itemIdToFabricObjectReverse,
       items,
       wordItemsInfo,
     }
@@ -690,6 +723,7 @@ export class Editor {
 
     let wordIdToSymbolDef = new Map<WordInfoId, fabric.Path>()
     let itemIdToFabricObject = new Map<ItemId, fabric.Object>()
+    let itemIdToFabricObjectReverse = new Map<fabric.Object, GeneratedItem>()
 
     const allWordItems = items.filter(
       (item) => item.kind === 'word'
@@ -892,6 +926,7 @@ export class Editor {
         wordGroup.setCoords()
 
         itemIdToFabricObject.set(item.id, wordGroup)
+        itemIdToFabricObjectReverse.set(wordGroup, item)
         addedItems.push(wordGroup)
       }
     }
@@ -923,7 +958,12 @@ export class Editor {
       }
     }
 
-    return { addedItems, itemIdToFabricObject, wordItemsInfo }
+    return {
+      addedItems,
+      itemIdToFabricObject,
+      wordItemsInfo,
+      itemIdToFabricObjectReverse,
+    }
   }
 
   fetchFonts = async (fontIds: FontId[]): Promise<Font[]> => {
@@ -958,6 +998,12 @@ export class Editor {
     }
     this.store.isVisualizing = true
     await this.generator.init()
+
+    console.log(
+      'locked items: ',
+      this.generatedItems.shape.items.filter((i) => i.locked)
+    )
+
     const shapeClone = await new Promise<fabric.Object>((r) =>
       this.fabricObjects.shape!.clone((obj: fabric.Object) => r(obj))
     )
