@@ -757,45 +757,110 @@ export class Editor {
 
         // TODO: optimize it with glyph-based paths
         const wordPath = fontInfo.font.otFont.getPath(item.text, 0, 0, 100)
-        const wordGroup = new fabric.Path(wordPath.toPathData(3))
+        const wordBounds = wordPath.getBoundingBox()
+
+        // console.log('wordBounds', wordBounds)
+
+        const wordGroup = new fabric.Group()
+        // wordGroup.addWithUpdate(
+        //   new fabric.Circle({
+        //     top: 0,
+        //     left: 0,
+        //     radius: 5,
+        //     fill: 'red',
+        //     originX: 'left',
+        //     originY: 'top',
+        //   })
+        // )
+        wordGroup.addWithUpdate(
+          // new fabric.Rect({
+          //   left: -wordBounds.x1,
+          //   top: -wordBounds.y1,
+          //   height: wordBounds.y2 - wordBounds.y1,
+          //   width: wordBounds.x2 - wordBounds.x1,
+          //   fill: 'red',
+          //   opacity: 0.5,
+          //   originX: 'left',
+          //   originY: 'bottom',
+          // })
+          new fabric.Path(wordPath.toPathData(3)).set({
+            originX: 'left',
+            originY: 'top',
+          })
+        )
+        const wordObj = wordGroup.item(0)
+
+        // console.log(
+        //   'wordGroup = ',
+        //   wordGroup.left,
+        //   wordGroup.top,
+        //   wordGroup.width,
+        //   wordGroup.height
+        // )
+
         wordItemsInfo.set(item.id, {
           path: wordPath,
           pathBounds: wordPath.getBoundingBox(),
         })
-        wordGroup.set({ fill: 'black' })
+        wordObj.set({ fill: 'black' })
 
         // const wordItem = new fabric.Group(pathItems)
         wordGroup.set({
-          selectable: false,
+          selectable: true,
         })
         const t = item.transform
         const m = [t.a, t.b, t.c, t.d, t.tx, t.ty]
         const md = fabric.util.qrDecompose(m)
 
-        const dy = wordGroup.getBoundingRect().top * md.scaleY
-        const dx = wordGroup.getBoundingRect().left * md.scaleX
+        const dy = wordBounds.y1 * md.scaleY
+        const dx = wordBounds.x1 * md.scaleX
+        // wordObj.set({ top: wordBounds.y1, left: wordBounds.x1 })
+        wordObj.setCoords()
+        wordGroup.setObjectsCoords()
+        wordGroup.setCoords()
+
+        // this.canvas.getContext().save()
+        // this.canvas.getContext().resetTransform()
+        // // @ts-ignore
+        // this.canvas.getContext().setTransform(...m)
+        // wordGroup._render(this.canvas.getContext())
+        // this.canvas.getContext().restore()
+
+        // debugger
 
         // TODO: fix rotation
-        wordGroup.set({ flipX: false, flipY: false })
-        wordGroup.set({ scaleX: md.scaleX, scaleY: md.scaleY })
-        wordGroup.setCoords()
         wordGroup.set({
-          left: dx,
-          top: dy,
+          flipX: false,
+          flipY: false,
+          centeredRotation: false,
+          originX: 'left',
+          // @ts-ignore
+          originY: -wordBounds.y1 / (wordBounds.y2 - wordBounds.y1),
         })
+        wordGroup.set({ scaleX: md.scaleX, scaleY: md.scaleY })
+        // wordGroup.setCoords()
+        // wordGroup.set({
+        //   left: dx,
+        //   top: dy,
+        // })
         wordGroup.setCoords()
         wordGroup.set({
           angle: md.angle,
         })
+        // wordGroup.set({
+        //   left: dx,
+        //   top: dy,
+        // })
         wordGroup.setCoords()
         wordGroup.set({
-          left: md.translateX + dx,
-          top: md.translateY + dy,
+          left: md.translateX,
+          top: md.translateY,
         })
-        // wordItem.setPositionByOrigin(
+        // wordGroup.setPositionByOrigin(
         //   new fabric.Point(md.translateX, md.translateY),
         //   'left',
-        //   'bottom'
+        //   // @ts-ignore
+        //   -wordBounds.y1 / (wordBounds.y2 - wordBounds.y1)
         // )
         wordGroup.setCoords()
 

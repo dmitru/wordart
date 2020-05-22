@@ -52,7 +52,7 @@ export class Generator {
     }
     this.logger.debug('Generator: generate', task)
 
-    const shapeCanvasMaxExtent = 340
+    const shapeCanvasMaxExtent = 280
 
     const shapeCanvas = task.shape.canvas
     console.screenshot(shapeCanvas, 0.3)
