@@ -21,6 +21,7 @@ const defaultWordsListBackground: WordStyleConfig[] = ['back'].map(
 )
 
 export const defaultShapeStyle: ShapeStyleConfig = {
+  kind: 'shape',
   fill: {
     kind: 'color-map',
     color: '#576DC7',
@@ -75,6 +76,7 @@ export const defaultShapeStyle: ShapeStyleConfig = {
 }
 
 export const defaultBackgroundStyle: BackgroundStyleConfig = {
+  kind: 'background',
   fill: {
     kind: 'color',
     color: '#ffffff',
@@ -129,6 +131,8 @@ export type IconId = number
 
 /** Describes UI state for background style  */
 export type BackgroundStyleConfig = {
+  kind: 'background'
+
   fill: {
     kind: 'color' | 'transparent'
     color: ColorString
@@ -175,6 +179,8 @@ export type BackgroundStyleConfig = {
 
 /** Describes UI state for shape style  */
 export type ShapeStyleConfig = {
+  kind: 'shape'
+
   processing: {
     edges: {
       enabled: boolean
@@ -259,6 +265,7 @@ export type ItemsColoringShapeColor = {
   kind: 'shape'
   dimSmallerItems: number
   shapeBrightness: number
+  shapeStyleFill?: ShapeStyleConfig['fill']
 }
 
 export type ItemsColoringSingleColor = {

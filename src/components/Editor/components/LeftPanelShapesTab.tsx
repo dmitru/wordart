@@ -30,7 +30,7 @@ import {
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
 import { Label } from 'components/Editor/components/shared'
-import { getItemsColoring } from 'components/Editor/lib/editor'
+import { getItemsColoring } from 'components/Editor/lib/editor-fabric'
 import { ColorPicker } from 'components/shared/ColorPicker'
 import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'

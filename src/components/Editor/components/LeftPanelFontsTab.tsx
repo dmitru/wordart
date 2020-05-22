@@ -27,7 +27,7 @@ import { Tooltip } from 'components/shared/Tooltip'
 import { TextInput } from 'components/shared/TextInput'
 import { observable } from 'mobx'
 import { uniq } from 'lodash'
-import { TargetKind } from 'components/Editor/lib/editor'
+import { TargetKind } from 'components/Editor/lib/editor-fabric'
 
 export type LeftPanelFontsTabProps = {
   target: TargetKind

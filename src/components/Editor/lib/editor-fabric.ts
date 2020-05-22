@@ -265,6 +265,12 @@ export class Editor {
         const scale = chroma.scale([coloring.colorFrom, coloring.colorTo])
         colors = scale.colors(10)
       }
+    } else if (coloring.kind === 'shape' && coloring.shapeStyleFill) {
+      if (coloring.shapeStyleFill.kind === 'single-color') {
+        colors = [coloring.shapeStyleFill.color]
+      } else {
+        colors = coloring.shapeStyleFill.colorMap
+      }
     }
 
     const itemAreas = items.map((item) => {
@@ -305,18 +311,7 @@ export class Editor {
       shapeRaster = await new Promise<fabric.Image>((r) =>
         this.fabricObjects.shape!.cloneAsImage((copy: fabric.Image) => r(copy))
       )
-      // (shapeItem.toCanvasElement() as any) as HTMLCanvasElement
-      // shapeRaster = shapeItemClone.rasterize(undefined, false)
-      // shapeRasterImgData = shapeRaster.getImageData(
-      //   new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
-      // )
-      // shapeItemClone.remove()
     }
-
-    // const canvas = shapeRaster!.getSubCanvas(
-    //   new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
-    // )
-    // const ctx = canvas.getContext('2d')!
 
     for (let i = 0; i < items.length; ++i) {
       const item = items[i]
@@ -337,69 +332,51 @@ export class Editor {
         objects.forEach((o) =>
           o.set({ fill: colors[index], stroke: colors[index] })
         )
-      } else {
-        // shape coloring
-        // if (!shapeRaster || !shapeRasterImgData) {
-        //   shapeRaster = this.paperItems.shape?.rasterize(undefined, false)
-        //   shapeRasterImgData = shapeRaster!.getImageData(
-        //     new paper.Rectangle(0, 0, shapeRaster!.width, shapeRaster!.height)
-        //   )
-        // }
-        // const imgDataPos = path.position
-        //   .subtract(shapeRaster!.bounds.topLeft)
-        //   .multiply(shapeRasterImgData.width / shapeRaster!.bounds.width)
-        // imgDataPos.x = Math.round(imgDataPos.x)
-        // imgDataPos.y = Math.round(imgDataPos.y)
-        // // ctx.fillStyle = 'red'
-        // // ctx.fillRect(imgDataPos.x, imgDataPos.y, 10, 10)
-        // const r =
-        //   shapeRasterImgData.data[
-        //     4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width)
-        //   ] / 255
-        // const g =
-        //   shapeRasterImgData.data[
-        //     4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width) + 1
-        //   ] / 255
-        // const b =
-        //   shapeRasterImgData.data[
-        //     4 * (imgDataPos.x + imgDataPos.y * shapeRasterImgData.width) + 2
-        //   ] / 255
-        const shapeColor = new paper.Color(item.shapeColor)
-        let color = chroma.rgb(
-          255 * shapeColor.red,
-          255 * shapeColor.green,
-          255 * shapeColor.blue
-        )
-        if (coloring.shapeBrightness != 0) {
-          color = color.brighten(coloring.shapeBrightness / 100)
+      } else if (coloring.shapeStyleFill) {
+        if (coloring.shapeStyleFill.kind === 'single-color') {
+          const shapeColor = new paper.Color(coloring.shapeStyleFill.color)
+          let color = chroma.rgb(
+            255 * shapeColor.red,
+            255 * shapeColor.green,
+            255 * shapeColor.blue
+          )
+          if (coloring.shapeBrightness != 0) {
+            color = color.brighten(coloring.shapeBrightness / 100)
+          }
+          const hex = color.hex()
+          objects.forEach((o) => o.set({ fill: hex, stroke: hex }))
+        } else if (coloring.shapeStyleFill.kind === 'color-map') {
+          const colorMapSorted = sortBy(
+            coloring.shapeStyleFill.defaultColorMap.map((color, index) => ({
+              color,
+              index,
+            })),
+            ({ color }) => chroma.distance(color, item.shapeColor, 'rgb')
+          )
+
+          const shapeColorStringIndex = colorMapSorted[0].index
+          const shapeColorString =
+            coloring.shapeStyleFill.colorMap[shapeColorStringIndex]
+
+          const shapeColor = new paper.Color(shapeColorString)
+
+          let color = chroma.rgb(
+            255 * shapeColor.red,
+            255 * shapeColor.green,
+            255 * shapeColor.blue
+          )
+          if (coloring.shapeBrightness != 0) {
+            color = color.brighten(coloring.shapeBrightness / 100)
+          }
+          const hex = color.hex()
+          objects.forEach((o) => o.set({ fill: hex, stroke: hex }))
         }
-        const hex = color.hex()
-        objects.forEach((o) => o.set({ fill: hex, stroke: hex }))
-        // const rgb = color.rgb()
-        // // console.log(
-        // //   'shapeRasterImgData',
-        // //   shapeRasterImgData.width,
-        // //   shapeRasterImgData.height,
-        // //   imgDataPos.x,
-        // //   imgDataPos.y,
-        // //   r,
-        // //   g,
-        // //   b
-        // // )
-        // path.fillColor = new paper.Color(
-        //   rgb[0] / 255,
-        //   rgb[1] / 255,
-        //   rgb[2] / 255,
-        //   1
-        // )
-        // path.strokeColor = path.fillColor
       }
       obj.opacity =
         (dimSmallerFactor * (area - minArea)) / (maxArea - minArea) +
         (1 - dimSmallerFactor)
     }
 
-    // console.screenshot(ctx.canvas, 0.3)
     this.canvas.requestRenderAll()
   }
 
@@ -438,7 +415,6 @@ export class Editor {
       // )
 
       colorsMap = computeColorsMap(shapeObj as fabric.Group)
-      console.log('computeColorsMap = ', colorsMap)
 
       // shapeItem = shapeItemGroup
     } else {
@@ -517,6 +493,7 @@ export class Editor {
     if (colorsMap) {
       shapeColors.colorMap = colorsMap?.colors.map((c) => c.color)
       shapeColors.defaultColorMap = colorsMap?.colors.map((c) => c.color)
+      console.log('setting default color map', shapeColors, colorsMap)
     }
     this.setShapeFillColors(shapeColors)
     return { colorsMap }
@@ -983,7 +960,7 @@ export class Editor {
     // )
     // shapeRaster.remove()
     const shapeCanvas = (shapeImage.toCanvasElement() as any) as HTMLCanvasElement
-    const shapeCanvasOriginal = (this.fabricObjects.originalShape.toCanvasElement() as any) as HTMLCanvasElement
+    const shapeCanvasOriginalColors = (this.fabricObjects.originalShape.toCanvasElement() as any) as HTMLCanvasElement
 
     const shapeRasterBounds = new paper.Rectangle(
       this.fabricObjects.originalShape.left || 0,
@@ -999,6 +976,7 @@ export class Editor {
       {
         shape: {
           canvas: shapeCanvas,
+          shapeCanvasOriginalColors,
           bounds: shapeRasterBounds,
           processing: {
             removeWhiteBg: {
@@ -1011,7 +989,6 @@ export class Editor {
             },
             edges: {
               enabled: style.processing.edges.enabled,
-              canvas: shapeCanvasOriginal,
               blur: 17 * (1 - style.processing.edges.amount / 100),
               lowThreshold: 30,
               highThreshold: 100,
@@ -1098,6 +1075,7 @@ export const getItemsColoring = (
     kind: 'shape',
     dimSmallerItems: coloring.dimSmallerItems,
     shapeBrightness: coloring.shapeBrightness,
+    shapeStyleFill: style.kind === 'shape' ? style.fill : undefined,
   }
 }
 

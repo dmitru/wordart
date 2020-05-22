@@ -55,6 +55,7 @@ export class Generator {
     const shapeCanvasMaxExtent = 280
 
     const shapeCanvas = task.shape.canvas
+    const shapeCanvasOriginalColors = task.shape.shapeCanvasOriginalColors
     console.screenshot(shapeCanvas, 0.3)
     const shapeCanvasScale =
       shapeCanvasMaxExtent / Math.max(shapeCanvas.width, shapeCanvas.height)
@@ -65,7 +66,7 @@ export class Generator {
     }
 
     const unrotatedCtx = createCanvasCtx(shapeCanvasDimensions)
-    const unrotatedCtxForEdges = createCanvasCtx(shapeCanvasDimensions)
+    const unrotatedCtxOriginalColors = createCanvasCtx(shapeCanvasDimensions)
 
     unrotatedCtx.drawImage(
       shapeCanvas,
@@ -78,14 +79,12 @@ export class Generator {
       unrotatedCtx.canvas.width - 2,
       unrotatedCtx.canvas.height - 2
     )
-    const canvasSrcForEdges =
-      task.shape.processing.edges.canvas || unrotatedCtx.canvas
-    unrotatedCtxForEdges.drawImage(
-      canvasSrcForEdges,
+    unrotatedCtxOriginalColors.drawImage(
+      shapeCanvasOriginalColors,
       0,
       0,
-      canvasSrcForEdges.width,
-      canvasSrcForEdges.height,
+      shapeCanvasOriginalColors.width,
+      shapeCanvasOriginalColors.height,
       1,
       1,
       unrotatedCtx.canvas.width - 2,
@@ -105,7 +104,7 @@ export class Generator {
       !task.shape.processing.invert.enabled
     ) {
       edgesCanvas = detectEdges(
-        unrotatedCtxForEdges.canvas,
+        unrotatedCtxOriginalColors.canvas,
         (task.shape.processing.edges.blur * shapeCanvasMaxExtent) / 300,
         task.shape.processing.edges.lowThreshold,
         task.shape.processing.edges.highThreshold
@@ -113,6 +112,7 @@ export class Generator {
     }
 
     clampPixelOpacityUp(unrotatedCtx.canvas)
+    clampPixelOpacityUp(unrotatedCtxOriginalColors.canvas)
 
     if (task.shape.processing.invert.enabled) {
       invertImageMask(unrotatedCtx.canvas)
@@ -139,8 +139,8 @@ export class Generator {
     }
 
     const unrotatedCtxOriginalShape = createCanvasCtxCopy(unrotatedCtx)
-    copyCanvas(unrotatedCtx, unrotatedCtxOriginalShape)
-    const unrotatedCtxOriginalShapeImgData = new Uint8ClampedArray(
+    copyCanvas(unrotatedCtxOriginalColors, unrotatedCtxOriginalShape)
+    const unrotatedCtxOriginalColorsImgData = new Uint8ClampedArray(
       unrotatedCtxOriginalShape.getImageData(
         0,
         0,
@@ -486,9 +486,9 @@ export class Generator {
 
           const colorSamplePixelIndex =
             4 * (unrotatedCtxOriginalShape.canvas.width * row + col)
-          const r = unrotatedCtxOriginalShapeImgData[colorSamplePixelIndex + 0]
-          const g = unrotatedCtxOriginalShapeImgData[colorSamplePixelIndex + 1]
-          const b = unrotatedCtxOriginalShapeImgData[colorSamplePixelIndex + 2]
+          const r = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 0]
+          const g = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 1]
+          const b = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 2]
           const shapeColor = chroma.rgb(r, g, b).hex()
 
           wordPath.draw(unrotatedCtx)
@@ -761,6 +761,7 @@ export class Generator {
 export type FillShapeTask = {
   shape: {
     canvas: HTMLCanvasElement
+    shapeCanvasOriginalColors: HTMLCanvasElement
     bounds: paper.Rectangle
     processing: {
       /** Pixels with lightness above the threshold will be made transparent */
@@ -779,7 +780,6 @@ export type FillShapeTask = {
       }
       edges: {
         enabled: boolean
-        canvas?: HTMLCanvasElement
         /** In pixels, normalized to 300 x 300 canvas */
         blur: number
         /** 0-100, input for Canny algorithm */

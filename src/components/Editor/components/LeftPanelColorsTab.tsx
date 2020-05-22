@@ -7,7 +7,10 @@ import { Label } from './shared'
 import { Slider } from 'components/shared/Slider'
 import { useThrottleCallback } from '@react-hook/throttle'
 import chroma from 'chroma-js'
-import { getItemsColoring, TargetKind } from 'components/Editor/lib/editor'
+import {
+  getItemsColoring,
+  TargetKind,
+} from 'components/Editor/lib/editor-fabric'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
