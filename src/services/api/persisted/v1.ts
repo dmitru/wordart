@@ -6,6 +6,7 @@ import {
 import { ItemId } from 'components/Editor/lib/generator'
 import { FontId } from 'data/fonts'
 import { Dimensions } from 'lib/wordart/canvas-utils'
+import { Rect } from 'lib/wordart/geometry'
 
 export type EditorPersistedDataV1 = {
   version: 1
@@ -18,6 +19,7 @@ export type EditorPersistedDataV1 = {
       fontIds: FontId[]
     }
     shape: {
+      bounds: Rect | null
       shapeId: ShapeId | null
       style: ShapeStyleConfig
       items: EditorPersistedItemV1[]

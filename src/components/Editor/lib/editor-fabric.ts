@@ -64,7 +64,7 @@ export class Editor {
   fabricObjects: {
     shapeItems?: fabric.Object[]
     shape?: fabric.Object
-    originalShape?: fabric.Object
+    shapeOriginalColors?: fabric.Object
   } = {}
 
   // paperItems: {
@@ -120,6 +120,24 @@ export class Editor {
 
     paper.setup(new paper.Size({ width: 1, height: 1 }))
     this.canvas = new fabric.Canvas(params.canvas.id)
+
+    this.canvas.on('object:modified', (evt) => {
+      const target = evt.target
+      console.log(target)
+      if (
+        target &&
+        target === this.fabricObjects.shape &&
+        this.fabricObjects.shapeOriginalColors
+      ) {
+        this.fabricObjects.shapeOriginalColors.set({
+          left: target.left,
+          top: target.top,
+          scaleX: target.scaleX,
+          scaleY: target.scaleY,
+        })
+        this.canvas.requestRenderAll()
+      }
+    })
     this.canvas.renderOnAddRemove = false
     // @ts-ignore
     window['canvas'] = this.canvas
@@ -185,12 +203,12 @@ export class Editor {
       return
     }
 
-    if (!this.fabricObjects.shape || !this.fabricObjects.originalShape) {
+    if (!this.fabricObjects.shape || !this.fabricObjects.shapeOriginalColors) {
       return
     }
 
     const shape = await new Promise<fabric.Object>((r) =>
-      this.fabricObjects.originalShape!.clone(
+      this.fabricObjects.shapeOriginalColors!.clone(
         (copy: fabric.Object) => r(copy),
         ['id']
       )
@@ -219,7 +237,7 @@ export class Editor {
       this.canvas.insertAt(shape, 0, false)
 
       this.currentShape.colorsMap = colorsMap
-      this.fabricObjects.shape = shape
+      this.setShapeObj(shape)
     } else {
       this.logger.debug('>  Using single color')
       const color = config.color
@@ -231,11 +249,15 @@ export class Editor {
       this.canvas.remove(this.fabricObjects.shape)
       this.canvas.insertAt(shape, 0, false)
 
-      this.fabricObjects.shape = shape
+      this.setShapeObj(shape)
     }
 
     this.setShapeFillOpacity(config.opacity)
     this.canvas.requestRenderAll()
+  }
+
+  setShapeObj = (shape: fabric.Object) => {
+    this.fabricObjects.shape = shape
   }
 
   setShapeFillOpacity = (opacity: number) => {
@@ -474,8 +496,8 @@ export class Editor {
     shapeObj.set({ opacity: shapeColors.opacity })
     this.canvas.add(shapeObj)
     this.canvas.requestRenderAll()
-    this.fabricObjects.shape = shapeObj
-    this.fabricObjects.originalShape = shapeCopy
+    this.setShapeObj(shapeObj)
+    this.fabricObjects.shapeOriginalColors = shapeCopy
 
     if (shape.kind === 'svg') {
       this.currentShape = {
@@ -930,7 +952,7 @@ export class Editor {
       console.error('No paperItems.shape')
       return
     }
-    if (!this.fabricObjects.originalShape) {
+    if (!this.fabricObjects.shapeOriginalColors) {
       console.error('No paperItemsoriginal')
       return
     }
@@ -960,11 +982,11 @@ export class Editor {
     // )
     // shapeRaster.remove()
     const shapeCanvas = (shapeImage.toCanvasElement() as any) as HTMLCanvasElement
-    const shapeCanvasOriginalColors = (this.fabricObjects.originalShape.toCanvasElement() as any) as HTMLCanvasElement
+    const shapeCanvasOriginalColors = (this.fabricObjects.shapeOriginalColors.toCanvasElement() as any) as HTMLCanvasElement
 
     const shapeRasterBounds = new paper.Rectangle(
-      this.fabricObjects.originalShape.left || 0,
-      this.fabricObjects.originalShape.top || 0,
+      this.fabricObjects.shape.left || 0,
+      this.fabricObjects.shape.top || 0,
       shapeCanvas.width,
       shapeCanvas.height
     )

@@ -94,6 +94,35 @@ export class EditorPageStore {
 
     if (data.shape.shapeId != null) {
       await this.selectShape(data.shape.shapeId)
+      if (
+        data.shape.bounds &&
+        this.editor.fabricObjects.shape &&
+        this.editor.fabricObjects.shapeOriginalColors
+      ) {
+        this.editor.fabricObjects.shape.set({
+          originX: 'left',
+          originY: 'top',
+        })
+        this.editor.fabricObjects.shape.set({
+          left: data.shape.bounds.x,
+          top: data.shape.bounds.y,
+          scaleX: data.shape.bounds.w / this.editor.fabricObjects.shape.width!,
+          scaleY: data.shape.bounds.h / this.editor.fabricObjects.shape.height!,
+        })
+        this.editor.fabricObjects.shape.setCoords()
+
+        this.editor.fabricObjects.shapeOriginalColors.set({
+          originX: 'left',
+          originY: 'top',
+        })
+        this.editor.fabricObjects.shapeOriginalColors.set({
+          left: data.shape.bounds.x,
+          top: data.shape.bounds.y,
+          scaleX: data.shape.bounds.w / this.editor.fabricObjects.shape.width!,
+          scaleY: data.shape.bounds.h / this.editor.fabricObjects.shape.height!,
+        })
+        this.editor.fabricObjects.shapeOriginalColors.setCoords()
+      }
     }
 
     const sceneSize = this.editor.getSceneBounds(0)
@@ -277,6 +306,8 @@ export class EditorPageStore {
       }
     }
 
+    const shapeBounds = this.editor.fabricObjects.shape?.calcCoords(true)
+
     const serializedData: EditorPersistedData = {
       version: 1,
       data: {
@@ -289,6 +320,14 @@ export class EditorPageStore {
           ...serializeItems(this.editor.generatedItems.bg.items),
         },
         shape: {
+          bounds: shapeBounds
+            ? {
+                x: shapeBounds.tl.x,
+                y: shapeBounds.tl.y,
+                w: shapeBounds.br.x - shapeBounds.tl.x,
+                h: shapeBounds.br.y - shapeBounds.tl.y,
+              }
+            : null,
           shapeId: this.editor.currentShape?.shapeConfig.id || null,
           style: toJS(this.styles.shape, { recurseEverything: true }),
           ...serializeItems(this.editor.generatedItems.shape.items),
