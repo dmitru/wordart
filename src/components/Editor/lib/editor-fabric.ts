@@ -123,7 +123,7 @@ export class Editor {
 
     this.canvas.on('object:modified', (evt) => {
       const target = evt.target
-      console.log(target)
+
       if (
         target &&
         target === this.fabricObjects.shape &&
