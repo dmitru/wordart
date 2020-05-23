@@ -341,6 +341,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           </Box>
                         </Box>
                       )}
+
                       {state.leftPanelContext === 'normal' && (
                         <>
                           {leftTab === 'shapes' && <LeftPanelShapesTab />}
@@ -674,7 +675,7 @@ const state = observable({
   leftTabShape: 'shapes' as LeftPanelTab,
   leftTabBg: 'words' as Omit<LeftPanelTab, 'shapes'>,
   targetTab: 'shape' as TargetTab,
-  leftPanelContext: 'resize' as 'normal' | 'resize',
+  leftPanelContext: 'normal' as 'normal' | 'resize',
 })
 
 export type TargetTab = 'shape' | 'bg'
