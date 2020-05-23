@@ -12,7 +12,7 @@ import {
 } from 'components/Editor/components/ShapeSelector'
 import { observable } from 'mobx'
 import { uniqBy } from 'lodash'
-import { TargetKind } from 'components/Editor/lib/editor-fabric'
+import { TargetKind } from 'components/Editor/lib/editor'
 
 export type LeftPanelIconsTabProps = {
   target: TargetKind

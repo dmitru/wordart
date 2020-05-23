@@ -104,7 +104,7 @@ export const defaultBackgroundStyle: BackgroundStyleConfig = {
   },
 
   words: {
-    fonts: [fonts[0].styles[0].fontId],
+    fontIds: [fonts[0].styles[0].fontId],
     wordList: defaultWordsListBackground,
     angles: {
       preset: 'horizontal',
@@ -150,7 +150,7 @@ export type BackgroundStyleConfig = {
   words: {
     wordList: WordStyleConfig[]
     /** Default fonts */
-    fonts: FontId[]
+    fontIds: FontId[]
     /** Default angles */
     angles: {
       preset: WordAnglesPresetKind

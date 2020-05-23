@@ -19,6 +19,7 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
+  Text,
   MenuGroup,
   MenuDivider,
 } from '@chakra-ui/core'
@@ -30,7 +31,7 @@ import {
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
 import { Label } from 'components/Editor/components/shared'
-import { getItemsColoring } from 'components/Editor/lib/editor-fabric'
+import { getItemsColoring } from 'components/Editor/lib/editor'
 import { ColorPicker } from 'components/shared/ColorPicker'
 import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'
@@ -42,8 +43,8 @@ import { useStore } from 'services/root-store'
 export type LeftPanelShapesTabProps = {}
 
 const state = observable({
-  isShowingColors: false,
   isShowingAdjust: false,
+  isTransforming: false,
 })
 
 const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
@@ -132,11 +133,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                     height: 115px;
                   }
                 `}
-                onClick={() => {
-                  state.isSelectingShape = true
-                }}
                 backgroundColor="white"
-                active={false}
                 shape={editorPageStore.getSelectedShape()}
               />
               <Box
@@ -160,18 +157,24 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                 <Flex>
                   <Tooltip
                     label="Customize colors, size and position"
-                    isDisabled={state.isShowingColors}
+                    isDisabled={state.isShowingAdjust}
                   >
                     <Button
                       // size="sm"
                       mr="2"
-                      variant={state.isShowingColors ? 'solid' : 'solid'}
-                      variantColor={state.isShowingColors ? 'green' : undefined}
+                      variant={state.isShowingAdjust ? 'solid' : 'solid'}
+                      variantColor={state.isShowingAdjust ? 'green' : undefined}
                       onClick={() => {
-                        state.isShowingColors = !state.isShowingColors
+                        state.isShowingAdjust = !state.isShowingAdjust
+                        if (state.isTransforming) {
+                          state.isTransforming = false
+                          editorPageStore.editor?.generateShapeItems({
+                            style: editorPageStore.styles.shape,
+                          })
+                        }
                       }}
                     >
-                      {state.isShowingColors ? 'Done' : 'Customize'}
+                      {state.isShowingAdjust ? 'Done' : 'Customize'}
                     </Button>
                   </Tooltip>
                 </Flex>
@@ -179,16 +182,16 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
             </Box>
 
             <Box>
-              {state.isShowingColors && (
+              {state.isShowingAdjust && (
                 <>
                   <Stack mb="4" p="2">
                     <Heading size="md" m="0">
-                      Shape colors
+                      Customize colors
                     </Heading>
                     {shapeStyle.fill.colorMap.length > 1 && (
                       <Box>
                         <Tabs
-                          variantColor="gray"
+                          variantColor="accent"
                           index={shapeStyle.fill.kind == 'color-map' ? 0 : 1}
                           variant="solid-rounded"
                           size="sm"
@@ -278,19 +281,57 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
                     <Box mt="5">
                       <Heading size="md" m="0">
-                        Size and position
+                        Resize, rotate, transform
                       </Heading>
-                      <p>
-                        Drag the shape to resize or reposition it. All unlocked
-                        words will be removed.
-                      </p>
-                      <Button variant="ghost">Reset</Button>
+                      {!state.isTransforming && (
+                        <>
+                          <Text mt="3">
+                            All unlocked words will be re-visualized.
+                          </Text>
+                          <Button
+                            variantColor="accent"
+                            onClick={() => {
+                              state.isTransforming = true
+                              editorPageStore.editor?.selectShape()
+                            }}
+                          >
+                            Transform shape
+                          </Button>
+                        </>
+                      )}
+
+                      {state.isTransforming && (
+                        <>
+                          <Text mt="3">
+                            Drag the shape to move or rotate it.
+                          </Text>
+                          <Stack direction="row" mt="3" spacing="3">
+                            <Button
+                              variantColor="accent"
+                              onClick={() => {
+                                state.isTransforming = false
+                                editorPageStore.editor?.deselectShape()
+                                editorPageStore.editor?.generateShapeItems({
+                                  style: editorPageStore.styles.shape,
+                                })
+                              }}
+                            >
+                              Apply
+                            </Button>
+                            <Tooltip label="Center shape and restore its original size">
+                              <Button variant="link" ml="3">
+                                Restore original
+                              </Button>
+                            </Tooltip>
+                          </Stack>
+                        </>
+                      )}
                     </Box>
                   </Stack>
                 </>
               )}
 
-              {!state.isShowingColors && !state.isShowingAdjust && (
+              {!state.isShowingAdjust && (
                 <>
                   <Flex mt="5">
                     <Tooltip label="Add custom image...">

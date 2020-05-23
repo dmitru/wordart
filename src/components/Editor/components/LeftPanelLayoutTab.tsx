@@ -4,7 +4,7 @@ import { Slider } from 'components/shared/Slider'
 import { Label } from 'components/Editor/components/shared'
 import { Box } from 'components/shared/Box'
 import { useCallback } from 'react'
-import { TargetKind } from 'components/Editor/lib/editor-fabric'
+import { TargetKind } from 'components/Editor/lib/editor'
 
 export type LeftPanelLayoutTabProps = {
   target: TargetKind

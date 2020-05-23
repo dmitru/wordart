@@ -19,7 +19,7 @@ export type EditorPersistedDataV1 = {
       fontIds: FontId[]
     }
     shape: {
-      bounds: Rect | null
+      transform: MatrixSerialized | null
       shapeId: ShapeId | null
       style: ShapeStyleConfig
       items: EditorPersistedItemV1[]

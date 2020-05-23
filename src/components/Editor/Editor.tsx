@@ -30,7 +30,7 @@ import { LeftPanelColorsTab } from 'components/Editor/components/LeftPanelColors
 import { LeftPanelLayoutTab } from 'components/Editor/components/LeftPanelLayoutTab'
 import { WordcloudId } from 'services/api/types'
 import { Api } from 'services/api/api'
-import { EditorInitParams } from 'components/Editor/lib/editor-fabric'
+import { EditorInitParams } from 'components/Editor/lib/editor'
 import {
   Menu,
   MenuButton,

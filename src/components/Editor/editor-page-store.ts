@@ -4,7 +4,7 @@ import {
   Editor,
   EditorInitParams,
   getItemsColoring,
-} from 'components/Editor/lib/editor-fabric'
+} from 'components/Editor/lib/editor'
 import { FontConfig, fonts, FontId, FontStyleConfig } from 'data/fonts'
 import { shapes } from 'components/Editor/icons'
 import {
@@ -37,6 +37,8 @@ import { flatten, uniq, uniqBy } from 'lodash'
 import { loadFont } from 'lib/wordart/fonts'
 import { Path, BoundingBox } from 'opentype.js'
 import paper from 'paper'
+import { fabric } from 'fabric'
+import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
 
 export class EditorPageStore {
   logger = consoleLoggers.editorStore
@@ -94,38 +96,11 @@ export class EditorPageStore {
 
     if (data.shape.shapeId != null) {
       await this.selectShape(data.shape.shapeId)
-      if (
-        data.shape.bounds &&
-        this.editor.fabricObjects.shape &&
-        this.editor.fabricObjects.shapeOriginalColors
-      ) {
-        this.editor.fabricObjects.shape.set({
-          originX: 'left',
-          originY: 'top',
-        })
-        this.editor.fabricObjects.shape.set({
-          left: data.shape.bounds.x,
-          top: data.shape.bounds.y,
-          scaleX: data.shape.bounds.w / this.editor.fabricObjects.shape.width!,
-          scaleY: data.shape.bounds.h / this.editor.fabricObjects.shape.height!,
-        })
-        this.editor.fabricObjects.shape.setCoords()
 
-        this.editor.fabricObjects.shapeOriginalColors.set({
-          originX: 'left',
-          originY: 'top',
-        })
-        this.editor.fabricObjects.shapeOriginalColors.set({
-          left: data.shape.bounds.x,
-          top: data.shape.bounds.y,
-          scaleX: data.shape.bounds.w / this.editor.fabricObjects.shape.width!,
-          scaleY: data.shape.bounds.h / this.editor.fabricObjects.shape.height!,
-        })
-        this.editor.fabricObjects.shapeOriginalColors.set({
-          originX: 'center',
-          originY: 'center',
-        })
-        this.editor.fabricObjects.shapeOriginalColors.setCoords()
+      const { shape, shapeOriginalColors } = this.editor.fabricObjects
+      if (data.shape.transform && shape && shapeOriginalColors) {
+        applyTransformToObj(shape, data.shape.transform)
+        applyTransformToObj(shapeOriginalColors, data.shape.transform)
       }
     }
 
@@ -310,7 +285,9 @@ export class EditorPageStore {
       }
     }
 
-    const shapeBounds = this.editor.fabricObjects.shape?.calcCoords(true)
+    const shapeTransform = (
+      this.editor.fabricObjects.shape?.calcTransformMatrix() || []
+    ).map((n: number) => roundFloat(n, 3)) as MatrixSerialized
 
     const serializedData: EditorPersistedData = {
       version: 1,
@@ -324,14 +301,7 @@ export class EditorPageStore {
           ...serializeItems(this.editor.generatedItems.bg.items),
         },
         shape: {
-          bounds: shapeBounds
-            ? {
-                x: shapeBounds.tl.x,
-                y: shapeBounds.tl.y,
-                w: shapeBounds.br.x - shapeBounds.tl.x,
-                h: shapeBounds.br.y - shapeBounds.tl.y,
-              }
-            : null,
+          transform: shapeTransform || null,
           shapeId: this.editor.currentShape?.shapeConfig.id || null,
           style: toJS(this.styles.shape, { recurseEverything: true }),
           ...serializeItems(this.editor.generatedItems.shape.items),

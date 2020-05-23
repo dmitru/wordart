@@ -1,33 +1,25 @@
-import { observer } from 'mobx-react'
-import { useStore } from 'services/root-store'
-import styled from '@emotion/styled'
-import * as evaicons from '@styled-icons/evaicons-outline'
-import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
-import { useState, useCallback } from 'react'
-import { Label } from './shared'
-import { FiUploadCloud } from 'react-icons/fi'
 import {
-  Stack,
+  Box,
   Button,
-  InputGroup,
-  InputLeftElement,
-  Input,
-  MenuButton,
-  Menu,
-  MenuList,
-  MenuItem,
   Icon,
   IconButton,
-  Heading,
-  Box,
-  Divider,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Stack,
 } from '@chakra-ui/core'
+import styled from '@emotion/styled'
+import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
+import { TargetKind } from 'components/Editor/lib/editor'
 import { BaseBtn } from 'components/shared/BaseBtn'
-import { Tooltip } from 'components/shared/Tooltip'
-import { TextInput } from 'components/shared/TextInput'
-import { observable } from 'mobx'
 import { uniq } from 'lodash'
-import { TargetKind } from 'components/Editor/lib/editor-fabric'
+import { observable } from 'mobx'
+import { observer } from 'mobx-react'
+import { useStore } from 'services/root-store'
 
 export type LeftPanelFontsTabProps = {
   target: TargetKind

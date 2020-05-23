@@ -32,6 +32,10 @@ import { EditorPersistedData } from 'services/api/types'
 import { fabric } from 'fabric'
 import paper from 'paper'
 import { FontId } from 'data/fonts'
+import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
+import { MatrixSerialized } from 'services/api/persisted/v1'
+import { Matrix } from 'transformation-matrix'
+import { waitAnimationFrame } from 'utils/async'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -84,8 +88,8 @@ export class Editor {
   generatedItems: {
     shape: {
       items: GeneratedItem[]
-      fabricObjects: Map<ItemId, fabric.Object>
-      fabricObjectsReverse: Map<fabric.Object, GeneratedItem>
+      itemIdToFabricObj: Map<ItemId, fabric.Object>
+      fabricObjToItem: Map<fabric.Object, GeneratedItem>
       wordItemsInfo: Map<
         ItemId,
         { path: opentype.Path; pathBounds: opentype.BoundingBox }
@@ -93,7 +97,8 @@ export class Editor {
     }
     bg: {
       items: GeneratedItem[]
-      fabricObjects: Map<number, fabric.Object>
+      itemIdToFabricObj: Map<number, fabric.Object>
+      fabricObjToItem: Map<fabric.Object, GeneratedItem>
       wordItemsInfo: Map<
         ItemId,
         { path: opentype.Path; pathBounds: opentype.BoundingBox }
@@ -122,6 +127,40 @@ export class Editor {
     paper.setup(new paper.Size({ width: 1, height: 1 }))
     this.canvas = new fabric.Canvas(params.canvas.id)
 
+    this.canvas.on('object:moving', (evt) => {
+      const target = evt.target
+      if (!target) {
+        return
+      }
+
+      if (target === this.fabricObjects.shape) {
+        this.clearItems('shape')
+        this.clearItems('bg')
+      }
+    })
+    this.canvas.on('object:rotating', (evt) => {
+      const target = evt.target
+      if (!target) {
+        return
+      }
+
+      if (target === this.fabricObjects.shape) {
+        this.clearItems('shape')
+        this.clearItems('bg')
+      }
+    })
+    this.canvas.on('object:scaling', (evt) => {
+      const target = evt.target
+      if (!target) {
+        return
+      }
+
+      if (target === this.fabricObjects.shape) {
+        this.clearItems('shape')
+        this.clearItems('bg')
+      }
+    })
+
     this.canvas.on('object:modified', (evt) => {
       const target = evt.target
       if (!target) {
@@ -132,33 +171,14 @@ export class Editor {
         target === this.fabricObjects.shape &&
         this.fabricObjects.shapeOriginalColors
       ) {
-        this.fabricObjects.shapeOriginalColors.set({
-          originX: 'left',
-          originY: 'top',
-        })
-        this.fabricObjects.shapeOriginalColors.set({
-          left: target.left,
-          top: target.top,
-          scaleX: target.scaleX,
-          scaleY: target.scaleY,
-        })
-        this.fabricObjects.shapeOriginalColors.setCoords()
-        this.fabricObjects.shapeOriginalColors.set({
-          originX: 'center',
-          originY: 'center ',
-        })
-        this.fabricObjects.shapeOriginalColors.rotate(target.angle || 0)
-        this.fabricObjects.shapeOriginalColors.setCoords()
-        this.fabricObjects.shapeOriginalColors.set({
-          originX: 'left',
-          originY: 'top',
-        })
-        this.fabricObjects.shapeOriginalColors.setCoords()
-        // this.fabricObjects.shapeOriginalColors.set({ originX: 'center', originY: 'center '})
+        applyTransformToObj(
+          this.fabricObjects.shapeOriginalColors,
+          this.fabricObjects.shape.calcTransformMatrix() as MatrixSerialized
+        )
+
         this.canvas.requestRenderAll()
       } else {
-        const item = this.generatedItems.shape.fabricObjectsReverse.get(target)
-        console.log('item = ', item)
+        const item = this.generatedItems.shape.fabricObjToItem.get(target)
         if (item) {
           item.locked = true
         }
@@ -184,11 +204,16 @@ export class Editor {
     this.generatedItems = {
       shape: {
         items: [],
-        fabricObjects: new Map(),
+        itemIdToFabricObj: new Map(),
         wordItemsInfo: new Map(),
-        fabricObjectsReverse: new Map(),
+        fabricObjToItem: new Map(),
       },
-      bg: { items: [], fabricObjects: new Map(), wordItemsInfo: new Map() },
+      bg: {
+        items: [],
+        itemIdToFabricObj: new Map(),
+        fabricObjToItem: new Map(),
+        wordItemsInfo: new Map(),
+      },
     }
 
     window.addEventListener('resize', this.handleResize)
@@ -301,7 +326,11 @@ export class Editor {
   }
 
   setItemsColor = async (target: TargetKind, coloring: ItemsColoring) => {
-    const { items, fabricObjects, wordItemsInfo } = this.generatedItems[target]
+    const {
+      items,
+      itemIdToFabricObj: fabricObjects,
+      wordItemsInfo,
+    } = this.generatedItems[target]
     this.logger.debug(
       'setItemsColor',
       target,
@@ -701,13 +730,22 @@ export class Editor {
     if (this.fabricObjects.shapeItems) {
       this.canvas.remove(...this.fabricObjects.shapeItems)
     }
+    for (const item of addedItems) {
+      // applyTransformToObj(
+      //   item,
+      //   fabric.util.multiplyTransformMatrices(
+      //     this.fabricObjects.shape.calcTransformMatrix(),
+      //     item.calcTransformMatrix()
+      //   ) as MatrixSerialized
+      // )
+    }
     this.canvas.add(...addedItems)
     this.canvas.requestRenderAll()
 
     this.fabricObjects.shapeItems = addedItems
     this.generatedItems.shape = {
-      fabricObjects: itemIdToFabricObject,
-      fabricObjectsReverse: itemIdToFabricObjectReverse,
+      itemIdToFabricObj: itemIdToFabricObject,
+      fabricObjToItem: itemIdToFabricObjectReverse,
       items,
       wordItemsInfo,
     }
@@ -806,124 +844,39 @@ export class Editor {
         //   })
         // )
         wordGroup.addWithUpdate(
-          // new fabric.Rect({
-          //   left: -wordBounds.x1,
-          //   top: -wordBounds.y1,
-          //   height: wordBounds.y2 - wordBounds.y1,
-          //   width: wordBounds.x2 - wordBounds.x1,
-          //   fill: 'red',
-          //   opacity: 0.5,
-          //   originX: 'left',
-          //   originY: 'bottom',
-          // })
           new fabric.Path(wordPath.toPathData(3)).set({
-            originX: 'left',
-            originY: 'top',
+            originX: 'center',
+            originY: 'center',
           })
         )
-        const wordObj = wordGroup.item(0)
-
-        // console.log(
-        //   'wordGroup = ',
-        //   wordGroup.left,
-        //   wordGroup.top,
-        //   wordGroup.width,
-        //   wordGroup.height
+        // wordGroup.addWithUpdate(
+        //   new fabric.Rect({
+        //     // left: wordGroup.get('left'),
+        //     // top: wordGroup.get('top'),
+        //     left: 0,
+        //     top: 0,
+        //     height: 10,
+        //     width: 10,
+        //     fill: 'red',
+        //     opacity: 0.5,
+        //     originX: 'center',
+        //     originY: 'center',
+        //   })
         // )
-
+        const wordObj = wordGroup.item(0)
         wordItemsInfo.set(item.id, {
           path: wordPath,
           pathBounds: wordPath.getBoundingBox(),
         })
         wordObj.set({ fill: 'black' })
 
-        // const wordItem = new fabric.Group(pathItems)
         wordGroup.set({
           selectable: true,
         })
-        const t = item.transform
-        const m = [t.a, t.b, t.c, t.d, t.tx, t.ty]
-        const md = fabric.util.qrDecompose(m)
-
-        const dy = wordBounds.y1 * md.scaleY
-        const dx = wordBounds.x1 * md.scaleX
-        // wordObj.set({ top: wordBounds.y1, left: wordBounds.x1 })
-        wordObj.setCoords()
-        wordGroup.setObjectsCoords()
-        wordGroup.setCoords()
-
-        // this.canvas.getContext().save()
-        // this.canvas.getContext().resetTransform()
-        // // @ts-ignore
-        // this.canvas.getContext().setTransform(...m)
-        // wordGroup._render(this.canvas.getContext())
-        // this.canvas.getContext().restore()
-
-        // debugger
-
-        // TODO: fix rotation
-        wordGroup.set({
-          flipX: false,
-          flipY: false,
-          centeredRotation: false,
-          originX: 'left',
-          // @ts-ignore
-          originY: -wordBounds.y1 / (wordBounds.y2 - wordBounds.y1),
-        })
-        wordGroup.set({ scaleX: md.scaleX, scaleY: md.scaleY })
-        // wordGroup.setCoords()
-        // wordGroup.set({
-        //   left: dx,
-        //   top: dy,
-        // })
-        wordGroup.setCoords()
-        wordGroup.set({
-          angle: md.angle,
-        })
-        // wordGroup.set({
-        //   left: dx,
-        //   top: dy,
-        // })
-        wordGroup.setCoords()
-        wordGroup.set({
-          left: md.translateX,
-          top: md.translateY,
-        })
-        // wordGroup.setPositionByOrigin(
-        //   new fabric.Point(md.translateX, md.translateY),
-        //   'left',
-        //   // @ts-ignore
-        //   -wordBounds.y1 / (wordBounds.y2 - wordBounds.y1)
-        // )
-        wordGroup.setCoords()
-
-        // wordItem.set({
-        //   scaleX: item.transform.scaling.x,
-        //   scaleY: item.transform.scaling.y,
-        // })
-        // wordItem.setCoords()
-        // wordItem.rotate(item.transform.rotation)
-        // wordItem.setCoords()
-        // console.log(
-        //   fontInfo.font.otFont.unitsPerEm * item.transform.scaling.y,
-        //   item.transform.scaling.y
-        // )
-        // wordItem.set({
-        //   left: item.transform.translation.x,
-        //   top: item.transform.translation.y,
-        // })
-        //
-        // const t = item.transform.inverted()
-        // wordItem.set({
-        //   transformMatrix: [t.a, t.b, t.c, t.d, t.tx, t.ty],
-        // })
-
-        // left: item.transform.translation.x,
-        // top: item.transform.translation.y,
-        // scaleX: item.transform.scaling.x,
-        // scaleY: item.transform.scaling.y,
-        // })
-        wordGroup.setCoords()
+        applyTransformToObj(
+          wordGroup,
+          item.transform.values as MatrixSerialized
+        )
 
         itemIdToFabricObject.set(item.id, wordGroup)
         itemIdToFabricObjectReverse.set(wordGroup, item)
@@ -997,6 +950,9 @@ export class Editor {
       return
     }
     this.store.isVisualizing = true
+    for (let i = 0; i < 10; ++i) {
+      await waitAnimationFrame()
+    }
     await this.generator.init()
 
     console.log(
@@ -1012,27 +968,12 @@ export class Editor {
       shapeClone.cloneAsImage((obj: fabric.Image) => r(obj))
     )
 
-    // const shapeOriginalImage = await new Promise<fabric.Image>((r) =>
-    //   this.fabricObjects.originalShape!.cloneAsImage((obj: fabric.Image) =>
-    //     r(obj)
-    //   )
-    // )
-    // if (style.fill.kind === 'single-color') {
-    //   shapeItem.fillColor = new paper.Color('black')
-    //   shapeItem.strokeColor = new paper.Color('black')
-    // }
-    // shapeItem.opacity = 1
-    // let shapeRaster: paper.Raster | undefined = shapeItem.rasterize(
-    //   this.paperItems.shape.view.resolution,
-    //   false
-    // )
-    // shapeRaster.remove()
     const shapeCanvas = (shapeImage.toCanvasElement() as any) as HTMLCanvasElement
     const shapeCanvasOriginalColors = (this.fabricObjects.shapeOriginalColors.toCanvasElement() as any) as HTMLCanvasElement
 
     const shapeRasterBounds = new paper.Rectangle(
-      this.fabricObjects.shape.left || 0,
-      this.fabricObjects.shape.top || 0,
+      this.fabricObjects.shape.getBoundingRect(true).left || 0,
+      this.fabricObjects.shape.getBoundingRect(true).top || 0,
       shapeCanvas.width,
       shapeCanvas.height
     )
@@ -1098,8 +1039,46 @@ export class Editor {
     this.canvas.clear()
   }
 
+  clearItems = (target: TargetKind) => {
+    if (
+      target === 'shape' &&
+      this.fabricObjects.shapeItems &&
+      this.fabricObjects.shapeItems.length > 0
+    ) {
+      // TODO: exclude locked items
+      this.canvas.remove(...this.fabricObjects.shapeItems)
+      this.generatedItems.shape = {
+        fabricObjToItem: new Map(),
+        itemIdToFabricObj: new Map(),
+        items: [],
+        wordItemsInfo: new Map(),
+      }
+      this.canvas.requestRenderAll()
+    } else {
+      // TODO
+    }
+  }
+
   destroy = () => {
     window.removeEventListener('resize', this.handleResize)
+  }
+
+  selectShape = () => {
+    if (!this.fabricObjects.shape) {
+      return
+    }
+    this.fabricObjects.shape.selectable = true
+    this.canvas.setActiveObject(this.fabricObjects.shape)
+    this.canvas.requestRenderAll()
+  }
+
+  deselectShape = () => {
+    if (!this.fabricObjects.shape) {
+      return
+    }
+    this.fabricObjects.shape.selectable = false
+    this.canvas.discardActiveObject()
+    this.canvas.requestRenderAll()
   }
 }
 

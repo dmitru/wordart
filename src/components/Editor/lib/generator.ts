@@ -500,6 +500,7 @@ export class Generator {
             fontId: word.font.id,
             text: word.text,
             wordConfigId: word.wordConfigId,
+            // Transform to the center of the placed item
             transform: new paper.Matrix()
               .translate(task.shape.bounds.left, task.shape.bounds.top)
               .scale(
@@ -508,7 +509,11 @@ export class Generator {
               )
               .append(rotatedBoundsTransform)
               .translate(tx, ty)
-              .scale(pathScale),
+              .scale(pathScale)
+              .translate(
+                0.5 * wordPathSize.w,
+                +wordPathBounds.y1 + wordPathSize.h * 0.5
+              ),
           })
         } else {
           unrotatedCtx.fillRect(
