@@ -29,6 +29,7 @@ import { MatrixSerialized } from 'services/api/persisted/v1'
 import { EditorPersistedData } from 'services/api/types'
 import { waitAnimationFrame } from 'utils/async'
 import { consoleLoggers } from 'utils/console-logger'
+import { computeColorsMap } from 'components/Editor/lib/colormap'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -36,6 +37,10 @@ export type EditorInitParams = {
   aspectRatio: number
   store: EditorStore
   serialized?: EditorPersistedData
+
+  onItemUpdated: (item: GeneratedItem) => void
+  onItemSelected: (item: GeneratedItem) => void
+  onItemSelectionCleared: () => void
 }
 
 export class Editor {
@@ -66,6 +71,9 @@ export class Editor {
     shapeOriginalColors?: fabric.Object
   } = {}
 
+  // TODO: store EditorItem class instances instead of GeneratedItem POJOs
+  // TODO: keep around original transform, current color, etc
+  // TODO: update these items accordingly when coloring changes, etc
   generatedItems: {
     shape: {
       items: GeneratedItem[]
@@ -100,6 +108,9 @@ export class Editor {
     }
   > = new Map()
 
+  itemsSelection = false
+  shapeSelection = false
+
   constructor(params: EditorInitParams) {
     this.params = params
     this.store = params.store
@@ -108,6 +119,26 @@ export class Editor {
     paper.setup(new paper.Size({ width: 1, height: 1 }))
     this.canvas = new fabric.Canvas(params.canvas.id)
     this.aspectRatio = this.params.aspectRatio
+
+    this.canvas.on('selection:created', () => {
+      const target = this.canvas.getActiveObject()
+      const item = this.generatedItems.shape.fabricObjToItem.get(target)
+      if (item) {
+        params.onItemSelected(item)
+      }
+    })
+
+    this.canvas.on('selection:updated', () => {
+      const target = this.canvas.getActiveObject()
+      const item = this.generatedItems.shape.fabricObjToItem.get(target)
+      if (item) {
+        params.onItemSelected(item)
+      }
+    })
+
+    this.canvas.on('selection:cleared', () => {
+      params.onItemSelectionCleared()
+    })
 
     this.canvas.on('object:moving', (evt) => {
       const target = evt.target
@@ -163,6 +194,7 @@ export class Editor {
         const item = this.generatedItems.shape.fabricObjToItem.get(target)
         if (item) {
           item.locked = true
+          params.onItemUpdated(item)
         }
       }
     })
@@ -200,6 +232,18 @@ export class Editor {
 
     window.addEventListener('resize', this.handleResize)
     this.handleResize()
+  }
+
+  enableItemsSelection = () => {
+    this.itemsSelection = true
+    this.fabricObjects.shapeItems?.forEach((obj) => (obj.selectable = true))
+    this.enableSelectionMode()
+    this.canvas.requestRenderAll()
+  }
+  disableItemsSelection = () => {
+    this.itemsSelection = false
+    this.fabricObjects.shapeItems?.forEach((obj) => (obj.selectable = false))
+    this.deselectAll()
   }
 
   setAspectRatio = (aspect: number) => {
@@ -306,6 +350,7 @@ export class Editor {
   }
 
   setShapeObj = (shape: fabric.Object) => {
+    shape.set({ selectable: this.shapeSelection })
     this.fabricObjects.shape = shape
   }
 
@@ -546,7 +591,13 @@ export class Editor {
     const shapeCopy = await new Promise<fabric.Object>((r) =>
       shapeObj!.clone((copy: fabric.Object) => r(copy), ['id'])
     )
-    shapeObj.set({ opacity: shapeColors.opacity })
+    shapeCopy.set({
+      selectable: false,
+    })
+    shapeObj.set({
+      opacity: shapeColors.opacity,
+      selectable: false,
+    })
     this.canvas.add(shapeObj)
     this.canvas.requestRenderAll()
     this.setShapeObj(shapeObj)
@@ -584,128 +635,10 @@ export class Editor {
 
   generateBgItems = async (params: { style: BackgroundStyleConfig }) => {
     return
-    // const { style } = params
-
-    // this.logger.debug('generateShapeItems')
-
-    // if (!this.paperItems.shape) {
-    //   console.error('No paperItems.shape')
-    //   return
-    // }
-    // if (!this.paperItems.originalShape) {
-    //   console.error('No paperItemsoriginal')
-    //   return
-    // }
-
-    // this.store.isVisualizing = true
-
-    // await this.generator.init()
-
-    // const shapeItem = this.paperItems.originalShape.clone({ insert: false })
-    // shapeItem.opacity = 1
-
-    // let shapeRaster: paper.Raster | undefined = shapeItem.rasterize(
-    //   this.paperItems.shape.view.resolution / paper.project.view.pixelRatio,
-    //   false
-    // )
-    // shapeRaster.remove()
-
-    // const shapeCanvas = shapeRaster.getSubCanvas(
-    //   new paper.Rectangle(0, 0, shapeRaster.width, shapeRaster.height)
-    // )
-
-    // const sceneBounds = this.getSceneBounds(0)
-    // const sceneCanvas = createCanvas({
-    //   w: sceneBounds.width,
-    //   h: sceneBounds.height,
-    // })
-
-    // sceneCanvas
-    //   .getContext('2d')!
-    //   .drawImage(shapeCanvas, shapeRaster.bounds.left, shapeRaster.bounds.top)
-
-    // shapeRaster = undefined
-
-    // const wordFonts: Font[] = await Promise.all(
-    //   style.words.fonts.map(async (fontId) => {
-    //     const { style } = this.store.getFontById(fontId)!
-    //     return { font: await loadFont(style.url), id: fontId, isCustom: false }
-    //   })
-    // )
-
-    // const shapeConfig = this.store.getSelectedShape()
-
-    // const result = await this.generator.fillShape(
-    //   {
-    //     shape: {
-    //       canvas: sceneCanvas,
-    //       bounds: sceneBounds,
-    //       processing: {
-    //         removeWhiteBg: {
-    //           enabled: shapeConfig.kind === 'img',
-    //           lightnessThreshold: 98,
-    //         },
-    //         shrink: {
-    //           enabled: style.layout.shapePadding > 0,
-    //           amount: style.layout.shapePadding,
-    //         },
-    //         edges: {
-    //           enabled: false,
-    //           blur: 0,
-    //           lowThreshold: 30,
-    //           highThreshold: 100,
-    //         },
-    //         invert: {
-    //           enabled: true,
-    //         },
-    //       },
-    //     },
-    //     itemPadding: Math.max(1, 100 - style.layout.itemDensity),
-    //     // Words
-    //     wordsMaxSize: style.layout.wordsMaxSize,
-    //     words: style.words.wordList.map((wc) => ({
-    //       wordConfigId: wc.id,
-    //       text: wc.text,
-    //       angles: style.words.angles.angles,
-    //       fillColors: ['red'],
-    //       // fonts: [fonts[0], fonts[1], fonts[2]],
-    //       fonts: wordFonts,
-    //     })),
-    //     // Icons
-    //     icons: style.icons.iconList.map((shape) => ({
-    //       shape: this.store.getShapeById(shape.shapeId)!,
-    //     })),
-    //     iconsMaxSize: style.layout.iconsMaxSize,
-    //     iconProbability: style.layout.iconsProportion / 100,
-    //   },
-    //   (progressPercent) => {
-    //     this.store.visualizingProgress = progressPercent
-    //   }
-    // )
-
-    // await this.setBgItems(result.generatedItems)
-    // this.setItemsColor('bg', getItemsColoring(style))
-
-    // this.store.isVisualizing = false
   }
 
   setBgItems = async (items: GeneratedItem[]) => {
-    // const {
-    //   addedItems,
-    //   itemIdToPaperItem,
-    // } = await this.convertItemsToPaperItems(items)
-    // this.paperItems.bgItemsGroup?.remove()
-    // const bgItemsGroup = new paper.Group([
-    //   // this.paperItems.shape.clone(),
-    //   ...addedItems,
-    // ])
-    // // shapeItemsGroup.clipped = true
-    // this.paperItems.bgItemsGroup = bgItemsGroup
-    // this.paperItems.bgItemsGroup.insertAbove(this.paperItems.bgRect!)
-    // this.generatedItems.bg = {
-    //   paperItems: itemIdToPaperItem,
-    //   items,
-    // }
+    return
   }
 
   setShapeItems = async (items: GeneratedItem[]) => {
@@ -723,15 +656,7 @@ export class Editor {
     if (this.fabricObjects.shapeItems) {
       this.canvas.remove(...this.fabricObjects.shapeItems)
     }
-    for (const item of addedItems) {
-      // applyTransformToObj(
-      //   item,
-      //   fabric.util.multiplyTransformMatrices(
-      //     this.fabricObjects.shape.calcTransformMatrix(),
-      //     item.calcTransformMatrix()
-      //   ) as MatrixSerialized
-      // )
-    }
+
     this.canvas.add(...addedItems)
     this.canvas.requestRenderAll()
 
@@ -744,15 +669,15 @@ export class Editor {
     }
   }
 
+  // TODO: optimize performance
+  // TODO: rename to "convert to EditorItems"
   convertItemsToFabricItems = async (items: GeneratedItem[]) => {
     const addedItems: fabric.Object[] = []
     const wordItemsInfo: Map<
       ItemId,
       { path: opentype.Path; pathBounds: opentype.BoundingBox }
     > = new Map()
-    let img: HTMLImageElement | null = null
 
-    let wordIdToSymbolDef = new Map<WordInfoId, fabric.Path>()
     let itemIdToFabricObject = new Map<ItemId, fabric.Object>()
     let itemIdToFabricObjectReverse = new Map<fabric.Object, GeneratedItem>()
 
@@ -864,7 +789,7 @@ export class Editor {
         wordObj.set({ fill: 'black' })
 
         wordGroup.set({
-          selectable: true,
+          selectable: this.itemsSelection,
         })
         applyTransformToObj(
           wordGroup,
@@ -947,11 +872,6 @@ export class Editor {
       await waitAnimationFrame()
     }
     await this.generator.init()
-
-    console.log(
-      'locked items: ',
-      this.generatedItems.shape.items.filter((i) => i.locked)
-    )
 
     const shapeClone = await new Promise<fabric.Object>((r) =>
       this.fabricObjects.shape!.clone((obj: fabric.Object) => r(obj))
@@ -1057,19 +977,40 @@ export class Editor {
   }
 
   selectShape = () => {
+    this.logger.debug('selectShape')
     if (!this.fabricObjects.shape) {
       return
     }
+    this.shapeSelection = true
     this.fabricObjects.shape.selectable = true
+    this.enableSelectionMode()
     this.canvas.setActiveObject(this.fabricObjects.shape)
     this.canvas.requestRenderAll()
   }
 
   deselectShape = () => {
+    this.logger.debug('deselectShape')
     if (!this.fabricObjects.shape) {
       return
     }
+    this.shapeSelection = false
     this.fabricObjects.shape.selectable = false
+    this.deselectAll()
+  }
+
+  disableSelectionMode = () => {
+    this.canvas.skipTargetFind = true
+    this.canvas.selection = false
+    this.canvas.requestRenderAll()
+  }
+
+  enableSelectionMode = () => {
+    this.canvas.skipTargetFind = false
+    this.canvas.selection = true
+    this.canvas.requestRenderAll()
+  }
+
+  deselectAll = () => {
     this.canvas.discardActiveObject()
     this.canvas.requestRenderAll()
   }
@@ -1117,119 +1058,4 @@ export const getItemsColoring = (
     shapeBrightness: coloring.shapeBrightness,
     shapeStyleFill: style.kind === 'shape' ? style.fill : undefined,
   }
-}
-
-export const findNamedChildren = (
-  item: fabric.Object,
-  level = 0,
-  maxLevel = 6
-): { name: string; item: fabric.Object }[] => {
-  const objects = item instanceof fabric.Group ? item.getObjects() : [item]
-  const namedChildren = objects.filter((obj) => (obj as any).id != null)
-  if (namedChildren.length > 0) {
-    return namedChildren.map((child) => ({
-      name: (child as any).id,
-      item: child,
-    }))
-  }
-
-  return []
-}
-
-/** Recursively finds all fill colors used (ignoring pure black) */
-export const getFillColor = (items: fabric.Object[]): string | undefined => {
-  for (let item of items) {
-    if (typeof item.fill === 'string') {
-      return item.fill
-    }
-  }
-  return undefined
-}
-
-/** Recursively finds all stroke colors used */
-export const getStrokeColor = (items: fabric.Object[]): string | undefined => {
-  for (let item of items) {
-    if (typeof item.stroke === 'string') {
-      return item.stroke
-    }
-  }
-  return undefined
-}
-
-export const computeColorsMap = (object: fabric.Object): SvgShapeColorsMap => {
-  const namedChildren = sortBy(findNamedChildren(object), (c) => c.name)
-  const namedChildrenByColor = groupBy(
-    namedChildren,
-    (ch) => ch.name.split('_')[0]
-  )
-  console.log('computeColorsMap', object, namedChildren)
-
-  let colorEntries: SvgShapeColorsMapEntry[] = []
-  if (Object.keys(namedChildrenByColor).length > 0) {
-    Object.keys(namedChildrenByColor).forEach((colorKey) => {
-      const children = namedChildrenByColor[colorKey]
-      const fillColor = getFillColor(children.map((c) => c.item))
-      const strokeColor = getStrokeColor(children.map((c) => c.item))
-
-      if (fillColor !== strokeColor) {
-        if (fillColor) {
-          colorEntries.push({
-            fabricItems: children.map((c) => c.item),
-            color: fillColor,
-            fill: true,
-            stroke: false,
-          })
-        }
-        if (strokeColor) {
-          colorEntries.push({
-            fabricItems: children.map((c) => c.item),
-            color: strokeColor,
-            fill: false,
-            stroke: true,
-          })
-        }
-      } else {
-        if (strokeColor) {
-          colorEntries.push({
-            fabricItems: children.map((c) => c.item),
-            color: strokeColor,
-            fill: true,
-            stroke: true,
-          })
-        }
-      }
-    })
-  } else {
-    colorEntries.push({
-      fabricItems:
-        object instanceof fabric.Group ? object.getObjects() : [object],
-      color: '#333',
-      stroke: true,
-      fill: true,
-    })
-  }
-
-  // Deduplicate color entries
-  const colorEntriesGrouped = groupBy(
-    colorEntries,
-    (e) => `${e.color}:${e.fill}:${e.stroke}`
-  )
-  colorEntries = Object.values(colorEntriesGrouped).map((ceGroup) => {
-    const ce = ceGroup[0]
-    return {
-      fill: ce.fill,
-      stroke: ce.stroke,
-      color: ce.color,
-      fabricItems: flatten(ceGroup.map((ce) => ce.fabricItems)),
-    } as SvgShapeColorsMapEntry
-  })
-
-  // Sort color entries
-  colorEntries = sortBy(
-    colorEntries,
-    (ce) => -(10 * (ce.fill ? 1 : 0) + (ce.stroke ? 1 : 0))
-  )
-
-  const colorsMap: SvgShapeColorsMap = { colors: colorEntries }
-  return colorsMap
 }

@@ -37,6 +37,13 @@ import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
 import { nanoid } from 'nanoid/non-secure'
 
+export type EditorMode = 'view' | 'edit items'
+
+export type EditorStoreInitParams = Pick<
+  EditorInitParams,
+  'aspectRatio' | 'canvas' | 'canvasWrapperEl' | 'serialized'
+>
+
 export class EditorStore {
   logger = consoleLoggers.editorStore
 
@@ -45,6 +52,9 @@ export class EditorStore {
 
   @observable isVisualizing = false
   @observable visualizingProgress = null as number | null
+
+  // TODO
+  @observable mode: EditorMode = 'view'
 
   @observable state: 'initializing' | 'initialized' | 'destroyed' =
     'initializing'
@@ -66,10 +76,25 @@ export class EditorStore {
     this.rootStore = rootStore
   }
 
-  @action initEditor = async (params: EditorInitParams) => {
+  @observable selectedItem: GeneratedItem | null = null
+
+  @action initEditor = async (params: EditorStoreInitParams) => {
     this.logger.debug('initEditor', params)
 
-    this.editor = new Editor(params)
+    this.editor = new Editor({
+      ...params,
+      store: this,
+      onItemSelected: (item) => {
+        console.log('onItemSelected', item)
+        this.selectedItem = item
+      },
+      onItemSelectionCleared: () => {
+        this.selectedItem = null
+      },
+      onItemUpdated: (item) => {
+        this.selectedItem = item
+      },
+    })
     this.editor.setBgColor(this.styles.bg.fill)
     // @ts-ignore
     window['editor'] = this.editor
@@ -83,6 +108,29 @@ export class EditorStore {
     this.state = 'initialized'
   }
 
+  setItemLock = (item: GeneratedItem, lockValue: boolean) => {
+    item.locked = lockValue
+  }
+
+  @action enterEditItemsMode = () => {
+    this.mode = 'edit items'
+    if (!this.editor) {
+      return
+    }
+    this.editor.enableItemsSelection()
+    this.editor.enableSelectionMode()
+  }
+
+  @action enterViewMode = () => {
+    this.mode = 'view'
+    if (!this.editor) {
+      return
+    }
+    this.selectedItem = null
+    this.editor.disableItemsSelection()
+    this.editor.disableSelectionMode()
+  }
+
   @action private loadSerialized = async (serialized: EditorPersistedData) => {
     this.logger.debug('loadSerialized', serialized)
     if (!this.editor) {
@@ -91,25 +139,25 @@ export class EditorStore {
 
     const { data } = serialized
     this.editor.setAspectRatio(
-      serialized.data.sceneSize.w / serialized.data.sceneSize.h
+      serialized.data.editor.sceneSize.w / serialized.data.editor.sceneSize.h
     )
 
-    if (data.shape.shapeId != null) {
-      await this.selectShape(data.shape.shapeId)
+    if (data.editor.shape.shapeId != null) {
+      await this.selectShape(data.editor.shape.shapeId)
 
       const { shape, shapeOriginalColors } = this.editor.fabricObjects
-      if (data.shape.transform && shape && shapeOriginalColors) {
-        applyTransformToObj(shape, data.shape.transform)
-        applyTransformToObj(shapeOriginalColors, data.shape.transform)
+      if (data.editor.shape.transform && shape && shapeOriginalColors) {
+        applyTransformToObj(shape, data.editor.shape.transform)
+        applyTransformToObj(shapeOriginalColors, data.editor.shape.transform)
       }
     }
 
     const sceneSize = this.editor.getSceneBounds(0)
-    const scale = sceneSize.width / serialized.data.sceneSize.w
-    console.log('sceneSize', scale, sceneSize, serialized.data.sceneSize)
+    const scale = sceneSize.width / serialized.data.editor.sceneSize.w
+    console.log('sceneSize', scale, sceneSize, serialized.data.editor.sceneSize)
 
-    this.styles.shape = data.shape.style
-    this.styles.bg = data.bg.style
+    this.styles.shape = data.editor.shape.style
+    this.styles.bg = data.editor.bg.style
 
     const deserializeItems = async ({
       items,
@@ -179,14 +227,14 @@ export class EditorStore {
 
     const [shapeItems, bgItems] = await Promise.all([
       deserializeItems({
-        items: data.shape.items,
-        fontIds: data.shape.fontIds,
-        words: data.shape.words,
+        items: data.generated.shape.items,
+        fontIds: data.generated.shape.fontIds,
+        words: data.generated.shape.words,
       }),
       deserializeItems({
-        items: data.bg.items,
-        fontIds: data.bg.fontIds,
-        words: data.bg.words,
+        items: data.generated.bg.items,
+        fontIds: data.generated.bg.fontIds,
+        words: data.generated.bg.words,
       }),
     ])
     await this.editor.setShapeItems(shapeItems)
@@ -292,19 +340,23 @@ export class EditorStore {
     const serializedData: EditorPersistedData = {
       version: 1,
       data: {
-        sceneSize: {
-          w: roundFloat(this.editor.getSceneBounds(0).width, 3),
-          h: roundFloat(this.editor.getSceneBounds(0).height, 3),
+        editor: {
+          sceneSize: {
+            w: roundFloat(this.editor.getSceneBounds(0).width, 3),
+            h: roundFloat(this.editor.getSceneBounds(0).height, 3),
+          },
+          bg: {
+            style: toJS(this.styles.bg, { recurseEverything: true }),
+          },
+          shape: {
+            transform: shapeTransform || null,
+            shapeId: this.editor.currentShape?.shapeConfig.id || null,
+            style: toJS(this.styles.shape, { recurseEverything: true }),
+          },
         },
-        bg: {
-          style: toJS(this.styles.bg, { recurseEverything: true }),
-          ...serializeItems(this.editor.generatedItems.bg.items),
-        },
-        shape: {
-          transform: shapeTransform || null,
-          shapeId: this.editor.currentShape?.shapeConfig.id || null,
-          style: toJS(this.styles.shape, { recurseEverything: true }),
-          ...serializeItems(this.editor.generatedItems.shape.items),
+        generated: {
+          bg: serializeItems(this.editor.generatedItems.bg.items),
+          shape: serializeItems(this.editor.generatedItems.shape.items),
         },
       },
     }

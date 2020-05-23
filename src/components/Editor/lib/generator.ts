@@ -856,7 +856,7 @@ export type WordGeneratedItem = {
   fontId: FontId
   transform: paper.Matrix
   wordConfigId?: WordConfigId
-  /** Color of the shape at the given location */
+  /** Color of the shape at the location where item was placed */
   shapeColor: string
 }
 

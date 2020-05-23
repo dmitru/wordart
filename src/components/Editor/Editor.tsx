@@ -1,51 +1,52 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react'
-import styled from '@emotion/styled'
-import 'lib/wordart/console-extensions'
-import { Shapes } from '@styled-icons/fa-solid/Shapes'
-import { TextFields } from '@styled-icons/material/TextFields'
-import { ChevronLeft } from '@styled-icons/material/ChevronLeft'
-import { Face } from '@styled-icons/material/Face'
-import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
-import { LayoutMasonry } from '@styled-icons/remix-fill/LayoutMasonry'
-import { Font } from '@styled-icons/icomoon/Font'
-import { observer } from 'mobx-react'
-import { useStore } from 'services/root-store'
-import { Dimensions } from 'lib/wordart/canvas-utils'
-import { Box } from 'components/shared/Box'
-import { darken, desaturate } from 'polished'
-import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
-import { css } from '@emotion/core'
-import { BaseBtn } from 'components/shared/BaseBtn'
-import { observable } from 'mobx'
-import { useRouter } from 'next/dist/client/router'
-import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
-import { Tooltip } from 'components/shared/Tooltip'
-import { Urls } from 'urls'
-import Link from 'next/link'
-import { LeftPanelShapesTab } from 'components/Editor/components/LeftPanelShapesTab'
-import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTab'
-import { LeftPanelFontsTab } from 'components/Editor/components/LeftPanelFontsTab'
-import { LeftPanelIconsTab } from 'components/Editor/components/LeftPanelIconsTab'
-import { LeftPanelColorsTab } from 'components/Editor/components/LeftPanelColorsTab'
-import { LeftPanelLayoutTab } from 'components/Editor/components/LeftPanelLayoutTab'
-import { WordcloudId } from 'services/api/types'
-import { Api } from 'services/api/api'
-import { EditorInitParams } from 'components/Editor/lib/editor'
 import {
+  Button,
+  Editable,
+  EditableInput,
+  EditablePreview,
+  Heading,
+  IconButton,
   Menu,
   MenuButton,
-  MenuList,
   MenuItem,
-  Button,
+  MenuList,
   useToast,
-  Icon,
-  IconButton,
-  Editable,
-  EditablePreview,
-  EditableInput,
-  Heading,
 } from '@chakra-ui/core'
-import { pageSizePresets } from 'components/Editor/editor-store'
+import { css } from '@emotion/core'
+import styled from '@emotion/styled'
+import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
+import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
+import { Shapes } from '@styled-icons/fa-solid/Shapes'
+import { Font } from '@styled-icons/icomoon/Font'
+import { Face } from '@styled-icons/material/Face'
+import { TextFields } from '@styled-icons/material/TextFields'
+import { LayoutMasonry } from '@styled-icons/remix-fill/LayoutMasonry'
+import { LeftPanelColorsTab } from 'components/Editor/components/LeftPanelColorsTab'
+import { LeftPanelFontsTab } from 'components/Editor/components/LeftPanelFontsTab'
+import { LeftPanelIconsTab } from 'components/Editor/components/LeftPanelIconsTab'
+import { LeftPanelLayoutTab } from 'components/Editor/components/LeftPanelLayoutTab'
+import { LeftPanelShapesTab } from 'components/Editor/components/LeftPanelShapesTab'
+import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTab'
+import {
+  pageSizePresets,
+  EditorStoreInitParams,
+} from 'components/Editor/editor-store'
+import { EditorInitParams } from 'components/Editor/lib/editor'
+import { BaseBtn } from 'components/shared/BaseBtn'
+import { Box } from 'components/shared/Box'
+import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
+import { Tooltip } from 'components/shared/Tooltip'
+import { Dimensions } from 'lib/wordart/canvas-utils'
+import 'lib/wordart/console-extensions'
+import { observable } from 'mobx'
+import { observer } from 'mobx-react'
+import { useRouter } from 'next/dist/client/router'
+import Link from 'next/link'
+import { darken, desaturate } from 'polished'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { Api } from 'services/api/api'
+import { WordcloudId } from 'services/api/types'
+import { useStore } from 'services/root-store'
+import { Urls } from 'urls'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -106,9 +107,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           canvasRef.current &&
           store.state !== 'initialized'
         ) {
-          const editorParams: EditorInitParams = {
+          const editorParams: EditorStoreInitParams = {
             canvas: canvasRef.current,
-            store: store,
             canvasWrapperEl: canvasWrapperRef.current!,
             aspectRatio,
           }
@@ -122,6 +122,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           }
 
           await store.initEditor(editorParams)
+          store.enterEditItemsMode()
 
           // store.editor?.generateShapeItems({
           //   style: store.styles.shape,
@@ -460,6 +461,60 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 >
                   Background
                 </Button>
+              </Box>
+
+              <Box mr="3" ml="3">
+                {store.mode === 'view' && (
+                  <Button
+                    css={css`
+                      box-shadow: none !important;
+                    `}
+                    py="1"
+                    variantColor="secondary"
+                    onClick={() => {
+                      store.enterEditItemsMode()
+                    }}
+                  >
+                    Edit
+                  </Button>
+                )}
+
+                {store.mode === 'edit items' && (
+                  <>
+                    <Button
+                      css={css`
+                        box-shadow: none !important;
+                      `}
+                      py="1"
+                      variantColor="green"
+                      onClick={() => {
+                        store.enterViewMode()
+                      }}
+                    >
+                      Done
+                    </Button>
+
+                    {store.selectedItem && (
+                      <>
+                        {/* <ColorPicker /> */}
+                        <Button
+                          ml="3"
+                          onClick={() => {
+                            if (!store.selectedItem) {
+                              return
+                            }
+                            store.setItemLock(
+                              store.selectedItem,
+                              !Boolean(store.selectedItem.locked)
+                            )
+                          }}
+                        >
+                          {store.selectedItem.locked ? 'Unlock' : 'Lock'}
+                        </Button>
+                      </>
+                    )}
+                  </>
+                )}
               </Box>
             </TopToolbar>
 

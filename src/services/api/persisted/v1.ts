@@ -10,23 +10,34 @@ import { Dimensions } from 'lib/wordart/canvas-utils'
 export type EditorPersistedDataV1 = {
   version: 1
   data: {
-    sceneSize: Dimensions
-    bg: {
-      style: BackgroundStyleConfig
-      items: EditorPersistedItemV1[]
-      words: EditorPersistedWordV1[]
-      fontIds: FontId[]
+    editor: {
+      sceneSize: Dimensions
+      bg: {
+        style: EditorPersistedBackgroundStyleConfigV1
+      }
+      shape: {
+        style: EditorPersistedShapeStyleConfigV1
+        transform: MatrixSerialized | null
+        shapeId: ShapeId | null
+      }
     }
-    shape: {
-      transform: MatrixSerialized | null
-      shapeId: ShapeId | null
-      style: ShapeStyleConfig
-      items: EditorPersistedItemV1[]
-      words: EditorPersistedWordV1[]
-      fontIds: FontId[]
+    generated: {
+      bg: {
+        items: EditorPersistedItemV1[]
+        words: EditorPersistedWordV1[]
+        fontIds: FontId[]
+      }
+      shape: {
+        items: EditorPersistedItemV1[]
+        words: EditorPersistedWordV1[]
+        fontIds: FontId[]
+      }
     }
   }
 }
+
+export type EditorPersistedBackgroundStyleConfigV1 = BackgroundStyleConfig
+export type EditorPersistedShapeStyleConfigV1 = ShapeStyleConfig
 
 export type EditorPersistedItemV1 =
   | EditorPersistedItemWordV1
