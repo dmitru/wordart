@@ -6,7 +6,6 @@ import {
 import { ItemId } from 'components/Editor/lib/generator'
 import { FontId } from 'data/fonts'
 import { Dimensions } from 'lib/wordart/canvas-utils'
-import { Rect } from 'lib/wordart/geometry'
 
 export type EditorPersistedDataV1 = {
   version: 1

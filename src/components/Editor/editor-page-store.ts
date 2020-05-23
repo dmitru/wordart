@@ -43,10 +43,6 @@ export class EditorPageStore {
   rootStore: RootStore
   editor: Editor | null = null
 
-  private nextWordId =
-    defaultBackgroundStyle.words.wordList.length +
-    defaultShapeStyle.words.wordList.length
-
   @observable isVisualizing = false
   @observable visualizingProgress = null as number | null
 
@@ -56,6 +52,11 @@ export class EditorPageStore {
   @observable styles = {
     bg: defaultBackgroundStyle,
     shape: defaultShapeStyle,
+  }
+
+  @observable pageSize: PageSize = {
+    kind: 'preset',
+    preset: pageSizePresets[1],
   }
 
   @observable availableShapes: ShapeConfig[] = shapes
@@ -89,6 +90,9 @@ export class EditorPageStore {
     }
 
     const { data } = serialized
+    this.editor.setAspectRatio(
+      serialized.data.sceneSize.w / serialized.data.sceneSize.h
+    )
 
     if (data.shape.shapeId != null) {
       await this.selectShape(data.shape.shapeId)
@@ -403,6 +407,53 @@ export class EditorPageStore {
     }
     set(word, update)
   }
+
+  @action setPageSize = (pageSize: PageSize) => {
+    this.pageSize = pageSize
+    if (!this.editor) {
+      return
+    }
+    const aspect =
+      pageSize.kind === 'preset'
+        ? pageSize.preset.aspect
+        : pageSize.width / pageSize.height
+    this.editor.setAspectRatio(aspect)
+  }
 }
 
 export type WordConfigId = string
+
+export type PageSize =
+  | {
+      kind: 'preset'
+      preset: PageSizePreset
+    }
+  | {
+      kind: 'custom'
+      width: number
+      height: number
+    }
+
+export type PageSizePreset = {
+  id: string
+  title: string
+  aspect: number
+}
+
+export const pageSizePresets: PageSizePreset[] = [
+  {
+    id: 'square',
+    title: 'Square',
+    aspect: 1,
+  },
+  {
+    id: '4:3',
+    title: 'Landscape',
+    aspect: 4 / 3,
+  },
+  {
+    id: '3:4',
+    title: 'Portrait',
+    aspect: 3 / 4,
+  },
+]

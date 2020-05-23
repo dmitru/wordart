@@ -1,41 +1,34 @@
+import chroma from 'chroma-js'
 import { EditorPageStore } from 'components/Editor/editor-page-store'
+import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
 import {
-  fetchImage,
-  removeLightPixels,
-  createCanvas,
-  Dimensions,
-} from 'lib/wordart/canvas-utils'
-import { consoleLoggers } from 'utils/console-logger'
-import {
+  Font,
+  GeneratedItem,
   Generator,
   ItemId,
-  GeneratedItem,
-  WordInfoId,
-  Font,
   WordGeneratedItem,
+  WordInfoId,
 } from 'components/Editor/lib/generator'
-import chroma from 'chroma-js'
-import { loadFont } from 'lib/wordart/fonts'
-import { Path, Glyph } from 'opentype.js'
-import { max, min, groupBy, sortBy, flatten } from 'lodash'
-import seedrandom from 'seedrandom'
 import {
-  ShapeConfig,
-  ColorString,
-  ShapeStyleConfig,
-  ItemsColoring,
   BackgroundStyleConfig,
+  ColorString,
+  ItemsColoring,
+  ShapeConfig,
+  ShapeStyleConfig,
 } from 'components/Editor/style'
-
-import { toJS } from 'mobx'
-import { EditorPersistedData } from 'services/api/types'
-import { fabric } from 'fabric'
-import paper from 'paper'
 import { FontId } from 'data/fonts'
-import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
+import { fabric } from 'fabric'
+import { removeLightPixels } from 'lib/wordart/canvas-utils'
+import { loadFont } from 'lib/wordart/fonts'
+import { flatten, groupBy, max, min, sortBy } from 'lodash'
+import { toJS } from 'mobx'
+import { Glyph } from 'opentype.js'
+import paper from 'paper'
+import seedrandom from 'seedrandom'
 import { MatrixSerialized } from 'services/api/persisted/v1'
-import { Matrix } from 'transformation-matrix'
+import { EditorPersistedData } from 'services/api/types'
 import { waitAnimationFrame } from 'utils/async'
+import { consoleLoggers } from 'utils/console-logger'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -51,6 +44,8 @@ export class Editor {
   private params: EditorInitParams
   private store: EditorPageStore
   private generator: Generator
+
+  private aspectRatio: number
 
   /** Info about the current shape */
   currentShape:
@@ -70,20 +65,6 @@ export class Editor {
     shape?: fabric.Object
     shapeOriginalColors?: fabric.Object
   } = {}
-
-  // paperItems: {
-  //   /** Background color */
-  //   bgRect?: paper.Path
-  //   /** Generated items of the background */
-  //   bgItemsGroup?: paper.Group
-  //   /** Generated items of the shape */
-  //   shapeItemsGroup?: paper.Group
-
-  //   /** Rendered shape */
-  //   shape?: paper.Item
-  //   /** Shape with the original coloring preserved */
-  //   originalShape?: paper.Item
-  // }
 
   generatedItems: {
     shape: {
@@ -126,6 +107,7 @@ export class Editor {
 
     paper.setup(new paper.Size({ width: 1, height: 1 }))
     this.canvas = new fabric.Canvas(params.canvas.id)
+    this.aspectRatio = this.params.aspectRatio
 
     this.canvas.on('object:moving', (evt) => {
       const target = evt.target
@@ -192,7 +174,7 @@ export class Editor {
       x: 0,
       y: 0,
       width: 1000,
-      height: 1000 / params.aspectRatio,
+      height: 1000 / this.aspectRatio,
     })
 
     this.logger.debug(
@@ -220,18 +202,29 @@ export class Editor {
     this.handleResize()
   }
 
+  setAspectRatio = (aspect: number) => {
+    this.aspectRatio = aspect
+    this.projectBounds = new paper.Rectangle({
+      x: 0,
+      y: 0,
+      width: 1000,
+      height: 1000 / this.aspectRatio,
+    })
+    this.handleResize()
+  }
+
   handleResize = () => {
     const wrapperBounds = this.params.canvasWrapperEl.getBoundingClientRect()
     wrapperBounds.width -= 40
     wrapperBounds.height -= 40
 
     // Update view size
-    if (wrapperBounds.width / wrapperBounds.height > this.params.aspectRatio) {
-      this.canvas.setWidth(this.params.aspectRatio * wrapperBounds.height)
+    if (wrapperBounds.width / wrapperBounds.height > this.aspectRatio) {
+      this.canvas.setWidth(this.aspectRatio * wrapperBounds.height)
       this.canvas.setHeight(wrapperBounds.height)
     } else {
       this.canvas.setWidth(wrapperBounds.width)
-      this.canvas.setHeight(wrapperBounds.width / this.params.aspectRatio)
+      this.canvas.setHeight(wrapperBounds.width / this.aspectRatio)
     }
 
     // // Update view transform to make sure the viewport includes the entire project bounds

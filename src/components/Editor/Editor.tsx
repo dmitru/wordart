@@ -43,7 +43,9 @@ import {
   Editable,
   EditablePreview,
   EditableInput,
+  Heading,
 } from '@chakra-ui/core'
+import { pageSizePresets } from 'components/Editor/editor-page-store'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -166,11 +168,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               Menu
             </MenuButton>
             <MenuList zIndex={4}>
-              <MenuItem>Download</MenuItem>
-              <MenuItem>Create a Copy</MenuItem>
-              <MenuItem>Mark as Draft</MenuItem>
-              <MenuItem>Delete</MenuItem>
-              <MenuItem>Attend a Workshop</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  state.leftPanelContext = 'resize'
+                }}
+              >
+                Change page size...
+              </MenuItem>
             </MenuList>
           </Menu>
           <Button
@@ -279,69 +283,88 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               </SideNavbar>
 
               <LeftPanel>
-                <LeftTopWrapper>
-                  <Box mr="3" ml="3">
-                    <Button
-                      css={css`
-                        width: 120px;
-                        box-shadow: none !important;
-                      `}
-                      py="1"
-                      borderTopRightRadius="0"
-                      borderBottomRightRadius="0"
-                      variantColor="secondary"
-                      onClick={() => {
-                        state.targetTab = 'shape'
-                      }}
-                      variant={
-                        state.targetTab !== 'shape' ? 'outline' : 'solid'
-                      }
-                    >
-                      Shape
-                    </Button>
-
-                    <Button
-                      css={css`
-                        width: 120px;
-                        box-shadow: none !important;
-                      `}
-                      py="1"
-                      borderTopLeftRadius="0"
-                      borderBottomLeftRadius="0"
-                      variantColor="secondary"
-                      onClick={() => {
-                        state.targetTab = 'bg'
-                      }}
-                      variant={state.targetTab !== 'bg' ? 'outline' : 'solid'}
-                    >
-                      Background
-                    </Button>
-                  </Box>
-                </LeftTopWrapper>
-
                 <LeftPanelContent id="left-panel-content" px="3" py="3">
                   {store.state === 'initialized' ? (
                     <>
-                      {leftTab === 'shapes' && <LeftPanelShapesTab />}
-                      {leftTab === 'words' && (
-                        <>
-                          <LeftPanelWordsTab target={state.targetTab} />
-                        </>
-                      )}
-                      {leftTab === 'fonts' && (
-                        <>
-                          <LeftPanelFontsTab target={state.targetTab} />
-                        </>
-                      )}
-                      {leftTab === 'symbols' && (
-                        <LeftPanelIconsTab target={state.targetTab} />
-                      )}
-                      {leftTab === 'colors' && (
-                        <LeftPanelColorsTab target={state.targetTab} />
-                      )}
+                      {state.leftPanelContext === 'resize' && (
+                        <Box>
+                          <Heading size="md" mt="0" mb="3">
+                            Page Size
+                          </Heading>
+                          {pageSizePresets.map((preset) => (
+                            <Button
+                              variantColor={
+                                store.pageSize.kind === 'preset' &&
+                                store.pageSize.preset.id === preset.id
+                                  ? 'primary'
+                                  : undefined
+                              }
+                              mr="2"
+                              mb="3"
+                              key={preset.id}
+                              onClick={() => {
+                                store.setPageSize({ kind: 'preset', preset })
+                              }}
+                            >
+                              {preset.title}
+                            </Button>
+                          ))}
+                          <Button
+                            variantColor={
+                              store.pageSize.kind === 'custom'
+                                ? 'primary'
+                                : undefined
+                            }
+                            mr="2"
+                            mb="3"
+                            onClick={() => {
+                              store.setPageSize({
+                                kind: 'custom',
+                                height: 2,
+                                width: 4,
+                              })
+                            }}
+                          >
+                            Custom
+                          </Button>
 
-                      {leftTab === 'layout' && (
-                        <LeftPanelLayoutTab target={state.targetTab} />
+                          <Box>
+                            <Button
+                              mt="4"
+                              variantColor="green"
+                              onClick={() => {
+                                state.leftPanelContext = 'normal'
+                              }}
+                            >
+                              Done
+                            </Button>
+                          </Box>
+                        </Box>
+                      )}
+                      {state.leftPanelContext === 'normal' && (
+                        <>
+                          {leftTab === 'shapes' && <LeftPanelShapesTab />}
+                          {leftTab === 'words' && (
+                            <>
+                              <LeftPanelWordsTab target={state.targetTab} />
+                            </>
+                          )}
+                          {leftTab === 'fonts' && (
+                            <>
+                              <LeftPanelFontsTab target={state.targetTab} />
+                            </>
+                          )}
+                          {leftTab === 'symbols' && (
+                            <LeftPanelIconsTab target={state.targetTab} />
+                          )}
+                          {leftTab === 'colors' && (
+                            <LeftPanelColorsTab target={state.targetTab} />
+                          )}
+
+                          {leftTab === 'layout' && (
+                            <LeftPanelLayoutTab target={state.targetTab} />
+                          )}
+                        </>
                       )}
                     </>
                   ) : (
@@ -401,6 +424,42 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               <Tooltip label="Redo" aria-label="Redo" hasArrow zIndex={5}>
                 <IconButton ml="1" icon="arrow-forward" aria-label="Redo" />
               </Tooltip>
+
+              <Box mr="3" ml="3">
+                <Button
+                  css={css`
+                    width: 120px;
+                    box-shadow: none !important;
+                  `}
+                  py="1"
+                  borderTopRightRadius="0"
+                  borderBottomRightRadius="0"
+                  variantColor="secondary"
+                  onClick={() => {
+                    state.targetTab = 'shape'
+                  }}
+                  variant={state.targetTab !== 'shape' ? 'outline' : 'solid'}
+                >
+                  Shape
+                </Button>
+
+                <Button
+                  css={css`
+                    width: 120px;
+                    box-shadow: none !important;
+                  `}
+                  py="1"
+                  borderTopLeftRadius="0"
+                  borderBottomLeftRadius="0"
+                  variantColor="secondary"
+                  onClick={() => {
+                    state.targetTab = 'bg'
+                  }}
+                  variant={state.targetTab !== 'bg' ? 'outline' : 'solid'}
+                >
+                  Background
+                </Button>
+              </Box>
             </TopToolbar>
 
             <CanvasWrappper ref={canvasWrapperRef}>
@@ -615,6 +674,7 @@ const state = observable({
   leftTabShape: 'shapes' as LeftPanelTab,
   leftTabBg: 'words' as Omit<LeftPanelTab, 'shapes'>,
   targetTab: 'shape' as TargetTab,
+  leftPanelContext: 'resize' as 'normal' | 'resize',
 })
 
 export type TargetTab = 'shape' | 'bg'
