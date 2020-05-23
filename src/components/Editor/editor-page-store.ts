@@ -1,44 +1,41 @@
-import { observable, action, set, toJS } from 'mobx'
-import { RootStore } from 'services/root-store'
+import { shapes } from 'components/Editor/icons'
 import {
   Editor,
   EditorInitParams,
   getItemsColoring,
+  TargetKind,
 } from 'components/Editor/lib/editor'
-import { FontConfig, fonts, FontId, FontStyleConfig } from 'data/fonts'
-import { shapes } from 'components/Editor/icons'
+import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
 import {
-  ShapeConfig,
-  ShapeId,
-  defaultBackgroundStyle,
-  defaultShapeStyle,
-  WordStyleConfig,
-  ShapeStyleConfig,
-  BackgroundStyleConfig,
-} from 'components/Editor/style'
-import { consoleLoggers } from 'utils/console-logger'
-import { EditorPersistedData } from 'services/api/types'
-import {
-  EditorPersistedItemWordV1,
-  MatrixSerialized,
-  EditorPersistedSymbolV1,
-  EditorPersistedItemV1,
-  EditorPersistedWordV1,
-} from 'services/api/persisted/v1'
-import { notEmpty } from 'utils/not-empty'
-import { roundFloat } from 'utils/round-float'
-import {
-  GeneratedItem,
   Font,
-  WordInfo,
+  GeneratedItem,
   WordGeneratedItem,
 } from 'components/Editor/lib/generator'
-import { flatten, uniq, uniqBy } from 'lodash'
+import {
+  defaultBackgroundStyle,
+  defaultShapeStyle,
+  ShapeConfig,
+  ShapeId,
+  WordStyleConfig,
+} from 'components/Editor/style'
+import { FontConfig, FontId, fonts, FontStyleConfig } from 'data/fonts'
 import { loadFont } from 'lib/wordart/fonts'
-import { Path, BoundingBox } from 'opentype.js'
+import { uniq, uniqBy } from 'lodash'
+import { action, observable, set, toJS } from 'mobx'
 import paper from 'paper'
-import { fabric } from 'fabric'
-import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
+import {
+  EditorPersistedItemV1,
+  EditorPersistedItemWordV1,
+  EditorPersistedSymbolV1,
+  EditorPersistedWordV1,
+  MatrixSerialized,
+} from 'services/api/persisted/v1'
+import { EditorPersistedData } from 'services/api/types'
+import { RootStore } from 'services/root-store'
+import { consoleLoggers } from 'utils/console-logger'
+import { notEmpty } from 'utils/not-empty'
+import { roundFloat } from 'utils/round-float'
+import { nanoid } from 'nanoid/non-secure'
 
 export class EditorPageStore {
   logger = consoleLoggers.editorStore
@@ -65,7 +62,6 @@ export class EditorPageStore {
   @observable selectedShapeId: ShapeId = shapes[4].id
 
   constructor(rootStore: RootStore) {
-    // paper.setup(new paper.Size({ width: 1, height: 1 }))
     this.rootStore = rootStore
   }
 
@@ -367,27 +363,36 @@ export class EditorPageStore {
     })
   }
 
-  @action deleteWord = (target: StyleKind, wordId: WordConfigId) => {
+  @action deleteWord = (target: TargetKind, wordId: WordConfigId) => {
     const style = this.styles[target]
     style.words.wordList = style.words.wordList.filter((w) => w.id !== wordId)
   }
 
-  @action clearWords = (target: StyleKind) => {
+  @action clearWords = (target: TargetKind) => {
     const style = this.styles[target]
     style.words.wordList = []
   }
 
-  @action addEmptyWord = (target: StyleKind) => {
+  @action addEmptyWord = (target: TargetKind) => {
     const style = this.styles[target]
     style.words.wordList.push({
-      id: this.nextWordId,
+      id: this.getUniqWordId(target),
       text: '',
     })
-    this.nextWordId += 1
+  }
+
+  getUniqWordId = (target: TargetKind) => {
+    const style = this.styles[target]
+    const wordIds = new Set(style.words.wordList.map((wl) => wl.id))
+    let candidate = nanoid(6)
+    while (wordIds.has(candidate)) {
+      candidate = nanoid(6)
+    }
+    return candidate
   }
 
   @action updateWord = (
-    target: StyleKind,
+    target: TargetKind,
     wordId: WordConfigId,
     update: Partial<Omit<WordStyleConfig, 'id'>>
   ) => {
@@ -400,7 +405,4 @@ export class EditorPageStore {
   }
 }
 
-// TODO: replace with unique short random string (for word configs can be deleted)
-export type WordConfigId = number
-
-export type StyleKind = 'shape' | 'bg'
+export type WordConfigId = string

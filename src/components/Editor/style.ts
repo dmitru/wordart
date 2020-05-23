@@ -1,6 +1,5 @@
-import { fonts, FontId } from 'data/fonts'
 import { WordConfigId } from 'components/Editor/editor-page-store'
-import { Rect } from 'lib/wordart/geometry'
+import { FontId, fonts } from 'data/fonts'
 
 const defaultWordsList: WordStyleConfig[] = [
   // 'O',
@@ -14,10 +13,10 @@ const defaultWordsList: WordStyleConfig[] = [
   'impress',
   'stunning',
   'creative',
-].map((s, index) => ({ id: index, text: s } as WordStyleConfig))
+].map((s, index) => ({ id: `${index}`, text: s } as WordStyleConfig))
 
 const defaultWordsListBackground: WordStyleConfig[] = ['back'].map(
-  (s, index) => ({ id: index, text: s } as WordStyleConfig)
+  (s, index) => ({ id: `${index}`, text: s } as WordStyleConfig)
 )
 
 export const defaultShapeStyle: ShapeStyleConfig = {
