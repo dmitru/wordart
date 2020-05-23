@@ -1,4 +1,4 @@
-import { WordConfigId } from 'components/Editor/editor-page-store'
+import { WordConfigId } from 'components/Editor/editor-store'
 import { ShapeConfig, ShapeId } from 'components/Editor/style'
 import {
   clampPixelOpacityUp,

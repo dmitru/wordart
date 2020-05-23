@@ -45,7 +45,7 @@ import {
   EditableInput,
   Heading,
 } from '@chakra-ui/core'
-import { pageSizePresets } from 'components/Editor/editor-page-store'
+import { pageSizePresets } from 'components/Editor/editor-store'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId

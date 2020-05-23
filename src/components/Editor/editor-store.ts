@@ -37,7 +37,7 @@ import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
 import { nanoid } from 'nanoid/non-secure'
 
-export class EditorPageStore {
+export class EditorStore {
   logger = consoleLoggers.editorStore
 
   rootStore: RootStore

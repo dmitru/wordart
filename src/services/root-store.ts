@@ -1,19 +1,19 @@
 import React, { useContext } from 'react'
 import { configure } from 'mobx'
 import 'mobx-react-lite/batchingForReactDom'
-import { EditorPageStore } from 'components/Editor/editor-page-store'
+import { EditorStore } from 'components/Editor/editor-store'
 import { AuthStore } from 'services/auth-store'
 import { WordcloudsStore } from 'services/wordclouds-store'
 
 configure({})
 
 export class RootStore {
-  editorPageStore: EditorPageStore
+  editorPageStore: EditorStore
   authStore: AuthStore
   wordcloudsStore: WordcloudsStore
 
   constructor() {
-    this.editorPageStore = new EditorPageStore(this)
+    this.editorPageStore = new EditorStore(this)
     this.authStore = new AuthStore(this)
     this.wordcloudsStore = new WordcloudsStore(this)
 

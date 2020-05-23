@@ -1,5 +1,5 @@
 import chroma from 'chroma-js'
-import { EditorPageStore } from 'components/Editor/editor-page-store'
+import { EditorStore } from 'components/Editor/editor-store'
 import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
 import {
   Font,
@@ -34,7 +34,7 @@ export type EditorInitParams = {
   canvas: HTMLCanvasElement
   canvasWrapperEl: HTMLElement
   aspectRatio: number
-  store: EditorPageStore
+  store: EditorStore
   serialized?: EditorPersistedData
 }
 
@@ -42,7 +42,7 @@ export class Editor {
   logger = consoleLoggers.editor
 
   private params: EditorInitParams
-  private store: EditorPageStore
+  private store: EditorStore
   private generator: Generator
 
   private aspectRatio: number
