@@ -68,6 +68,7 @@ export class EditorStore {
     preset: pageSizePresets[1],
   }
 
+  @observable hasItemChanges = false
   @observable availableShapes: ShapeConfig[] = shapes
   @observable selectedShapeId: ShapeId = shapes[4].id
 
@@ -105,6 +106,7 @@ export class EditorStore {
         this.selectedItem = null
       },
       onItemUpdated: (item) => {
+        this.hasItemChanges = true
         this.selectedItem = item
         this.selectedItemData = {
           id: item.id,
@@ -139,16 +141,24 @@ export class EditorStore {
     this.editor?.canvas.requestRenderAll()
   }
 
-  setItemColor = (color: string) => {
+  // TODO
+  resetAllItems = () => {
+    this.hasItemChanges = false
+  }
+
+  setItemCustomColor = (color: string) => {
     if (!this.selectedItem || !this.selectedItemData) {
       return
     }
+    this.hasItemChanges = true
     this.selectedItem.setCustomColor(color)
+    this.selectedItem.setLocked(true)
     this.selectedItemData.customColor = color
+    this.selectedItemData.locked = true
     this.editor?.canvas.requestRenderAll()
   }
 
-  resetItemColor = () => {
+  resetItemCustomColor = () => {
     if (!this.selectedItem || !this.selectedItemData) {
       return
     }

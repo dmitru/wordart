@@ -429,6 +429,88 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               </Tooltip>
 
               <Box mr="3" ml="3">
+                {store.mode === 'view' && (
+                  <Button
+                    css={css`
+                      box-shadow: none !important;
+                    `}
+                    py="1"
+                    onClick={() => {
+                      store.enterEditItemsMode()
+                    }}
+                  >
+                    Edit Items
+                  </Button>
+                )}
+
+                {store.mode === 'edit items' && (
+                  <>
+                    <Button
+                      css={css`
+                        box-shadow: none !important;
+                      `}
+                      mr="3"
+                      py="1"
+                      variantColor="green"
+                      onClick={() => {
+                        store.enterViewMode()
+                      }}
+                    >
+                      Done
+                    </Button>
+
+                    <Button
+                      mr="3"
+                      isDisabled={!store.hasItemChanges}
+                      variant="ghost"
+                      onClick={store.resetAllItems}
+                    >
+                      Reset All
+                    </Button>
+
+                    {!store.selectedItemData && (
+                      <Text display="inline">Select item to edit it...</Text>
+                    )}
+
+                    {store.selectedItemData && (
+                      <>
+                        <ColorPicker
+                          value={
+                            store.selectedItemData.customColor ||
+                            store.selectedItemData.color
+                          }
+                          onAfterChange={(color) => {
+                            store.setItemCustomColor(color)
+                          }}
+                        >
+                          <Button
+                            onClick={() => {
+                              store.resetItemCustomColor()
+                            }}
+                          >
+                            Reset Default Color
+                          </Button>
+                        </ColorPicker>
+                        <Button
+                          ml="3"
+                          onClick={() => {
+                            if (!store.selectedItemData) {
+                              return
+                            }
+                            store.setItemLock(
+                              !Boolean(store.selectedItemData.locked)
+                            )
+                          }}
+                        >
+                          {store.selectedItemData.locked ? 'Unlock' : 'Lock'}
+                        </Button>
+                      </>
+                    )}
+                  </>
+                )}
+              </Box>
+
+              <Box mr="3" ml="3" marginLeft="auto">
                 <Text display="inline" mr="2">
                   Layer:
                 </Text>
@@ -462,75 +544,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 >
                   BKG
                 </Button>
-              </Box>
-
-              <Box mr="3" ml="3">
-                {store.mode === 'view' && (
-                  <Button
-                    css={css`
-                      box-shadow: none !important;
-                    `}
-                    py="1"
-                    variantColor="secondary"
-                    onClick={() => {
-                      store.enterEditItemsMode()
-                    }}
-                  >
-                    Edit
-                  </Button>
-                )}
-
-                {store.mode === 'edit items' && (
-                  <>
-                    <Button
-                      css={css`
-                        box-shadow: none !important;
-                      `}
-                      py="1"
-                      variantColor="green"
-                      onClick={() => {
-                        store.enterViewMode()
-                      }}
-                    >
-                      Done
-                    </Button>
-
-                    {store.selectedItemData && (
-                      <>
-                        <ColorPicker
-                          value={
-                            store.selectedItemData.customColor ||
-                            store.selectedItemData.color
-                          }
-                          onAfterChange={(color) => {
-                            store.setItemColor(color)
-                          }}
-                        >
-                          <Button
-                            onClick={() => {
-                              store.resetItemColor()
-                            }}
-                          >
-                            Reset Default Color
-                          </Button>
-                        </ColorPicker>
-                        <Button
-                          ml="3"
-                          onClick={() => {
-                            if (!store.selectedItemData) {
-                              return
-                            }
-                            store.setItemLock(
-                              !Boolean(store.selectedItemData.locked)
-                            )
-                          }}
-                        >
-                          {store.selectedItemData.locked ? 'Unlock' : 'Lock'}
-                        </Button>
-                      </>
-                    )}
-                  </>
-                )}
               </Box>
             </TopToolbar>
 

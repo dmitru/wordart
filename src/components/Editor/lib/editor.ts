@@ -181,7 +181,6 @@ export class EditorItemWord {
   setCustomColor = (color: string) => {
     this.customColor = color
     this._updateColor(this.customColor)
-    this.setLocked(true)
   }
 
   clearCustomColor = () => {
