@@ -449,7 +449,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       css={css`
                         box-shadow: none !important;
                       `}
-                      mr="3"
+                      mr="2"
                       py="1"
                       variantColor="green"
                       onClick={() => {
@@ -460,17 +460,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     </Button>
 
                     <Button
-                      mr="3"
+                      mr="2"
+                      size="sm"
                       isDisabled={!store.hasItemChanges}
                       variant="ghost"
                       onClick={store.resetAllItems}
                     >
                       Reset All
                     </Button>
-
-                    {!store.selectedItemData && (
-                      <Text display="inline">Select item to edit it...</Text>
-                    )}
 
                     {store.selectedItemData && (
                       <>
@@ -492,7 +489,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           </Button>
                         </ColorPicker>
                         <Button
-                          ml="3"
+                          ml="2"
+                          size="sm"
                           onClick={() => {
                             if (!store.selectedItemData) {
                               return
@@ -510,41 +508,43 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 )}
               </Box>
 
-              <Box mr="3" ml="3" marginLeft="auto">
-                <Text display="inline" mr="2">
-                  Layer:
-                </Text>
-                <Button
-                  css={css`
-                    box-shadow: none !important;
-                  `}
-                  py="1"
-                  borderTopRightRadius="0"
-                  borderBottomRightRadius="0"
-                  variantColor="secondary"
-                  onClick={() => {
-                    state.targetTab = 'shape'
-                  }}
-                  variant={state.targetTab !== 'shape' ? 'outline' : 'solid'}
-                >
-                  FG
-                </Button>
-                <Button
-                  css={css`
-                    box-shadow: none !important;
-                  `}
-                  py="1"
-                  borderTopLeftRadius="0"
-                  borderBottomLeftRadius="0"
-                  variantColor="secondary"
-                  onClick={() => {
-                    state.targetTab = 'bg'
-                  }}
-                  variant={state.targetTab !== 'bg' ? 'outline' : 'solid'}
-                >
-                  BKG
-                </Button>
-              </Box>
+              {store.mode === 'view' && (
+                <Box mr="3" ml="3" marginLeft="auto">
+                  <Text display="inline" mr="2">
+                    Layer:
+                  </Text>
+                  <Button
+                    css={css`
+                      box-shadow: none !important;
+                    `}
+                    py="1"
+                    borderTopRightRadius="0"
+                    borderBottomRightRadius="0"
+                    variantColor="secondary"
+                    onClick={() => {
+                      state.targetTab = 'shape'
+                    }}
+                    variant={state.targetTab !== 'shape' ? 'outline' : 'solid'}
+                  >
+                    FG
+                  </Button>
+                  <Button
+                    css={css`
+                      box-shadow: none !important;
+                    `}
+                    py="1"
+                    borderTopLeftRadius="0"
+                    borderBottomLeftRadius="0"
+                    variantColor="secondary"
+                    onClick={() => {
+                      state.targetTab = 'bg'
+                    }}
+                    variant={state.targetTab !== 'bg' ? 'outline' : 'solid'}
+                  >
+                    BKG
+                  </Button>
+                </Box>
+              )}
             </TopToolbar>
 
             <CanvasWrappper ref={canvasWrapperRef}>
