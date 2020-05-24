@@ -10,6 +10,7 @@ import {
   MenuItem,
   MenuList,
   useToast,
+  Text,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
@@ -47,6 +48,7 @@ import { Api } from 'services/api/api'
 import { WordcloudId } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
+import { ColorPicker } from 'components/shared/ColorPicker'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -122,7 +124,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           }
 
           await store.initEditor(editorParams)
-          store.enterEditItemsMode()
 
           // store.editor?.generateShapeItems({
           //   style: store.styles.shape,
@@ -428,9 +429,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               </Tooltip>
 
               <Box mr="3" ml="3">
+                <Text display="inline" mr="2">
+                  Layer:
+                </Text>
                 <Button
                   css={css`
-                    width: 120px;
                     box-shadow: none !important;
                   `}
                   py="1"
@@ -442,12 +445,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   }}
                   variant={state.targetTab !== 'shape' ? 'outline' : 'solid'}
                 >
-                  Shape
+                  FG
                 </Button>
-
                 <Button
                   css={css`
-                    width: 120px;
                     box-shadow: none !important;
                   `}
                   py="1"
@@ -459,7 +460,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   }}
                   variant={state.targetTab !== 'bg' ? 'outline' : 'solid'}
                 >
-                  Background
+                  BKG
                 </Button>
               </Box>
 
@@ -494,22 +495,37 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       Done
                     </Button>
 
-                    {store.selectedItem && (
+                    {store.selectedItemData && (
                       <>
-                        {/* <ColorPicker /> */}
+                        <ColorPicker
+                          value={
+                            store.selectedItemData.customColor ||
+                            store.selectedItemData.color
+                          }
+                          onAfterChange={(color) => {
+                            store.setItemColor(color)
+                          }}
+                        >
+                          <Button
+                            onClick={() => {
+                              store.resetItemColor()
+                            }}
+                          >
+                            Reset Default Color
+                          </Button>
+                        </ColorPicker>
                         <Button
                           ml="3"
                           onClick={() => {
-                            if (!store.selectedItem) {
+                            if (!store.selectedItemData) {
                               return
                             }
                             store.setItemLock(
-                              store.selectedItem,
-                              !Boolean(store.selectedItem.locked)
+                              !Boolean(store.selectedItemData.locked)
                             )
                           }}
                         >
-                          {store.selectedItem.locked ? 'Unlock' : 'Lock'}
+                          {store.selectedItemData.locked ? 'Unlock' : 'Lock'}
                         </Button>
                       </>
                     )}

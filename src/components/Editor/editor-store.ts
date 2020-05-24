@@ -4,13 +4,13 @@ import {
   EditorInitParams,
   getItemsColoring,
   TargetKind,
+  EditorItemId,
+  EditorItem,
+  EditorItemConfig,
+  EditorItemConfigWord,
 } from 'components/Editor/lib/editor'
 import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
-import {
-  Font,
-  GeneratedItem,
-  WordGeneratedItem,
-} from 'components/Editor/lib/generator'
+import { Font } from 'components/Editor/lib/generator'
 import {
   defaultBackgroundStyle,
   defaultShapeStyle,
@@ -20,13 +20,12 @@ import {
 } from 'components/Editor/style'
 import { FontConfig, FontId, fonts, FontStyleConfig } from 'data/fonts'
 import { loadFont } from 'lib/wordart/fonts'
-import { uniq, uniqBy } from 'lodash'
+import { uniq, uniqBy, sortBy } from 'lodash'
 import { action, observable, set, toJS } from 'mobx'
 import paper from 'paper'
 import {
   EditorPersistedItemV1,
   EditorPersistedItemWordV1,
-  EditorPersistedSymbolV1,
   EditorPersistedWordV1,
   MatrixSerialized,
 } from 'services/api/persisted/v1'
@@ -76,7 +75,14 @@ export class EditorStore {
     this.rootStore = rootStore
   }
 
-  @observable selectedItem: GeneratedItem | null = null
+  @observable selectedItemData: {
+    id: EditorItemId
+    locked: boolean
+    color: string
+    customColor: string | undefined
+    customText: string | undefined
+  } | null = null
+  selectedItem: EditorItem | null = null
 
   @action initEditor = async (params: EditorStoreInitParams) => {
     this.logger.debug('initEditor', params)
@@ -85,14 +91,28 @@ export class EditorStore {
       ...params,
       store: this,
       onItemSelected: (item) => {
-        console.log('onItemSelected', item)
         this.selectedItem = item
+        this.selectedItemData = {
+          id: item.id,
+          locked: item.locked,
+          color: item.color,
+          customColor: item.customColor,
+          customText: item.customText,
+        }
       },
       onItemSelectionCleared: () => {
+        this.selectedItemData = null
         this.selectedItem = null
       },
       onItemUpdated: (item) => {
         this.selectedItem = item
+        this.selectedItemData = {
+          id: item.id,
+          locked: item.locked,
+          color: item.color,
+          customColor: item.customColor,
+          customText: item.customText,
+        }
       },
     })
     this.editor.setBgColor(this.styles.bg.fill)
@@ -105,11 +125,36 @@ export class EditorStore {
       await this.selectShape(shapes[5].id)
     }
 
+    this.enterViewMode()
+
     this.state = 'initialized'
   }
 
-  setItemLock = (item: GeneratedItem, lockValue: boolean) => {
-    item.locked = lockValue
+  setItemLock = (lockValue: boolean) => {
+    if (!this.selectedItem || !this.selectedItemData) {
+      return
+    }
+    this.selectedItem.setLocked(lockValue)
+    this.selectedItemData.locked = lockValue
+    this.editor?.canvas.requestRenderAll()
+  }
+
+  setItemColor = (color: string) => {
+    if (!this.selectedItem || !this.selectedItemData) {
+      return
+    }
+    this.selectedItem.setCustomColor(color)
+    this.selectedItemData.customColor = color
+    this.editor?.canvas.requestRenderAll()
+  }
+
+  resetItemColor = () => {
+    if (!this.selectedItem || !this.selectedItemData) {
+      return
+    }
+    this.selectedItem.clearCustomColor()
+    this.selectedItemData.customColor = undefined
+    this.editor?.canvas.requestRenderAll()
   }
 
   @action enterEditItemsMode = () => {
@@ -117,6 +162,7 @@ export class EditorStore {
     if (!this.editor) {
       return
     }
+    this.editor.showLockBorders()
     this.editor.enableItemsSelection()
     this.editor.enableSelectionMode()
   }
@@ -126,7 +172,9 @@ export class EditorStore {
     if (!this.editor) {
       return
     }
+    this.selectedItemData = null
     this.selectedItem = null
+    this.editor.hideLockBorders()
     this.editor.disableItemsSelection()
     this.editor.disableSelectionMode()
   }
@@ -167,7 +215,7 @@ export class EditorStore {
       items: EditorPersistedItemV1[]
       words: EditorPersistedWordV1[]
       fontIds: FontId[]
-    }): Promise<GeneratedItem[]> => {
+    }): Promise<EditorItemConfig[]> => {
       console.log('deserializeItems: ', { words, items, fontIds })
 
       // Fetch all required Fonts
@@ -185,8 +233,8 @@ export class EditorStore {
         { fontId: FontId; text: string; wordConfigId?: WordConfigId }
       >()
 
-      const result: GeneratedItem[] = []
-      for (const item of items) {
+      const result: EditorItemConfig[] = []
+      for (const [index, item] of items.entries()) {
         if (item.k === 'w') {
           const word = words[item.wi]
           const fontId = fontIds[word.fontIndex]
@@ -205,8 +253,11 @@ export class EditorStore {
           }
 
           const { text, wordConfigId } = wordsInfoMap.get(wordInfoId)!
-          const wordItem: WordGeneratedItem = {
-            id: item.id,
+          const wordItem: EditorItemConfigWord = {
+            index: index,
+            color: item.c,
+            customColor: item.cc,
+            locked: item.l || false,
             shapeColor: item.sc,
             kind: 'word',
             transform: new paper.Matrix(item.t).prepend(
@@ -265,7 +316,7 @@ export class EditorStore {
     ]
 
     const serializeItems = (
-      items: GeneratedItem[]
+      items: EditorItem[]
     ): {
       fontIds: FontId[]
       words: EditorPersistedWordV1[]
@@ -277,7 +328,7 @@ export class EditorStore {
             if (item.kind !== 'word') {
               return null
             }
-            return item.fontId
+            return item.font.id
           })
           .filter(notEmpty)
       )
@@ -287,10 +338,10 @@ export class EditorStore {
           if (item.kind !== 'word') {
             return null
           }
-          const fontIndex = fontIds.findIndex((fId) => fId === item.fontId)
+          const fontIndex = fontIds.findIndex((fId) => fId === item.font.id)
           return {
             fontIndex,
-            text: item.text,
+            text: item.customText || item.defaultText,
           }
         })
         .filter(notEmpty)
@@ -306,11 +357,14 @@ export class EditorStore {
           .map((item, index) => {
             if (item.kind === 'word') {
               return {
-                k: 'w',
                 id: item.id,
+                k: 'w',
+                c: item.color,
+                cc: item.customColor,
                 t: serializeMatrix(item.transform),
                 wcId: item.wordConfigId,
                 sc: item.shapeColor,
+                l: item.locked,
                 wi: uniqWords.findIndex(
                   (uw) =>
                     uw.fontIndex === words[index].fontIndex &&
@@ -318,14 +372,14 @@ export class EditorStore {
                 ),
               } as EditorPersistedItemWordV1
             }
-            if (item.kind === 'symbol') {
-              return {
-                k: 's',
-                id: item.id,
-                t: serializeMatrix(item.transform),
-                sId: item.shapeId,
-              } as EditorPersistedSymbolV1
-            }
+            // if (item.kind === 'symbol') {
+            //   return {
+            //     k: 's',
+            //     id: item.index,
+            //     t: serializeMatrix(item.transform),
+            //     sId: item.shapeId,
+            //   } as EditorPersistedSymbolV1
+            // }
 
             return null
           })
@@ -355,8 +409,8 @@ export class EditorStore {
           },
         },
         generated: {
-          bg: serializeItems(this.editor.generatedItems.bg.items),
-          shape: serializeItems(this.editor.generatedItems.shape.items),
+          bg: serializeItems(this.editor.getItemsSorted('bg')),
+          shape: serializeItems(this.editor.getItemsSorted('shape')),
         },
       },
     }

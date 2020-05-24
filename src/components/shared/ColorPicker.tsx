@@ -12,7 +12,6 @@ import {
   PopoverArrow,
   PopoverCloseButton,
   PopoverBody,
-  IButton,
   ButtonProps,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
@@ -22,6 +21,7 @@ export type ColorPickerProps = {
   disableAlpha?: boolean
   onChange?: (hex: string) => void
   onAfterChange?: (hex: string) => void
+  children?: React.ReactNode
 } & Omit<ButtonProps, 'children' | 'onChange'>
 
 const ColorSwatch = styled(Button)<{ color: string }>`
@@ -52,6 +52,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   disableAlpha,
   onAfterChange,
   onChange,
+  children,
   ...props
 }) => {
   const initialFocusRef = useRef(null)
@@ -112,6 +113,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
                 }
               }}
             />
+            {children}
           </PopoverBody>
         </PopoverContent>
       </Popover>

@@ -1,26 +1,26 @@
+import chroma from 'chroma-js'
 import { WordConfigId } from 'components/Editor/editor-store'
 import { ShapeConfig, ShapeId } from 'components/Editor/style'
+import { FontId } from 'data/fonts'
 import {
   clampPixelOpacityUp,
   clearCanvas,
+  copyCanvas,
   createCanvasCtx,
+  createCanvasCtxCopy,
   detectEdges,
   Dimensions,
   invertImageMask,
   removeLightPixels,
   shrinkShape,
-  createCanvasCtxCopy,
-  copyCanvas,
 } from 'lib/wordart/canvas-utils'
-import { Rect, Point } from 'lib/wordart/geometry'
+import { Rect } from 'lib/wordart/geometry'
 import { ImageProcessorWasm } from 'lib/wordart/wasm/image-processor-wasm'
 import { getWasmModule, WasmModule } from 'lib/wordart/wasm/wasm-module'
 import { flatten, noop, sample, uniq } from 'lodash'
-import { BoundingBox, Path } from 'opentype.js'
-import { consoleLoggers } from 'utils/console-logger'
-import { FontId } from 'data/fonts'
+import { Path } from 'opentype.js'
 import paper from 'paper'
-import chroma from 'chroma-js'
+import { consoleLoggers } from 'utils/console-logger'
 
 const FONT_SIZE = 100
 
@@ -222,7 +222,7 @@ export class Generator {
     const placedWordItems: WordGeneratedItem[] = []
     const placedSymbolItems: SymbolGeneratedItem[] = []
 
-    const nIter = 500
+    const nIter = 2
     const t1 = performance.now()
 
     const wordAngles = uniq(flatten(task.words.map((w) => w.angles)))
@@ -494,7 +494,7 @@ export class Generator {
           wordPath.draw(unrotatedCtx)
 
           placedWordItems.push({
-            id: i,
+            index: i,
             kind: 'word',
             shapeColor,
             fontId: word.font.id,
@@ -704,7 +704,7 @@ export class Generator {
           )
 
           placedSymbolItems.push({
-            id: i,
+            index: i,
             kind: 'symbol',
             shapeColor: 'black',
             symbolDef: iconSymDef,
@@ -833,7 +833,7 @@ export type GeneratedItem =
 export type RasterGeneratedItem = {
   kind: 'img'
   locked?: boolean
-  id: ItemId
+  index: number
   ctx: CanvasRenderingContext2D
   transform: paper.Matrix
 }
@@ -841,7 +841,7 @@ export type RasterGeneratedItem = {
 export type SymbolGeneratedItem = {
   kind: 'symbol'
   locked?: boolean
-  id: ItemId
+  index: number
   shapeId: ShapeId
   shapeColor: string
   symbolDef: paper.SymbolDefinition
@@ -850,17 +850,14 @@ export type SymbolGeneratedItem = {
 
 export type WordGeneratedItem = {
   kind: 'word'
-  locked?: boolean
-  id: ItemId
+  index: number
   text: string
   fontId: FontId
   transform: paper.Matrix
-  wordConfigId?: WordConfigId
+  wordConfigId: WordConfigId
   /** Color of the shape at the location where item was placed */
   shapeColor: string
 }
-
-export type ItemId = number
 
 // Perhaps it's not needed
 export class WordInfo {

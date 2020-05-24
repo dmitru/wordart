@@ -152,7 +152,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               updateItemsColoring()
             }}
           >
-            Same as Shape
+            Shape color
           </Button>
 
           <Button

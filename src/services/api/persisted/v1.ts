@@ -3,9 +3,9 @@ import {
   ShapeId,
   ShapeStyleConfig,
 } from 'components/Editor/style'
-import { ItemId } from 'components/Editor/lib/generator'
 import { FontId } from 'data/fonts'
 import { Dimensions } from 'lib/wordart/canvas-utils'
+import { EditorItemId } from 'components/Editor/lib/editor'
 
 export type EditorPersistedDataV1 = {
   version: 1
@@ -53,22 +53,26 @@ export type EditorPersistedWordV1 = {
 export type EditorPersistedItemWordV1 = {
   /** Kind */
   k: 'w'
-  id: ItemId
+  id: EditorItemId
   /** Word config ID */
   wcId?: number
   /** Word list index */
   wi: number
   /** Transform */
   t: MatrixSerialized
+  /** Is locked? */
+  l?: boolean
   /** Color */
   c: string
+  /** Custom color? */
+  cc?: string
   /** Shape color */
   sc: string
 }
 export type EditorPersistedSymbolV1 = {
   /** Kind */
   k: 's'
-  id: ItemId
+  id: EditorItemId
   /** Shape ID */
   sId: ShapeId
   /** Transform */
