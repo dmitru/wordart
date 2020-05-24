@@ -94,14 +94,15 @@ export class EditorItemWord {
     const pw = pathBounds.x2 - pathBounds.x1
     const ph = pathBounds.y2 - pathBounds.y1
 
+    const pad = 10
     const wordGroup = new fabric.Group([
       new fabric.Rect().set({
         originX: 'center',
         originY: 'center',
         left: pathBounds.x1,
         top: pathBounds.y1,
-        width: pw,
-        height: ph,
+        width: pw + 2 * pad,
+        height: ph + 2 * pad,
         strokeWidth: 1,
         stroke: 'black',
         fill: 'rgba(255,255,255,0.3)',
@@ -150,7 +151,10 @@ export class EditorItemWord {
   }
 
   private _updateColor = (color: string) => {
-    this.fabricObj.cornerStrokeColor = color
+    this.fabricObj.cornerColor = color
+    this.fabricObj.cornerStyle = 'circle'
+    this.fabricObj.transparentCorners = false
+    this.fabricObj.borderColor = color
     this.wordObj.set({ fill: color })
     this.lockBorder.set({ stroke: color })
   }
