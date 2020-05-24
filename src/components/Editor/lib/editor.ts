@@ -11,7 +11,11 @@ import {
 } from 'components/Editor/style'
 import { FontId } from 'data/fonts'
 import { fabric } from 'fabric'
-import { removeLightPixels } from 'lib/wordart/canvas-utils'
+import {
+  removeLightPixels,
+  createCanvasCtx,
+  createCanvas,
+} from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { flatten, groupBy, keyBy, sortBy, max, min } from 'lodash'
 import { toJS } from 'mobx'
@@ -96,7 +100,7 @@ export class EditorItemWord {
     const pw = pathBounds.x2 - pathBounds.x1
     const ph = pathBounds.y2 - pathBounds.y1
 
-    const pad = 10
+    const pad = 0
     const wordGroup = new fabric.Group([
       new fabric.Rect().set({
         originX: 'center',
@@ -177,6 +181,7 @@ export class EditorItemWord {
   setCustomColor = (color: string) => {
     this.customColor = color
     this._updateColor(this.customColor)
+    this.setLocked(true)
   }
 
   clearCustomColor = () => {
@@ -954,6 +959,28 @@ export class Editor {
     const shapeCanvas = (shapeImage.toCanvasElement() as any) as HTMLCanvasElement
     const shapeCanvasOriginalColors = (this.fabricObjects.shapeOriginalColors.toCanvasElement() as any) as HTMLCanvasElement
 
+    let canvasSubtract: HTMLCanvasElement | undefined
+    const lockedItems = this.getItemsSorted('shape').filter((i) => i.locked)
+    if (lockedItems.length > 0) {
+      canvasSubtract = createCanvas({
+        w: shapeCanvas.width,
+        h: shapeCanvas.height,
+      })
+      const ctx = canvasSubtract.getContext('2d')!
+      for (const item of lockedItems) {
+        ctx.save()
+        ctx.translate(
+          -this.fabricObjects.shape.getBoundingRect(true).left || 0,
+          -this.fabricObjects.shape.getBoundingRect(true).top || 0
+        )
+        const saved = item.isShowingLockBorder
+        item.setLockBorderVisibility(false)
+        item.fabricObj.drawObject(ctx)
+        item.setLockBorderVisibility(saved)
+        ctx.restore()
+      }
+    }
+
     const shapeRasterBounds = new paper.Rectangle(
       this.fabricObjects.shape.getBoundingRect(true).left || 0,
       this.fabricObjects.shape.getBoundingRect(true).top || 0,
@@ -968,6 +995,7 @@ export class Editor {
       {
         shape: {
           canvas: shapeCanvas,
+          canvasSubtract,
           shapeCanvasOriginalColors,
           bounds: shapeRasterBounds,
           processing: {
