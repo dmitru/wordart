@@ -25,6 +25,7 @@ export class UninqIdGenerator {
         attempt = 0
       }
     }
+    this.ids.add(candidate)
     return candidate
   }
 

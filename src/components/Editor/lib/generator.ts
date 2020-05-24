@@ -52,7 +52,7 @@ export class Generator {
     }
     this.logger.debug('Generator: generate', task)
 
-    const shapeCanvasMaxExtent = 280
+    const shapeCanvasMaxExtent = 320
 
     const shapeCanvas = task.shape.canvas
     const shapeCanvasOriginalColors = task.shape.shapeCanvasOriginalColors
@@ -155,6 +155,25 @@ export class Generator {
       unrotatedCtx.drawImage(edgesCanvas, 0, 0)
       unrotatedCtx.restore()
     }
+    if (task.shape.canvasSubtract) {
+      unrotatedCtx.save()
+      unrotatedCtx.globalCompositeOperation = 'destination-out'
+      unrotatedCtx.shadowBlur =
+        0.25 + (task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6
+      unrotatedCtx.shadowColor = 'black'
+      unrotatedCtx.drawImage(
+        task.shape.canvasSubtract,
+        0,
+        0,
+        task.shape.canvasSubtract.width,
+        task.shape.canvasSubtract.height,
+        0,
+        0,
+        unrotatedCtx.canvas.width,
+        unrotatedCtx.canvas.height
+      )
+      unrotatedCtx.restore()
+    }
 
     const imageProcessor = new ImageProcessorWasm(this.wasm)
 
@@ -222,7 +241,7 @@ export class Generator {
     const placedWordItems: WordGeneratedItem[] = []
     const placedSymbolItems: SymbolGeneratedItem[] = []
 
-    const nIter = 400
+    const nIter = 500
     const t1 = performance.now()
 
     const wordAngles = uniq(flatten(task.words.map((w) => w.angles)))
@@ -447,14 +466,9 @@ export class Generator {
         unrotatedCtx.save()
         rotatedBoundsTransform.applyToContext(unrotatedCtx)
 
-        if (task.itemPadding > 0) {
-          unrotatedCtx.shadowBlur =
-            ((task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6) /
-            pathScale
-          unrotatedCtx.shadowColor = 'red'
-        } else {
-          unrotatedCtx.shadowBlur = 0
-        }
+        unrotatedCtx.shadowBlur =
+          0.25 + (task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6
+        unrotatedCtx.shadowColor = 'red'
 
         if (
           pathScale * Math.min(largestRect.w, largestRect.h) >=
@@ -511,8 +525,8 @@ export class Generator {
               .translate(tx, ty)
               .scale(pathScale)
               .translate(
-                0.5 * wordPathSize.w,
-                +wordPathBounds.y1 + wordPathSize.h * 0.5
+                wordPathBounds.x1 + 0.5 * wordPathSize.w,
+                wordPathBounds.y1 + wordPathSize.h * 0.5
               ),
           })
         } else {
@@ -766,6 +780,8 @@ export class Generator {
 export type FillShapeTask = {
   shape: {
     canvas: HTMLCanvasElement
+    /** Subtract this canvas from `canvas` before starting generation */
+    canvasSubtract?: HTMLCanvasElement
     shapeCanvasOriginalColors: HTMLCanvasElement
     bounds: paper.Rectangle
     processing: {
