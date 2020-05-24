@@ -4,7 +4,6 @@ import {
   Icon,
   IconButton,
   Editable,
-  Heading,
   EditablePreview,
   EditableInput,
   InputGroup,
@@ -17,6 +16,22 @@ import {
   MenuItem,
   MenuGroup,
   MenuDivider,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  Link,
+  Text,
+  TabPanel,
+  Textarea,
+  Checkbox,
 } from '@chakra-ui/core'
 import { capitalize } from 'lodash'
 import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
@@ -29,6 +44,7 @@ import { useStore } from 'services/root-store'
 import { FiUploadCloud } from 'react-icons/fi'
 import { ColorPicker } from 'components/shared/ColorPicker'
 import { Tooltip } from 'components/shared/Tooltip'
+import stopword from 'stopword'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -59,7 +75,14 @@ const WordRow = styled(Box)`
   }
 `
 
-const state = observable({})
+const state = observable({
+  isShowingImport: false,
+  editor: {
+    import: {
+      textInput: '',
+    },
+  },
+})
 
 const Toolbar = styled(Box)``
 
@@ -79,7 +102,13 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               <Button leftIcon="edit">Open editor...</Button>
             </Tooltip>
 
-            <Button ml="2" leftIcon="arrow-up">
+            <Button
+              ml="2"
+              leftIcon="arrow-up"
+              onClick={() => {
+                state.isShowingImport = true
+              }}
+            >
               Import
             </Button>
 
@@ -147,7 +176,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             <Button
               variantColor="green"
               leftIcon="add"
-              onClick={() => store.addEmptyWord(target)}
+              onClick={() => store.addWord(target)}
             >
               Add
             </Button>
@@ -195,6 +224,99 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             ))}
           </WordList>
         </Stack>
+
+        <Modal
+          size="lg"
+          isOpen={state.isShowingImport}
+          onClose={() => {
+            state.isShowingImport = false
+          }}
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Import Words</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Tabs size="md" variant="enclosed">
+                <TabList>
+                  <Tab>Text</Tab>
+                  <Tab>CSV / Excel</Tab>
+                  <Tab>Web</Tab>
+                </TabList>
+                <TabPanels>
+                  <TabPanel>
+                    <Textarea
+                      mt="4"
+                      minHeight="200px"
+                      placeholder="Enter text..."
+                      value={state.editor.import.textInput}
+                      onChange={(evt) => {
+                        state.editor.import.textInput = evt.target.value
+                      }}
+                    />
+                    <Box mt="4" mb="4">
+                      <Stack direction="row" spacing="5">
+                        <Checkbox>Remove common words</Checkbox>
+                        <Checkbox>Remove numbers</Checkbox>
+                      </Stack>
+                      <Box>
+                        <Checkbox>
+                          Word stemming (e.g. treat “love” and “loves” as one
+                          word)
+                        </Checkbox>
+                      </Box>
+                    </Box>
+                  </TabPanel>
+                  <TabPanel>
+                    <Box mt="4">
+                      <Text>
+                        <Link>Learn more</Link> about importing words from CSV,
+                        Excel or Google Sheets.
+                      </Text>
+                      <Textarea
+                        mt="3"
+                        placeholder="Paste CSV..."
+                        value={state.editor.import.textInput}
+                        onChange={(evt) => {
+                          state.editor.import.textInput = evt.target.value
+                        }}
+                      />
+                      <Box mt="3">
+                        <Text>
+                          Or you can choose a CSV file:{' '}
+                          <Button>Open CSV file...</Button>
+                        </Text>
+                      </Box>
+                    </Box>
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
+            </ModalBody>
+
+            <ModalFooter>
+              <Checkbox marginRight="auto">
+                Clear word list before importing
+              </Checkbox>
+              <Button
+                ml="3"
+                variantColor="accent"
+                onClick={() => {
+                  const rawWords = state.editor.import.textInput
+                    .split(' ')
+                    .map((word) => word.toLocaleLowerCase().trim())
+                  const processedWords = stopword.removeStopwords(rawWords)
+
+                  for (const word of processedWords) {
+                    store.addWord(target, word)
+                  }
+                  state.isShowingImport = false
+                }}
+              >
+                Import
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Box>
     )
   }

@@ -35,6 +35,7 @@ import { consoleLoggers } from 'utils/console-logger'
 import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
 import { nanoid } from 'nanoid/non-secure'
+import { UninqIdGenerator } from 'utils/ids'
 
 export type EditorMode = 'view' | 'edit items'
 
@@ -71,6 +72,8 @@ export class EditorStore {
   @observable hasItemChanges = false
   @observable availableShapes: ShapeConfig[] = shapes
   @observable selectedShapeId: ShapeId = shapes[4].id
+
+  wordIdGen = new UninqIdGenerator(3)
 
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
@@ -490,25 +493,18 @@ export class EditorStore {
 
   @action clearWords = (target: TargetKind) => {
     const style = this.styles[target]
+    const ids = style.words.wordList.map((w) => w.id)
+    this.wordIdGen.removeIds(ids)
+    this.wordIdGen.resetLen()
     style.words.wordList = []
   }
 
-  @action addEmptyWord = (target: TargetKind) => {
+  @action addWord = (target: TargetKind, text = '') => {
     const style = this.styles[target]
     style.words.wordList.push({
-      id: this.getUniqWordId(target),
-      text: '',
+      id: this.wordIdGen.get(),
+      text,
     })
-  }
-
-  getUniqWordId = (target: TargetKind) => {
-    const style = this.styles[target]
-    const wordIds = new Set(style.words.wordList.map((wl) => wl.id))
-    let candidate = nanoid(6)
-    while (wordIds.has(candidate)) {
-      candidate = nanoid(6)
-    }
-    return candidate
   }
 
   @action updateWord = (
