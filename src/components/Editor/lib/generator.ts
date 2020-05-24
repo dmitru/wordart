@@ -222,7 +222,7 @@ export class Generator {
     const placedWordItems: WordGeneratedItem[] = []
     const placedSymbolItems: SymbolGeneratedItem[] = []
 
-    const nIter = 2
+    const nIter = 400
     const t1 = performance.now()
 
     const wordAngles = uniq(flatten(task.words.map((w) => w.angles)))

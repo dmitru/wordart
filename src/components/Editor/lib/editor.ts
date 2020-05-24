@@ -13,7 +13,7 @@ import { FontId } from 'data/fonts'
 import { fabric } from 'fabric'
 import { removeLightPixels } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
-import { flatten, groupBy, keyBy, sortBy } from 'lodash'
+import { flatten, groupBy, keyBy, sortBy, max, min } from 'lodash'
 import { toJS } from 'mobx'
 import { Glyph } from 'opentype.js'
 import paper from 'paper'
@@ -23,6 +23,8 @@ import { waitAnimationFrame } from 'utils/async'
 import { consoleLoggers } from 'utils/console-logger'
 import { UninqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
+import chroma from 'chroma-js'
+import seedrandom from 'seedrandom'
 
 export type EditorItemConfig = EditorItemConfigWord
 
@@ -157,6 +159,19 @@ export class EditorItemWord {
     this.fabricObj.borderColor = color
     this.wordObj.set({ fill: color })
     this.lockBorder.set({ stroke: color })
+  }
+
+  private _updateOpacity = (opacity: number) => {
+    this.fabricObj.opacity = opacity
+  }
+
+  setColor = (color: string) => {
+    this.color = color
+    this._updateColor(this.customColor || this.color)
+  }
+
+  setOpacity = (opacity: number) => {
+    this._updateOpacity(opacity)
   }
 
   setCustomColor = (color: string) => {
@@ -520,114 +535,111 @@ export class Editor {
   }
 
   setItemsColor = async (target: TargetKind, coloring: ItemsColoring) => {
-    // const { items } = this.items[target]
-    // this.logger.debug(
-    //   'setItemsColor',
-    //   target,
-    //   coloring,
-    //   `${items.length} items`
-    // )
-    // let colors: string[] = []
-    // if (coloring.kind === 'gradient' || coloring.kind === 'single-color') {
-    //   if (coloring.kind === 'single-color') {
-    //     colors = [coloring.color]
-    //   } else if (coloring.kind === 'gradient') {
-    //     const scale = chroma.scale([coloring.colorFrom, coloring.colorTo])
-    //     colors = scale.colors(10)
-    //   }
-    // } else if (coloring.kind === 'shape' && coloring.shapeStyleFill) {
-    //   if (coloring.shapeStyleFill.kind === 'single-color') {
-    //     colors = [coloring.shapeStyleFill.color]
-    //   } else {
-    //     colors = coloring.shapeStyleFill.colorMap
-    //   }
-    // }
-    // const itemAreas = items.map((item) => {
-    //   if (item.kind === 'word') {
-    //     const wordPathBb = item.pathBounds!
-    //     const scaling = item.transform.scaling
-    //     const wordH = (wordPathBb.y2 - wordPathBb.y1) * scaling.y
-    //     const wordW = (wordPathBb.x2 - wordPathBb.x1) * scaling.x
-    //     const wordArea = Math.sqrt(wordH * wordW)
-    //     return wordArea
-    //   }
-    //   // if (item.kind === 'symbol') {
-    //   //   const bounds = item.symbolDef.item.bounds
-    //   //   const w = bounds.width * item.transform.scaling.x
-    //   //   const h = bounds.height * item.transform.scaling.y
-    //   //   return Math.sqrt(w * h)
-    //   // }
-    //   return 0
-    // })
-    // const maxArea = max(itemAreas)!
-    // const minArea = min(itemAreas)!
-    // const rng = seedrandom('fill color')
-    // let shapeRaster: fabric.Image | undefined
-    // let shapeRasterImgData: ImageData | undefined
-    // const dimSmallerFactor = coloring.dimSmallerItems / 100
-    // if ((!shapeRaster || !shapeRasterImgData) && this.fabricObjects.shape) {
-    //   shapeRaster = await new Promise<fabric.Image>((r) =>
-    //     this.fabricObjects.shape!.cloneAsImage((copy: fabric.Image) => r(copy))
-    //   )
-    // }
-    // for (let i = 0; i < items.length; ++i) {
-    //   const item = items[i]
-    //   const area = itemAreas[i]
-    //   const obj = item.fabricObj
-    //   if (!obj) {
-    //     continue
-    //   }
-    //   if (item.kind !== 'word' && item.kind !== 'symbol') {
-    //     continue
-    //   }
-    //   const objects = obj instanceof fabric.Group ? obj.getObjects() : [obj]
-    //   if (coloring.kind === 'gradient' || coloring.kind === 'single-color') {
-    //     const index = Math.floor(rng() * colors.length)
-    //     objects.forEach((o) =>
-    //       o.set({ fill: colors[index], stroke: colors[index] })
-    //     )
-    //   } else if (coloring.shapeStyleFill) {
-    //     if (coloring.shapeStyleFill.kind === 'single-color') {
-    //       const shapeColor = new paper.Color(coloring.shapeStyleFill.color)
-    //       let color = chroma.rgb(
-    //         255 * shapeColor.red,
-    //         255 * shapeColor.green,
-    //         255 * shapeColor.blue
-    //       )
-    //       if (coloring.shapeBrightness != 0) {
-    //         color = color.brighten(coloring.shapeBrightness / 100)
-    //       }
-    //       const hex = color.hex()
-    //       objects.forEach((o) => o.set({ fill: hex, stroke: hex }))
-    //     } else if (coloring.shapeStyleFill.kind === 'color-map') {
-    //       const colorMapSorted = sortBy(
-    //         coloring.shapeStyleFill.defaultColorMap.map((color, index) => ({
-    //           color,
-    //           index,
-    //         })),
-    //         ({ color }) => chroma.distance(color, item.shapeColor, 'rgb')
-    //       )
-    //       const shapeColorStringIndex = colorMapSorted[0].index
-    //       const shapeColorString =
-    //         coloring.shapeStyleFill.colorMap[shapeColorStringIndex]
-    //       const shapeColor = new paper.Color(shapeColorString)
-    //       let color = chroma.rgb(
-    //         255 * shapeColor.red,
-    //         255 * shapeColor.green,
-    //         255 * shapeColor.blue
-    //       )
-    //       if (coloring.shapeBrightness != 0) {
-    //         color = color.brighten(coloring.shapeBrightness / 100)
-    //       }
-    //       const hex = color.hex()
-    //       objects.forEach((o) => o.set({ fill: hex, stroke: hex }))
-    //     }
-    //   }
-    //   obj.opacity =
-    //     (dimSmallerFactor * (area - minArea)) / (maxArea - minArea) +
-    //     (1 - dimSmallerFactor)
-    // }
-    // this.canvas.requestRenderAll()
+    const { itemsById } = this.items[target]
+    const items = [...itemsById.values()]
+    this.logger.debug(
+      'setItemsColor',
+      target,
+      coloring,
+      `${items.length} items`
+    )
+    let colors: string[] = []
+    if (coloring.kind === 'gradient' || coloring.kind === 'single-color') {
+      if (coloring.kind === 'single-color') {
+        colors = [coloring.color]
+      } else if (coloring.kind === 'gradient') {
+        const scale = chroma.scale([coloring.colorFrom, coloring.colorTo])
+        colors = scale.colors(10)
+      }
+    } else if (coloring.kind === 'shape' && coloring.shapeStyleFill) {
+      if (coloring.shapeStyleFill.kind === 'single-color') {
+        colors = [coloring.shapeStyleFill.color]
+      } else {
+        colors = coloring.shapeStyleFill.colorMap
+      }
+    }
+    const itemAreas = items.map((item) => {
+      if (item.kind === 'word') {
+        const wordPathBb = item.pathBounds!
+        const scaling = item.transform.scaling
+        const wordH = (wordPathBb.y2 - wordPathBb.y1) * scaling.y
+        const wordW = (wordPathBb.x2 - wordPathBb.x1) * scaling.x
+        const wordArea = Math.sqrt(wordH * wordW)
+        return wordArea
+      }
+      // if (item.kind === 'symbol') {
+      //   const bounds = item.symbolDef.item.bounds
+      //   const w = bounds.width * item.transform.scaling.x
+      //   const h = bounds.height * item.transform.scaling.y
+      //   return Math.sqrt(w * h)
+      // }
+      return 0
+    })
+    const maxArea = max(itemAreas)!
+    const minArea = min(itemAreas)!
+    const rng = seedrandom('fill color')
+    let shapeRaster: fabric.Image | undefined
+    let shapeRasterImgData: ImageData | undefined
+    const dimSmallerFactor = coloring.dimSmallerItems / 100
+    if ((!shapeRaster || !shapeRasterImgData) && this.fabricObjects.shape) {
+      shapeRaster = await new Promise<fabric.Image>((r) =>
+        this.fabricObjects.shape!.cloneAsImage((copy: fabric.Image) => r(copy))
+      )
+    }
+    for (let i = 0; i < items.length; ++i) {
+      const item = items[i]
+      const area = itemAreas[i]
+
+      if (item.kind !== 'word' && item.kind !== 'symbol') {
+        continue
+      }
+
+      if (coloring.kind === 'gradient' || coloring.kind === 'single-color') {
+        const index = Math.floor(rng() * colors.length)
+        item.setColor(colors[index])
+      } else if (coloring.shapeStyleFill) {
+        if (coloring.shapeStyleFill.kind === 'single-color') {
+          const shapeColor = new paper.Color(coloring.shapeStyleFill.color)
+          let color = chroma.rgb(
+            255 * shapeColor.red,
+            255 * shapeColor.green,
+            255 * shapeColor.blue
+          )
+          if (coloring.shapeBrightness != 0) {
+            color = color.brighten(coloring.shapeBrightness / 100)
+          }
+          const hex = color.hex()
+          item.setColor(hex)
+        } else if (coloring.shapeStyleFill.kind === 'color-map') {
+          const colorMapSorted = sortBy(
+            coloring.shapeStyleFill.defaultColorMap.map((color, index) => ({
+              color,
+              index,
+            })),
+            ({ color }) => chroma.distance(color, item.shapeColor, 'rgb')
+          )
+          const shapeColorStringIndex = colorMapSorted[0].index
+          const shapeColorString =
+            coloring.shapeStyleFill.colorMap[shapeColorStringIndex]
+          const shapeColor = new paper.Color(shapeColorString)
+          let color = chroma.rgb(
+            255 * shapeColor.red,
+            255 * shapeColor.green,
+            255 * shapeColor.blue
+          )
+          if (coloring.shapeBrightness != 0) {
+            color = color.brighten(coloring.shapeBrightness / 100)
+          }
+          const hex = color.hex()
+          item.setColor(hex)
+        }
+      }
+      item.setOpacity(
+        (dimSmallerFactor * (area - minArea)) / (maxArea - minArea) +
+          (1 - dimSmallerFactor)
+      )
+    }
+    this.canvas.requestRenderAll()
   }
 
   /** Sets the shape, clearing the project */
