@@ -39,11 +39,13 @@ import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import React, { useCallback, useState } from 'react'
 import { useStore } from 'services/root-store'
+import { AddCustomImageModal } from 'components/Editor/components/AddCustomImageModal'
 
 export type LeftPanelShapesTabProps = {}
 
 const state = observable({
-  isShowingAdjust: false,
+  isShowingCustomize: false,
+  isShowingAddCustomImage: false,
   isTransforming: false,
 })
 
@@ -63,9 +65,9 @@ const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
 
 export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
   () => {
-    const { editorPageStore } = useStore()
-    const shapeStyle = editorPageStore.styles.shape
-    const shape = editorPageStore.getSelectedShape()
+    const { editorPageStore: store } = useStore()
+    const shapeStyle = store.styles.shape
+    const shape = store.getSelectedShape()
 
     const [term, setTerm] = useState('')
     const allOptions = [
@@ -94,24 +96,21 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
     } | null>(null)
 
     const visualize = useCallback(() => {
-      editorPageStore.editor?.generateShapeItems({
+      store.editor?.generateShapeItems({
         style: shapeStyle,
       })
     }, [])
 
     const [query, setQuery] = useState('')
-    const matchingShapes = editorPageStore
+    const matchingShapes = store
       .getAvailableShapes()
       .filter((s) => s.title.toLowerCase().includes(query.toLowerCase()))
 
     const updateShapeColoring = useThrottleCallback(
       () => {
-        editorPageStore.editor?.setShapeFillColors(shapeStyle.fill)
+        store.editor?.setShapeFillColors(shapeStyle.fill)
         if (shapeStyle.itemsColoring.kind === 'shape') {
-          editorPageStore.editor?.setItemsColor(
-            'shape',
-            getItemsColoring(shapeStyle)
-          )
+          store.editor?.setItemsColor('shape', getItemsColoring(shapeStyle))
         }
       },
       20,
@@ -135,7 +134,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                   }
                 `}
                 backgroundColor="white"
-                shape={editorPageStore.getSelectedShape()}
+                shape={store.getSelectedShape()}
               />
               <Box
                 flex={1}
@@ -150,7 +149,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                   <ShapeOpacitySlider
                     style={shapeStyle}
                     onAfterChange={(value: number) => {
-                      editorPageStore.editor?.setShapeFillOpacity(value / 100)
+                      store.editor?.setShapeFillOpacity(value / 100)
                     }}
                   />
                 </Box>
@@ -158,25 +157,27 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                 <Flex>
                   <Tooltip
                     label="Customize colors, size and position"
-                    isDisabled={state.isShowingAdjust}
+                    isDisabled={state.isShowingCustomize}
                   >
                     <Button
                       // size="sm"
                       mr="2"
-                      variant={state.isShowingAdjust ? 'solid' : 'solid'}
-                      variantColor={state.isShowingAdjust ? 'green' : undefined}
+                      variant={state.isShowingCustomize ? 'solid' : 'solid'}
+                      variantColor={
+                        state.isShowingCustomize ? 'green' : undefined
+                      }
                       onClick={() => {
-                        state.isShowingAdjust = !state.isShowingAdjust
+                        state.isShowingCustomize = !state.isShowingCustomize
                         if (state.isTransforming) {
                           state.isTransforming = false
-                          editorPageStore.editor?.deselectShape()
-                          editorPageStore.editor?.generateShapeItems({
-                            style: editorPageStore.styles.shape,
+                          store.editor?.deselectShape()
+                          store.editor?.generateShapeItems({
+                            style: store.styles.shape,
                           })
                         }
                       }}
                     >
-                      {state.isShowingAdjust ? 'Done' : 'Customize'}
+                      {state.isShowingCustomize ? 'Done' : 'Customize'}
                     </Button>
                   </Tooltip>
                 </Flex>
@@ -184,7 +185,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
             </Box>
 
             <Box>
-              {state.isShowingAdjust && (
+              {state.isShowingCustomize && (
                 <>
                   <Stack mb="4" p="2">
                     {shape.kind === 'svg' && (
@@ -300,7 +301,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                             variantColor="accent"
                             onClick={() => {
                               state.isTransforming = true
-                              editorPageStore.editor?.selectShape()
+                              store.editor?.selectShape()
                             }}
                           >
                             Transform shape
@@ -318,9 +319,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               variantColor="accent"
                               onClick={() => {
                                 state.isTransforming = false
-                                editorPageStore.editor?.deselectShape()
-                                editorPageStore.editor?.generateShapeItems({
-                                  style: editorPageStore.styles.shape,
+                                store.editor?.deselectShape()
+                                store.editor?.generateShapeItems({
+                                  style: store.styles.shape,
                                 })
                               }}
                             >
@@ -339,7 +340,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                 </>
               )}
 
-              {!state.isShowingAdjust && (
+              {!state.isShowingCustomize && (
                 <>
                   <Flex mt="5">
                     <Tooltip label="Add custom image...">
@@ -348,6 +349,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         variantColor="green"
                         size="sm"
                         mr="2"
+                        onClick={() => {
+                          state.isShowingAddCustomImage = true
+                        }}
                       >
                         Image
                       </Button>
@@ -452,15 +456,46 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                     overflowY="auto"
                     shapes={matchingShapes}
                     onSelected={(shape) => {
-                      editorPageStore.selectShape(shape.id)
+                      store.selectShape(shape.id)
                     }}
-                    selectedShapeId={editorPageStore.getSelectedShape().id}
+                    selectedShapeId={store.getSelectedShape().id}
                   />
                 </>
               )}
             </Box>
           </>
         </Box>
+
+        <AddCustomImageModal
+          isOpen={state.isShowingAddCustomImage}
+          onClose={() => {
+            state.isShowingAddCustomImage = false
+          }}
+          onSubmit={({ thumbnailUrl, state }) => {
+            const customImgId = store.addCustomShapeImg({
+              kind: 'img',
+              title: 'Custom',
+              url: state.originalUrl!,
+              thumbnailUrl,
+              isCustom: true,
+              processing: {
+                edges: {
+                  enabled: false,
+                  amount: 0,
+                },
+                invert: {
+                  enabled: state.invert,
+                  color: state.invertColor,
+                },
+                removeLightBackground: {
+                  enabled: true,
+                  threshold: state.removeLightBackground,
+                },
+              },
+            })
+            store.selectShape(customImgId)
+          }}
+        />
       </>
     )
   }

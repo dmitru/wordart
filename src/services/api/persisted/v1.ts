@@ -2,6 +2,7 @@ import {
   BackgroundStyleConfig,
   ShapeId,
   ShapeStyleConfig,
+  ShapeConfigImg,
 } from 'components/Editor/style'
 import { FontId } from 'data/fonts'
 import { Dimensions } from 'lib/wordart/canvas-utils'
@@ -18,7 +19,14 @@ export type EditorPersistedDataV1 = {
       shape: {
         style: EditorPersistedShapeStyleConfigV1
         transform: MatrixSerialized | null
+        kind: 'empty' | 'builtin' | 'custom'
+        /** null for custom images */
         shapeId: ShapeId | null
+        /** null for builtin images  */
+        custom: {
+          url: string
+          processing: ShapeConfigImg['processing']
+        } | null
       }
     }
     generated: {

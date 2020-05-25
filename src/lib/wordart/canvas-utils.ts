@@ -2,6 +2,7 @@ import { noop } from 'lodash'
 import { Rect } from 'lib/wordart/geometry'
 // @ts-ignore
 import jsfeat from 'jsfeat'
+import chroma from 'chroma-js'
 
 export type Dimensions = { w: number; h: number }
 
@@ -194,18 +195,22 @@ export const clampPixelOpacityDown = (canvas: HTMLCanvasElement) => {
 /** Turns each fully transparent pixel into a fully opaque pixel of the given color.
  * Turns each non-transparent pixel into a fully transparent one.
  */
-export const invertImageMask = (canvas: HTMLCanvasElement) => {
+export const invertImageMask = (canvas: HTMLCanvasElement, color = 'black') => {
+  const [red, green, blue] = chroma(color).rgb()
   const ctx = canvas.getContext('2d')!
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
   for (let r = 0; r < imgData.height; ++r) {
     for (let c = 0; c < imgData.width; ++c) {
       // Fully transparent pixel
-      const imgDataIndex = (r * imgData.width + c) * 4 + 3
-      const isTransparentAtLeastABit = imgData.data[imgDataIndex] < 255
+      const imgDataIndex = (r * imgData.width + c) * 4
+      const isTransparentAtLeastABit = imgData.data[imgDataIndex + 3] < 255
       if (isTransparentAtLeastABit) {
-        imgData.data[imgDataIndex] = 255
+        imgData.data[imgDataIndex + 3] = 255
+        imgData.data[imgDataIndex] = red
+        imgData.data[imgDataIndex + 1] = green
+        imgData.data[imgDataIndex + 2] = blue
       } else {
-        imgData.data[imgDataIndex] = 0
+        imgData.data[imgDataIndex + 3] = 0
       }
     }
   }
@@ -231,16 +236,25 @@ export const shrinkShape = (canvas: HTMLCanvasElement, radius = 10) => {
 
 export const loadImageUrlToCanvasCtx = async (
   url: string,
-  width?: number,
-  height?: number,
-  padding = 0,
-  onProgress: ProgressCallback = noop
+  params: {
+    width?: number
+    height?: number
+    padding?: number
+    getSize?: (imgSize: Dimensions) => Dimensions
+    onProgress?: ProgressCallback
+  }
 ): Promise<CanvasRenderingContext2D> => {
+  const { width, height, padding = 0, getSize, onProgress = noop } = params
   const img = await fetchImage(url, onProgress)
-  const ctx = createCanvasCtx({
-    w: width || img.width,
-    h: height || img.height,
-  })
+  const imgSize: Dimensions = { w: img.width, h: img.height }
+  let size = getSize ? getSize(imgSize) : imgSize
+  if (width) {
+    size.w = width
+  }
+  if (height) {
+    size.h = height
+  }
+  const ctx = createCanvasCtx(size)
   ctx.drawImage(
     img,
     padding,

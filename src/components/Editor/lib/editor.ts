@@ -16,6 +16,7 @@ import {
   createCanvasCtx,
   createCanvas,
   canvasToImgElement,
+  invertImageMask,
 } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { flatten, groupBy, keyBy, sortBy, max, min } from 'lodash'
@@ -214,6 +215,19 @@ export type EditorInitParams = {
   onItemSelectionCleared: () => void
 }
 
+type CurrentShapeInfo =
+  | {
+      kind: 'svg'
+      shapeConfig: ShapeConfig
+      colorsMap: SvgShapeColorsMap
+    }
+  | {
+      kind: 'img'
+      shapeConfig: ShapeConfig
+      originalCanvas: HTMLCanvasElement
+      processedCanvas: HTMLCanvasElement
+    }
+
 export class Editor {
   logger = consoleLoggers.editor
 
@@ -225,17 +239,7 @@ export class Editor {
   private editorItemIdGen = new UninqIdGenerator(3)
 
   /** Info about the current shape */
-  currentShape:
-    | null
-    | {
-        kind: 'svg'
-        shapeConfig: ShapeConfig
-        colorsMap: SvgShapeColorsMap
-      }
-    | {
-        kind: 'img'
-        shapeConfig: ShapeConfig
-      } = null
+  currentShapeInfo: null | CurrentShapeInfo = null
 
   fabricObjects: {
     shape?: fabric.Object
@@ -463,12 +467,12 @@ export class Editor {
       toJS(config, { recurseEverything: true })
     )
 
-    if (!this.currentShape) {
+    if (!this.currentShapeInfo) {
       this.logger.debug('>  No current shape, early exit')
       return
     }
 
-    if (this.currentShape.kind === 'img') {
+    if (this.currentShapeInfo.kind === 'img') {
       return
     }
 
@@ -505,7 +509,7 @@ export class Editor {
       this.canvas.remove(this.fabricObjects.shape)
       this.canvas.insertAt(shape, 0, false)
 
-      this.currentShape.colorsMap = colorsMap
+      this.currentShapeInfo.colorsMap = colorsMap
       this.setShapeObj(shape)
     } else {
       this.logger.debug('>  Using single color')
@@ -617,7 +621,7 @@ export class Editor {
           const hex = color.hex()
           item.setColor(hex)
         } else if (coloring.shapeStyleFill.kind === 'color-map') {
-          if (this.currentShape?.kind === 'svg') {
+          if (this.currentShapeInfo?.kind === 'svg') {
             const colorMapSorted = sortBy(
               coloring.shapeStyleFill.defaultColorMap.map((color, index) => ({
                 color,
@@ -639,7 +643,7 @@ export class Editor {
             }
             const hex = color.hex()
             item.setColor(hex)
-          } else if (this.currentShape?.kind === 'img') {
+          } else if (this.currentShapeInfo?.kind === 'img') {
             let color = chroma(item.shapeColor)
             if (coloring.shapeBrightness != 0) {
               color = color.brighten(coloring.shapeBrightness / 100)
@@ -658,47 +662,70 @@ export class Editor {
 
   /** Sets the shape, clearing the project */
   setShape = async (params: {
-    shape: ShapeConfig
+    shapeConfig: ShapeConfig
     bgColors: BgFillColorsConfig
     shapeColors: ShapeFillColorsConfig
   }): Promise<{ colorsMap?: SvgShapeColorsMap }> => {
-    const { shape, shapeColors, bgColors } = params
+    const { shapeConfig, shapeColors, bgColors } = params
 
-    if (!shape) {
+    if (!shapeConfig) {
       throw new Error('Missing shape config')
     }
     this.logger.debug('setShape', toJS(params, { recurseEverything: true }))
 
     let colorsMap: SvgShapeColorsMap | undefined
     let shapeObj: fabric.Object | undefined
+    let currentShapeInfo: CurrentShapeInfo | undefined
 
     // Process the shape...
-    if (shape.kind === 'svg') {
+    if (shapeConfig.kind === 'svg') {
       shapeObj = await new Promise<fabric.Object>((resolve) =>
-        fabric.loadSVGFromURL(shape.url, (objects, options) => {
+        fabric.loadSVGFromURL(shapeConfig.url, (objects, options) => {
           var obj = fabric.util.groupSVGElements(objects, options)
           resolve(obj)
         })
       )
 
       colorsMap = computeColorsMap(shapeObj as fabric.Group)
-    } else if (shape.kind === 'img') {
+      currentShapeInfo = {
+        kind: 'svg',
+        colorsMap,
+        shapeConfig,
+      }
+    } else if (shapeConfig.kind === 'img') {
       shapeObj = await new Promise<fabric.Object>((resolve) =>
-        fabric.Image.fromURL(shape.url, (oImg) => {
+        fabric.Image.fromURL(shapeConfig.url, (oImg) => {
           resolve(oImg)
         })
       )
-      const canvas = (shapeObj.toCanvasElement() as any) as HTMLCanvasElement
-      removeLightPixels(canvas, 0.95)
-      console.log(canvasToImgElement(canvas))
-      shapeObj = new fabric.Image(canvasToImgElement(canvas))
+      const originalCanvas = (shapeObj.toCanvasElement() as any) as HTMLCanvasElement
+      const processedCanvas = (shapeObj.toCanvasElement() as any) as HTMLCanvasElement
+
+      if (shapeConfig.processing) {
+        if (shapeConfig.processing.removeLightBackground.enabled) {
+          removeLightPixels(
+            processedCanvas,
+            shapeConfig.processing.removeLightBackground.threshold
+          )
+        }
+        if (shapeConfig.processing.invert.enabled) {
+          invertImageMask(processedCanvas, shapeConfig.processing.invert.color)
+        }
+      }
+      shapeObj = new fabric.Image(canvasToImgElement(processedCanvas))
+
+      currentShapeInfo = {
+        kind: 'img',
+        shapeConfig,
+        originalCanvas,
+        processedCanvas,
+      }
     }
 
     if (!shapeObj) {
       throw new Error('no shape obj')
     }
 
-    // TODO: configure these
     const w = shapeObj.width!
     const h = shapeObj.height!
     const defaultPadding = 50
@@ -742,18 +769,7 @@ export class Editor {
     this.setShapeObj(shapeObj)
     this.fabricObjects.shapeOriginalColors = shapeCopy
 
-    if (shape.kind === 'svg') {
-      this.currentShape = {
-        kind: shape.kind,
-        shapeConfig: shape,
-        colorsMap: colorsMap!,
-      }
-    } else {
-      this.currentShape = {
-        kind: shape.kind,
-        shapeConfig: shape,
-      }
-    }
+    this.currentShapeInfo = currentShapeInfo!
 
     if (colorsMap) {
       shapeColors.colorMap = colorsMap?.colors.map((c) => c.color)

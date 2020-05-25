@@ -73,7 +73,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         </PopoverTrigger>
         <PopoverContent
           outline="none"
-          zIndex={4}
+          zIndex={4000}
           css={css`
             width: 250px;
           `}

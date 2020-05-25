@@ -49,29 +49,29 @@ export const ShapeThumbnailBtn: React.FC<
         onClick={onClick}
         backgroundColor={backgroundColor}
       >
-        <ShapeThumbnailBtnInnerImg src={shape.url} />
+        <ShapeThumbnailBtnInnerImg src={shape.thumbnailUrl || shape.url} />
       </ShapeThumbnailBtnInner>
     )
   }
 
-  if (shape.kind === 'svg') {
-    return (
-      <ShapeThumbnailBtnInner
-        backgroundColor={backgroundColor}
-        active={active}
-        onClick={onClick}
-      >
-        <ReactSVG
-          src={shape.url}
-          style={{
-            color: shape.keepSvgColors ? undefined : shape.fill || 'black',
-            width: `78px`,
-            height: `78px`,
-          }}
-        />
-      </ShapeThumbnailBtnInner>
-    )
-  }
+  // if (shape.kind === 'svg') {
+  //   return (
+  //     <ShapeThumbnailBtnInner
+  //       backgroundColor={backgroundColor}
+  //       active={active}
+  //       onClick={onClick}
+  //     >
+  //       <ReactSVG
+  //         src={shape.url}
+  //         style={{
+  //           color: shape.keepSvgColors ? undefined : shape.fill || 'black',
+  //           width: `78px`,
+  //           height: `78px`,
+  //         }}
+  //       />
+  //     </ShapeThumbnailBtnInner>
+  //   )
+  // }
 
   return null
 }

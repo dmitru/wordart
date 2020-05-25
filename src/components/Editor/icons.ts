@@ -10,7 +10,7 @@ export const svgIcons: ShapeConfig[] = [
   .map((icon, index) =>
     icon
       ? ({
-          id: 100 + index,
+          id: `i-${100 + index}`,
           kind: 'svg',
           title: icon.title,
           url: icon.url,
@@ -24,7 +24,7 @@ export const svgIconsOutline: ShapeConfig[] = [...iconsFaRegular.slice(0, 5)]
   .map((icon, index) =>
     icon
       ? ({
-          id: 1000 + index,
+          id: `io-${1000 + index}`,
           kind: 'svg',
           title: icon.title,
           url: icon.url,
@@ -165,7 +165,7 @@ export const shapes: ShapeConfig[] = [
       url: '/images/yin-yang.svg',
       fill: 'green',
     },
-  ].map((c, index) => ({ ...c, id: index + 1 })),
+  ].map((c, index) => ({ ...c, id: `${index + 1}` })),
   ...svgIcons,
   ...svgIconsOutline,
 ]

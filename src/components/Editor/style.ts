@@ -39,6 +39,10 @@ export const defaultShapeStyle: ShapeStyleConfig = {
   },
 
   processing: {
+    removeLightBackground: {
+      enabled: false,
+      threshold: 0.95,
+    },
     edges: {
       enabled: true,
       amount: 80,
@@ -115,24 +119,30 @@ export const defaultBackgroundStyle: BackgroundStyleConfig = {
   },
 }
 
-export type ShapeConfig =
-  | {
-      id: ShapeId
-      kind: 'svg'
-      keepSvgColors?: boolean
-      url: string
-      title: string
-      fill?: string
-    }
-  | {
-      id: ShapeId
-      kind: 'img'
-      url: string
-      title: string
-    }
+export type ShapeConfigSvg = {
+  id: ShapeId
+  kind: 'svg'
+  keepSvgColors?: boolean
+  isCustom?: boolean
+  url: string
+  thumbnailUrl: string
+  title: string
+  fill?: string
+  processing?: ShapeStyleConfig['processing']
+}
+export type ShapeConfigImg = {
+  id: ShapeId
+  kind: 'img'
+  isCustom?: boolean
+  url: string
+  thumbnailUrl?: string
+  title: string
+  processing?: ShapeStyleConfig['processing']
+}
+export type ShapeConfig = ShapeConfigSvg | ShapeConfigImg
 
 export type ShapeKind = 'img' | 'svg'
-export type ShapeId = number
+export type ShapeId = string
 export type IconId = number
 
 /** Describes UI state for background style  */
@@ -188,6 +198,11 @@ export type ShapeStyleConfig = {
   kind: 'shape'
 
   processing: {
+    removeLightBackground: {
+      enabled: boolean
+      /** 0 - 1, 0 means no pixels are modified, 1 means only pure black pixels remain */
+      threshold: number
+    }
     edges: {
       enabled: boolean
       /** Edge detection intensity, 0-100% */

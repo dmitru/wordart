@@ -17,6 +17,7 @@ import {
   ShapeConfig,
   ShapeId,
   WordStyleConfig,
+  ShapeConfigImg,
 } from 'components/Editor/style'
 import { FontConfig, FontId, fonts, FontStyleConfig } from 'data/fonts'
 import { loadFont } from 'lib/wordart/fonts'
@@ -35,7 +36,7 @@ import { consoleLoggers } from 'utils/console-logger'
 import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
 import { nanoid } from 'nanoid/non-secure'
-import { UninqIdGenerator } from 'utils/ids'
+import { UninqIdGenerator as UniqIdGenerator } from 'utils/ids'
 
 export type EditorMode = 'view' | 'edit items'
 
@@ -73,7 +74,8 @@ export class EditorStore {
   @observable availableShapes: ShapeConfig[] = shapes
   @observable selectedShapeId: ShapeId = shapes[4].id
 
-  wordIdGen = new UninqIdGenerator(3)
+  wordIdGen = new UniqIdGenerator(3)
+  customImgIdGen = new UniqIdGenerator(3)
 
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
@@ -203,19 +205,30 @@ export class EditorStore {
       serialized.data.editor.sceneSize.w / serialized.data.editor.sceneSize.h
     )
 
-    if (data.editor.shape.shapeId != null) {
+    if (data.editor.shape.kind === 'custom' && data.editor.shape.custom) {
+      const customImgId = this.addCustomShapeImg({
+        kind: 'img',
+        title: 'Custom',
+        url: data.editor.shape.custom.url,
+        isCustom: true,
+        processing: data.editor.shape.custom.processing,
+      })
+      await this.selectShape(customImgId)
+    } else if (
+      data.editor.shape.kind === 'builtin' &&
+      data.editor.shape.shapeId != null
+    ) {
       await this.selectShape(data.editor.shape.shapeId)
+    }
 
-      const { shape, shapeOriginalColors } = this.editor.fabricObjects
-      if (data.editor.shape.transform && shape && shapeOriginalColors) {
-        applyTransformToObj(shape, data.editor.shape.transform)
-        applyTransformToObj(shapeOriginalColors, data.editor.shape.transform)
-      }
+    const { shape, shapeOriginalColors } = this.editor.fabricObjects
+    if (data.editor.shape.transform && shape && shapeOriginalColors) {
+      applyTransformToObj(shape, data.editor.shape.transform)
+      applyTransformToObj(shapeOriginalColors, data.editor.shape.transform)
     }
 
     const sceneSize = this.editor.getSceneBounds(0)
     const scale = sceneSize.width / serialized.data.editor.sceneSize.w
-    console.log('sceneSize', scale, sceneSize, serialized.data.editor.sceneSize)
 
     this.styles.shape = data.editor.shape.style
     this.styles.bg = data.editor.bg.style
@@ -417,8 +430,20 @@ export class EditorStore {
           },
           shape: {
             transform: shapeTransform || null,
-            shapeId: this.editor.currentShape?.shapeConfig.id || null,
+            shapeId: this.editor.currentShapeInfo?.shapeConfig.id || null,
             style: toJS(this.styles.shape, { recurseEverything: true }),
+            kind: this.editor.currentShapeInfo?.shapeConfig
+              ? this.editor.currentShapeInfo.shapeConfig.isCustom
+                ? 'custom'
+                : 'builtin'
+              : 'empty',
+            custom: this.editor.currentShapeInfo?.shapeConfig.isCustom
+              ? {
+                  url: this.editor.currentShapeInfo.shapeConfig.url,
+                  processing: this.editor.currentShapeInfo.shapeConfig
+                    .processing,
+                }
+              : null,
           },
         },
         generated: {
@@ -439,7 +464,21 @@ export class EditorStore {
     this.state = 'destroyed'
   }
 
-  getAvailableShapes = (): ShapeConfig[] => this.availableShapes
+  addCustomShapeImg = (shape: Omit<ShapeConfigImg, 'id'>) => {
+    const id = this.customImgIdGen.get()
+    this.availableShapes.push({
+      ...shape,
+      id,
+    } as ShapeConfig)
+    return id
+  }
+
+  getAvailableShapes = (): ShapeConfig[] =>
+    sortBy(
+      this.availableShapes,
+      (s) => (s.isCustom ? -1 : 1),
+      (s) => s.title
+    )
   getShapeById = (shapeId: ShapeId): ShapeConfig | undefined =>
     this.availableShapes.find((s) => s.id === shapeId)
 
@@ -480,7 +519,7 @@ export class EditorStore {
     this.selectedShapeId = shapeId
     const shape = this.getShapeById(shapeId)!
     await this.editor.setShape({
-      shape: shape,
+      shapeConfig: shape,
       bgColors: this.styles.bg.fill,
       shapeColors: this.styles.shape.fill,
     })
