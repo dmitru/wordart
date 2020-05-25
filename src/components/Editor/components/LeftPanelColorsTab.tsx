@@ -2,12 +2,12 @@ import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { ColorPicker } from 'components/shared/ColorPicker'
 import { Box } from 'components/shared/Box'
-import { Button } from 'components/shared/Button'
 import { Label } from './shared'
 import { Slider } from 'components/shared/Slider'
 import { useThrottleCallback } from '@react-hook/throttle'
 import chroma from 'chroma-js'
 import { getItemsColoring, TargetKind } from 'components/Editor/lib/editor'
+import { Button } from '@chakra-ui/core'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -145,8 +145,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             px="2"
             py="1"
             mr="0"
-            secondary={style.itemsColoring.kind === 'shape'}
-            outline={style.itemsColoring.kind !== 'shape'}
+            variantColor={
+              style.itemsColoring.kind === 'shape' ? 'primary' : undefined
+            }
             onClick={() => {
               style.itemsColoring.kind = 'shape'
               updateItemsColoring()
@@ -158,8 +159,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           <Button
             px="2"
             py="1"
-            secondary={style.itemsColoring.kind === 'gradient'}
-            outline={style.itemsColoring.kind !== 'gradient'}
+            variantColor={
+              style.itemsColoring.kind === 'gradient' ? 'primary' : undefined
+            }
             onClick={() => {
               style.itemsColoring.kind = 'gradient'
               updateItemsColoring()
@@ -172,8 +174,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             px="2"
             py="1"
             mr="0"
-            secondary={style.itemsColoring.kind === 'color'}
-            outline={style.itemsColoring.kind !== 'color'}
+            variantColor={
+              style.itemsColoring.kind === 'color' ? 'primary' : undefined
+            }
             onClick={() => {
               style.itemsColoring.kind = 'color'
               updateItemsColoring()

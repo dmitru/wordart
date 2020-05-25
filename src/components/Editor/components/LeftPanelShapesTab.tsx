@@ -65,6 +65,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
   () => {
     const { editorPageStore } = useStore()
     const shapeStyle = editorPageStore.styles.shape
+    const shape = editorPageStore.getSelectedShape()
 
     const [term, setTerm] = useState('')
     const allOptions = [
@@ -168,6 +169,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         state.isShowingAdjust = !state.isShowingAdjust
                         if (state.isTransforming) {
                           state.isTransforming = false
+                          editorPageStore.editor?.deselectShape()
                           editorPageStore.editor?.generateShapeItems({
                             style: editorPageStore.styles.shape,
                           })
@@ -185,98 +187,104 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
               {state.isShowingAdjust && (
                 <>
                   <Stack mb="4" p="2">
-                    <Heading size="md" m="0">
-                      Customize colors
-                    </Heading>
-                    {shapeStyle.fill.colorMap.length > 1 && (
-                      <Box>
-                        <Tabs
-                          variantColor="accent"
-                          index={shapeStyle.fill.kind == 'color-map' ? 0 : 1}
-                          variant="solid-rounded"
-                          size="sm"
-                          onChange={(index) => {
-                            if (index === 0) {
-                              shapeStyle.fill.kind = 'color-map'
-                              updateShapeColoring()
-                            } else {
-                              shapeStyle.fill.kind = 'single-color'
-                              updateShapeColoring()
-                            }
-                          }}
-                        >
-                          <TabList mb="1em">
-                            <Tab>Multiple</Tab>
-                            <Tab>Single</Tab>
-                          </TabList>
-                          <TabPanels>
-                            <TabPanel>
-                              <Box>
-                                {shapeStyle.fill.colorMap.map(
-                                  (color, index) => (
-                                    <Box
-                                      mr="1"
-                                      key={index}
-                                      display="inline-block"
-                                    >
-                                      <ColorPicker
-                                        disableAlpha
-                                        value={chroma(color).alpha(1).hex()}
-                                        onChange={(hex) => {
-                                          shapeStyle.fill.colorMap[
-                                            index
-                                          ] = chroma(hex).hex()
-                                        }}
-                                        onAfterChange={() => {
-                                          updateShapeColoring()
-                                        }}
-                                      />
-                                    </Box>
-                                  )
-                                )}
-                              </Box>
-                            </TabPanel>
-                            <TabPanel>
-                              <ColorPicker
-                                disableAlpha
-                                value={chroma(shapeStyle.fill.color)
-                                  .alpha(1)
-                                  .hex()}
-                                onChange={(hex) => {
-                                  shapeStyle.fill.color = chroma(hex).hex()
-                                }}
-                                onAfterChange={() => {
+                    {shape.kind === 'svg' && (
+                      <>
+                        <Heading size="md" m="0">
+                          Customize colors
+                        </Heading>
+                        {shapeStyle.fill.colorMap.length > 1 && (
+                          <Box>
+                            <Tabs
+                              variantColor="accent"
+                              index={
+                                shapeStyle.fill.kind == 'color-map' ? 0 : 1
+                              }
+                              variant="solid-rounded"
+                              size="sm"
+                              onChange={(index) => {
+                                if (index === 0) {
+                                  shapeStyle.fill.kind = 'color-map'
                                   updateShapeColoring()
-                                }}
-                              />
-                            </TabPanel>
-                          </TabPanels>
-                        </Tabs>
-                      </Box>
-                    )}
-                    {shapeStyle.fill.colorMap.length === 1 && (
-                      <ColorPicker
-                        disableAlpha
-                        value={chroma(shapeStyle.fill.color).alpha(1).hex()}
-                        onChange={(hex) => {
-                          shapeStyle.fill.kind = 'single-color'
-                          shapeStyle.fill.color = chroma(hex).hex()
-                        }}
-                        onAfterChange={() => {
-                          updateShapeColoring()
-                        }}
-                      />
-                    )}
-                    {shapeStyle.processing.invert.enabled && (
-                      <ColorPicker
-                        value={shapeStyle.processing.invert.color}
-                        onChange={(color) => {
-                          shapeStyle.processing.invert.color = chroma(
-                            color
-                          ).hex()
-                          visualize()
-                        }}
-                      />
+                                } else {
+                                  shapeStyle.fill.kind = 'single-color'
+                                  updateShapeColoring()
+                                }
+                              }}
+                            >
+                              <TabList mb="1em">
+                                <Tab>Multiple</Tab>
+                                <Tab>Single</Tab>
+                              </TabList>
+                              <TabPanels>
+                                <TabPanel>
+                                  <Box>
+                                    {shapeStyle.fill.colorMap.map(
+                                      (color, index) => (
+                                        <Box
+                                          mr="1"
+                                          key={index}
+                                          display="inline-block"
+                                        >
+                                          <ColorPicker
+                                            disableAlpha
+                                            value={chroma(color).alpha(1).hex()}
+                                            onChange={(hex) => {
+                                              shapeStyle.fill.colorMap[
+                                                index
+                                              ] = chroma(hex).hex()
+                                            }}
+                                            onAfterChange={() => {
+                                              updateShapeColoring()
+                                            }}
+                                          />
+                                        </Box>
+                                      )
+                                    )}
+                                  </Box>
+                                </TabPanel>
+                                <TabPanel>
+                                  <ColorPicker
+                                    disableAlpha
+                                    value={chroma(shapeStyle.fill.color)
+                                      .alpha(1)
+                                      .hex()}
+                                    onChange={(hex) => {
+                                      shapeStyle.fill.color = chroma(hex).hex()
+                                    }}
+                                    onAfterChange={() => {
+                                      updateShapeColoring()
+                                    }}
+                                  />
+                                </TabPanel>
+                              </TabPanels>
+                            </Tabs>
+                          </Box>
+                        )}
+                        {shapeStyle.fill.colorMap.length === 1 && (
+                          <ColorPicker
+                            disableAlpha
+                            value={chroma(shapeStyle.fill.color).alpha(1).hex()}
+                            onChange={(hex) => {
+                              shapeStyle.fill.kind = 'single-color'
+                              shapeStyle.fill.color = chroma(hex).hex()
+                            }}
+                            onAfterChange={() => {
+                              updateShapeColoring()
+                            }}
+                          />
+                        )}
+                        {shapeStyle.processing.invert.enabled && (
+                          <ColorPicker
+                            value={shapeStyle.processing.invert.color}
+                            onChange={(color) => {
+                              shapeStyle.processing.invert.color = chroma(
+                                color
+                              ).hex()
+                              visualize()
+                            }}
+                          />
+                        )}
+                      </>
                     )}
 
                     <Box mt="5">
@@ -319,7 +327,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               Apply
                             </Button>
                             <Tooltip label="Center shape and restore its original size">
-                              <Button variant="link" ml="3">
+                              <Button variant="ghost" ml="3">
                                 Restore original
                               </Button>
                             </Tooltip>

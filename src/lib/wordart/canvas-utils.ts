@@ -79,6 +79,18 @@ export const createOffscreenCanvasCtx = (size: Dimensions): CanvasCtx => {
   return ctx
 }
 
+export const canvasToImgElement = (
+  canvas: HTMLCanvasElement
+): HTMLImageElement => {
+  const dataUri = canvasToDataUri(canvas, { format: 'image/png', quality: 1 })
+  const img = document.createElement('img')
+  img.src = dataUri
+  console.log(img.width, img.height)
+  img.width = canvas.width
+  img.height = canvas.height
+  return img
+}
+
 export const canvasToDataUri = (
   canvas: HTMLCanvasElement,
   { format = 'image/jpeg', quality = 0.8 } = {}

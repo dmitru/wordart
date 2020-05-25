@@ -115,14 +115,21 @@ export const defaultBackgroundStyle: BackgroundStyleConfig = {
   },
 }
 
-export type ShapeConfig = {
-  id: ShapeId
-  kind: ShapeKind
-  keepSvgColors?: boolean
-  url: string
-  title: string
-  fill?: string
-}
+export type ShapeConfig =
+  | {
+      id: ShapeId
+      kind: 'svg'
+      keepSvgColors?: boolean
+      url: string
+      title: string
+      fill?: string
+    }
+  | {
+      id: ShapeId
+      kind: 'img'
+      url: string
+      title: string
+    }
 
 export type ShapeKind = 'img' | 'svg'
 export type ShapeId = number
@@ -183,12 +190,12 @@ export type ShapeStyleConfig = {
   processing: {
     edges: {
       enabled: boolean
-      /* edge detection intensity, 0-100% */
+      /** Edge detection intensity, 0-100% */
       amount: number
     }
     invert: {
       enabled: boolean
-      /* edge detection intensity, 0-100% */
+      /** Color to fill the negative space */
       color: string
     }
   }

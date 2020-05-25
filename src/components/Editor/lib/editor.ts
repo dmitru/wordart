@@ -15,6 +15,7 @@ import {
   removeLightPixels,
   createCanvasCtx,
   createCanvas,
+  canvasToImgElement,
 } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { flatten, groupBy, keyBy, sortBy, max, min } from 'lodash'
@@ -547,6 +548,7 @@ export class Editor {
       coloring,
       `${items.length} items`
     )
+
     let colors: string[] = []
     if (coloring.kind === 'gradient' || coloring.kind === 'single-color') {
       if (coloring.kind === 'single-color') {
@@ -615,27 +617,31 @@ export class Editor {
           const hex = color.hex()
           item.setColor(hex)
         } else if (coloring.shapeStyleFill.kind === 'color-map') {
-          const colorMapSorted = sortBy(
-            coloring.shapeStyleFill.defaultColorMap.map((color, index) => ({
-              color,
-              index,
-            })),
-            ({ color }) => chroma.distance(color, item.shapeColor, 'rgb')
-          )
-          const shapeColorStringIndex = colorMapSorted[0].index
-          const shapeColorString =
-            coloring.shapeStyleFill.colorMap[shapeColorStringIndex]
-          const shapeColor = new paper.Color(shapeColorString)
-          let color = chroma.rgb(
-            255 * shapeColor.red,
-            255 * shapeColor.green,
-            255 * shapeColor.blue
-          )
-          if (coloring.shapeBrightness != 0) {
-            color = color.brighten(coloring.shapeBrightness / 100)
+          if (this.currentShape?.kind === 'svg') {
+            const colorMapSorted = sortBy(
+              coloring.shapeStyleFill.defaultColorMap.map((color, index) => ({
+                color,
+                index,
+              })),
+              ({ color }) => chroma.distance(color, item.shapeColor, 'rgb')
+            )
+            const shapeColorStringIndex = colorMapSorted[0].index
+            const shapeColorString =
+              coloring.shapeStyleFill.colorMap[shapeColorStringIndex]
+            const shapeColor = new paper.Color(shapeColorString)
+            let color = chroma.rgb(
+              255 * shapeColor.red,
+              255 * shapeColor.green,
+              255 * shapeColor.blue
+            )
+            if (coloring.shapeBrightness != 0) {
+              color = color.brighten(coloring.shapeBrightness / 100)
+            }
+            const hex = color.hex()
+            item.setColor(hex)
+          } else if (this.currentShape?.kind === 'img') {
+            item.setColor(item.shapeColor)
           }
-          const hex = color.hex()
-          item.setColor(hex)
         }
       }
       item.setOpacity(
@@ -672,36 +678,18 @@ export class Editor {
           resolve(obj)
         })
       )
-      // const shapeItemGroup: paper.Group = await new Promise<paper.Group>(
-      //   (resolve) =>
-      //     new paper.Item().importSVG(shape.url, (item: paper.Item) => {
-      //       item.remove()
-      //       resolve(item as paper.Group)
-      //     })
-      // )
 
       colorsMap = computeColorsMap(shapeObj as fabric.Group)
-
-      // shapeItem = shapeItemGroup
-    } else {
-      const shapeItemRaster: paper.Raster = await new Promise<paper.Raster>(
-        (resolve) => {
-          const raster = new paper.Raster(shape.url)
-          raster.remove()
-          raster.onLoad = () => {
-            resolve(raster)
-          }
-        }
+    } else if (shape.kind === 'img') {
+      shapeObj = await new Promise<fabric.Object>((resolve) =>
+        fabric.Image.fromURL(shape.url, (oImg) => {
+          resolve(oImg)
+        })
       )
-      const canvas = shapeItemRaster.getSubCanvas(
-        new paper.Rectangle(0, 0, shapeItemRaster.width, shapeItemRaster.height)
-      )
+      const canvas = (shapeObj.toCanvasElement() as any) as HTMLCanvasElement
       removeLightPixels(canvas, 0.95)
-      const imgData = canvas
-        .getContext('2d')!
-        .getImageData(0, 0, shapeItemRaster.width, shapeItemRaster.height)
-      shapeItemRaster.setImageData(imgData, new paper.Point(0, 0))
-      shapeItem = shapeItemRaster
+      console.log(canvasToImgElement(canvas))
+      shapeObj = new fabric.Image(canvasToImgElement(canvas))
     }
 
     if (!shapeObj) {

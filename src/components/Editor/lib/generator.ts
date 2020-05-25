@@ -241,7 +241,7 @@ export class Generator {
     const placedWordItems: WordGeneratedItem[] = []
     const placedSymbolItems: SymbolGeneratedItem[] = []
 
-    const nIter = 800
+    const nIter = 100
     const t1 = performance.now()
 
     const wordAngles = uniq(flatten(task.words.map((w) => w.angles)))
@@ -503,6 +503,7 @@ export class Generator {
           const r = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 0]
           const g = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 1]
           const b = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 2]
+
           const shapeColor = chroma.rgb(r, g, b).hex()
 
           wordPath.draw(unrotatedCtx)
