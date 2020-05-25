@@ -193,9 +193,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           Customize colors
                         </Heading>
                         {shapeStyle.fill.colorMap.length > 1 && (
-                          <Box>
+                          <Box mt="3">
                             <Tabs
-                              variantColor="accent"
+                              variantColor="primary"
                               index={
                                 shapeStyle.fill.kind == 'color-map' ? 0 : 1
                               }

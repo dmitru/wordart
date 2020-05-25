@@ -520,7 +520,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     py="1"
                     borderTopRightRadius="0"
                     borderBottomRightRadius="0"
-                    variantColor="secondary"
+                    variantColor="primary"
                     onClick={() => {
                       state.targetTab = 'shape'
                     }}
@@ -535,7 +535,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     py="1"
                     borderTopLeftRadius="0"
                     borderBottomLeftRadius="0"
-                    variantColor="secondary"
+                    variantColor="primary"
                     onClick={() => {
                       state.targetTab = 'bg'
                     }}

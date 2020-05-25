@@ -85,7 +85,6 @@ export const canvasToImgElement = (
   const dataUri = canvasToDataUri(canvas, { format: 'image/png', quality: 1 })
   const img = document.createElement('img')
   img.src = dataUri
-  console.log(img.width, img.height)
   img.width = canvas.width
   img.height = canvas.height
   return img

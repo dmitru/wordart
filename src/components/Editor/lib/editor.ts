@@ -669,9 +669,7 @@ export class Editor {
     }
     this.logger.debug('setShape', toJS(params, { recurseEverything: true }))
 
-    let shapeItem: paper.Item | undefined
     let colorsMap: SvgShapeColorsMap | undefined
-
     let shapeObj: fabric.Object | undefined
 
     // Process the shape...
@@ -701,13 +699,16 @@ export class Editor {
     }
 
     // TODO: configure these
-    const w = shapeObj.getBoundingRect().width
-    const h = shapeObj.getBoundingRect().height
+    const w = shapeObj.width!
+    const h = shapeObj.height!
     const defaultPadding = 50
 
     const sceneBounds = this.getSceneBounds(defaultPadding)
     if (Math.max(w, h) !== Math.max(sceneBounds.width, sceneBounds.height)) {
-      const scale = Math.min(sceneBounds.width / w, sceneBounds.height / h)
+      const scale =
+        w / h > sceneBounds.width / sceneBounds.height
+          ? sceneBounds.width / w
+          : sceneBounds.height / h
       shapeObj.set({ scaleX: scale, scaleY: scale })
     }
 
