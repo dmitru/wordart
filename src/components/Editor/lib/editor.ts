@@ -640,7 +640,11 @@ export class Editor {
             const hex = color.hex()
             item.setColor(hex)
           } else if (this.currentShape?.kind === 'img') {
-            item.setColor(item.shapeColor)
+            let color = chroma(item.shapeColor)
+            if (coloring.shapeBrightness != 0) {
+              color = color.brighten(coloring.shapeBrightness / 100)
+            }
+            item.setColor(color.hex())
           }
         }
       }
