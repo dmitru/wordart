@@ -1,5 +1,7 @@
 import { WordConfigId } from 'components/Editor/editor-store'
 import { FontId, fonts } from 'data/fonts'
+import { ShapeFillColorsConfig } from 'components/Editor/lib/editor'
+import { MatrixSerialized } from 'services/api/persisted/v1'
 
 const defaultWordsList: WordStyleConfig[] = [
   // 'O',
@@ -129,6 +131,8 @@ export type ShapeConfigSvg = {
   title: string
   fill?: string
   processing?: ShapeStyleConfig['processing']
+  fillConfig?: ShapeFillColorsConfig
+  transform?: MatrixSerialized
 }
 export type ShapeConfigImg = {
   id: ShapeId
@@ -138,6 +142,8 @@ export type ShapeConfigImg = {
   thumbnailUrl?: string
   title: string
   processing?: ShapeStyleConfig['processing']
+  fillConfig?: ShapeFillColorsConfig
+  transform?: MatrixSerialized
 }
 export type ShapeConfig = ShapeConfigSvg | ShapeConfigImg
 
@@ -216,7 +222,7 @@ export type ShapeStyleConfig = {
   }
 
   fill: {
-    kind: 'color-map' | 'single-color'
+    kind: 'original' | 'color-map' | 'single-color'
     colorMap: string[]
     defaultColorMap: string[]
     color: ColorString

@@ -37,6 +37,13 @@ import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
 import { nanoid } from 'nanoid/non-secure'
 import { UninqIdGenerator as UniqIdGenerator } from 'utils/ids'
+import {
+  loadImageUrlToCanvasCtx,
+  loadImageUrlToCanvasCtxWithMaxSize,
+  removeLightPixels,
+  invertImageMask,
+  processImg,
+} from 'lib/wordart/canvas-utils'
 
 export type EditorMode = 'view' | 'edit items'
 
@@ -211,6 +218,7 @@ export class EditorStore {
         title: 'Custom',
         url: data.editor.shape.custom.url,
         isCustom: true,
+        thumbnailUrl: undefined,
         processing: data.editor.shape.custom.processing,
       })
       await this.selectShape(customImgId)
@@ -220,6 +228,8 @@ export class EditorStore {
     ) {
       await this.selectShape(data.editor.shape.shapeId)
     }
+
+    this.updateShapeThumbnail()
 
     const { shape, shapeOriginalColors } = this.editor.fabricObjects
     if (data.editor.shape.transform && shape && shapeOriginalColors) {
@@ -318,9 +328,25 @@ export class EditorStore {
     await this.editor.setBgItems(bgItems)
 
     this.editor.setBgColor(this.styles.bg.fill)
-    this.editor.setShapeFillColors(this.styles.shape.fill)
-    this.editor.setItemsColor('bg', getItemsColoring(this.styles.bg))
-    this.editor.setItemsColor('shape', getItemsColoring(this.styles.shape))
+    await this.editor.setShapeFillColors(this.styles.shape.fill)
+    await this.editor.setItemsColor('bg', getItemsColoring(this.styles.bg))
+    await this.editor.setItemsColor(
+      'shape',
+      getItemsColoring(this.styles.shape)
+    )
+  }
+
+  updateShapeThumbnail = async () => {
+    if (!this.editor) {
+      return
+    }
+    const currentShapeConfig = this.getSelectedShape()
+    const shape = await new Promise<fabric.Object>((r) =>
+      this.editor!.fabricObjects.shape!.clone((copy: fabric.Object) => r(copy))
+    )
+    shape.set({ opacity: 1 })
+    const canvas = (shape.toCanvasElement() as any) as HTMLCanvasElement
+    currentShapeConfig.thumbnailUrl = canvas.toDataURL()
   }
 
   serialize = (): EditorPersistedData => {

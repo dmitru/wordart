@@ -597,8 +597,8 @@ const TopNavWrapper = styled(Box)`
 const LeftWrapper = styled.div`
   height: 100%;
   background: white;
-  max-width: 440px;
-  min-width: 440px;
+  max-width: 460px;
+  min-width: 460px;
   flex: 1;
   z-index: 3;
   display: flex;
@@ -740,7 +740,7 @@ const RightWrapper = styled.div`
 const CanvasWrappper = styled.div`
   flex: 1;
   height: calc(100vh - 100px);
-  width: calc(100vw - 440px);
+  width: calc(100vw - 460px);
   padding: 20px;
   display: flex;
   justify-content: center;

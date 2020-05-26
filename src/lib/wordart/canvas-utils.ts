@@ -3,6 +3,7 @@ import { Rect } from 'lib/wordart/geometry'
 // @ts-ignore
 import jsfeat from 'jsfeat'
 import chroma from 'chroma-js'
+import { ShapeStyleConfig } from 'components/Editor/style'
 
 export type Dimensions = { w: number; h: number }
 
@@ -263,6 +264,39 @@ export const loadImageUrlToCanvasCtx = async (
     ctx.canvas.height - 2 * padding
   )
   return ctx
+}
+
+export const processImg = (
+  canvas: HTMLCanvasElement,
+  processing: ShapeStyleConfig['processing']
+) => {
+  if (processing.removeLightBackground.enabled) {
+    removeLightPixels(canvas, processing.removeLightBackground.threshold)
+  }
+  if (processing.invert.enabled) {
+    invertImageMask(canvas, processing.invert.color)
+  }
+  if (processing.edges.enabled) {
+    // TODO
+  }
+}
+
+export const loadImageUrlToCanvasCtxWithMaxSize = async (
+  url: string,
+  maxSize = 300
+): Promise<CanvasRenderingContext2D> => {
+  return loadImageUrlToCanvasCtx(url, {
+    getSize: (imgSize) => {
+      const aspect = imgSize.w / imgSize.h
+      const maxImgDim = Math.max(imgSize.w, imgSize.h)
+      const maxDim = Math.min(maxSize, maxImgDim)
+      if (aspect >= 1) {
+        return { w: maxDim, h: maxDim / aspect }
+      } else {
+        return { w: maxDim * aspect, h: maxDim }
+      }
+    },
+  })
 }
 
 export const copyCanvas = (

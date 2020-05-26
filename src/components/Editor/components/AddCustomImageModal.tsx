@@ -19,6 +19,8 @@ import {
   loadImageUrlToCanvasCtx,
   removeLightPixels,
   invertImageMask,
+  loadImageUrlToCanvasCtxWithMaxSize,
+  processImg,
 } from 'lib/wordart/canvas-utils'
 import { Slider } from 'components/shared/Slider'
 import css from '@emotion/css'
@@ -79,11 +81,20 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
         c.height
       )
 
-      removeLightPixels(ctx.canvas, state.removeLightBackground)
-
-      if (state.invert) {
-        invertImageMask(ctx.canvas, state.invertColor)
-      }
+      processImg(ctx.canvas, {
+        edges: {
+          enabled: false,
+          amount: 0,
+        },
+        invert: {
+          enabled: state.invert,
+          color: state.invertColor,
+        },
+        removeLightBackground: {
+          enabled: true,
+          threshold: state.removeLightBackground,
+        },
+      })
     }
 
     const updateImgPreviewThrottled = updateImgPreview
@@ -95,20 +106,9 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
           if (!processedImgCanvasRef.current) {
             return
           }
-          const ctxOriginal = await loadImageUrlToCanvasCtx(
+          const ctxOriginal = await loadImageUrlToCanvasCtxWithMaxSize(
             reader.result as string,
-            {
-              getSize: (imgSize) => {
-                const aspect = imgSize.w / imgSize.h
-                const maxImgDim = Math.max(imgSize.w, imgSize.h)
-                const maxDim = Math.min(1000, maxImgDim)
-                if (aspect >= 1) {
-                  return { w: maxDim, h: maxDim / aspect }
-                } else {
-                  return { w: maxDim * aspect, h: maxDim }
-                }
-              },
-            }
+            1000
           )
           state.originalUrl = ctxOriginal.canvas.toDataURL()
           originalImgCanvas.current = ctxOriginal.canvas

@@ -472,7 +472,9 @@ export class Editor {
       return
     }
 
-    if (this.currentShapeInfo.kind === 'img') {
+    if (this.currentShapeInfo.kind === 'img' || config.kind === 'original') {
+      this.setShapeFillOpacity(config.opacity)
+      this.canvas.requestRenderAll()
       return
     }
 
@@ -500,7 +502,7 @@ export class Editor {
           if (colorEntry.fill) {
             item.set({ fill: color })
           }
-          if (colorEntry.stroke) {
+          if (colorEntry.stroke && item.stroke) {
             item.set({ stroke: color })
           }
         })
@@ -517,7 +519,12 @@ export class Editor {
 
       const objects =
         shape instanceof fabric.Group ? shape.getObjects() : [shape]
-      objects.forEach((obj) => obj.set({ fill: color, stroke: color }))
+      objects.forEach((obj) => {
+        obj.set({ fill: color })
+        if (obj.stroke) {
+          obj.set({ stroke: color })
+        }
+      })
 
       this.canvas.remove(this.fabricObjects.shape)
       this.canvas.insertAt(shape, 0, false)

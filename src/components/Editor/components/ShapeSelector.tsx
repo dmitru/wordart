@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react'
 import styled from '@emotion/styled'
-import { ReactSVG } from 'react-svg'
 import { Box, BoxProps } from 'components/shared/Box'
 import { noop } from 'lodash'
 import { darken } from 'polished'
@@ -40,7 +39,7 @@ export const ShapeThumbnailBtn: React.FC<
     shape: ShapeConfig
     active?: boolean
   } & Omit<React.HTMLProps<HTMLButtonElement>, 'shape' | 'type'>
-> = ({ shape, backgroundColor, active = false, onClick, ...rest }) => {
+> = observer(({ shape, backgroundColor, active = false, onClick, ...rest }) => {
   if (shape.kind === 'img' || shape.kind === 'svg') {
     return (
       <ShapeThumbnailBtnInner
@@ -74,22 +73,16 @@ export const ShapeThumbnailBtn: React.FC<
   // }
 
   return null
-}
+})
 
 const ShapeThumbnailBtnInnerImg = styled.img`
-  width: 96px;
-  height: 96px;
+  width: 90px;
+  height: 90px;
   margin: 0;
   object-fit: contain;
 `
 
-export const ShapeThumbnails = styled(Box)`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  margin-right: -16px;
-`
+export const ShapeThumbnails = styled(Box)``
 
 const ShapeThumbnailBtnInner = styled.button<
   {
@@ -98,11 +91,11 @@ const ShapeThumbnailBtnInner = styled.button<
     active: boolean
   } & React.HTMLProps<HTMLButtonElement>
 >`
+  width: 106px;
+  height: 106px;
+  border: 1px solid #ddd;
   outline: none;
   background: white;
-  width: 106px;
-  border: 1px solid #ddd;
-  height: 106px;
   display: inline-flex;
   padding: 5px;
   margin: 0;
@@ -114,9 +107,13 @@ const ShapeThumbnailBtnInner = styled.button<
 
   -webkit-appearance: none;
 
+  img {
+    margin: 0;
+  }
+
   svg {
-    width: 98px;
-    height: 98px;
+    width: 90px;
+    height: 90px;
 
     * {
       ${({ fill }) => fill && `fill: ${fill}`};
