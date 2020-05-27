@@ -337,7 +337,7 @@ export class EditorStore {
   }
 
   updateShapeThumbnail = async () => {
-    if (!this.editor) {
+    if (!this.editor || !this.editor.fabricObjects.shape) {
       return
     }
     const currentShapeConfig = this.getSelectedShape()

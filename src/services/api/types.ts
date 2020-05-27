@@ -19,6 +19,7 @@ export type WordcloudId = string
 export type Wordcloud = {
   id: WordcloudId
   title: string
+  thumbnail: string
   author: string
   createdAt: string
   updatedAt: string
@@ -30,10 +31,12 @@ export type EditorPersistedData = EditorPersistedDataV1
 
 export type CreateWordcloudDto = {
   title: string
+  thumbnail: string
   editorData: EditorPersistedData
 }
 
 export type SaveWordcloudDto = {
   title: string
+  thumbnail: string
   editorData: EditorPersistedData
 }

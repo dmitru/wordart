@@ -75,18 +75,27 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           return
         }
         setIsSaving(true)
+        const thumbnail = store.editor.canvas.toDataURL({
+          multiplier: 0.3,
+          format: 'jpeg',
+          quality: 0.8,
+        })
+        const editorData = store.serialize()
+
         if (isNew) {
           const wordcloud = await wordcloudsStore.create({
-            editorData: store.serialize(),
-            title: 'some title',
+            title: state.title,
+            editorData,
+            thumbnail,
           })
           router.push(Urls.editor._next, Urls.editor.edit(wordcloud.id), {
             shallow: true,
           })
         } else {
           await wordcloudsStore.save(props.wordcloudId!, {
-            title: 'some title',
-            editorData: store.serialize(),
+            title: state.title,
+            thumbnail,
+            editorData,
           })
         }
         toast({
@@ -116,11 +125,17 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           }
 
           if (props.wordcloudId != null) {
+            const wordcloud = wordcloudsStore.getById(props.wordcloudId)
+            if (wordcloud) {
+              state.title = wordcloud.title
+            }
             const editorData = await Api.wordclouds.fetchEditorData(
               props.wordcloudId
             )
 
             editorParams.serialized = editorData
+          } else {
+            state.title = 'New wordart'
           }
 
           await store.initEditor(editorParams)
@@ -192,7 +207,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
           <Editable
             ml="4"
-            defaultValue="Title"
+            value={state.title}
+            onChange={(value) => {
+              state.title = value
+            }}
             placeholder="Enter name..."
             color="white"
             fontSize="xl"
@@ -753,6 +771,7 @@ const Canvas = styled.canvas`
 `
 
 const state = observable({
+  title: 'New wordart',
   leftTabShape: 'shapes' as LeftPanelTab,
   leftTabBg: 'words' as Omit<LeftPanelTab, 'shapes'>,
   targetTab: 'shape' as TargetTab,
