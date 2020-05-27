@@ -163,17 +163,18 @@ export const removeLightPixels = (
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
   for (let row = 0; row < imgData.height; ++row) {
     for (let col = 0; col < imgData.width; ++col) {
-      const r = imgData.data[(row * imgData.width + col) * 4 + 0]
-      const g = imgData.data[(row * imgData.width + col) * 4 + 1]
-      const b = imgData.data[(row * imgData.width + col) * 4 + 2]
+      const imgDataIndex = (row * imgData.width + col) * 4
+      const r = imgData.data[imgDataIndex + 0]
+      const g = imgData.data[imgDataIndex + 1]
+      const b = imgData.data[imgDataIndex + 2]
       const value = (r + r + g + g + g + b) / 6
       // If the pixel isn't dark enough...
       if (value >= 255 * threshold) {
         // Make that pixel transparent
-        imgData.data[(row * imgData.width + col) * 4 + 0] = 255
-        imgData.data[(row * imgData.width + col) * 4 + 1] = 255
-        imgData.data[(row * imgData.width + col) * 4 + 2] = 255
-        imgData.data[(row * imgData.width + col) * 4 + 3] = 0
+        imgData.data[imgDataIndex + 0] = 255
+        imgData.data[imgDataIndex + 1] = 255
+        imgData.data[imgDataIndex + 2] = 255
+        imgData.data[imgDataIndex + 3] = 0
       }
     }
   }
@@ -270,15 +271,52 @@ export const processImg = (
   canvas: HTMLCanvasElement,
   processing: ShapeStyleConfig['processing']
 ) => {
-  if (processing.removeLightBackground.enabled) {
-    removeLightPixels(canvas, processing.removeLightBackground.threshold)
+  console.log('processImg', canvas.width, canvas.height)
+  if (!processing.removeLightBackground.enabled && !processing.invert.enabled) {
+    return
   }
-  if (processing.invert.enabled) {
-    invertImageMask(canvas, processing.invert.color)
+
+  const ctx = canvas.getContext('2d')!
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+  const [red, green, blue] = chroma(processing.invert.color).rgb()
+  const threshold = processing.removeLightBackground.threshold
+
+  for (let row = 0; row < imgData.height; ++row) {
+    for (let col = 0; col < imgData.width; ++col) {
+      const imgDataIndex = (row * imgData.width + col) * 4
+      if (processing.removeLightBackground.enabled) {
+        // removeLightPixels
+        const r = imgData.data[imgDataIndex + 0]
+        const g = imgData.data[imgDataIndex + 1]
+        const b = imgData.data[imgDataIndex + 2]
+        const value = (r + r + g + g + g + b) / 6
+        // If the pixel isn't dark enough...
+        if (value >= 255 * threshold) {
+          // Make that pixel transparent
+          imgData.data[imgDataIndex + 0] = 255
+          imgData.data[imgDataIndex + 1] = 255
+          imgData.data[imgDataIndex + 2] = 255
+          imgData.data[imgDataIndex + 3] = 0
+        }
+      }
+
+      if (processing.invert.enabled) {
+        // Fully transparent pixel
+
+        const isTransparentAtLeastABit = imgData.data[imgDataIndex + 3] < 255
+        if (isTransparentAtLeastABit) {
+          imgData.data[imgDataIndex + 3] = 255
+          imgData.data[imgDataIndex] = red
+          imgData.data[imgDataIndex + 1] = green
+          imgData.data[imgDataIndex + 2] = blue
+        } else {
+          imgData.data[imgDataIndex + 3] = 0
+        }
+      }
+    }
   }
-  if (processing.edges.enabled) {
-    // TODO
-  }
+
+  ctx.putImageData(imgData, 0, 0)
 }
 
 export const loadImageUrlToCanvasCtxWithMaxSize = async (

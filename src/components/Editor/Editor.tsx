@@ -510,9 +510,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
               {store.mode === 'view' && (
                 <Box mr="3" ml="3" marginLeft="auto">
-                  <Text display="inline" mr="2">
-                    Layer:
-                  </Text>
                   <Button
                     css={css`
                       box-shadow: none !important;
@@ -526,7 +523,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     }}
                     variant={state.targetTab !== 'shape' ? 'outline' : 'solid'}
                   >
-                    FG
+                    Shape
                   </Button>
                   <Button
                     css={css`
@@ -541,7 +538,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     }}
                     variant={state.targetTab !== 'bg' ? 'outline' : 'solid'}
                   >
-                    BKG
+                    Background
                   </Button>
                 </Box>
               )}

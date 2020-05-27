@@ -26,6 +26,7 @@ import {
 import { css } from '@emotion/core'
 import { useThrottleCallback } from '@react-hook/throttle'
 import chroma from 'chroma-js'
+import paper from 'paper'
 import { AddCustomImageModal } from 'components/Editor/components/AddCustomImageModal'
 import {
   ShapeSelector,
@@ -42,12 +43,15 @@ import { observer } from 'mobx-react'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
+import { CustomizeRasterImageModal } from 'components/Editor/components/CustomizeRasterImageModal'
+import { MatrixSerialized } from 'services/api/persisted/v1'
 
 export type LeftPanelShapesTabProps = {}
 
 const state = observable({
   isShowingCustomize: false,
   isShowingAddCustomImage: false,
+  isShowingCustomizeImage: false,
   isTransforming: false,
 })
 
@@ -133,6 +137,10 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
         state.isShowingAddCustomImage = false
       }
     }, [])
+
+    const shapeScale = shape.transform
+      ? new paper.Matrix(shape.transform).scaling.x
+      : 1
 
     return (
       <>
@@ -227,17 +235,19 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                     exit={{ x: 355, y: 0, opacity: 0 }}
                   >
                     <Stack mb="4" p="2" position="absolute" width="100%">
-                      <Heading size="md" m="0" mb="3" display="flex">
-                        Customize Colors
-                        <Button
-                          variant="ghost"
-                          variantColor="blue"
-                          size="sm"
-                          marginLeft="auto"
-                        >
-                          Reset
-                        </Button>
-                      </Heading>
+                      {shape.kind === 'svg' && (
+                        <Heading size="md" m="0" mb="3" display="flex">
+                          Customize Colors
+                          <Button
+                            variant="ghost"
+                            variantColor="blue"
+                            size="sm"
+                            marginLeft="auto"
+                          >
+                            Reset
+                          </Button>
+                        </Heading>
+                      )}
                       {shape.kind === 'svg' &&
                         shapeStyle.fill.colorMap.length > 1 && (
                           <Box mt="3">
@@ -326,32 +336,21 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                             }}
                           />
                         )}
-                      {shape.kind === 'img' && (
+                      {shape.kind === 'img' && shape.processing && (
                         <>
-                          <Box height="30px" display="flex">
-                            <Checkbox
-                              display="flex"
-                              height="34px"
-                              isChecked={shape.processing?.invert.enabled}
-                              onChange={(e) => {
-                                shape.processing!.invert.enabled =
-                                  e.target.checked
+                          <Heading size="md" m="0" mb="3" display="flex">
+                            Image
+                          </Heading>
+
+                          <Box>
+                            <Button
+                              variantColor="accent"
+                              onClick={() => {
+                                state.isShowingCustomizeImage = true
                               }}
                             >
-                              Invert colors?
-                            </Checkbox>
-                            {shape.processing?.invert.enabled && (
-                              <Box ml="3">
-                                <ColorPicker
-                                  value={shape.processing.invert.color}
-                                  onChange={(color) => {
-                                    shape.processing!.invert.color = chroma(
-                                      color
-                                    ).hex()
-                                  }}
-                                />
-                              </Box>
-                            )}
+                              Customize Image
+                            </Button>
                           </Box>
                         </>
                       )}
@@ -550,6 +549,40 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
             </Box>
           </>
         </Box>
+
+        <CustomizeRasterImageModal
+          isOpen={state.isShowingCustomizeImage}
+          value={{
+            invert: shape.processing?.invert.enabled || false,
+            invertColor: shape.processing?.invert.color || 'black',
+            removeLightBackground:
+              shape.processing?.removeLightBackground.threshold || 0,
+            originalUrl: shape.url,
+          }}
+          onClose={() => {
+            state.isShowingCustomizeImage = false
+          }}
+          onSubmit={async (thumbnailUrl, value) => {
+            console.log('onSubmit = ', value)
+            shape.thumbnailUrl = thumbnailUrl
+            shape.processing = {
+              invert: {
+                enabled: value.invert,
+                color: value.invertColor,
+              },
+              removeLightBackground: {
+                enabled: true,
+                threshold: value.removeLightBackground,
+              },
+              edges: {
+                enabled: false,
+                amount: 0,
+              },
+            }
+            await store.updateShape()
+            store.updateShapeThumbnail()
+          }}
+        />
 
         <AddCustomImageModal
           isOpen={state.isShowingAddCustomImage}

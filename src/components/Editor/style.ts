@@ -221,6 +221,7 @@ export type ShapeStyleConfig = {
     }
   }
 
+  // TODO: refactor to take tagged union
   fill: {
     kind: 'original' | 'color-map' | 'single-color'
     colorMap: string[]
@@ -229,6 +230,7 @@ export type ShapeStyleConfig = {
     opacity: number
   }
 
+  // TODO: refactor to take tagged union
   itemsColoring: {
     kind: 'color' | 'gradient' | 'shape'
     color: ColorString

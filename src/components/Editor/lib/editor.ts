@@ -17,6 +17,7 @@ import {
   createCanvas,
   canvasToImgElement,
   invertImageMask,
+  processImg,
 } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { flatten, groupBy, keyBy, sortBy, max, min } from 'lodash'
@@ -31,6 +32,7 @@ import { UninqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import chroma from 'chroma-js'
 import seedrandom from 'seedrandom'
+import { exhaustiveCheck } from 'utils/type-utils'
 
 export type EditorItemConfig = EditorItemConfigWord
 
@@ -556,7 +558,7 @@ export class Editor {
     this.logger.debug(
       'setItemsColor',
       target,
-      coloring,
+      toJS(coloring, { recurseEverything: true }),
       `${items.length} items`
     )
 
@@ -571,10 +573,14 @@ export class Editor {
     } else if (coloring.kind === 'shape' && coloring.shapeStyleFill) {
       if (coloring.shapeStyleFill.kind === 'single-color') {
         colors = [coloring.shapeStyleFill.color]
-      } else {
+      } else if (coloring.shapeStyleFill.kind === 'color-map') {
         colors = coloring.shapeStyleFill.colorMap
+      } else if (coloring.shapeStyleFill.kind === 'original') {
+      } else {
+        exhaustiveCheck(coloring.shapeStyleFill.kind)
       }
     }
+
     const itemAreas = items.map((item) => {
       if (item.kind === 'word') {
         const wordPathBb = item.pathBounds!
@@ -584,12 +590,6 @@ export class Editor {
         const wordArea = Math.sqrt(wordH * wordW)
         return wordArea
       }
-      // if (item.kind === 'symbol') {
-      //   const bounds = item.symbolDef.item.bounds
-      //   const w = bounds.width * item.transform.scaling.x
-      //   const h = bounds.height * item.transform.scaling.y
-      //   return Math.sqrt(w * h)
-      // }
       return 0
     })
     const maxArea = max(itemAreas)!
@@ -657,6 +657,19 @@ export class Editor {
             }
             item.setColor(color.hex())
           }
+        } else if (coloring.shapeStyleFill.kind === 'original') {
+          const shape = this.currentShapeInfo?.shapeConfig
+          let colorString = item.shapeColor
+          if (shape?.kind === 'img' && shape?.processing?.invert.enabled) {
+            colorString = shape.processing.invert.color
+          }
+          let color = chroma(colorString)
+          if (coloring.shapeBrightness != 0) {
+            color = color.brighten(coloring.shapeBrightness / 100)
+          }
+          item.setColor(color.hex())
+        } else {
+          exhaustiveCheck(coloring.shapeStyleFill.kind)
         }
       }
       item.setOpacity(
@@ -672,7 +685,9 @@ export class Editor {
     shapeConfig: ShapeConfig
     bgColors: BgFillColorsConfig
     shapeColors: ShapeFillColorsConfig
+    clear: boolean
   }): Promise<{ colorsMap?: SvgShapeColorsMap }> => {
+    console.log('setShape', params)
     const { shapeConfig, shapeColors, bgColors } = params
 
     if (!shapeConfig) {
@@ -709,15 +724,7 @@ export class Editor {
       const processedCanvas = (shapeObj.toCanvasElement() as any) as HTMLCanvasElement
 
       if (shapeConfig.processing) {
-        if (shapeConfig.processing.removeLightBackground.enabled) {
-          removeLightPixels(
-            processedCanvas,
-            shapeConfig.processing.removeLightBackground.threshold
-          )
-        }
-        if (shapeConfig.processing.invert.enabled) {
-          invertImageMask(processedCanvas, shapeConfig.processing.invert.color)
-        }
+        processImg(processedCanvas, shapeConfig.processing)
       }
       shapeObj = new fabric.Image(canvasToImgElement(processedCanvas))
 
@@ -746,7 +753,9 @@ export class Editor {
       shapeObj.set({ scaleX: scale, scaleY: scale })
     }
 
-    this.clear()
+    if (params.clear) {
+      this.clear()
+    }
 
     this.setBgColor(bgColors)
     shapeObj.setPositionByOrigin(
@@ -758,9 +767,6 @@ export class Editor {
       'center'
     )
 
-    if (this.fabricObjects.shape) {
-      this.canvas.remove(this.fabricObjects.shape)
-    }
     const shapeCopy = await new Promise<fabric.Object>((r) =>
       shapeObj!.clone((copy: fabric.Object) => r(copy), ['id'])
     )
@@ -771,19 +777,25 @@ export class Editor {
       opacity: shapeColors.opacity,
       selectable: false,
     })
+    if (this.fabricObjects.shape) {
+      this.canvas.remove(this.fabricObjects.shape)
+    }
     this.canvas.add(shapeObj)
-    this.canvas.requestRenderAll()
     this.setShapeObj(shapeObj)
     this.fabricObjects.shapeOriginalColors = shapeCopy
 
     this.currentShapeInfo = currentShapeInfo!
 
-    if (colorsMap) {
+    if (shapeConfig.kind === 'img') {
+      shapeColors.kind = 'original'
+    } else if (colorsMap) {
       shapeColors.colorMap = colorsMap?.colors.map((c) => c.color)
       shapeColors.defaultColorMap = colorsMap?.colors.map((c) => c.color)
+      shapeColors.kind = 'color-map'
       console.log('setting default color map', shapeColors, colorsMap)
     }
-    this.setShapeFillColors(shapeColors)
+    await this.setShapeFillColors(shapeColors)
+    this.canvas.requestRenderAll()
     return { colorsMap }
   }
 

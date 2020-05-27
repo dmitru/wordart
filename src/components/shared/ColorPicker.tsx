@@ -78,9 +78,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
             width: 250px;
           `}
         >
-          <PopoverHeader fontWeight="bold">Pick color</PopoverHeader>
           <PopoverArrow />
-          <PopoverCloseButton />
           <PopoverBody p={2}>
             <SketchPicker
               css={css`

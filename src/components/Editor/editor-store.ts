@@ -544,11 +544,33 @@ export class EditorStore {
 
     this.selectedShapeId = shapeId
     const shape = this.getShapeById(shapeId)!
+
     await this.editor.setShape({
       shapeConfig: shape,
       bgColors: this.styles.bg.fill,
       shapeColors: this.styles.shape.fill,
+      clear: true,
     })
+  }
+
+  updateShape = async () => {
+    if (!this.editor) {
+      return
+    }
+
+    const shape = this.getShapeById(this.selectedShapeId)!
+    await this.editor.setShape({
+      shapeConfig: shape,
+      bgColors: this.styles.bg.fill,
+      shapeColors: this.styles.shape.fill,
+      clear: false,
+    })
+    if (this.styles.shape.itemsColoring.kind === 'shape') {
+      await this.editor.setItemsColor(
+        'shape',
+        getItemsColoring(this.styles.shape)
+      )
+    }
   }
 
   @action deleteWord = (target: TargetKind, wordId: WordConfigId) => {
