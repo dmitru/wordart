@@ -22,6 +22,7 @@ import {
   Tabs,
   Text,
   Checkbox,
+  Textarea,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
 import { useThrottleCallback } from '@react-hook/throttle'
@@ -44,16 +45,40 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { CustomizeRasterImageModal } from 'components/Editor/components/CustomizeRasterImageModal'
-import { MatrixSerialized } from 'services/api/persisted/v1'
+import { createCanvas } from 'lib/wordart/canvas-utils'
+import { fabric } from 'fabric'
+import { createMultilineFabricTextGroup } from 'components/Editor/lib/fabric-utils'
 
 export type LeftPanelShapesTabProps = {}
 
-const state = observable({
-  isShowingCustomize: false,
+type TabMode = 'home' | 'customize shape' | 'add text shape'
+
+const initialState = {
+  mode: 'home' as TabMode,
   isShowingAddCustomImage: false,
   isShowingCustomizeImage: false,
   isTransforming: false,
-})
+  textShape: {
+    thumbnailPreview: '',
+    text: '',
+    // TODO: font id
+    color: {
+      kind: 'single',
+      invert: false,
+      color: 'red',
+    } as
+      | {
+          kind: 'single'
+          invert: boolean
+          color: string
+        }
+      | {
+          kind: 'letters'
+          colors: string[]
+        },
+  },
+}
+const state = observable({ ...initialState })
 
 const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
   <Slider
@@ -132,15 +157,49 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
         if (state.isTransforming) {
           store.editor?.deselectShape()
         }
-        state.isShowingCustomize = false
-        state.isTransforming = false
-        state.isShowingAddCustomImage = false
+        Object.assign(state, initialState)
       }
     }, [])
 
-    const shapeScale = shape.transform
-      ? new paper.Matrix(shape.transform).scaling.x
-      : 1
+    const updateTextThumbnailPreview = async () => {
+      const fontInfo = store.getAvailableFonts()[4]
+      const font = await store.fetchFontById(fontInfo.style.fontId)
+      if (!font) {
+        return
+      }
+
+      const canvasSize = 400
+      const pad = 10
+      const fontSize = 100
+
+      const canvas = createCanvas({ w: canvasSize, h: canvasSize })
+      const c = new fabric.StaticCanvas(canvas)
+
+      const text = state.textShape.text || 'Preview'
+      const group = createMultilineFabricTextGroup(
+        text,
+        font,
+        fontSize,
+        state.textShape.color.kind === 'single'
+          ? state.textShape.color.color
+          : state.textShape.color.colors[0]
+      )
+      if (group.height! > group.width!) {
+        group.scaleToHeight(canvasSize - 2 * pad)
+      } else {
+        group.scaleToWidth(canvasSize - 2 * pad)
+      }
+      group.setPositionByOrigin(
+        new fabric.Point(canvasSize / 2, canvasSize / 2),
+        'center',
+        'center'
+      )
+      c.add(group)
+
+      c.renderAll()
+      state.textShape.thumbnailPreview = c.toDataURL()
+      c.dispose()
+    }
 
     return (
       <>
@@ -159,7 +218,11 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                   }
                 `}
                 backgroundColor="white"
-                shape={store.getSelectedShape()}
+                url={
+                  (state.mode === 'add text shape'
+                    ? state.textShape.thumbnailPreview
+                    : shape.thumbnailUrl || shape.url)!
+                }
               />
               <Box
                 flex={1}
@@ -171,25 +234,27 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                 height="120px"
               >
                 <Box flex={1} width="100%" mb="2">
-                  <ShapeOpacitySlider
-                    style={shapeStyle}
-                    onAfterChange={(value: number) => {
-                      store.editor?.setShapeFillOpacity(value / 100)
-                    }}
-                  />
+                  {state.mode !== 'add text shape' && (
+                    <ShapeOpacitySlider
+                      style={shapeStyle}
+                      onAfterChange={(value: number) => {
+                        store.editor?.setShapeFillOpacity(value / 100)
+                      }}
+                    />
+                  )}
                 </Box>
 
                 <Flex marginTop="70px">
-                  {!state.isShowingCustomize && (
+                  {state.mode === 'home' && (
                     <Tooltip
                       label="Customize colors, size and position"
-                      isDisabled={state.isShowingCustomize}
+                      isDisabled={state.mode === 'customize shape'}
                     >
                       <Button
                         mr="2"
                         variant="solid"
                         onClick={() => {
-                          state.isShowingCustomize = true
+                          state.mode = 'customize shape'
                         }}
                       >
                         Customize
@@ -197,11 +262,11 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                     </Tooltip>
                   )}
 
-                  {state.isShowingCustomize && (
+                  {state.mode === 'customize shape' && (
                     <Button
                       variantColor="green"
                       onClick={() => {
-                        state.isShowingCustomize = false
+                        state.mode = 'home'
                         if (state.isTransforming) {
                           state.isTransforming = false
                           store.editor?.deselectShape()
@@ -226,7 +291,86 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
               height="calc(100vh - 255px)"
             >
               <AnimatePresence initial={false}>
-                {state.isShowingCustomize && (
+                {state.mode === 'add text shape' && (
+                  <motion.div
+                    key="customize"
+                    initial={{ x: 355, y: 0, opacity: 0 }}
+                    transition={{ ease: 'easeInOut', duration: 0.2 }}
+                    animate={{ x: 0, y: 0, opacity: 1 }}
+                    exit={{ x: 355, y: 0, opacity: 0 }}
+                  >
+                    <Stack mb="4" p="2" position="absolute" width="100%">
+                      <Heading size="md" m="0" mb="3" display="flex">
+                        Add Text Shape
+                      </Heading>
+                      <Textarea
+                        autoFocus
+                        value={state.textShape.text}
+                        onChange={(e) => {
+                          state.textShape.text = e.target.value
+                          updateTextThumbnailPreview()
+                        }}
+                        placeholder="Type text here..."
+                      />
+                      <ColorPicker
+                        value={
+                          state.textShape.color.kind === 'single'
+                            ? state.textShape.color.color
+                            : state.textShape.color.colors[0]
+                        }
+                        onChange={(color) => {
+                          state.textShape.color = {
+                            kind: 'single',
+                            color,
+                            invert: false,
+                          }
+                          updateTextThumbnailPreview()
+                        }}
+                      />
+
+                      <Box mt="3">
+                        <Button
+                          variantColor="accent"
+                          size="lg"
+                          onClick={async () => {
+                            const shapeId = store.addCustomShapeText({
+                              kind: 'text',
+                              text: state.textShape.text,
+                              // @ts-ignore
+                              color: state.textShape.color.color,
+                              fontId: store.getAvailableFonts()[2].style.fontId,
+                              title: 'Custom text',
+                              fillConfig: {
+                                kind: 'original',
+                                color: 'black',
+                                colorMap: [],
+                                defaultColorMap: [],
+                                opacity: 1,
+                              },
+                              isCustom: true,
+                            })
+                            state.mode = 'home'
+                            await store.selectShape(shapeId)
+                            store.updateShapeThumbnail()
+                          }}
+                        >
+                          Done
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="lg"
+                          onClick={() => {
+                            state.mode = 'home'
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </Box>
+                    </Stack>
+                  </motion.div>
+                )}
+
+                {state.mode === 'customize shape' && (
                   <motion.div
                     key="customize"
                     initial={{ x: 355, y: 0, opacity: 0 }}
@@ -413,7 +557,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                   </motion.div>
                 )}
 
-                {!state.isShowingCustomize && (
+                {state.mode === 'home' && (
                   <motion.div
                     key="main"
                     transition={{ ease: 'easeInOut', duration: 0.2 }}
@@ -443,6 +587,10 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                             variantColor="green"
                             size="sm"
                             mr="2"
+                            onClick={() => {
+                              state.mode = 'add text shape'
+                              updateTextThumbnailPreview()
+                            }}
                           >
                             Text
                           </Button>
@@ -563,7 +711,6 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
             state.isShowingCustomizeImage = false
           }}
           onSubmit={async (thumbnailUrl, value) => {
-            console.log('onSubmit = ', value)
             shape.thumbnailUrl = thumbnailUrl
             shape.processing = {
               invert: {

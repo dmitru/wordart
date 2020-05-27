@@ -24,7 +24,7 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
               }}
               backgroundColor="white"
               active={shape.id === selectedShapeId}
-              shape={shape}
+              url={shape.thumbnailUrl || shape.url}
             />
           ))}
         </ShapeThumbnails>
@@ -36,42 +36,20 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
 export const ShapeThumbnailBtn: React.FC<
   {
     backgroundColor: string
-    shape: ShapeConfig
+    url: string
     active?: boolean
   } & Omit<React.HTMLProps<HTMLButtonElement>, 'shape' | 'type'>
-> = observer(({ shape, backgroundColor, active = false, onClick, ...rest }) => {
-  if (shape.kind === 'img' || shape.kind === 'svg') {
-    return (
-      <ShapeThumbnailBtnInner
-        {...rest}
-        active={active}
-        onClick={onClick}
-        backgroundColor={backgroundColor}
-      >
-        <ShapeThumbnailBtnInnerImg src={shape.thumbnailUrl || shape.url} />
-      </ShapeThumbnailBtnInner>
-    )
-  }
-
-  // if (shape.kind === 'svg') {
-  //   return (
-  //     <ShapeThumbnailBtnInner
-  //       backgroundColor={backgroundColor}
-  //       active={active}
-  //       onClick={onClick}
-  //     >
-  //       <ReactSVG
-  //         src={shape.url}
-  //         style={{
-  //           color: shape.keepSvgColors ? undefined : shape.fill || 'black',
-  //           width: `78px`,
-  //           height: `78px`,
-  //         }}
-  //       />
-  //     </ShapeThumbnailBtnInner>
-  //   )
-  // }
-
+> = observer(({ url, backgroundColor, active = false, onClick, ...rest }) => {
+  return (
+    <ShapeThumbnailBtnInner
+      {...rest}
+      active={active}
+      onClick={onClick}
+      backgroundColor={backgroundColor}
+    >
+      <ShapeThumbnailBtnInnerImg src={url} />
+    </ShapeThumbnailBtnInner>
+  )
   return null
 })
 

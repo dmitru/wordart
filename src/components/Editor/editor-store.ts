@@ -18,6 +18,7 @@ import {
   ShapeId,
   WordStyleConfig,
   ShapeConfigImg,
+  ShapeConfigText,
 } from 'components/Editor/style'
 import { FontConfig, FontId, fonts, FontStyleConfig } from 'data/fonts'
 import { loadFont } from 'lib/wordart/fonts'
@@ -491,6 +492,15 @@ export class EditorStore {
   }
 
   addCustomShapeImg = (shape: Omit<ShapeConfigImg, 'id'>) => {
+    const id = this.customImgIdGen.get()
+    this.availableShapes.push({
+      ...shape,
+      id,
+    } as ShapeConfig)
+    return id
+  }
+
+  addCustomShapeText = (shape: Omit<ShapeConfigText, 'id'>) => {
     const id = this.customImgIdGen.get()
     this.availableShapes.push({
       ...shape,

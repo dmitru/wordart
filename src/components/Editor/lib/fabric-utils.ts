@@ -1,5 +1,6 @@
 import { fabric } from 'fabric'
 import { MatrixSerialized } from 'services/api/persisted/v1'
+import { color } from 'styled-system'
 
 export const applyTransformToObj = (
   shape: fabric.Object,
@@ -26,4 +27,28 @@ export const applyTransformToObj = (
   })
 
   shape.setCoords()
+}
+
+export const createMultilineFabricTextGroup = (
+  text: string,
+  font: opentype.Font,
+  fontSize = 100,
+  color: string
+) => {
+  const lines = text.split('\n')
+  const lineObjs: fabric.Path[] = lines.map((line, index) => {
+    const path = font.getPath(line, 0, 0, fontSize)
+    const pathData = path.toPathData(3)
+
+    return new fabric.Path(pathData, {
+      left: 0,
+      top: index * fontSize,
+      originX: 'center',
+      originY: 'center',
+      fill: color,
+    })
+  })
+
+  const group = new fabric.Group(lineObjs)
+  return group
 }

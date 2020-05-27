@@ -145,9 +145,20 @@ export type ShapeConfigImg = {
   fillConfig?: ShapeFillColorsConfig
   transform?: MatrixSerialized
 }
-export type ShapeConfig = ShapeConfigSvg | ShapeConfigImg
+export type ShapeConfigText = {
+  id: ShapeId
+  kind: 'text'
+  text: string
+  color: string
+  isCustom?: boolean
+  fontId: FontId
+  title: string
+  fillConfig?: ShapeFillColorsConfig
+  transform?: MatrixSerialized
+}
+export type ShapeConfig = ShapeConfigSvg | ShapeConfigImg | ShapeConfigText
 
-export type ShapeKind = 'img' | 'svg'
+export type ShapeKind = 'img' | 'svg' | 'text'
 export type ShapeId = string
 export type IconId = number
 

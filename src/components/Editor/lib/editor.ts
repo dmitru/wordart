@@ -1,6 +1,10 @@
+import chroma from 'chroma-js'
 import { EditorStore, WordConfigId } from 'components/Editor/editor-store'
 import { computeColorsMap } from 'components/Editor/lib/colormap'
-import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
+import {
+  applyTransformToObj,
+  createMultilineFabricTextGroup,
+} from 'components/Editor/lib/fabric-utils'
 import { Font, Generator } from 'components/Editor/lib/generator'
 import {
   BackgroundStyleConfig,
@@ -12,26 +16,22 @@ import {
 import { FontId } from 'data/fonts'
 import { fabric } from 'fabric'
 import {
-  removeLightPixels,
-  createCanvasCtx,
-  createCanvas,
   canvasToImgElement,
-  invertImageMask,
+  createCanvas,
   processImg,
 } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
-import { flatten, groupBy, keyBy, sortBy, max, min } from 'lodash'
+import { flatten, groupBy, keyBy, max, min, sortBy } from 'lodash'
 import { toJS } from 'mobx'
 import { Glyph } from 'opentype.js'
 import paper from 'paper'
+import seedrandom from 'seedrandom'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { EditorPersistedData } from 'services/api/types'
 import { waitAnimationFrame } from 'utils/async'
 import { consoleLoggers } from 'utils/console-logger'
 import { UninqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
-import chroma from 'chroma-js'
-import seedrandom from 'seedrandom'
 import { exhaustiveCheck } from 'utils/type-utils'
 
 export type EditorItemConfig = EditorItemConfigWord
@@ -228,6 +228,10 @@ type CurrentShapeInfo =
       shapeConfig: ShapeConfig
       originalCanvas: HTMLCanvasElement
       processedCanvas: HTMLCanvasElement
+    }
+  | {
+      kind: 'text'
+      shapeConfig: ShapeConfig
     }
 
 export class Editor {
@@ -733,6 +737,28 @@ export class Editor {
         shapeConfig,
         originalCanvas,
         processedCanvas,
+      }
+    } else if (shapeConfig.kind === 'text') {
+      const font = await this.store.fetchFontById(shapeConfig.fontId)
+      const group = createMultilineFabricTextGroup(
+        shapeConfig.text,
+        font!,
+        100,
+        shapeConfig.color
+      )
+      group.setPositionByOrigin(
+        new fabric.Point(
+          this.canvas.getWidth() / 2,
+          this.canvas.getHeight() / 2
+        ),
+        'center',
+        'center'
+      )
+      shapeObj = group
+
+      currentShapeInfo = {
+        kind: 'text',
+        shapeConfig,
       }
     }
 

@@ -19,6 +19,10 @@ export type EditorPersistedDataV1 = {
       shape: {
         style: EditorPersistedShapeStyleConfigV1
         transform: MatrixSerialized | null
+        // TODO: refactor this to e.g.
+        // custom: boolean
+        // kind: 'empty' | 'text' | 'svg' | 'raster'
+        // and a tag union for these types...
         kind: 'empty' | 'builtin' | 'custom'
         /** null for custom images */
         shapeId: ShapeId | null
