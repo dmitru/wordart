@@ -9,12 +9,14 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  PopoverArrow,
   Icon,
   Text,
   MenuDivider,
   Divider,
 } from '@chakra-ui/core'
 import 'lib/wordart/console-extensions'
+import css from '@emotion/css'
 import { observer } from 'mobx-react'
 import React from 'react'
 import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
@@ -44,6 +46,24 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
       border="gray.50"
       mr="4"
       mb="6"
+      css={css`
+        transition: all 0.13s;
+        box-shadow: 0 0px 25px -5px rgba(0, 0, 0, 0.05),
+          0 0px 10px -5px rgba(0, 0, 0, 0.03);
+
+        img {
+          transition: all 0.18s;
+        }
+
+        &:hover {
+          box-shadow: 0 0px 25px -5px rgba(0, 0, 0, 0.2),
+            0 0px 10px -5px rgba(0, 0, 0, 0.06);
+
+          img {
+            transform: scale(1.1);
+          }
+        }
+      `}
     >
       <Box cursor="pointer">
         <Link
@@ -55,7 +75,7 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
             <Text fontSize="lg" fontWeight="semibold">
               {wordcloud.title}
             </Text>
-            <AspectRatioBox maxW="200px" ratio={4 / 3}>
+            <AspectRatioBox maxW="200px" ratio={4 / 3} overflow="hidden">
               <Image src={wordcloud.thumbnail} objectFit="contain" />
             </AspectRatioBox>
           </div>
@@ -83,7 +103,8 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
             >
               <DotsThreeVertical size={18} />
             </MenuButton>
-            <MenuList>
+            <MenuList hasArrow>
+              <PopoverArrow />
               <MenuItem>
                 <Icon name="folder" size="20px" color="gray.500" mr="2" />
                 Move to folder...

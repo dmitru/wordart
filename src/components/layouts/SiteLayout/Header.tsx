@@ -35,7 +35,7 @@ export const Header: React.FC<HeaderProps> = observer(() => {
                 <Button accent>Create</Button>
               </Link>
               <Link href={Urls.dashboard} passHref>
-                <Button>My Creations</Button>
+                <Button>My Designs</Button>
               </Link>
               <Link href={Urls.profile} passHref>
                 <Button>Profile</Button>
