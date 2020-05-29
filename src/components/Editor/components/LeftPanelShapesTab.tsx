@@ -97,8 +97,8 @@ const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
 export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
   () => {
     const { editorPageStore: store } = useStore()
-    const shapeStyle = store.styles.shape
-    const shape = store.getSelectedShape()
+    const shapeStyle = store.styleOptions.shape
+    const shape = store.getSelectedShapeConf()
 
     const [term, setTerm] = useState('')
     const allOptions = [
@@ -142,7 +142,10 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
         await store.editor?.setShapeFillColors(shapeStyle.fill)
         store.updateShapeThumbnail()
         if (shapeStyle.itemsColoring.kind === 'shape') {
-          store.editor?.setItemsColor('shape', getItemsColoring(shapeStyle))
+          store.editor?.setShapeItemsColor(
+            'shape',
+            getItemsColoring(shapeStyle)
+          )
         }
       },
       20,
@@ -238,7 +241,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                     <ShapeOpacitySlider
                       style={shapeStyle}
                       onAfterChange={(value: number) => {
-                        store.editor?.setShapeFillOpacity(value / 100)
+                        store.editor?.setShapeOpacity(value / 100)
                       }}
                     />
                   )}
@@ -271,7 +274,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           state.isTransforming = false
                           store.editor?.deselectShape()
                           store.editor?.generateShapeItems({
-                            style: store.styles.shape,
+                            style: store.styleOptions.shape,
                           })
                         }
                       }}
@@ -480,7 +483,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                             }}
                           />
                         )}
-                      {shape.kind === 'img' && shape.processing && (
+                      {shape.kind === 'raster' && shape.processing && (
                         <>
                           <Heading size="md" m="0" mb="3" display="flex">
                             Image
@@ -540,7 +543,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                   state.isTransforming = false
                                   store.editor?.deselectShape()
                                   store.editor?.generateShapeItems({
-                                    style: store.styles.shape,
+                                    style: store.styleOptions.shape,
                                   })
                                 }}
                               >
@@ -688,7 +691,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         onSelected={(shape) => {
                           store.selectShape(shape.id)
                         }}
-                        selectedShapeId={store.getSelectedShape().id}
+                        selectedShapeId={store.getSelectedShapeConf().id}
                       />
                     </Box>
                   </motion.div>
@@ -738,7 +741,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
           }}
           onSubmit={({ thumbnailUrl, state }) => {
             const customImgId = store.addCustomShapeImg({
-              kind: 'img',
+              kind: 'raster',
               title: 'Custom',
               url: state.originalUrl!,
               thumbnailUrl,

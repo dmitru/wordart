@@ -1,4 +1,4 @@
-import { EditorComponent } from 'components/Editor/Editor'
+import { EditorComponent } from 'components/Editor/components/Editor'
 import { observer } from 'mobx-react'
 import { useRouter } from 'next/dist/client/router'
 import React from 'react'

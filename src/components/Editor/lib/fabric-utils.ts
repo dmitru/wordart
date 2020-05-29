@@ -29,6 +29,17 @@ export const applyTransformToObj = (
   shape.setCoords()
 }
 
+export const cloneObj = (obj: fabric.Object) =>
+  new Promise<fabric.Object>((r) => obj!.clone((obj: fabric.Object) => r(obj)))
+
+export const cloneObjAsImage = (obj: fabric.Object) =>
+  new Promise<fabric.Object>((r) =>
+    obj!.cloneAsImage((obj: fabric.Object) => r(obj as fabric.Image))
+  )
+
+export const objAsCanvasElement = (obj: fabric.Object): HTMLCanvasElement =>
+  (obj.toCanvasElement() as any) as HTMLCanvasElement
+
 export const createMultilineFabricTextGroup = (
   text: string,
   font: opentype.Font,

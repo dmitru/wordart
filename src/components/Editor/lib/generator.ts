@@ -1,6 +1,6 @@
 import chroma from 'chroma-js'
 import { WordConfigId } from 'components/Editor/editor-store'
-import { ShapeConfig, ShapeId } from 'components/Editor/style'
+import { ShapeConf, ShapeId } from 'components/Editor/style'
 import { FontId } from 'data/fonts'
 import {
   clampPixelOpacityUp,
@@ -835,7 +835,7 @@ export type FillShapeTaskWordConfig = {
 }
 
 export type FillShapeTaskIconConfig = {
-  shape: ShapeConfig
+  shape: ShapeConf
 }
 
 export type FillShapeTaskResult = {
@@ -848,7 +848,7 @@ export type GeneratedItem =
   | RasterGeneratedItem
 
 export type RasterGeneratedItem = {
-  kind: 'img'
+  kind: 'raster'
   locked?: boolean
   index: number
   ctx: CanvasRenderingContext2D

@@ -1,7 +1,6 @@
 import { css } from '@emotion/core'
 import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
-import { Box } from 'components/shared/Box'
-import { Button } from 'components/shared/Button'
+import { Box, Button } from '@chakra-ui/core'
 import { TextInputField } from 'components/shared/formik/TextInputField'
 import { Form, Formik } from 'formik'
 import 'lib/wordart/console-extensions'
@@ -93,7 +92,12 @@ export const LoginPage = observer(() => {
                   label="Password"
                 />
 
-                <Button mt="4" primary disabled={isSubmitting} type="submit">
+                <Button
+                  mt="4"
+                  variantColor="accent"
+                  isDisabled={isSubmitting}
+                  type="submit"
+                >
                   Log in
                 </Button>
 

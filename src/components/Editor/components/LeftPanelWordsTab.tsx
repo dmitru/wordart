@@ -89,7 +89,7 @@ const Toolbar = styled(Box)``
 export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
   ({ target }) => {
     const { editorPageStore: store } = useStore()
-    const style = store.styles[target]
+    const style = store.styleOptions[target]
     const words = style.words
 
     const fonts = store.getAvailableFonts()

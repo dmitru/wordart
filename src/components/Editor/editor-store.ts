@@ -1,50 +1,53 @@
-import { shapes } from 'components/Editor/icons'
+import {
+  defaultBgStyleOptions,
+  defaultShapeStyleOptions,
+} from 'components/Editor/default-style-options'
 import {
   Editor,
   EditorInitParams,
-  getItemsColoring,
   TargetKind,
-  EditorItemId,
+} from 'components/Editor/lib/editor'
+import {
   EditorItem,
   EditorItemConfig,
   EditorItemConfigWord,
-} from 'components/Editor/lib/editor'
-import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
+  EditorItemId,
+} from 'components/Editor/lib/editor-item'
+import {
+  applyTransformToObj,
+  cloneObj,
+  objAsCanvasElement,
+} from 'components/Editor/lib/fabric-utils'
 import { Font } from 'components/Editor/lib/generator'
 import {
-  defaultBackgroundStyle,
-  defaultShapeStyle,
-  ShapeConfig,
+  ShapeConf,
   ShapeId,
-  WordStyleConfig,
-  ShapeConfigImg,
-  ShapeConfigText,
+  ShapeRasterConf,
+  ShapeTextConf,
+} from 'components/Editor/shape-config'
+import {
+  mkBgConfFromOptions,
+  mkShapeConfFromOptions,
 } from 'components/Editor/style'
+import { WordListEntry } from 'components/Editor/style-options'
 import { FontConfig, FontId, fonts, FontStyleConfig } from 'data/fonts'
+import { shapes } from 'data/shapes'
 import { loadFont } from 'lib/wordart/fonts'
-import { uniq, uniqBy, sortBy } from 'lodash'
+import { sortBy, uniq, uniqBy } from 'lodash'
 import { action, observable, set, toJS } from 'mobx'
 import paper from 'paper'
 import {
-  EditorPersistedItemV1,
-  EditorPersistedItemWordV1,
-  EditorPersistedWordV1,
   MatrixSerialized,
+  PersistedItemV1,
+  PersistedItemWordV1,
+  PersistedWordV1,
 } from 'services/api/persisted/v1'
 import { EditorPersistedData } from 'services/api/types'
 import { RootStore } from 'services/root-store'
 import { consoleLoggers } from 'utils/console-logger'
+import { UninqIdGenerator as UniqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
-import { nanoid } from 'nanoid/non-secure'
-import { UninqIdGenerator as UniqIdGenerator } from 'utils/ids'
-import {
-  loadImageUrlToCanvasCtx,
-  loadImageUrlToCanvasCtxWithMaxSize,
-  removeLightPixels,
-  invertImageMask,
-  processImg,
-} from 'lib/wordart/canvas-utils'
 
 export type EditorMode = 'view' | 'edit items'
 
@@ -55,6 +58,8 @@ export type EditorStoreInitParams = Pick<
 
 export class EditorStore {
   logger = consoleLoggers.editorStore
+  @observable lifecycleState: 'initializing' | 'initialized' | 'destroyed' =
+    'initializing'
 
   rootStore: RootStore
   editor: Editor | null = null
@@ -62,15 +67,12 @@ export class EditorStore {
   @observable isVisualizing = false
   @observable visualizingProgress = null as number | null
 
-  // TODO
   @observable mode: EditorMode = 'view'
 
-  @observable state: 'initializing' | 'initialized' | 'destroyed' =
-    'initializing'
-
-  @observable styles = {
-    bg: defaultBackgroundStyle,
-    shape: defaultShapeStyle,
+  /** Ui state of the various settings of the editor */
+  @observable styleOptions = {
+    bg: defaultBgStyleOptions,
+    shape: defaultShapeStyleOptions,
   }
 
   @observable pageSize: PageSize = {
@@ -79,7 +81,7 @@ export class EditorStore {
   }
 
   @observable hasItemChanges = false
-  @observable availableShapes: ShapeConfig[] = shapes
+  @observable availableShapes: ShapeConf[] = shapes
   @observable selectedShapeId: ShapeId = shapes[4].id
 
   wordIdGen = new UniqIdGenerator(3)
@@ -130,7 +132,7 @@ export class EditorStore {
         }
       },
     })
-    this.editor.setBgColor(this.styles.bg.fill)
+    this.editor.setBgColor(mkBgConfFromOptions(this.styleOptions.bg).fill)
     // @ts-ignore
     window['editor'] = this.editor
 
@@ -142,7 +144,7 @@ export class EditorStore {
 
     this.enterViewMode()
 
-    this.state = 'initialized'
+    this.lifecycleState = 'initialized'
   }
 
   setItemLock = (lockValue: boolean) => {
@@ -210,47 +212,44 @@ export class EditorStore {
 
     const { data } = serialized
     this.editor.setAspectRatio(
-      serialized.data.editor.sceneSize.w / serialized.data.editor.sceneSize.h
+      serialized.data.sceneSize.w / serialized.data.sceneSize.h
     )
 
-    if (data.editor.shape.kind === 'custom' && data.editor.shape.custom) {
+    if (data.shape.kind === 'custom' && data.shape.custom) {
       const customImgId = this.addCustomShapeImg({
-        kind: 'img',
+        kind: 'raster',
         title: 'Custom',
-        url: data.editor.shape.custom.url,
+        url: data.shape.custom.url,
         isCustom: true,
         thumbnailUrl: undefined,
-        processing: data.editor.shape.custom.processing,
+        processing: data.shape.custom.processing,
       })
       await this.selectShape(customImgId)
-    } else if (
-      data.editor.shape.kind === 'builtin' &&
-      data.editor.shape.shapeId != null
-    ) {
-      await this.selectShape(data.editor.shape.shapeId)
+    } else if (data.shape.kind === 'builtin' && data.shape.shapeId != null) {
+      await this.selectShape(data.shape.shapeId)
     }
 
     this.updateShapeThumbnail()
 
     const { shape, shapeOriginalColors } = this.editor.fabricObjects
-    if (data.editor.shape.transform && shape && shapeOriginalColors) {
-      applyTransformToObj(shape, data.editor.shape.transform)
-      applyTransformToObj(shapeOriginalColors, data.editor.shape.transform)
+    if (data.shape.transform && shape && shapeOriginalColors) {
+      applyTransformToObj(shape, data.shape.transform)
+      applyTransformToObj(shapeOriginalColors, data.shape.transform)
     }
 
     const sceneSize = this.editor.getSceneBounds(0)
-    const scale = sceneSize.width / serialized.data.editor.sceneSize.w
+    const scale = sceneSize.width / serialized.data.sceneSize.w
 
-    this.styles.shape = data.editor.shape.style
-    this.styles.bg = data.editor.bg.style
+    this.styleOptions.shape = data.shapeStyle
+    this.styleOptions.bg = data.bgStyle
 
     const deserializeItems = async ({
       items,
       words,
       fontIds,
     }: {
-      items: EditorPersistedItemV1[]
-      words: EditorPersistedWordV1[]
+      items: PersistedItemV1[]
+      words: PersistedWordV1[]
       fontIds: FontId[]
     }): Promise<EditorItemConfig[]> => {
       console.log('deserializeItems: ', { words, items, fontIds })
@@ -328,26 +327,25 @@ export class EditorStore {
     await this.editor.setShapeItems(shapeItems)
     await this.editor.setBgItems(bgItems)
 
-    this.editor.setBgColor(this.styles.bg.fill)
-    await this.editor.setShapeFillColors(this.styles.shape.fill)
-    await this.editor.setItemsColor('bg', getItemsColoring(this.styles.bg))
-    await this.editor.setItemsColor(
-      'shape',
-      getItemsColoring(this.styles.shape)
+    this.editor.setBgColor(mkBgConfFromOptions(this.styleOptions.bg).fill)
+    await this.editor.setShapeFillColors(this.styleOptions.shape)
+    // await this.editor.setShapeItemsColor(
+    //   getItemsColoring(this.styleOptions.bg)
+    // )
+    await this.editor.setShapeItemsColor(
+      mkShapeConfFromOptions(this.styleOptions.shape).items.coloring
     )
   }
 
   updateShapeThumbnail = async () => {
-    if (!this.editor || !this.editor.fabricObjects.shape) {
+    if (!this.editor || !this.editor.shape) {
       return
     }
-    const currentShapeConfig = this.getSelectedShape()
-    const shape = await new Promise<fabric.Object>((r) =>
-      this.editor!.fabricObjects.shape!.clone((copy: fabric.Object) => r(copy))
-    )
+    const currentShapeConf = this.getSelectedShapeConf()
+    const shape = await cloneObj(this.editor.shape.obj)
     shape.set({ opacity: 1 })
-    const canvas = (shape.toCanvasElement() as any) as HTMLCanvasElement
-    currentShapeConfig.thumbnailUrl = canvas.toDataURL()
+    const canvas = objAsCanvasElement(shape)
+    currentShapeConf.thumbnailUrl = canvas.toDataURL()
   }
 
   serialize = (): EditorPersistedData => {
@@ -372,8 +370,8 @@ export class EditorStore {
       items: EditorItem[]
     ): {
       fontIds: FontId[]
-      words: EditorPersistedWordV1[]
-      items: EditorPersistedItemV1[]
+      words: PersistedWordV1[]
+      items: PersistedItemV1[]
     } => {
       const fontIds: FontId[] = uniq(
         items
@@ -386,7 +384,7 @@ export class EditorStore {
           .filter(notEmpty)
       )
 
-      const words: EditorPersistedWordV1[] = items
+      const words: PersistedWordV1[] = items
         .map((item) => {
           if (item.kind !== 'word') {
             return null
@@ -398,7 +396,7 @@ export class EditorStore {
           }
         })
         .filter(notEmpty)
-      const uniqWords: EditorPersistedWordV1[] = uniqBy(
+      const uniqWords: PersistedWordV1[] = uniqBy(
         words,
         (w) => `${w.fontIndex}.${w.text}`
       )
@@ -423,7 +421,7 @@ export class EditorStore {
                     uw.fontIndex === words[index].fontIndex &&
                     uw.text === words[index].text
                 ),
-              } as EditorPersistedItemWordV1
+              } as PersistedItemWordV1
             }
             // if (item.kind === 'symbol') {
             //   return {
@@ -453,12 +451,12 @@ export class EditorStore {
             h: roundFloat(this.editor.getSceneBounds(0).height, 3),
           },
           bg: {
-            style: toJS(this.styles.bg, { recurseEverything: true }),
+            style: toJS(this.styleOptions.bg, { recurseEverything: true }),
           },
           shape: {
             transform: shapeTransform || null,
             shapeId: this.editor.currentShapeInfo?.shapeConfig.id || null,
-            style: toJS(this.styles.shape, { recurseEverything: true }),
+            style: toJS(this.styleOptions.shape, { recurseEverything: true }),
             kind: this.editor.currentShapeInfo?.shapeConfig
               ? this.editor.currentShapeInfo.shapeConfig.isCustom
                 ? 'custom'
@@ -488,34 +486,34 @@ export class EditorStore {
   @action destroyEditor = () => {
     this.logger.debug('destroyEditor')
     this.editor?.destroy()
-    this.state = 'destroyed'
+    this.lifecycleState = 'destroyed'
   }
 
-  addCustomShapeImg = (shape: Omit<ShapeConfigImg, 'id'>) => {
+  addCustomShapeImg = (shape: Omit<ShapeRasterConf, 'id'>) => {
     const id = this.customImgIdGen.get()
     this.availableShapes.push({
       ...shape,
       id,
-    } as ShapeConfig)
+    } as ShapeConf)
     return id
   }
 
-  addCustomShapeText = (shape: Omit<ShapeConfigText, 'id'>) => {
+  addCustomShapeText = (shape: Omit<ShapeTextConf, 'id'>) => {
     const id = this.customImgIdGen.get()
     this.availableShapes.push({
       ...shape,
       id,
-    } as ShapeConfig)
+    } as ShapeConf)
     return id
   }
 
-  getAvailableShapes = (): ShapeConfig[] =>
+  getAvailableShapes = (): ShapeConf[] =>
     sortBy(
       this.availableShapes,
       (s) => (s.isCustom ? -1 : 1),
       (s) => s.title
     )
-  getShapeById = (shapeId: ShapeId): ShapeConfig | undefined =>
+  getShapeById = (shapeId: ShapeId): ShapeConf | undefined =>
     this.availableShapes.find((s) => s.id === shapeId)
 
   getAvailableFonts = (): { font: FontConfig; style: FontStyleConfig }[] => {
@@ -544,7 +542,7 @@ export class EditorStore {
       ? loadFont(this.getFontById(fontId)!.style.url)
       : Promise.resolve(null)
 
-  getSelectedShape = () =>
+  getSelectedShapeConf = () =>
     this.availableShapes.find((s) => s.id === this.selectedShapeId)!
 
   @action selectShape = async (shapeId: ShapeId) => {
@@ -557,8 +555,8 @@ export class EditorStore {
 
     await this.editor.setShape({
       shapeConfig: shape,
-      bgColors: this.styles.bg.fill,
-      shapeColors: this.styles.shape.fill,
+      bgFillStyle: mkBgConfFromOptions(this.styleOptions.bg).fill,
+      shapeStyle: mkShapeConfFromOptions(this.styleOptions.shape),
       clear: true,
     })
   }
@@ -571,34 +569,35 @@ export class EditorStore {
     const shape = this.getShapeById(this.selectedShapeId)!
     await this.editor.setShape({
       shapeConfig: shape,
-      bgColors: this.styles.bg.fill,
-      shapeColors: this.styles.shape.fill,
+      bgFillStyle: mkBgConfFromOptions(this.styleOptions.bg).fill,
+      shapeStyle: mkShapeConfFromOptions(this.styleOptions.shape),
       clear: false,
     })
-    if (this.styles.shape.itemsColoring.kind === 'shape') {
-      await this.editor.setItemsColor(
-        'shape',
-        getItemsColoring(this.styles.shape)
+    if (this.styleOptions.shape.items.coloring.kind === 'shape') {
+      await this.editor.setShapeItemsColor(
+        mkShapeConfFromOptions(this.styleOptions.shape).items.coloring
       )
     }
   }
 
   @action deleteWord = (target: TargetKind, wordId: WordConfigId) => {
-    const style = this.styles[target]
-    style.words.wordList = style.words.wordList.filter((w) => w.id !== wordId)
+    const style = this.styleOptions[target]
+    style.items.words.wordList = style.items.words.wordList.filter(
+      (w) => w.id !== wordId
+    )
   }
 
   @action clearWords = (target: TargetKind) => {
-    const style = this.styles[target]
-    const ids = style.words.wordList.map((w) => w.id)
+    const style = this.styleOptions[target]
+    const ids = style.items.words.wordList.map((w) => w.id)
     this.wordIdGen.removeIds(ids)
     this.wordIdGen.resetLen()
-    style.words.wordList = []
+    style.items.words.wordList = []
   }
 
   @action addWord = (target: TargetKind, text = '') => {
-    const style = this.styles[target]
-    style.words.wordList.push({
+    const style = this.styleOptions[target]
+    style.items.words.wordList.push({
       id: this.wordIdGen.get(),
       text,
     })
@@ -607,10 +606,10 @@ export class EditorStore {
   @action updateWord = (
     target: TargetKind,
     wordId: WordConfigId,
-    update: Partial<Omit<WordStyleConfig, 'id'>>
+    update: Partial<Omit<WordListEntry, 'id'>>
   ) => {
-    const style = this.styles[target]
-    const word = style.words.wordList.find((w) => w.id === wordId)
+    const style = this.styleOptions[target]
+    const word = style.items.words.wordList.find((w) => w.id === wordId)
     if (!word) {
       throw new Error(`missing word, id = ${wordId}`)
     }

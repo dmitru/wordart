@@ -3,7 +3,7 @@ import { Rect } from 'lib/wordart/geometry'
 // @ts-ignore
 import jsfeat from 'jsfeat'
 import chroma from 'chroma-js'
-import { ShapeStyleConfig } from 'components/Editor/style'
+import { RasterProcessingConf } from 'components/Editor/shape-config'
 
 export type Dimensions = { w: number; h: number }
 
@@ -267,29 +267,32 @@ export const loadImageUrlToCanvasCtx = async (
   return ctx
 }
 
-export const processImg = (
+export const processRasterImg = (
   canvas: HTMLCanvasElement,
-  processing: ShapeStyleConfig['processing']
+  processing: RasterProcessingConf
 ) => {
   console.log('processImg', canvas.width, canvas.height)
-  if (!processing.removeLightBackground.enabled && !processing.invert.enabled) {
+  if (!processing.removeLightBackground && !processing.invert) {
     return
   }
 
   const ctx = canvas.getContext('2d')!
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-  const [red, green, blue] = chroma(processing.invert.color).rgb()
-  const threshold = processing.removeLightBackground.threshold
+  const [red, green, blue] = processing.invert?.color
+    ? chroma(processing.invert.color).rgb()
+    : [0, 0, 0]
+  const threshold = processing.removeLightBackground?.threshold || 0
 
   for (let row = 0; row < imgData.height; ++row) {
     for (let col = 0; col < imgData.width; ++col) {
       const imgDataIndex = (row * imgData.width + col) * 4
-      if (processing.removeLightBackground.enabled) {
+      if (processing.removeLightBackground) {
         // removeLightPixels
         const r = imgData.data[imgDataIndex + 0]
         const g = imgData.data[imgDataIndex + 1]
         const b = imgData.data[imgDataIndex + 2]
         const value = (r + r + g + g + g + b) / 6
+
         // If the pixel isn't dark enough...
         if (value >= 255 * threshold) {
           // Make that pixel transparent
@@ -300,7 +303,7 @@ export const processImg = (
         }
       }
 
-      if (processing.invert.enabled) {
+      if (processing.invert) {
         // Fully transparent pixel
 
         const isTransparentAtLeastABit = imgData.data[imgDataIndex + 3] < 255

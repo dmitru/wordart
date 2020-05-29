@@ -10,9 +10,9 @@ import {
   Tracks,
 } from 'react-compound-slider'
 import { noop } from 'lodash'
-import { Box } from 'components/shared/Box'
 import { css } from '@emotion/core'
-import { lighten, darken } from 'polished'
+import { darken } from 'polished'
+import { Box } from '@chakra-ui/core'
 
 export type SliderProps = {
   value: number

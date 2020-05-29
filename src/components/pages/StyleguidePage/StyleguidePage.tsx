@@ -2,10 +2,8 @@ import React from 'react'
 import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
 import styled from '@emotion/styled'
-import { Checkbox } from 'components/shared/Checkbox'
 import { observable } from 'mobx'
-import { Box } from 'components/shared/Box'
-import { Button } from '@chakra-ui/core'
+import { Box, Button } from '@chakra-ui/core'
 
 const PageLayoutWrapper = styled.div`
   margin: 50px auto;
@@ -26,7 +24,7 @@ const state = observable({
 export const StyleguidePage = observer(() => {
   return (
     <PageLayoutWrapper>
-      <Section>
+      {/* <Section>
         <h1>Buttons</h1>
         <Button variantColor="primary">Primary</Button>
         <Button variantColor="secondary">Secondary</Button>
@@ -36,7 +34,7 @@ export const StyleguidePage = observer(() => {
         <Button variantColor="secondary" variant="outline">
           Secondary
         </Button>
-      </Section>
+      </Section> */}
       {/* 
       <Section>
         <h1>Form controls</h1>

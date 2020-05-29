@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from '@emotion/styled'
 import Link from 'next/link'
-import { Box } from 'components/shared/Box'
 import { Urls } from 'urls'
+import { Box } from '@chakra-ui/core'
 
 export type FooterProps = {}
 
@@ -22,18 +22,18 @@ export const Footer: React.FC<FooterProps> = () => {
   )
 }
 
-export const FooterWrapper = styled(Box)`
+export const FooterWrapper = styled(Box)<{ theme: any }>`
   background: ${(p) => p.theme.colors.light1};
 `
 
-export const ContentContainer = styled(Box)`
+export const ContentContainer = styled(Box)<{ theme: any }>`
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
   padding: 10px 20px;
 `
 
-export const FooterLink = styled.a`
+export const FooterLink = styled.a<{ theme: any }>`
   padding: 10px;
   color: ${({ theme }) => theme.colors.primary};
 `

@@ -116,7 +116,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         if (
           authStore.hasInitialized &&
           canvasRef.current &&
-          store.state !== 'initialized'
+          store.lifecycleState !== 'initialized'
         ) {
           const editorParams: EditorStoreInitParams = {
             canvas: canvasRef.current,
@@ -304,7 +304,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
               <LeftPanel>
                 <LeftPanelContent id="left-panel-content" px="3" py="3">
-                  {store.state === 'initialized' ? (
+                  {store.lifecycleState === 'initialized' ? (
                     <>
                       {state.leftPanelContext === 'resize' && (
                         <Box>
@@ -416,11 +416,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 onClick={() => {
                   if (state.targetTab === 'shape') {
                     store.editor?.generateShapeItems({
-                      style: store.styles.shape,
+                      style: store.styleOptions.shape,
                     })
                   } else {
                     store.editor?.generateBgItems({
-                      style: store.styles.bg,
+                      style: store.styleOptions.bg,
                     })
                   }
                 }}

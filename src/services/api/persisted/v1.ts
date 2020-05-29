@@ -1,68 +1,88 @@
-import {
-  BackgroundStyleConfig,
-  ShapeId,
-  ShapeStyleConfig,
-  ShapeConfigImg,
-} from 'components/Editor/style'
 import { FontId } from 'data/fonts'
 import { Dimensions } from 'lib/wordart/canvas-utils'
-import { EditorItemId } from 'components/Editor/lib/editor'
+import { BgStyleConf, ShapeStyleConf } from 'components/Editor/style'
+import {
+  ShapeId,
+  RasterProcessingConf,
+  SvgProcessingConf,
+  ShapeTextStyle,
+} from 'components/Editor/shape-config'
+import { EditorItemId } from 'components/Editor/lib/editor-item'
 
 export type EditorPersistedDataV1 = {
   version: 1
   data: {
-    editor: {
-      sceneSize: Dimensions
-      bg: {
-        style: EditorPersistedBackgroundStyleConfigV1
-      }
-      shape: {
-        style: EditorPersistedShapeStyleConfigV1
-        transform: MatrixSerialized | null
-        // TODO: refactor this to e.g.
-        // custom: boolean
-        // kind: 'empty' | 'text' | 'svg' | 'raster'
-        // and a tag union for these types...
-        kind: 'empty' | 'builtin' | 'custom'
-        /** null for custom images */
-        shapeId: ShapeId | null
-        /** null for builtin images  */
-        custom: {
-          url: string
-          processing: ShapeConfigImg['processing']
-        } | null
-      }
+    sceneSize: Dimensions
+    shape: PersistedShapeConfV1
+
+    bgStyle: PersistedBgStyleConfV1
+    shapeStyle: PersistedShapeStyleConfV1
+
+    bgItems: {
+      items: PersistedItemV1[]
+      words: PersistedWordV1[]
+      fontIds: FontId[]
     }
-    generated: {
-      bg: {
-        items: EditorPersistedItemV1[]
-        words: EditorPersistedWordV1[]
-        fontIds: FontId[]
-      }
-      shape: {
-        items: EditorPersistedItemV1[]
-        words: EditorPersistedWordV1[]
-        fontIds: FontId[]
-      }
+    shapeItems: {
+      items: PersistedItemV1[]
+      words: PersistedWordV1[]
+      fontIds: FontId[]
     }
   }
 }
 
-export type EditorPersistedBackgroundStyleConfigV1 = BackgroundStyleConfig
-export type EditorPersistedShapeStyleConfigV1 = ShapeStyleConfig
+export type PersistedShapeConfV1 =
+  | PersistedShapeConfRasterV1
+  | PersistedShapeConfCustomRasterV1
+  | PersistedShapeConfSvgV1
+  | PersistedShapeConfCustomSvgV1
+  | PersistedShapeConfCustomTextV1
 
-export type EditorPersistedItemV1 =
-  | EditorPersistedItemWordV1
-  | EditorPersistedSymbolV1
+export type PersistedShapeConfRasterV1 = {
+  kind: 'raster'
+  transform: MatrixSerialized
+  shapeId: ShapeId
+  processing?: RasterProcessingConf
+}
+export type PersistedShapeConfCustomRasterV1 = {
+  kind: 'custom-raster'
+  transform: MatrixSerialized
+  url: string
+  processing?: RasterProcessingConf
+}
+export type PersistedShapeConfSvgV1 = {
+  kind: 'svg'
+  transform: MatrixSerialized
+  shapeId: ShapeId
+  processing?: SvgProcessingConf
+}
+export type PersistedShapeConfCustomSvgV1 = {
+  kind: 'custom-svg'
+  transform: MatrixSerialized
+  url: string
+  processing?: SvgProcessingConf
+}
+export type PersistedShapeConfCustomTextV1 = {
+  kind: 'custom-text'
+  transform: MatrixSerialized
+  text: string
+  textStyle: ShapeTextStyle
+  // TODO: add custom fonts...
+}
+
+export type PersistedBgStyleConfV1 = BgStyleConf
+export type PersistedShapeStyleConfV1 = ShapeStyleConf
+
+export type PersistedItemV1 = PersistedItemWordV1 | PersistedSymbolV1
 
 export type MatrixSerialized = [number, number, number, number, number, number]
 
-export type EditorPersistedWordV1 = {
+export type PersistedWordV1 = {
   text: string
   fontIndex: number
 }
 
-export type EditorPersistedItemWordV1 = {
+export type PersistedItemWordV1 = {
   /** Kind */
   k: 'w'
   id: EditorItemId
@@ -81,7 +101,7 @@ export type EditorPersistedItemWordV1 = {
   /** Shape color */
   sc: string
 }
-export type EditorPersistedSymbolV1 = {
+export type PersistedSymbolV1 = {
   /** Kind */
   k: 's'
   id: EditorItemId

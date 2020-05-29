@@ -29,7 +29,7 @@ const state = observable({
 export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
   ({ target }) => {
     const { editorPageStore } = useStore()
-    const style = editorPageStore.styles[target]
+    const style = editorPageStore.styleOptions[target]
     const icons = style.icons.iconList
 
     const shapes = editorPageStore

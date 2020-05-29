@@ -4,22 +4,15 @@ import { computeColorsMap } from 'components/Editor/lib/colormap'
 import {
   applyTransformToObj,
   createMultilineFabricTextGroup,
+  cloneObj,
+  cloneObjAsImage,
+  objAsCanvasElement,
 } from 'components/Editor/lib/fabric-utils'
 import { Font, Generator } from 'components/Editor/lib/generator'
-import {
-  BackgroundStyleConfig,
-  ColorString,
-  ItemsColoring,
-  ShapeConfig,
-  ShapeStyleConfig,
-} from 'components/Editor/style'
+import { Shape } from 'components/Editor/shape'
 import { FontId } from 'data/fonts'
 import { fabric } from 'fabric'
-import {
-  canvasToImgElement,
-  createCanvas,
-  processImg,
-} from 'lib/wordart/canvas-utils'
+import { canvasToImgElement, createCanvas } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { flatten, groupBy, keyBy, max, min, sortBy } from 'lodash'
 import { toJS } from 'mobx'
@@ -33,177 +26,16 @@ import { consoleLoggers } from 'utils/console-logger'
 import { UninqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { exhaustiveCheck } from 'utils/type-utils'
-
-export type EditorItemConfig = EditorItemConfigWord
-
-export type EditorItemConfigWord = {
-  kind: 'word'
-  index: number
-  locked: boolean
-  text: string
-  fontId: FontId
-  transform: paper.Matrix
-  wordConfigId?: WordConfigId
-  customColor?: string
-  /** Default color of the item, determined by the coloring style */
-  color: string
-  /** Color of the shape at the location where item was placed */
-  shapeColor: string
-}
-
-export type EditorItemId = string
-export type EditorItem = EditorItemWord
-
-export class EditorItemWord {
-  kind = 'word' as 'word'
-  font: Font
-  id: EditorItemId
-  wordConfigId?: WordConfigId
-  defaultText = ''
-  customText?: string
-
-  /** When was the item placed by the generation algorithm */
-  placedIndex = -1
-
-  /** Transform produced by the generator algorithm */
-  generatedTransform = new paper.Matrix()
-  /** Current transform of the item */
-  transform = new paper.Matrix()
-  /** Is position locked? */
-  locked = false
-
-  /** Color of the shape where the item was auto-placed */
-  shapeColor = 'black'
-  /** Custom color of the item */
-  customColor?: string
-  /** Default color of the item, determined by the coloring style */
-  color: string
-
-  fabricObj: fabric.Group
-  wordObj: fabric.Object
-  canvas: fabric.Canvas
-
-  path?: opentype.Path
-  pathBounds?: opentype.BoundingBox
-  lockBorder: fabric.Group
-
-  isShowingLockBorder = false
-
-  constructor(
-    id: EditorItemId,
-    canvas: fabric.Canvas,
-    conf: EditorItemConfigWord,
-    font: Font
-  ) {
-    this.id = id
-    this.canvas = canvas
-    this.font = font
-
-    const wordPath = font.otFont.getPath(conf.text, 0, 0, 100)
-    const pathBounds = wordPath.getBoundingBox()
-    const pw = pathBounds.x2 - pathBounds.x1
-    const ph = pathBounds.y2 - pathBounds.y1
-
-    const pad = 0
-    const wordGroup = new fabric.Group([
-      new fabric.Rect().set({
-        originX: 'center',
-        originY: 'center',
-        left: pathBounds.x1,
-        top: pathBounds.y1,
-        width: pw + 2 * pad,
-        height: ph + 2 * pad,
-        strokeWidth: 1,
-        stroke: 'black',
-        fill: 'rgba(255,255,255,0.3)',
-        opacity: 0,
-      }),
-      new fabric.Path(wordPath.toPathData(3)).set({
-        originX: 'center',
-        originY: 'center',
-      }),
-    ])
-
-    this.customColor = conf.customColor
-    this.color = conf.color || 'black'
-
-    this.fabricObj = wordGroup
-    this.wordObj = wordGroup.item(1)
-    this.lockBorder = wordGroup.item(0)
-    this.wordObj.set({ fill: this.color })
-
-    this.transform = conf.transform
-    this.generatedTransform = conf.transform
-    this.defaultText = conf.text
-    this.shapeColor = conf.shapeColor
-    this.path = wordPath
-    this.pathBounds = pathBounds
-    this.placedIndex = conf.index
-    this.wordConfigId = conf.wordConfigId
-
-    this.setLocked(conf.locked)
-
-    wordGroup.on('modified', () => {
-      this.transform = new paper.Matrix(wordGroup.calcOwnMatrix())
-    })
-    wordGroup.on('selected', () => {
-      this.fabricObj.bringToFront()
-      this.canvas.requestRenderAll()
-    })
-
-    this._updateColor(this.customColor || this.color)
-
-    applyTransformToObj(wordGroup, conf.transform.values as MatrixSerialized)
-  }
-
-  setSelectable = (value: boolean) => {
-    this.fabricObj.selectable = value
-  }
-
-  private _updateColor = (color: string) => {
-    this.fabricObj.cornerColor = color
-    this.fabricObj.cornerStyle = 'circle'
-    this.fabricObj.transparentCorners = false
-    this.fabricObj.borderColor = color
-    this.wordObj.set({ fill: color })
-    this.lockBorder.set({ stroke: color })
-  }
-
-  private _updateOpacity = (opacity: number) => {
-    this.fabricObj.opacity = opacity
-  }
-
-  setColor = (color: string) => {
-    this.color = color
-    this._updateColor(this.customColor || this.color)
-  }
-
-  setOpacity = (opacity: number) => {
-    this._updateOpacity(opacity)
-  }
-
-  setCustomColor = (color: string) => {
-    this.customColor = color
-    this._updateColor(this.customColor)
-  }
-
-  clearCustomColor = () => {
-    this.customColor = undefined
-    this._updateColor(this.color)
-  }
-
-  setLockBorderVisibility = (value: boolean) => {
-    this.isShowingLockBorder = value
-    this.lockBorder.set({
-      opacity: this.locked && value ? 1 : 0,
-    })
-  }
-
-  setLocked = (value: boolean) => {
-    this.locked = value
-    this.lockBorder.set({ opacity: value && this.isShowingLockBorder ? 1 : 0 })
-  }
-}
+import { ColorString, ItemsColoring } from 'components/Editor/style-options'
+import { BgStyleConf, ShapeStyleConf } from 'components/Editor/style'
+import {
+  EditorItem,
+  EditorItemId,
+  EditorItemConfig,
+  EditorItemConfigWord,
+  EditorItemWord,
+} from 'components/Editor/lib/editor-item'
+import { ShapeConf } from 'components/Editor/shape-config'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -217,22 +49,10 @@ export type EditorInitParams = {
   onItemSelectionCleared: () => void
 }
 
-type CurrentShapeInfo =
-  | {
-      kind: 'svg'
-      shapeConfig: ShapeConfig
-      colorsMap: SvgShapeColorsMap
-    }
-  | {
-      kind: 'img'
-      shapeConfig: ShapeConfig
-      originalCanvas: HTMLCanvasElement
-      processedCanvas: HTMLCanvasElement
-    }
-  | {
-      kind: 'text'
-      shapeConfig: ShapeConfig
-    }
+type FontInfo = {
+  font: Font
+  glyphs: Map<string, { glyph: Glyph; path: opentype.Path; pathData: string }>
+}
 
 export class Editor {
   logger = consoleLoggers.editor
@@ -245,12 +65,7 @@ export class Editor {
   private editorItemIdGen = new UninqIdGenerator(3)
 
   /** Info about the current shape */
-  currentShapeInfo: null | CurrentShapeInfo = null
-
-  fabricObjects: {
-    shape?: fabric.Object
-    shapeOriginalColors?: fabric.Object
-  } = {}
+  shape: null | Shape = null
 
   items: {
     shape: {
@@ -265,16 +80,7 @@ export class Editor {
   /** Size of the scene in project coordinates */
   projectBounds: paper.Rectangle
   canvas: fabric.Canvas
-  fontsInfo: Map<
-    FontId,
-    {
-      font: Font
-      glyphs: Map<
-        string,
-        { glyph: Glyph; path: opentype.Path; pathData: string }
-      >
-    }
-  > = new Map()
+  fontsInfo: Map<FontId, FontInfo> = new Map()
 
   itemsSelection = false
   shapeSelection = false
@@ -314,7 +120,7 @@ export class Editor {
         return
       }
 
-      if (target === this.fabricObjects.shape) {
+      if (target === this.shape?.obj) {
         this.clearItems('shape')
         this.clearItems('bg')
       }
@@ -325,7 +131,7 @@ export class Editor {
         return
       }
 
-      if (target === this.fabricObjects.shape) {
+      if (target === this.shape?.obj) {
         this.clearItems('shape')
         this.clearItems('bg')
       }
@@ -336,7 +142,7 @@ export class Editor {
         return
       }
 
-      if (target === this.fabricObjects.shape) {
+      if (target === this.shape?.obj) {
         this.clearItems('shape')
         this.clearItems('bg')
       }
@@ -349,12 +155,13 @@ export class Editor {
       }
 
       if (
-        target === this.fabricObjects.shape &&
-        this.fabricObjects.shapeOriginalColors
+        target === this.shape?.obj &&
+        this.shape.kind === 'svg' &&
+        this.shape.objOriginalColors
       ) {
         applyTransformToObj(
-          this.fabricObjects.shapeOriginalColors,
-          this.fabricObjects.shape.calcTransformMatrix() as MatrixSerialized
+          this.shape.objOriginalColors,
+          this.shape.obj.calcTransformMatrix() as MatrixSerialized
         )
 
         this.canvas.requestRenderAll()
@@ -461,25 +268,31 @@ export class Editor {
     this.canvas.setZoom(this.canvas.getWidth() / this.projectBounds.width)
   }
 
-  setBgColor = (config: BgFillColorsConfig) => {
+  setBgColor = (config: BgStyleConf['fill']) => {
     this.logger.debug('setBgColor', toJS(config, { recurseEverything: true }))
-    this.canvas.backgroundColor = config.color
+    this.canvas.backgroundColor =
+      config.kind === 'transparent' ? 'transparent' : config.color
     this.canvas.requestRenderAll()
   }
 
-  setShapeFillColors = async (config: ShapeFillColorsConfig) => {
+  setShapeFillColors = async (
+    config: Pick<
+      ShapeStyleConf['items'],
+      'coloring' | 'opacity' | 'dimSmallerItems'
+    >
+  ) => {
     this.logger.debug(
       'setShapeFillColors',
       toJS(config, { recurseEverything: true })
     )
 
-    if (!this.currentShapeInfo) {
+    if (!this.shape) {
       this.logger.debug('>  No current shape, early exit')
       return
     }
 
-    if (this.currentShapeInfo.kind === 'img' || config.kind === 'original') {
-      this.setShapeFillOpacity(config.opacity)
+    if (this.shape.kind === 'raster') {
+      this.setShapeOpacity(config.opacity)
       this.canvas.requestRenderAll()
       return
     }
@@ -517,7 +330,7 @@ export class Editor {
       this.canvas.remove(this.fabricObjects.shape)
       this.canvas.insertAt(shape, 0, false)
 
-      this.currentShapeInfo.colorsMap = colorsMap
+      // this.shape. = colorsMap
       this.setShapeObj(shape)
     } else {
       this.logger.debug('>  Using single color')
@@ -538,30 +351,34 @@ export class Editor {
       this.setShapeObj(shape)
     }
 
-    this.setShapeFillOpacity(config.opacity)
+    this.setShapeOpacity(config.opacity)
     this.canvas.requestRenderAll()
   }
 
   setShapeObj = (shape: fabric.Object) => {
+    if (!this.shape) {
+      throw new Error('no shape')
+    }
     shape.set({ selectable: this.shapeSelection })
-    this.fabricObjects.shape = shape
+    this.shape.obj = shape
   }
 
-  setShapeFillOpacity = (opacity: number) => {
-    this.logger.debug('setShapeFillOpacity', opacity)
-    if (!this.fabricObjects.shape) {
+  setShapeOpacity = (opacity: number) => {
+    this.logger.debug('setShapeOpacity', opacity)
+    if (!this.shape) {
       return
     }
-    this.fabricObjects.shape.set({ opacity })
+    this.shape.obj.set({ opacity })
     this.canvas.requestRenderAll()
   }
 
-  setItemsColor = async (target: TargetKind, coloring: ItemsColoring) => {
-    const { itemsById } = this.items[target]
+  setShapeItemsColor = async (
+    coloring: ShapeStyleConf['items']['coloring']
+  ) => {
+    const { itemsById } = this.items.shape
     const items = [...itemsById.values()]
     this.logger.debug(
       'setItemsColor',
-      target,
       toJS(coloring, { recurseEverything: true }),
       `${items.length} items`
     )
@@ -632,7 +449,7 @@ export class Editor {
           const hex = color.hex()
           item.setColor(hex)
         } else if (coloring.shapeStyleFill.kind === 'color-map') {
-          if (this.currentShapeInfo?.kind === 'svg') {
+          if (this.shape?.kind === 'svg') {
             const colorMapSorted = sortBy(
               coloring.shapeStyleFill.defaultColorMap.map((color, index) => ({
                 color,
@@ -654,7 +471,7 @@ export class Editor {
             }
             const hex = color.hex()
             item.setColor(hex)
-          } else if (this.currentShapeInfo?.kind === 'img') {
+          } else if (this.shape?.kind === 'raster') {
             let color = chroma(item.shapeColor)
             if (coloring.shapeBrightness != 0) {
               color = color.brighten(coloring.shapeBrightness / 100)
@@ -662,9 +479,9 @@ export class Editor {
             item.setColor(color.hex())
           }
         } else if (coloring.shapeStyleFill.kind === 'original') {
-          const shape = this.currentShapeInfo?.shapeConfig
+          const shape = this.shape?.shapeConfig
           let colorString = item.shapeColor
-          if (shape?.kind === 'img' && shape?.processing?.invert.enabled) {
+          if (shape?.kind === 'raster' && shape?.processing?.invert.enabled) {
             colorString = shape.processing.invert.color
           }
           let color = chroma(colorString)
@@ -686,11 +503,11 @@ export class Editor {
 
   /** Sets the shape, clearing the project */
   setShape = async (params: {
-    shapeConfig: ShapeConfig
-    bgColors: BgFillColorsConfig
-    shapeColors: ShapeFillColorsConfig
+    shapeConfig: ShapeConf
+    bgFillStyle: BgStyleConf['fill']
+    shapeStyle: ShapeStyleConf
     clear: boolean
-  }): Promise<{ colorsMap?: SvgShapeColorsMap }> => {
+  }) => {
     console.log('setShape', params)
     const { shapeConfig, shapeColors, bgColors } = params
 
@@ -701,7 +518,7 @@ export class Editor {
 
     let colorsMap: SvgShapeColorsMap | undefined
     let shapeObj: fabric.Object | undefined
-    let currentShapeInfo: CurrentShapeInfo | undefined
+    let Shape: Shape | undefined
 
     // Process the shape...
     if (shapeConfig.kind === 'svg') {
@@ -713,12 +530,12 @@ export class Editor {
       )
 
       colorsMap = computeColorsMap(shapeObj as fabric.Group)
-      currentShapeInfo = {
+      Shape = {
         kind: 'svg',
         colorsMap,
         shapeConfig,
       }
-    } else if (shapeConfig.kind === 'img') {
+    } else if (shapeConfig.kind === 'raster') {
       shapeObj = await new Promise<fabric.Object>((resolve) =>
         fabric.Image.fromURL(shapeConfig.url, (oImg) => {
           resolve(oImg)
@@ -732,8 +549,8 @@ export class Editor {
       }
       shapeObj = new fabric.Image(canvasToImgElement(processedCanvas))
 
-      currentShapeInfo = {
-        kind: 'img',
+      Shape = {
+        kind: 'raster',
         shapeConfig,
         originalCanvas,
         processedCanvas,
@@ -756,7 +573,7 @@ export class Editor {
       )
       shapeObj = group
 
-      currentShapeInfo = {
+      Shape = {
         kind: 'text',
         shapeConfig,
       }
@@ -810,9 +627,9 @@ export class Editor {
     this.setShapeObj(shapeObj)
     this.fabricObjects.shapeOriginalColors = shapeCopy
 
-    this.currentShapeInfo = currentShapeInfo!
+    this.shape = Shape!
 
-    if (shapeConfig.kind === 'img') {
+    if (shapeConfig.kind === 'raster') {
       shapeColors.kind = 'original'
     } else if (colorsMap) {
       shapeColors.colorMap = colorsMap?.colors.map((c) => c.color)
@@ -832,10 +649,6 @@ export class Editor {
       width: this.projectBounds.width - pad * 2,
       height: this.projectBounds.height - pad * 2,
     })
-
-  generateBgItems = async (params: { style: BackgroundStyleConfig }) => {
-    return
-  }
 
   setBgItems = async (items: EditorItemConfig[]) => {
     return
@@ -894,6 +707,231 @@ export class Editor {
       itemsById,
       fabricObjToItem,
     }
+  }
+
+  generateBgItems = async (params: { style: BgStyleConf }) => {
+    return
+  }
+
+  generateShapeItems = async (params: { style: ShapeStyleConf }) => {
+    const { style } = params
+    const { coloring } = style.items
+    this.logger.debug('generateShapeItems')
+    if (!this.shape?.obj) {
+      console.error('No shape obj')
+      return
+    }
+    const shapeObj = this.shape.obj
+    const shapeOriginalColorsObj =
+      this.shape.kind === 'svg' ? this.shape.objOriginalColors : this.shape.obj
+    if (!shapeOriginalColorsObj) {
+      console.error('No shapeOriginalColorsObj')
+      return
+    }
+
+    this.store.isVisualizing = true
+    for (let i = 0; i < 10; ++i) {
+      await waitAnimationFrame()
+    }
+    await this.generator.init()
+
+    const shapeClone = await cloneObj(shapeObj)
+    shapeClone.set({ opacity: 1 })
+    const shapeImage = await cloneObjAsImage(shapeClone)
+
+    const shapeCanvas = objAsCanvasElement(shapeImage)
+    const shapeCanvasOriginalColors = objAsCanvasElement(shapeOriginalColorsObj)
+
+    let canvasSubtract: HTMLCanvasElement | undefined
+    const lockedItems = this.getItemsSorted('shape').filter((i) => i.locked)
+    if (lockedItems.length > 0) {
+      canvasSubtract = createCanvas({
+        w: shapeCanvas.width,
+        h: shapeCanvas.height,
+      })
+      const ctx = canvasSubtract.getContext('2d')!
+      for (const item of lockedItems) {
+        ctx.save()
+        ctx.translate(
+          -shapeObj.getBoundingRect(true).left || 0,
+          -shapeObj.getBoundingRect(true).top || 0
+        )
+        const saved = item.isShowingLockBorder
+        item.setLockBorderVisibility(false)
+        item.fabricObj.drawObject(ctx)
+        item.setLockBorderVisibility(saved)
+        ctx.restore()
+      }
+    }
+
+    const shapeRasterBounds = new paper.Rectangle(
+      shapeObj.getBoundingRect(true).left || 0,
+      shapeObj.getBoundingRect(true).top || 0,
+      shapeCanvas.width,
+      shapeCanvas.height
+    )
+    // shapeRaster = undefined
+    const wordFonts: Font[] = await this.fetchFonts(style.items.words.fontIds)
+
+    const shapeConfig = this.store.getSelectedShapeConf()
+    const result = await this.generator.fillShape(
+      {
+        shape: {
+          canvas: shapeCanvas,
+          canvasSubtract,
+          shapeCanvasOriginalColors,
+          bounds: shapeRasterBounds,
+          processing: {
+            removeWhiteBg: {
+              enabled: shapeConfig.kind === 'raster',
+              lightnessThreshold: 98,
+            },
+            shrink: {
+              enabled: style.items.placement.shapePadding > 0,
+              amount: style.items.placement.shapePadding,
+            },
+            edges: {
+              enabled:
+                this.shape.kind === 'raster' || this.shape.kind === 'svg'
+                  ? this.shape.processing.edges != null
+                  : false,
+              blur:
+                17 *
+                (1 -
+                  ((this.shape.kind === 'raster' ||
+                    this.shape.kind === 'svg') &&
+                  this.shape.processing.edges
+                    ? this.shape.processing.edges.amount
+                    : 0) /
+                    100),
+              lowThreshold: 30,
+              highThreshold: 100,
+            },
+            invert: {
+              enabled: false,
+            },
+          },
+        },
+        itemPadding: Math.max(1, 100 - style.items.placement.itemDensity),
+        // Words
+        wordsMaxSize: style.items.placement.wordsMaxSize,
+        words: style.items.words.wordList.map((wc) => ({
+          wordConfigId: wc.id,
+          text: wc.text,
+          angles: style.items.words.angles,
+          fillColors: ['red'],
+          // fonts: [fonts[0], fonts[1], fonts[2]],
+          fonts: wordFonts,
+        })),
+        // Icons
+        icons: style.items.icons.iconList.map((shape) => ({
+          shape: this.store.getShapeById(shape.shapeId)!,
+        })),
+        iconsMaxSize: style.items.placement.iconsMaxSize,
+        iconProbability: style.items.placement.iconsProportion / 100,
+      },
+      (progressPercent) => {
+        this.store.visualizingProgress = progressPercent
+      }
+    )
+
+    const wordConfigsById = keyBy(style.items.words.wordList, 'id')
+    const items: EditorItemConfig[] = []
+
+    for (const genItem of result.generatedItems) {
+      if (genItem.kind === 'word') {
+        const wordConfig = wordConfigsById[genItem.wordConfigId]
+        items.push({
+          ...genItem,
+          color: 'black',
+          locked: false,
+          text: wordConfig.text,
+          customColor: wordConfig.color,
+        })
+      }
+    }
+
+    await this.setShapeItems(items)
+    await this.setShapeItemsColor(style.items.coloring)
+    this.store.isVisualizing = false
+  }
+
+  clear = async () => {
+    this.logger.debug('Editor: clear')
+    this.canvas.clear()
+
+    this.shape = null
+
+    this.items.bg.fabricObjToItem.clear()
+    this.items.bg.itemsById.clear()
+    this.items.shape.fabricObjToItem.clear()
+    this.items.shape.itemsById.clear()
+  }
+
+  clearItems = (target: TargetKind) => {
+    if (target === 'shape') {
+      const nonLockedItems = [...this.items.shape.itemsById.values()].filter(
+        (item) => !item.locked
+      )
+
+      const fabricObjs = nonLockedItems.map((i) => i.fabricObj).filter(notEmpty)
+      this.canvas.remove(...fabricObjs)
+
+      fabricObjs.forEach((obj) => this.items.shape.fabricObjToItem.delete(obj))
+      nonLockedItems.forEach((item) =>
+        this.items.shape.itemsById.delete(item.id)
+      )
+
+      this.editorItemIdGen.removeIds(nonLockedItems.map((i) => i.id))
+      this.editorItemIdGen.resetLen()
+
+      this.canvas.requestRenderAll()
+    } else {
+      // TODO
+    }
+  }
+
+  destroy = () => {
+    window.removeEventListener('resize', this.handleResize)
+  }
+
+  selectShape = () => {
+    this.logger.debug('selectShape')
+    if (!this.shape) {
+      return
+    }
+    this.shapeSelection = true
+    this.shape.obj.selectable = true
+    this.enableSelectionMode()
+    this.canvas.setActiveObject(this.shape.obj)
+    this.canvas.requestRenderAll()
+  }
+
+  deselectShape = () => {
+    this.logger.debug('deselectShape')
+    if (!this.shape) {
+      return
+    }
+    this.shapeSelection = false
+    this.shape.obj.selectable = false
+    this.deselectAll()
+  }
+
+  disableSelectionMode = () => {
+    this.canvas.skipTargetFind = true
+    this.canvas.selection = false
+    this.canvas.requestRenderAll()
+  }
+
+  enableSelectionMode = () => {
+    this.canvas.skipTargetFind = false
+    this.canvas.selection = true
+    this.canvas.requestRenderAll()
+  }
+
+  deselectAll = () => {
+    this.canvas.discardActiveObject()
+    this.canvas.requestRenderAll()
   }
 
   // TODO: optimize performance
@@ -982,259 +1020,6 @@ export class Editor {
       })
     )
   }
-
-  generateShapeItems = async (params: { style: ShapeStyleConfig }) => {
-    const { style } = params
-    const coloring = getItemsColoring(style)
-    this.logger.debug('generateShapeItems')
-    if (!this.fabricObjects.shape) {
-      console.error('No paperItems.shape')
-      return
-    }
-    if (!this.fabricObjects.shapeOriginalColors) {
-      console.error('No paperItemsoriginal')
-      return
-    }
-    this.store.isVisualizing = true
-    for (let i = 0; i < 10; ++i) {
-      await waitAnimationFrame()
-    }
-    await this.generator.init()
-
-    const shapeClone = await new Promise<fabric.Object>((r) =>
-      this.fabricObjects.shape!.clone((obj: fabric.Object) => r(obj))
-    )
-    shapeClone.set({ opacity: 1 })
-    const shapeImage = await new Promise<fabric.Image>((r) =>
-      shapeClone.cloneAsImage((obj: fabric.Image) => r(obj))
-    )
-
-    const shapeCanvas = (shapeImage.toCanvasElement() as any) as HTMLCanvasElement
-    const shapeCanvasOriginalColors = (this.fabricObjects.shapeOriginalColors.toCanvasElement() as any) as HTMLCanvasElement
-
-    let canvasSubtract: HTMLCanvasElement | undefined
-    const lockedItems = this.getItemsSorted('shape').filter((i) => i.locked)
-    if (lockedItems.length > 0) {
-      canvasSubtract = createCanvas({
-        w: shapeCanvas.width,
-        h: shapeCanvas.height,
-      })
-      const ctx = canvasSubtract.getContext('2d')!
-      for (const item of lockedItems) {
-        ctx.save()
-        ctx.translate(
-          -this.fabricObjects.shape.getBoundingRect(true).left || 0,
-          -this.fabricObjects.shape.getBoundingRect(true).top || 0
-        )
-        const saved = item.isShowingLockBorder
-        item.setLockBorderVisibility(false)
-        item.fabricObj.drawObject(ctx)
-        item.setLockBorderVisibility(saved)
-        ctx.restore()
-      }
-    }
-
-    const shapeRasterBounds = new paper.Rectangle(
-      this.fabricObjects.shape.getBoundingRect(true).left || 0,
-      this.fabricObjects.shape.getBoundingRect(true).top || 0,
-      shapeCanvas.width,
-      shapeCanvas.height
-    )
-    // shapeRaster = undefined
-    const wordFonts: Font[] = await this.fetchFonts(style.words.fontIds)
-
-    const shapeConfig = this.store.getSelectedShape()
-    const result = await this.generator.fillShape(
-      {
-        shape: {
-          canvas: shapeCanvas,
-          canvasSubtract,
-          shapeCanvasOriginalColors,
-          bounds: shapeRasterBounds,
-          processing: {
-            removeWhiteBg: {
-              enabled: shapeConfig.kind === 'img',
-              lightnessThreshold: 98,
-            },
-            shrink: {
-              enabled: style.layout.shapePadding > 0,
-              amount: style.layout.shapePadding,
-            },
-            edges: {
-              enabled: style.processing.edges.enabled,
-              blur: 17 * (1 - style.processing.edges.amount / 100),
-              lowThreshold: 30,
-              highThreshold: 100,
-            },
-            invert: {
-              enabled: style.processing.invert.enabled,
-            },
-          },
-        },
-        itemPadding: Math.max(1, 100 - style.layout.itemDensity),
-        // Words
-        wordsMaxSize: style.layout.wordsMaxSize,
-        words: style.words.wordList.map((wc) => ({
-          wordConfigId: wc.id,
-          text: wc.text,
-          angles: style.words.angles.angles,
-          fillColors: ['red'],
-          // fonts: [fonts[0], fonts[1], fonts[2]],
-          fonts: wordFonts,
-        })),
-        // Icons
-        icons: style.icons.iconList.map((shape) => ({
-          shape: this.store.getShapeById(shape.shapeId)!,
-        })),
-        iconsMaxSize: style.layout.iconsMaxSize,
-        iconProbability: style.layout.iconsProportion / 100,
-      },
-      (progressPercent) => {
-        this.store.visualizingProgress = progressPercent
-      }
-    )
-
-    const wordConfigsById = keyBy(style.words.wordList, 'id')
-    const items: EditorItemConfig[] = []
-
-    for (const genItem of result.generatedItems) {
-      if (genItem.kind === 'word') {
-        const wordConfig = wordConfigsById[genItem.wordConfigId]
-        items.push({
-          ...genItem,
-          color: 'black',
-          locked: false,
-          text: wordConfig.text,
-          customColor: wordConfig.color,
-        })
-      }
-    }
-
-    await this.setShapeItems(items)
-    await this.setItemsColor('shape', coloring)
-    this.store.isVisualizing = false
-  }
-
-  clear = async () => {
-    this.logger.debug('Editor: clear')
-    this.canvas.clear()
-
-    this.fabricObjects.shape = undefined
-    this.fabricObjects.shapeOriginalColors = undefined
-
-    this.items.bg.fabricObjToItem.clear()
-    this.items.bg.itemsById.clear()
-    this.items.shape.fabricObjToItem.clear()
-    this.items.shape.itemsById.clear()
-  }
-
-  clearItems = (target: TargetKind) => {
-    if (target === 'shape') {
-      const nonLockedItems = [...this.items.shape.itemsById.values()].filter(
-        (item) => !item.locked
-      )
-
-      const fabricObjs = nonLockedItems.map((i) => i.fabricObj).filter(notEmpty)
-      this.canvas.remove(...fabricObjs)
-
-      fabricObjs.forEach((obj) => this.items.shape.fabricObjToItem.delete(obj))
-      nonLockedItems.forEach((item) =>
-        this.items.shape.itemsById.delete(item.id)
-      )
-
-      this.editorItemIdGen.removeIds(nonLockedItems.map((i) => i.id))
-      this.editorItemIdGen.resetLen()
-
-      this.canvas.requestRenderAll()
-    } else {
-      // TODO
-    }
-  }
-
-  destroy = () => {
-    window.removeEventListener('resize', this.handleResize)
-  }
-
-  selectShape = () => {
-    this.logger.debug('selectShape')
-    if (!this.fabricObjects.shape) {
-      return
-    }
-    this.shapeSelection = true
-    this.fabricObjects.shape.selectable = true
-    this.enableSelectionMode()
-    this.canvas.setActiveObject(this.fabricObjects.shape)
-    this.canvas.requestRenderAll()
-  }
-
-  deselectShape = () => {
-    this.logger.debug('deselectShape')
-    if (!this.fabricObjects.shape) {
-      return
-    }
-    this.shapeSelection = false
-    this.fabricObjects.shape.selectable = false
-    this.deselectAll()
-  }
-
-  disableSelectionMode = () => {
-    this.canvas.skipTargetFind = true
-    this.canvas.selection = false
-    this.canvas.requestRenderAll()
-  }
-
-  enableSelectionMode = () => {
-    this.canvas.skipTargetFind = false
-    this.canvas.selection = true
-    this.canvas.requestRenderAll()
-  }
-
-  deselectAll = () => {
-    this.canvas.discardActiveObject()
-    this.canvas.requestRenderAll()
-  }
 }
-
-export type SvgShapeColorsMap = {
-  colors: SvgShapeColorsMapEntry[]
-}
-
-export type SvgShapeColorsMapEntry = {
-  stroke: boolean
-  fill: boolean
-  color: ColorString
-  fabricItems: fabric.Object[]
-}
-
-export type ShapeFillColorsConfig = ShapeStyleConfig['fill']
-export type BgFillColorsConfig = BackgroundStyleConfig['fill']
 
 export type TargetKind = 'shape' | 'bg'
-
-export const getItemsColoring = (
-  style: BackgroundStyleConfig | ShapeStyleConfig
-): ItemsColoring => {
-  const coloring = style.itemsColoring
-
-  if (coloring.kind === 'color') {
-    return {
-      kind: 'single-color',
-      color: coloring.color,
-      dimSmallerItems: coloring.dimSmallerItems,
-    }
-  } else if (coloring.kind === 'gradient') {
-    return {
-      kind: 'gradient',
-      colorFrom: coloring.gradient.from,
-      colorTo: coloring.gradient.to,
-      assignColorBy: coloring.gradient.assignBy,
-      dimSmallerItems: coloring.dimSmallerItems,
-    }
-  }
-  return {
-    kind: 'shape',
-    dimSmallerItems: coloring.dimSmallerItems,
-    shapeBrightness: coloring.shapeBrightness,
-    shapeStyleFill: style.kind === 'shape' ? style.fill : undefined,
-  }
-}

@@ -1,20 +1,18 @@
-import styled from '@emotion/styled'
-import { useState, useRef } from 'react'
-import { SketchPicker } from 'react-color'
-import chroma from 'chroma-js'
-import { lighten } from 'polished'
 import {
   Button,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverHeader,
-  PopoverArrow,
-  PopoverCloseButton,
-  PopoverBody,
   ButtonProps,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
+import styled from '@emotion/styled'
+import chroma from 'chroma-js'
+import { lighten } from 'polished'
+import { useRef, useState } from 'react'
+import { SketchPicker } from 'react-color'
 
 export type ColorPickerProps = {
   value: string
@@ -24,7 +22,7 @@ export type ColorPickerProps = {
   children?: React.ReactNode
 } & Omit<ButtonProps, 'children' | 'onChange'>
 
-const ColorSwatch = styled(Button)<{ color: string }>`
+const ColorSwatch = styled(Button)<{ color: string; theme: any }>`
   border: 1px solid ${(p) => p.theme.colors.dark4};
   cursor: pointer;
   outline: none;
@@ -69,7 +67,9 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         usePortal
       >
         <PopoverTrigger>
-          <ColorSwatch borderRadius="none" color={value} ref={ref} {...props} />
+          <ColorSwatch borderRadius="none" color={value} ref={ref} {...props}>
+            {null}
+          </ColorSwatch>
         </PopoverTrigger>
         <PopoverContent
           outline="none"

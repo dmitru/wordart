@@ -16,14 +16,17 @@ export type LeftPanelColorsTabProps = {
 export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
   ({ target }) => {
     const { editorPageStore } = useStore()
-    const shape = editorPageStore.getSelectedShape()
-    const shapeStyle = editorPageStore.styles.shape
-    const bgStyle = editorPageStore.styles.bg
-    const style = editorPageStore.styles[target]
+    const shape = editorPageStore.getSelectedShapeConf()
+    const shapeStyle = editorPageStore.styleOptions.shape
+    const bgStyle = editorPageStore.styleOptions.bg
+    const style = editorPageStore.styleOptions[target]
 
     const updateItemsColoring = useThrottleCallback(
       () => {
-        editorPageStore.editor?.setItemsColor(target, getItemsColoring(style))
+        editorPageStore.editor?.setShapeItemsColor(
+          target,
+          getItemsColoring(style)
+        )
       },
       20,
       true
@@ -33,7 +36,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
       () => {
         editorPageStore.editor?.setShapeFillColors(shapeStyle.fill)
         if (shapeStyle.itemsColoring.kind === 'shape') {
-          editorPageStore.editor?.setItemsColor(
+          editorPageStore.editor?.setShapeItemsColor(
             'shape',
             getItemsColoring(shapeStyle)
           )
@@ -122,7 +125,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                 shapeStyle.fill.opacity = value / 100
               }}
               onAfterChange={(value) => {
-                editorPageStore.editor?.setShapeFillOpacity(value / 100)
+                editorPageStore.editor?.setShapeOpacity(value / 100)
               }}
               min={0}
               max={100}
@@ -265,7 +268,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             onAfterChange={() => {
               editorPageStore.editor?.setBgColor(bgStyle.fill)
               if (bgStyle.itemsColoring.kind === 'shape') {
-                editorPageStore.editor?.setItemsColor(
+                editorPageStore.editor?.setShapeItemsColor(
                   'bg',
                   getItemsColoring(bgStyle)
                 )

@@ -3,12 +3,12 @@ import styled from '@emotion/styled'
 import { Box, BoxProps } from 'components/shared/Box'
 import { noop } from 'lodash'
 import { darken } from 'polished'
-import { ShapeConfig, ShapeId } from 'components/Editor/style'
+import { ShapeConf, ShapeId } from 'components/Editor/style'
 
 export type ShapeSelectorProps = {
-  shapes: ShapeConfig[]
+  shapes: ShapeConf[]
   selectedShapeId?: ShapeId
-  onSelected?: (shape: ShapeConfig) => void
+  onSelected?: (shape: ShapeConf) => void
 } & BoxProps
 
 export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(

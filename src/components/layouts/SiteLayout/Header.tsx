@@ -1,10 +1,9 @@
 import React from 'react'
 import styled from '@emotion/styled'
 import Link from 'next/link'
-import { Box } from 'components/shared/Box'
 import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
-import { Button } from 'components/shared/Button'
+import { Box, Button } from '@chakra-ui/core'
 import { Urls } from 'urls'
 
 export type HeaderProps = {}
@@ -32,7 +31,7 @@ export const Header: React.FC<HeaderProps> = observer(() => {
           {isLoggedIn && (
             <>
               <Link href={Urls.editor._next} as={Urls.editor.create} passHref>
-                <Button accent>Create</Button>
+                <Button variantColor="accent">Create</Button>
               </Link>
               <Link href={Urls.dashboard} passHref>
                 <Button>My Designs</Button>
@@ -45,12 +44,10 @@ export const Header: React.FC<HeaderProps> = observer(() => {
           {isNotLoggedIn && (
             <>
               <Link href={Urls.login} passHref>
-                <Button accent>Sign up</Button>
+                <Button variantColor="accent">Sign up</Button>
               </Link>
               <Link href={Urls.login} passHref>
-                <Button accent outline>
-                  Log in
-                </Button>
+                <Button variant="outline">Log in</Button>
               </Link>
             </>
           )}
@@ -60,7 +57,7 @@ export const Header: React.FC<HeaderProps> = observer(() => {
   )
 })
 
-export const HeaderWrapper = styled(Box)`
+export const HeaderWrapper = styled(Box)<{ theme: any }>`
   background: ${(p) => p.theme.colors.light1};
 `
 
@@ -73,7 +70,7 @@ export const ContentContainer = styled(Box)`
   height: 60px;
 `
 
-export const HeaderLink = styled.a`
+export const HeaderLink = styled.a<{ theme: any }>`
   padding: 10px;
   color: ${({ theme }) => theme.colors.primary};
 `

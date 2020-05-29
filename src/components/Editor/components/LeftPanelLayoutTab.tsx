@@ -48,7 +48,7 @@ export type LeftPanelLayoutTabProps = {
 export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
   ({ target }) => {
     const { editorPageStore } = useStore()
-    const style = editorPageStore.styles[target]
+    const style = editorPageStore.styleOptions[target]
 
     const visualize = useCallback(() => {
       // editorPageStore.editor?.generateShapeItems({ style })

@@ -1,5 +1,5 @@
-import { TextInput } from 'components/shared/TextInput'
 import { FieldConfig, useField } from 'formik'
+import { Input } from '@chakra-ui/core'
 
 export const TextInputField: React.FC<
   { label?: string } & FieldConfig<string>
@@ -9,7 +9,14 @@ export const TextInputField: React.FC<
     <>
       <label>
         {label}
-        <TextInput {...field} {...props} onChange={setValue} />
+        {/* 
+        // @ts-ignore */}
+        <Input
+          {...field}
+          {...props}
+          // @ts-ignore
+          onChange={(e) => setValue(e.target.value)}
+        />
       </label>
       {meta.touched && meta.error ? (
         <div className="error">{meta.error}</div>
