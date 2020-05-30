@@ -19,7 +19,7 @@ import {
   objAsCanvasElement,
 } from 'components/Editor/lib/fabric-utils'
 import { Font } from 'components/Editor/lib/generator'
-import { Shape } from 'components/Editor/shape'
+import { Shape, SvgShapeColorsMapEntry } from 'components/Editor/shape'
 import {
   ShapeConf,
   ShapeId,
@@ -39,6 +39,7 @@ import {
   ItemsColoringShapeConf,
   ShapeStyleOptions,
   WordListEntry,
+  ColorString,
 } from 'components/Editor/style-options'
 import { FontConfig, FontId, fonts, FontStyleConfig } from 'data/fonts'
 import { shapes } from 'data/shapes'
@@ -645,7 +646,10 @@ export class EditorStore {
     )
   getShapeConfById = (shapeId: ShapeId): ShapeConf | undefined =>
     this.availableShapes.find((s) => s.id === shapeId)
-  getShape = (): Shape | undefined => this.editor?.shape || undefined
+  getShape = (): Shape | undefined => {
+    const { selectedShapeId } = this
+    return this.editor?.shape || undefined
+  }
   getShapeConf = (): ShapeConf | undefined => this.getShape()?.config
 
   getAvailableFonts = (): { font: FontConfig; style: FontStyleConfig }[] => {
@@ -682,15 +686,27 @@ export class EditorStore {
       return
     }
 
-    this.selectedShapeId = shapeId
-    const shape = this.getShapeConfById(shapeId)!
+    const shapeConfig = this.getShapeConfById(shapeId)!
 
     await this.editor.setShape({
-      shapeConfig: shape,
+      shapeConfig,
       bgFillStyle: mkBgConfFromOptions(this.styleOptions.bg).fill,
       shapeStyle: mkShapeConfFromOptions(this.styleOptions.shape),
       clear: true,
     })
+
+    if (this.editor.shape?.kind === 'svg') {
+      if (!this.styleOptions.shape.colors.colorMaps.get(this.editor.shape.id)) {
+        this.styleOptions.shape.colors.colorMaps.set(
+          this.editor.shape.id,
+          this.editor.shape.originalColors
+        )
+      }
+    }
+
+    this.selectedShapeId = shapeId
+
+    this.updateShapeThumbnail()
   }
 
   updateShape = async () => {

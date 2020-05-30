@@ -1,14 +1,11 @@
-import { MatrixSerialized } from 'services/api/persisted/v1'
 import {
-  ShapeTextStyle,
   ShapeId,
-  RasterProcessingConf,
-  SvgProcessingConf,
-  ShapeSvgConf,
   ShapeRasterConf,
+  ShapeSvgConf,
   ShapeTextConf,
 } from 'components/Editor/shape-config'
 import { ColorString } from 'components/Editor/style-options'
+import { MatrixSerialized } from 'services/api/persisted/v1'
 
 /** Representation of the currently selected shape */
 export type Shape = ShapeSvg | ShapeRaster | ShapeText

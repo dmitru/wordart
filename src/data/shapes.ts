@@ -15,6 +15,7 @@ export const svgIcons: ShapeConf[] = [
           title: icon.title,
           url: icon.url,
           thumbnailUrl: icon.url,
+          processing: { colors: { kind: 'original' } },
         } as ShapeConf)
       : null
   )
@@ -30,6 +31,9 @@ export const svgIconsOutline: ShapeConf[] = [...iconsFaRegular.slice(0, 5)]
           title: icon.title,
           url: icon.url,
           thumbnailUrl: icon.url,
+          processing: {
+            colors: { kind: 'original' },
+          },
         } as ShapeConf)
       : null
   )
@@ -42,103 +46,86 @@ export const shapes: ShapeConf[] = [
       kind: 'svg',
       title: 'Smile',
       url: '/images/smile.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Desert',
       url: '/images/desert.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Cat',
       url: '/images/cat.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Orange',
       url: '/images/orange.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Banana',
       url: '/images/banana.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Tree 1',
       url: '/images/tree.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Tree 2',
       url: '/images/tree-2.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Tree 3',
       url: '/images/tree-3.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Tree 4',
       url: '/images/tree-4.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Baloons',
       url: '/images/baloons.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Heart 1',
       url: '/images/heart-1.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Cloud 1',
       url: '/images/cloud-1.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Hand',
       url: '/images/hand.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Apple',
       url: '/images/apple.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Bear Face',
       url: '/images/bear-face.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Bear Side',
       url: '/images/bear-side.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'svg',
       title: 'Bear Belly',
       url: '/images/bear-belly.svg',
-      keepSvgColors: true,
     },
     {
       kind: 'raster',
@@ -167,7 +154,14 @@ export const shapes: ShapeConf[] = [
       url: '/images/yin-yang.svg',
       fill: 'green',
     },
-  ].map((c, index) => ({ ...c, id: `${index + 1}`, thumbnailUrl: c.url })),
+  ].map((c, index) => ({
+    ...c,
+    id: `${index + 1}`,
+    thumbnailUrl: c.url,
+    processing: {
+      colors: { kind: 'original' },
+    },
+  })),
   ...svgIcons,
   ...svgIconsOutline,
 ]

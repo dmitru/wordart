@@ -304,14 +304,15 @@ export class Editor {
       return
     }
 
-    let shape = await cloneObj(this.shape.objOriginalColors)
-    shape.opacity = this.shape.obj.opacity || 1
+    let shapeObj = await cloneObj(this.shape.objOriginalColors)
+    shapeObj.selectable = false
+    shapeObj.opacity = this.shape.obj.opacity || 1
     const { colors } = config.processing
 
     if (colors.kind === 'original') {
-      // Do nothing...
+      // do nothing
     } else if (colors.kind === 'color-map') {
-      const colorsMap = computeColorsMap(shape)
+      const colorsMap = computeColorsMap(shapeObj)
 
       this.logger.debug('>  Using color map', colorsMap)
       colorsMap.forEach((colorEntry, entryIndex) => {
@@ -328,30 +329,24 @@ export class Editor {
           }
         })
       })
-
-      this.canvas.remove(this.shape.obj)
-      this.canvas.insertAt(shape, 0, false)
-
-      // this.shape. = colorsMap
-      this.setShapeObj(shape)
     } else {
       this.logger.debug('>  Using single color')
       const color = colors.color
 
       const objects =
-        shape instanceof fabric.Group ? shape.getObjects() : [shape]
+        shapeObj instanceof fabric.Group ? shapeObj.getObjects() : [shapeObj]
       objects.forEach((obj) => {
         obj.set({ fill: color })
         if (obj.stroke) {
           obj.set({ stroke: color })
         }
       })
-
-      this.canvas.remove(this.shape.obj)
-      this.canvas.insertAt(shape, 0, false)
-
-      this.setShapeObj(shape)
     }
+
+    this.canvas.remove(this.shape.obj)
+    this.canvas.insertAt(shapeObj, 0, false)
+
+    this.shape.obj = shapeObj
 
     this.canvas.requestRenderAll()
   }
@@ -537,8 +532,6 @@ export class Editor {
     // Process the shape...
     if (shapeConfig.kind === 'svg') {
       shapeObj = await loadObjFromSvg(shapeConfig.url)
-      const shapeCopyObj = await cloneObj(shapeObj)
-      shapeCopyObj.set({ selectable: false })
 
       colorMap = computeColorsMap(shapeObj as fabric.Group)
 
@@ -548,7 +541,7 @@ export class Editor {
         id: shapeConfig.id,
         isCustom: shapeConfig.isCustom || false,
         obj: shapeObj,
-        objOriginalColors: shapeCopyObj,
+        objOriginalColors: shapeObj,
         originalColors: colorMap.map((c) => c.color),
         transform: new paper.Matrix().values as MatrixSerialized,
         url: shapeConfig.url,
@@ -644,8 +637,16 @@ export class Editor {
       this.canvas.remove(this.shape.obj)
     }
     this.canvas.add(shapeObj)
+
+    if (shape?.kind === 'svg') {
+      const shapeCopyObj = await cloneObj(shapeObj)
+      shapeCopyObj.set({ selectable: false })
+      shape.objOriginalColors = shapeCopyObj
+    }
+
     this.shape = shape!
-    this.setShapeObj(shapeObj)
+
+    this.updateShapeColors(this.shape.config)
 
     // if (shapeConfig.kind === 'raster') {
     //   shapeStyle.kind = 'original'

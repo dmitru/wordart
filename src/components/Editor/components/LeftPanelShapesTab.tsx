@@ -344,18 +344,18 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                             const shapeId = store.addCustomShapeText({
                               kind: 'text',
                               text: state.textShape.text,
-                              // @ts-ignore
-                              color: state.textShape.color.color,
-                              fontId: store.getAvailableFonts()[2].style.fontId,
-                              title: 'Custom text',
-                              fillConfig: {
-                                kind: 'original',
-                                color: 'black',
-                                colorMap: [],
-                                defaultColorMap: [],
-                                opacity: 1,
+                              textStyle: {
+                                // TODO
+                                color:
+                                  state.textShape.color.kind === 'single'
+                                    ? state.textShape.color.color
+                                    : 'red',
+                                fontId: store.getAvailableFonts()[2].style
+                                  .fontId,
                               },
+                              title: 'Custom text',
                               isCustom: true,
+                              thumbnailUrl: state.textShape.thumbnailPreview,
                             })
                             state.mode = 'home'
                             await store.selectShape(shapeId)
@@ -390,14 +390,6 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                       {shape.config.kind === 'svg' && (
                         <Heading size="md" m="0" mb="3" display="flex">
                           Customize Colors
-                          <Button
-                            variant="ghost"
-                            variantColor="blue"
-                            size="sm"
-                            marginLeft="auto"
-                          >
-                            Reset
-                          </Button>
                         </Heading>
                       )}
                       {shape.kind === 'svg' && shape.colorMap.length > 1 && (
@@ -406,28 +398,44 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                             variantColor="primary"
                             index={
                               shape.config.processing.colors.kind == 'color-map'
+                                ? 1
+                                : shape.config.processing.colors.kind ==
+                                  'original'
                                 ? 0
-                                : 1
+                                : 2
                             }
                             variant="solid-rounded"
                             size="sm"
                             onChange={(index) => {
                               if (index === 0) {
-                                shape.config.processing.colors.kind =
-                                  'color-map'
+                                shape.config.processing.colors = {
+                                  kind: 'original',
+                                }
                                 updateShapeColoring()
-                              } else {
-                                shape.config.processing.colors.kind =
-                                  'single-color'
+                              } else if (index === 1) {
+                                shape.config.processing.colors = {
+                                  kind: 'color-map',
+                                  colors:
+                                    shapeStyle.colors.colorMaps.get(shape.id) ||
+                                    [],
+                                }
+                                updateShapeColoring()
+                              } else if (index === 2) {
+                                shape.config.processing.colors = {
+                                  kind: 'single-color',
+                                  color: shapeStyle.colors.color,
+                                }
                                 updateShapeColoring()
                               }
                             }}
                           >
                             <TabList mb="1em">
+                              <Tab>Original</Tab>
                               <Tab>Multiple</Tab>
                               <Tab>Single</Tab>
                             </TabList>
                             <TabPanels>
+                              <TabPanel>{null}</TabPanel>
                               <TabPanel>
                                 <Box>
                                   {shape.config.processing.colors.kind ===
@@ -451,6 +459,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                                 shape.config.processing.colors.colors[
                                                   index
                                                 ] = chroma(hex).hex()
+                                                shapeStyle.colors.colorMaps.get(
+                                                  shape.id
+                                                )![index] = chroma(hex).hex()
                                               }
                                             }}
                                             onAfterChange={() => {
@@ -460,29 +471,47 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                         </Box>
                                       )
                                     )}
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      shape.config.processing.colors = {
+                                        kind: 'color-map',
+                                        colors: shape.originalColors,
+                                      }
+                                      shapeStyle.colors.colorMaps.set(
+                                        shape.id,
+                                        shape.originalColors
+                                      )
+                                      updateShapeColoring()
+                                    }}
+                                  >
+                                    Reset
+                                  </Button>
                                 </Box>
                               </TabPanel>
                               <TabPanel>
-                                <Box mr="1" mb="2">
-                                  <ColorPicker
-                                    disableAlpha
-                                    value={chroma(shapeStyle.color.color)
-                                      .alpha(1)
-                                      .hex()}
-                                    onChange={(hex) => {
-                                      shapeStyle.color.color = hex
-                                      if (
-                                        shape.config.processing.colors.kind ===
-                                        'single-color'
-                                      ) {
-                                        shape.config.processing.colors.color = hex
-                                      }
-                                    }}
-                                    onAfterChange={() => {
-                                      updateShapeColoring()
-                                    }}
-                                  />
-                                </Box>
+                                {shape.config.processing.colors.kind ===
+                                  'single-color' && (
+                                  <Box mr="1" mb="2">
+                                    <ColorPicker
+                                      disableAlpha
+                                      value={chroma(shapeStyle.colors.color)
+                                        .alpha(1)
+                                        .hex()}
+                                      onChange={(hex) => {
+                                        shapeStyle.colors.color = hex
+                                        shape.config.processing.colors = {
+                                          kind: 'single-color',
+                                          color: hex,
+                                        }
+                                      }}
+                                      onAfterChange={() => {
+                                        updateShapeColoring()
+                                      }}
+                                    />
+                                  </Box>
+                                )}
                               </TabPanel>
                             </TabPanels>
                           </Tabs>
@@ -710,8 +739,10 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         width="345px"
                         overflowY="scroll"
                         shapes={matchingShapes}
-                        onSelected={(shape) => {
-                          store.selectShape(shape.id)
+                        onSelected={(shapeConfig) => {
+                          if (store.selectedShapeId !== shapeConfig.id) {
+                            store.selectShape(shapeConfig.id)
+                          }
                         }}
                         selectedShapeId={store.getSelectedShapeConf().id}
                       />
