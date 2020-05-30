@@ -478,14 +478,14 @@ export class EditorStore {
             kind: 'custom-raster',
             transform,
             url: shape.url,
-            processing: shape.processing || {},
+            processing: shape.config.processing || {},
           }
         } else {
           return {
             kind: 'raster',
             transform,
             shapeId: shape.id,
-            processing: shape.processing || {},
+            processing: shape.config.processing || {},
           }
         }
       } else if (shape.kind === 'svg') {
@@ -494,21 +494,21 @@ export class EditorStore {
             kind: 'custom-svg',
             transform,
             url: shape.url,
-            processing: shape.processing || {},
+            processing: shape.config.processing || {},
           }
         } else {
           return {
             kind: 'svg',
             transform,
             shapeId: shape.id,
-            processing: shape.processing || {},
+            processing: shape.config.processing || {},
           }
         }
       } else if (shape.kind === 'text') {
         return {
           kind: 'custom-text',
-          text: shape.text,
-          textStyle: shape.textStyle,
+          text: shape.config.text,
+          textStyle: shape.config.textStyle,
           transform,
         }
       } else {

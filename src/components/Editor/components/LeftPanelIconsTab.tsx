@@ -3,8 +3,6 @@ import { useStore } from 'services/root-store'
 import styled from '@emotion/styled'
 import * as evaicons from '@styled-icons/evaicons-outline'
 import { Label } from './shared'
-import { Button } from 'components/shared/Button'
-import { Box } from 'components/shared/Box'
 import {
   ShapeThumbnails,
   ShapeThumbnailBtn,
@@ -13,6 +11,7 @@ import {
 import { observable } from 'mobx'
 import { uniqBy } from 'lodash'
 import { TargetKind } from 'components/Editor/lib/editor'
+import { Button, Box } from '@chakra-ui/core'
 
 export type LeftPanelIconsTabProps = {
   target: TargetKind
@@ -30,7 +29,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
   ({ target }) => {
     const { editorPageStore } = useStore()
     const style = editorPageStore.styleOptions[target]
-    const icons = style.icons.iconList
+    const icons = style.items.icons.iconList
 
     const shapes = editorPageStore
       .getAvailableShapes()
@@ -46,7 +45,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 px="2"
                 py="1"
                 mt="2"
-                primary
+                variantColor="primary"
                 onClick={() => {
                   state.isAdding = true
                 }}
@@ -56,9 +55,8 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
               <Button
                 px="2"
                 py="1"
-                outline
                 onClick={() => {
-                  style.icons.iconList = []
+                  style.items.icons.iconList = []
                 }}
               >
                 Clear
@@ -72,7 +70,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 px="2"
                 py="1"
                 mt="2"
-                secondary
+                variantColor="secondary"
                 onClick={() => {
                   state.isAdding = false
                 }}
@@ -87,15 +85,15 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
           <ShapeSelector
             shapes={shapes}
             onSelected={(shape) => {
-              style.icons.iconList = uniqBy(
-                [...style.icons.iconList, { shapeId: shape.id }],
+              style.items.icons.iconList = uniqBy(
+                [...style.items.icons.iconList, { shapeId: shape.id }],
                 'shapeId'
               )
               state.isAdding = false
             }}
           />
         )}
-
+        {/* 
         {!state.isAdding && (
           <IconsList mt="2">
             <ShapeThumbnails mt="2">
@@ -103,7 +101,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 <ShapeThumbnailBtn
                   key={icon.shapeId}
                   onClick={() => {
-                    style.icons.iconList = style.icons.iconList.filter(
+                    style.items.icons.iconList = style.items.icons.iconList.filter(
                       (i) => i.shapeId !== icon.shapeId
                     )
                   }}
@@ -113,7 +111,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
               ))}
             </ShapeThumbnails>
           </IconsList>
-        )}
+        )} */}
       </>
     )
   }

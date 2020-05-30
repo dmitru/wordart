@@ -1,6 +1,5 @@
 import chroma from 'chroma-js'
 import { WordConfigId } from 'components/Editor/editor-store'
-import { ShapeConf, ShapeId } from 'components/Editor/style'
 import { FontId } from 'data/fonts'
 import {
   clampPixelOpacityUp,
@@ -21,6 +20,11 @@ import { flatten, noop, sample, uniq } from 'lodash'
 import { Path } from 'opentype.js'
 import paper from 'paper'
 import { consoleLoggers } from 'utils/console-logger'
+import {
+  ShapeConf,
+  ShapeId,
+  ShapeSvgConf,
+} from 'components/Editor/shape-config'
 
 const FONT_SIZE = 100
 
@@ -186,8 +190,9 @@ export class Generator {
       icons.map(async (icon) => {
         const shapeItemGroup: paper.Group = await new Promise<paper.Group>(
           (resolve) =>
-            new paper.Item().importSVG(icon.shape.url, (item: paper.Item) =>
-              resolve(item as paper.Group)
+            new paper.Item().importSVG(
+              (icon.shape as ShapeSvgConf).url,
+              (item: paper.Item) => resolve(item as paper.Group)
             )
         )
         shapeItemGroup.fillColor = new paper.Color('black')

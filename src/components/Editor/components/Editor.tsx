@@ -11,6 +11,7 @@ import {
   MenuList,
   useToast,
   Text,
+  Box,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
@@ -33,7 +34,6 @@ import {
 } from 'components/Editor/editor-store'
 import { EditorInitParams } from 'components/Editor/lib/editor'
 import { BaseBtn } from 'components/shared/BaseBtn'
-import { Box } from 'components/shared/Box'
 import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 import { Tooltip } from 'components/shared/Tooltip'
 import { Dimensions } from 'lib/wordart/canvas-utils'
@@ -49,6 +49,7 @@ import { WordcloudId } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { ColorPicker } from 'components/shared/ColorPicker'
+import { mkShapeConfFromOptions } from 'components/Editor/style'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -179,6 +180,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               ml="4"
               color="white"
               as={Button}
+              // @ts-ignore
               rightIcon="chevron-down"
               variant="ghost"
             >
@@ -416,12 +418,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 onClick={() => {
                   if (state.targetTab === 'shape') {
                     store.editor?.generateShapeItems({
-                      style: store.styleOptions.shape,
+                      style: mkShapeConfFromOptions(store.styleOptions.shape),
                     })
                   } else {
-                    store.editor?.generateBgItems({
-                      style: store.styleOptions.bg,
-                    })
+                    // store.editor?.generateBgItems({
+                    //   style: store.styleOptions.bg,
+                    // })
                   }
                 }}
               >
@@ -648,7 +650,7 @@ const LeftPanel = styled(Box)`
   width: 350px;
 `
 
-const SideNavbar = styled.div<{ activeIndex: number }>`
+const SideNavbar = styled.div<{ theme: any; activeIndex: number }>`
   /* background: ${(p) =>
     darken(0.1, desaturate(0.5, p.theme.colors.dark4))}; */
   /* border-bottom: 1px solid #cecece; */
@@ -679,7 +681,7 @@ const SideNavbar = styled.div<{ activeIndex: number }>`
   }
 `
 
-const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
+const LeftNavbarBtn = styled(BaseBtn)<{ theme: any; active: boolean }>`
   min-width: 20%;
   font-weight: 500;
   height: 70px;
@@ -734,7 +736,7 @@ const LeftNavbarBtn = styled(BaseBtn)<{ active: boolean }>`
   }
 `
 
-const LeftPanelContent = styled(Box)`
+const LeftPanelContent = styled(Box)<{ theme: any }>`
   flex: 1;
   height: 100%;
   overflow: auto;

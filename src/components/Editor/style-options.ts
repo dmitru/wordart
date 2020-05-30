@@ -33,6 +33,9 @@ export type BgStyleOptions = {
 /** UI state for shape style options */
 export type ShapeStyleOptions = {
   opacity: number
+  color: {
+    color: ColorString
+  }
   items: {
     words: WordItemsOptions
     icons: IconItemsOptions

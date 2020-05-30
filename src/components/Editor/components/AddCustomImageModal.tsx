@@ -20,7 +20,7 @@ import {
   removeLightPixels,
   invertImageMask,
   loadImageUrlToCanvasCtxWithMaxSize,
-  processImg,
+  processRasterImg,
 } from 'lib/wordart/canvas-utils'
 import { Slider } from 'components/shared/Slider'
 import css from '@emotion/css'
@@ -81,17 +81,16 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
         c.height
       )
 
-      processImg(ctx.canvas, {
+      processRasterImg(ctx.canvas, {
         edges: {
-          enabled: false,
           amount: 0,
         },
-        invert: {
-          enabled: state.invert,
-          color: state.invertColor,
-        },
+        invert: state.invert
+          ? {
+              color: state.invertColor,
+            }
+          : undefined,
         removeLightBackground: {
-          enabled: true,
           threshold: state.removeLightBackground,
         },
       })

@@ -34,7 +34,6 @@ import {
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
 import { Label } from 'components/Editor/components/shared'
-import { getItemsColoring } from 'components/Editor/lib/editor'
 import { ColorPicker } from 'components/shared/ColorPicker'
 import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'
@@ -48,6 +47,7 @@ import { CustomizeRasterImageModal } from 'components/Editor/components/Customiz
 import { createCanvas } from 'lib/wordart/canvas-utils'
 import { fabric } from 'fabric'
 import { createMultilineFabricTextGroup } from 'components/Editor/lib/fabric-utils'
+import { mkShapeConfFromOptions as mkShapeStyleConfFromOptions } from 'components/Editor/style'
 
 export type LeftPanelShapesTabProps = {}
 
@@ -78,14 +78,14 @@ const initialState = {
         },
   },
 }
-const state = observable({ ...initialState })
+const state = observable<typeof initialState>({ ...initialState })
 
 const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
   <Slider
     label="Opacity"
-    value={100 * style.fill.opacity}
+    value={100 * style.opacity}
     onChange={(value) => {
-      style.fill.opacity = value / 100
+      style.opacity = value / 100
     }}
     onAfterChange={onAfterChange}
     min={0}
@@ -98,7 +98,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
   () => {
     const { editorPageStore: store } = useStore()
     const shapeStyle = store.styleOptions.shape
-    const shape = store.getSelectedShapeConf()
+    const shape = store.getShape()
 
     const [term, setTerm] = useState('')
     const allOptions = [
@@ -128,9 +128,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
     const visualize = useCallback(() => {
       store.editor?.generateShapeItems({
-        style: shapeStyle,
+        style: mkShapeStyleConfFromOptions(shapeStyle),
       })
-    }, [])
+    }, [shapeStyle])
 
     const [query, setQuery] = useState('')
     const matchingShapes = store
@@ -139,13 +139,14 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
     const [updateShapeColoring] = useDebouncedCallback(
       async () => {
-        await store.editor?.updateShapeColors(shapeStyle.fill)
+        if (!shape) {
+          return
+        }
+        const style = mkShapeStyleConfFromOptions(shapeStyle)
+        await store.editor?.updateShapeColors(shape.config)
         store.updateShapeThumbnail()
-        if (shapeStyle.itemsColoring.kind === 'shape') {
-          store.editor?.setShapeItemsStyle(
-            'shape',
-            getItemsColoring(shapeStyle)
-          )
+        if (style.items.coloring.kind === 'shape') {
+          store.editor?.setShapeItemsStyle(style.items)
         }
       },
       20,
@@ -209,24 +210,26 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
         <Box>
           <>
             <Box display="flex" alignItems="flex-start" mb="3">
-              <ShapeThumbnailBtn
-                css={css`
-                  width: 180px;
-                  height: 180px;
-                  min-width: 180px;
+              {shape && (
+                <ShapeThumbnailBtn
+                  css={css`
+                    width: 180px;
+                    height: 180px;
+                    min-width: 180px;
 
-                  img {
-                    width: 175px;
-                    height: 175px;
+                    img {
+                      width: 175px;
+                      height: 175px;
+                    }
+                  `}
+                  backgroundColor="white"
+                  url={
+                    (state.mode === 'add text shape'
+                      ? state.textShape.thumbnailPreview
+                      : shape.config.thumbnailUrl)!
                   }
-                `}
-                backgroundColor="white"
-                url={
-                  (state.mode === 'add text shape'
-                    ? state.textShape.thumbnailPreview
-                    : shape.thumbnailUrl || shape.url)!
-                }
-              />
+                />
+              )}
               <Box
                 flex={1}
                 ml="3"
@@ -251,7 +254,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                   {state.mode === 'home' && (
                     <Tooltip
                       label="Customize colors, size and position"
-                      isDisabled={state.mode === 'customize shape'}
+                      isDisabled={(state.mode as TabMode) === 'customize shape'}
                     >
                       <Button
                         mr="2"
@@ -274,7 +277,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           state.isTransforming = false
                           store.editor?.deselectShape()
                           store.editor?.generateShapeItems({
-                            style: store.styleOptions.shape,
+                            style: mkShapeStyleConfFromOptions(
+                              store.styleOptions.shape
+                            ),
                           })
                         }
                       }}
@@ -309,7 +314,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                       <Textarea
                         autoFocus
                         value={state.textShape.text}
-                        onChange={(e) => {
+                        onChange={(e: any) => {
                           state.textShape.text = e.target.value
                           updateTextThumbnailPreview()
                         }}
@@ -373,7 +378,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                   </motion.div>
                 )}
 
-                {state.mode === 'customize shape' && (
+                {shape && state.mode === 'customize shape' && (
                   <motion.div
                     key="customize"
                     initial={{ x: 355, y: 0, opacity: 0 }}
@@ -382,7 +387,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                     exit={{ x: 355, y: 0, opacity: 0 }}
                   >
                     <Stack mb="4" p="2" position="absolute" width="100%">
-                      {shape.kind === 'svg' && (
+                      {shape.config.kind === 'svg' && (
                         <Heading size="md" m="0" mb="3" display="flex">
                           Customize Colors
                           <Button
@@ -395,34 +400,39 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           </Button>
                         </Heading>
                       )}
-                      {shape.kind === 'svg' &&
-                        shapeStyle.fill.colorMap.length > 1 && (
-                          <Box mt="3">
-                            <Tabs
-                              variantColor="primary"
-                              index={
-                                shapeStyle.fill.kind == 'color-map' ? 0 : 1
+                      {shape.kind === 'svg' && shape.colorMap.length > 1 && (
+                        <Box mt="3">
+                          <Tabs
+                            variantColor="primary"
+                            index={
+                              shape.config.processing.colors.kind == 'color-map'
+                                ? 0
+                                : 1
+                            }
+                            variant="solid-rounded"
+                            size="sm"
+                            onChange={(index) => {
+                              if (index === 0) {
+                                shape.config.processing.colors.kind =
+                                  'color-map'
+                                updateShapeColoring()
+                              } else {
+                                shape.config.processing.colors.kind =
+                                  'single-color'
+                                updateShapeColoring()
                               }
-                              variant="solid-rounded"
-                              size="sm"
-                              onChange={(index) => {
-                                if (index === 0) {
-                                  shapeStyle.fill.kind = 'color-map'
-                                  updateShapeColoring()
-                                } else {
-                                  shapeStyle.fill.kind = 'single-color'
-                                  updateShapeColoring()
-                                }
-                              }}
-                            >
-                              <TabList mb="1em">
-                                <Tab>Multiple</Tab>
-                                <Tab>Single</Tab>
-                              </TabList>
-                              <TabPanels>
-                                <TabPanel>
-                                  <Box>
-                                    {shapeStyle.fill.colorMap.map(
+                            }}
+                          >
+                            <TabList mb="1em">
+                              <Tab>Multiple</Tab>
+                              <Tab>Single</Tab>
+                            </TabList>
+                            <TabPanels>
+                              <TabPanel>
+                                <Box>
+                                  {shape.config.processing.colors.kind ===
+                                    'color-map' &&
+                                    shape.config.processing.colors.colors.map(
                                       (color, index) => (
                                         <Box
                                           mr="1"
@@ -434,9 +444,14 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                             disableAlpha
                                             value={chroma(color).alpha(1).hex()}
                                             onChange={(hex) => {
-                                              shapeStyle.fill.colorMap[
-                                                index
-                                              ] = chroma(hex).hex()
+                                              if (
+                                                shape.config.processing.colors
+                                                  .kind === 'color-map'
+                                              ) {
+                                                shape.config.processing.colors.colors[
+                                                  index
+                                                ] = chroma(hex).hex()
+                                              }
                                             }}
                                             onAfterChange={() => {
                                               updateShapeColoring()
@@ -445,31 +460,35 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                         </Box>
                                       )
                                     )}
-                                  </Box>
-                                </TabPanel>
-                                <TabPanel>
-                                  <Box mr="1" mb="2">
-                                    <ColorPicker
-                                      disableAlpha
-                                      value={chroma(shapeStyle.fill.color)
-                                        .alpha(1)
-                                        .hex()}
-                                      onChange={(hex) => {
-                                        shapeStyle.fill.color = chroma(
-                                          hex
-                                        ).hex()
-                                      }}
-                                      onAfterChange={() => {
-                                        updateShapeColoring()
-                                      }}
-                                    />
-                                  </Box>
-                                </TabPanel>
-                              </TabPanels>
-                            </Tabs>
-                          </Box>
-                        )}
-                      {shape.kind === 'svg' &&
+                                </Box>
+                              </TabPanel>
+                              <TabPanel>
+                                <Box mr="1" mb="2">
+                                  <ColorPicker
+                                    disableAlpha
+                                    value={chroma(shapeStyle.color.color)
+                                      .alpha(1)
+                                      .hex()}
+                                    onChange={(hex) => {
+                                      shapeStyle.color.color = hex
+                                      if (
+                                        shape.config.processing.colors.kind ===
+                                        'single-color'
+                                      ) {
+                                        shape.config.processing.colors.color = hex
+                                      }
+                                    }}
+                                    onAfterChange={() => {
+                                      updateShapeColoring()
+                                    }}
+                                  />
+                                </Box>
+                              </TabPanel>
+                            </TabPanels>
+                          </Tabs>
+                        </Box>
+                      )}
+                      {/* {shapeConf.kind === 'svg' &&
                         shapeStyle.fill.colorMap.length === 1 && (
                           <ColorPicker
                             disableAlpha
@@ -483,7 +502,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                             }}
                           />
                         )}
-                      {shape.kind === 'raster' && shape.processing && (
+                      {shapeConf.kind === 'raster' && shapeConf.processing && (
                         <>
                           <Heading size="md" m="0" mb="3" display="flex">
                             Image
@@ -500,7 +519,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                             </Button>
                           </Box>
                         </>
-                      )}
+                      )} */}
 
                       <Box mt="6">
                         <Heading size="md" m="0" display="flex">
@@ -543,7 +562,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                   state.isTransforming = false
                                   store.editor?.deselectShape()
                                   store.editor?.generateShapeItems({
-                                    style: store.styleOptions.shape,
+                                    style: mkShapeStyleConfFromOptions(
+                                      store.styleOptions.shape
+                                    ),
                                   })
                                 }}
                               >
@@ -633,6 +654,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         <Box flex={1}>
                           <Menu>
                             <MenuButton
+                              // @ts-ignore
                               variant="link"
                               variantColor="primary"
                               as={Button}
@@ -701,38 +723,38 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
           </>
         </Box>
 
-        <CustomizeRasterImageModal
-          isOpen={state.isShowingCustomizeImage}
-          value={{
-            invert: shape.processing?.invert.enabled || false,
-            invertColor: shape.processing?.invert.color || 'black',
-            removeLightBackground:
-              shape.processing?.removeLightBackground.threshold || 0,
-            originalUrl: shape.url,
-          }}
-          onClose={() => {
-            state.isShowingCustomizeImage = false
-          }}
-          onSubmit={async (thumbnailUrl, value) => {
-            shape.thumbnailUrl = thumbnailUrl
-            shape.processing = {
-              invert: {
-                enabled: value.invert,
-                color: value.invertColor,
-              },
-              removeLightBackground: {
-                enabled: true,
-                threshold: value.removeLightBackground,
-              },
-              edges: {
-                enabled: false,
-                amount: 0,
-              },
-            }
-            await store.updateShape()
-            store.updateShapeThumbnail()
-          }}
-        />
+        {shape && shape.kind === 'raster' && (
+          <CustomizeRasterImageModal
+            isOpen={state.isShowingCustomizeImage}
+            value={{
+              invert: shape.config.processing?.invert != null,
+              invertColor: shape.config.processing?.invert?.color || 'black',
+              removeLightBackground:
+                shape.config.processing?.removeLightBackground?.threshold || 0,
+              originalUrl: shape.url,
+            }}
+            onClose={() => {
+              state.isShowingCustomizeImage = false
+            }}
+            onSubmit={async (thumbnailUrl, value) => {
+              shape.config.thumbnailUrl = thumbnailUrl
+              shape.config.processing = {
+                invert: value.invert
+                  ? {
+                      color: value.invertColor,
+                    }
+                  : undefined,
+                removeLightBackground: value.removeLightBackground
+                  ? {
+                      threshold: value.removeLightBackground,
+                    }
+                  : undefined,
+              }
+              await store.updateShape()
+              store.updateShapeThumbnail()
+            }}
+          />
+        )}
 
         <AddCustomImageModal
           isOpen={state.isShowingAddCustomImage}
@@ -747,16 +769,12 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
               thumbnailUrl,
               isCustom: true,
               processing: {
-                edges: {
-                  enabled: false,
-                  amount: 0,
-                },
-                invert: {
-                  enabled: state.invert,
-                  color: state.invertColor,
-                },
+                invert: state.invert
+                  ? {
+                      color: state.invertColor,
+                    }
+                  : undefined,
                 removeLightBackground: {
-                  enabled: true,
                   threshold: state.removeLightBackground,
                 },
               },

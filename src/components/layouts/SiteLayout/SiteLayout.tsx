@@ -2,7 +2,7 @@ import React from 'react'
 import styled from '@emotion/styled'
 import { Header } from 'components/layouts/SiteLayout/Header'
 import { Footer } from 'components/layouts/SiteLayout/Footer'
-import { Box } from 'components/shared/Box'
+import { Box } from '@chakra-ui/core'
 
 export type SiteLayoutProps = {
   children: React.ReactNode

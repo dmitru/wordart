@@ -40,11 +40,11 @@ const FontButton = styled(BaseBtn)`
   }
 `
 FontButton.defaultProps = {
-  pr: '2',
-  py: '1',
+  pr: 2,
+  py: 1,
 }
 
-const FontButtonContainer = styled(Box)<{ selected?: boolean }>`
+const FontButtonContainer = styled(Box)<{ theme: any; selected?: boolean }>`
   ${FontDeleteButton} {
     opacity: 0;
     transition: 0.2s opacity;
@@ -80,7 +80,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
   ({ target }) => {
     const { editorPageStore: store } = useStore()
     const style = store.styleOptions[target]
-    const words = style.words
+    const words = style.items.words
 
     const fonts = store.getAvailableFonts()
 
@@ -115,7 +115,8 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
             {fonts.map((font) => {
               const { style: fontStyle } = font
               const isSelected =
-                style.words.fontIds.find((f) => f === fontStyle.fontId) != null
+                style.items.words.fontIds.find((f) => f === fontStyle.fontId) !=
+                null
               return (
                 <FontButtonContainer
                   key={fontStyle.fontId}
@@ -125,14 +126,17 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                   <FontButton
                     onClick={(evt) => {
                       if (evt.metaKey) {
-                        style.words.fontIds =
+                        style.items.words.fontIds =
                           isSelected && style.words.fontIds.length > 1
-                            ? style.words.fontIds.filter(
+                            ? style.items.words.fontIds.filter(
                                 (f) => f !== fontStyle.fontId
                               )
-                            : uniq([...style.words.fontIds, fontStyle.fontId])
+                            : uniq([
+                                ...style.items.words.fontIds,
+                                fontStyle.fontId,
+                              ])
                       } else {
-                        style.words.fontIds = [fontStyle.fontId]
+                        style.items.words.fontIds = [fontStyle.fontId]
                       }
                     }}
                   >

@@ -15,7 +15,7 @@ import { ColorPicker } from 'components/shared/ColorPicker'
 import { Slider } from 'components/shared/Slider'
 import {
   loadImageUrlToCanvasCtxWithMaxSize,
-  processImg,
+  processRasterImg,
 } from 'lib/wordart/canvas-utils'
 import { observer, useLocalStore } from 'mobx-react'
 import { useRef, useEffect } from 'react'
@@ -74,17 +74,16 @@ export const CustomizeRasterImageModal: React.FC<CustomizeRasterImageModalProps>
         c.height
       )
 
-      processImg(ctx.canvas, {
+      processRasterImg(ctx.canvas, {
         edges: {
-          enabled: false,
           amount: 0,
         },
-        invert: {
-          enabled: state.invert,
-          color: state.invertColor,
-        },
+        invert: state.invert
+          ? {
+              color: state.invertColor,
+            }
+          : undefined,
         removeLightBackground: {
-          enabled: true,
           threshold: state.removeLightBackground,
         },
       })

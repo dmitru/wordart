@@ -1,6 +1,7 @@
 import { FontId } from 'data/fonts'
 import { WordConfigId } from 'components/Editor/editor-store'
-import fabric from 'fabric/fabric-impl'
+import { fabric } from 'fabric'
+import paper from 'paper'
 import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { Font } from 'components/Editor/lib/generator'

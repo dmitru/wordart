@@ -550,11 +550,6 @@ export class Editor {
         obj: shapeObj,
         objOriginalColors: shapeCopyObj,
         originalColors: colorMap.map((c) => c.color),
-        processing: {
-          colors: {
-            kind: 'original',
-          },
-        },
         transform: new paper.Matrix().values as MatrixSerialized,
         url: shapeConfig.url,
         colorMap,
@@ -575,7 +570,6 @@ export class Editor {
         id: shapeConfig.id,
         isCustom: shapeConfig.isCustom || false,
         obj: shapeObj,
-        processing: shapeConfig.processing || {},
         transform: new paper.Matrix().values as MatrixSerialized,
         url: shapeConfig.url,
         originalCanvas,
@@ -603,8 +597,6 @@ export class Editor {
         config: shapeConfig,
         kind: 'text',
         id: shapeConfig.id,
-        text: shapeConfig.text,
-        textStyle: shapeConfig.textStyle,
         isCustom: shapeConfig.isCustom || false,
         transform: new paper.Matrix().values as MatrixSerialized,
         obj: shapeObj,
@@ -652,9 +644,8 @@ export class Editor {
       this.canvas.remove(this.shape.obj)
     }
     this.canvas.add(shapeObj)
-    this.setShapeObj(shapeObj)
-
     this.shape = shape!
+    this.setShapeObj(shapeObj)
 
     // if (shapeConfig.kind === 'raster') {
     //   shapeStyle.kind = 'original'
@@ -820,15 +811,15 @@ export class Editor {
             edges: {
               enabled:
                 this.shape.kind === 'raster' || this.shape.kind === 'svg'
-                  ? this.shape.processing.edges != null
+                  ? this.shape.config.processing?.edges != null
                   : false,
               blur:
                 17 *
                 (1 -
                   ((this.shape.kind === 'raster' ||
                     this.shape.kind === 'svg') &&
-                  this.shape.processing.edges
-                    ? this.shape.processing.edges.amount
+                  this.shape.config.processing?.edges
+                    ? this.shape.config.processing?.edges.amount
                     : 0) /
                     100),
               lowThreshold: 30,

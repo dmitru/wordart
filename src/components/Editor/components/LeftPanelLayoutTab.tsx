@@ -2,11 +2,10 @@ import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { Slider } from 'components/shared/Slider'
 import { Label } from 'components/Editor/components/shared'
-import { Box } from 'components/shared/Box'
 import { useCallback } from 'react'
 import { TargetKind } from 'components/Editor/lib/editor'
-import { WordAnglesPresetKind } from 'components/Editor/style'
 import { Button, Heading } from '@chakra-ui/core'
+import { WordAnglesPresetKind } from 'components/Editor/style-options'
 
 const anglePresets: {
   kind: WordAnglesPresetKind
@@ -54,137 +53,139 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
       // editorPageStore.editor?.generateShapeItems({ style })
     }, [])
 
-    return (
-      <>
-        {style.words.wordList.length > 0 && (
-          <Box mb="5">
-            <Heading size="md" mt="2" mb="3">
-              Words
-            </Heading>
+    return null
 
-            <Box mb="3">
-              <Slider
-                label="Size"
-                value={style.layout.wordsMaxSize}
-                onChange={(value) => {
-                  const val = (value as any) as number
-                  style.layout.wordsMaxSize = val
-                }}
-                onAfterChange={visualize}
-                min={20}
-                max={100}
-                step={1}
-              />
-            </Box>
+    // return (
+    //   <>
+    //     {style.words.wordList.length > 0 && (
+    //       <Box mb="5">
+    //         <Heading size="md" mt="2" mb="3">
+    //           Words
+    //         </Heading>
 
-            <Box>
-              {anglePresets.map((preset) => (
-                <Button
-                  key={preset.kind}
-                  onClick={() => {
-                    style.words.angles.preset = preset.kind
-                    style.words.angles.angles = preset.getAngles()
-                  }}
-                  variantColor={
-                    preset.kind === style.words.angles.preset
-                      ? 'primary'
-                      : undefined
-                  }
-                >
-                  {preset.title}
-                </Button>
-              ))}
-            </Box>
-            {style.words.angles.preset === 'custom' && (
-              <Slider
-                label="Angle"
-                value={style.words.angles.angles[0]}
-                onChange={(value) => {
-                  const val = (value as any) as number
-                  style.words.angles.angles = [val]
-                }}
-                onAfterChange={visualize}
-                min={-90}
-                max={90}
-                step={1}
-              />
-            )}
-          </Box>
-        )}
+    //         <Box mb="3">
+    //           <Slider
+    //             label="Size"
+    //             value={style.placement.wordsMaxSize}
+    //             onChange={(value) => {
+    //               const val = (value as any) as number
+    //               style.placement.wordsMaxSize = val
+    //             }}
+    //             onAfterChange={visualize}
+    //             min={20}
+    //             max={100}
+    //             step={1}
+    //           />
+    //         </Box>
 
-        {style.icons.iconList.length > 0 && (
-          <Box mb="4">
-            <Label>Icons</Label>
-            <Slider
-              label="Size"
-              value={style.layout.iconsMaxSize}
-              onChange={(value) => {
-                const val = (value as any) as number
-                style.layout.iconsMaxSize = val
-              }}
-              onAfterChange={visualize}
-              min={20}
-              max={100}
-              step={1}
-            />
-            <Slider
-              label="Amount"
-              value={style.layout.iconsProportion}
-              onChange={(value) => {
-                const val = (value as any) as number
-                style.layout.iconsProportion = val
-              }}
-              onAfterChange={visualize}
-              min={0}
-              max={100}
-              step={1}
-            />
-          </Box>
-        )}
+    //         <Box>
+    //           {anglePresets.map((preset) => (
+    //             <Button
+    //               key={preset.kind}
+    //               onClick={() => {
+    //                 style.words.angles.preset = preset.kind
+    //                 style.words.angles.angles = preset.getAngles()
+    //               }}
+    //               variantColor={
+    //                 preset.kind === style.words.angles.preset
+    //                   ? 'primary'
+    //                   : undefined
+    //               }
+    //             >
+    //               {preset.title}
+    //             </Button>
+    //           ))}
+    //         </Box>
+    //         {style.words.angles.preset === 'custom' && (
+    //           <Slider
+    //             label="Angle"
+    //             value={style.words.angles.angles[0]}
+    //             onChange={(value) => {
+    //               const val = (value as any) as number
+    //               style.words.angles.angles = [val]
+    //             }}
+    //             onAfterChange={visualize}
+    //             min={-90}
+    //             max={90}
+    //             step={1}
+    //           />
+    //         )}
+    //       </Box>
+    //     )}
 
-        <Box mb="4">
-          <Heading size="md" mb="3" mt="2">
-            Placement
-          </Heading>
-          {/* <Checkbox
-            id="fit-shape"
-            label="Allow words to go beyond shape"
-            value={!style.fitWithinShape}
-            onChange={(value) => {
-              style.fitWithinShape = !value
-            }}
-            mb="3"
-          /> */}
-          <Slider
-            label="Density"
-            value={style.layout.itemDensity}
-            onChange={(value) => {
-              const val = (value as any) as number
-              style.layout.itemDensity = val
-            }}
-            onAfterChange={visualize}
-            min={0}
-            max={100}
-            step={1}
-          />
-          {style.layout.fitWithinShape && (
-            <>
-              <Slider
-                label="Shape Offset"
-                value={style.layout.shapePadding}
-                onChange={(value) => {
-                  const val = (value as any) as number
-                  style.layout.shapePadding = val
-                }}
-                onAfterChange={visualize}
-                min={0}
-                max={100}
-                step={1}
-              />
-            </>
-          )}
-        </Box>
-      </>
-    )
+    //     {style.icons.iconList.length > 0 && (
+    //       <Box mb="4">
+    //         <Label>Icons</Label>
+    //         <Slider
+    //           label="Size"
+    //           value={style.placement.iconsMaxSize}
+    //           onChange={(value) => {
+    //             const val = (value as any) as number
+    //             style.placement.iconsMaxSize = val
+    //           }}
+    //           onAfterChange={visualize}
+    //           min={20}
+    //           max={100}
+    //           step={1}
+    //         />
+    //         <Slider
+    //           label="Amount"
+    //           value={style.placement.iconsProportion}
+    //           onChange={(value) => {
+    //             const val = (value as any) as number
+    //             style.placement.iconsProportion = val
+    //           }}
+    //           onAfterChange={visualize}
+    //           min={0}
+    //           max={100}
+    //           step={1}
+    //         />
+    //       </Box>
+    //     )}
+
+    //     <Box mb="4">
+    //       <Heading size="md" mb="3" mt="2">
+    //         Placement
+    //       </Heading>
+    //       {/* <Checkbox
+    //         id="fit-shape"
+    //         label="Allow words to go beyond shape"
+    //         value={!style.fitWithinShape}
+    //         onChange={(value) => {
+    //           style.fitWithinShape = !value
+    //         }}
+    //         mb="3"
+    //       /> */}
+    //       <Slider
+    //         label="Density"
+    //         value={style.placement.itemDensity}
+    //         onChange={(value) => {
+    //           const val = (value as any) as number
+    //           style.placement.itemDensity = val
+    //         }}
+    //         onAfterChange={visualize}
+    //         min={0}
+    //         max={100}
+    //         step={1}
+    //       />
+    //       {style.placement.fitWithinShape && (
+    //         <>
+    //           <Slider
+    //             label="Shape Offset"
+    //             value={style.placement.shapePadding}
+    //             onChange={(value) => {
+    //               const val = (value as any) as number
+    //               style.placement.shapePadding = val
+    //             }}
+    //             onAfterChange={visualize}
+    //             min={0}
+    //             max={100}
+    //             step={1}
+    //           />
+    //         </>
+    //       )}
+    //     </Box>
+    //   </>
+    // )
   }
 )

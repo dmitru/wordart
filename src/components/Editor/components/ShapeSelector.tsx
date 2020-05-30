@@ -1,9 +1,9 @@
 import { observer } from 'mobx-react'
 import styled from '@emotion/styled'
-import { Box, BoxProps } from 'components/shared/Box'
 import { noop } from 'lodash'
 import { darken } from 'polished'
-import { ShapeConf, ShapeId } from 'components/Editor/style'
+import { Box, BoxProps } from '@chakra-ui/core'
+import { ShapeConf, ShapeId } from 'components/Editor/shape-config'
 
 export type ShapeSelectorProps = {
   shapes: ShapeConf[]
@@ -24,7 +24,7 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
               }}
               backgroundColor="white"
               active={shape.id === selectedShapeId}
-              url={shape.thumbnailUrl || shape.url}
+              url={shape.thumbnailUrl}
             />
           ))}
         </ShapeThumbnails>
@@ -62,13 +62,12 @@ const ShapeThumbnailBtnInnerImg = styled.img`
 
 export const ShapeThumbnails = styled(Box)``
 
-const ShapeThumbnailBtnInner = styled.button<
-  {
-    backgroundColor: string
-    fill?: string
-    active: boolean
-  } & React.HTMLProps<HTMLButtonElement>
->`
+const ShapeThumbnailBtnInner = styled.button<{
+  theme: any
+  backgroundColor: string
+  fill?: string
+  active: boolean
+}>`
   width: 106px;
   height: 106px;
   border: 1px solid #ddd;

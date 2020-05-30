@@ -29,25 +29,6 @@ export type ShapeSvg = {
 
   config: ShapeSvgConf
 
-  processing: {
-    colors:
-      | {
-          kind: 'original'
-        }
-      | {
-          kind: 'single-color'
-          color: ColorString
-        }
-      | {
-          kind: 'color-map'
-          colors: ColorString[]
-        }
-    edges?: {
-      /** Edge detection intensity, 0-100% */
-      amount: number
-    }
-  }
-
   obj: fabric.Object
   objOriginalColors: fabric.Object
 }
@@ -66,7 +47,6 @@ export type ShapeRaster = {
   kind: 'raster'
   isCustom: boolean
   url: string
-  processing: RasterProcessingConf
   transform: MatrixSerialized
 
   config: ShapeRasterConf
@@ -84,8 +64,6 @@ export type ShapeText = {
   id: ShapeId
   kind: 'text'
   isCustom: boolean
-  text: string
-  textStyle: ShapeTextStyle
 
   config: ShapeTextConf
 

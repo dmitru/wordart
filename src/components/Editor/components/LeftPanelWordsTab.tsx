@@ -90,7 +90,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
   ({ target }) => {
     const { editorPageStore: store } = useStore()
     const style = store.styleOptions[target]
-    const words = style.words
+    const words = style.items.words
 
     const fonts = store.getAvailableFonts()
 
@@ -250,7 +250,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                       minHeight="200px"
                       placeholder="Enter text..."
                       value={state.editor.import.textInput}
-                      onChange={(evt) => {
+                      onChange={(evt: any) => {
                         state.editor.import.textInput = evt.target.value
                       }}
                     />
@@ -277,7 +277,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                         mt="3"
                         placeholder="Paste CSV..."
                         value={state.editor.import.textInput}
-                        onChange={(evt) => {
+                        onChange={(evt: any) => {
                           state.editor.import.textInput = evt.target.value
                         }}
                       />
