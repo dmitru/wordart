@@ -13,17 +13,17 @@ export type EditorPersistedDataV1 = {
   version: 1
   data: {
     sceneSize: Dimensions
+
     shape: PersistedShapeConfV1
-
-    bgStyle: PersistedBgStyleConfV1
     shapeStyle: PersistedShapeStyleConfV1
-
-    bgItems: {
+    shapeItems: {
       items: PersistedItemV1[]
       words: PersistedWordV1[]
       fontIds: FontId[]
     }
-    shapeItems: {
+
+    bgStyle: PersistedBgStyleConfV1
+    bgItems: {
       items: PersistedItemV1[]
       words: PersistedWordV1[]
       fontIds: FontId[]

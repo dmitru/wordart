@@ -139,10 +139,10 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
     const [updateShapeColoring] = useDebouncedCallback(
       async () => {
-        await store.editor?.setShapeFillColors(shapeStyle.fill)
+        await store.editor?.updateShapeColors(shapeStyle.fill)
         store.updateShapeThumbnail()
         if (shapeStyle.itemsColoring.kind === 'shape') {
-          store.editor?.setShapeItemsColor(
+          store.editor?.setShapeItemsStyle(
             'shape',
             getItemsColoring(shapeStyle)
           )

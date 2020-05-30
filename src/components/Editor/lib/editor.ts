@@ -1,20 +1,39 @@
 import chroma from 'chroma-js'
-import { EditorStore, WordConfigId } from 'components/Editor/editor-store'
+import { EditorStore } from 'components/Editor/editor-store'
 import { computeColorsMap } from 'components/Editor/lib/colormap'
 import {
+  EditorItem,
+  EditorItemConfig,
+  EditorItemConfigWord,
+  EditorItemId,
+  EditorItemWord,
+} from 'components/Editor/lib/editor-item'
+import {
   applyTransformToObj,
-  createMultilineFabricTextGroup,
   cloneObj,
   cloneObjAsImage,
+  createMultilineFabricTextGroup,
+  loadObjFromImg,
+  loadObjFromSvg,
   objAsCanvasElement,
 } from 'components/Editor/lib/fabric-utils'
 import { Font, Generator } from 'components/Editor/lib/generator'
-import { Shape } from 'components/Editor/shape'
+import { Shape, SvgShapeColorsMapEntry } from 'components/Editor/shape'
+import {
+  ShapeConf,
+  ShapeRasterConf,
+  ShapeSvgConf,
+} from 'components/Editor/shape-config'
+import { BgStyleConf, ShapeStyleConf } from 'components/Editor/style'
 import { FontId } from 'data/fonts'
 import { fabric } from 'fabric'
-import { canvasToImgElement, createCanvas } from 'lib/wordart/canvas-utils'
+import {
+  canvasToImgElement,
+  createCanvas,
+  processRasterImg,
+} from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
-import { flatten, groupBy, keyBy, max, min, sortBy } from 'lodash'
+import { flatten, groupBy, keyBy, max, min } from 'lodash'
 import { toJS } from 'mobx'
 import { Glyph } from 'opentype.js'
 import paper from 'paper'
@@ -25,17 +44,6 @@ import { waitAnimationFrame } from 'utils/async'
 import { consoleLoggers } from 'utils/console-logger'
 import { UninqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
-import { exhaustiveCheck } from 'utils/type-utils'
-import { ColorString, ItemsColoring } from 'components/Editor/style-options'
-import { BgStyleConf, ShapeStyleConf } from 'components/Editor/style'
-import {
-  EditorItem,
-  EditorItemId,
-  EditorItemConfig,
-  EditorItemConfigWord,
-  EditorItemWord,
-} from 'components/Editor/lib/editor-item'
-import { ShapeConf } from 'components/Editor/shape-config'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -275,49 +283,43 @@ export class Editor {
     this.canvas.requestRenderAll()
   }
 
-  setShapeFillColors = async (
-    config: Pick<
-      ShapeStyleConf['items'],
-      'coloring' | 'opacity' | 'dimSmallerItems'
-    >
-  ) => {
-    this.logger.debug(
-      'setShapeFillColors',
-      toJS(config, { recurseEverything: true })
-    )
-
-    if (!this.shape) {
-      this.logger.debug('>  No current shape, early exit')
-      return
-    }
-
-    if (this.shape.kind === 'raster') {
-      this.setShapeOpacity(config.opacity)
-      this.canvas.requestRenderAll()
-      return
-    }
-
-    if (!this.fabricObjects.shape || !this.fabricObjects.shapeOriginalColors) {
-      return
-    }
-
-    const shape = await new Promise<fabric.Object>((r) =>
-      this.fabricObjects.shapeOriginalColors!.clone(
-        (copy: fabric.Object) => r(copy),
-        ['id']
+  updateRasterShapeColors = (config: ShapeRasterConf) => {
+    if (this.shape?.kind !== 'raster') {
+      console.error(
+        `Unexpected shape type: expected raster, got ${this.shape?.kind}, shape id: ${this.shape?.id}`
       )
-    )
+      return
+    }
+  }
 
-    if (config.kind === 'color-map') {
+  updateSvgShapeColors = async (config: ShapeSvgConf) => {
+    if (this.shape?.kind !== 'svg') {
+      console.error(
+        `Unexpected shape type: expected svg, got ${this.shape?.kind}, shape id: ${this.shape?.id}`
+      )
+      return
+    }
+
+    if (!this.shape.obj || !this.shape.objOriginalColors) {
+      return
+    }
+
+    let shape = await cloneObj(this.shape.objOriginalColors)
+    shape.opacity = this.shape.obj.opacity || 1
+    const { colors } = config.processing
+
+    if (colors.kind === 'original') {
+      // Do nothing...
+    } else if (colors.kind === 'color-map') {
       const colorsMap = computeColorsMap(shape)
 
       this.logger.debug('>  Using color map', colorsMap)
-      colorsMap.colors.forEach((colorEntry, entryIndex) => {
+      colorsMap.forEach((colorEntry, entryIndex) => {
         this.logger.debug(
-          `>    Setting color to ${config.colorMap[entryIndex]}, ${colorEntry.color} for ${colorEntry.fabricItems.length} items...`
+          `>    Setting color to ${colors.colors[entryIndex]}, ${colorEntry.color} for ${colorEntry.objs.length} items...`
         )
-        colorEntry.fabricItems.forEach((item) => {
-          const color = config.colorMap[entryIndex] || colorEntry.color
+        colorEntry.objs.forEach((item) => {
+          const color = colors.colors[entryIndex] || colorEntry.color
           if (colorEntry.fill) {
             item.set({ fill: color })
           }
@@ -327,14 +329,14 @@ export class Editor {
         })
       })
 
-      this.canvas.remove(this.fabricObjects.shape)
+      this.canvas.remove(this.shape.obj)
       this.canvas.insertAt(shape, 0, false)
 
       // this.shape. = colorsMap
       this.setShapeObj(shape)
     } else {
       this.logger.debug('>  Using single color')
-      const color = config.color
+      const color = colors.color
 
       const objects =
         shape instanceof fabric.Group ? shape.getObjects() : [shape]
@@ -345,14 +347,30 @@ export class Editor {
         }
       })
 
-      this.canvas.remove(this.fabricObjects.shape)
+      this.canvas.remove(this.shape.obj)
       this.canvas.insertAt(shape, 0, false)
 
       this.setShapeObj(shape)
     }
 
-    this.setShapeOpacity(config.opacity)
     this.canvas.requestRenderAll()
+  }
+
+  updateShapeColors = async (config: ShapeConf) => {
+    this.logger.debug(
+      'updateShapeColors',
+      toJS(config, { recurseEverything: true })
+    )
+    if (!this.shape) {
+      this.logger.debug('>  No current shape, early exit')
+      return
+    }
+    if (config.kind === 'raster' && this.shape.kind === 'raster') {
+      return this.updateRasterShapeColors(config)
+    }
+    if (config.kind === 'svg' && this.shape.kind === 'svg') {
+      return this.updateSvgShapeColors(config)
+    }
   }
 
   setShapeObj = (shape: fabric.Object) => {
@@ -372,9 +390,8 @@ export class Editor {
     this.canvas.requestRenderAll()
   }
 
-  setShapeItemsColor = async (
-    coloring: ShapeStyleConf['items']['coloring']
-  ) => {
+  setShapeItemsStyle = async (style: ShapeStyleConf['items']) => {
+    const { coloring, dimSmallerItems } = style
     const { itemsById } = this.items.shape
     const items = [...itemsById.values()]
     this.logger.debug(
@@ -384,22 +401,18 @@ export class Editor {
     )
 
     let colors: string[] = []
-    if (coloring.kind === 'gradient' || coloring.kind === 'single-color') {
-      if (coloring.kind === 'single-color') {
+    if (coloring.kind === 'gradient' || coloring.kind === 'color') {
+      if (coloring.kind === 'color') {
         colors = [coloring.color]
       } else if (coloring.kind === 'gradient') {
-        const scale = chroma.scale([coloring.colorFrom, coloring.colorTo])
-        colors = scale.colors(10)
+        const scale = chroma.scale([
+          coloring.gradient.from,
+          coloring.gradient.to,
+        ])
+        colors = scale.colors(20)
       }
-    } else if (coloring.kind === 'shape' && coloring.shapeStyleFill) {
-      if (coloring.shapeStyleFill.kind === 'single-color') {
-        colors = [coloring.shapeStyleFill.color]
-      } else if (coloring.shapeStyleFill.kind === 'color-map') {
-        colors = coloring.shapeStyleFill.colorMap
-      } else if (coloring.shapeStyleFill.kind === 'original') {
-      } else {
-        exhaustiveCheck(coloring.shapeStyleFill.kind)
-      }
+    } else if (coloring.kind === 'shape') {
+      // TODO
     }
 
     const itemAreas = items.map((item) => {
@@ -418,12 +431,11 @@ export class Editor {
     const rng = seedrandom('fill color')
     let shapeRaster: fabric.Image | undefined
     let shapeRasterImgData: ImageData | undefined
-    const dimSmallerFactor = coloring.dimSmallerItems / 100
-    if ((!shapeRaster || !shapeRasterImgData) && this.fabricObjects.shape) {
-      shapeRaster = await new Promise<fabric.Image>((r) =>
-        this.fabricObjects.shape!.cloneAsImage((copy: fabric.Image) => r(copy))
-      )
+    const dimSmallerFactor = dimSmallerItems / 100
+    if ((!shapeRaster || !shapeRasterImgData) && this.shape?.obj) {
+      shapeRaster = await cloneObjAsImage(this.shape.obj)
     }
+
     for (let i = 0; i < items.length; ++i) {
       const item = items[i]
       const area = itemAreas[i]
@@ -432,66 +444,68 @@ export class Editor {
         continue
       }
 
-      if (coloring.kind === 'gradient' || coloring.kind === 'single-color') {
+      if (coloring.kind === 'gradient' || coloring.kind === 'color') {
         const index = Math.floor(rng() * colors.length)
         item.setColor(colors[index])
-      } else if (coloring.shapeStyleFill) {
-        if (coloring.shapeStyleFill.kind === 'single-color') {
-          const shapeColor = new paper.Color(coloring.shapeStyleFill.color)
-          let color = chroma.rgb(
-            255 * shapeColor.red,
-            255 * shapeColor.green,
-            255 * shapeColor.blue
-          )
-          if (coloring.shapeBrightness != 0) {
-            color = color.brighten(coloring.shapeBrightness / 100)
-          }
-          const hex = color.hex()
-          item.setColor(hex)
-        } else if (coloring.shapeStyleFill.kind === 'color-map') {
-          if (this.shape?.kind === 'svg') {
-            const colorMapSorted = sortBy(
-              coloring.shapeStyleFill.defaultColorMap.map((color, index) => ({
-                color,
-                index,
-              })),
-              ({ color }) => chroma.distance(color, item.shapeColor, 'rgb')
-            )
-            const shapeColorStringIndex = colorMapSorted[0].index
-            const shapeColorString =
-              coloring.shapeStyleFill.colorMap[shapeColorStringIndex]
-            const shapeColor = new paper.Color(shapeColorString)
-            let color = chroma.rgb(
-              255 * shapeColor.red,
-              255 * shapeColor.green,
-              255 * shapeColor.blue
-            )
-            if (coloring.shapeBrightness != 0) {
-              color = color.brighten(coloring.shapeBrightness / 100)
-            }
-            const hex = color.hex()
-            item.setColor(hex)
-          } else if (this.shape?.kind === 'raster') {
-            let color = chroma(item.shapeColor)
-            if (coloring.shapeBrightness != 0) {
-              color = color.brighten(coloring.shapeBrightness / 100)
-            }
-            item.setColor(color.hex())
-          }
-        } else if (coloring.shapeStyleFill.kind === 'original') {
-          const shape = this.shape?.shapeConfig
-          let colorString = item.shapeColor
-          if (shape?.kind === 'raster' && shape?.processing?.invert.enabled) {
-            colorString = shape.processing.invert.color
-          }
-          let color = chroma(colorString)
-          if (coloring.shapeBrightness != 0) {
-            color = color.brighten(coloring.shapeBrightness / 100)
-          }
-          item.setColor(color.hex())
-        } else {
-          exhaustiveCheck(coloring.shapeStyleFill.kind)
-        }
+      } else if (coloring.kind === 'shape') {
+        // TODO: Original shape color
+        //
+        // if (coloring.shapeStyleFill.kind === 'color') {
+        //   const shapeColor = new paper.Color(coloring.shapeStyleFill.color)
+        //   let color = chroma.rgb(
+        //     255 * shapeColor.red,
+        //     255 * shapeColor.green,
+        //     255 * shapeColor.blue
+        //   )
+        //   if (coloring.shapeBrightness != 0) {
+        //     color = color.brighten(coloring.shapeBrightness / 100)
+        //   }
+        //   const hex = color.hex()
+        //   item.setColor(hex)
+        // } else if (coloring.shapeStyleFill.kind === 'color-map') {
+        //   if (this.shape?.kind === 'svg') {
+        //     const colorMapSorted = sortBy(
+        //       coloring.shapeStyleFill.defaultColorMap.map((color, index) => ({
+        //         color,
+        //         index,
+        //       })),
+        //       ({ color }) => chroma.distance(color, item.shapeColor, 'rgb')
+        //     )
+        //     const shapeColorStringIndex = colorMapSorted[0].index
+        //     const shapeColorString =
+        //       coloring.shapeStyleFill.colorMap[shapeColorStringIndex]
+        //     const shapeColor = new paper.Color(shapeColorString)
+        //     let color = chroma.rgb(
+        //       255 * shapeColor.red,
+        //       255 * shapeColor.green,
+        //       255 * shapeColor.blue
+        //     )
+        //     if (coloring.shapeBrightness != 0) {
+        //       color = color.brighten(coloring.shapeBrightness / 100)
+        //     }
+        //     const hex = color.hex()
+        //     item.setColor(hex)
+        //   } else if (this.shape?.kind === 'raster') {
+        //     let color = chroma(item.shapeColor)
+        //     if (coloring.shapeBrightness != 0) {
+        //       color = color.brighten(coloring.shapeBrightness / 100)
+        //     }
+        //     item.setColor(color.hex())
+        //   }
+        // } else if (coloring.shapeStyleFill.kind === 'original') {
+        //   const shape = this.shape?.shapeConfig
+        //   let colorString = item.shapeColor
+        //   if (shape?.kind === 'raster' && shape?.processing?.invert.enabled) {
+        //     colorString = shape.processing.invert.color
+        //   }
+        //   let color = chroma(colorString)
+        //   if (coloring.shapeBrightness != 0) {
+        //     color = color.brighten(coloring.shapeBrightness / 100)
+        //   }
+        //   item.setColor(color.hex())
+        // } else {
+        //   exhaustiveCheck(coloring.kind)
+        // }
       }
       item.setOpacity(
         (dimSmallerFactor * (area - minArea)) / (maxArea - minArea) +
@@ -509,59 +523,71 @@ export class Editor {
     clear: boolean
   }) => {
     console.log('setShape', params)
-    const { shapeConfig, shapeColors, bgColors } = params
+    const { shapeConfig } = params
 
     if (!shapeConfig) {
       throw new Error('Missing shape config')
     }
     this.logger.debug('setShape', toJS(params, { recurseEverything: true }))
 
-    let colorsMap: SvgShapeColorsMap | undefined
+    let colorMap: SvgShapeColorsMapEntry[] | undefined
     let shapeObj: fabric.Object | undefined
-    let Shape: Shape | undefined
+    let shape: Shape | undefined
 
     // Process the shape...
     if (shapeConfig.kind === 'svg') {
-      shapeObj = await new Promise<fabric.Object>((resolve) =>
-        fabric.loadSVGFromURL(shapeConfig.url, (objects, options) => {
-          var obj = fabric.util.groupSVGElements(objects, options)
-          resolve(obj)
-        })
-      )
+      shapeObj = await loadObjFromSvg(shapeConfig.url)
+      const shapeCopyObj = await cloneObj(shapeObj)
+      shapeCopyObj.set({ selectable: false })
 
-      colorsMap = computeColorsMap(shapeObj as fabric.Group)
-      Shape = {
+      colorMap = computeColorsMap(shapeObj as fabric.Group)
+
+      shape = {
+        config: shapeConfig,
         kind: 'svg',
-        colorsMap,
-        shapeConfig,
+        id: shapeConfig.id,
+        isCustom: shapeConfig.isCustom || false,
+        obj: shapeObj,
+        objOriginalColors: shapeCopyObj,
+        originalColors: colorMap.map((c) => c.color),
+        processing: {
+          colors: {
+            kind: 'original',
+          },
+        },
+        transform: new paper.Matrix().values as MatrixSerialized,
+        url: shapeConfig.url,
+        colorMap,
       }
     } else if (shapeConfig.kind === 'raster') {
-      shapeObj = await new Promise<fabric.Object>((resolve) =>
-        fabric.Image.fromURL(shapeConfig.url, (oImg) => {
-          resolve(oImg)
-        })
-      )
-      const originalCanvas = (shapeObj.toCanvasElement() as any) as HTMLCanvasElement
-      const processedCanvas = (shapeObj.toCanvasElement() as any) as HTMLCanvasElement
+      shapeObj = await loadObjFromImg(shapeConfig.url)
+      const originalCanvas = objAsCanvasElement(shapeObj)
+      const processedCanvas = objAsCanvasElement(shapeObj)
 
       if (shapeConfig.processing) {
-        processImg(processedCanvas, shapeConfig.processing)
+        processRasterImg(processedCanvas, shapeConfig.processing)
       }
       shapeObj = new fabric.Image(canvasToImgElement(processedCanvas))
 
-      Shape = {
+      shape = {
+        config: shapeConfig,
         kind: 'raster',
-        shapeConfig,
+        id: shapeConfig.id,
+        isCustom: shapeConfig.isCustom || false,
+        obj: shapeObj,
+        processing: shapeConfig.processing || {},
+        transform: new paper.Matrix().values as MatrixSerialized,
+        url: shapeConfig.url,
         originalCanvas,
         processedCanvas,
       }
     } else if (shapeConfig.kind === 'text') {
-      const font = await this.store.fetchFontById(shapeConfig.fontId)
+      const font = await this.store.fetchFontById(shapeConfig.textStyle.fontId)
       const group = createMultilineFabricTextGroup(
         shapeConfig.text,
         font!,
         100,
-        shapeConfig.color
+        shapeConfig.textStyle.color
       )
       group.setPositionByOrigin(
         new fabric.Point(
@@ -573,9 +599,15 @@ export class Editor {
       )
       shapeObj = group
 
-      Shape = {
+      shape = {
+        config: shapeConfig,
         kind: 'text',
-        shapeConfig,
+        id: shapeConfig.id,
+        text: shapeConfig.text,
+        textStyle: shapeConfig.textStyle,
+        isCustom: shapeConfig.isCustom || false,
+        transform: new paper.Matrix().values as MatrixSerialized,
+        obj: shapeObj,
       }
     }
 
@@ -600,7 +632,9 @@ export class Editor {
       this.clear()
     }
 
-    this.setBgColor(bgColors)
+    const { shapeStyle, bgFillStyle } = params
+
+    this.setBgColor(bgFillStyle)
     shapeObj.setPositionByOrigin(
       new fabric.Point(
         defaultPadding + sceneBounds.width / 2,
@@ -610,36 +644,29 @@ export class Editor {
       'center'
     )
 
-    const shapeCopy = await new Promise<fabric.Object>((r) =>
-      shapeObj!.clone((copy: fabric.Object) => r(copy), ['id'])
-    )
-    shapeCopy.set({
-      selectable: false,
-    })
     shapeObj.set({
-      opacity: shapeColors.opacity,
+      opacity: shapeStyle.opacity,
       selectable: false,
     })
-    if (this.fabricObjects.shape) {
-      this.canvas.remove(this.fabricObjects.shape)
+    if (this.shape?.obj) {
+      this.canvas.remove(this.shape.obj)
     }
     this.canvas.add(shapeObj)
     this.setShapeObj(shapeObj)
-    this.fabricObjects.shapeOriginalColors = shapeCopy
 
-    this.shape = Shape!
+    this.shape = shape!
 
-    if (shapeConfig.kind === 'raster') {
-      shapeColors.kind = 'original'
-    } else if (colorsMap) {
-      shapeColors.colorMap = colorsMap?.colors.map((c) => c.color)
-      shapeColors.defaultColorMap = colorsMap?.colors.map((c) => c.color)
-      shapeColors.kind = 'color-map'
-      console.log('setting default color map', shapeColors, colorsMap)
-    }
-    await this.setShapeFillColors(shapeColors)
+    // if (shapeConfig.kind === 'raster') {
+    //   shapeStyle.kind = 'original'
+    // } else if (colorMap) {
+    //   shapeColors.colorMap = colorMap?.colors.map((c) => c.color)
+    //   shapeColors.defaultColorMap = colorMap?.colors.map((c) => c.color)
+    //   shapeColors.kind = 'color-map'
+    //   console.log('setting default color map', shapeColors, colorMap)
+    // }
+    // await this.updateShapeColors(shapeColors)
     this.canvas.requestRenderAll()
-    return { colorsMap }
+    return { colorsMap: colorMap }
   }
 
   getSceneBounds = (pad = 20): paper.Rectangle =>
@@ -668,7 +695,7 @@ export class Editor {
   }
 
   setShapeItems = async (itemConfigs: EditorItemConfig[]) => {
-    if (!this.fabricObjects.shape) {
+    if (!this.shape?.obj) {
       console.error('No shape')
       return
     }
@@ -825,7 +852,7 @@ export class Editor {
         })),
         // Icons
         icons: style.items.icons.iconList.map((shape) => ({
-          shape: this.store.getShapeById(shape.shapeId)!,
+          shape: this.store.getShapeConfById(shape.shapeId)!,
         })),
         iconsMaxSize: style.items.placement.iconsMaxSize,
         iconProbability: style.items.placement.iconsProportion / 100,
@@ -852,7 +879,7 @@ export class Editor {
     }
 
     await this.setShapeItems(items)
-    await this.setShapeItemsColor(style.items.coloring)
+    await this.setShapeItemsStyle(style.items)
     this.store.isVisualizing = false
   }
 

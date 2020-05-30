@@ -4,6 +4,9 @@ import {
   ShapeId,
   RasterProcessingConf,
   SvgProcessingConf,
+  ShapeSvgConf,
+  ShapeRasterConf,
+  ShapeTextConf,
 } from 'components/Editor/shape-config'
 import { ColorString } from 'components/Editor/style-options'
 
@@ -23,6 +26,8 @@ export type ShapeSvg = {
   originalColors: ColorString[]
   /** Mapping of color slots to fabric items */
   colorMap: SvgShapeColorsMapEntry[]
+
+  config: ShapeSvgConf
 
   processing: {
     colors:
@@ -49,6 +54,9 @@ export type ShapeSvg = {
 
 export type SvgShapeColorsMapEntry = {
   objs: fabric.Object[]
+  color: string
+  fill: boolean
+  stroke: boolean
 }
 
 // Raster
@@ -60,6 +68,8 @@ export type ShapeRaster = {
   url: string
   processing: RasterProcessingConf
   transform: MatrixSerialized
+
+  config: ShapeRasterConf
 
   // Canvases
   originalCanvas: HTMLCanvasElement
@@ -73,11 +83,12 @@ export type ShapeRaster = {
 export type ShapeText = {
   id: ShapeId
   kind: 'text'
-  text: string
-  color: string
   isCustom: boolean
+  text: string
   textStyle: ShapeTextStyle
-  transform: MatrixSerialized
 
+  config: ShapeTextConf
+
+  transform: MatrixSerialized
   obj: fabric.Object
 }

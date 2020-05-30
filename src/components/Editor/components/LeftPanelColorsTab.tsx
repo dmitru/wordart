@@ -23,7 +23,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
     const updateItemsColoring = useThrottleCallback(
       () => {
-        editorPageStore.editor?.setShapeItemsColor(
+        editorPageStore.editor?.setShapeItemsStyle(
           target,
           getItemsColoring(style)
         )
@@ -34,9 +34,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
     const updateShapeColoring = useThrottleCallback(
       () => {
-        editorPageStore.editor?.setShapeFillColors(shapeStyle.fill)
+        editorPageStore.editor?.updateShapeColors(shapeStyle.fill)
         if (shapeStyle.itemsColoring.kind === 'shape') {
-          editorPageStore.editor?.setShapeItemsColor(
+          editorPageStore.editor?.setShapeItemsStyle(
             'shape',
             getItemsColoring(shapeStyle)
           )
@@ -268,7 +268,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             onAfterChange={() => {
               editorPageStore.editor?.setBgColor(bgStyle.fill)
               if (bgStyle.itemsColoring.kind === 'shape') {
-                editorPageStore.editor?.setShapeItemsColor(
+                editorPageStore.editor?.setShapeItemsStyle(
                   'bg',
                   getItemsColoring(bgStyle)
                 )

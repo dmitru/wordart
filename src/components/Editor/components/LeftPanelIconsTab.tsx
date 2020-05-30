@@ -108,7 +108,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                     )
                   }}
                   backgroundColor="white"
-                  shape={editorPageStore.getShapeById(icon.shapeId)!}
+                  shape={editorPageStore.getShapeConfById(icon.shapeId)!}
                 />
               ))}
             </ShapeThumbnails>

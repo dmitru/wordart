@@ -47,6 +47,7 @@ export const mkBgConfFromOptions = (opts: BgStyleOptions): BgStyleConf => ({
 })
 
 export type ShapeStyleConf = {
+  opacity: number
   items: {
     words: WordItemsConf
     icons: IconItemsConf
@@ -66,6 +67,7 @@ export type ShapeStyleConf = {
 export const mkShapeConfFromOptions = (
   opts: ShapeStyleOptions
 ): ShapeStyleConf => ({
+  opacity: opts.opacity,
   items: {
     words: mkWordItemsConfFromOptions(opts.items.words),
     icons: opts.items.icons,
@@ -87,9 +89,9 @@ export const mkWordItemsConfFromOptions = (
   wordList: opts.wordList,
   fontIds: opts.fontIds,
   angles:
-    opts.preset === 'custom'
+    opts.anglesPreset === 'custom'
       ? opts.customAngles
-      : getAnglesForPreset(opts.preset),
+      : getAnglesForPreset(opts.anglesPreset),
 })
 
 export type WordItemsConf = {

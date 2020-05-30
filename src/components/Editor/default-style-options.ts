@@ -29,6 +29,7 @@ const defaultWordsListBackground: WordListEntry[] = ['back'].map(
 
 /** Defines initial state of editor style options UI for the Shape */
 export const defaultShapeStyleOptions: ShapeStyleOptions = {
+  opacity: 0.4,
   items: {
     dimSmallerItems: 20,
     opacity: 100,
@@ -55,7 +56,7 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
     words: {
       fontIds: [fonts[3].styles[0].fontId, fonts[2].styles[0].fontId],
       wordList: defaultWordsList,
-      preset: 'horizontal',
+      anglesPreset: 'horizontal',
       customAngles: [],
     },
     icons: {
@@ -102,7 +103,7 @@ export const defaultBgStyleOptions: BgStyleOptions = {
     words: {
       fontIds: [fonts[3].styles[0].fontId, fonts[2].styles[0].fontId],
       wordList: defaultWordsListBackground,
-      preset: 'horizontal',
+      anglesPreset: 'horizontal',
       customAngles: [],
     },
     icons: {

@@ -1,9 +1,6 @@
 import { fabric } from 'fabric'
 import { flatten, groupBy, sortBy } from 'lodash'
-import {
-  SvgShapeColorsMap,
-  SvgShapeColorsMapEntry,
-} from 'components/Editor/lib/editor'
+import { SvgShapeColorsMapEntry } from 'components/Editor/shape'
 
 export const findNamedChildren = (
   item: fabric.Object
@@ -40,7 +37,9 @@ export const getStrokeColor = (items: fabric.Object[]): string | undefined => {
   return undefined
 }
 
-export const computeColorsMap = (object: fabric.Object): SvgShapeColorsMap => {
+export const computeColorsMap = (
+  object: fabric.Object
+): SvgShapeColorsMapEntry[] => {
   const namedChildren = sortBy(findNamedChildren(object), (c) => c.name)
   const namedChildrenByColor = groupBy(
     namedChildren,
@@ -58,7 +57,7 @@ export const computeColorsMap = (object: fabric.Object): SvgShapeColorsMap => {
       if (fillColor !== strokeColor) {
         if (fillColor) {
           colorEntries.push({
-            fabricItems: children.map((c) => c.item),
+            objs: children.map((c) => c.item),
             color: fillColor,
             fill: true,
             stroke: false,
@@ -66,7 +65,7 @@ export const computeColorsMap = (object: fabric.Object): SvgShapeColorsMap => {
         }
         if (strokeColor) {
           colorEntries.push({
-            fabricItems: children.map((c) => c.item),
+            objs: children.map((c) => c.item),
             color: strokeColor,
             fill: false,
             stroke: true,
@@ -75,7 +74,7 @@ export const computeColorsMap = (object: fabric.Object): SvgShapeColorsMap => {
       } else {
         if (strokeColor) {
           colorEntries.push({
-            fabricItems: children.map((c) => c.item),
+            objs: children.map((c) => c.item),
             color: strokeColor,
             fill: true,
             stroke: true,
@@ -85,8 +84,7 @@ export const computeColorsMap = (object: fabric.Object): SvgShapeColorsMap => {
     })
   } else {
     colorEntries.push({
-      fabricItems:
-        object instanceof fabric.Group ? object.getObjects() : [object],
+      objs: object instanceof fabric.Group ? object.getObjects() : [object],
       color: '#333',
       stroke: true,
       fill: true,
@@ -104,7 +102,7 @@ export const computeColorsMap = (object: fabric.Object): SvgShapeColorsMap => {
       fill: ce.fill,
       stroke: ce.stroke,
       color: ce.color,
-      fabricItems: flatten(ceGroup.map((ce) => ce.fabricItems)),
+      objs: flatten(ceGroup.map((ce) => ce.objs)),
     } as SvgShapeColorsMapEntry
   })
 
@@ -114,6 +112,5 @@ export const computeColorsMap = (object: fabric.Object): SvgShapeColorsMap => {
     (ce) => -(10 * (ce.fill ? 1 : 0) + (ce.stroke ? 1 : 0))
   )
 
-  const colorsMap: SvgShapeColorsMap = { colors: colorEntries }
-  return colorsMap
+  return colorEntries
 }

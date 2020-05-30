@@ -19,6 +19,7 @@ import {
   objAsCanvasElement,
 } from 'components/Editor/lib/fabric-utils'
 import { Font } from 'components/Editor/lib/generator'
+import { Shape } from 'components/Editor/shape'
 import {
   ShapeConf,
   ShapeId,
@@ -26,20 +27,30 @@ import {
   ShapeTextConf,
 } from 'components/Editor/shape-config'
 import {
+  getAnglesForPreset,
   mkBgConfFromOptions,
   mkShapeConfFromOptions,
 } from 'components/Editor/style'
-import { WordListEntry } from 'components/Editor/style-options'
+import {
+  BgFill,
+  BgStyleOptions,
+  ItemsColoringColorConf,
+  ItemsColoringGradientConf,
+  ItemsColoringShapeConf,
+  ShapeStyleOptions,
+  WordListEntry,
+} from 'components/Editor/style-options'
 import { FontConfig, FontId, fonts, FontStyleConfig } from 'data/fonts'
 import { shapes } from 'data/shapes'
 import { loadFont } from 'lib/wordart/fonts'
 import { sortBy, uniq, uniqBy } from 'lodash'
-import { action, observable, set, toJS } from 'mobx'
+import { action, observable, set } from 'mobx'
 import paper from 'paper'
 import {
   MatrixSerialized,
   PersistedItemV1,
   PersistedItemWordV1,
+  PersistedShapeConfV1,
   PersistedWordV1,
 } from 'services/api/persisted/v1'
 import { EditorPersistedData } from 'services/api/types'
@@ -48,6 +59,7 @@ import { consoleLoggers } from 'utils/console-logger'
 import { UninqIdGenerator as UniqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
+import { exhaustiveCheck } from 'utils/type-utils'
 
 export type EditorMode = 'view' | 'edit items'
 
@@ -215,33 +227,49 @@ export class EditorStore {
       serialized.data.sceneSize.w / serialized.data.sceneSize.h
     )
 
-    if (data.shape.kind === 'custom' && data.shape.custom) {
+    if (data.shape.kind === 'custom-raster') {
       const customImgId = this.addCustomShapeImg({
         kind: 'raster',
         title: 'Custom',
-        url: data.shape.custom.url,
+        url: data.shape.url,
         isCustom: true,
-        thumbnailUrl: undefined,
-        processing: data.shape.custom.processing,
+        thumbnailUrl: data.shape.url,
+        processing: data.shape.processing,
       })
       await this.selectShape(customImgId)
-    } else if (data.shape.kind === 'builtin' && data.shape.shapeId != null) {
+    } else if (data.shape.kind === 'custom-text') {
+      const customImgId = this.addCustomShapeText({
+        kind: 'text',
+        title: 'Custom',
+        isCustom: true,
+        thumbnailUrl: '', // TODO
+        text: data.shape.text,
+        textStyle: data.shape.textStyle,
+      })
+      await this.selectShape(customImgId)
+    } else if (
+      (data.shape.kind === 'raster' || data.shape.kind === 'svg') &&
+      data.shape.shapeId != null
+    ) {
       await this.selectShape(data.shape.shapeId)
     }
 
     this.updateShapeThumbnail()
 
-    const { shape, shapeOriginalColors } = this.editor.fabricObjects
-    if (data.shape.transform && shape && shapeOriginalColors) {
-      applyTransformToObj(shape, data.shape.transform)
-      applyTransformToObj(shapeOriginalColors, data.shape.transform)
+    const shape = this.editor.shape
+    if (data.shape.transform && shape) {
+      applyTransformToObj(shape.obj, data.shape.transform)
+      if (shape.kind === 'svg') {
+        applyTransformToObj(shape.objOriginalColors, data.shape.transform)
+      }
     }
 
     const sceneSize = this.editor.getSceneBounds(0)
     const scale = sceneSize.width / serialized.data.sceneSize.w
 
-    this.styleOptions.shape = data.shapeStyle
-    this.styleOptions.bg = data.bgStyle
+    // TODO
+    // this.styleOptions.shape = data.shapeStyle
+    // this.styleOptions.bg = data.bgStyle
 
     const deserializeItems = async ({
       items,
@@ -314,26 +342,27 @@ export class EditorStore {
 
     const [shapeItems, bgItems] = await Promise.all([
       deserializeItems({
-        items: data.generated.shape.items,
-        fontIds: data.generated.shape.fontIds,
-        words: data.generated.shape.words,
+        items: data.shapeItems.items,
+        fontIds: data.shapeItems.fontIds,
+        words: data.shapeItems.words,
       }),
       deserializeItems({
-        items: data.generated.bg.items,
-        fontIds: data.generated.bg.fontIds,
-        words: data.generated.bg.words,
+        items: data.bgItems.items,
+        fontIds: data.bgItems.fontIds,
+        words: data.bgItems.words,
       }),
     ])
     await this.editor.setShapeItems(shapeItems)
     await this.editor.setBgItems(bgItems)
 
     this.editor.setBgColor(mkBgConfFromOptions(this.styleOptions.bg).fill)
-    await this.editor.setShapeFillColors(this.styleOptions.shape)
+    const shapeConf = this.getShapeConfById(this.selectedShapeId)!
+    await this.editor.updateShapeColors(shapeConf)
     // await this.editor.setShapeItemsColor(
     //   getItemsColoring(this.styleOptions.bg)
     // )
-    await this.editor.setShapeItemsColor(
-      mkShapeConfFromOptions(this.styleOptions.shape).items.coloring
+    await this.editor.setShapeItemsStyle(
+      mkShapeConfFromOptions(this.styleOptions.shape).items
     )
   }
 
@@ -438,43 +467,144 @@ export class EditorStore {
       }
     }
 
-    const shapeTransform = (
-      this.editor.fabricObjects.shape?.calcTransformMatrix() || []
-    ).map((n: number) => roundFloat(n, 3)) as MatrixSerialized
+    const serializeShape = (shape: Shape): PersistedShapeConfV1 => {
+      const transform = (
+        this.getShape()?.obj.calcTransformMatrix() || []
+      ).map((n: number) => roundFloat(n, 3)) as MatrixSerialized
+
+      if (shape.kind === 'raster') {
+        if (shape.isCustom) {
+          return {
+            kind: 'custom-raster',
+            transform,
+            url: shape.url,
+            processing: shape.processing || {},
+          }
+        } else {
+          return {
+            kind: 'raster',
+            transform,
+            shapeId: shape.id,
+            processing: shape.processing || {},
+          }
+        }
+      } else if (shape.kind === 'svg') {
+        if (shape.isCustom) {
+          return {
+            kind: 'custom-svg',
+            transform,
+            url: shape.url,
+            processing: shape.processing || {},
+          }
+        } else {
+          return {
+            kind: 'svg',
+            transform,
+            shapeId: shape.id,
+            processing: shape.processing || {},
+          }
+        }
+      } else if (shape.kind === 'text') {
+        return {
+          kind: 'custom-text',
+          text: shape.text,
+          textStyle: shape.textStyle,
+          transform,
+        }
+      } else {
+        exhaustiveCheck(shape)
+      }
+    }
+
+    const serializeShapeItemsColoring = (
+      coloring: ShapeStyleOptions['items']['coloring']
+    ):
+      | ItemsColoringColorConf
+      | ItemsColoringGradientConf
+      | ItemsColoringShapeConf => {
+      if (coloring.kind === 'color') {
+        return coloring.color
+      }
+      if (coloring.kind === 'gradient') {
+        return coloring.gradient
+      }
+      if (coloring.kind === 'shape') {
+        return coloring.shape
+      }
+      exhaustiveCheck(coloring.kind)
+    }
+
+    const serializeBgItemsColoring = (
+      coloring: BgStyleOptions['items']['coloring']
+    ): ItemsColoringColorConf | ItemsColoringGradientConf => {
+      if (coloring.kind === 'color') {
+        return coloring.color
+      }
+      if (coloring.kind === 'gradient') {
+        return coloring.gradient
+      }
+
+      exhaustiveCheck(coloring.kind)
+    }
+
+    const serializeBgFill = (fill: BgStyleOptions['fill']): BgFill => {
+      if (fill.kind === 'color') {
+        return fill.color
+      }
+      if (fill.kind === 'transparent') {
+        return { kind: 'transparent' }
+      }
+      exhaustiveCheck(fill.kind)
+    }
 
     const serializedData: EditorPersistedData = {
       version: 1,
       data: {
-        editor: {
-          sceneSize: {
-            w: roundFloat(this.editor.getSceneBounds(0).width, 3),
-            h: roundFloat(this.editor.getSceneBounds(0).height, 3),
-          },
-          bg: {
-            style: toJS(this.styleOptions.bg, { recurseEverything: true }),
-          },
-          shape: {
-            transform: shapeTransform || null,
-            shapeId: this.editor.currentShapeInfo?.shapeConfig.id || null,
-            style: toJS(this.styleOptions.shape, { recurseEverything: true }),
-            kind: this.editor.currentShapeInfo?.shapeConfig
-              ? this.editor.currentShapeInfo.shapeConfig.isCustom
-                ? 'custom'
-                : 'builtin'
-              : 'empty',
-            custom: this.editor.currentShapeInfo?.shapeConfig.isCustom
-              ? {
-                  url: this.editor.currentShapeInfo.shapeConfig.url,
-                  processing: this.editor.currentShapeInfo.shapeConfig
-                    .processing,
-                }
-              : null,
+        sceneSize: {
+          w: roundFloat(this.editor.getSceneBounds(0).width, 3),
+          h: roundFloat(this.editor.getSceneBounds(0).height, 3),
+        },
+        shapeStyle: {
+          opacity: this.styleOptions.shape.opacity,
+          items: {
+            ...this.styleOptions.shape.items,
+            coloring: serializeShapeItemsColoring(
+              this.styleOptions.shape.items.coloring
+            ),
+            words: {
+              angles:
+                this.styleOptions.shape.items.words.anglesPreset === 'custom'
+                  ? this.styleOptions.shape.items.words.customAngles
+                  : getAnglesForPreset(
+                      this.styleOptions.shape.items.words.anglesPreset
+                    ),
+              fontIds: this.styleOptions.shape.items.words.fontIds,
+              wordList: this.styleOptions.shape.items.words.wordList,
+            },
           },
         },
-        generated: {
-          bg: serializeItems(this.editor.getItemsSorted('bg')),
-          shape: serializeItems(this.editor.getItemsSorted('shape')),
+        bgStyle: {
+          items: {
+            ...this.styleOptions.bg.items,
+            coloring: serializeBgItemsColoring(
+              this.styleOptions.bg.items.coloring
+            ),
+            words: {
+              angles:
+                this.styleOptions.shape.items.words.anglesPreset === 'custom'
+                  ? this.styleOptions.shape.items.words.customAngles
+                  : getAnglesForPreset(
+                      this.styleOptions.shape.items.words.anglesPreset
+                    ),
+              fontIds: this.styleOptions.shape.items.words.fontIds,
+              wordList: this.styleOptions.shape.items.words.wordList,
+            },
+          },
+          fill: serializeBgFill(this.styleOptions.bg.fill),
         },
+        shape: serializeShape(this.getShape()!),
+        bgItems: serializeItems(this.editor.getItemsSorted('bg')),
+        shapeItems: serializeItems(this.editor.getItemsSorted('shape')),
       },
     }
 
@@ -513,8 +643,10 @@ export class EditorStore {
       (s) => (s.isCustom ? -1 : 1),
       (s) => s.title
     )
-  getShapeById = (shapeId: ShapeId): ShapeConf | undefined =>
+  getShapeConfById = (shapeId: ShapeId): ShapeConf | undefined =>
     this.availableShapes.find((s) => s.id === shapeId)
+  getShape = (): Shape | undefined => this.editor?.shape || undefined
+  getShapeConf = (): ShapeConf | undefined => this.getShape()?.config
 
   getAvailableFonts = (): { font: FontConfig; style: FontStyleConfig }[] => {
     const result: { font: FontConfig; style: FontStyleConfig }[] = []
@@ -551,7 +683,7 @@ export class EditorStore {
     }
 
     this.selectedShapeId = shapeId
-    const shape = this.getShapeById(shapeId)!
+    const shape = this.getShapeConfById(shapeId)!
 
     await this.editor.setShape({
       shapeConfig: shape,
@@ -566,7 +698,7 @@ export class EditorStore {
       return
     }
 
-    const shape = this.getShapeById(this.selectedShapeId)!
+    const shape = this.getShapeConfById(this.selectedShapeId)!
     await this.editor.setShape({
       shapeConfig: shape,
       bgFillStyle: mkBgConfFromOptions(this.styleOptions.bg).fill,
@@ -574,8 +706,8 @@ export class EditorStore {
       clear: false,
     })
     if (this.styleOptions.shape.items.coloring.kind === 'shape') {
-      await this.editor.setShapeItemsColor(
-        mkShapeConfFromOptions(this.styleOptions.shape).items.coloring
+      await this.editor.setShapeItemsStyle(
+        mkShapeConfFromOptions(this.styleOptions.shape).items
       )
     }
   }

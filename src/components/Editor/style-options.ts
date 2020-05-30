@@ -32,6 +32,7 @@ export type BgStyleOptions = {
 
 /** UI state for shape style options */
 export type ShapeStyleOptions = {
+  opacity: number
   items: {
     words: WordItemsOptions
     icons: IconItemsOptions
@@ -87,7 +88,7 @@ export type ItemsColoringShapeConf = {
 export type WordItemsOptions = {
   wordList: WordListEntry[]
   fontIds: FontId[]
-  preset: WordAnglesPresetKind
+  anglesPreset: WordAnglesPresetKind
   customAngles: number[]
 }
 

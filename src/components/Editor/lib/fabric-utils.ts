@@ -29,11 +29,28 @@ export const applyTransformToObj = (
   shape.setCoords()
 }
 
-export const cloneObj = (obj: fabric.Object) =>
-  new Promise<fabric.Object>((r) => obj!.clone((obj: fabric.Object) => r(obj)))
+export const loadObjFromImg = (url: string) =>
+  new Promise<fabric.Image>((resolve) =>
+    fabric.Image.fromURL(url, (oImg) => {
+      resolve(oImg)
+    })
+  )
+
+export const loadObjFromSvg = (url: string) =>
+  new Promise<fabric.Object>((resolve) =>
+    fabric.loadSVGFromURL(url, (objects, options) => {
+      var obj = fabric.util.groupSVGElements(objects, options)
+      resolve(obj)
+    })
+  )
+
+export const cloneObj = (obj: fabric.Object, attrs: string[] = ['id']) =>
+  new Promise<fabric.Object>((r) =>
+    obj!.clone((obj: fabric.Object) => r(obj), attrs)
+  )
 
 export const cloneObjAsImage = (obj: fabric.Object) =>
-  new Promise<fabric.Object>((r) =>
+  new Promise<fabric.Image>((r) =>
     obj!.cloneAsImage((obj: fabric.Object) => r(obj as fabric.Image))
   )
 
