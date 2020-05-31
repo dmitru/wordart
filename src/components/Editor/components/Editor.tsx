@@ -80,9 +80,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         }
         setIsSaving(true)
         const thumbnail = store.editor.canvas.toDataURL({
-          multiplier: 0.3,
+          multiplier: 0.25,
           format: 'jpeg',
-          quality: 0.8,
+          quality: 0.85,
         })
         const editorData = store.serialize()
 

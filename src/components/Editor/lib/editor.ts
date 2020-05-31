@@ -32,6 +32,8 @@ import {
   canvasToImgElement,
   createCanvas,
   processRasterImg,
+  copyCanvas,
+  createCanvasCtxCopy,
 } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { flatten, groupBy, keyBy, max, min, sortBy } from 'lodash'
@@ -856,36 +858,49 @@ export class Editor {
     const shapeImage = await cloneObjAsImage(shapeClone)
 
     const shapeCanvas = objAsCanvasElement(shapeImage)
-    const shapeCanvasOriginalColors = objAsCanvasElement(shapeOriginalColorsObj)
 
-    let canvasSubtract: HTMLCanvasElement | undefined
-    const lockedItems = this.getItemsSorted('shape').filter((i) => i.locked)
-    if (lockedItems.length > 0) {
-      canvasSubtract = createCanvas({
-        w: shapeCanvas.width,
-        h: shapeCanvas.height,
-      })
-      const ctx = canvasSubtract.getContext('2d')!
-      for (const item of lockedItems) {
-        ctx.save()
-        ctx.translate(
-          -shapeObj.getBoundingRect(true).left || 0,
-          -shapeObj.getBoundingRect(true).top || 0
-        )
-        const saved = item.isShowingLockBorder
-        item.setLockBorderVisibility(false)
-        item.fabricObj.drawObject(ctx)
-        item.setLockBorderVisibility(saved)
-        ctx.restore()
-      }
-    }
+    const sceneBounds = this.getSceneBounds(0)
+    const sceneCanvas = createCanvas({
+      w: sceneBounds.width,
+      h: sceneBounds.height,
+    })
 
-    const shapeRasterBounds = new paper.Rectangle(
-      shapeObj.getBoundingRect(true).left || 0,
-      shapeObj.getBoundingRect(true).top || 0,
-      shapeCanvas.width,
-      shapeCanvas.height
+    sceneCanvas
+      .getContext('2d')!
+      .drawImage(
+        shapeCanvas,
+        shapeObj.getBoundingRect(true).left,
+        shapeObj.getBoundingRect(true).top
+      )
+
+    const sceneCanvasOriginalColors = createCanvasCtxCopy(
+      sceneCanvas.getContext('2d')!
     )
+    copyCanvas(sceneCanvas.getContext('2d')!, sceneCanvasOriginalColors)
+
+    // TODO
+    // let canvasSubtract: HTMLCanvasElement | undefined
+    // const lockedItems = this.getItemsSorted('shape').filter((i) => i.locked)
+    // if (lockedItems.length > 0) {
+    //   canvasSubtract = createCanvas({
+    //     w: shapeCanvas.width,
+    //     h: shapeCanvas.height,
+    //   })
+    //   const ctx = canvasSubtract.getContext('2d')!
+    //   for (const item of lockedItems) {
+    //     ctx.save()
+    //     ctx.translate(
+    //       -shapeObj.getBoundingRect(true).left || 0,
+    //       -shapeObj.getBoundingRect(true).top || 0
+    //     )
+    //     const saved = item.isShowingLockBorder
+    //     item.setLockBorderVisibility(false)
+    //     item.fabricObj.drawObject(ctx)
+    //     item.setLockBorderVisibility(saved)
+    //     ctx.restore()
+    //   }
+    // }
+
     // shapeRaster = undefined
     const wordFonts: Font[] = await this.fetchFonts(style.items.words.fontIds)
 
@@ -897,10 +912,10 @@ export class Editor {
     const result = await this.generator.fillShape(
       {
         shape: {
-          canvas: shapeCanvas,
-          canvasSubtract,
-          shapeCanvasOriginalColors,
-          bounds: shapeRasterBounds,
+          canvas: sceneCanvas,
+          // canvasSubtract,
+          shapeCanvasOriginalColors: sceneCanvasOriginalColors.canvas,
+          bounds: sceneBounds,
           processing: {
             removeWhiteBg: {
               enabled: shapeConfig.kind === 'raster',

@@ -60,7 +60,7 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
             0 0px 10px -5px rgba(0, 0, 0, 0.06);
 
           img {
-            transform: scale(1.1);
+            transform: scale(1.2) rotate(-5deg);
           }
         }
       `}

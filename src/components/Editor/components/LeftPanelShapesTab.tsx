@@ -418,10 +418,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               value={shape.config.textStyle.color}
                               onChange={async (color) => {
                                 shape.config.textStyle.color = color
-                                await store.editor?.updateShapeColors(
-                                  shape.config
-                                )
-                                store.updateShapeThumbnail()
+                                updateShapeColoring()
                               }}
                             />
                           </Stack>
