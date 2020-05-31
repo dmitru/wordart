@@ -49,7 +49,10 @@ import { WordcloudId } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { ColorPicker } from 'components/shared/ColorPicker'
-import { mkShapeConfFromOptions } from 'components/Editor/style'
+import {
+  mkShapeConfFromOptions,
+  mkBgConfFromOptions,
+} from 'components/Editor/style'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -423,9 +426,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       style: mkShapeConfFromOptions(store.styleOptions.shape),
                     })
                   } else {
-                    // store.editor?.generateBgItems({
-                    //   style: store.styleOptions.bg,
-                    // })
+                    store.editor?.generateBgItems({
+                      style: mkBgConfFromOptions(store.styleOptions.bg),
+                    })
                   }
                 }}
               >

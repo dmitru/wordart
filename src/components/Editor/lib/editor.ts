@@ -202,10 +202,12 @@ export class Editor {
 
     this.items = {
       shape: {
+        items: [],
         itemsById: new Map(),
         fabricObjToItem: new Map(),
       },
       bg: {
+        items: [],
         itemsById: new Map(),
         fabricObjToItem: new Map(),
       },
@@ -409,6 +411,10 @@ export class Editor {
     }
     this.shape.obj.set({ opacity })
     this.canvas.requestRenderAll()
+  }
+
+  setBgItemsStyle = async (itemsStyleConf: BgStyleConf['items']) => {
+    // ...
   }
 
   setShapeItemsStyle = async (itemsStyleConf: ShapeStyleConf['items']) => {
@@ -719,10 +725,6 @@ export class Editor {
       height: this.projectBounds.height - pad * 2,
     })
 
-  setBgItems = async (items: EditorItemConfig[]) => {
-    return
-  }
-
   /** Returns list of items in paint order (order: bottom to front) */
   getItemsSorted = (target: TargetKind): EditorItem[] => {
     const fabricObjToItem =
@@ -773,6 +775,17 @@ export class Editor {
   }
 
   setShapeItems = async (itemConfigs: EditorItemConfig[]) => {
+    this.setItems('shape', itemConfigs)
+  }
+
+  setBgItems = async (itemConfigs: EditorItemConfig[]) => {
+    this.setItems('bg', itemConfigs)
+  }
+
+  private setItems = async (
+    target: TargetKind,
+    itemConfigs: EditorItemConfig[]
+  ) => {
     if (!this.shape?.obj) {
       console.error('No shape')
       return
@@ -783,10 +796,10 @@ export class Editor {
       fabricObjToItem,
     } = await this.convertToEditorItems(itemConfigs)
 
-    const oldItemsToDelete = [...this.items.shape.itemsById.values()].filter(
+    const oldItemsToDelete = [...this.items[target].itemsById.values()].filter(
       (item) => !item.locked
     )
-    const oldItemsToKeep = [...this.items.shape.itemsById.values()].filter(
+    const oldItemsToKeep = [...this.items[target].itemsById.values()].filter(
       (item) => item.locked
     )
 
@@ -808,7 +821,7 @@ export class Editor {
     this.canvas.add(...objs)
     this.canvas.requestRenderAll()
 
-    this.items.shape = {
+    this.items[target] = {
       items,
       itemsById,
       fabricObjToItem,
@@ -816,7 +829,175 @@ export class Editor {
   }
 
   generateBgItems = async (params: { style: BgStyleConf }) => {
-    return
+    const { style } = params
+    const { coloring } = style.items
+    this.logger.debug('generateBgItems')
+    if (!this.shape?.obj) {
+      console.error('No shape obj')
+      return
+    }
+    const shapeObj = this.shape.obj
+    const shapeOriginalColorsObj =
+      this.shape.kind === 'svg' ? this.shape.objOriginalColors : this.shape.obj
+    if (!shapeOriginalColorsObj) {
+      console.error('No shapeOriginalColorsObj')
+      return
+    }
+
+    this.store.visualizingProgress = 0
+    this.store.isVisualizing = true
+    for (let i = 0; i < 10; ++i) {
+      await waitAnimationFrame()
+    }
+    await this.generator.init()
+
+    const shapeClone = await cloneObj(shapeObj)
+    shapeClone.set({ opacity: 1 })
+    const shapeImage = await cloneObjAsImage(shapeClone)
+
+    const shapeCanvas = objAsCanvasElement(shapeImage)
+    const shapeCanvasOriginalColors = objAsCanvasElement(shapeOriginalColorsObj)
+
+    let canvasSubtract: HTMLCanvasElement | undefined
+    const lockedItems = this.getItemsSorted('shape').filter((i) => i.locked)
+    if (lockedItems.length > 0) {
+      canvasSubtract = createCanvas({
+        w: shapeCanvas.width,
+        h: shapeCanvas.height,
+      })
+      const ctx = canvasSubtract.getContext('2d')!
+      for (const item of lockedItems) {
+        ctx.save()
+        ctx.translate(
+          -shapeObj.getBoundingRect(true).left || 0,
+          -shapeObj.getBoundingRect(true).top || 0
+        )
+        const saved = item.isShowingLockBorder
+        item.setLockBorderVisibility(false)
+        item.fabricObj.drawObject(ctx)
+        item.setLockBorderVisibility(saved)
+        ctx.restore()
+      }
+    }
+
+    const shapeRasterBounds = new paper.Rectangle(
+      shapeObj.getBoundingRect(true).left || 0,
+      shapeObj.getBoundingRect(true).top || 0,
+      shapeCanvas.width,
+      shapeCanvas.height
+    )
+    // shapeRaster = undefined
+    const wordFonts: Font[] = await this.fetchFonts(style.items.words.fontIds)
+
+    const shapeConfig = this.store.getSelectedShapeConf()
+    const wordConfigsById = keyBy(style.items.words.wordList, 'id')
+
+    let addedFirstBatch = false
+
+    const result = await this.generator.fillShape(
+      {
+        shape: {
+          canvas: shapeCanvas,
+          canvasSubtract,
+          shapeCanvasOriginalColors,
+          bounds: shapeRasterBounds,
+          processing: {
+            removeWhiteBg: {
+              enabled: shapeConfig.kind === 'raster',
+              lightnessThreshold: 98,
+            },
+            shrink: {
+              enabled: style.items.placement.shapePadding > 0,
+              amount: style.items.placement.shapePadding,
+            },
+            edges: {
+              enabled:
+                this.shape.kind === 'raster' || this.shape.kind === 'svg'
+                  ? this.shape.config.processing?.edges != null
+                  : false,
+              blur:
+                17 *
+                (1 -
+                  ((this.shape.kind === 'raster' ||
+                    this.shape.kind === 'svg') &&
+                  this.shape.config.processing?.edges
+                    ? this.shape.config.processing?.edges.amount
+                    : 0) /
+                    100),
+              lowThreshold: 30,
+              highThreshold: 100,
+            },
+            invert: {
+              enabled: true,
+            },
+          },
+        },
+        itemPadding: Math.max(1, 100 - style.items.placement.itemDensity),
+        // Words
+        wordsMaxSize: style.items.placement.wordsMaxSize,
+        words: style.items.words.wordList.map((wc) => ({
+          wordConfigId: wc.id,
+          text: wc.text,
+          angles: style.items.words.angles,
+          fillColors: ['red'],
+          // fonts: [fonts[0], fonts[1], fonts[2]],
+          fonts: wordFonts,
+        })),
+        // Icons
+        icons: style.items.icons.iconList.map((shape) => ({
+          shape: this.store.getShapeConfById(shape.shapeId)!,
+        })),
+        iconsMaxSize: style.items.placement.iconsMaxSize,
+        iconProbability: style.items.placement.iconsProportion / 100,
+      },
+      async (batch, progressPercent) => {
+        // if (!addedFirstBatch) {
+        //   await this.deleteNonLockedShapeItems()
+        //   addedFirstBatch = true
+        // }
+        // const items: EditorItemConfig[] = []
+
+        // for (const genItem of batch) {
+        //   if (genItem.kind === 'word') {
+        //     const wordConfig = wordConfigsById[genItem.wordConfigId]
+        //     items.push({
+        //       ...genItem,
+        //       color: 'black',
+        //       locked: false,
+        //       text: wordConfig.text,
+        //       customColor: wordConfig.color,
+        //     })
+        //   }
+        // }
+        // await this.addShapeItems(items)
+        // console.log(
+        //   'this.store.visualizingProgress=',
+        //   this.store.visualizingProgress
+        // )
+        this.store.visualizingProgress = progressPercent
+        // await this.setShapeItemsStyle(style.items)
+        await waitAnimationFrame()
+      }
+    )
+
+    const items: EditorItemConfig[] = []
+
+    for (const genItem of result.generatedItems) {
+      if (genItem.kind === 'word') {
+        const wordConfig = wordConfigsById[genItem.wordConfigId]
+        items.push({
+          ...genItem,
+          color: 'black',
+          locked: false,
+          text: wordConfig.text,
+          customColor: wordConfig.color,
+        })
+      }
+    }
+
+    await this.setBgItems(items)
+    await this.setBgItemsStyle(style.items)
+    this.store.isVisualizing = false
   }
 
   generateShapeItems = async (params: { style: ShapeStyleConf }) => {
@@ -997,8 +1178,11 @@ export class Editor {
 
     this.shape = null
 
+    this.items.bg.items = []
     this.items.bg.fabricObjToItem.clear()
     this.items.bg.itemsById.clear()
+
+    this.items.shape.items = []
     this.items.shape.fabricObjToItem.clear()
     this.items.shape.itemsById.clear()
   }
