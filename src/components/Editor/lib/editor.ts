@@ -1289,7 +1289,10 @@ export class Editor {
     await this.fetchFonts(uniqFontIds)
 
     // Process all fonts...
-    for (const itemConfig of allWordItems) {
+    for (const [index, itemConfig] of allWordItems.entries()) {
+      if (index % 200 === 0) {
+        await waitAnimationFrame()
+      }
       // Process all glyphs...
       // const uniqGlyphs = [
       //   ...new Set(
@@ -1314,7 +1317,7 @@ export class Editor {
 
       // Process items...
 
-      // TODO: optimize it with glyph-based paths
+      // TODO: optimize it with glyph-based paths, also pre-compute all Fabric Paths
 
       const fontInfo = this.fontsInfo.get(itemConfig.fontId)!
       const item = new EditorItemWord(
