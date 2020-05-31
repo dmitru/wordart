@@ -16,6 +16,398 @@
   }
   
   export const fonts: FontConfig[] = [{
+  "title": "Calligraffitti",
+  "categories": [
+    "handwriting"
+  ],
+  "styles": [
+    {
+      "fontId": "Calligraffitti:regular",
+      "title": "regular",
+      "thumbnail": "/images/fonts/calligraffitti:regular.png",
+      "url": "/fonts/calligraffitti-v11-latin-regular.ttf",
+      "glyphRanges": [
+        [
+          32,
+          126
+        ],
+        [
+          160,
+          255
+        ],
+        [
+          305,
+          305
+        ],
+        [
+          338,
+          339
+        ],
+        [
+          710,
+          710
+        ],
+        [
+          730,
+          730
+        ],
+        [
+          732,
+          732
+        ],
+        [
+          8211,
+          8212
+        ],
+        [
+          8216,
+          8218
+        ],
+        [
+          8220,
+          8222
+        ],
+        [
+          8226,
+          8226
+        ],
+        [
+          8230,
+          8230
+        ],
+        [
+          8249,
+          8250
+        ],
+        [
+          8260,
+          8260
+        ],
+        [
+          8364,
+          8364
+        ],
+        [
+          8722,
+          8722
+        ]
+      ]
+    }
+  ]
+},
+{
+  "title": "Euphoria Script",
+  "categories": [
+    "handwriting"
+  ],
+  "styles": [
+    {
+      "fontId": "Euphoria Script:regular",
+      "title": "regular",
+      "thumbnail": "/images/fonts/euphoria-script:regular.png",
+      "url": "/fonts/euphoria-script-v8-latin-ext_latin-regular.ttf",
+      "glyphRanges": [
+        [
+          32,
+          126
+        ],
+        [
+          161,
+          174
+        ],
+        [
+          176,
+          255
+        ],
+        [
+          338,
+          339
+        ],
+        [
+          352,
+          353
+        ],
+        [
+          376,
+          376
+        ],
+        [
+          381,
+          382
+        ],
+        [
+          402,
+          402
+        ],
+        [
+          710,
+          710
+        ],
+        [
+          732,
+          732
+        ],
+        [
+          8211,
+          8212
+        ],
+        [
+          8216,
+          8218
+        ],
+        [
+          8220,
+          8222
+        ],
+        [
+          8224,
+          8224
+        ],
+        [
+          8226,
+          8226
+        ],
+        [
+          8230,
+          8230
+        ],
+        [
+          8249,
+          8250
+        ],
+        [
+          8364,
+          8364
+        ],
+        [
+          8482,
+          8482
+        ]
+      ]
+    }
+  ]
+},
+{
+  "title": "Kaushan Script",
+  "categories": [
+    "handwriting"
+  ],
+  "styles": [
+    {
+      "fontId": "Kaushan Script:regular",
+      "title": "regular",
+      "thumbnail": "/images/fonts/kaushan-script:regular.png",
+      "url": "/fonts/kaushan-script-v8-latin-ext_latin-regular.ttf",
+      "glyphRanges": [
+        [
+          13,
+          13
+        ],
+        [
+          32,
+          126
+        ],
+        [
+          160,
+          382
+        ],
+        [
+          399,
+          399
+        ],
+        [
+          402,
+          402
+        ],
+        [
+          490,
+          491
+        ],
+        [
+          506,
+          511
+        ],
+        [
+          536,
+          539
+        ],
+        [
+          567,
+          567
+        ],
+        [
+          601,
+          601
+        ],
+        [
+          700,
+          700
+        ],
+        [
+          710,
+          710
+        ],
+        [
+          730,
+          730
+        ],
+        [
+          732,
+          732
+        ],
+        [
+          7748,
+          7749
+        ],
+        [
+          7808,
+          7813
+        ],
+        [
+          7922,
+          7923
+        ],
+        [
+          7928,
+          7929
+        ],
+        [
+          8211,
+          8212
+        ],
+        [
+          8216,
+          8218
+        ],
+        [
+          8220,
+          8222
+        ],
+        [
+          8224,
+          8224
+        ],
+        [
+          8226,
+          8226
+        ],
+        [
+          8230,
+          8230
+        ],
+        [
+          8249,
+          8250
+        ],
+        [
+          8260,
+          8260
+        ],
+        [
+          8308,
+          8308
+        ],
+        [
+          8364,
+          8364
+        ],
+        [
+          8482,
+          8482
+        ],
+        [
+          8722,
+          8722
+        ],
+        [
+          8725,
+          8725
+        ]
+      ]
+    }
+  ]
+},
+{
+  "title": "Mountains of Christmas",
+  "categories": [
+    "display"
+  ],
+  "styles": [
+    {
+      "fontId": "Mountains of Christmas:bold",
+      "title": "bold",
+      "thumbnail": "/images/fonts/mountains-of christmas:bold.png",
+      "url": "/fonts/mountains-of-christmas-v12-latin-700.ttf",
+      "glyphRanges": [
+        [
+          32,
+          126
+        ],
+        [
+          160,
+          255
+        ],
+        [
+          305,
+          305
+        ],
+        [
+          338,
+          339
+        ],
+        [
+          710,
+          710
+        ],
+        [
+          730,
+          730
+        ],
+        [
+          732,
+          732
+        ],
+        [
+          8211,
+          8212
+        ],
+        [
+          8216,
+          8218
+        ],
+        [
+          8220,
+          8222
+        ],
+        [
+          8226,
+          8226
+        ],
+        [
+          8230,
+          8230
+        ],
+        [
+          8249,
+          8250
+        ],
+        [
+          8260,
+          8260
+        ],
+        [
+          8364,
+          8364
+        ],
+        [
+          8722,
+          8722
+        ]
+      ]
+    }
+  ]
+},
+{
   "title": "Akronim",
   "categories": [
     "display"

@@ -1,5 +1,45 @@
 module.exports = [
   {
+    title: 'Calligraffitti',
+    categories: ['handwriting'],
+    styles: [
+      {
+        title: 'regular',
+        file: 'calligraffitti-v11-latin-regular.ttf',
+      },
+    ],
+  },
+  {
+    title: 'Euphoria Script',
+    categories: ['handwriting'],
+    styles: [
+      {
+        title: 'regular',
+        file: 'euphoria-script-v8-latin-ext_latin-regular.ttf',
+      },
+    ],
+  },
+  {
+    title: 'Kaushan Script',
+    categories: ['handwriting'],
+    styles: [
+      {
+        title: 'regular',
+        file: 'kaushan-script-v8-latin-ext_latin-regular.ttf',
+      },
+    ],
+  },
+  {
+    title: 'Mountains of Christmas',
+    categories: ['display'],
+    styles: [
+      {
+        title: 'bold',
+        file: 'mountains-of-christmas-v12-latin-700.ttf',
+      },
+    ],
+  },
+  {
     title: 'Akronim',
     categories: ['display'],
     styles: [
