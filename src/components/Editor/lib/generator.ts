@@ -49,7 +49,10 @@ export class Generator {
 
   fillShape = async (
     task: FillShapeTask,
-    onProgressCallback: (progress: number) => void = noop
+    onProgressCallback?: (
+      batch: GeneratedItem[],
+      progress: number
+    ) => Promise<void>
   ): Promise<FillShapeTaskResult> => {
     if (!this.wasm) {
       throw new Error('call init() first')
@@ -57,10 +60,12 @@ export class Generator {
     this.logger.debug('Generator: generate', task)
 
     const shapeCanvasMaxExtent = 280
+    const batchSize = 50
+    const nIter = 700
 
     const shapeCanvas = task.shape.canvas
     const shapeCanvasOriginalColors = task.shape.shapeCanvasOriginalColors
-    console.screenshot(shapeCanvas, 0.3)
+    // console.screenshot(shapeCanvas, 0.3)
     const shapeCanvasScale =
       shapeCanvasMaxExtent / Math.max(shapeCanvas.width, shapeCanvas.height)
 
@@ -243,10 +248,9 @@ export class Generator {
       wordPath.getBoundingBox()
     )
 
-    const placedWordItems: WordGeneratedItem[] = []
-    const placedSymbolItems: SymbolGeneratedItem[] = []
+    const generatedItems: GeneratedItem[] = []
+    let currentBatch: GeneratedItem[] = []
 
-    const nIter = 100
     const t1 = performance.now()
 
     const wordAngles = uniq(flatten(task.words.map((w) => w.angles)))
@@ -512,8 +516,7 @@ export class Generator {
           const shapeColor = chroma.rgb(r, g, b).hex()
 
           wordPath.draw(unrotatedCtx)
-
-          placedWordItems.push({
+          const item: WordGeneratedItem = {
             index: i,
             kind: 'word',
             shapeColor,
@@ -534,7 +537,10 @@ export class Generator {
                 wordPathBounds.x1 + 0.5 * wordPathSize.w,
                 wordPathBounds.y1 + wordPathSize.h * 0.5
               ),
-          })
+          }
+
+          currentBatch.push(item)
+          generatedItems.push(item)
         } else {
           unrotatedCtx.fillRect(
             largestRect.x,
@@ -723,7 +729,7 @@ export class Generator {
             iconBounds.h
           )
 
-          placedSymbolItems.push({
+          const item: SymbolGeneratedItem = {
             index: i,
             kind: 'symbol',
             shapeColor: 'black',
@@ -738,7 +744,9 @@ export class Generator {
               .append(rotatedBoundsTransform)
               .translate(tx, ty)
               .scale(iconScale),
-          })
+          }
+          currentBatch.push(item)
+          generatedItems.push(item)
         } else {
           unrotatedCtx.fillRect(
             largestRect.x,
@@ -755,6 +763,11 @@ export class Generator {
         iconIndex = (iconIndex + 1) % icons.length
       }
 
+      if (currentBatch.length >= batchSize && onProgressCallback) {
+        await onProgressCallback(currentBatch, i / nIter)
+        currentBatch = []
+      }
+
       if (i % 30) {
         const t2 = performance.now()
         if (t2 - t1 > 50) {
@@ -767,17 +780,21 @@ export class Generator {
 
     const t2 = performance.now()
 
+    if (onProgressCallback) {
+      await onProgressCallback(currentBatch, 1)
+    }
+
     console.screenshot(unrotatedCtx.canvas, 1)
     console.log(
       `Placed ${
-        placedWordItems.length
-      } words; Finished ${nIter} iterations in ${((t2 - t1) / 1000).toFixed(
+        generatedItems.length
+      } items; Finished ${nIter} iterations in ${((t2 - t1) / 1000).toFixed(
         2
       )} s, ${((t2 - t1) / nIter).toFixed(3)}ms / iter`
     )
 
     return {
-      generatedItems: [...placedWordItems, ...placedSymbolItems],
+      generatedItems,
     }
   }
 }

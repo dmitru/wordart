@@ -78,10 +78,12 @@ export class Editor {
 
   items: {
     shape: {
+      items: EditorItem[]
       itemsById: Map<EditorItemId, EditorItem>
       fabricObjToItem: Map<fabric.Object, EditorItem>
     }
     bg: {
+      items: EditorItem[]
       itemsById: Map<EditorItemId, EditorItem>
       fabricObjToItem: Map<fabric.Object, EditorItem>
     }
@@ -410,8 +412,7 @@ export class Editor {
 
   setShapeItemsStyle = async (style: ShapeStyleConf['items']) => {
     const { coloring, dimSmallerItems } = style
-    const { itemsById } = this.items.shape
-    const items = [...itemsById.values()]
+    const { items } = this.items.shape
     this.logger.debug(
       'setItemsColor',
       toJS(coloring, { recurseEverything: true }),
@@ -709,6 +710,42 @@ export class Editor {
     return items
   }
 
+  deleteNonLockedShapeItems = async () => {
+    const oldItemsToDelete = [...this.items.shape.itemsById.values()].filter(
+      (item) => !item.locked
+    )
+    this.canvas.remove(
+      ...flatten(
+        oldItemsToDelete.map((item) => [
+          item.fabricObj,
+          ...item.fabricObj.getObjects(),
+        ])
+      )
+    )
+    oldItemsToDelete.forEach((i) => this.items.shape.itemsById.delete(i.id))
+  }
+
+  addShapeItems = async (itemConfigs: EditorItemConfig[]) => {
+    let { items, itemsById, fabricObjToItem } = await this.convertToEditorItems(
+      itemConfigs
+    )
+    const oldItemsToKeep = [...this.items.shape.items]
+    for (const item of oldItemsToKeep) {
+      itemsById.set(item.id, item)
+      fabricObjToItem.set(item.fabricObj, item)
+    }
+
+    const objs = items.map((item) => item.fabricObj)
+    this.canvas.add(...objs)
+    this.canvas.requestRenderAll()
+
+    this.items.shape = {
+      items: [...oldItemsToKeep, ...items],
+      itemsById,
+      fabricObjToItem,
+    }
+  }
+
   setShapeItems = async (itemConfigs: EditorItemConfig[]) => {
     if (!this.shape?.obj) {
       console.error('No shape')
@@ -746,6 +783,7 @@ export class Editor {
     this.canvas.requestRenderAll()
 
     this.items.shape = {
+      items,
       itemsById,
       fabricObjToItem,
     }
@@ -771,6 +809,7 @@ export class Editor {
       return
     }
 
+    this.store.visualizingProgress = 0
     this.store.isVisualizing = true
     for (let i = 0; i < 10; ++i) {
       await waitAnimationFrame()
@@ -816,6 +855,10 @@ export class Editor {
     const wordFonts: Font[] = await this.fetchFonts(style.items.words.fontIds)
 
     const shapeConfig = this.store.getSelectedShapeConf()
+    const wordConfigsById = keyBy(style.items.words.wordList, 'id')
+
+    let addedFirstBatch = false
+
     const result = await this.generator.fillShape(
       {
         shape: {
@@ -872,12 +915,36 @@ export class Editor {
         iconsMaxSize: style.items.placement.iconsMaxSize,
         iconProbability: style.items.placement.iconsProportion / 100,
       },
-      (progressPercent) => {
+      async (batch, progressPercent) => {
+        // if (!addedFirstBatch) {
+        //   await this.deleteNonLockedShapeItems()
+        //   addedFirstBatch = true
+        // }
+        // const items: EditorItemConfig[] = []
+
+        // for (const genItem of batch) {
+        //   if (genItem.kind === 'word') {
+        //     const wordConfig = wordConfigsById[genItem.wordConfigId]
+        //     items.push({
+        //       ...genItem,
+        //       color: 'black',
+        //       locked: false,
+        //       text: wordConfig.text,
+        //       customColor: wordConfig.color,
+        //     })
+        //   }
+        // }
+        // await this.addShapeItems(items)
+        // console.log(
+        //   'this.store.visualizingProgress=',
+        //   this.store.visualizingProgress
+        // )
         this.store.visualizingProgress = progressPercent
+        // await this.setShapeItemsStyle(style.items)
+        await waitAnimationFrame()
       }
     )
 
-    const wordConfigsById = keyBy(style.items.words.wordList, 'id')
     const items: EditorItemConfig[] = []
 
     for (const genItem of result.generatedItems) {

@@ -413,7 +413,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 // accent
                 // isDisabled={store.isVisualizing}
                 variantColor="accent"
-                loadingText="Working"
+                loadingText={`${Math.round(
+                  (store.visualizingProgress || 0) * 100
+                )}%`}
                 isLoading={store.isVisualizing}
                 onClick={() => {
                   if (state.targetTab === 'shape') {
@@ -433,12 +435,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     margin-right: 4px;
                   `}
                 />
-
-                {store.isVisualizing
-                  ? `Working: ${Math.round(
-                      (store.visualizingProgress || 0) * 100
-                    )}%`
-                  : 'Visualize'}
+                Visualize
               </Button>
 
               <Tooltip label="Undo" aria-label="Undo" hasArrow zIndex={5}>

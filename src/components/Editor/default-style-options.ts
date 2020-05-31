@@ -38,7 +38,7 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
     dimSmallerItems: 20,
     opacity: 100,
     coloring: {
-      kind: 'gradient',
+      kind: 'shape',
       color: {
         kind: 'color',
         color: 'black',
@@ -70,7 +70,7 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
       iconsMaxSize: 30,
       iconsProportion: 20,
       shapePadding: 15,
-      itemDensity: 95,
+      itemDensity: 85,
       wordsMaxSize: 70,
     },
   },
