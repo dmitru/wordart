@@ -34,7 +34,7 @@ import {
   processRasterImg,
 } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
-import { flatten, groupBy, keyBy, max, min } from 'lodash'
+import { flatten, groupBy, keyBy, max, min, sortBy } from 'lodash'
 import { toJS } from 'mobx'
 import { Glyph } from 'opentype.js'
 import paper from 'paper'
@@ -45,6 +45,7 @@ import { waitAnimationFrame } from 'utils/async'
 import { consoleLoggers } from 'utils/console-logger'
 import { UninqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
+import { exhaustiveCheck } from 'utils/type-utils'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -410,8 +411,8 @@ export class Editor {
     this.canvas.requestRenderAll()
   }
 
-  setShapeItemsStyle = async (style: ShapeStyleConf['items']) => {
-    const { coloring, dimSmallerItems } = style
+  setShapeItemsStyle = async (itemsStyleConf: ShapeStyleConf['items']) => {
+    const { coloring, dimSmallerItems } = itemsStyleConf
     const { items } = this.items.shape
     this.logger.debug(
       'setItemsColor',
@@ -455,9 +456,15 @@ export class Editor {
       shapeRaster = await cloneObjAsImage(this.shape.obj)
     }
 
+    const shape = this.shape
+
     for (let i = 0; i < items.length; ++i) {
       const item = items[i]
       const area = itemAreas[i]
+
+      if (!shape) {
+        continue
+      }
 
       if (item.kind !== 'word' && item.kind !== 'symbol') {
         continue
@@ -467,65 +474,84 @@ export class Editor {
         const index = Math.floor(rng() * colors.length)
         item.setColor(colors[index])
       } else if (coloring.kind === 'shape') {
-        // TODO: Original shape color
-        //
-        // if (coloring.shapeStyleFill.kind === 'color') {
-        //   const shapeColor = new paper.Color(coloring.shapeStyleFill.color)
-        //   let color = chroma.rgb(
-        //     255 * shapeColor.red,
-        //     255 * shapeColor.green,
-        //     255 * shapeColor.blue
-        //   )
-        //   if (coloring.shapeBrightness != 0) {
-        //     color = color.brighten(coloring.shapeBrightness / 100)
-        //   }
-        //   const hex = color.hex()
-        //   item.setColor(hex)
-        // } else if (coloring.shapeStyleFill.kind === 'color-map') {
-        //   if (this.shape?.kind === 'svg') {
-        //     const colorMapSorted = sortBy(
-        //       coloring.shapeStyleFill.defaultColorMap.map((color, index) => ({
-        //         color,
-        //         index,
-        //       })),
-        //       ({ color }) => chroma.distance(color, item.shapeColor, 'rgb')
-        //     )
-        //     const shapeColorStringIndex = colorMapSorted[0].index
-        //     const shapeColorString =
-        //       coloring.shapeStyleFill.colorMap[shapeColorStringIndex]
-        //     const shapeColor = new paper.Color(shapeColorString)
-        //     let color = chroma.rgb(
-        //       255 * shapeColor.red,
-        //       255 * shapeColor.green,
-        //       255 * shapeColor.blue
-        //     )
-        //     if (coloring.shapeBrightness != 0) {
-        //       color = color.brighten(coloring.shapeBrightness / 100)
-        //     }
-        //     const hex = color.hex()
-        //     item.setColor(hex)
-        //   } else if (this.shape?.kind === 'raster') {
-        //     let color = chroma(item.shapeColor)
-        //     if (coloring.shapeBrightness != 0) {
-        //       color = color.brighten(coloring.shapeBrightness / 100)
-        //     }
-        //     item.setColor(color.hex())
-        //   }
-        // } else if (coloring.shapeStyleFill.kind === 'original') {
-        //   const shape = this.shape?.shapeConfig
-        //   let colorString = item.shapeColor
-        //   if (shape?.kind === 'raster' && shape?.processing?.invert.enabled) {
-        //     colorString = shape.processing.invert.color
-        //   }
-        //   let color = chroma(colorString)
-        //   if (coloring.shapeBrightness != 0) {
-        //     color = color.brighten(coloring.shapeBrightness / 100)
-        //   }
-        //   item.setColor(color.hex())
-        // } else {
-        //   exhaustiveCheck(coloring.kind)
-        // }
+        // TODO
+        if (shape.kind === 'svg') {
+          if (shape.config.processing.colors.kind === 'single-color') {
+            const shapeColor = new paper.Color(
+              shape.config.processing.colors.color
+            )
+            let color = chroma.rgb(
+              255 * shapeColor.red,
+              255 * shapeColor.green,
+              255 * shapeColor.blue
+            )
+            if (coloring.shapeBrightness != 0) {
+              color = color.brighten(coloring.shapeBrightness / 100)
+            }
+            const hex = color.hex()
+            item.setColor(hex)
+          } else if (shape.config.processing.colors.kind === 'color-map') {
+            const colorMapSorted = sortBy(
+              shape.originalColors.map((color, index) => ({
+                color,
+                index,
+              })),
+              ({ color }) => chroma.distance(color, item.shapeColor, 'rgb')
+            )
+            const shapeColorStringIndex = colorMapSorted[0].index
+            const shapeColorString =
+              shape.config.processing.colors.colors[shapeColorStringIndex]
+            const shapeColor = new paper.Color(shapeColorString)
+            let color = chroma.rgb(
+              255 * shapeColor.red,
+              255 * shapeColor.green,
+              255 * shapeColor.blue
+            )
+            if (coloring.shapeBrightness != 0) {
+              color = color.brighten(coloring.shapeBrightness / 100)
+            }
+            const hex = color.hex()
+            item.setColor(hex)
+          } else if (shape.config.processing.colors.kind === 'original') {
+            const shapeColor = new paper.Color(item.shapeColor)
+            let color = chroma.rgb(
+              255 * shapeColor.red,
+              255 * shapeColor.green,
+              255 * shapeColor.blue
+            )
+            if (coloring.shapeBrightness != 0) {
+              color = color.brighten(coloring.shapeBrightness / 100)
+            }
+            const hex = color.hex()
+            item.setColor(hex)
+          }
+        } else if (shape.kind === 'raster') {
+          let colorString = item.shapeColor
+          if (shape.config.processing?.invert) {
+            colorString = shape.config.processing.invert.color
+          }
+          let color = chroma(colorString)
+          if (coloring.shapeBrightness != 0) {
+            color = color.brighten(coloring.shapeBrightness / 100)
+          }
+          item.setColor(color.hex())
+        } else if (shape.kind === 'text') {
+          const shapeColor = new paper.Color(shape.config.textStyle.color)
+          let color = chroma.rgb(
+            255 * shapeColor.red,
+            255 * shapeColor.green,
+            255 * shapeColor.blue
+          )
+          if (coloring.shapeBrightness != 0) {
+            color = color.brighten(coloring.shapeBrightness / 100)
+          }
+          const hex = color.hex()
+          item.setColor(hex)
+        }
+      } else {
+        exhaustiveCheck(coloring)
       }
+
       item.setOpacity(
         (dimSmallerFactor * (area - minArea)) / (maxArea - minArea) +
           (1 - dimSmallerFactor)
