@@ -38,7 +38,7 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
     dimSmallerItems: 20,
     opacity: 100,
     coloring: {
-      kind: 'shape',
+      kind: 'gradient',
       color: {
         kind: 'color',
         color: 'black',

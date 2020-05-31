@@ -23,6 +23,7 @@ import {
   ShapeConf,
   ShapeRasterConf,
   ShapeSvgConf,
+  ShapeTextConf,
 } from 'components/Editor/shape-config'
 import { BgStyleConf, ShapeStyleConf } from 'components/Editor/style'
 import { FontId } from 'data/fonts'
@@ -292,6 +293,25 @@ export class Editor {
     }
   }
 
+  updateTextShapeColors = async (config: ShapeTextConf) => {
+    if (this.shape?.kind !== 'text') {
+      console.error(
+        `Unexpected shape type: expected text, got ${this.shape?.kind}, shape id: ${this.shape?.id}`
+      )
+      return
+    }
+
+    if (!this.shape.obj) {
+      return
+    }
+
+    const shapeObj = this.shape.obj
+    const objects =
+      shapeObj instanceof fabric.Group ? shapeObj.getObjects() : [shapeObj]
+    objects.forEach((obj) => obj.set({ fill: config.textStyle.color }))
+    this.canvas.requestRenderAll()
+  }
+
   updateSvgShapeColors = async (config: ShapeSvgConf) => {
     if (this.shape?.kind !== 'svg') {
       console.error(
@@ -365,6 +385,9 @@ export class Editor {
     }
     if (config.kind === 'svg' && this.shape.kind === 'svg') {
       return this.updateSvgShapeColors(config)
+    }
+    if (config.kind === 'text' && this.shape.kind === 'text') {
+      return this.updateTextShapeColors(config)
     }
   }
 

@@ -205,6 +205,11 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
       c.dispose()
     }
 
+    const singleColorSvgTabIndex =
+      shape && shape.kind === 'svg' && shape.colorMap.length > 1 ? 2 : 1
+    const multiColorSvgTabIndex =
+      shape && shape.kind === 'svg' && shape.colorMap.length > 1 ? 1 : 2
+
     return (
       <>
         <Box>
@@ -387,22 +392,58 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                     exit={{ x: 355, y: 0, opacity: 0 }}
                   >
                     <Stack mb="4" p="2" position="absolute" width="100%">
+                      {shape.kind === 'text' && (
+                        <>
+                          <Stack mb="4" width="100%">
+                            <Heading size="md" m="0" mb="3" display="flex">
+                              Customize Text
+                            </Heading>
+                            <Textarea
+                              autoFocus
+                              value={shape.config.text}
+                              onChange={async (e: any) => {
+                                shape.config.text = e.target.value
+                                await store.updateShape()
+                                store.updateShapeThumbnail()
+                              }}
+                              placeholder="Type text here..."
+                            />
+                          </Stack>
+
+                          <Stack mb="2">
+                            <Heading size="md" m="0" mb="3">
+                              Colors
+                            </Heading>
+                            <ColorPicker
+                              value={shape.config.textStyle.color}
+                              onChange={async (color) => {
+                                shape.config.textStyle.color = color
+                                await store.editor?.updateShapeColors(
+                                  shape.config
+                                )
+                                store.updateShapeThumbnail()
+                              }}
+                            />
+                          </Stack>
+                        </>
+                      )}
+
                       {shape.config.kind === 'svg' && (
-                        <Heading size="md" m="0" mb="3" display="flex">
+                        <Heading size="md" m="0" mb="2" display="flex">
                           Customize Colors
                         </Heading>
                       )}
-                      {shape.kind === 'svg' && shape.colorMap.length > 1 && (
+                      {shape.kind === 'svg' && (
                         <Box mt="3">
                           <Tabs
                             variantColor="primary"
                             index={
                               shape.config.processing.colors.kind == 'color-map'
-                                ? 1
+                                ? multiColorSvgTabIndex
                                 : shape.config.processing.colors.kind ==
                                   'original'
                                 ? 0
-                                : 2
+                                : singleColorSvgTabIndex
                             }
                             variant="solid-rounded"
                             size="sm"
@@ -412,7 +453,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                   kind: 'original',
                                 }
                                 updateShapeColoring()
-                              } else if (index === 1) {
+                              } else if (index === multiColorSvgTabIndex) {
                                 shape.config.processing.colors = {
                                   kind: 'color-map',
                                   colors:
@@ -420,7 +461,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                     [],
                                 }
                                 updateShapeColoring()
-                              } else if (index === 2) {
+                              } else if (index === singleColorSvgTabIndex) {
                                 shape.config.processing.colors = {
                                   kind: 'single-color',
                                   color: shapeStyle.colors.color,
@@ -431,65 +472,71 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           >
                             <TabList mb="1em">
                               <Tab>Original</Tab>
-                              <Tab>Multiple</Tab>
-                              <Tab>Single</Tab>
+                              {shape.colorMap.length > 1 && (
+                                <Tab>Multi-color</Tab>
+                              )}
+                              <Tab>Single color</Tab>
                             </TabList>
                             <TabPanels>
                               <TabPanel>{null}</TabPanel>
-                              <TabPanel>
-                                <Box>
-                                  {shape.config.processing.colors.kind ===
-                                    'color-map' &&
-                                    shape.config.processing.colors.colors.map(
-                                      (color, index) => (
-                                        <Box
-                                          mr="1"
-                                          mb="2"
-                                          key={index}
-                                          display="inline-block"
-                                        >
-                                          <ColorPicker
-                                            disableAlpha
-                                            value={chroma(color).alpha(1).hex()}
-                                            onChange={(hex) => {
-                                              if (
-                                                shape.config.processing.colors
-                                                  .kind === 'color-map'
-                                              ) {
-                                                shape.config.processing.colors.colors[
-                                                  index
-                                                ] = chroma(hex).hex()
-                                                shapeStyle.colors.colorMaps.get(
-                                                  shape.id
-                                                )![index] = chroma(hex).hex()
-                                              }
-                                            }}
-                                            onAfterChange={() => {
-                                              updateShapeColoring()
-                                            }}
-                                          />
-                                        </Box>
-                                      )
-                                    )}
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      shape.config.processing.colors = {
-                                        kind: 'color-map',
-                                        colors: shape.originalColors,
-                                      }
-                                      shapeStyle.colors.colorMaps.set(
-                                        shape.id,
-                                        shape.originalColors
-                                      )
-                                      updateShapeColoring()
-                                    }}
-                                  >
-                                    Reset
-                                  </Button>
-                                </Box>
-                              </TabPanel>
+                              {shape.colorMap.length > 1 && (
+                                <TabPanel>
+                                  <Box>
+                                    {shape.config.processing.colors.kind ===
+                                      'color-map' &&
+                                      shape.config.processing.colors.colors.map(
+                                        (color, index) => (
+                                          <Box
+                                            mr="1"
+                                            mb="2"
+                                            key={index}
+                                            display="inline-block"
+                                          >
+                                            <ColorPicker
+                                              disableAlpha
+                                              value={chroma(color)
+                                                .alpha(1)
+                                                .hex()}
+                                              onChange={(hex) => {
+                                                if (
+                                                  shape.config.processing.colors
+                                                    .kind === 'color-map'
+                                                ) {
+                                                  shape.config.processing.colors.colors[
+                                                    index
+                                                  ] = chroma(hex).hex()
+                                                  shapeStyle.colors.colorMaps.get(
+                                                    shape.id
+                                                  )![index] = chroma(hex).hex()
+                                                }
+                                              }}
+                                              onAfterChange={() => {
+                                                updateShapeColoring()
+                                              }}
+                                            />
+                                          </Box>
+                                        )
+                                      )}
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        shape.config.processing.colors = {
+                                          kind: 'color-map',
+                                          colors: shape.originalColors,
+                                        }
+                                        shapeStyle.colors.colorMaps.set(
+                                          shape.id,
+                                          shape.originalColors
+                                        )
+                                        updateShapeColoring()
+                                      }}
+                                    >
+                                      Reset
+                                    </Button>
+                                  </Box>
+                                </TabPanel>
+                              )}
                               <TabPanel>
                                 {shape.config.processing.colors.kind ===
                                   'single-color' && (
@@ -510,6 +557,23 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                         updateShapeColoring()
                                       }}
                                     />
+
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        const originalColor =
+                                          shape.originalColors[0] || 'black'
+                                        shape.config.processing.colors = {
+                                          kind: 'single-color',
+                                          color: originalColor,
+                                        }
+                                        shapeStyle.colors.color = originalColor
+                                        updateShapeColoring()
+                                      }}
+                                    >
+                                      Reset
+                                    </Button>
                                   </Box>
                                 )}
                               </TabPanel>
@@ -530,8 +594,8 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               updateShapeColoring()
                             }}
                           />
-                        )}
-                      {shapeConf.kind === 'raster' && shapeConf.processing && (
+                        )} */}
+                      {shape.kind === 'raster' && (
                         <>
                           <Heading size="md" m="0" mb="3" display="flex">
                             Image
@@ -548,7 +612,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                             </Button>
                           </Box>
                         </>
-                      )} */}
+                      )}
 
                       <Box mt="6">
                         <Heading size="md" m="0" display="flex">
@@ -757,6 +821,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
         {shape && shape.kind === 'raster' && (
           <CustomizeRasterImageModal
             isOpen={state.isShowingCustomizeImage}
+            key={shape.id}
             value={{
               invert: shape.config.processing?.invert != null,
               invertColor: shape.config.processing?.invert?.color || 'black',

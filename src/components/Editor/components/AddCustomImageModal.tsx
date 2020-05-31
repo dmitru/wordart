@@ -39,20 +39,22 @@ type State = {
   removeLightBackground: number
 }
 
+const initialState: State = {
+  originalUrl: null,
+  invert: false,
+  invertColor: 'black',
+  removeLightBackground: 0.95,
+}
+
 export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
   (props) => {
     const { isOpen } = props
     const originalImgCanvas = useRef<HTMLCanvasElement | null>(null)
 
-    const state = useLocalStore<State>(() => ({
-      originalUrl: null,
-      invert: false,
-      invertColor: 'black',
-      removeLightBackground: 0.95,
-    }))
+    const state = useLocalStore<State>(() => initialState)
 
     const close = () => {
-      state.originalUrl = null
+      Object.assign(state, initialState)
       props.onClose()
     }
 

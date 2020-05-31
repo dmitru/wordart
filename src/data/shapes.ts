@@ -2,6 +2,10 @@ import { iconsFaRegular } from 'data/icons-fa-regular'
 import { iconsFaSolid } from 'data/icons-fa-solid'
 import { ShapeConf } from 'components/Editor/shape-config'
 
+const defaultEdgesProcessing = {
+  amount: 80,
+}
+
 export const svgIcons: ShapeConf[] = [
   iconsFaSolid.find((i) => i.title === 'Square full'),
   ...iconsFaSolid.slice(0, 5),
@@ -15,7 +19,10 @@ export const svgIcons: ShapeConf[] = [
           title: icon.title,
           url: icon.url,
           thumbnailUrl: icon.url,
-          processing: { colors: { kind: 'original' } },
+          processing: {
+            colors: { kind: 'original' },
+            edges: defaultEdgesProcessing,
+          },
         } as ShapeConf)
       : null
   )
@@ -33,6 +40,7 @@ export const svgIconsOutline: ShapeConf[] = [...iconsFaRegular.slice(0, 5)]
           thumbnailUrl: icon.url,
           processing: {
             colors: { kind: 'original' },
+            edges: defaultEdgesProcessing,
           },
         } as ShapeConf)
       : null
@@ -160,6 +168,7 @@ export const shapes: ShapeConf[] = [
     thumbnailUrl: c.url,
     processing: {
       colors: { kind: 'original' },
+      edges: defaultEdgesProcessing,
     },
   })),
   ...svgIcons,
