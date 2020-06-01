@@ -106,15 +106,31 @@ export type IconItemsConf = {
 
 export const getAnglesForPreset = (preset: WordAnglesPresetKind): number[] => {
   switch (preset) {
-    case 'horizontal': {
+    case 'horizontal':
       return [0]
-    }
-    case 'vertical': {
+    case 'vertical':
       return [-90]
-    }
-    // TODO
-    default: {
+    case 'random':
+      return Array(8)
+        .fill(null)
+        .map((a) => -90 + Math.round(180 * Math.random()))
+    case 'hor-ver':
+      return [0, -90]
+    case 'hor-ver-diagonal':
+      return [0, -90, -45, 45]
+    case '15 down':
+      return [15]
+    case '15 up':
+      return [-15]
+    case '15':
+      return [-15, 15]
+    case 'diagonal':
+      return [-45, 45]
+    case 'diagonal up':
+      return [-45]
+    case 'diagonal down':
       return [45]
-    }
+    default:
+      return [45]
   }
 }
