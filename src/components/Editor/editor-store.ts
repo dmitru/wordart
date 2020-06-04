@@ -28,8 +28,8 @@ import {
 } from 'components/Editor/shape-config'
 import {
   getAnglesForPreset,
-  mkBgConfFromOptions,
-  mkShapeConfFromOptions,
+  mkBgStyleConfFromOptions,
+  mkShapeStyleConfFromOptions,
 } from 'components/Editor/style'
 import {
   BgFill,
@@ -145,7 +145,7 @@ export class EditorStore {
         }
       },
     })
-    this.editor.setBgColor(mkBgConfFromOptions(this.styleOptions.bg).fill)
+    this.editor.setBgColor(mkBgStyleConfFromOptions(this.styleOptions.bg).fill)
     // @ts-ignore
     window['editor'] = this.editor
 
@@ -356,14 +356,14 @@ export class EditorStore {
     await this.editor.setShapeItems(shapeItems)
     await this.editor.setBgItems(bgItems)
 
-    this.editor.setBgColor(mkBgConfFromOptions(this.styleOptions.bg).fill)
+    this.editor.setBgColor(mkBgStyleConfFromOptions(this.styleOptions.bg).fill)
     const shapeConf = this.getShapeConfById(this.selectedShapeId)!
     await this.editor.updateShapeColors(shapeConf)
     // await this.editor.setShapeItemsColor(
     //   getItemsColoring(this.styleOptions.bg)
     // )
     await this.editor.setShapeItemsStyle(
-      mkShapeConfFromOptions(this.styleOptions.shape).items
+      mkShapeStyleConfFromOptions(this.styleOptions.shape).items
     )
   }
 
@@ -690,8 +690,8 @@ export class EditorStore {
 
     await this.editor.setShape({
       shapeConfig,
-      bgFillStyle: mkBgConfFromOptions(this.styleOptions.bg).fill,
-      shapeStyle: mkShapeConfFromOptions(this.styleOptions.shape),
+      bgFillStyle: mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
+      shapeStyle: mkShapeStyleConfFromOptions(this.styleOptions.shape),
       clear: true,
     })
 
@@ -717,13 +717,13 @@ export class EditorStore {
     const shape = this.getShapeConfById(this.selectedShapeId)!
     await this.editor.setShape({
       shapeConfig: shape,
-      bgFillStyle: mkBgConfFromOptions(this.styleOptions.bg).fill,
-      shapeStyle: mkShapeConfFromOptions(this.styleOptions.shape),
+      bgFillStyle: mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
+      shapeStyle: mkShapeStyleConfFromOptions(this.styleOptions.shape),
       clear: false,
     })
     if (this.styleOptions.shape.items.coloring.kind === 'shape') {
       await this.editor.setShapeItemsStyle(
-        mkShapeConfFromOptions(this.styleOptions.shape).items
+        mkShapeStyleConfFromOptions(this.styleOptions.shape).items
       )
     }
   }

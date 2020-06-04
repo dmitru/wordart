@@ -1,12 +1,17 @@
-import { observer } from 'mobx-react'
-import { useStore } from 'services/root-store'
-import { ColorPicker } from 'components/shared/ColorPicker'
-import { Label } from './shared'
-import { Slider } from 'components/shared/Slider'
+import { Box, Button, Heading, Flex, Stack } from '@chakra-ui/core'
 import { useThrottleCallback } from '@react-hook/throttle'
 import chroma from 'chroma-js'
-import { Button, Box } from '@chakra-ui/core'
 import { TargetKind } from 'components/Editor/lib/editor'
+import {
+  mkShapeStyleConfFromOptions,
+  mkBgStyleConfFromOptions,
+} from 'components/Editor/style'
+import { ColorPicker } from 'components/shared/ColorPicker'
+import { Slider } from 'components/shared/Slider'
+import { observer } from 'mobx-react'
+import { useStore } from 'services/root-store'
+import { useDebouncedCallback } from 'use-debounce/lib'
+import css from '@emotion/css'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -14,270 +19,469 @@ export type LeftPanelColorsTabProps = {
 
 export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
   ({ target }) => {
-    const { editorPageStore } = useStore()
-    const shape = editorPageStore.getSelectedShapeConf()
-    const shapeStyle = editorPageStore.styleOptions.shape
-    const bgStyle = editorPageStore.styleOptions.bg
-    // const style = editorPageStore.styleOptions[target]
+    const { editorPageStore: store } = useStore()
+    const shape = store.getShape()
+    const shapeStyle = store.styleOptions.shape
+    const bgStyle = store.styleOptions.bg
 
-    // const updateItemsColoring = useThrottleCallback(
-    //   () => {
-    //     editorPageStore.editor?.setShapeItemsStyle(
-    //       target,
-    //       getItemsColoring(style)
-    //     )
-    //   },
-    //   20,
-    //   true
-    // )
+    const updateShapeItemsColoring = useThrottleCallback(
+      () => {
+        store.editor?.setShapeItemsStyle(
+          mkShapeStyleConfFromOptions(shapeStyle).items
+        )
+      },
+      20,
+      true
+    )
 
-    // const updateShapeColoring = useThrottleCallback(
-    //   () => {
-    //     editorPageStore.editor?.updateShapeColors(shapeStyle.fill)
-    //     if (shapeStyle.itemsColoring.kind === 'shape') {
-    //       editorPageStore.editor?.setShapeItemsStyle(
-    //         'shape',
-    //         getItemsColoring(shapeStyle)
-    //       )
-    //     }
-    //   },
-    //   20,
-    //   true
-    // )
+    const updateBgItemsColoring = useThrottleCallback(
+      () => {
+        store.editor?.setBgItemsStyle(mkBgStyleConfFromOptions(bgStyle).items)
+      },
+      20,
+      true
+    )
 
-    return null
+    const [updateShapeColoring] = useDebouncedCallback(
+      async (updateItems = true) => {
+        if (!shape) {
+          return
+        }
+        const style = mkShapeStyleConfFromOptions(shapeStyle)
+        await store.editor?.updateShapeColors(shape.config)
+        store.updateShapeThumbnail()
+        if (updateItems && shapeStyle.items.coloring.kind === 'shape') {
+          store.editor?.setShapeItemsStyle(style.items)
+        }
+      },
+      20,
+      {
+        leading: true,
+        trailing: true,
+      }
+    )
 
-    // return (
-    // <>
-    //   <Box mb="4">
-    //     <Box>
-    //       <Label mb="2">Shape</Label>
-    //     </Box>
+    return (
+      <>
+        <Box mb="5">
+          <Heading size="md" mt="0" mb="3">
+            Shape Color
+          </Heading>
 
-    //     {shape.kind === 'svg' && (
-    //       <>
-    //         <Box>
-    //           <Button
-    //             px="2"
-    //             py="1"
-    //             mr="0"
-    //             secondary={shapeStyle.fill.kind === 'color-map'}
-    //             outline={shapeStyle.fill.kind !== 'color-map'}
-    //             onClick={() => {
-    //               shapeStyle.fill.kind = 'color-map'
-    //               updateShapeColoring()
-    //             }}
-    //           >
-    //             Shape colors
-    //           </Button>
-    //           <Button
-    //             px="2"
-    //             py="1"
-    //             mr="0"
-    //             secondary={shapeStyle.fill.kind === 'single-color'}
-    //             outline={shapeStyle.fill.kind !== 'single-color'}
-    //             onClick={() => {
-    //               shapeStyle.fill.kind = 'single-color'
-    //               updateShapeColoring()
-    //             }}
-    //           >
-    //             Color
-    //           </Button>
-    //         </Box>
+          <Slider
+            label="Opacity"
+            value={100 * shapeStyle.opacity}
+            onChange={(value) => {
+              shapeStyle.opacity = value / 100
+            }}
+            onAfterChange={(value) => {
+              store.editor?.setShapeOpacity(value / 100)
+            }}
+            min={0}
+            max={100}
+            step={1}
+          />
 
-    //         <Box mt="2">
-    //           {shapeStyle.fill.kind === 'single-color' && (
-    //             <ColorPicker
-    //               disableAlpha
-    //               value={chroma(shapeStyle.fill.color).alpha(1).hex()}
-    //               onChange={(hex) => {
-    //                 shapeStyle.fill.color = chroma(hex).hex()
-    //               }}
-    //               onAfterChange={() => {
-    //                 updateShapeColoring()
-    //               }}
-    //             />
-    //           )}
+          {shape?.kind === 'text' && (
+            <ColorPicker
+              value={chroma(shape.config.textStyle.color).alpha(1).hex()}
+              onChange={(hex) => {
+                shape.config.textStyle.color = chroma(hex).hex()
+                updateShapeColoring(false)
+              }}
+              onAfterChange={() => {
+                updateShapeColoring()
+              }}
+            />
+          )}
 
-    //           {shapeStyle.fill.kind === 'color-map' &&
-    //             shapeStyle.fill.colorMap.map((color, index) => (
-    //               <Box mr="1" key={index} display="inline-block">
-    //                 <ColorPicker
-    //                   disableAlpha
-    //                   value={chroma(color).alpha(1).hex()}
-    //                   onChange={(hex) => {
-    //                     shapeStyle.fill.colorMap[index] = chroma(hex).hex()
-    //                   }}
-    //                   onAfterChange={() => {
-    //                     updateShapeColoring()
-    //                   }}
-    //                 />
-    //               </Box>
-    //             ))}
-    //         </Box>
-    //       </>
-    //     )}
+          {shape?.kind === 'svg' && (
+            <>
+              <Box>
+                <Button
+                  px="2"
+                  py="1"
+                  mr="0"
+                  size="sm"
+                  variantColor={
+                    shape.config.processing.colors.kind === 'original'
+                      ? 'primary'
+                      : undefined
+                  }
+                  onClick={() => {
+                    shape.config.processing.colors = {
+                      kind: 'original',
+                    }
+                    updateShapeColoring()
+                  }}
+                >
+                  Original
+                </Button>
 
-    //     <Box mt="2">
-    //       <Slider
-    //         label="Opacity"
-    //         value={100 * shapeStyle.fill.opacity}
-    //         onChange={(value) => {
-    //           shapeStyle.fill.opacity = value / 100
-    //         }}
-    //         onAfterChange={(value) => {
-    //           editorPageStore.editor?.setShapeOpacity(value / 100)
-    //         }}
-    //         min={0}
-    //         max={100}
-    //         step={1}
-    //       />
-    //     </Box>
-    //   </Box>
+                <Button
+                  px="2"
+                  py="1"
+                  mr="0"
+                  size="sm"
+                  variantColor={
+                    shape.config.processing.colors.kind === 'single-color'
+                      ? 'primary'
+                      : undefined
+                  }
+                  onClick={() => {
+                    shape.config.processing.colors = {
+                      kind: 'single-color',
+                      color: shapeStyle.colors.color,
+                    }
+                    updateShapeColoring()
+                  }}
+                >
+                  Single color
+                </Button>
 
-    //   <Box mb="2">
-    //     <Label mb="2">Words & Icons</Label>
-    //     {/* <Checkbox
-    //       id="gradient"
-    //       label="Gradient"
-    //       value={style.itemsColoring.kind === 'gradient'}
-    //       onChange={(value) => {
-    //         style.itemsColoring.kind = value ? 'gradient' : 'color'
-    //       }}
-    //     /> */}
-    //     <Button
-    //       px="2"
-    //       py="1"
-    //       mr="0"
-    //       variantColor={
-    //         style.itemsColoring.kind === 'shape' ? 'primary' : undefined
-    //       }
-    //       onClick={() => {
-    //         style.itemsColoring.kind = 'shape'
-    //         updateItemsColoring()
-    //       }}
-    //     >
-    //       Shape color
-    //     </Button>
+                <Button
+                  px="2"
+                  py="1"
+                  mr="0"
+                  size="sm"
+                  variantColor={
+                    shape.config.processing.colors.kind === 'color-map'
+                      ? 'primary'
+                      : undefined
+                  }
+                  onClick={() => {
+                    shape.config.processing.colors = {
+                      kind: 'color-map',
+                      colors: shapeStyle.colors.colorMaps.get(shape.id)!,
+                    }
+                    updateShapeColoring()
+                  }}
+                >
+                  Color map
+                </Button>
+              </Box>
 
-    //     <Button
-    //       px="2"
-    //       py="1"
-    //       variantColor={
-    //         style.itemsColoring.kind === 'gradient' ? 'primary' : undefined
-    //       }
-    //       onClick={() => {
-    //         style.itemsColoring.kind = 'gradient'
-    //         updateItemsColoring()
-    //       }}
-    //     >
-    //       Gradient
-    //     </Button>
+              <Box mt="2">
+                {shape.config.processing.colors.kind === 'single-color' && (
+                  <ColorPicker
+                    disableAlpha
+                    value={chroma(shape.config.processing.colors.color)
+                      .alpha(1)
+                      .hex()}
+                    onChange={(hex) => {
+                      if (
+                        shape.config.processing.colors.kind === 'single-color'
+                      ) {
+                        shape.config.processing.colors.color = chroma(hex).hex()
+                      }
+                    }}
+                    onAfterChange={() => {
+                      updateShapeColoring()
+                    }}
+                  />
+                )}
 
-    //     <Button
-    //       px="2"
-    //       py="1"
-    //       mr="0"
-    //       variantColor={
-    //         style.itemsColoring.kind === 'color' ? 'primary' : undefined
-    //       }
-    //       onClick={() => {
-    //         style.itemsColoring.kind = 'color'
-    //         updateItemsColoring()
-    //       }}
-    //     >
-    //       Color
-    //     </Button>
+                {shape.config.processing.colors.kind === 'color-map' &&
+                  shape.config.processing.colors.colors.map((color, index) => (
+                    <Box mr="1" key={index} display="inline-block">
+                      <ColorPicker
+                        disableAlpha
+                        value={chroma(color).alpha(1).hex()}
+                        onChange={(hex) => {
+                          if (
+                            shape.config.processing.colors.kind === 'color-map'
+                          ) {
+                            shape.config.processing.colors.colors[
+                              index
+                            ] = chroma(hex).hex()
+                          }
+                        }}
+                        onAfterChange={() => {
+                          updateShapeColoring()
+                        }}
+                      />
+                    </Box>
+                  ))}
+              </Box>
+            </>
+          )}
+        </Box>
 
-    //     <Box mt="2">
-    //       {style.itemsColoring.kind === 'shape' && (
-    //         <Box mb="4">
-    //           <Slider
-    //             label="Brightness"
-    //             value={style.itemsColoring.shapeBrightness}
-    //             onChange={(value) => {
-    //               const val = (value as any) as number
-    //               style.itemsColoring.shapeBrightness = val
-    //             }}
-    //             onAfterChange={updateItemsColoring}
-    //             min={-100}
-    //             max={100}
-    //             step={1}
-    //           />
-    //         </Box>
-    //       )}
-    //       {style.itemsColoring.kind === 'color' && (
-    //         <ColorPicker
-    //           disableAlpha
-    //           value={style.itemsColoring.color}
-    //           onChange={(hex) => {
-    //             style.itemsColoring.color = hex
-    //           }}
-    //           onAfterChange={updateItemsColoring}
-    //         />
-    //       )}
-    //       {style.itemsColoring.kind === 'gradient' && (
-    //         <>
-    //           <Box mr="1" display="inline-block">
-    //             <ColorPicker
-    //               disableAlpha
-    //               value={style.itemsColoring.gradient.from}
-    //               onChange={(hex) => {
-    //                 style.itemsColoring.gradient.from = hex
-    //               }}
-    //               onAfterChange={updateItemsColoring}
-    //             />
-    //           </Box>
-    //           <Box mr="1" display="inline-block">
-    //             <ColorPicker
-    //               disableAlpha
-    //               value={style.itemsColoring.gradient.to}
-    //               onChange={(hex) => {
-    //                 style.itemsColoring.gradient.to = hex
-    //               }}
-    //               onAfterChange={updateItemsColoring}
-    //             />
-    //           </Box>
-    //         </>
-    //       )}
-    //     </Box>
-    //   </Box>
+        <Box mb="5">
+          <Heading size="md" mt="0" mb="3">
+            Shape Items
+          </Heading>
 
-    //   <Box mb="4">
-    //     <Slider
-    //       label="Make larger words brighter"
-    //       value={style.itemsColoring.dimSmallerItems}
-    //       onChange={(value) => {
-    //         const val = (value as any) as number
-    //         style.itemsColoring.dimSmallerItems = val
-    //       }}
-    //       onAfterChange={updateItemsColoring}
-    //       min={0}
-    //       max={100}
-    //       step={1}
-    //     />
-    //   </Box>
+          <Box flex="1">
+            <Button
+              px="2"
+              py="1"
+              mr="0"
+              size="sm"
+              variantColor={
+                shapeStyle.items.coloring.kind === 'shape'
+                  ? 'primary'
+                  : undefined
+              }
+              onClick={() => {
+                shapeStyle.items.coloring.kind = 'shape'
+                updateShapeItemsColoring()
+              }}
+            >
+              Shape color
+            </Button>
 
-    //   <Box mb="4">
-    //     <Label mb="2">Background</Label>
-    //     <ColorPicker
-    //       disableAlpha
-    //       value={chroma(bgStyle.fill.color).alpha(1).hex()}
-    //       onChange={(hex) => {
-    //         bgStyle.fill.color = chroma(hex).hex()
-    //       }}
-    //       onAfterChange={() => {
-    //         editorPageStore.editor?.setBgColor(bgStyle.fill)
-    //         if (bgStyle.itemsColoring.kind === 'shape') {
-    //           editorPageStore.editor?.setShapeItemsStyle(
-    //             'bg',
-    //             getItemsColoring(bgStyle)
-    //           )
-    //         }
-    //       }}
-    //     />
-    //   </Box>
-    // </>
-    // )
+            <Button
+              px="2"
+              py="1"
+              size="sm"
+              variantColor={
+                shapeStyle.items.coloring.kind === 'gradient'
+                  ? 'primary'
+                  : undefined
+              }
+              onClick={() => {
+                shapeStyle.items.coloring.kind = 'gradient'
+                updateShapeItemsColoring()
+              }}
+            >
+              Gradient
+            </Button>
+
+            <Button
+              px="2"
+              py="1"
+              mr="0"
+              size="sm"
+              variantColor={
+                shapeStyle.items.coloring.kind === 'color'
+                  ? 'primary'
+                  : undefined
+              }
+              onClick={() => {
+                shapeStyle.items.coloring.kind = 'color'
+                updateShapeItemsColoring()
+              }}
+            >
+              Color
+            </Button>
+          </Box>
+
+          <Box mt="3">
+            {/* {shapeStyle.items.coloring.kind === 'shape' && (
+              <Box mb="4">
+                <Slider
+                  css={css`
+                    width: 50%;
+                  `}
+                  label="Brightness"
+                  value={shapeStyle.items.coloring.shape.shapeBrightness}
+                  onChange={(value) => {
+                    const val = (value as any) as number
+                    shapeStyle.items.coloring.shape.shapeBrightness = val
+                  }}
+                  onAfterChange={updateShapeItemsColoring}
+                  min={-100}
+                  max={100}
+                  step={1}
+                />
+              </Box>
+            )} */}
+            {shapeStyle.items.coloring.kind === 'color' && (
+              <ColorPicker
+                disableAlpha
+                value={shapeStyle.items.coloring.color.color}
+                onChange={(hex) => {
+                  shapeStyle.items.coloring.color.color = hex
+                }}
+                onAfterChange={updateShapeItemsColoring}
+              />
+            )}
+            {shapeStyle.items.coloring.kind === 'gradient' && (
+              <>
+                <Box mr="1" display="inline-block">
+                  <ColorPicker
+                    disableAlpha
+                    value={shapeStyle.items.coloring.gradient.gradient.from}
+                    onChange={(hex) => {
+                      shapeStyle.items.coloring.gradient.gradient.from = hex
+                    }}
+                    onAfterChange={updateShapeItemsColoring}
+                  />
+                </Box>
+                <Box mr="1" display="inline-block">
+                  <ColorPicker
+                    disableAlpha
+                    value={shapeStyle.items.coloring.gradient.gradient.to}
+                    onChange={(hex) => {
+                      shapeStyle.items.coloring.gradient.gradient.to = hex
+                    }}
+                    onAfterChange={updateShapeItemsColoring}
+                  />
+                </Box>
+              </>
+            )}
+          </Box>
+
+          <Stack direction="row" spacing="3" mt="3">
+            <Slider
+              css={css`
+                flex: 1;
+              `}
+              label="Dim smaller items"
+              value={shapeStyle.items.dimSmallerItems}
+              onChange={(value) => {
+                const val = (value as any) as number
+                shapeStyle.items.dimSmallerItems = val
+              }}
+              onAfterChange={updateShapeItemsColoring}
+              min={0}
+              max={100}
+              step={1}
+            />
+
+            <Slider
+              css={css`
+                flex: 1;
+              `}
+              label="Opacity"
+              value={100 * shapeStyle.items.opacity}
+              onChange={(value) => {
+                shapeStyle.items.opacity = value / 100
+              }}
+              onAfterChange={updateShapeItemsColoring}
+              min={0}
+              max={100}
+              step={1}
+            />
+          </Stack>
+        </Box>
+
+        <Box mb="5">
+          <Heading size="md" mt="0" mb="3">
+            Background
+          </Heading>
+
+          <ColorPicker
+            value={chroma(bgStyle.fill.color.color).alpha(1).hex()}
+            onChange={(hex) => {
+              bgStyle.fill.color.color = chroma(hex).hex()
+              store.editor?.setBgColor(bgStyle.fill.color)
+            }}
+          />
+        </Box>
+
+        <Box mb="5">
+          <Heading size="md" mt="0" mb="3">
+            Background Items
+          </Heading>
+
+          <Box flex="1">
+            <Button
+              px="2"
+              py="1"
+              size="sm"
+              variantColor={
+                bgStyle.items.coloring.kind === 'gradient'
+                  ? 'primary'
+                  : undefined
+              }
+              onClick={() => {
+                bgStyle.items.coloring.kind = 'gradient'
+                updateBgItemsColoring()
+              }}
+            >
+              Gradient
+            </Button>
+
+            <Button
+              px="2"
+              py="1"
+              mr="0"
+              size="sm"
+              variantColor={
+                bgStyle.items.coloring.kind === 'color' ? 'primary' : undefined
+              }
+              onClick={() => {
+                bgStyle.items.coloring.kind = 'color'
+                updateBgItemsColoring()
+              }}
+            >
+              Color
+            </Button>
+          </Box>
+
+          <Box mt="3">
+            {bgStyle.items.coloring.kind === 'color' && (
+              <ColorPicker
+                disableAlpha
+                value={bgStyle.items.coloring.color.color}
+                onChange={(hex) => {
+                  bgStyle.items.coloring.color.color = hex
+                }}
+                onAfterChange={updateBgItemsColoring}
+              />
+            )}
+            {bgStyle.items.coloring.kind === 'gradient' && (
+              <>
+                <Box mr="1" display="inline-block">
+                  <ColorPicker
+                    disableAlpha
+                    value={bgStyle.items.coloring.gradient.gradient.from}
+                    onChange={(hex) => {
+                      bgStyle.items.coloring.gradient.gradient.from = hex
+                    }}
+                    onAfterChange={updateBgItemsColoring}
+                  />
+                </Box>
+                <Box mr="1" display="inline-block">
+                  <ColorPicker
+                    disableAlpha
+                    value={shapeStyle.items.coloring.gradient.gradient.to}
+                    onChange={(hex) => {
+                      shapeStyle.items.coloring.gradient.gradient.to = hex
+                    }}
+                    onAfterChange={updateBgItemsColoring}
+                  />
+                </Box>
+              </>
+            )}
+          </Box>
+
+          <Stack direction="row" spacing="3" mt="3">
+            <Slider
+              css={css`
+                flex: 1;
+              `}
+              label="Dim smaller items"
+              value={bgStyle.items.dimSmallerItems}
+              onChange={(value) => {
+                const val = (value as any) as number
+                bgStyle.items.dimSmallerItems = val
+              }}
+              onAfterChange={updateBgItemsColoring}
+              min={0}
+              max={100}
+              step={1}
+            />
+
+            <Slider
+              css={css`
+                flex: 1;
+              `}
+              label="Opacity"
+              value={100 * bgStyle.items.opacity}
+              onChange={(value) => {
+                bgStyle.items.opacity = value / 100
+              }}
+              onAfterChange={updateBgItemsColoring}
+              min={0}
+              max={100}
+              step={1}
+            />
+          </Stack>
+        </Box>
+      </>
+    )
   }
 )

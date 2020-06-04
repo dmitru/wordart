@@ -33,14 +33,10 @@ export const Slider: React.FC<SliderProps> = (props) => {
     label,
     onChange = noop,
     onAfterChange = noop,
+    ...rest
   } = props
   return (
-    <Box
-      css={css`
-        //position: relative;
-      `}
-      mb="2"
-    >
+    <Box {...rest} mb="2">
       {label && (
         <Box
           css={css`

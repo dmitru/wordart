@@ -50,8 +50,8 @@ import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { ColorPicker } from 'components/shared/ColorPicker'
 import {
-  mkShapeConfFromOptions,
-  mkBgConfFromOptions,
+  mkShapeStyleConfFromOptions,
+  mkBgStyleConfFromOptions,
 } from 'components/Editor/style'
 
 export type EditorComponentProps = {
@@ -423,11 +423,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 onClick={() => {
                   if (state.targetTab === 'shape') {
                     store.editor?.generateShapeItems({
-                      style: mkShapeConfFromOptions(store.styleOptions.shape),
+                      style: mkShapeStyleConfFromOptions(
+                        store.styleOptions.shape
+                      ),
                     })
                   } else {
                     store.editor?.generateBgItems({
-                      style: mkBgConfFromOptions(store.styleOptions.bg),
+                      style: mkBgStyleConfFromOptions(store.styleOptions.bg),
                     })
                   }
                 }}

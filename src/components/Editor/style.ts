@@ -31,7 +31,9 @@ export type BgStyleConf = {
   }
 }
 
-export const mkBgConfFromOptions = (opts: BgStyleOptions): BgStyleConf => ({
+export const mkBgStyleConfFromOptions = (
+  opts: BgStyleOptions
+): BgStyleConf => ({
   fill: opts.fill.kind === 'color' ? opts.fill.color : { kind: 'transparent' },
   items: {
     words: mkWordItemsConfFromOptions(opts.items.words),
@@ -64,7 +66,7 @@ export type ShapeStyleConf = {
   }
 }
 
-export const mkShapeConfFromOptions = (
+export const mkShapeStyleConfFromOptions = (
   opts: ShapeStyleOptions
 ): ShapeStyleConf => ({
   opacity: opts.opacity,

@@ -71,6 +71,10 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
               />
             </Box>
 
+            <Heading size="sm" mt="2" mb="3">
+              Angles
+            </Heading>
+
             <Box>
               {anglePresets.map((preset) => (
                 <Button

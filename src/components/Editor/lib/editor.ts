@@ -416,12 +416,18 @@ export class Editor {
   }
 
   setBgItemsStyle = async (itemsStyleConf: BgStyleConf['items']) => {
-    // ...
+    this.setItemsStyle('bg', itemsStyleConf)
+  }
+  setShapeItemsStyle = async (itemsStyleConf: ShapeStyleConf['items']) => {
+    this.setItemsStyle('shape', itemsStyleConf)
   }
 
-  setShapeItemsStyle = async (itemsStyleConf: ShapeStyleConf['items']) => {
+  setItemsStyle = async (
+    target: TargetKind,
+    itemsStyleConf: BgStyleConf['items'] | ShapeStyleConf['items']
+  ) => {
     const { coloring, dimSmallerItems } = itemsStyleConf
-    const { items } = this.items.shape
+    const { items } = this.items[target]
     this.logger.debug(
       'setItemsColor',
       toJS(coloring, { recurseEverything: true }),
@@ -561,8 +567,9 @@ export class Editor {
       }
 
       item.setOpacity(
-        (dimSmallerFactor * (area - minArea)) / (maxArea - minArea) +
-          (1 - dimSmallerFactor)
+        ((dimSmallerFactor * (area - minArea)) / (maxArea - minArea) +
+          (1 - dimSmallerFactor)) *
+          itemsStyleConf.opacity
       )
     }
     this.canvas.requestRenderAll()

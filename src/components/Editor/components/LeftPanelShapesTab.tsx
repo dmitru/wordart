@@ -47,7 +47,7 @@ import { CustomizeRasterImageModal } from 'components/Editor/components/Customiz
 import { createCanvas } from 'lib/wordart/canvas-utils'
 import { fabric } from 'fabric'
 import { createMultilineFabricTextGroup } from 'components/Editor/lib/fabric-utils'
-import { mkShapeConfFromOptions as mkShapeStyleConfFromOptions } from 'components/Editor/style'
+import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 
 export type LeftPanelShapesTabProps = {}
 
