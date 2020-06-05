@@ -22,6 +22,7 @@ export type SliderProps = {
   min: number
   max: number
   step: number
+  horizontal?: boolean
 }
 
 export const Slider: React.FC<SliderProps> = (props) => {
@@ -31,17 +32,29 @@ export const Slider: React.FC<SliderProps> = (props) => {
     step,
     value,
     label,
+    horizontal = false,
     onChange = noop,
     onAfterChange = noop,
     ...rest
   } = props
   return (
-    <Box {...rest} mb="2">
+    <Box
+      {...rest}
+      mb="2"
+      {...(horizontal
+        ? { display: 'flex', flexDir: 'row', alignItems: 'center' }
+        : {})}
+    >
       {label && (
         <Box
           css={css`
             margin-bottom: -4px;
             color: #666;
+            ${horizontal
+              ? `
+              margin-right: 16px;
+            `
+              : ''}
           `}
         >
           {label}
@@ -56,6 +69,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
         css={css`
           position: relative;
           height: 30px;
+          flex: 1;
         `}
       >
         <Rail>
@@ -187,11 +201,11 @@ export const KeyboardHandle: React.FC<HandleProps> = ({
         justifyContent: 'center',
         height: 24,
         borderRadius: 8,
-        backgroundColor: disabled ? '#666' : theme.colors.primary['500'],
+        backgroundColor: disabled ? '#666' : theme.colors.secondary['500'],
         '&:hover, &:focus': {
           backgroundColor: disabled
             ? '#666'
-            : darken(0.05, theme.colors.primary['500']),
+            : darken(0.05, theme.colors.secondary['500']),
         },
       })}
       {...getHandleProps(id)}
@@ -224,7 +238,7 @@ export const Track: React.FC<TrackProps> = ({
         transform: 'translate(0%, -50%)',
         height: 14,
         zIndex: 1,
-        backgroundColor: disabled ? '#999' : '#607E9E',
+        backgroundColor: disabled ? '#999' : '#888',
         borderRadius: 7,
         cursor: 'pointer',
         left: `${source.percent}%`,

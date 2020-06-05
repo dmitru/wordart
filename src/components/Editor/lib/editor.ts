@@ -783,13 +783,11 @@ export class Editor {
     }
   }
 
-  setShapeItems = async (itemConfigs: EditorItemConfig[]) => {
+  setShapeItems = (itemConfigs: EditorItemConfig[]) =>
     this.setItems('shape', itemConfigs)
-  }
 
-  setBgItems = async (itemConfigs: EditorItemConfig[]) => {
+  setBgItems = (itemConfigs: EditorItemConfig[]) =>
     this.setItems('bg', itemConfigs)
-  }
 
   private setItems = async (
     target: TargetKind,
@@ -1210,26 +1208,22 @@ export class Editor {
   }
 
   clearItems = (target: TargetKind) => {
-    if (target === 'shape') {
-      const nonLockedItems = [...this.items.shape.itemsById.values()].filter(
-        (item) => !item.locked
-      )
+    const nonLockedItems = [
+      ...(target === 'shape'
+        ? this.items.shape.itemsById.values()
+        : this.items.bg.itemsById.values()),
+    ].filter((item) => !item.locked)
 
-      const fabricObjs = nonLockedItems.map((i) => i.fabricObj).filter(notEmpty)
-      this.canvas.remove(...fabricObjs)
+    const fabricObjs = nonLockedItems.map((i) => i.fabricObj).filter(notEmpty)
+    this.canvas.remove(...fabricObjs)
 
-      fabricObjs.forEach((obj) => this.items.shape.fabricObjToItem.delete(obj))
-      nonLockedItems.forEach((item) =>
-        this.items.shape.itemsById.delete(item.id)
-      )
+    fabricObjs.forEach((obj) => this.items.shape.fabricObjToItem.delete(obj))
+    nonLockedItems.forEach((item) => this.items.shape.itemsById.delete(item.id))
 
-      this.editorItemIdGen.removeIds(nonLockedItems.map((i) => i.id))
-      this.editorItemIdGen.resetLen()
+    this.editorItemIdGen.removeIds(nonLockedItems.map((i) => i.id))
+    this.editorItemIdGen.resetLen()
 
-      this.canvas.requestRenderAll()
-    } else {
-      // TODO
-    }
+    this.canvas.requestRenderAll()
   }
 
   destroy = () => {

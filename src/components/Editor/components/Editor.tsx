@@ -166,6 +166,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       return <SpinnerSplashScreen />
     }
 
+    const hasItems = store.editor
+      ? state.targetTab === 'bg'
+        ? store.editor.items.bg.items.length > 0
+        : store.editor.items.shape.items.length > 0
+      : false
+
     const leftTab =
       state.targetTab === 'bg' ? state.leftTabBg : state.leftTabShape
 
@@ -464,6 +470,20 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     Edit Items
                   </Button>
                 )}
+                {store.mode === 'view' && hasItems && (
+                  <Button
+                    css={css`
+                      box-shadow: none !important;
+                    `}
+                    variant="ghost"
+                    py="1"
+                    onClick={() => {
+                      store.editor?.clearItems(state.targetTab)
+                    }}
+                  >
+                    Clear All
+                  </Button>
+                )}
 
                 {store.mode === 'edit items' && (
                   <>
@@ -539,7 +559,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     py="1"
                     borderTopRightRadius="0"
                     borderBottomRightRadius="0"
-                    variantColor="primary"
+                    variantColor="secondary"
                     onClick={() => {
                       state.targetTab = 'shape'
                     }}
@@ -554,7 +574,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     py="1"
                     borderTopLeftRadius="0"
                     borderBottomLeftRadius="0"
-                    variantColor="primary"
+                    variantColor="secondary"
                     onClick={() => {
                       state.targetTab = 'bg'
                     }}
