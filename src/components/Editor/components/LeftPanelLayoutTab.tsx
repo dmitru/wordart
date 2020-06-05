@@ -132,6 +132,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
               <Slider
                 horizontal
                 label="Size"
+                afterLabel="%"
                 value={style.items.placement.wordsMaxSize}
                 onChange={(value) => {
                   const val = (value as any) as number
@@ -236,6 +237,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
             <Slider
               horizontal
               label="Size"
+              afterLabel="%"
               value={style.items.placement.iconsMaxSize}
               onChange={(value) => {
                 const val = (value as any) as number
@@ -249,6 +251,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
             <Slider
               horizontal
               label="Amount"
+              afterLabel="%"
               value={style.items.placement.iconsProportion}
               onChange={(value) => {
                 const val = (value as any) as number
@@ -278,6 +281,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
           <Slider
             horizontal
             label="Density"
+            afterLabel="%"
             value={style.items.placement.itemDensity}
             onChange={(value) => {
               const val = (value as any) as number
@@ -292,6 +296,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
           <Slider
             horizontal
             label="Shape Offset"
+            afterLabel="%"
             value={style.items.placement.shapePadding}
             onChange={(value) => {
               const val = (value as any) as number
