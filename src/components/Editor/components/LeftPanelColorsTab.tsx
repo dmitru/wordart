@@ -23,6 +23,8 @@ import { useDebouncedCallback } from 'use-debounce/lib'
 import css from '@emotion/css'
 import { themePresets } from 'components/Editor/theme-presets'
 import styled from '@emotion/styled'
+import { cloneDeep } from 'lodash'
+import { toJS } from 'mobx'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -198,13 +200,13 @@ const ThemePresetThumbnailContainer = styled(Box)`
 `
 
 const ThemePresetThumbnails = styled(Box)`
+  margin: 0 -10px;
+
   > * {
     margin-right: 10px;
+    margin-left: 10px;
+    margin-bottom: 16px;
   }
-
-  overflow-x: auto;
-  overflow-y: hidden;
-  width: 100%;
 `
 
 export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
@@ -213,6 +215,12 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
     const shape = store.getShape()
     const shapeStyle = store.styleOptions.shape
     const bgStyle = store.styleOptions.bg
+
+    const state = useLocalStore(() => ({
+      view: 'normal' as 'normal' | 'themes',
+      selectedThemeTitle: '',
+      savedStyle: null as any,
+    }))
 
     const updateShapeItemsColoring = useThrottleCallback(
       () => {
@@ -232,18 +240,20 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
       true
     )
 
+    const updateShapeColoringImmediately = async (updateItems = true) => {
+      if (!shape) {
+        return
+      }
+      const style = mkShapeStyleConfFromOptions(shapeStyle)
+      await store.editor?.updateShapeColors(shape.config)
+      store.updateShapeThumbnail()
+      if (updateItems && shapeStyle.items.coloring.kind === 'shape') {
+        store.editor?.setShapeItemsStyle(style.items)
+      }
+    }
+
     const [updateShapeColoring] = useDebouncedCallback(
-      async (updateItems = true) => {
-        if (!shape) {
-          return
-        }
-        const style = mkShapeStyleConfFromOptions(shapeStyle)
-        await store.editor?.updateShapeColors(shape.config)
-        store.updateShapeThumbnail()
-        if (updateItems && shapeStyle.items.coloring.kind === 'shape') {
-          store.editor?.setShapeItemsStyle(style.items)
-        }
-      },
+      updateShapeColoringImmediately,
       20,
       {
         leading: true,
@@ -251,354 +261,455 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
       }
     )
 
+    const updateAllStyles = async () => {
+      const shape = store.getShape()
+      const shapeStyle = store.styleOptions.shape
+      const bgStyle = store.styleOptions.bg
+      await updateShapeColoringImmediately()
+      await store.editor?.setShapeItemsStyle(
+        mkShapeStyleConfFromOptions(shapeStyle).items
+      )
+      await store.editor?.setBgItemsStyle(
+        mkBgStyleConfFromOptions(bgStyle).items
+      )
+      store.editor?.setBgColor(bgStyle.fill.color)
+    }
+
+    const applyTheme = (theme: ThemePreset) => {
+      // <update-styles>
+      // Shape
+      shapeStyle.opacity = theme.shapeOpacity
+
+      // Bg
+      bgStyle.fill.kind = 'color'
+      bgStyle.fill.color = {
+        kind: 'color',
+        color: theme.bgFill,
+      }
+
+      // Shape fill
+      if (shape?.kind === 'svg') {
+        shape.config.processing.colors = {
+          kind: 'single-color',
+          color: theme.shapeFill,
+        }
+      } else if (shape?.kind === 'text') {
+        shape.config.textStyle.color = theme.shapeFill
+      }
+
+      // Shape items coloring
+      shapeStyle.items.coloring.kind = theme.shapeItemsColoring.kind
+      if (theme.shapeItemsColoring.kind === 'color') {
+        shapeStyle.items.coloring.color = theme.shapeItemsColoring
+      } else if (theme.shapeItemsColoring.kind === 'gradient') {
+        shapeStyle.items.coloring.gradient = theme.shapeItemsColoring
+      } else if (theme.shapeItemsColoring.kind === 'shape') {
+        shapeStyle.items.coloring.shape = theme.shapeItemsColoring
+      }
+
+      // Bg items coloring
+      bgStyle.items.coloring.kind = theme.bgItemsColoring.kind
+      if (theme.bgItemsColoring.kind === 'color') {
+        bgStyle.items.coloring.color = theme.bgItemsColoring
+      } else if (theme.bgItemsColoring.kind === 'gradient') {
+        shapeStyle.items.coloring.gradient = theme.bgItemsColoring
+      }
+
+      shapeStyle.items.dimSmallerItems = theme.shapeDimSmallerItems
+      bgStyle.items.dimSmallerItems = theme.bgDimSmallerItems
+      // </update-styles>
+
+      // <apply-update>
+      updateAllStyles()
+      // </apply-update>
+    }
+
     return (
       <>
-        <Box mb="6">
-          <Text fontSize="xl">Themes</Text>
-          <ThemePresetThumbnails display="flex" flexDirection="row">
-            {themePresets.map((theme) => (
-              <ThemePresetThumbnailContainer
-                aria-role="button"
-                key={theme.title}
+        {state.view === 'themes' && (
+          <Box>
+            <Flex mb="5">
+              <Button
+                leftIcon="chevron-left"
                 onClick={() => {
-                  // <update-styles>
-                  // Shape
-                  shapeStyle.opacity = theme.shapeOpacity
-
-                  // Bg
-                  bgStyle.fill.kind = 'color'
-                  bgStyle.fill.color = {
-                    kind: 'color',
-                    color: theme.bgFill,
+                  state.view = 'normal'
+                  if (state.savedStyle) {
+                    store.styleOptions.shape = state.savedStyle.shapeStyle
+                    store.styleOptions.bg = state.savedStyle.bgStyle
+                    // @ts-ignore
+                    shape.config = state.savedStyle.shapeConfig
+                    updateAllStyles()
                   }
-
-                  // Shape fill
-                  if (shape?.kind === 'svg') {
-                    shape.config.processing.colors = {
-                      kind: 'single-color',
-                      color: theme.shapeFill,
-                    }
-                  } else if (shape?.kind === 'text') {
-                    shape.config.textStyle.color = theme.shapeFill
-                  }
-
-                  // Shape items coloring
-                  shapeStyle.items.coloring.kind = theme.shapeItemsColoring.kind
-                  if (theme.shapeItemsColoring.kind === 'color') {
-                    shapeStyle.items.coloring.color = theme.shapeItemsColoring
-                  } else if (theme.shapeItemsColoring.kind === 'gradient') {
-                    shapeStyle.items.coloring.gradient =
-                      theme.shapeItemsColoring
-                  } else if (theme.shapeItemsColoring.kind === 'shape') {
-                    shapeStyle.items.coloring.shape = theme.shapeItemsColoring
-                  }
-
-                  // Bg items coloring
-                  bgStyle.items.coloring.kind = theme.bgItemsColoring.kind
-                  if (theme.bgItemsColoring.kind === 'color') {
-                    bgStyle.items.coloring.color = theme.bgItemsColoring
-                  } else if (theme.bgItemsColoring.kind === 'gradient') {
-                    shapeStyle.items.coloring.gradient = theme.bgItemsColoring
-                  }
-
-                  shapeStyle.items.dimSmallerItems = theme.shapeDimSmallerItems
-                  bgStyle.items.dimSmallerItems = theme.bgDimSmallerItems
-                  // </update-styles>
-
-                  // <apply-update>
-                  updateShapeColoring()
-                  updateShapeItemsColoring()
-                  updateBgItemsColoring()
-                  store.editor?.setBgColor(bgStyle.fill.color)
-                  // </apply-update>
                 }}
               >
-                <ThemePresetThumbnail theme={theme} />
-                {theme.title}
-              </ThemePresetThumbnailContainer>
-            ))}
-          </ThemePresetThumbnails>
-        </Box>
+                Cancel
+              </Button>
+              {state.selectedThemeTitle && (
+                <Button
+                  marginLeft="auto"
+                  variantColor="accent"
+                  variant="solid"
+                  isDisabled={!state.selectedThemeTitle}
+                  onClick={() => {
+                    state.view = 'normal'
+                    state.savedStyle = null
+                  }}
+                >
+                  Apply Theme
+                </Button>
+              )}
+            </Flex>
 
-        <Divider />
+            <Text fontSize="xl">Choose a theme</Text>
+            <ThemePresetThumbnails
+              display="flex"
+              flexDirection="row"
+              flexWrap="wrap"
+            >
+              {themePresets.map((theme) => (
+                <ThemePresetThumbnailContainer
+                  aria-role="button"
+                  key={theme.title}
+                  css={css`
+                    ${state.selectedThemeTitle === theme.title &&
+                    'transform: scale(1.05); svg { outline: 5px solid #d53f8c; }'}
+                  `}
+                  onClick={() => {
+                    state.selectedThemeTitle = theme.title
+                    applyTheme(theme)
+                  }}
+                >
+                  <ThemePresetThumbnail theme={theme} />
+                  {theme.title}
+                </ThemePresetThumbnailContainer>
+              ))}
+            </ThemePresetThumbnails>
+          </Box>
+        )}
 
-        {/* <shape-color> */}
-        <Box mb="0">
-          <Flex direction="column">
-            <Text fontSize="xl">Shape</Text>
+        {state.view === 'normal' && (
+          <>
             <Box mb="3">
-              <Slider
-                labelCss="width: 60px"
-                label="Opacity"
-                horizontal
-                value={100 * shapeStyle.opacity}
-                onChange={(value) => {
-                  shapeStyle.opacity = value / 100
+              <Button
+                marginLeft="auto"
+                variant="solid"
+                variantColor="green"
+                rightIcon="chevron-right"
+                onClick={() => {
+                  state.view = 'themes'
+                  state.selectedThemeTitle = ''
+                  state.savedStyle = cloneDeep({
+                    shapeStyle: toJS(shapeStyle, {
+                      recurseEverything: true,
+                      exportMapsAsObjects: false,
+                    }),
+                    bgStyle: toJS(bgStyle, { recurseEverything: true }),
+                    shapeConfig: toJS(shape!.config, {
+                      recurseEverything: true,
+                    }),
+                  })
                 }}
-                onAfterChange={(value) => {
-                  store.editor?.setShapeOpacity(value / 100)
-                }}
-                min={0}
-                max={100}
-                step={1}
-              />
+              >
+                Explore Color Themes
+              </Button>
             </Box>
 
-            {shape?.kind === 'text' && (
-              <Box mb="5">
-                <ColorPicker
-                  value={chroma(shape.config.textStyle.color).alpha(1).hex()}
-                  onChange={(hex) => {
-                    shape.config.textStyle.color = chroma(hex).hex()
-                    updateShapeColoring(false)
-                  }}
-                  onAfterChange={() => {
-                    updateShapeColoring()
-                  }}
-                />
-              </Box>
-            )}
+            {/* <shape-color> */}
+            <Box mb="0">
+              <Flex direction="column">
+                <Box display="flex">
+                  <Text fontSize="xl">Shape</Text>
+                </Box>
 
-            {/* <svg-shape */}
-            {shape?.kind === 'svg' && (
-              <>
-                {/* <svg-color-options> */}
-                <Box
-                  mb="2"
-                  display="flex"
-                  flexDirection="row"
-                  alignItems="flex-start"
-                >
-                  <Text fontSize="md" mr="3" width="65px">
-                    Fill:
-                  </Text>
+                <Box mb="3">
+                  <Slider
+                    labelCss="width: 60px"
+                    label="Opacity"
+                    horizontal
+                    value={100 * shapeStyle.opacity}
+                    onChange={(value) => {
+                      shapeStyle.opacity = value / 100
+                    }}
+                    onAfterChange={(value) => {
+                      store.editor?.setShapeOpacity(value / 100)
+                    }}
+                    min={0}
+                    max={100}
+                    step={1}
+                  />
+                </Box>
 
-                  <Box>
-                    <Flex direction="row">
-                      <Button
-                        px="2"
-                        py="1"
-                        mr="0"
-                        size="sm"
-                        variant={
-                          shape.config.processing.colors.kind === 'original'
-                            ? 'solid'
-                            : 'outline'
-                        }
-                        variantColor={
-                          shape.config.processing.colors.kind === 'original'
-                            ? 'secondary'
-                            : undefined
-                        }
-                        onClick={() => {
-                          shape.config.processing.colors = {
-                            kind: 'original',
-                          }
-                          updateShapeColoring()
-                        }}
-                      >
-                        Original
-                      </Button>
+                {shape?.kind === 'text' && (
+                  <Box mb="5">
+                    <ColorPicker
+                      value={chroma(shape.config.textStyle.color)
+                        .alpha(1)
+                        .hex()}
+                      onChange={(hex) => {
+                        shape.config.textStyle.color = chroma(hex).hex()
+                        updateShapeColoring(false)
+                      }}
+                      onAfterChange={() => {
+                        updateShapeColoring()
+                      }}
+                    />
+                  </Box>
+                )}
 
-                      <Button
-                        px="2"
-                        py="1"
-                        mr="0"
-                        size="sm"
-                        variant={
-                          shape.config.processing.colors.kind === 'color-map'
-                            ? 'solid'
-                            : 'outline'
-                        }
-                        variantColor={
-                          shape.config.processing.colors.kind === 'color-map'
-                            ? 'secondary'
-                            : undefined
-                        }
-                        onClick={() => {
-                          shape.config.processing.colors = {
-                            kind: 'color-map',
-                            colors: shapeStyle.colors.colorMaps.get(shape.id)!,
-                          }
-                          updateShapeColoring()
-                        }}
-                      >
-                        Multicolor
-                      </Button>
+                {/* <svg-shape */}
+                {shape?.kind === 'svg' && (
+                  <>
+                    {/* <svg-color-options> */}
+                    <Box
+                      mb="2"
+                      display="flex"
+                      flexDirection="row"
+                      alignItems="flex-start"
+                    >
+                      <Text fontSize="md" mr="3" width="65px">
+                        Fill:
+                      </Text>
 
-                      <Button
-                        px="2"
-                        py="1"
-                        mr="0"
-                        size="sm"
-                        variant={
-                          shape.config.processing.colors.kind === 'single-color'
-                            ? 'solid'
-                            : 'outline'
-                        }
-                        variantColor={
-                          shape.config.processing.colors.kind === 'single-color'
-                            ? 'secondary'
-                            : undefined
-                        }
-                        onClick={() => {
-                          shape.config.processing.colors = {
-                            kind: 'single-color',
-                            color: shapeStyle.colors.color,
-                          }
-                          updateShapeColoring()
-                        }}
-                      >
-                        Single color
-                      </Button>
-                    </Flex>
+                      <Box>
+                        <Flex direction="row">
+                          <Button
+                            px="2"
+                            py="1"
+                            mr="0"
+                            size="sm"
+                            variant={
+                              shape.config.processing.colors.kind === 'original'
+                                ? 'solid'
+                                : 'outline'
+                            }
+                            variantColor={
+                              shape.config.processing.colors.kind === 'original'
+                                ? 'secondary'
+                                : undefined
+                            }
+                            onClick={() => {
+                              shape.config.processing.colors = {
+                                kind: 'original',
+                              }
+                              updateShapeColoring()
+                            }}
+                          >
+                            Original
+                          </Button>
 
-                    {shape.config.processing.colors.kind === 'single-color' && (
-                      <Box mb="4" mt="2">
-                        <ColorPicker
-                          disableAlpha
-                          value={chroma(shape.config.processing.colors.color)
-                            .alpha(1)
-                            .hex()}
-                          onChange={(hex) => {
-                            if (
+                          <Button
+                            px="2"
+                            py="1"
+                            mr="0"
+                            size="sm"
+                            variant={
+                              shape.config.processing.colors.kind ===
+                              'color-map'
+                                ? 'solid'
+                                : 'outline'
+                            }
+                            variantColor={
+                              shape.config.processing.colors.kind ===
+                              'color-map'
+                                ? 'secondary'
+                                : undefined
+                            }
+                            onClick={() => {
+                              console.log(
+                                'shapeStyle.colors.colorMaps',
+                                toJS(shapeStyle.colors.colorMaps)
+                              )
+                              shape.config.processing.colors = {
+                                kind: 'color-map',
+                                colors: shapeStyle.colors.colorMaps.get(
+                                  shape.id
+                                )!,
+                              }
+                              updateShapeColoring()
+                            }}
+                          >
+                            Multicolor
+                          </Button>
+
+                          <Button
+                            px="2"
+                            py="1"
+                            mr="0"
+                            size="sm"
+                            variant={
                               shape.config.processing.colors.kind ===
                               'single-color'
-                            ) {
-                              shape.config.processing.colors.color = chroma(
-                                hex
-                              ).hex()
+                                ? 'solid'
+                                : 'outline'
                             }
-                          }}
-                          onAfterChange={() => {
-                            updateShapeColoring()
-                          }}
-                        />
-                      </Box>
-                    )}
+                            variantColor={
+                              shape.config.processing.colors.kind ===
+                              'single-color'
+                                ? 'secondary'
+                                : undefined
+                            }
+                            onClick={() => {
+                              shape.config.processing.colors = {
+                                kind: 'single-color',
+                                color: shapeStyle.colors.color,
+                              }
+                              updateShapeColoring()
+                            }}
+                          >
+                            Single color
+                          </Button>
+                        </Flex>
 
-                    {shape.config.processing.colors.kind === 'color-map' && (
-                      <Box mb="4" mt="2">
-                        {shape.config.processing.colors.colors.map(
-                          (color, index) => (
-                            <Box mr="1" key={index} display="inline-block">
-                              <ColorPicker
-                                disableAlpha
-                                value={chroma(color).alpha(1).hex()}
-                                onChange={(hex) => {
-                                  if (
-                                    shape.config.processing.colors.kind ===
-                                    'color-map'
-                                  ) {
-                                    shape.config.processing.colors.colors[
-                                      index
-                                    ] = chroma(hex).hex()
-                                  }
-                                }}
-                                onAfterChange={() => {
-                                  updateShapeColoring()
-                                }}
-                              />
-                            </Box>
-                          )
+                        {shape.config.processing.colors.kind ===
+                          'single-color' && (
+                          <Box mb="4" mt="2">
+                            <ColorPicker
+                              disableAlpha
+                              value={chroma(
+                                shape.config.processing.colors.color
+                              )
+                                .alpha(1)
+                                .hex()}
+                              onChange={(hex) => {
+                                if (
+                                  shape.config.processing.colors.kind ===
+                                  'single-color'
+                                ) {
+                                  shape.config.processing.colors.color = chroma(
+                                    hex
+                                  ).hex()
+                                }
+                              }}
+                              onAfterChange={() => {
+                                updateShapeColoring()
+                              }}
+                            />
+                          </Box>
+                        )}
+
+                        {shape.config.processing.colors.kind ===
+                          'color-map' && (
+                          <Box mb="4" mt="2">
+                            {shape.config.processing.colors.colors.map(
+                              (color, index) => (
+                                <Box mr="1" key={index} display="inline-block">
+                                  <ColorPicker
+                                    disableAlpha
+                                    value={chroma(color).alpha(1).hex()}
+                                    onChange={(hex) => {
+                                      if (
+                                        shape.config.processing.colors.kind ===
+                                        'color-map'
+                                      ) {
+                                        shape.config.processing.colors.colors[
+                                          index
+                                        ] = chroma(hex).hex()
+                                      }
+                                    }}
+                                    onAfterChange={() => {
+                                      updateShapeColoring()
+                                    }}
+                                  />
+                                </Box>
+                              )
+                            )}
+                          </Box>
                         )}
                       </Box>
-                    )}
-                  </Box>
-                </Box>
-                {/* <svg-color-options> */}
-              </>
-            )}
-            {/* </svg-shape> */}
-          </Flex>
-        </Box>
-        {/* </shape-color> */}
-
-        {/* <shape-items> */}
-        <Box mb="6">
-          <Box
-            mb="2"
-            display="flex"
-            flexDirection="row"
-            alignItems="flex-start"
-          >
-            <Text fontSize="md" mr="3" width="65px">
-              Items:
-            </Text>
-
-            <Box>
-              <Flex direction="row">
-                <Button
-                  px="2"
-                  py="1"
-                  mr="0"
-                  size="sm"
-                  variant={
-                    shapeStyle.items.coloring.kind === 'shape'
-                      ? 'solid'
-                      : 'outline'
-                  }
-                  variantColor={
-                    shapeStyle.items.coloring.kind === 'shape'
-                      ? 'secondary'
-                      : undefined
-                  }
-                  onClick={() => {
-                    shapeStyle.items.coloring.kind = 'shape'
-                    updateShapeItemsColoring()
-                  }}
-                >
-                  Shape color
-                </Button>
-
-                <Button
-                  px="2"
-                  py="1"
-                  size="sm"
-                  variant={
-                    shapeStyle.items.coloring.kind === 'gradient'
-                      ? 'solid'
-                      : 'outline'
-                  }
-                  variantColor={
-                    shapeStyle.items.coloring.kind === 'gradient'
-                      ? 'secondary'
-                      : undefined
-                  }
-                  onClick={() => {
-                    shapeStyle.items.coloring.kind = 'gradient'
-                    updateShapeItemsColoring()
-                  }}
-                >
-                  Gradient
-                </Button>
-
-                <Button
-                  px="2"
-                  py="1"
-                  mr="0"
-                  size="sm"
-                  variantColor={
-                    shapeStyle.items.coloring.kind === 'color'
-                      ? 'secondary'
-                      : undefined
-                  }
-                  variant={
-                    shapeStyle.items.coloring.kind === 'color'
-                      ? 'solid'
-                      : 'outline'
-                  }
-                  onClick={() => {
-                    shapeStyle.items.coloring.kind = 'color'
-                    updateShapeItemsColoring()
-                  }}
-                >
-                  Color
-                </Button>
+                    </Box>
+                    {/* <svg-color-options> */}
+                  </>
+                )}
+                {/* </svg-shape> */}
               </Flex>
+            </Box>
+            {/* </shape-color> */}
 
-              <Box mt="2">
-                {/* {shapeStyle.items.coloring.kind === 'shape' && (
+            {/* <shape-items> */}
+            <Box mb="6">
+              <Box
+                mb="2"
+                display="flex"
+                flexDirection="row"
+                alignItems="flex-start"
+              >
+                <Text fontSize="md" mr="3" width="65px">
+                  Items:
+                </Text>
+
+                <Box>
+                  <Flex direction="row">
+                    <Button
+                      px="2"
+                      py="1"
+                      mr="0"
+                      size="sm"
+                      variant={
+                        shapeStyle.items.coloring.kind === 'shape'
+                          ? 'solid'
+                          : 'outline'
+                      }
+                      variantColor={
+                        shapeStyle.items.coloring.kind === 'shape'
+                          ? 'secondary'
+                          : undefined
+                      }
+                      onClick={() => {
+                        shapeStyle.items.coloring.kind = 'shape'
+                        updateShapeItemsColoring()
+                      }}
+                    >
+                      Shape color
+                    </Button>
+
+                    <Button
+                      px="2"
+                      py="1"
+                      size="sm"
+                      variant={
+                        shapeStyle.items.coloring.kind === 'gradient'
+                          ? 'solid'
+                          : 'outline'
+                      }
+                      variantColor={
+                        shapeStyle.items.coloring.kind === 'gradient'
+                          ? 'secondary'
+                          : undefined
+                      }
+                      onClick={() => {
+                        shapeStyle.items.coloring.kind = 'gradient'
+                        updateShapeItemsColoring()
+                      }}
+                    >
+                      Gradient
+                    </Button>
+
+                    <Button
+                      px="2"
+                      py="1"
+                      mr="0"
+                      size="sm"
+                      variantColor={
+                        shapeStyle.items.coloring.kind === 'color'
+                          ? 'secondary'
+                          : undefined
+                      }
+                      variant={
+                        shapeStyle.items.coloring.kind === 'color'
+                          ? 'solid'
+                          : 'outline'
+                      }
+                      onClick={() => {
+                        shapeStyle.items.coloring.kind = 'color'
+                        updateShapeItemsColoring()
+                      }}
+                    >
+                      Color
+                    </Button>
+                  </Flex>
+
+                  <Box mt="2">
+                    {/* {shapeStyle.items.coloring.kind === 'shape' && (
               <Box mb="4">
                 <Slider
                   css={css`
@@ -617,235 +728,245 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                 />
               </Box>
             )} */}
-                {shapeStyle.items.coloring.kind === 'color' && (
+                    {shapeStyle.items.coloring.kind === 'color' && (
+                      <ColorPicker
+                        disableAlpha
+                        value={shapeStyle.items.coloring.color.color}
+                        onChange={(hex) => {
+                          shapeStyle.items.coloring.color.color = hex
+                        }}
+                        onAfterChange={updateShapeItemsColoring}
+                      />
+                    )}
+                    {shapeStyle.items.coloring.kind === 'gradient' && (
+                      <>
+                        <Box mr="1" display="inline-block">
+                          <ColorPicker
+                            disableAlpha
+                            value={
+                              shapeStyle.items.coloring.gradient.gradient.from
+                            }
+                            onChange={(hex) => {
+                              shapeStyle.items.coloring.gradient.gradient.from = hex
+                            }}
+                            onAfterChange={updateShapeItemsColoring}
+                          />
+                        </Box>
+                        <Box mr="1" display="inline-block">
+                          <ColorPicker
+                            disableAlpha
+                            value={
+                              shapeStyle.items.coloring.gradient.gradient.to
+                            }
+                            onChange={(hex) => {
+                              shapeStyle.items.coloring.gradient.gradient.to = hex
+                            }}
+                            onAfterChange={updateShapeItemsColoring}
+                          />
+                        </Box>
+                      </>
+                    )}
+                  </Box>
+                </Box>
+              </Box>
+
+              <Stack direction="column" spacing="3" mt="3">
+                <Slider
+                  labelCss="width: 60px"
+                  horizontal
+                  label="Opacity"
+                  value={100 * shapeStyle.items.opacity}
+                  onChange={(value) => {
+                    shapeStyle.items.opacity = value / 100
+                  }}
+                  onAfterChange={updateShapeItemsColoring}
+                  min={0}
+                  max={100}
+                  step={1}
+                />
+
+                <Slider
+                  css={css`
+                    flex: 1;
+                  `}
+                  horizontal
+                  label="Emphasize size"
+                  value={shapeStyle.items.dimSmallerItems}
+                  onChange={(value) => {
+                    const val = (value as any) as number
+                    shapeStyle.items.dimSmallerItems = val
+                  }}
+                  onAfterChange={updateShapeItemsColoring}
+                  min={0}
+                  max={100}
+                  step={1}
+                />
+              </Stack>
+            </Box>
+            {/* </shape-items> */}
+
+            <Divider />
+
+            {/* <background> */}
+
+            <Box>
+              <Text fontSize="xl">Background</Text>
+              <Stack direction="row" spacing="3">
+                <Box
+                  mb="6"
+                  display="flex"
+                  alignItems="flex-start"
+                  flex="1"
+                  justifyContent="flex-start"
+                >
+                  <Text fontSize="md" mr="3">
+                    Items:
+                  </Text>
+
+                  <Box>
+                    <Box flex="1" width="130px">
+                      <Button
+                        px="2"
+                        py="1"
+                        size="sm"
+                        variant={
+                          bgStyle.items.coloring.kind === 'gradient'
+                            ? 'solid'
+                            : 'outline'
+                        }
+                        variantColor={
+                          bgStyle.items.coloring.kind === 'gradient'
+                            ? 'secondary'
+                            : undefined
+                        }
+                        onClick={() => {
+                          bgStyle.items.coloring.kind = 'gradient'
+                          updateBgItemsColoring()
+                        }}
+                      >
+                        Gradient
+                      </Button>
+
+                      <Button
+                        px="2"
+                        py="1"
+                        mr="0"
+                        size="sm"
+                        variant={
+                          bgStyle.items.coloring.kind === 'color'
+                            ? 'solid'
+                            : 'outline'
+                        }
+                        variantColor={
+                          bgStyle.items.coloring.kind === 'color'
+                            ? 'secondary'
+                            : undefined
+                        }
+                        onClick={() => {
+                          bgStyle.items.coloring.kind = 'color'
+                          updateBgItemsColoring()
+                        }}
+                      >
+                        Color
+                      </Button>
+                    </Box>
+
+                    <Box mt="3">
+                      {bgStyle.items.coloring.kind === 'color' && (
+                        <ColorPicker
+                          disableAlpha
+                          value={bgStyle.items.coloring.color.color}
+                          onChange={(hex) => {
+                            bgStyle.items.coloring.color.color = hex
+                          }}
+                          onAfterChange={updateBgItemsColoring}
+                        />
+                      )}
+                      {bgStyle.items.coloring.kind === 'gradient' && (
+                        <>
+                          <Box mr="1" display="inline-block">
+                            <ColorPicker
+                              disableAlpha
+                              value={
+                                bgStyle.items.coloring.gradient.gradient.from
+                              }
+                              onChange={(hex) => {
+                                bgStyle.items.coloring.gradient.gradient.from = hex
+                              }}
+                              onAfterChange={updateBgItemsColoring}
+                            />
+                          </Box>
+                          <Box mr="1" display="inline-block">
+                            <ColorPicker
+                              disableAlpha
+                              value={
+                                shapeStyle.items.coloring.gradient.gradient.to
+                              }
+                              onChange={(hex) => {
+                                shapeStyle.items.coloring.gradient.gradient.to = hex
+                              }}
+                              onAfterChange={updateBgItemsColoring}
+                            />
+                          </Box>
+                        </>
+                      )}
+                    </Box>
+                  </Box>
+                </Box>
+
+                <Box mb="6" display="flex" alignItems="flex-start">
+                  <Text fontSize="md" mr="3">
+                    Fill:
+                  </Text>
+
                   <ColorPicker
-                    disableAlpha
-                    value={shapeStyle.items.coloring.color.color}
+                    value={chroma(bgStyle.fill.color.color).alpha(1).hex()}
                     onChange={(hex) => {
-                      shapeStyle.items.coloring.color.color = hex
+                      bgStyle.fill.color.color = chroma(hex).hex()
+                      store.editor?.setBgColor(bgStyle.fill.color)
                     }}
-                    onAfterChange={updateShapeItemsColoring}
                   />
-                )}
-                {shapeStyle.items.coloring.kind === 'gradient' && (
-                  <>
-                    <Box mr="1" display="inline-block">
-                      <ColorPicker
-                        disableAlpha
-                        value={shapeStyle.items.coloring.gradient.gradient.from}
-                        onChange={(hex) => {
-                          shapeStyle.items.coloring.gradient.gradient.from = hex
-                        }}
-                        onAfterChange={updateShapeItemsColoring}
-                      />
-                    </Box>
-                    <Box mr="1" display="inline-block">
-                      <ColorPicker
-                        disableAlpha
-                        value={shapeStyle.items.coloring.gradient.gradient.to}
-                        onChange={(hex) => {
-                          shapeStyle.items.coloring.gradient.gradient.to = hex
-                        }}
-                        onAfterChange={updateShapeItemsColoring}
-                      />
-                    </Box>
-                  </>
-                )}
-              </Box>
-            </Box>
-          </Box>
-
-          <Stack direction="column" spacing="3" mt="3">
-            <Slider
-              labelCss="width: 60px"
-              horizontal
-              label="Opacity"
-              value={100 * shapeStyle.items.opacity}
-              onChange={(value) => {
-                shapeStyle.items.opacity = value / 100
-              }}
-              onAfterChange={updateShapeItemsColoring}
-              min={0}
-              max={100}
-              step={1}
-            />
-
-            <Slider
-              css={css`
-                flex: 1;
-              `}
-              horizontal
-              label="Emphasize size"
-              value={shapeStyle.items.dimSmallerItems}
-              onChange={(value) => {
-                const val = (value as any) as number
-                shapeStyle.items.dimSmallerItems = val
-              }}
-              onAfterChange={updateShapeItemsColoring}
-              min={0}
-              max={100}
-              step={1}
-            />
-          </Stack>
-        </Box>
-        {/* </shape-items> */}
-
-        <Divider />
-
-        {/* <background> */}
-
-        <Box>
-          <Text fontSize="xl">Background</Text>
-          <Stack direction="row" spacing="3">
-            <Box
-              mb="6"
-              display="flex"
-              alignItems="flex-start"
-              flex="1"
-              justifyContent="flex-start"
-            >
-              <Text fontSize="md" mr="3">
-                Items:
-              </Text>
-
-              <Box>
-                <Box flex="1" width="130px">
-                  <Button
-                    px="2"
-                    py="1"
-                    size="sm"
-                    variant={
-                      bgStyle.items.coloring.kind === 'gradient'
-                        ? 'solid'
-                        : 'outline'
-                    }
-                    variantColor={
-                      bgStyle.items.coloring.kind === 'gradient'
-                        ? 'secondary'
-                        : undefined
-                    }
-                    onClick={() => {
-                      bgStyle.items.coloring.kind = 'gradient'
-                      updateBgItemsColoring()
-                    }}
-                  >
-                    Gradient
-                  </Button>
-
-                  <Button
-                    px="2"
-                    py="1"
-                    mr="0"
-                    size="sm"
-                    variant={
-                      bgStyle.items.coloring.kind === 'color'
-                        ? 'solid'
-                        : 'outline'
-                    }
-                    variantColor={
-                      bgStyle.items.coloring.kind === 'color'
-                        ? 'secondary'
-                        : undefined
-                    }
-                    onClick={() => {
-                      bgStyle.items.coloring.kind = 'color'
-                      updateBgItemsColoring()
-                    }}
-                  >
-                    Color
-                  </Button>
                 </Box>
+              </Stack>
 
-                <Box mt="3">
-                  {bgStyle.items.coloring.kind === 'color' && (
-                    <ColorPicker
-                      disableAlpha
-                      value={bgStyle.items.coloring.color.color}
-                      onChange={(hex) => {
-                        bgStyle.items.coloring.color.color = hex
-                      }}
-                      onAfterChange={updateBgItemsColoring}
-                    />
-                  )}
-                  {bgStyle.items.coloring.kind === 'gradient' && (
-                    <>
-                      <Box mr="1" display="inline-block">
-                        <ColorPicker
-                          disableAlpha
-                          value={bgStyle.items.coloring.gradient.gradient.from}
-                          onChange={(hex) => {
-                            bgStyle.items.coloring.gradient.gradient.from = hex
-                          }}
-                          onAfterChange={updateBgItemsColoring}
-                        />
-                      </Box>
-                      <Box mr="1" display="inline-block">
-                        <ColorPicker
-                          disableAlpha
-                          value={shapeStyle.items.coloring.gradient.gradient.to}
-                          onChange={(hex) => {
-                            shapeStyle.items.coloring.gradient.gradient.to = hex
-                          }}
-                          onAfterChange={updateBgItemsColoring}
-                        />
-                      </Box>
-                    </>
-                  )}
-                </Box>
-              </Box>
+              <Stack direction="column" spacing="3">
+                <Slider
+                  css={css`
+                    flex: 1;
+                  `}
+                  horizontal
+                  label="Opacity"
+                  value={100 * bgStyle.items.opacity}
+                  onChange={(value) => {
+                    bgStyle.items.opacity = value / 100
+                  }}
+                  onAfterChange={updateBgItemsColoring}
+                  min={0}
+                  max={100}
+                  step={1}
+                />
+
+                <Slider
+                  css={css`
+                    flex: 1;
+                  `}
+                  horizontal
+                  label="Emphasize size"
+                  value={bgStyle.items.dimSmallerItems}
+                  onChange={(value) => {
+                    const val = (value as any) as number
+                    bgStyle.items.dimSmallerItems = val
+                  }}
+                  onAfterChange={updateBgItemsColoring}
+                  min={0}
+                  max={100}
+                  step={1}
+                />
+              </Stack>
             </Box>
-
-            <Box mb="6" display="flex" alignItems="flex-start">
-              <Text fontSize="md" mr="3">
-                Fill:
-              </Text>
-
-              <ColorPicker
-                value={chroma(bgStyle.fill.color.color).alpha(1).hex()}
-                onChange={(hex) => {
-                  bgStyle.fill.color.color = chroma(hex).hex()
-                  store.editor?.setBgColor(bgStyle.fill.color)
-                }}
-              />
-            </Box>
-          </Stack>
-
-          <Stack direction="column" spacing="3">
-            <Slider
-              css={css`
-                flex: 1;
-              `}
-              horizontal
-              label="Opacity"
-              value={100 * bgStyle.items.opacity}
-              onChange={(value) => {
-                bgStyle.items.opacity = value / 100
-              }}
-              onAfterChange={updateBgItemsColoring}
-              min={0}
-              max={100}
-              step={1}
-            />
-
-            <Slider
-              css={css`
-                flex: 1;
-              `}
-              horizontal
-              label="Emphasize size"
-              value={bgStyle.items.dimSmallerItems}
-              onChange={(value) => {
-                const val = (value as any) as number
-                bgStyle.items.dimSmallerItems = val
-              }}
-              onAfterChange={updateBgItemsColoring}
-              min={0}
-              max={100}
-              step={1}
-            />
-          </Stack>
-        </Box>
-        {/* </background> */}
+            {/* </background> */}
+          </>
+        )}
       </>
     )
   }

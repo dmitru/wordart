@@ -429,7 +429,8 @@ export class Editor {
     const { coloring, dimSmallerItems } = itemsStyleConf
     const { items } = this.items[target]
     this.logger.debug(
-      'setItemsColor',
+      'setItemsStyle',
+      target,
       toJS(coloring, { recurseEverything: true }),
       `${items.length} items`
     )

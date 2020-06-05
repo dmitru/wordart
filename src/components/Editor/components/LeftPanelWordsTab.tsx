@@ -97,7 +97,22 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     return (
       <Box mb="5">
         <Stack spacing="0">
-          <Stack direction="row" spacing="0">
+          <Stack direction="row" mb="2">
+            <Button
+              variantColor="green"
+              leftIcon="add"
+              onClick={() => store.addWord(target)}
+            >
+              Add
+            </Button>
+
+            <InputGroup flex={1}>
+              <InputLeftElement children={<Icon name="search" />} />
+              <Input placeholder="Filter..." />
+            </InputGroup>
+          </Stack>
+
+          <Stack direction="row" mt="2" spacing="0">
             <Tooltip label="Open advanced words editor..." showDelay={300}>
               <Button leftIcon="edit">Open editor...</Button>
             </Tooltip>
@@ -170,21 +185,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                 </MenuItem>
               </MenuList>
             </Menu>
-          </Stack>
-
-          <Stack direction="row" mt="3">
-            <Button
-              variantColor="green"
-              leftIcon="add"
-              onClick={() => store.addWord(target)}
-            >
-              Add
-            </Button>
-
-            <InputGroup flex={1}>
-              <InputLeftElement children={<Icon name="search" />} />
-              <Input placeholder="Filter..." />
-            </InputGroup>
           </Stack>
 
           <WordList mt="2">
