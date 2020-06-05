@@ -11,10 +11,24 @@ import {
   WordAnglesPresetKind,
   WordItemsOptions,
   WordListEntry,
+  ColorString,
 } from 'components/Editor/style-options'
 import { FontId } from 'data/fonts'
 
 export type IconId = number
+
+export type ThemePreset = {
+  title: string
+  // style
+  bgFill: ColorString
+  bgItemsColoring: BgStyleConf['items']['coloring']
+  shapeFill: ColorString
+  shapeItemsColoring: ShapeStyleConf['items']['coloring']
+  shapeOpacity: number
+  itemsOpacity: number
+  shapeDimSmallerItems: number
+  bgDimSmallerItems: number
+}
 
 export type BgStyleConf = {
   fill: BgFill

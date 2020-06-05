@@ -13,17 +13,199 @@ import { TargetKind } from 'components/Editor/lib/editor'
 import {
   mkShapeStyleConfFromOptions,
   mkBgStyleConfFromOptions,
+  ThemePreset,
 } from 'components/Editor/style'
 import { ColorPicker } from 'components/shared/ColorPicker'
 import { Slider } from 'components/shared/Slider'
-import { observer } from 'mobx-react'
+import { observer, useLocalStore } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import css from '@emotion/css'
+import { themePresets } from 'components/Editor/theme-presets'
+import styled from '@emotion/styled'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
 }
+
+export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
+  theme,
+}) => {
+  let shapeItemsColor = 'black'
+  if (theme.shapeItemsColoring.kind === 'color') {
+    shapeItemsColor = theme.shapeItemsColoring.color
+  } else if (theme.shapeItemsColoring.kind === 'gradient') {
+    shapeItemsColor = theme.shapeItemsColoring.gradient.from
+  } else if (theme.shapeItemsColoring.kind === 'shape') {
+    shapeItemsColor = theme.shapeFill
+  }
+
+  let bgItemsColor = 'black'
+  if (theme.bgItemsColoring.kind === 'color') {
+    bgItemsColor = theme.bgItemsColoring.color
+  } else if (theme.bgItemsColoring.kind === 'gradient') {
+    bgItemsColor = theme.bgItemsColoring.gradient.from
+  }
+
+  return (
+    <svg
+      width="100px"
+      height="76px"
+      viewBox="0 0 319 240"
+      version="1.1"
+      style={{ border: '1px solid #888' }}
+    >
+      <g
+        id="Page-1"
+        stroke="none"
+        stroke-width="1"
+        fill="none"
+        fill-rule="evenodd"
+      >
+        <g id="Group-2">
+          <rect
+            id="Rectangle"
+            fill={theme.bgFill}
+            x="0"
+            y="0"
+            width="319"
+            height="240"
+          ></rect>
+          <g id="Group" transform="translate(50.000000, 51.000000)">
+            <rect
+              id="Rectangle"
+              fill={theme.shapeFill}
+              opacity={theme.shapeOpacity}
+              x="0"
+              y="0"
+              width="218"
+              height="140"
+              rx="29"
+            ></rect>
+            <rect
+              id="Rectangle"
+              fill={shapeItemsColor}
+              x="16"
+              y="29"
+              width="112"
+              height="21"
+            ></rect>
+            <rect
+              id="Rectangle"
+              fill={shapeItemsColor}
+              x="68"
+              y="67"
+              width="84"
+              height="17"
+            ></rect>
+            <rect
+              id="Rectangle"
+              fill={shapeItemsColor}
+              x="56"
+              y="99"
+              width="72"
+              height="22"
+            ></rect>
+            <rect
+              id="Rectangle"
+              fill={shapeItemsColor}
+              x="152"
+              y="33"
+              width="54"
+              height="17"
+            ></rect>
+            <rect
+              id="Rectangle"
+              fill={shapeItemsColor}
+              x="168"
+              y="80"
+              width="23"
+              height="39"
+            ></rect>
+            <rect
+              id="Rectangle"
+              fill={shapeItemsColor}
+              x="17"
+              y="65"
+              width="23"
+              height="39"
+            ></rect>
+          </g>
+          <rect
+            id="Rectangle"
+            fill={bgItemsColor}
+            x="149"
+            y="15"
+            width="83"
+            height="18"
+          ></rect>
+          <rect
+            id="Rectangle"
+            fill={bgItemsColor}
+            x="66"
+            y="204"
+            width="83"
+            height="18"
+          ></rect>
+          <rect
+            id="Rectangle"
+            fill={bgItemsColor}
+            x="16"
+            y="20"
+            width="23"
+            height="59"
+          ></rect>
+          <rect
+            id="Rectangle"
+            fill={bgItemsColor}
+            x="14"
+            y="185"
+            width="25"
+            height="38"
+          ></rect>
+          <rect
+            id="Rectangle"
+            fill={bgItemsColor}
+            x="279"
+            y="32"
+            width="25"
+            height="38"
+          ></rect>
+          <rect
+            id="Rectangle"
+            fill={bgItemsColor}
+            x="279"
+            y="147"
+            width="25"
+            height="77"
+          ></rect>
+        </g>
+      </g>
+    </svg>
+  )
+}
+
+const ThemePresetThumbnailContainer = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+
+  transition: 0.2s transform;
+  &:hover {
+    transform: scale(1.05);
+  }
+`
+
+const ThemePresetThumbnails = styled(Box)`
+  > * {
+    margin-right: 10px;
+  }
+
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+`
 
 export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
   ({ target }) => {
@@ -71,8 +253,77 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
     return (
       <>
-        {/* <shape-color> */}
         <Box mb="6">
+          <Text fontSize="xl">Themes</Text>
+          <ThemePresetThumbnails display="flex" flexDirection="row">
+            {themePresets.map((theme) => (
+              <ThemePresetThumbnailContainer
+                aria-role="button"
+                key={theme.title}
+                onClick={() => {
+                  // <update-styles>
+                  // Shape
+                  shapeStyle.opacity = theme.shapeOpacity
+
+                  // Bg
+                  bgStyle.fill.kind = 'color'
+                  bgStyle.fill.color = {
+                    kind: 'color',
+                    color: theme.bgFill,
+                  }
+
+                  // Shape fill
+                  if (shape?.kind === 'svg') {
+                    shape.config.processing.colors = {
+                      kind: 'single-color',
+                      color: theme.shapeFill,
+                    }
+                  } else if (shape?.kind === 'text') {
+                    shape.config.textStyle.color = theme.shapeFill
+                  }
+
+                  // Shape items coloring
+                  shapeStyle.items.coloring.kind = theme.shapeItemsColoring.kind
+                  if (theme.shapeItemsColoring.kind === 'color') {
+                    shapeStyle.items.coloring.color = theme.shapeItemsColoring
+                  } else if (theme.shapeItemsColoring.kind === 'gradient') {
+                    shapeStyle.items.coloring.gradient =
+                      theme.shapeItemsColoring
+                  } else if (theme.shapeItemsColoring.kind === 'shape') {
+                    shapeStyle.items.coloring.shape = theme.shapeItemsColoring
+                  }
+
+                  // Bg items coloring
+                  bgStyle.items.coloring.kind = theme.bgItemsColoring.kind
+                  if (theme.bgItemsColoring.kind === 'color') {
+                    bgStyle.items.coloring.color = theme.bgItemsColoring
+                  } else if (theme.bgItemsColoring.kind === 'gradient') {
+                    shapeStyle.items.coloring.gradient = theme.bgItemsColoring
+                  }
+
+                  shapeStyle.items.dimSmallerItems = theme.shapeDimSmallerItems
+                  bgStyle.items.dimSmallerItems = theme.bgDimSmallerItems
+                  // </update-styles>
+
+                  // <apply-update>
+                  updateShapeColoring()
+                  updateShapeItemsColoring()
+                  updateBgItemsColoring()
+                  store.editor?.setBgColor(bgStyle.fill.color)
+                  // </apply-update>
+                }}
+              >
+                <ThemePresetThumbnail theme={theme} />
+                {theme.title}
+              </ThemePresetThumbnailContainer>
+            ))}
+          </ThemePresetThumbnails>
+        </Box>
+
+        <Divider />
+
+        {/* <shape-color> */}
+        <Box mb="0">
           <Flex direction="column">
             <Text fontSize="xl">Shape</Text>
             <Box mb="3">
@@ -264,7 +515,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
         {/* </shape-color> */}
 
         {/* <shape-items> */}
-        <Box mb="6" mt="35px">
+        <Box mb="6">
           <Box
             mb="2"
             display="flex"

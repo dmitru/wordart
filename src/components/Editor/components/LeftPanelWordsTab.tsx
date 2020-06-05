@@ -189,7 +189,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
           <WordList mt="2">
             {words.wordList.map((word) => (
-              <WordRow key={word.id}>
+              <WordRow key={word.id} aria-label="">
                 <Editable
                   ml="2"
                   flex={1}

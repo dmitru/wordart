@@ -145,7 +145,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           await store.initEditor(editorParams)
 
           // store.editor?.generateShapeItems({
-          //   style: store.styles.shape,
+          //   style: mkShapeStyleConfFromOptions(store.styleOptions.shape),
           // })
         }
       }
@@ -314,7 +314,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               </SideNavbar>
 
               <LeftPanel>
-                <LeftPanelContent id="left-panel-content" px="3" py="3">
+                <LeftPanelContent
+                  id="left-panel-content"
+                  px="3"
+                  py="3"
+                  noScroll={leftTab === 'shapes'}
+                >
                   {store.lifecycleState === 'initialized' ? (
                     <>
                       {state.leftPanelContext === 'resize' && (
@@ -758,9 +763,9 @@ const LeftNavbarBtn = styled(BaseBtn)<{ theme: any; active: boolean }>`
   }
 `
 
-const LeftPanelContent = styled(Box)<{ theme: any }>`
+const LeftPanelContent = styled(Box)<{ theme: any; noScroll: boolean }>`
   flex: 1;
-  height: 100%;
+  height: ${(p) => (p.noScroll ? '100%' : 'calc(100vh - 50px)')};
   overflow: auto;
   background: ${(p) => p.theme.colors.light};
   z-index: 2;
