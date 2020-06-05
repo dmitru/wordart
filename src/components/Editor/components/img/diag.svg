@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="250px" height="276px" viewBox="0 0 250 276" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 62 (91390) - https://sketch.com -->
+    <title>Group 6</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-6" transform="translate(-34.000000, -93.000000)">
+            <rect id="Rectangle" x="13" y="86" width="295" height="295"></rect>
+            <text id="Diagonal-Down" transform="translate(112.000000, 291.000000) rotate(45.000000) translate(-112.000000, -291.000000) " font-family="Impact" font-size="56" font-style="condensed" font-weight="700" line-spacing="54" fill="#000000">
+                <tspan x="9" y="293">Diagonal</tspan>
+                <tspan x="48.3339844" y="347">Down</tspan>
+            </text>
+            <text id="Diagonal-Up" transform="translate(271.500000, 146.000000) rotate(-45.000000) translate(-271.500000, -146.000000) " font-family="Impact" font-size="48" font-style="condensed" font-weight="700" fill="#000000">
+                <tspan x="124" y="136">Diagonal</tspan>
+                <tspan x="124" y="194">Up</tspan>
+            </text>
+        </g>
+    </g>
+</svg>

@@ -61,7 +61,7 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
       fontIds: [fonts[3].styles[0].fontId, fonts[2].styles[0].fontId],
       wordList: defaultWordsList,
       anglesPreset: 'horizontal',
-      customAngles: [],
+      customAngles: [0],
     },
     icons: {
       iconList: [],
@@ -108,7 +108,7 @@ export const defaultBgStyleOptions: BgStyleOptions = {
       fontIds: [fonts[3].styles[0].fontId, fonts[2].styles[0].fontId],
       wordList: defaultWordsListBackground,
       anglesPreset: 'horizontal',
-      customAngles: [],
+      customAngles: [0],
     },
     icons: {
       iconList: [],

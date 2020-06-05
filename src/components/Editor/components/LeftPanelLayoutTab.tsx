@@ -4,34 +4,106 @@ import { Slider } from 'components/shared/Slider'
 import { Label } from 'components/Editor/components/shared'
 import { useCallback } from 'react'
 import { TargetKind } from 'components/Editor/lib/editor'
-import { Button, Box, Heading } from '@chakra-ui/core'
+import {
+  Text,
+  Box,
+  Heading,
+  Button,
+  Flex,
+  CloseButton,
+  Icon,
+} from '@chakra-ui/core'
 import { WordAnglesPresetKind } from 'components/Editor/style-options'
+// @ts-ignore
+import VerImg from './img/ver.svg'
+// @ts-ignore
+import HorImg from './img/hor.svg'
+// @ts-ignore
+import HorVerImg from './img/hor-ver.svg'
+// @ts-ignore
+import HorVerDiagImg from './img/hor-ver-diag.svg'
+// @ts-ignore
+import DiagImg from './img/diag.svg'
+// @ts-ignore
+import DiagUpImg from './img/diag-up.svg'
+// @ts-ignore
+import DiagDownImg from './img/diag-down.svg'
+// @ts-ignore
+import SlopeImg from './img/slope.svg'
+// @ts-ignore
+import SlopeUpImg from './img/slope-up.svg'
+// @ts-ignore
+import SlopeDownImg from './img/slope-down.svg'
+// @ts-ignore
+import CustomImg from './img/custom.svg'
+// @ts-ignore
+import RandomImg from './img/random.svg'
+import styled from '@emotion/styled'
+import css from '@emotion/css'
 
 const anglePresets: {
   kind: WordAnglesPresetKind
   title: string
+  Svg?: React.ComponentType<any>
 }[] = [
-  { kind: 'horizontal', title: 'Horizontal' },
-  { kind: 'vertical', title: 'Vertical' },
+  { kind: 'horizontal', title: 'Horizontal', Svg: HorImg },
+  { kind: 'vertical', title: 'Vertical', Svg: VerImg },
   {
     kind: 'hor-ver',
     title: 'Horizontal / Vertical',
+    Svg: HorVerImg,
   },
   {
     kind: 'hor-ver-diagonal',
     title: 'Horizontal / Vertical / Diagonal',
+    Svg: HorVerDiagImg,
   },
-  { kind: 'diagonal', title: 'Diagonal' },
-  { kind: 'diagonal up', title: 'Diagonal Up' },
-  { kind: 'diagonal down', title: 'Diagonal Down' },
-  { kind: '15 up', title: 'Sloping Up' },
-  { kind: '15 down', title: 'Sloping Down' },
-  { kind: '15', title: 'Sloping' },
+  {
+    kind: 'diagonal',
+    title: 'Diagonal',
+    Svg: DiagImg,
+  },
+  { kind: 'diagonal up', title: 'Diagonal Up', Svg: DiagUpImg },
+  { kind: 'diagonal down', title: 'Diagonal Down', Svg: DiagDownImg },
   {
     kind: 'random',
     title: 'Random',
+    Svg: RandomImg,
+  },
+  { kind: '15 up', title: 'Sloping Up', Svg: SlopeUpImg },
+  { kind: '15 down', title: 'Sloping Down', Svg: SlopeDownImg },
+  { kind: '15', title: 'Sloping', Svg: SlopeImg },
+  {
+    kind: 'custom',
+    title: 'Custom',
+    Svg: CustomImg,
   },
 ]
+
+const PresetBtns = styled(Box)`
+  margin: 0 -2px;
+`
+
+const PresetBtn = styled(Box)<{ active: boolean; theme: any }>`
+  cursor: pointer;
+  user-select: none;
+  display: inline-block;
+  width: 78px;
+  height: 78px;
+  margin: 0px 2px;
+  border: 1px solid #aaa;
+  padding: 6px;
+
+&:hover {
+  transform: scale(1.05);
+}
+
+  transition: transform 0.2s;
+
+  ${(p) => p.active && `outline: 3px solid ${p.theme.colors.accent['500']};`}
+  ${(p) => p.active && `background: #d7eaff;`}
+  ${(p) => p.active && `transform: scale(1.05);`}
+`
 
 export type LeftPanelLayoutTabProps = {
   target: TargetKind
@@ -72,40 +144,88 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
               />
             </Box>
 
-            <Heading size="sm" mt="2" mb="3">
+            <Text fontSize="lg" mt="3" mb="2">
               Angles
-            </Heading>
+            </Text>
 
-            <Box>
+            <PresetBtns>
               {anglePresets.map((preset) => (
-                <Button
-                  key={preset.kind}
-                  onClick={() => {
-                    style.items.words.anglesPreset = preset.kind
-                  }}
-                  variantColor={
-                    preset.kind === style.items.words.anglesPreset
-                      ? 'primary'
-                      : undefined
-                  }
-                >
-                  {preset.title}
-                </Button>
+                <>
+                  <PresetBtn
+                    active={preset.kind === style.items.words.anglesPreset}
+                    onClick={() => {
+                      style.items.words.anglesPreset = preset.kind
+                    }}
+                  >
+                    {preset.Svg && <preset.Svg width="100%" height="100%" />}
+                  </PresetBtn>
+                </>
               ))}
-            </Box>
+            </PresetBtns>
             {style.items.words.anglesPreset === 'custom' && (
-              <Slider
-                label="Angle"
-                value={style.items.words.customAngles[0]}
-                onChange={(value) => {
-                  const val = (value as any) as number
-                  style.items.words.customAngles = [val]
-                }}
-                onAfterChange={visualize}
-                min={-90}
-                max={90}
-                step={1}
-              />
+              <>
+                <Box mt="3">
+                  <Button
+                    mr="3"
+                    variantColor="green"
+                    isDisabled={style.items.words.customAngles.length >= 8}
+                    size="sm"
+                    leftIcon="add"
+                    onClick={() => {
+                      style.items.words.customAngles.push(
+                        Math.round(-90 + Math.random() * 180)
+                      )
+                    }}
+                  >
+                    Add
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      style.items.words.customAngles = [0]
+                    }}
+                  >
+                    Clear
+                  </Button>
+                </Box>
+
+                <Box mt="2" paddingLeft="30px">
+                  {style.items.words.customAngles.map((angle, index) => (
+                    <Flex direction="row" key={index}>
+                      <Slider
+                        css={css`
+                          flex: 1;
+                        `}
+                        label={`Angle #${index + 1}`}
+                        horizontal
+                        value={angle}
+                        onChange={(value) => {
+                          const val = (value as any) as number
+                          style.items.words.customAngles[index] = val
+                        }}
+                        min={-90}
+                        max={90}
+                        step={1}
+                        afterLabel="°"
+                      />
+                      <Box width="30px">
+                        {style.items.words.customAngles.length > 1 && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              style.items.words.customAngles.splice(index, 1)
+                            }}
+                          >
+                            <Icon name="close" />
+                          </Button>
+                        )}
+                      </Box>
+                    </Flex>
+                  ))}
+                </Box>
+              </>
             )}
           </Box>
         )}

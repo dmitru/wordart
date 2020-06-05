@@ -24,6 +24,7 @@ export type SliderProps = {
   step: number
   horizontal?: boolean
   labelCss?: string
+  afterLabel?: string
 }
 
 export const Slider: React.FC<SliderProps> = (props) => {
@@ -37,6 +38,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
     onChange = noop,
     onAfterChange = noop,
     labelCss = '',
+    afterLabel = '',
     ...rest
   } = props
   return (
@@ -92,6 +94,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
                   handle={handle}
                   domain={[min, max]}
                   getHandleProps={getHandleProps}
+                  afterLabel={afterLabel}
                 />
               ))}
             </Box>
@@ -165,6 +168,7 @@ interface HandleProps {
   getHandleProps: GetHandleProps
   disabled?: boolean
   showValue?: boolean
+  afterLabel?: string
 }
 
 // *******************************************************
@@ -177,6 +181,7 @@ export const KeyboardHandle: React.FC<HandleProps> = ({
   disabled = false,
   showValue = true,
   getHandleProps,
+  afterLabel = '',
 }) => {
   return (
     <button
@@ -213,6 +218,7 @@ export const KeyboardHandle: React.FC<HandleProps> = ({
       {...getHandleProps(id)}
     >
       {showValue && value.toFixed(0)}
+      {afterLabel}
     </button>
   )
 }
