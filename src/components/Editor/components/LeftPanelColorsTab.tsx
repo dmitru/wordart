@@ -91,6 +91,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
               y="29"
               width="112"
               height="21"
+              rx="8"
             ></rect>
             <rect
               id="Rectangle"
@@ -99,6 +100,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
               y="67"
               width="84"
               height="17"
+              rx="8"
             ></rect>
             <rect
               id="Rectangle"
@@ -107,6 +109,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
               y="99"
               width="72"
               height="22"
+              rx="8"
             ></rect>
             <rect
               id="Rectangle"
@@ -115,6 +118,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
               y="33"
               width="54"
               height="17"
+              rx="8"
             ></rect>
             <rect
               id="Rectangle"
@@ -123,6 +127,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
               y="80"
               width="23"
               height="39"
+              rx="8"
             ></rect>
             <rect
               id="Rectangle"
@@ -131,6 +136,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
               y="65"
               width="23"
               height="39"
+              rx="8"
             ></rect>
           </g>
           <rect
@@ -140,6 +146,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
             y="15"
             width="83"
             height="18"
+            rx="8"
           ></rect>
           <rect
             id="Rectangle"
@@ -148,6 +155,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
             y="204"
             width="83"
             height="18"
+            rx="8"
           ></rect>
           <rect
             id="Rectangle"
@@ -156,6 +164,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
             y="20"
             width="23"
             height="59"
+            rx="8"
           ></rect>
           <rect
             id="Rectangle"
@@ -164,6 +173,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
             y="185"
             width="25"
             height="38"
+            rx="8"
           ></rect>
           <rect
             id="Rectangle"
@@ -172,6 +182,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
             y="32"
             width="25"
             height="38"
+            rx="8"
           ></rect>
           <rect
             id="Rectangle"
@@ -180,6 +191,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
             y="147"
             width="25"
             height="77"
+            rx="8"
           ></rect>
         </g>
       </g>
@@ -418,7 +430,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             <Box mb="0">
               <Flex direction="column">
                 <Box display="flex">
-                  <Text fontSize="xl">Shape</Text>
+                  <Text fontSize="xl" mb="0">
+                    Shape
+                  </Text>
                 </Box>
 
                 <Box mb="3">

@@ -135,17 +135,17 @@ export const getAnglesForPreset = (preset: WordAnglesPresetKind): number[] => {
     case 'hor-ver-diagonal':
       return [0, -90, -45, 45]
     case '15 down':
-      return [15]
-    case '15 up':
       return [-15]
+    case '15 up':
+      return [15]
     case '15':
       return [-15, 15]
     case 'diagonal':
       return [-45, 45]
     case 'diagonal up':
-      return [-45]
-    case 'diagonal down':
       return [45]
+    case 'diagonal down':
+      return [-45]
     default:
       return [45]
   }
