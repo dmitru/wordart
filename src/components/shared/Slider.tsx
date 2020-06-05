@@ -12,7 +12,7 @@ import {
 import { noop } from 'lodash'
 import { css } from '@emotion/core'
 import { darken } from 'polished'
-import { Box } from '@chakra-ui/core'
+import { Text, Box } from '@chakra-ui/core'
 
 export type SliderProps = {
   value: number
@@ -23,6 +23,7 @@ export type SliderProps = {
   max: number
   step: number
   horizontal?: boolean
+  labelCss?: string
 }
 
 export const Slider: React.FC<SliderProps> = (props) => {
@@ -35,6 +36,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
     horizontal = false,
     onChange = noop,
     onAfterChange = noop,
+    labelCss = '',
     ...rest
   } = props
   return (
@@ -46,19 +48,19 @@ export const Slider: React.FC<SliderProps> = (props) => {
         : {})}
     >
       {label && (
-        <Box
+        <Text
           css={css`
             margin-bottom: -4px;
-            color: #666;
             ${horizontal
               ? `
               margin-right: 16px;
             `
               : ''}
+            ${labelCss}
           `}
         >
           {label}
-        </Box>
+        </Text>
       )}
       <SliderImpl
         domain={[min, max]}
