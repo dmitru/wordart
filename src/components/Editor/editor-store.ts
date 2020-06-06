@@ -619,6 +619,7 @@ export class EditorStore {
     this.logger.debug('destroyEditor')
     this.editor?.destroy()
     this.lifecycleState = 'destroyed'
+    this.availableShapes = this.availableShapes.filter((s) => !s.isCustom)
   }
 
   addCustomShapeImg = (shape: Omit<ShapeRasterConf, 'id'>) => {
