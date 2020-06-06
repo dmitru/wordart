@@ -462,7 +462,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               </Tooltip>
 
               <Box mr="3" ml="3">
-                {store.mode === 'view' && (
+                {store.mode === 'view' && hasItems && (
                   <Button
                     css={css`
                       box-shadow: none !important;
@@ -483,7 +483,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     variant="ghost"
                     py="1"
                     onClick={() => {
-                      store.editor?.clearItems(state.targetTab)
+                      store.editor?.clearItems(state.targetTab, true)
                     }}
                   >
                     Clear All

@@ -1209,12 +1209,12 @@ export class Editor {
     this.items.shape.itemsById.clear()
   }
 
-  clearItems = (target: TargetKind) => {
+  clearItems = (target: TargetKind, removeLocked = false) => {
     const nonLockedItems = [
       ...(target === 'shape'
         ? this.items.shape.itemsById.values()
         : this.items.bg.itemsById.values()),
-    ].filter((item) => !item.locked)
+    ].filter((item) => !item.locked || removeLocked)
 
     const fabricObjs = nonLockedItems.map((i) => i.fabricObj).filter(notEmpty)
     this.canvas.remove(...fabricObjs)
@@ -1342,7 +1342,6 @@ export class Editor {
     }
 
     // Process all fonts...
-    debugger
     for (const [index, itemConfig] of allWordItems.entries()) {
       if (index % 200 === 0) {
         await waitAnimationFrame()
