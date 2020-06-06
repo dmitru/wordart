@@ -42,7 +42,7 @@ import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { FiUploadCloud } from 'react-icons/fi'
-import { ColorPicker } from 'components/shared/ColorPicker'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { Tooltip } from 'components/shared/Tooltip'
 import stopword from 'stopword'
 
@@ -97,24 +97,11 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     return (
       <Box mb="5">
         <Stack spacing="0">
-          <Stack direction="row" mb="2">
-            <Button
-              variantColor="green"
-              leftIcon="add"
-              onClick={() => store.addWord(target)}
-            >
-              Add
-            </Button>
-
-            <InputGroup flex={1}>
-              <InputLeftElement children={<Icon name="search" />} />
-              <Input placeholder="Filter..." />
-            </InputGroup>
-          </Stack>
-
-          <Stack direction="row" mt="2" spacing="0">
+          <Stack direction="row" mb="2" spacing="0">
             <Tooltip label="Open advanced words editor..." showDelay={300}>
-              <Button leftIcon="edit">Open editor...</Button>
+              <Button leftIcon="edit" variantColor="accent">
+                Edit words...
+              </Button>
             </Tooltip>
 
             <Button
@@ -185,6 +172,21 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                 </MenuItem>
               </MenuList>
             </Menu>
+          </Stack>
+
+          <Stack direction="row" mb="2" mt="2">
+            <Button
+              variantColor="green"
+              leftIcon="add"
+              onClick={() => store.addWord(target)}
+            >
+              Add
+            </Button>
+
+            <InputGroup flex={1}>
+              <InputLeftElement children={<Icon name="search" />} />
+              <Input placeholder="Filter..." />
+            </InputGroup>
           </Stack>
 
           <WordList mt="2">

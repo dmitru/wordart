@@ -24,7 +24,7 @@ import {
 } from 'lib/wordart/canvas-utils'
 import { Slider } from 'components/shared/Slider'
 import css from '@emotion/css'
-import { ColorPicker } from 'components/shared/ColorPicker'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 
 export type AddCustomImageModalProps = {
   isOpen: boolean
@@ -170,7 +170,7 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
                     Invert color
                   </Checkbox>
                   {state.invert && (
-                    <ColorPicker
+                    <ColorPickerPopover
                       value={state.invertColor}
                       onChange={(color) => {
                         state.invertColor = color

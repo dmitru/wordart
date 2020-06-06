@@ -34,7 +34,7 @@ import {
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
 import { Label } from 'components/Editor/components/shared'
-import { ColorPicker } from 'components/shared/ColorPicker'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -325,7 +325,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         }}
                         placeholder="Type text here..."
                       />
-                      <ColorPicker
+                      <ColorPickerPopover
                         value={
                           state.textShape.color.kind === 'single'
                             ? state.textShape.color.color
@@ -414,7 +414,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                             <Heading size="md" m="0" mb="3">
                               Colors
                             </Heading>
-                            <ColorPicker
+                            <ColorPickerPopover
                               value={shape.config.textStyle.color}
                               onChange={async (color) => {
                                 shape.config.textStyle.color = color
@@ -489,7 +489,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                             key={index}
                                             display="inline-block"
                                           >
-                                            <ColorPicker
+                                            <ColorPickerPopover
                                               disableAlpha
                                               value={chroma(color)
                                                 .alpha(1)
@@ -538,7 +538,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                 {shape.config.processing.colors.kind ===
                                   'single-color' && (
                                   <Box mr="1" mb="2">
-                                    <ColorPicker
+                                    <ColorPickerPopover
                                       disableAlpha
                                       value={chroma(shapeStyle.colors.color)
                                         .alpha(1)

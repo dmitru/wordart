@@ -1,225 +1,33 @@
-import {
-  Box,
-  Button,
-  Heading,
-  Flex,
-  Text,
-  Stack,
-  Divider,
-} from '@chakra-ui/core'
+import { Box, Button, Divider, Flex, Stack, Text } from '@chakra-ui/core'
+import css from '@emotion/css'
 import { useThrottleCallback } from '@react-hook/throttle'
 import chroma from 'chroma-js'
+import { SvgShapeColorPicker } from 'components/Editor/components/SvgShapeColorPicker'
+import {
+  ThemePresetThumbnail,
+  ThemePresetThumbnailContainer,
+  ThemePresetThumbnails,
+} from 'components/Editor/components/ThemePresetThumbnail'
 import { TargetKind } from 'components/Editor/lib/editor'
 import {
-  mkShapeStyleConfFromOptions,
   mkBgStyleConfFromOptions,
+  mkShapeStyleConfFromOptions,
   ThemePreset,
 } from 'components/Editor/style'
-import { ColorPicker } from 'components/shared/ColorPicker'
+import { themePresets } from 'components/Editor/theme-presets'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { Slider } from 'components/shared/Slider'
+import { cloneDeep } from 'lodash'
+import { toJS } from 'mobx'
 import { observer, useLocalStore } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
-import css from '@emotion/css'
-import { themePresets } from 'components/Editor/theme-presets'
-import styled from '@emotion/styled'
-import { cloneDeep } from 'lodash'
-import { toJS } from 'mobx'
+import { ChoiceButtons } from 'components/Editor/components/ChoiceButtons'
+import { ShapeItemsColorPicker } from 'components/Editor/components/ShapeItemsColorPicker'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
 }
-
-export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
-  theme,
-}) => {
-  let shapeItemsColor = 'black'
-  if (theme.shapeItemsColoring.kind === 'color') {
-    shapeItemsColor = theme.shapeItemsColoring.color
-  } else if (theme.shapeItemsColoring.kind === 'gradient') {
-    shapeItemsColor = theme.shapeItemsColoring.gradient.from
-  } else if (theme.shapeItemsColoring.kind === 'shape') {
-    shapeItemsColor = theme.shapeFill
-  }
-
-  let bgItemsColor = 'black'
-  if (theme.bgItemsColoring.kind === 'color') {
-    bgItemsColor = theme.bgItemsColoring.color
-  } else if (theme.bgItemsColoring.kind === 'gradient') {
-    bgItemsColor = theme.bgItemsColoring.gradient.from
-  }
-
-  return (
-    <svg
-      width="100px"
-      height="76px"
-      viewBox="0 0 319 240"
-      version="1.1"
-      style={{ border: '1px solid #888' }}
-    >
-      <g
-        id="Page-1"
-        stroke="none"
-        stroke-width="1"
-        fill="none"
-        fill-rule="evenodd"
-      >
-        <g id="Group-2">
-          <rect
-            id="Rectangle"
-            fill={theme.bgFill}
-            x="0"
-            y="0"
-            width="319"
-            height="240"
-          ></rect>
-          <g id="Group" transform="translate(50.000000, 51.000000)">
-            <rect
-              id="Rectangle"
-              fill={theme.shapeFill}
-              opacity={theme.shapeOpacity}
-              x="0"
-              y="0"
-              width="218"
-              height="140"
-              rx="29"
-            ></rect>
-            <rect
-              id="Rectangle"
-              fill={shapeItemsColor}
-              x="16"
-              y="29"
-              width="112"
-              height="21"
-              rx="8"
-            ></rect>
-            <rect
-              id="Rectangle"
-              fill={shapeItemsColor}
-              x="68"
-              y="67"
-              width="84"
-              height="17"
-              rx="8"
-            ></rect>
-            <rect
-              id="Rectangle"
-              fill={shapeItemsColor}
-              x="56"
-              y="99"
-              width="72"
-              height="22"
-              rx="8"
-            ></rect>
-            <rect
-              id="Rectangle"
-              fill={shapeItemsColor}
-              x="152"
-              y="33"
-              width="54"
-              height="17"
-              rx="8"
-            ></rect>
-            <rect
-              id="Rectangle"
-              fill={shapeItemsColor}
-              x="168"
-              y="80"
-              width="23"
-              height="39"
-              rx="8"
-            ></rect>
-            <rect
-              id="Rectangle"
-              fill={shapeItemsColor}
-              x="17"
-              y="65"
-              width="23"
-              height="39"
-              rx="8"
-            ></rect>
-          </g>
-          <rect
-            id="Rectangle"
-            fill={bgItemsColor}
-            x="149"
-            y="15"
-            width="83"
-            height="18"
-            rx="8"
-          ></rect>
-          <rect
-            id="Rectangle"
-            fill={bgItemsColor}
-            x="66"
-            y="204"
-            width="83"
-            height="18"
-            rx="8"
-          ></rect>
-          <rect
-            id="Rectangle"
-            fill={bgItemsColor}
-            x="16"
-            y="20"
-            width="23"
-            height="59"
-            rx="8"
-          ></rect>
-          <rect
-            id="Rectangle"
-            fill={bgItemsColor}
-            x="14"
-            y="185"
-            width="25"
-            height="38"
-            rx="8"
-          ></rect>
-          <rect
-            id="Rectangle"
-            fill={bgItemsColor}
-            x="279"
-            y="32"
-            width="25"
-            height="38"
-            rx="8"
-          ></rect>
-          <rect
-            id="Rectangle"
-            fill={bgItemsColor}
-            x="279"
-            y="147"
-            width="25"
-            height="77"
-            rx="8"
-          ></rect>
-        </g>
-      </g>
-    </svg>
-  )
-}
-
-const ThemePresetThumbnailContainer = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-
-  transition: 0.2s transform;
-  &:hover {
-    transform: scale(1.05);
-  }
-`
-
-const ThemePresetThumbnails = styled(Box)`
-  margin: 0 -10px;
-
-  > * {
-    margin-right: 10px;
-    margin-left: 10px;
-    margin-bottom: 16px;
-  }
-`
 
 export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
   ({ target }) => {
@@ -252,7 +60,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
       true
     )
 
-    const updateShapeColoringImmediately = async (updateItems = true) => {
+    const onUpdateImmediately = async (updateItems = true) => {
       if (!shape) {
         return
       }
@@ -264,20 +72,16 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
       }
     }
 
-    const [updateShapeColoring] = useDebouncedCallback(
-      updateShapeColoringImmediately,
-      20,
-      {
-        leading: true,
-        trailing: true,
-      }
-    )
+    const [onUpdate] = useDebouncedCallback(onUpdateImmediately, 20, {
+      leading: true,
+      trailing: true,
+    })
 
     const updateAllStyles = async () => {
       const shape = store.getShape()
       const shapeStyle = store.styleOptions.shape
       const bgStyle = store.styleOptions.bg
-      await updateShapeColoringImmediately()
+      await onUpdateImmediately()
       await store.editor?.setShapeItemsStyle(
         mkShapeStyleConfFromOptions(shapeStyle).items
       )
@@ -305,6 +109,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           kind: 'single-color',
           color: theme.shapeFill,
         }
+        shapeStyle.colors.color = theme.shapeFill
       } else if (shape?.kind === 'text') {
         shape.config.textStyle.color = theme.shapeFill
       }
@@ -331,9 +136,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
       bgStyle.items.dimSmallerItems = theme.bgDimSmallerItems
       // </update-styles>
 
-      // <apply-update>
       updateAllStyles()
-      // </apply-update>
     }
 
     return (
@@ -435,8 +238,13 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   </Text>
                 </Box>
 
-                <Box mb="3">
+                <Flex direction="row" mb="3">
                   <Slider
+                    css={css`
+                      flex: 1;
+                      margin-right: 20px;
+                    `}
+                    afterLabel="%"
                     labelCss="width: 60px"
                     label="Opacity"
                     horizontal
@@ -451,9 +259,13 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     max={100}
                     step={1}
                   />
-                </Box>
 
-                {shape?.kind === 'text' && (
+                  {shape?.kind === 'svg' && (
+                    <SvgShapeColorPicker shape={shape} onUpdate={onUpdate} />
+                  )}
+                </Flex>
+
+                {/* {shape?.kind === 'text' && (
                   <Box mb="5">
                     <ColorPicker
                       value={chroma(shape.config.textStyle.color)
@@ -461,176 +273,20 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                         .hex()}
                       onChange={(hex) => {
                         shape.config.textStyle.color = chroma(hex).hex()
-                        updateShapeColoring(false)
+                        onUpdate(false)
                       }}
                       onAfterChange={() => {
-                        updateShapeColoring()
+                        onUpdate()
                       }}
                     />
                   </Box>
-                )}
+                )} */}
 
                 {/* <svg-shape */}
                 {shape?.kind === 'svg' && (
                   <>
                     {/* <svg-color-options> */}
-                    <Box
-                      mb="2"
-                      display="flex"
-                      flexDirection="row"
-                      alignItems="flex-start"
-                    >
-                      <Text fontSize="md" mr="3" width="65px">
-                        Fill:
-                      </Text>
 
-                      <Box>
-                        <Flex direction="row">
-                          <Button
-                            px="2"
-                            py="1"
-                            mr="0"
-                            size="sm"
-                            variant={
-                              shape.config.processing.colors.kind === 'original'
-                                ? 'solid'
-                                : 'outline'
-                            }
-                            variantColor={
-                              shape.config.processing.colors.kind === 'original'
-                                ? 'secondary'
-                                : undefined
-                            }
-                            onClick={() => {
-                              shape.config.processing.colors = {
-                                kind: 'original',
-                              }
-                              updateShapeColoring()
-                            }}
-                          >
-                            Original
-                          </Button>
-
-                          <Button
-                            px="2"
-                            py="1"
-                            mr="0"
-                            size="sm"
-                            variant={
-                              shape.config.processing.colors.kind ===
-                              'color-map'
-                                ? 'solid'
-                                : 'outline'
-                            }
-                            variantColor={
-                              shape.config.processing.colors.kind ===
-                              'color-map'
-                                ? 'secondary'
-                                : undefined
-                            }
-                            onClick={() => {
-                              console.log(
-                                'shapeStyle.colors.colorMaps',
-                                toJS(shapeStyle.colors.colorMaps)
-                              )
-                              shape.config.processing.colors = {
-                                kind: 'color-map',
-                                colors: shapeStyle.colors.colorMaps.get(
-                                  shape.id
-                                )!,
-                              }
-                              updateShapeColoring()
-                            }}
-                          >
-                            Multicolor
-                          </Button>
-
-                          <Button
-                            px="2"
-                            py="1"
-                            mr="0"
-                            size="sm"
-                            variant={
-                              shape.config.processing.colors.kind ===
-                              'single-color'
-                                ? 'solid'
-                                : 'outline'
-                            }
-                            variantColor={
-                              shape.config.processing.colors.kind ===
-                              'single-color'
-                                ? 'secondary'
-                                : undefined
-                            }
-                            onClick={() => {
-                              shape.config.processing.colors = {
-                                kind: 'single-color',
-                                color: shapeStyle.colors.color,
-                              }
-                              updateShapeColoring()
-                            }}
-                          >
-                            Single color
-                          </Button>
-                        </Flex>
-
-                        {shape.config.processing.colors.kind ===
-                          'single-color' && (
-                          <Box mb="4" mt="2">
-                            <ColorPicker
-                              disableAlpha
-                              value={chroma(
-                                shape.config.processing.colors.color
-                              )
-                                .alpha(1)
-                                .hex()}
-                              onChange={(hex) => {
-                                if (
-                                  shape.config.processing.colors.kind ===
-                                  'single-color'
-                                ) {
-                                  shape.config.processing.colors.color = chroma(
-                                    hex
-                                  ).hex()
-                                }
-                              }}
-                              onAfterChange={() => {
-                                updateShapeColoring()
-                              }}
-                            />
-                          </Box>
-                        )}
-
-                        {shape.config.processing.colors.kind ===
-                          'color-map' && (
-                          <Box mb="4" mt="2">
-                            {shape.config.processing.colors.colors.map(
-                              (color, index) => (
-                                <Box mr="1" key={index} display="inline-block">
-                                  <ColorPicker
-                                    disableAlpha
-                                    value={chroma(color).alpha(1).hex()}
-                                    onChange={(hex) => {
-                                      if (
-                                        shape.config.processing.colors.kind ===
-                                        'color-map'
-                                      ) {
-                                        shape.config.processing.colors.colors[
-                                          index
-                                        ] = chroma(hex).hex()
-                                      }
-                                    }}
-                                    onAfterChange={() => {
-                                      updateShapeColoring()
-                                    }}
-                                  />
-                                </Box>
-                              )
-                            )}
-                          </Box>
-                        )}
-                      </Box>
-                    </Box>
                     {/* <svg-color-options> */}
                   </>
                 )}
@@ -639,91 +295,40 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             </Box>
             {/* </shape-color> */}
 
+            <Divider />
+
+            <Text fontSize="xl">Shape Words & Icons</Text>
+
             {/* <shape-items> */}
-            <Box mb="6">
-              <Box
-                mb="2"
-                display="flex"
-                flexDirection="row"
-                alignItems="flex-start"
-              >
-                <Text fontSize="md" mr="3" width="65px">
-                  Items:
-                </Text>
+            <Box mb="1">
+              <Flex direction="row" mb="0">
+                <Slider
+                  css={css`
+                    flex: 1;
+                    margin-right: 20px;
+                  `}
+                  afterLabel="%"
+                  labelCss="width: 60px"
+                  horizontal
+                  label="Opacity"
+                  value={100 * shapeStyle.items.opacity}
+                  onChange={(value) => {
+                    shapeStyle.items.opacity = value / 100
+                  }}
+                  onAfterChange={updateShapeItemsColoring}
+                  min={0}
+                  max={100}
+                  step={1}
+                />
 
-                <Box>
-                  <Flex direction="row">
-                    <Button
-                      px="2"
-                      py="1"
-                      mr="0"
-                      size="sm"
-                      variant={
-                        shapeStyle.items.coloring.kind === 'shape'
-                          ? 'solid'
-                          : 'outline'
-                      }
-                      variantColor={
-                        shapeStyle.items.coloring.kind === 'shape'
-                          ? 'secondary'
-                          : undefined
-                      }
-                      onClick={() => {
-                        shapeStyle.items.coloring.kind = 'shape'
-                        updateShapeItemsColoring()
-                      }}
-                    >
-                      Shape color
-                    </Button>
+                <ShapeItemsColorPicker
+                  shapeStyle={shapeStyle}
+                  onUpdate={updateShapeItemsColoring}
+                />
+              </Flex>
 
-                    <Button
-                      px="2"
-                      py="1"
-                      size="sm"
-                      variant={
-                        shapeStyle.items.coloring.kind === 'gradient'
-                          ? 'solid'
-                          : 'outline'
-                      }
-                      variantColor={
-                        shapeStyle.items.coloring.kind === 'gradient'
-                          ? 'secondary'
-                          : undefined
-                      }
-                      onClick={() => {
-                        shapeStyle.items.coloring.kind = 'gradient'
-                        updateShapeItemsColoring()
-                      }}
-                    >
-                      Gradient
-                    </Button>
-
-                    <Button
-                      px="2"
-                      py="1"
-                      mr="0"
-                      size="sm"
-                      variantColor={
-                        shapeStyle.items.coloring.kind === 'color'
-                          ? 'secondary'
-                          : undefined
-                      }
-                      variant={
-                        shapeStyle.items.coloring.kind === 'color'
-                          ? 'solid'
-                          : 'outline'
-                      }
-                      onClick={() => {
-                        shapeStyle.items.coloring.kind = 'color'
-                        updateShapeItemsColoring()
-                      }}
-                    >
-                      Color
-                    </Button>
-                  </Flex>
-
-                  <Box mt="2">
-                    {/* {shapeStyle.items.coloring.kind === 'shape' && (
+              <Box mb="2">
+                {/* {shapeStyle.items.coloring.kind === 'shape' && (
               <Box mb="4">
                 <Slider
                   css={css`
@@ -742,80 +347,27 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                 />
               </Box>
             )} */}
-                    {shapeStyle.items.coloring.kind === 'color' && (
-                      <ColorPicker
-                        disableAlpha
-                        value={shapeStyle.items.coloring.color.color}
-                        onChange={(hex) => {
-                          shapeStyle.items.coloring.color.color = hex
-                        }}
-                        onAfterChange={updateShapeItemsColoring}
-                      />
-                    )}
-                    {shapeStyle.items.coloring.kind === 'gradient' && (
-                      <>
-                        <Box mr="1" display="inline-block">
-                          <ColorPicker
-                            disableAlpha
-                            value={
-                              shapeStyle.items.coloring.gradient.gradient.from
-                            }
-                            onChange={(hex) => {
-                              shapeStyle.items.coloring.gradient.gradient.from = hex
-                            }}
-                            onAfterChange={updateShapeItemsColoring}
-                          />
-                        </Box>
-                        <Box mr="1" display="inline-block">
-                          <ColorPicker
-                            disableAlpha
-                            value={
-                              shapeStyle.items.coloring.gradient.gradient.to
-                            }
-                            onChange={(hex) => {
-                              shapeStyle.items.coloring.gradient.gradient.to = hex
-                            }}
-                            onAfterChange={updateShapeItemsColoring}
-                          />
-                        </Box>
-                      </>
-                    )}
-                  </Box>
-                </Box>
               </Box>
+            </Box>
 
-              <Stack direction="column" spacing="3" mt="3">
-                <Slider
-                  labelCss="width: 60px"
-                  horizontal
-                  label="Opacity"
-                  value={100 * shapeStyle.items.opacity}
-                  onChange={(value) => {
-                    shapeStyle.items.opacity = value / 100
-                  }}
-                  onAfterChange={updateShapeItemsColoring}
-                  min={0}
-                  max={100}
-                  step={1}
-                />
-
-                <Slider
-                  css={css`
-                    flex: 1;
-                  `}
-                  horizontal
-                  label="Emphasize size"
-                  value={shapeStyle.items.dimSmallerItems}
-                  onChange={(value) => {
-                    const val = (value as any) as number
-                    shapeStyle.items.dimSmallerItems = val
-                  }}
-                  onAfterChange={updateShapeItemsColoring}
-                  min={0}
-                  max={100}
-                  step={1}
-                />
-              </Stack>
+            <Box mb="4">
+              <Slider
+                css={css`
+                  flex: 1;
+                `}
+                horizontal
+                label="Emphasize size"
+                afterLabel="%"
+                value={shapeStyle.items.dimSmallerItems}
+                onChange={(value) => {
+                  const val = (value as any) as number
+                  shapeStyle.items.dimSmallerItems = val
+                }}
+                onAfterChange={updateShapeItemsColoring}
+                min={0}
+                max={100}
+                step={1}
+              />
             </Box>
             {/* </shape-items> */}
 
@@ -826,114 +378,12 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             <Box>
               <Text fontSize="xl">Background</Text>
               <Stack direction="row" spacing="3">
-                <Box
-                  mb="6"
-                  display="flex"
-                  alignItems="flex-start"
-                  flex="1"
-                  justifyContent="flex-start"
-                >
-                  <Text fontSize="md" mr="3">
-                    Items:
-                  </Text>
-
-                  <Box>
-                    <Box flex="1" width="130px">
-                      <Button
-                        px="2"
-                        py="1"
-                        size="sm"
-                        variant={
-                          bgStyle.items.coloring.kind === 'gradient'
-                            ? 'solid'
-                            : 'outline'
-                        }
-                        variantColor={
-                          bgStyle.items.coloring.kind === 'gradient'
-                            ? 'secondary'
-                            : undefined
-                        }
-                        onClick={() => {
-                          bgStyle.items.coloring.kind = 'gradient'
-                          updateBgItemsColoring()
-                        }}
-                      >
-                        Gradient
-                      </Button>
-
-                      <Button
-                        px="2"
-                        py="1"
-                        mr="0"
-                        size="sm"
-                        variant={
-                          bgStyle.items.coloring.kind === 'color'
-                            ? 'solid'
-                            : 'outline'
-                        }
-                        variantColor={
-                          bgStyle.items.coloring.kind === 'color'
-                            ? 'secondary'
-                            : undefined
-                        }
-                        onClick={() => {
-                          bgStyle.items.coloring.kind = 'color'
-                          updateBgItemsColoring()
-                        }}
-                      >
-                        Color
-                      </Button>
-                    </Box>
-
-                    <Box mt="3">
-                      {bgStyle.items.coloring.kind === 'color' && (
-                        <ColorPicker
-                          disableAlpha
-                          value={bgStyle.items.coloring.color.color}
-                          onChange={(hex) => {
-                            bgStyle.items.coloring.color.color = hex
-                          }}
-                          onAfterChange={updateBgItemsColoring}
-                        />
-                      )}
-                      {bgStyle.items.coloring.kind === 'gradient' && (
-                        <>
-                          <Box mr="1" display="inline-block">
-                            <ColorPicker
-                              disableAlpha
-                              value={
-                                bgStyle.items.coloring.gradient.gradient.from
-                              }
-                              onChange={(hex) => {
-                                bgStyle.items.coloring.gradient.gradient.from = hex
-                              }}
-                              onAfterChange={updateBgItemsColoring}
-                            />
-                          </Box>
-                          <Box mr="1" display="inline-block">
-                            <ColorPicker
-                              disableAlpha
-                              value={
-                                shapeStyle.items.coloring.gradient.gradient.to
-                              }
-                              onChange={(hex) => {
-                                shapeStyle.items.coloring.gradient.gradient.to = hex
-                              }}
-                              onAfterChange={updateBgItemsColoring}
-                            />
-                          </Box>
-                        </>
-                      )}
-                    </Box>
-                  </Box>
-                </Box>
-
                 <Box mb="6" display="flex" alignItems="flex-start">
                   <Text fontSize="md" mr="3">
                     Fill:
                   </Text>
 
-                  <ColorPicker
+                  <ColorPickerPopover
                     value={chroma(bgStyle.fill.color.color).alpha(1).hex()}
                     onChange={(hex) => {
                       bgStyle.fill.color.color = chroma(hex).hex()
@@ -942,6 +392,81 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   />
                 </Box>
               </Stack>
+            </Box>
+
+            <Box>
+              <Text fontSize="xl">Background Words & Icons</Text>
+
+              <Box
+                mb="6"
+                display="flex"
+                alignItems="flex-start"
+                flex="1"
+                justifyContent="flex-start"
+              >
+                <Text fontSize="md" mr="3">
+                  Items:
+                </Text>
+
+                <Box>
+                  <ChoiceButtons
+                    choices={[
+                      { title: 'Gradient', value: 'gradient' },
+                      { title: 'Color', value: 'color' },
+                    ]}
+                    value={bgStyle.items.coloring.kind}
+                    onChange={(value) => {
+                      if (value === 'gradient') {
+                        bgStyle.items.coloring.kind = 'gradient'
+                      } else if (value === 'color') {
+                        bgStyle.items.coloring.kind = 'color'
+                      }
+                      updateBgItemsColoring()
+                    }}
+                  />
+
+                  <Box mt="3">
+                    {bgStyle.items.coloring.kind === 'color' && (
+                      <ColorPickerPopover
+                        disableAlpha
+                        value={bgStyle.items.coloring.color.color}
+                        onChange={(hex) => {
+                          bgStyle.items.coloring.color.color = hex
+                        }}
+                        onAfterChange={updateBgItemsColoring}
+                      />
+                    )}
+                    {bgStyle.items.coloring.kind === 'gradient' && (
+                      <>
+                        <Box mr="1" display="inline-block">
+                          <ColorPickerPopover
+                            disableAlpha
+                            value={
+                              bgStyle.items.coloring.gradient.gradient.from
+                            }
+                            onChange={(hex) => {
+                              bgStyle.items.coloring.gradient.gradient.from = hex
+                            }}
+                            onAfterChange={updateBgItemsColoring}
+                          />
+                        </Box>
+                        <Box mr="1" display="inline-block">
+                          <ColorPickerPopover
+                            disableAlpha
+                            value={
+                              shapeStyle.items.coloring.gradient.gradient.to
+                            }
+                            onChange={(hex) => {
+                              shapeStyle.items.coloring.gradient.gradient.to = hex
+                            }}
+                            onAfterChange={updateBgItemsColoring}
+                          />
+                        </Box>
+                      </>
+                    )}
+                  </Box>
+                </Box>
+              </Box>
 
               <Stack direction="column" spacing="3">
                 <Slider

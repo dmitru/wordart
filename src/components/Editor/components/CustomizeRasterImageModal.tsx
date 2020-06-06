@@ -11,7 +11,7 @@ import {
   ModalOverlay,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
-import { ColorPicker } from 'components/shared/ColorPicker'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { Slider } from 'components/shared/Slider'
 import {
   loadImageUrlToCanvasCtxWithMaxSize,
@@ -156,7 +156,7 @@ export const CustomizeRasterImageModal: React.FC<CustomizeRasterImageModalProps>
                     Invert color
                   </Checkbox>
                   {state.invert && (
-                    <ColorPicker
+                    <ColorPickerPopover
                       value={state.invertColor}
                       onChange={(color) => {
                         state.invertColor = color

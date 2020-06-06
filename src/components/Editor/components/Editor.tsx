@@ -12,6 +12,8 @@ import {
   useToast,
   Text,
   Box,
+  Select,
+  Icon,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
@@ -32,7 +34,7 @@ import {
   pageSizePresets,
   EditorStoreInitParams,
 } from 'components/Editor/editor-store'
-import { EditorInitParams } from 'components/Editor/lib/editor'
+import { EditorInitParams, TargetKind } from 'components/Editor/lib/editor'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 import { Tooltip } from 'components/shared/Tooltip'
@@ -48,7 +50,7 @@ import { Api } from 'services/api/api'
 import { WordcloudId } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
-import { ColorPicker } from 'components/shared/ColorPicker'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import {
   mkShapeStyleConfFromOptions,
   mkBgStyleConfFromOptions,
@@ -522,7 +524,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
                     {store.selectedItemData && (
                       <>
-                        <ColorPicker
+                        <ColorPickerPopover
                           value={
                             store.selectedItemData.customColor ||
                             store.selectedItemData.color
@@ -538,7 +540,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           >
                             Reset Default Color
                           </Button>
-                        </ColorPicker>
+                        </ColorPickerPopover>
                         <Button
                           ml="2"
                           size="sm"
@@ -560,8 +562,27 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               </Box>
 
               {store.mode === 'view' && (
-                <Box mr="3" ml="3" marginLeft="auto">
-                  <Button
+                <Box
+                  mr="3"
+                  ml="3"
+                  marginLeft="auto"
+                  display="flex"
+                  alignItems="center"
+                >
+                  <Text fontSize="md" mr="3" my="0">
+                    Layer:
+                  </Text>
+                  <Select
+                    isRequired
+                    value={state.targetTab}
+                    onChange={(e) => {
+                      state.targetTab = e.target.value as TargetKind
+                    }}
+                  >
+                    <option value="shape">Shape</option>
+                    <option value="bg">Background</option>
+                  </Select>
+                  {/* <Button
                     css={css`
                       box-shadow: none !important;
                     `}
@@ -590,7 +611,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     variant={state.targetTab !== 'bg' ? 'outline' : 'solid'}
                   >
                     Background
-                  </Button>
+                  </Button> */}
                 </Box>
               )}
             </TopToolbar>
