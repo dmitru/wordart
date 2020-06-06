@@ -5,6 +5,7 @@ import paper from 'paper'
 import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { Font } from 'components/Editor/lib/generator'
+import { BoundingBox } from 'opentype.js'
 
 export type EditorItemConfig = EditorItemConfigWord
 
@@ -25,6 +26,13 @@ export type EditorItemConfigWord = {
 
 export type EditorItemId = string
 export type EditorItem = EditorItemWord
+
+export type GlyphInfo = {
+  key: string
+  glyph: opentype.Glyph
+  path: opentype.Path
+  pathData: string | any[]
+}
 
 export class EditorItemWord {
   kind = 'word' as 'word'
@@ -65,18 +73,37 @@ export class EditorItemWord {
     id: EditorItemId,
     canvas: fabric.Canvas,
     conf: EditorItemConfigWord,
-    font: Font
+    font: Font,
+    wordPath: opentype.Path,
+    wordPathData: string | any[],
+    wordPathObj: fabric.Path,
+    pathBounds: BoundingBox
   ) {
     this.id = id
     this.canvas = canvas
     this.font = font
 
-    const wordPath = font.otFont.getPath(conf.text, 0, 0, 100)
-    const pathBounds = wordPath.getBoundingBox()
     const pw = pathBounds.x2 - pathBounds.x1
     const ph = pathBounds.y2 - pathBounds.y1
 
     const pad = 0
+    // @ts-ignore
+    const saved = fabric.Polyline.prototype._setPositionDimensions
+    // @ts-ignore
+    fabric.Polyline.prototype._setPositionDimensions = () => null
+    const path = new fabric.Path(wordPathData).set({
+      originX: 'center',
+      originY: 'center',
+    })
+    // @ts-ignore
+    fabric.Polyline.prototype._setPositionDimensions = saved
+    path.top = wordPathObj.top
+    path.left = wordPathObj.left
+    path.width = wordPathObj.width
+    path.height = wordPathObj.height
+    // @ts-ignore
+    path.pathOffset = wordPathObj.pathOffset
+
     const wordGroup = new fabric.Group([
       new fabric.Rect().set({
         originX: 'center',
@@ -90,10 +117,7 @@ export class EditorItemWord {
         fill: 'rgba(255,255,255,0.3)',
         opacity: 0,
       }),
-      new fabric.Path(wordPath.toPathData(3)).set({
-        originX: 'center',
-        originY: 'center',
-      }),
+      path,
     ])
 
     this.customColor = conf.customColor

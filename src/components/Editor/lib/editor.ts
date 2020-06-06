@@ -7,6 +7,7 @@ import {
   EditorItemConfigWord,
   EditorItemId,
   EditorItemWord,
+  GlyphInfo,
 } from 'components/Editor/lib/editor-item'
 import {
   applyTransformToObj,
@@ -38,7 +39,7 @@ import {
 import { loadFont } from 'lib/wordart/fonts'
 import { flatten, groupBy, keyBy, max, min, sortBy } from 'lodash'
 import { toJS } from 'mobx'
-import { Glyph } from 'opentype.js'
+import { Glyph, BoundingBox } from 'opentype.js'
 import paper from 'paper'
 import seedrandom from 'seedrandom'
 import { MatrixSerialized } from 'services/api/persisted/v1'
@@ -1290,43 +1291,76 @@ export class Editor {
     const uniqFontIds = Object.keys(wordItemsByFont)
     await this.fetchFonts(uniqFontIds)
 
+    const glyphsInfo = new Map<string, GlyphInfo>()
+    const paths = new Map<string, opentype.Path>()
+    const wordPathObjs = new Map<string, fabric.Path>()
+    const pathDatas = new Map<string, string | any[]>()
+    const pathBounds = new Map<string, BoundingBox>()
+
+    // Process all word items...
+    for (const itemConfig of allWordItems) {
+      // Process all glyphs...
+      const font = this.fontsInfo.get(itemConfig.fontId)!.font
+      const glyphs = font.otFont.stringToGlyphs(itemConfig.text)
+
+      const wordPath = font.otFont.getPath(itemConfig.text, 0, 0, 100)
+      const pathBoundsKey = `${font.id}:${itemConfig.text}`
+      if (!pathBounds.has(pathBoundsKey)) {
+        paths.set(pathBoundsKey, wordPath)
+        const wordPathCmds = wordPath.commands.map(
+          ({ type, x, y, x1, y1, x2, y2 }) => [type, x, y, x1, y1, x2, y2]
+        )
+        const wordPathObj = new fabric.Path(wordPathCmds as any)
+        wordPathObj.set({ originX: 'center', originY: 'center ' })
+        wordPathObjs.set(pathBoundsKey, wordPathObj)
+        pathDatas.set(pathBoundsKey, wordPathCmds)
+        pathBounds.set(pathBoundsKey, wordPath.getBoundingBox())
+      }
+
+      for (const glyph of glyphs) {
+        const glyphKey = `${font.id}:${glyph.unicode}`
+        if (glyphsInfo.has(glyphKey)) {
+          continue
+        }
+        const path = glyph.getPath(0, 0, 100)
+        const pathData = path.commands.map(({ type, x, y, x1, y1, x2, y2 }) => [
+          type,
+          x,
+          y,
+          x1,
+          y1,
+          x2,
+          y2,
+        ])
+        glyphsInfo.set(glyphKey, {
+          key: glyphKey,
+          path,
+          glyph,
+          pathData,
+        })
+      }
+    }
+
     // Process all fonts...
+    debugger
     for (const [index, itemConfig] of allWordItems.entries()) {
       if (index % 200 === 0) {
         await waitAnimationFrame()
       }
-      // Process all glyphs...
-      // const uniqGlyphs = [
-      //   ...new Set(
-      //     flatten(
-      //       wordItemConfigs.map((wi) =>
-      //         fontInfo.font.otFont.stringToGlyphs(wi.text)
-      //       )
-      //     )
-      //   ),
-      // ]
-      // for (const glyph of uniqGlyphs) {
-      //   if (fontInfo.glyphs.has(glyph.name)) {
-      //     continue
-      //   }
-      //   const path = glyph.getPath(0, 0, 100)
-      //   fontInfo.glyphs.set(glyph.name, {
-      //     glyph,
-      //     path,
-      //     pathData: path.toPathData(3),
-      //   })
-      // }
 
       // Process items...
-
-      // TODO: optimize it with glyph-based paths, also pre-compute all Fabric Paths
+      const font = this.fontsInfo.get(itemConfig.fontId)!.font
 
       const fontInfo = this.fontsInfo.get(itemConfig.fontId)!
       const item = new EditorItemWord(
         this.editorItemIdGen.get(),
         this.canvas,
         itemConfig,
-        fontInfo.font
+        fontInfo.font,
+        paths.get(`${font.id}:${itemConfig.text}`)!,
+        pathDatas.get(`${font.id}:${itemConfig.text}`)!,
+        wordPathObjs.get(`${font.id}:${itemConfig.text}`)!,
+        pathBounds.get(`${font.id}:${itemConfig.text}`)!
       )
       item.setSelectable(this.itemsSelection)
 
