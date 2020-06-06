@@ -67,12 +67,15 @@ type FontInfo = {
   glyphs: Map<string, { glyph: Glyph; path: opentype.Path; pathData: string }>
 }
 
+export type EditorMode = 'view' | 'edit'
+
 export class Editor {
   logger = consoleLoggers.editor
 
   private params: EditorInitParams
   private store: EditorStore
   private generator: Generator
+  mode: EditorMode = 'view'
 
   private aspectRatio: number
   private editorItemIdGen = new UninqIdGenerator(3)

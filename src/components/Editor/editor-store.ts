@@ -227,6 +227,7 @@ export class EditorStore {
     this.editor.setAspectRatio(
       serialized.data.sceneSize.w / serialized.data.sceneSize.h
     )
+    this.availableShapes = this.availableShapes.filter((s) => !s.isCustom)
 
     if (data.shape.kind === 'custom-raster') {
       const customImgId = this.addCustomShapeImg({
@@ -622,10 +623,12 @@ export class EditorStore {
 
   addCustomShapeImg = (shape: Omit<ShapeRasterConf, 'id'>) => {
     const id = this.customImgIdGen.get()
+
     this.availableShapes.push({
       ...shape,
       id,
     } as ShapeConf)
+
     return id
   }
 
