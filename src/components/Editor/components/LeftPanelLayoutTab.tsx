@@ -10,8 +10,8 @@ import {
   Heading,
   Button,
   Flex,
-  CloseButton,
   Icon,
+  Divider,
 } from '@chakra-ui/core'
 import { WordAnglesPresetKind } from 'components/Editor/style-options'
 // @ts-ignore
@@ -122,153 +122,10 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
     return (
       <>
-        {style.items.words.wordList.length > 0 && (
-          <Box mb="5">
-            <Heading size="md" mt="2" mb="3">
-              Words
-            </Heading>
-
-            <Box mb="3">
-              <Slider
-                horizontal
-                label="Size"
-                afterLabel="%"
-                value={style.items.placement.wordsMaxSize}
-                onChange={(value) => {
-                  const val = (value as any) as number
-                  style.items.placement.wordsMaxSize = val
-                }}
-                onAfterChange={visualize}
-                min={20}
-                max={100}
-                step={1}
-              />
-            </Box>
-
-            <Text fontSize="lg" mt="3" mb="2">
-              Angles
-            </Text>
-
-            <PresetBtns>
-              {anglePresets.map((preset) => (
-                <>
-                  <PresetBtn
-                    active={preset.kind === style.items.words.anglesPreset}
-                    onClick={() => {
-                      style.items.words.anglesPreset = preset.kind
-                    }}
-                  >
-                    {preset.Svg && <preset.Svg width="100%" height="100%" />}
-                  </PresetBtn>
-                </>
-              ))}
-            </PresetBtns>
-            {style.items.words.anglesPreset === 'custom' && (
-              <>
-                <Box mt="3">
-                  <Button
-                    mr="3"
-                    variantColor="green"
-                    isDisabled={style.items.words.customAngles.length >= 8}
-                    size="sm"
-                    leftIcon="add"
-                    onClick={() => {
-                      style.items.words.customAngles.push(
-                        Math.round(-90 + Math.random() * 180)
-                      )
-                    }}
-                  >
-                    Add
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      style.items.words.customAngles = [0]
-                    }}
-                  >
-                    Clear
-                  </Button>
-                </Box>
-
-                <Box mt="2" paddingLeft="30px">
-                  {style.items.words.customAngles.map((angle, index) => (
-                    <Flex direction="row" key={index}>
-                      <Slider
-                        css={css`
-                          flex: 1;
-                        `}
-                        label={`Angle #${index + 1}`}
-                        horizontal
-                        value={angle}
-                        onChange={(value) => {
-                          const val = (value as any) as number
-                          style.items.words.customAngles[index] = val
-                        }}
-                        min={-90}
-                        max={90}
-                        step={1}
-                        afterLabel="°"
-                      />
-                      <Box width="30px">
-                        {style.items.words.customAngles.length > 1 && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              style.items.words.customAngles.splice(index, 1)
-                            }}
-                          >
-                            <Icon name="close" />
-                          </Button>
-                        )}
-                      </Box>
-                    </Flex>
-                  ))}
-                </Box>
-              </>
-            )}
-          </Box>
-        )}
-
-        {style.items.icons.iconList.length > 0 && (
-          <Box mb="4">
-            <Label>Icons</Label>
-            <Slider
-              horizontal
-              label="Size"
-              afterLabel="%"
-              value={style.items.placement.iconsMaxSize}
-              onChange={(value) => {
-                const val = (value as any) as number
-                style.items.placement.iconsMaxSize = val
-              }}
-              onAfterChange={visualize}
-              min={20}
-              max={100}
-              step={1}
-            />
-            <Slider
-              horizontal
-              label="Amount"
-              afterLabel="%"
-              value={style.items.placement.iconsProportion}
-              onChange={(value) => {
-                const val = (value as any) as number
-                style.items.placement.iconsProportion = val
-              }}
-              onAfterChange={visualize}
-              min={0}
-              max={100}
-              step={1}
-            />
-          </Box>
-        )}
-
-        <Box mb="4">
-          <Heading size="md" mb="3" mt="2">
+        <Box mb="6">
+          <Text fontSize="xl" mb="2" mt="2">
             Placement
-          </Heading>
+          </Text>
           {/* <Checkbox
             id="fit-shape"
             label="Allow words to go beyond shape"
@@ -308,6 +165,152 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
             step={1}
           />
         </Box>
+
+        {style.items.words.wordList.length > 0 && (
+          <>
+            <Divider />
+            <Box mb="5" mt="5">
+              <Text fontSize="xl" mb="2" mt="2">
+                Words
+              </Text>
+
+              <Box mb="3">
+                <Slider
+                  horizontal
+                  label="Size"
+                  afterLabel="%"
+                  value={style.items.placement.wordsMaxSize}
+                  onChange={(value) => {
+                    const val = (value as any) as number
+                    style.items.placement.wordsMaxSize = val
+                  }}
+                  onAfterChange={visualize}
+                  min={20}
+                  max={100}
+                  step={1}
+                />
+              </Box>
+
+              <Text fontSize="lg" mt="3" mb="2">
+                Angles
+              </Text>
+
+              <PresetBtns>
+                {anglePresets.map((preset) => (
+                  <>
+                    <PresetBtn
+                      active={preset.kind === style.items.words.anglesPreset}
+                      onClick={() => {
+                        style.items.words.anglesPreset = preset.kind
+                      }}
+                    >
+                      {preset.Svg && <preset.Svg width="100%" height="100%" />}
+                    </PresetBtn>
+                  </>
+                ))}
+              </PresetBtns>
+              {style.items.words.anglesPreset === 'custom' && (
+                <>
+                  <Box mt="3">
+                    <Button
+                      mr="3"
+                      variantColor="green"
+                      isDisabled={style.items.words.customAngles.length >= 8}
+                      size="sm"
+                      leftIcon="add"
+                      onClick={() => {
+                        style.items.words.customAngles.push(
+                          Math.round(-90 + Math.random() * 180)
+                        )
+                      }}
+                    >
+                      Add
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        style.items.words.customAngles = [0]
+                      }}
+                    >
+                      Clear
+                    </Button>
+                  </Box>
+
+                  <Box mt="2" paddingLeft="30px">
+                    {style.items.words.customAngles.map((angle, index) => (
+                      <Flex direction="row" key={index}>
+                        <Slider
+                          css={css`
+                            flex: 1;
+                          `}
+                          label={`Angle #${index + 1}`}
+                          horizontal
+                          value={angle}
+                          onChange={(value) => {
+                            const val = (value as any) as number
+                            style.items.words.customAngles[index] = val
+                          }}
+                          min={-90}
+                          max={90}
+                          step={1}
+                          afterLabel="°"
+                        />
+                        <Box width="30px">
+                          {style.items.words.customAngles.length > 1 && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                style.items.words.customAngles.splice(index, 1)
+                              }}
+                            >
+                              <Icon name="close" />
+                            </Button>
+                          )}
+                        </Box>
+                      </Flex>
+                    ))}
+                  </Box>
+                </>
+              )}
+            </Box>
+          </>
+        )}
+
+        {style.items.icons.iconList.length > 0 && (
+          <Box mb="4">
+            <Label>Icons</Label>
+            <Slider
+              horizontal
+              label="Size"
+              afterLabel="%"
+              value={style.items.placement.iconsMaxSize}
+              onChange={(value) => {
+                const val = (value as any) as number
+                style.items.placement.iconsMaxSize = val
+              }}
+              onAfterChange={visualize}
+              min={20}
+              max={100}
+              step={1}
+            />
+            <Slider
+              horizontal
+              label="Amount"
+              afterLabel="%"
+              value={style.items.placement.iconsProportion}
+              onChange={(value) => {
+                const val = (value as any) as number
+                style.items.placement.iconsProportion = val
+              }}
+              onAfterChange={visualize}
+              min={0}
+              max={100}
+              step={1}
+            />
+          </Box>
+        )}
       </>
     )
   }
