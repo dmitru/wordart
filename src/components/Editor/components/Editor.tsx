@@ -801,8 +801,6 @@ const RightWrapper = styled.div`
   height: 100%;
   background: #eee;
   flex: 1;
-  display: flex;
-  flex-direction: column;
   box-shadow: 0 0 5px 0 #00000033;
 `
 

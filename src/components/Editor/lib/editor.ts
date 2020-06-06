@@ -1023,6 +1023,8 @@ export class Editor {
     await this.setBgItems(items)
     await this.setBgItemsStyle(style.items)
     this.store.isVisualizing = false
+
+    this.store.renderKey++
   }
 
   generateShapeItems = async (params: { style: ShapeStyleConf }) => {
@@ -1195,6 +1197,8 @@ export class Editor {
     await this.setShapeItems(items)
     await this.setShapeItemsStyle(style.items)
     this.store.isVisualizing = false
+
+    this.store.renderKey++
   }
 
   clear = async () => {

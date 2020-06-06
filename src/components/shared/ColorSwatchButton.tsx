@@ -1,3 +1,4 @@
+import React from 'react'
 import { Button, ButtonProps } from '@chakra-ui/core'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
@@ -8,93 +9,95 @@ export type ColorSwatchButtonProps = Omit<ButtonProps, 'children' | 'color'> & {
   colors?: string[]
 }
 
-export const ColorSwatchButton: React.FC<ColorSwatchButtonProps> = ({
-  kind,
-  color = 'red',
-  colors = ['red'],
-  ...props
-}) => {
-  if (kind === 'color') {
-    return (
-      <ColorSwatchButtonStyled
-        {...props}
-        css={css`
-          &,
-          &:hover {
-            background: ${color};
-          }
-        `}
-      >
-        {null}
-      </ColorSwatchButtonStyled>
-    )
+export const ColorSwatchButton = React.forwardRef<any, ColorSwatchButtonProps>(
+  ({ kind, color = 'red', colors = ['red'], ...props }, ref) => {
+    if (kind === 'color') {
+      return (
+        <ColorSwatchButtonStyled
+          {...props}
+          ref={ref}
+          css={css`
+            &,
+            &:hover {
+              background: ${color};
+            }
+          `}
+        >
+          {null}
+        </ColorSwatchButtonStyled>
+      )
+    }
+    if (kind === 'spectrum') {
+      return (
+        <ColorSwatchButtonStyled
+          {...props}
+          ref={ref}
+          css={css`
+            &,
+            &:hover {
+              background-image: linear-gradient(
+                45deg,
+                red,
+                yellow,
+                lime,
+                aqua,
+                blue,
+                magenta,
+                red
+              );
+            }
+          `}
+        >
+          {null}
+        </ColorSwatchButtonStyled>
+      )
+    }
+
+    if (kind === 'colors') {
+      const n = colors.length
+      const gradStops = colors
+        .map((c, i) => `${c} ${(i / n) * 100}%, ${c} ${((i + 1) / n) * 100}%`)
+        .join(',')
+
+      return (
+        <ColorSwatchButtonStyled
+          {...props}
+          ref={ref}
+          css={css`
+            &,
+            &:hover {
+              background-image: linear-gradient(90deg, ${gradStops});
+            }
+          `}
+        >
+          {null}
+        </ColorSwatchButtonStyled>
+      )
+    }
+
+    if (kind === 'gradient') {
+      const n = colors.length - 1
+      const gradStops = colors.map((c, i) => `${c} ${(i / n) * 100}%`).join(',')
+
+      return (
+        <ColorSwatchButtonStyled
+          {...props}
+          ref={ref}
+          css={css`
+            &,
+            &:hover {
+              background-image: linear-gradient(90deg, ${gradStops});
+            }
+          `}
+        >
+          {null}
+        </ColorSwatchButtonStyled>
+      )
+    }
+
+    return null
   }
-  if (kind === 'spectrum') {
-    return (
-      <ColorSwatchButtonStyled
-        {...props}
-        css={css`
-          &,
-          &:hover {
-            background-image: conic-gradient(
-              red,
-              yellow,
-              lime,
-              aqua,
-              blue,
-              magenta,
-              red
-            );
-          }
-        `}
-      >
-        {null}
-      </ColorSwatchButtonStyled>
-    )
-  }
-
-  if (kind === 'colors') {
-    const n = colors.length
-    const gradStops = colors
-      .map((c, i) => `${c} ${(i / n) * 100}%, ${c} ${((i + 1) / n) * 100}%`)
-      .join(',')
-
-    return (
-      <ColorSwatchButtonStyled
-        {...props}
-        css={css`
-          &,
-          &:hover {
-            background-image: linear-gradient(90deg, ${gradStops});
-          }
-        `}
-      >
-        {null}
-      </ColorSwatchButtonStyled>
-    )
-  }
-
-  if (kind === 'gradient') {
-    const n = colors.length
-    const gradStops = colors.map((c, i) => `${c} ${(i / n) * 100}%`).join(',')
-
-    return (
-      <ColorSwatchButtonStyled
-        {...props}
-        css={css`
-          &,
-          &:hover {
-            background-image: linear-gradient(90deg, ${gradStops});
-          }
-        `}
-      >
-        {null}
-      </ColorSwatchButtonStyled>
-    )
-  }
-
-  return null
-}
+)
 
 ColorSwatchButton.defaultProps = {
   mb: '3',

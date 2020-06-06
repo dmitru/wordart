@@ -41,9 +41,7 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
         usePortal
       >
         <PopoverTrigger>
-          <ColorSwatchButton kind="color" color={value} ref={ref} {...props}>
-            {null}
-          </ColorSwatchButton>
+          <ColorSwatchButton kind="color" color={value} ref={ref} {...props} />
         </PopoverTrigger>
         <PopoverContent
           outline="none"

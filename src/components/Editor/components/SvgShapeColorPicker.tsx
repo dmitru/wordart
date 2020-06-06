@@ -41,9 +41,7 @@ export const SvgShapeColorPicker: React.FC<{
         kind="color"
         ref={ref}
         {...props}
-      >
-        {null}
-      </ColorSwatchButton>
+      />
     )
   } else if (shape.config.processing.colors.kind === 'original') {
     trigger = (
@@ -56,9 +54,7 @@ export const SvgShapeColorPicker: React.FC<{
         kind="colors"
         ref={ref}
         {...props}
-      >
-        {null}
-      </ColorSwatchButton>
+      />
     )
   } else if (shape.config.processing.colors.kind === 'color-map') {
     trigger = (
@@ -71,9 +67,7 @@ export const SvgShapeColorPicker: React.FC<{
         kind="colors"
         ref={ref}
         {...props}
-      >
-        {null}
-      </ColorSwatchButton>
+      />
     )
   }
 

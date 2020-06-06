@@ -24,6 +24,7 @@ import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { ChoiceButtons } from 'components/Editor/components/ChoiceButtons'
 import { ShapeItemsColorPicker } from 'components/Editor/components/ShapeItemsColorPicker'
+import { BgItemsColorPicker } from 'components/Editor/components/BgItemsColorPicker'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -32,6 +33,10 @@ export type LeftPanelColorsTabProps = {
 export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
   ({ target }) => {
     const { editorPageStore: store } = useStore()
+    const {
+      // @ts-ignore
+      renderKey, // eslint-disable-line
+    } = store
     const shape = store.getShape()
     const shapeStyle = store.styleOptions.shape
     const bgStyle = store.styleOptions.bg
@@ -297,10 +302,32 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
             <Divider />
 
-            <Text fontSize="xl">Shape Words & Icons</Text>
+            {/* <background> */}
+
+            <Box>
+              <Text fontSize="xl">Background</Text>
+              <Stack direction="row" spacing="3">
+                <Box mb="2" display="flex" alignItems="flex-start">
+                  <Text fontSize="md" mr="3">
+                    Fill:
+                  </Text>
+
+                  <ColorPickerPopover
+                    value={chroma(bgStyle.fill.color.color).alpha(1).hex()}
+                    onChange={(hex) => {
+                      bgStyle.fill.color.color = chroma(hex).hex()
+                      store.editor?.setBgColor(bgStyle.fill.color)
+                    }}
+                  />
+                </Box>
+              </Stack>
+            </Box>
+
+            <Divider />
 
             {/* <shape-items> */}
             <Box mb="1">
+              <Text fontSize="xl">Shape Words & Icons</Text>
               <Flex direction="row" mb="0">
                 <Slider
                   css={css`
@@ -373,135 +400,37 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
             <Divider />
 
-            {/* <background> */}
-
-            <Box>
-              <Text fontSize="xl">Background</Text>
-              <Stack direction="row" spacing="3">
-                <Box mb="6" display="flex" alignItems="flex-start">
-                  <Text fontSize="md" mr="3">
-                    Fill:
-                  </Text>
-
-                  <ColorPickerPopover
-                    value={chroma(bgStyle.fill.color.color).alpha(1).hex()}
-                    onChange={(hex) => {
-                      bgStyle.fill.color.color = chroma(hex).hex()
-                      store.editor?.setBgColor(bgStyle.fill.color)
-                    }}
-                  />
-                </Box>
-              </Stack>
-            </Box>
-
             <Box>
               <Text fontSize="xl">Background Words & Icons</Text>
 
-              <Box
-                mb="6"
-                display="flex"
-                alignItems="flex-start"
-                flex="1"
-                justifyContent="flex-start"
-              >
-                <Text fontSize="md" mr="3">
-                  Items:
-                </Text>
-
-                <Box>
-                  <ChoiceButtons
-                    choices={[
-                      { title: 'Gradient', value: 'gradient' },
-                      { title: 'Color', value: 'color' },
-                    ]}
-                    value={bgStyle.items.coloring.kind}
+              {store?.editor && store.editor.items.bg.items.length > 0 ? (
+                <Flex direction="row" mb="3">
+                  <Slider
+                    css={css`
+                      flex: 1;
+                      margin-right: 20px;
+                    `}
+                    horizontal
+                    afterLabel="%"
+                    label="Opacity"
+                    value={100 * bgStyle.items.opacity}
                     onChange={(value) => {
-                      if (value === 'gradient') {
-                        bgStyle.items.coloring.kind = 'gradient'
-                      } else if (value === 'color') {
-                        bgStyle.items.coloring.kind = 'color'
-                      }
-                      updateBgItemsColoring()
+                      bgStyle.items.opacity = value / 100
                     }}
+                    onAfterChange={updateBgItemsColoring}
+                    min={0}
+                    max={100}
+                    step={1}
                   />
 
-                  <Box mt="3">
-                    {bgStyle.items.coloring.kind === 'color' && (
-                      <ColorPickerPopover
-                        disableAlpha
-                        value={bgStyle.items.coloring.color.color}
-                        onChange={(hex) => {
-                          bgStyle.items.coloring.color.color = hex
-                        }}
-                        onAfterChange={updateBgItemsColoring}
-                      />
-                    )}
-                    {bgStyle.items.coloring.kind === 'gradient' && (
-                      <>
-                        <Box mr="1" display="inline-block">
-                          <ColorPickerPopover
-                            disableAlpha
-                            value={
-                              bgStyle.items.coloring.gradient.gradient.from
-                            }
-                            onChange={(hex) => {
-                              bgStyle.items.coloring.gradient.gradient.from = hex
-                            }}
-                            onAfterChange={updateBgItemsColoring}
-                          />
-                        </Box>
-                        <Box mr="1" display="inline-block">
-                          <ColorPickerPopover
-                            disableAlpha
-                            value={
-                              shapeStyle.items.coloring.gradient.gradient.to
-                            }
-                            onChange={(hex) => {
-                              shapeStyle.items.coloring.gradient.gradient.to = hex
-                            }}
-                            onAfterChange={updateBgItemsColoring}
-                          />
-                        </Box>
-                      </>
-                    )}
-                  </Box>
-                </Box>
-              </Box>
-
-              <Stack direction="column" spacing="3">
-                <Slider
-                  css={css`
-                    flex: 1;
-                  `}
-                  horizontal
-                  label="Opacity"
-                  value={100 * bgStyle.items.opacity}
-                  onChange={(value) => {
-                    bgStyle.items.opacity = value / 100
-                  }}
-                  onAfterChange={updateBgItemsColoring}
-                  min={0}
-                  max={100}
-                  step={1}
-                />
-
-                <Slider
-                  css={css`
-                    flex: 1;
-                  `}
-                  horizontal
-                  label="Emphasize size"
-                  value={bgStyle.items.dimSmallerItems}
-                  onChange={(value) => {
-                    const val = (value as any) as number
-                    bgStyle.items.dimSmallerItems = val
-                  }}
-                  onAfterChange={updateBgItemsColoring}
-                  min={0}
-                  max={100}
-                  step={1}
-                />
-              </Stack>
+                  <BgItemsColorPicker
+                    bgStyle={bgStyle}
+                    onUpdate={updateBgItemsColoring}
+                  />
+                </Flex>
+              ) : (
+                <Text>Add some items to the Background layer first.</Text>
+              )}
             </Box>
             {/* </background> */}
           </>
