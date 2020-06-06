@@ -166,6 +166,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       return <SpinnerSplashScreen />
     }
 
+    const {
+      // @ts-ignore
+      renderKey, // eslint-disable-line
+    } = store
     const hasItems = store.editor
       ? state.targetTab === 'bg'
         ? store.editor.items.bg.items.length > 0

@@ -1227,8 +1227,12 @@ export class Editor {
 
     this.editorItemIdGen.removeIds(nonLockedItems.map((i) => i.id))
     this.editorItemIdGen.resetLen()
+    this.items[target].items = this.items[target].items.filter(
+      (i) => i.locked && !removeLocked
+    )
 
     this.canvas.requestRenderAll()
+    this.store.renderKey++
   }
 
   destroy = () => {

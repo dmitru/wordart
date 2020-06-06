@@ -76,6 +76,7 @@ export class EditorStore {
 
   rootStore: RootStore
   editor: Editor | null = null
+  @observable renderKey = 1
 
   @observable isVisualizing = false
   @observable visualizingProgress = null as number | null
