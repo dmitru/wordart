@@ -17,6 +17,7 @@ import {
   loadObjFromImg,
   loadObjFromSvg,
   objAsCanvasElement,
+  getObjTransformMatrix,
 } from 'components/Editor/lib/fabric-utils'
 import { Font, Generator } from 'components/Editor/lib/generator'
 import { Shape, SvgShapeColorsMapEntry } from 'components/Editor/shape'
@@ -177,10 +178,10 @@ export class Editor {
         this.shape.kind === 'svg' &&
         this.shape.objOriginalColors
       ) {
-        applyTransformToObj(
-          this.shape.objOriginalColors,
-          this.shape.obj.calcTransformMatrix() as MatrixSerialized
-        )
+        const transform = getObjTransformMatrix(this.shape.obj)
+        this.shape.transform = transform
+        applyTransformToObj(this.shape.objOriginalColors, transform)
+        this.store.renderKey++
 
         this.canvas.requestRenderAll()
       } else {
@@ -586,9 +587,10 @@ export class Editor {
     bgFillStyle: BgStyleConf['fill']
     shapeStyle: ShapeStyleConf
     clear: boolean
+    updateShapeColors?: boolean
   }) => {
     console.log('setShape', params)
-    const { shapeConfig } = params
+    const { shapeConfig, updateShapeColors = true } = params
 
     if (!shapeConfig) {
       throw new Error('Missing shape config')
@@ -614,6 +616,7 @@ export class Editor {
         objOriginalColors: shapeObj,
         originalColors: colorMap.map((c) => c.color),
         transform: new paper.Matrix().values as MatrixSerialized,
+        originalTransform: new paper.Matrix().values as MatrixSerialized,
         url: shapeConfig.url,
         colorMap,
       }
@@ -634,6 +637,7 @@ export class Editor {
         isCustom: shapeConfig.isCustom || false,
         obj: shapeObj,
         transform: new paper.Matrix().values as MatrixSerialized,
+        originalTransform: new paper.Matrix().values as MatrixSerialized,
         url: shapeConfig.url,
         originalCanvas,
         processedCanvas,
@@ -662,6 +666,7 @@ export class Editor {
         id: shapeConfig.id,
         isCustom: shapeConfig.isCustom || false,
         transform: new paper.Matrix().values as MatrixSerialized,
+        originalTransform: new paper.Matrix().values as MatrixSerialized,
         obj: shapeObj,
       }
     }
@@ -716,18 +721,14 @@ export class Editor {
 
     this.shape = shape!
 
-    this.updateShapeColors(this.shape.config)
+    this.shape.originalTransform = getObjTransformMatrix(this.shape.obj)
+    this.shape.transform = getObjTransformMatrix(this.shape.obj)
 
-    // if (shapeConfig.kind === 'raster') {
-    //   shapeStyle.kind = 'original'
-    // } else if (colorMap) {
-    //   shapeColors.colorMap = colorMap?.colors.map((c) => c.color)
-    //   shapeColors.defaultColorMap = colorMap?.colors.map((c) => c.color)
-    //   shapeColors.kind = 'color-map'
-    //   console.log('setting default color map', shapeColors, colorMap)
-    // }
-    // await this.updateShapeColors(shapeColors)
-    this.canvas.requestRenderAll()
+    if (updateShapeColors) {
+      this.updateShapeColors(this.shape.config)
+      this.canvas.requestRenderAll()
+    }
+
     return { colorsMap: colorMap }
   }
 
@@ -1282,8 +1283,6 @@ export class Editor {
     this.canvas.requestRenderAll()
   }
 
-  // TODO: optimize performance
-  // TODO: rename to "convert to EditorItems"
   convertToEditorItems = async (
     itemConfigs: EditorItemConfig[]
   ): Promise<{

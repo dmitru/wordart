@@ -19,6 +19,7 @@ export type ShapeSvg = {
   url: string
   isCustom: boolean
   transform: MatrixSerialized
+  originalTransform: MatrixSerialized
   /** Original colors, correspond to colorMap indices */
   originalColors: ColorString[]
   /** Mapping of color slots to fabric items */
@@ -45,6 +46,7 @@ export type ShapeRaster = {
   isCustom: boolean
   url: string
   transform: MatrixSerialized
+  originalTransform: MatrixSerialized
 
   config: ShapeRasterConf
 
@@ -65,5 +67,6 @@ export type ShapeText = {
   config: ShapeTextConf
 
   transform: MatrixSerialized
+  originalTransform: MatrixSerialized
   obj: fabric.Object
 }

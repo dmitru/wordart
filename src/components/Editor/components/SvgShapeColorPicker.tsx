@@ -83,7 +83,9 @@ export const SvgShapeColorPicker: React.FC<{
         usePortal
       >
         <PopoverTrigger>
-          <Box>{trigger}</Box>
+          <Box display="inline-block" width="80px">
+            {trigger}
+          </Box>
         </PopoverTrigger>
 
         <PopoverContent

@@ -1,6 +1,12 @@
 import { fabric } from 'fabric'
 import { MatrixSerialized } from 'services/api/persisted/v1'
-import { color } from 'styled-system'
+import { roundFloat } from 'utils/round-float'
+
+export const getObjTransformMatrix = (obj: fabric.Object): MatrixSerialized => {
+  return (obj.calcTransformMatrix() || []).map((n: number) =>
+    roundFloat(n, 3)
+  ) as MatrixSerialized
+}
 
 export const applyTransformToObj = (
   shape: fabric.Object,

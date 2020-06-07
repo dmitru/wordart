@@ -17,6 +17,7 @@ import {
   applyTransformToObj,
   cloneObj,
   objAsCanvasElement,
+  getObjTransformMatrix,
 } from 'components/Editor/lib/fabric-utils'
 import { Font } from 'components/Editor/lib/generator'
 import { Shape, SvgShapeColorsMapEntry } from 'components/Editor/shape'
@@ -44,7 +45,7 @@ import {
 import { FontConfig, FontId, fonts, FontStyleConfig } from 'data/fonts'
 import { shapes } from 'data/shapes'
 import { loadFont } from 'lib/wordart/fonts'
-import { sortBy, uniq, uniqBy } from 'lodash'
+import { sortBy, uniq, uniqBy, cloneDeep } from 'lodash'
 import { action, observable, set } from 'mobx'
 import paper from 'paper'
 import {
@@ -61,6 +62,7 @@ import { UninqIdGenerator as UniqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
 import { exhaustiveCheck } from 'utils/type-utils'
+import { waitAnimationFrame } from 'utils/async'
 
 export type EditorMode = 'view' | 'edit items'
 
@@ -239,7 +241,7 @@ export class EditorStore {
         thumbnailUrl: data.shape.url,
         processing: data.shape.processing,
       })
-      await this.selectShape(customImgId)
+      await this.selectShape(customImgId, false)
     } else if (data.shape.kind === 'custom-text') {
       const customImgId = this.addCustomShapeText({
         kind: 'text',
@@ -249,15 +251,13 @@ export class EditorStore {
         text: data.shape.text,
         textStyle: data.shape.textStyle,
       })
-      await this.selectShape(customImgId)
+      await this.selectShape(customImgId, false)
     } else if (
       (data.shape.kind === 'raster' || data.shape.kind === 'svg') &&
       data.shape.shapeId != null
     ) {
-      await this.selectShape(data.shape.shapeId)
+      await this.selectShape(data.shape.shapeId, false)
     }
-
-    this.updateShapeThumbnail()
 
     const shape = this.editor.shape
     if (data.shape.transform && shape) {
@@ -267,12 +267,67 @@ export class EditorStore {
       }
     }
 
+    if (
+      shape?.kind === 'svg' &&
+      data.shape.kind === 'svg' &&
+      data.shape.processing
+    ) {
+      shape.config.processing = data.shape.processing
+    } else if (
+      shape?.kind === 'raster' &&
+      data.shape.kind === 'raster' &&
+      data.shape.processing
+    ) {
+      shape.config.processing = data.shape.processing
+    }
+
     const sceneSize = this.editor.getSceneBounds(0)
     const scale = sceneSize.width / serialized.data.sceneSize.w
 
-    // TODO
-    // this.styleOptions.shape = data.shapeStyle
-    // this.styleOptions.bg = data.bgStyle
+    // Restore BG style options
+    if (data.bgStyle.fill.kind === 'color') {
+      this.styleOptions.bg.fill.color = data.bgStyle.fill
+    } else if (data.bgStyle.fill.kind === 'transparent') {
+      this.styleOptions.bg.fill.kind = 'transparent'
+    }
+
+    const bgStyle = this.styleOptions.bg
+    bgStyle.items.dimSmallerItems = data.bgStyle.items.dimSmallerItems
+    bgStyle.items.opacity = data.bgStyle.items.opacity
+    bgStyle.items.placement = data.bgStyle.items.placement
+    bgStyle.items.words.customAngles = data.bgStyle.items.words.angles
+    bgStyle.items.words.wordList = data.bgStyle.items.words.wordList
+    bgStyle.items.words.fontIds = data.bgStyle.items.words.fontIds
+
+    if (data.bgStyle.items.coloring.kind === 'color') {
+      bgStyle.items.coloring.kind = 'color'
+      bgStyle.items.coloring.color = data.bgStyle.items.coloring
+    } else if (data.bgStyle.items.coloring.kind === 'gradient') {
+      bgStyle.items.coloring.kind = 'gradient'
+      bgStyle.items.coloring.gradient = data.bgStyle.items.coloring
+    }
+
+    // Restore Shape style options
+    const shapeStyle = this.styleOptions.shape
+
+    shapeStyle.items.dimSmallerItems = data.shapeStyle.items.dimSmallerItems
+    shapeStyle.items.opacity = data.shapeStyle.items.opacity
+    shapeStyle.items.placement = data.shapeStyle.items.placement
+    shapeStyle.items.words.customAngles = data.shapeStyle.items.words.angles
+    shapeStyle.items.words.wordList = data.shapeStyle.items.words.wordList
+    shapeStyle.items.words.fontIds = data.shapeStyle.items.words.fontIds
+    shapeStyle.opacity = data.shapeStyle.opacity
+
+    if (data.shapeStyle.items.coloring.kind === 'color') {
+      shapeStyle.items.coloring.kind = 'color'
+      shapeStyle.items.coloring.color = data.shapeStyle.items.coloring
+    } else if (data.shapeStyle.items.coloring.kind === 'gradient') {
+      shapeStyle.items.coloring.kind = 'gradient'
+      shapeStyle.items.coloring.gradient = data.shapeStyle.items.coloring
+    } else if (data.shapeStyle.items.coloring.kind === 'shape') {
+      shapeStyle.items.coloring.kind = 'shape'
+      shapeStyle.items.coloring.shape = data.shapeStyle.items.coloring
+    }
 
     const deserializeItems = async ({
       items,
@@ -355,18 +410,25 @@ export class EditorStore {
         words: data.bgItems.words,
       }),
     ])
+    this.editor.setShapeOpacity(shapeStyle.opacity)
     await this.editor.setShapeItems(shapeItems)
     await this.editor.setBgItems(bgItems)
 
     this.editor.setBgColor(mkBgStyleConfFromOptions(this.styleOptions.bg).fill)
     const shapeConf = this.getShapeConfById(this.selectedShapeId)!
     await this.editor.updateShapeColors(shapeConf)
-    // await this.editor.setShapeItemsColor(
-    //   getItemsColoring(this.styleOptions.bg)
-    // )
+
     await this.editor.setShapeItemsStyle(
       mkShapeStyleConfFromOptions(this.styleOptions.shape).items
     )
+    await this.editor.setBgItemsStyle(
+      mkBgStyleConfFromOptions(this.styleOptions.bg).items
+    )
+
+    await this.updateShapeThumbnail()
+    for (let i = 0; i < 10; ++i) {
+      await waitAnimationFrame()
+    }
   }
 
   updateShapeThumbnail = async () => {
@@ -375,6 +437,8 @@ export class EditorStore {
     }
     const currentShapeConf = this.getSelectedShapeConf()
     const shape = await cloneObj(this.editor.shape.obj)
+    applyTransformToObj(shape, this.editor.shape.originalTransform)
+
     shape.set({ opacity: 1 })
     const canvas = objAsCanvasElement(shape)
     currentShapeConf.thumbnailUrl = canvas.toDataURL()
@@ -471,9 +535,7 @@ export class EditorStore {
     }
 
     const serializeShape = (shape: Shape): PersistedShapeConfV1 => {
-      const transform = (
-        this.getShape()?.obj.calcTransformMatrix() || []
-      ).map((n: number) => roundFloat(n, 3)) as MatrixSerialized
+      const transform = getObjTransformMatrix(this.getShape()!.obj)
 
       if (shape.kind === 'raster') {
         if (shape.isCustom) {
@@ -621,6 +683,8 @@ export class EditorStore {
     this.editor?.destroy()
     this.lifecycleState = 'destroyed'
     this.availableShapes = this.availableShapes.filter((s) => !s.isCustom)
+    this.styleOptions.shape = cloneDeep(defaultShapeStyleOptions)
+    this.styleOptions.bg = cloneDeep(defaultBgStyleOptions)
   }
 
   addCustomShapeImg = (shape: Omit<ShapeRasterConf, 'id'>) => {
@@ -686,7 +750,7 @@ export class EditorStore {
   getSelectedShapeConf = () =>
     this.availableShapes.find((s) => s.id === this.selectedShapeId)!
 
-  @action selectShape = async (shapeId: ShapeId) => {
+  @action selectShape = async (shapeId: ShapeId, updateShapeColors = true) => {
     if (!this.editor) {
       return
     }
@@ -698,6 +762,7 @@ export class EditorStore {
       bgFillStyle: mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
       shapeStyle: mkShapeStyleConfFromOptions(this.styleOptions.shape),
       clear: true,
+      updateShapeColors,
     })
 
     if (this.editor.shape?.kind === 'svg') {

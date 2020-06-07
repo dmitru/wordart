@@ -13,7 +13,7 @@ import {
   Text,
   Box,
   Select,
-  Icon,
+  Skeleton,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
@@ -55,6 +55,7 @@ import {
   mkShapeStyleConfFromOptions,
   mkBgStyleConfFromOptions,
 } from 'components/Editor/style'
+import { Spinner } from 'components/Editor/components/Spinner'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -411,7 +412,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       )}
                     </>
                   ) : (
-                    <Box>Loading...</Box>
+                    <Box>
+                      <Skeleton height="50px" my="10px" />
+                      <Skeleton height="30px" my="10px" />
+                      <Skeleton height="300px" my="10px" />
+                    </Box>
                   )}
                 </LeftPanelContent>
               </LeftPanel>
@@ -426,163 +431,169 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               p="2"
               pl="3"
             >
-              <Button
-                css={css`
-                  width: 128px;
-                `}
-                // accent
-                // isDisabled={store.isVisualizing}
-                variantColor="accent"
-                loadingText={`${Math.round(
-                  (store.visualizingProgress || 0) * 100
-                )}%`}
-                isLoading={store.isVisualizing}
-                onClick={() => {
-                  if (state.targetTab === 'shape') {
-                    store.editor?.generateShapeItems({
-                      style: mkShapeStyleConfFromOptions(
-                        store.styleOptions.shape
-                      ),
-                    })
-                  } else {
-                    store.editor?.generateBgItems({
-                      style: mkBgStyleConfFromOptions(store.styleOptions.bg),
-                    })
-                  }
-                }}
-              >
-                <MagicWand
-                  size={24}
-                  css={css`
-                    margin-right: 4px;
-                  `}
-                />
-                Visualize
-              </Button>
-
-              <Tooltip label="Undo" aria-label="Undo" hasArrow zIndex={5}>
-                <IconButton ml="3" icon="arrow-back" aria-label="Undo" />
-              </Tooltip>
-              <Tooltip label="Redo" aria-label="Redo" hasArrow zIndex={5}>
-                <IconButton ml="1" icon="arrow-forward" aria-label="Redo" />
-              </Tooltip>
-
-              <Box mr="3" ml="3">
-                {store.mode === 'view' && hasItems && (
+              {store.lifecycleState === 'initialized' && (
+                <>
                   <Button
                     css={css`
-                      box-shadow: none !important;
+                      width: 128px;
                     `}
-                    py="1"
+                    // accent
+                    // isDisabled={store.isVisualizing}
+                    variantColor="accent"
+                    loadingText={`${Math.round(
+                      (store.visualizingProgress || 0) * 100
+                    )}%`}
+                    isLoading={store.isVisualizing}
                     onClick={() => {
-                      store.enterEditItemsMode()
+                      if (state.targetTab === 'shape') {
+                        store.editor?.generateShapeItems({
+                          style: mkShapeStyleConfFromOptions(
+                            store.styleOptions.shape
+                          ),
+                        })
+                      } else {
+                        store.editor?.generateBgItems({
+                          style: mkBgStyleConfFromOptions(
+                            store.styleOptions.bg
+                          ),
+                        })
+                      }
                     }}
                   >
-                    Edit Items
-                  </Button>
-                )}
-                {store.mode === 'view' && hasItems && (
-                  <Button
-                    css={css`
-                      box-shadow: none !important;
-                    `}
-                    variant="ghost"
-                    py="1"
-                    onClick={() => {
-                      store.editor?.clearItems(state.targetTab, true)
-                    }}
-                  >
-                    Clear All
-                  </Button>
-                )}
-
-                {store.mode === 'edit items' && (
-                  <>
-                    <Button
+                    <MagicWand
+                      size={24}
                       css={css`
-                        box-shadow: none !important;
+                        margin-right: 4px;
                       `}
-                      mr="2"
-                      py="1"
-                      variantColor="green"
-                      onClick={() => {
-                        store.enterViewMode()
-                      }}
-                    >
-                      Done
-                    </Button>
+                    />
+                    Visualize
+                  </Button>
 
-                    <Button
-                      mr="2"
-                      size="sm"
-                      isDisabled={!store.hasItemChanges}
-                      variant="ghost"
-                      onClick={store.resetAllItems}
-                    >
-                      Reset All
-                    </Button>
+                  <Tooltip label="Undo" aria-label="Undo" hasArrow zIndex={5}>
+                    <IconButton ml="3" icon="arrow-back" aria-label="Undo" />
+                  </Tooltip>
+                  <Tooltip label="Redo" aria-label="Redo" hasArrow zIndex={5}>
+                    <IconButton ml="1" icon="arrow-forward" aria-label="Redo" />
+                  </Tooltip>
 
-                    {store.selectedItemData && (
+                  <Box mr="3" ml="3">
+                    {store.mode === 'view' && hasItems && (
+                      <Button
+                        css={css`
+                          box-shadow: none !important;
+                        `}
+                        py="1"
+                        onClick={() => {
+                          store.enterEditItemsMode()
+                        }}
+                      >
+                        Edit Items
+                      </Button>
+                    )}
+                    {store.mode === 'view' && hasItems && (
+                      <Button
+                        css={css`
+                          box-shadow: none !important;
+                        `}
+                        variant="ghost"
+                        py="1"
+                        onClick={() => {
+                          store.editor?.clearItems(state.targetTab, true)
+                        }}
+                      >
+                        Clear All
+                      </Button>
+                    )}
+
+                    {store.mode === 'edit items' && (
                       <>
-                        <ColorPickerPopover
-                          value={
-                            store.selectedItemData.customColor ||
-                            store.selectedItemData.color
-                          }
-                          onAfterChange={(color) => {
-                            store.setItemCustomColor(color)
-                          }}
-                        >
-                          <Button
-                            onClick={() => {
-                              store.resetItemCustomColor()
-                            }}
-                          >
-                            Reset Default Color
-                          </Button>
-                        </ColorPickerPopover>
                         <Button
-                          ml="2"
-                          size="sm"
+                          css={css`
+                            box-shadow: none !important;
+                          `}
+                          mr="2"
+                          py="1"
+                          variantColor="green"
                           onClick={() => {
-                            if (!store.selectedItemData) {
-                              return
-                            }
-                            store.setItemLock(
-                              !Boolean(store.selectedItemData.locked)
-                            )
+                            store.enterViewMode()
                           }}
                         >
-                          {store.selectedItemData.locked ? 'Unlock' : 'Lock'}
+                          Done
                         </Button>
+
+                        <Button
+                          mr="2"
+                          size="sm"
+                          isDisabled={!store.hasItemChanges}
+                          variant="ghost"
+                          onClick={store.resetAllItems}
+                        >
+                          Reset All
+                        </Button>
+
+                        {store.selectedItemData && (
+                          <>
+                            <ColorPickerPopover
+                              value={
+                                store.selectedItemData.customColor ||
+                                store.selectedItemData.color
+                              }
+                              onAfterChange={(color) => {
+                                store.setItemCustomColor(color)
+                              }}
+                            >
+                              <Button
+                                onClick={() => {
+                                  store.resetItemCustomColor()
+                                }}
+                              >
+                                Reset Default Color
+                              </Button>
+                            </ColorPickerPopover>
+                            <Button
+                              ml="2"
+                              size="sm"
+                              onClick={() => {
+                                if (!store.selectedItemData) {
+                                  return
+                                }
+                                store.setItemLock(
+                                  !Boolean(store.selectedItemData.locked)
+                                )
+                              }}
+                            >
+                              {store.selectedItemData.locked
+                                ? 'Unlock'
+                                : 'Lock'}
+                            </Button>
+                          </>
+                        )}
                       </>
                     )}
-                  </>
-                )}
-              </Box>
+                  </Box>
 
-              {store.mode === 'view' && (
-                <Box
-                  mr="3"
-                  ml="3"
-                  marginLeft="auto"
-                  display="flex"
-                  alignItems="center"
-                >
-                  <Text fontSize="md" mr="3" my="0">
-                    Layer:
-                  </Text>
-                  <Select
-                    isRequired
-                    value={state.targetTab}
-                    onChange={(e) => {
-                      state.targetTab = e.target.value as TargetKind
-                    }}
-                  >
-                    <option value="shape">Shape</option>
-                    <option value="bg">Background</option>
-                  </Select>
-                  {/* <Button
+                  {store.mode === 'view' && (
+                    <Box
+                      mr="3"
+                      ml="3"
+                      marginLeft="auto"
+                      display="flex"
+                      alignItems="center"
+                    >
+                      <Text fontSize="md" mr="3" my="0">
+                        Layer:
+                      </Text>
+                      <Select
+                        isRequired
+                        value={state.targetTab}
+                        onChange={(e) => {
+                          state.targetTab = e.target.value as TargetKind
+                        }}
+                      >
+                        <option value="shape">Shape</option>
+                        <option value="bg">Background</option>
+                      </Select>
+                      {/* <Button
                     css={css`
                       box-shadow: none !important;
                     `}
@@ -612,7 +623,16 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   >
                     Background
                   </Button> */}
-                </Box>
+                    </Box>
+                  )}
+                </>
+              )}
+
+              {store.lifecycleState !== 'initialized' && (
+                <>
+                  <Skeleton height="30px" width="100px" mr="20px" />
+                  <Skeleton height="30px" width="300px" mr="20px" />
+                </>
               )}
             </TopToolbar>
 
@@ -623,6 +643,22 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 ref={canvasRef}
                 id="scene"
               />
+              {store.lifecycleState !== 'initialized' && (
+                <Box
+                  position="absolute"
+                  width="100%"
+                  height="100%"
+                  display="flex"
+                  flexDir="column"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Spinner />
+                  <Text mt="4" fontSize="lg">
+                    Initializing...
+                  </Text>
+                </Box>
+              )}
             </CanvasWrappper>
           </RightWrapper>
         </EditorLayout>
@@ -810,6 +846,7 @@ const CanvasWrappper = styled.div`
   width: calc(100vw - 460px);
   padding: 20px;
   display: flex;
+  position: relative;
   justify-content: center;
   align-items: center;
   box-shadow: inset 0 0 5px 0 #00000033;
