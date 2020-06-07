@@ -1318,7 +1318,8 @@ export class Editor {
       if (!pathBounds.has(pathBoundsKey)) {
         paths.set(pathBoundsKey, wordPath)
         const wordPathCmds = wordPath.commands.map(
-          ({ type, x, y, x1, y1, x2, y2 }) => [type, x, y, x1, y1, x2, y2]
+          ({ type, x, y, x1, y1, x2, y2 }) =>
+            [type, x1, y1, x2, y2, x, y].filter(notEmpty)
         )
         const wordPathObj = new fabric.Path(wordPathCmds as any)
         wordPathObj.set({ originX: 'center', originY: 'center ' })
@@ -1333,15 +1334,9 @@ export class Editor {
           continue
         }
         const path = glyph.getPath(0, 0, 100)
-        const pathData = path.commands.map(({ type, x, y, x1, y1, x2, y2 }) => [
-          type,
-          x,
-          y,
-          x1,
-          y1,
-          x2,
-          y2,
-        ])
+        const pathData = path.commands.map(({ type, x, y, x1, y1, x2, y2 }) =>
+          [type, x1, y1, x2, y2, x, y].filter(notEmpty)
+        )
         glyphsInfo.set(glyphKey, {
           key: glyphKey,
           path,
