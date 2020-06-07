@@ -242,6 +242,7 @@ export class EditorStore {
         url: data.shape.url,
         isCustom: true,
         thumbnailUrl: data.shape.url,
+        processedThumbnailUrl: data.shape.url,
         processing: data.shape.processing,
       })
       await this.selectShape(customImgId, false)
@@ -250,7 +251,8 @@ export class EditorStore {
         kind: 'text',
         title: 'Custom',
         isCustom: true,
-        thumbnailUrl: '', // TODO
+        thumbnailUrl: '',
+        processedThumbnailUrl: '', // TODO
         text: data.shape.text,
         textStyle: data.shape.textStyle,
       })
@@ -462,7 +464,10 @@ export class EditorStore {
 
     shape.set({ opacity: 1 })
     const canvas = objAsCanvasElement(shape)
-    currentShapeConf.thumbnailUrl = canvas.toDataURL()
+    if (!currentShapeConf.thumbnailUrl) {
+      currentShapeConf.thumbnailUrl = canvas.toDataURL()
+    }
+    currentShapeConf.processedThumbnailUrl = canvas.toDataURL()
   }
 
   serialize = (): EditorPersistedData => {

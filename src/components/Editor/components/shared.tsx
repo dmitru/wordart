@@ -1,8 +1,11 @@
 import styled from '@emotion/styled'
-import { Box } from '@chakra-ui/core'
+import { Text } from '@chakra-ui/core'
 
-export const Label = styled(Box)<{ theme: any }>`
-  font-size: ${(p) => p.theme.fontSizes[3]}px;
-  font-weight: ${(p) => p.theme.fontWeights.semibold};
-  color: ${(p) => p.theme.colors.dark2};
+export const SectionLabel = styled(Text)<{ theme: any }>`
+  text-transform: uppercase;
+  font-weight: 600 !important;
+  font-size: 0.9em;
+  margin: 0;
+  margin-bottom: 8px;
+  color: #888;
 `

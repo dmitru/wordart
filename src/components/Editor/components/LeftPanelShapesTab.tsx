@@ -33,7 +33,7 @@ import {
   ShapeSelector,
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
-import { Label } from 'components/Editor/components/shared'
+import { SectionLabel } from 'components/Editor/components/shared'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'
@@ -51,7 +51,10 @@ import {
   applyTransformToObj,
 } from 'components/Editor/lib/fabric-utils'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
-import { SvgShapeColorPicker } from 'components/Editor/components/SvgShapeColorPicker'
+import {
+  SvgShapeColorPickerPopover,
+  SvgShapeColorPickerCollapse,
+} from 'components/Editor/components/SvgShapeColorPicker'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { isEqual } from 'lodash'
 
@@ -258,7 +261,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                   url={
                     (state.mode === 'add text shape'
                       ? state.textShape.thumbnailPreview
-                      : shape.config.thumbnailUrl)!
+                      : shape.config.processedThumbnailUrl)!
                   }
                 />
               )}
@@ -388,6 +391,8 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               title: 'Custom text',
                               isCustom: true,
                               thumbnailUrl: state.textShape.thumbnailPreview,
+                              processedThumbnailUrl:
+                                state.textShape.thumbnailPreview,
                             })
                             state.mode = 'home'
                             await store.selectShape(shapeId)
@@ -454,11 +459,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
                       {shape.kind === 'svg' && (
                         <>
-                          <Heading size="md" m="0" mb="2" display="flex">
-                            Customize Colors
-                          </Heading>
-                          <SvgShapeColorPicker
+                          <SvgShapeColorPickerCollapse
                             shape={shape}
+                            label="Customize color"
                             onUpdate={updateShapeColoring}
                           />
                         </>
@@ -502,7 +505,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         </Heading>
                         {!state.isTransforming && (
                           <>
-                            <Text mt="2">
+                            <Text mt="2" color="gray.500" fontSize="sm">
                               All unlocked words will be removed.
                             </Text>
                             <Stack direction="row" mt="3" spacing="3">
@@ -614,7 +617,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                       </Flex>
 
                       <Flex align="center" mt="2" mb="1">
-                        <Label mr="2">Category:</Label>
+                        <Text my="0" mr="2" fontWeight="600">
+                          Category:
+                        </Text>
 
                         <Box flex={1}>
                           <Menu>
@@ -672,6 +677,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
                       <ShapeSelector
                         height="calc(100vh - 370px)"
+                        showProcessedThumbnails
                         width="345px"
                         overflowY="scroll"
                         shapes={matchingShapes}
@@ -705,7 +711,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
               state.isShowingCustomizeImage = false
             }}
             onSubmit={async (thumbnailUrl, value) => {
-              shape.config.thumbnailUrl = thumbnailUrl
+              shape.config.processedThumbnailUrl = thumbnailUrl
               shape.config.processing = {
                 invert: value.invert
                   ? {
@@ -735,6 +741,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
               title: 'Custom',
               url: state.originalUrl!,
               thumbnailUrl,
+              processedThumbnailUrl: thumbnailUrl,
               isCustom: true,
               processing: {
                 invert: state.invert

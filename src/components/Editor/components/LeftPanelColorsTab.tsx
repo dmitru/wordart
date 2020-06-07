@@ -1,8 +1,20 @@
-import { Box, Button, Divider, Flex, Stack, Text } from '@chakra-ui/core'
+import {
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Stack,
+  Text,
+  Collapse,
+} from '@chakra-ui/core'
 import css from '@emotion/css'
 import { useThrottleCallback } from '@react-hook/throttle'
 import chroma from 'chroma-js'
-import { SvgShapeColorPicker } from 'components/Editor/components/SvgShapeColorPicker'
+import {
+  SvgShapeColorPicker,
+  SvgShapeColorPickerSwatch,
+  SvgShapeColorPickerCollapse,
+} from 'components/Editor/components/SvgShapeColorPicker'
 import {
   ThemePresetThumbnail,
   ThemePresetThumbnailContainer,
@@ -25,6 +37,8 @@ import { useDebouncedCallback } from 'use-debounce/lib'
 import { ChoiceButtons } from 'components/Editor/components/ChoiceButtons'
 import { ShapeItemsColorPicker } from 'components/Editor/components/ShapeItemsColorPicker'
 import { BgItemsColorPicker } from 'components/Editor/components/BgItemsColorPicker'
+import { useState } from 'react'
+import { SectionLabel } from 'components/Editor/components/shared'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -71,6 +85,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
       }
       const style = mkShapeStyleConfFromOptions(shapeStyle)
       await store.editor?.updateShapeColors(shape.config)
+      store.renderKey++
       store.updateShapeThumbnail()
       if (updateItems && shapeStyle.items.coloring.kind === 'shape') {
         store.editor?.setShapeItemsStyle(style.items)
@@ -209,7 +224,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
         {state.view === 'normal' && (
           <>
-            <Box mb="3">
+            <Box mb="5">
               <Button
                 marginLeft="auto"
                 variant="solid"
@@ -236,39 +251,44 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
             {/* <shape-color> */}
             <Box mb="0">
+              <SectionLabel>Shape</SectionLabel>
+
               <Flex direction="column">
-                <Box display="flex">
+                {/* <Box display="flex">
                   <Text fontSize="xl" mb="0">
                     Shape
                   </Text>
-                </Box>
+                </Box> */}
 
-                <Flex direction="row" mb="3">
-                  <Slider
-                    css={css`
-                      flex: 1;
-                      margin-right: 20px;
-                    `}
-                    afterLabel="%"
-                    labelCss="width: 60px"
-                    label="Opacity"
-                    horizontal
-                    value={100 * shapeStyle.opacity}
-                    onChange={(value) => {
-                      shapeStyle.opacity = value / 100
-                    }}
-                    onAfterChange={(value) => {
-                      store.editor?.setShapeOpacity(value / 100)
-                    }}
-                    min={0}
-                    max={100}
-                    step={1}
-                  />
+                <Slider
+                  css={css`
+                    flex: 1;
+                    margin-right: 20px;
+                  `}
+                  horizontal
+                  afterLabel="%"
+                  label="Opacity"
+                  value={100 * shapeStyle.opacity}
+                  onChange={(value) => {
+                    shapeStyle.opacity = value / 100
+                  }}
+                  onAfterChange={(value) => {
+                    store.editor?.setShapeOpacity(value / 100)
+                  }}
+                  min={0}
+                  max={100}
+                  step={1}
+                />
 
-                  {shape?.kind === 'svg' && (
-                    <SvgShapeColorPicker shape={shape} onUpdate={onUpdate} />
-                  )}
-                </Flex>
+                {shape?.kind === 'svg' && (
+                  <>
+                    <SvgShapeColorPickerCollapse
+                      shape={shape}
+                      onUpdate={onUpdate}
+                      label="Color"
+                    />
+                  </>
+                )}
 
                 {/* {shape?.kind === 'text' && (
                   <Box mb="5">
@@ -300,16 +320,14 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             </Box>
             {/* </shape-color> */}
 
-            <Divider />
-
             {/* <background> */}
 
-            <Box>
-              <Text fontSize="xl">Background</Text>
+            <Box mt="2.5rem">
+              <SectionLabel>Background</SectionLabel>
               <Stack direction="row" spacing="3">
-                <Box mb="2" display="flex" alignItems="flex-start">
-                  <Text fontSize="md" mr="3">
-                    Fill:
+                <Box display="flex" alignItems="flex-start">
+                  <Text my="0" fontWeight="600" mr="3">
+                    Color
                   </Text>
 
                   <ColorPickerPopover
@@ -323,11 +341,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               </Stack>
             </Box>
 
-            <Divider />
-
             {/* <shape-items> */}
-            <Box mb="1">
-              <Text fontSize="xl">Shape Words & Icons</Text>
+            <Box mt="2.5rem">
+              <SectionLabel>Shape Words & Icons</SectionLabel>
               <Flex direction="row" mb="0">
                 <Slider
                   css={css`
@@ -398,10 +414,8 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             </Box>
             {/* </shape-items> */}
 
-            <Divider />
-
-            <Box>
-              <Text fontSize="xl">Background Words & Icons</Text>
+            <Box mt="3.5rem">
+              <SectionLabel>Background Words & Icons</SectionLabel>
 
               {store?.editor && store.editor.items.bg.items.length > 0 ? (
                 <Flex direction="row" mb="3">
@@ -429,7 +443,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   />
                 </Flex>
               ) : (
-                <Text>Add some items to the Background layer first.</Text>
+                <Text color="gray.500" fontSize="sm">
+                  Background layer doens't have any items yet.
+                </Text>
               )}
             </Box>
             {/* </background> */}

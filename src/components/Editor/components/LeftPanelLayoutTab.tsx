@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { Slider } from 'components/shared/Slider'
-import { Label } from 'components/Editor/components/shared'
+import { SectionLabel } from 'components/Editor/components/shared'
 import { useCallback } from 'react'
 import { TargetKind } from 'components/Editor/lib/editor'
 import {
@@ -122,10 +122,8 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
     return (
       <>
-        <Box mb="6">
-          <Text fontSize="xl" mb="2" mt="2">
-            Placement
-          </Text>
+        <Box mb="2.5rem">
+          <SectionLabel>Placement</SectionLabel>
           {/* <Checkbox
             id="fit-shape"
             label="Allow words to go beyond shape"
@@ -168,13 +166,10 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
         {style.items.words.wordList.length > 0 && (
           <>
-            <Divider />
-            <Box mb="5" mt="5">
-              <Text fontSize="xl" mb="2" mt="2">
-                Words
-              </Text>
+            <Box mb="2.5rem">
+              <SectionLabel>Words</SectionLabel>
 
-              <Box mb="3">
+              <Box mb="4">
                 <Slider
                   horizontal
                   label="Size"
@@ -276,9 +271,8 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
         {style.items.icons.iconList.length > 0 && (
           <Box mb="4">
-            <Text fontSize="xl" mb="2" mt="2">
-              Icons
-            </Text>
+            <SectionLabel>Icons</SectionLabel>
+
             <Slider
               horizontal
               label="Size"
@@ -288,21 +282,19 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                 const val = (value as any) as number
                 style.items.placement.iconsMaxSize = val
               }}
-              onAfterChange={visualize}
               min={20}
               max={100}
               step={1}
             />
             <Slider
               horizontal
-              label="Amount"
+              label="Icons amount"
               afterLabel="%"
               value={style.items.placement.iconsProportion}
               onChange={(value) => {
                 const val = (value as any) as number
                 style.items.placement.iconsProportion = val
               }}
-              onAfterChange={visualize}
               min={0}
               max={100}
               step={1}

@@ -17,6 +17,7 @@ import { Text, Box } from '@chakra-ui/core'
 export type SliderProps = {
   value: number
   label?: string
+  labelRight?: string
   onChange?: (value: number) => void
   onAfterChange?: (value: number) => void
   min: number
@@ -34,6 +35,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
     step,
     value,
     label,
+    labelRight,
     horizontal = false,
     onChange = noop,
     onAfterChange = noop,
@@ -52,6 +54,10 @@ export const Slider: React.FC<SliderProps> = (props) => {
       {label && (
         <Text
           css={css`
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+              Helvetica, Arial, sans-serif, 'Apple Color Emoji',
+              'Segoe UI Emoji', 'Segoe UI Symbol';
+            font-weight: 600;
             margin-bottom: -4px;
             ${horizontal
               ? `
@@ -115,6 +121,21 @@ export const Slider: React.FC<SliderProps> = (props) => {
           )}
         </Tracks>
       </SliderImpl>
+      {labelRight && (
+        <Text
+          css={css`
+            margin-bottom: -4px;
+            ${horizontal
+              ? `
+              margin-right: 16px;
+            `
+              : ''}
+            ${labelCss}
+          `}
+        >
+          {labelRight}
+        </Text>
+      )}
     </Box>
   )
 }

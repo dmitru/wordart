@@ -2,7 +2,7 @@ import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import styled from '@emotion/styled'
 import * as evaicons from '@styled-icons/evaicons-outline'
-import { Label } from './shared'
+import { SectionLabel } from './shared'
 import {
   ShapeThumbnails,
   ShapeThumbnailBtn,
@@ -12,6 +12,7 @@ import { observable } from 'mobx'
 import { uniqBy } from 'lodash'
 import { TargetKind } from 'components/Editor/lib/editor'
 import { Button, Box, Text } from '@chakra-ui/core'
+import { Slider } from 'components/shared/Slider'
 
 export type LeftPanelIconsTabProps = {
   target: TargetKind
@@ -123,6 +124,42 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 ))}
               </ShapeThumbnails>
             </IconsList>
+
+            {style.items.icons.iconList.length > 0 && (
+              <Box mt="3.5rem">
+                <SectionLabel>Icons Settings</SectionLabel>
+                <Slider
+                  horizontal
+                  label="Max. size"
+                  afterLabel="%"
+                  value={style.items.placement.iconsMaxSize}
+                  onChange={(value) => {
+                    const val = (value as any) as number
+                    style.items.placement.iconsMaxSize = val
+                  }}
+                  min={20}
+                  max={100}
+                  step={1}
+                />
+                <Slider
+                  horizontal
+                  label="Icons amount"
+                  afterLabel="%"
+                  value={style.items.placement.iconsProportion}
+                  onChange={(value) => {
+                    const val = (value as any) as number
+                    style.items.placement.iconsProportion = val
+                  }}
+                  min={0}
+                  max={100}
+                  step={1}
+                />
+                <Text color="gray.500" fontSize="sm">
+                  How many icons compared to words will be placed. E.g. 30%
+                  means 30% icons, 70% words.
+                </Text>
+              </Box>
+            )}
           </>
         )}
       </>

@@ -11,6 +11,7 @@ export type ShapeSvgConf = {
   kind: 'svg'
   url: string
   thumbnailUrl: string
+  processedThumbnailUrl: string
   title: string
   processing: SvgProcessingConf
 }
@@ -20,6 +21,7 @@ export type ShapeRasterConf = {
   kind: 'raster'
   url: string
   thumbnailUrl: string
+  processedThumbnailUrl: string
   title: string
   processing?: RasterProcessingConf
 }
@@ -28,6 +30,7 @@ export type ShapeTextConf = {
   id: ShapeId
   title: string
   thumbnailUrl: string
+  processedThumbnailUrl: string
   kind: 'text'
   text: string
   textStyle: ShapeTextStyle

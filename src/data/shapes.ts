@@ -19,6 +19,7 @@ export const svgIcons: ShapeConf[] = [
           title: icon.title,
           url: icon.url,
           thumbnailUrl: icon.url,
+          processedThumbnailUrl: icon.url,
           processing: {
             colors: { kind: 'original' },
             edges: defaultEdgesProcessing,
@@ -38,6 +39,7 @@ export const svgIconsOutline: ShapeConf[] = [...iconsFaRegular.slice(0, 5)]
           title: icon.title,
           url: icon.url,
           thumbnailUrl: icon.url,
+          processedThumbnailUrl: icon.url,
           processing: {
             colors: { kind: 'original' },
             edges: defaultEdgesProcessing,
@@ -166,6 +168,7 @@ export const shapes: ShapeConf[] = [
     ...c,
     id: `${index + 1}`,
     thumbnailUrl: c.url,
+    processedThumbnailUrl: c.url,
     processing: {
       colors: { kind: 'original' },
       edges: defaultEdgesProcessing,

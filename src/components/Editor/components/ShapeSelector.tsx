@@ -7,12 +7,19 @@ import { ShapeConf, ShapeId } from 'components/Editor/shape-config'
 
 export type ShapeSelectorProps = {
   shapes: ShapeConf[]
+  showProcessedThumbnails?: boolean
   selectedShapeId?: ShapeId
   onSelected?: (shape: ShapeConf) => void
 } & BoxProps
 
 export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
-  ({ shapes, selectedShapeId, onSelected = noop, ...rest }) => {
+  ({
+    shapes,
+    selectedShapeId,
+    showProcessedThumbnails = false,
+    onSelected = noop,
+    ...rest
+  }) => {
     return (
       <>
         <ShapeThumbnails mt="2" {...rest}>
@@ -24,7 +31,11 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
               }}
               backgroundColor="white"
               active={shape.id === selectedShapeId}
-              url={shape.thumbnailUrl}
+              url={
+                (showProcessedThumbnails
+                  ? shape.processedThumbnailUrl
+                  : shape.thumbnailUrl) || shape.thumbnailUrl
+              }
             />
           ))}
         </ShapeThumbnails>
