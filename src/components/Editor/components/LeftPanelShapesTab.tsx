@@ -89,6 +89,7 @@ const state = observable<typeof initialState>({ ...initialState })
 const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
   <Slider
     label="Opacity"
+    afterLabel="%"
     value={100 * style.opacity}
     onChange={(value) => {
       style.opacity = value / 100

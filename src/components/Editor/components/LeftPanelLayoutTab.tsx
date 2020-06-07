@@ -191,10 +191,6 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                 />
               </Box>
 
-              <Text fontSize="lg" mt="3" mb="2">
-                Angles
-              </Text>
-
               <PresetBtns>
                 {anglePresets.map((preset) => (
                   <>
@@ -280,7 +276,9 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
         {style.items.icons.iconList.length > 0 && (
           <Box mb="4">
-            <Label>Icons</Label>
+            <Text fontSize="xl" mb="2" mt="2">
+              Icons
+            </Text>
             <Slider
               horizontal
               label="Size"

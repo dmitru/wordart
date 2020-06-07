@@ -77,7 +77,7 @@ export const SvgShapeColorPicker: React.FC<{
     <>
       <Popover
         initialFocusRef={initialFocusRef}
-        placement="bottom"
+        placement="left-start"
         closeOnBlur
         closeOnEsc
         usePortal

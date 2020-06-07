@@ -87,12 +87,12 @@ export const defaultBgStyleOptions: BgStyleOptions = {
   },
   items: {
     dimSmallerItems: 20,
-    opacity: 100,
+    opacity: 20,
     coloring: {
       kind: 'color',
       color: {
         kind: 'color',
-        color: 'lime',
+        color: 'black',
       },
       gradient: {
         kind: 'gradient',

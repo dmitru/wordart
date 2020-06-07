@@ -11,7 +11,7 @@ import {
 import { observable } from 'mobx'
 import { uniqBy } from 'lodash'
 import { TargetKind } from 'components/Editor/lib/editor'
-import { Button, Box } from '@chakra-ui/core'
+import { Button, Box, Text } from '@chakra-ui/core'
 
 export type LeftPanelIconsTabProps = {
   target: TargetKind
@@ -38,14 +38,11 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
     return (
       <>
         <Toolbar display="flex" alignItems="center">
-          <Label flex={1}>{state.isAdding ? 'Add Icon' : 'Icons'}</Label>
           {!state.isAdding && (
             <>
               <Button
-                px="2"
-                py="1"
-                mt="2"
-                variantColor="primary"
+                mr="3"
+                variantColor="green"
                 onClick={() => {
                   state.isAdding = true
                 }}
@@ -53,8 +50,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 <evaicons.PlusOutline size="20" /> Add
               </Button>
               <Button
-                px="2"
-                py="1"
+                variant="ghost"
                 onClick={() => {
                   style.items.icons.iconList = []
                 }}
@@ -67,51 +63,68 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
           {state.isAdding && (
             <>
               <Button
-                px="2"
-                py="1"
-                mt="2"
-                variantColor="secondary"
+                leftIcon="chevron-left"
                 onClick={() => {
                   state.isAdding = false
                 }}
               >
-                Cancel
+                Back
               </Button>
             </>
           )}
         </Toolbar>
 
         {state.isAdding && (
-          <ShapeSelector
-            shapes={shapes}
-            onSelected={(shape) => {
-              style.items.icons.iconList = uniqBy(
-                [...style.items.icons.iconList, { shapeId: shape.id }],
-                'shapeId'
-              )
-              state.isAdding = false
-            }}
-          />
+          <Text fontSize="xl" mb="2" mt="5" flex={1}>
+            Add Icon
+          </Text>
         )}
-        {/* 
-        {!state.isAdding && (
-          <IconsList mt="2">
-            <ShapeThumbnails mt="2">
-              {icons.map((icon) => (
-                <ShapeThumbnailBtn
-                  key={icon.shapeId}
-                  onClick={() => {
-                    style.items.icons.iconList = style.items.icons.iconList.filter(
-                      (i) => i.shapeId !== icon.shapeId
-                    )
-                  }}
-                  backgroundColor="white"
-                  shape={editorPageStore.getShapeConfById(icon.shapeId)!}
-                />
-              ))}
-            </ShapeThumbnails>
-          </IconsList>
-        )} */}
+        {!state.isAdding && icons.length === 0 && (
+          <Text fontSize="lg" mb="2" mt="5" flex={1}>
+            You haven't added icons yet.
+          </Text>
+        )}
+
+        {state.isAdding && (
+          <>
+            <ShapeSelector
+              shapes={shapes}
+              onSelected={(shape) => {
+                style.items.icons.iconList = uniqBy(
+                  [...style.items.icons.iconList, { shapeId: shape.id }],
+                  'shapeId'
+                )
+                state.isAdding = false
+              }}
+            />
+          </>
+        )}
+        {!state.isAdding && icons.length > 0 && (
+          <>
+            <Text mb="3" mt="2" fontSize="sm" color="gray.500">
+              Hint: click on icon to remove it.
+            </Text>
+            <IconsList mt="2">
+              <ShapeThumbnails mt="2">
+                {icons.map((icon) => (
+                  <ShapeThumbnailBtn
+                    key={icon.shapeId}
+                    onClick={() => {
+                      style.items.icons.iconList = style.items.icons.iconList.filter(
+                        (i) => i.shapeId !== icon.shapeId
+                      )
+                    }}
+                    backgroundColor="white"
+                    url={
+                      editorPageStore.getShapeConfById(icon.shapeId)!
+                        .thumbnailUrl
+                    }
+                  />
+                ))}
+              </ShapeThumbnails>
+            </IconsList>
+          </>
+        )}
       </>
     )
   }

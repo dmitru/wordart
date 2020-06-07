@@ -162,7 +162,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   }
                 }}
               >
-                Cancel
+                Back
               </Button>
               {state.selectedThemeTitle && (
                 <Button
