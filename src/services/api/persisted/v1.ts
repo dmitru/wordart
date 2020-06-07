@@ -73,7 +73,7 @@ export type PersistedShapeConfCustomTextV1 = {
 export type PersistedBgStyleConfV1 = BgStyleConf
 export type PersistedShapeStyleConfV1 = ShapeStyleConf
 
-export type PersistedItemV1 = PersistedItemWordV1 | PersistedSymbolV1
+export type PersistedItemV1 = PersistedItemWordV1 | PersistedItemShapeV1
 
 export type MatrixSerialized = [number, number, number, number, number, number]
 
@@ -101,7 +101,7 @@ export type PersistedItemWordV1 = {
   /** Shape color */
   sc: string
 }
-export type PersistedSymbolV1 = {
+export type PersistedItemShapeV1 = {
   /** Kind */
   k: 's'
   id: EditorItemId
@@ -109,4 +109,12 @@ export type PersistedSymbolV1 = {
   sId: ShapeId
   /** Transform */
   t: MatrixSerialized
+  /** Is locked? */
+  l?: boolean
+  /** Color */
+  c: string
+  /** Custom color? */
+  cc?: string
+  /** Shape color */
+  sc: string
 }

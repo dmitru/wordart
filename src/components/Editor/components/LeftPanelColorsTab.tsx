@@ -213,7 +213,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               <Button
                 marginLeft="auto"
                 variant="solid"
-                variantColor="green"
+                variantColor="accent"
                 rightIcon="chevron-right"
                 onClick={() => {
                   state.view = 'themes'
@@ -230,7 +230,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   })
                 }}
               >
-                Explore Color Themes
+                See Color Themes
               </Button>
             </Box>
 

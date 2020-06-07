@@ -1,5 +1,10 @@
 import chroma from 'chroma-js'
 import { WordConfigId } from 'components/Editor/editor-store'
+import {
+  ShapeConf,
+  ShapeId,
+  ShapeSvgConf,
+} from 'components/Editor/shape-config'
 import { FontId } from 'data/fonts'
 import {
   clampPixelOpacityUp,
@@ -16,15 +21,15 @@ import {
 import { Rect } from 'lib/wordart/geometry'
 import { ImageProcessorWasm } from 'lib/wordart/wasm/image-processor-wasm'
 import { getWasmModule, WasmModule } from 'lib/wordart/wasm/wasm-module'
-import { flatten, noop, sample, uniq } from 'lodash'
+import { flatten, sample, uniq } from 'lodash'
 import { Path } from 'opentype.js'
 import paper from 'paper'
 import { consoleLoggers } from 'utils/console-logger'
 import {
-  ShapeConf,
-  ShapeId,
-  ShapeSvgConf,
-} from 'components/Editor/shape-config'
+  loadObjFromSvg,
+  objAsCanvasElement,
+  setFillColor,
+} from 'components/Editor/lib/fabric-utils'
 
 const FONT_SIZE = 100
 
@@ -61,7 +66,7 @@ export class Generator {
 
     const shapeCanvasMaxExtent = 280
     const batchSize = 50
-    const nIter = 1000
+    const nIter = 100
 
     const shapeCanvas = task.shape.canvas
     const shapeCanvasOriginalColors = task.shape.shapeCanvasOriginalColors
@@ -187,46 +192,32 @@ export class Generator {
     const imageProcessor = new ImageProcessorWasm(this.wasm)
 
     const icons = task.icons
-    const iconSymbolDefs: paper.SymbolDefinition[] = []
     const iconRasterCanvases: HTMLCanvasElement[] = []
     const iconsBounds: Rect[] = []
 
-    await Promise.all(
-      icons.map(async (icon) => {
-        const shapeItemGroup: paper.Group = await new Promise<paper.Group>(
-          (resolve) =>
-            new paper.Item().importSVG(
-              (icon.shape as ShapeSvgConf).url,
-              (item: paper.Item) => resolve(item as paper.Group)
-            )
-        )
-        shapeItemGroup.fillColor = new paper.Color('black')
-        shapeItemGroup.strokeColor = new paper.Color('black')
-        shapeItemGroup.scale(
-          shapeCanvasMaxExtent /
-            Math.max(
-              shapeItemGroup.bounds.width,
-              shapeItemGroup.bounds.height
-            ) /
-            2
-        )
-        const iconSymDef = new paper.SymbolDefinition(shapeItemGroup)
-        iconSymbolDefs.push(iconSymDef)
+    for (let icon of icons) {
+      const shapeItemGroup = await loadObjFromSvg(
+        (icon.shape as ShapeSvgConf).url
+      )
+      setFillColor(shapeItemGroup, 'black')
+      // shapeItemGroup.fillColor = new paper.Color('black')
+      // shapeItemGroup.strokeColor = new paper.Color('black')
+      // Scale the shape so that it's 100 in max dimension
+      // shapeItemGroup.set({ originX: 'center', originY: 'center' })
+      shapeItemGroup.scale(100 / shapeItemGroup.getBoundingRect().width)
+      shapeItemGroup.setCoords()
 
-        const raster = iconSymDef.item.rasterize(40, false)
-        const rasterCanvas = raster.getSubCanvas(
-          new paper.Rectangle(0, 0, raster.width, raster.height)
-        )
-        iconRasterCanvases.push(rasterCanvas)
-        const iconBounds = iconSymDef.item.bounds
-        iconsBounds.push({
-          x: Math.round(iconBounds.left),
-          y: Math.round(iconBounds.top),
-          h: Math.round(iconBounds.height),
-          w: Math.round(iconBounds.width),
-        })
+      const rasterCanvas = objAsCanvasElement(shapeItemGroup)
+      iconRasterCanvases.push(rasterCanvas)
+      const bounds = shapeItemGroup.getBoundingRect(undefined, true)
+
+      iconsBounds.push({
+        x: bounds.left,
+        y: bounds.top,
+        h: bounds.height,
+        w: bounds.width,
       })
-    )
+    }
 
     const words = flatten(
       task.words.map((word) =>
@@ -557,7 +548,6 @@ export class Generator {
         wordIndex = (wordIndex + 1) % words.length
       } else {
         const icon = icons[iconIndex]
-        const iconSymDef = iconSymbolDefs[iconIndex]
         const rasterCanvas = iconRasterCanvases[iconIndex]
 
         const angle = 0
@@ -672,8 +662,7 @@ export class Generator {
 
         if (task.itemPadding > 0) {
           unrotatedCtx.shadowBlur =
-            ((task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6) /
-            iconScale
+            0.25 + (task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6
           unrotatedCtx.shadowColor = 'red'
         } else {
           unrotatedCtx.shadowBlur = 0
@@ -729,11 +718,10 @@ export class Generator {
             iconBounds.h
           )
 
-          const item: SymbolGeneratedItem = {
+          const item: ShapeGeneratedItem = {
             index: i,
-            kind: 'symbol',
+            kind: 'shape',
             shapeColor: 'black',
-            symbolDef: iconSymDef,
             shapeId: icon.shape.id,
             transform: new paper.Matrix()
               .translate(task.shape.bounds.left, task.shape.bounds.top)
@@ -743,7 +731,11 @@ export class Generator {
               )
               .append(rotatedBoundsTransform)
               .translate(tx, ty)
-              .scale(iconScale),
+              .scale(iconScale)
+              .translate(
+                iconBounds.x + iconBounds.w / 2,
+                iconBounds.y + iconBounds.h / 2
+              ),
           }
           currentBatch.push(item)
           generatedItems.push(item)
@@ -866,7 +858,7 @@ export type FillShapeTaskResult = {
 
 export type GeneratedItem =
   | WordGeneratedItem
-  | SymbolGeneratedItem
+  | ShapeGeneratedItem
   | RasterGeneratedItem
 
 export type RasterGeneratedItem = {
@@ -877,13 +869,12 @@ export type RasterGeneratedItem = {
   transform: paper.Matrix
 }
 
-export type SymbolGeneratedItem = {
-  kind: 'symbol'
+export type ShapeGeneratedItem = {
+  kind: 'shape'
   locked?: boolean
   index: number
   shapeId: ShapeId
   shapeColor: string
-  symbolDef: paper.SymbolDefinition
   transform: paper.Matrix
 }
 

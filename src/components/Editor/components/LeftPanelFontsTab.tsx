@@ -11,6 +11,7 @@ import {
   MenuItem,
   MenuList,
   Stack,
+  Text,
 } from '@chakra-ui/core'
 import styled from '@emotion/styled'
 import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
@@ -39,10 +40,6 @@ const FontButton = styled(BaseBtn)`
     object-fit: contain;
   }
 `
-FontButton.defaultProps = {
-  pr: 2,
-  py: 1,
-}
 
 const FontButtonContainer = styled(Box)<{ theme: any; selected?: boolean }>`
   ${FontDeleteButton} {
@@ -90,7 +87,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
           <Stack direction="row">
             <InputGroup flex={1} size="md">
               <InputLeftElement children={<Icon name="search" />} />
-              <Input placeholder="Filter..." />
+              <Input placeholder="Find a font..." />
             </InputGroup>
 
             <Menu>
@@ -111,6 +108,10 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
             </Menu>
           </Stack>
 
+          <Text mb="3" mt="2" fontSize="sm" color="gray.500">
+            Hint: ctrl+click to select multiple fonts.
+          </Text>
+
           <Box mt="3">
             {fonts.map((font) => {
               const { style: fontStyle } = font
@@ -127,7 +128,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                     onClick={(evt) => {
                       if (evt.metaKey) {
                         style.items.words.fontIds =
-                          isSelected && style.words.fontIds.length > 1
+                          isSelected && style.items.words.fontIds.length > 1
                             ? style.items.words.fontIds.filter(
                                 (f) => f !== fontStyle.fontId
                               )

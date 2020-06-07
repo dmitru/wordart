@@ -1,11 +1,23 @@
 import { fabric } from 'fabric'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { roundFloat } from 'utils/round-float'
+import { cloneCanvas } from 'lib/wordart/canvas-utils'
 
 export const getObjTransformMatrix = (obj: fabric.Object): MatrixSerialized => {
   return (obj.calcTransformMatrix() || []).map((n: number) =>
     roundFloat(n, 3)
   ) as MatrixSerialized
+}
+
+export const setFillColor = (shapeObj: fabric.Object, color: string) => {
+  const objects =
+    shapeObj instanceof fabric.Group ? shapeObj.getObjects() : [shapeObj]
+  objects.forEach((obj) => {
+    obj.set({ fill: color })
+    if (obj.stroke) {
+      obj.set({ stroke: color })
+    }
+  })
 }
 
 export const applyTransformToObj = (

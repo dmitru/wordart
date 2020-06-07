@@ -340,6 +340,12 @@ export const loadImageUrlToCanvasCtxWithMaxSize = async (
   })
 }
 
+export const cloneCanvas = (src: HTMLCanvasElement): HTMLCanvasElement => {
+  const dest = createCanvasCtx({ w: src.width, h: src.height })
+  copyCanvas(src.getContext('2d')!, dest)
+  return dest.canvas
+}
+
 export const copyCanvas = (
   srcCanvas: CanvasRenderingContext2D,
   destCanvas: CanvasRenderingContext2D,

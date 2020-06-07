@@ -189,42 +189,50 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             </InputGroup>
           </Stack>
 
-          <WordList mt="2">
-            {words.wordList.map((word) => (
-              <WordRow key={word.id} aria-label="">
-                <Editable
-                  ml="2"
-                  flex={1}
-                  value={word.text}
-                  onChange={(text) => {
-                    store.updateWord(target, word.id, {
-                      text,
-                    })
-                  }}
-                  selectAllOnFocus
-                  placeholder="Type new word here..."
-                >
-                  <EditablePreview flex={1} width="100%" />
-                  <EditableInput placeholder="Type new word here..." />
-                </Editable>
+          {words.wordList.length === 0 && (
+            <Text mt="4" size="lg">
+              You haven't added any words yet.
+            </Text>
+          )}
 
-                {/* <ColorPicker value="#ff7777" mb="0" height="26px" /> */}
+          {words.wordList.length > 0 && (
+            <WordList mt="2">
+              {words.wordList.map((word) => (
+                <WordRow key={word.id} aria-label="">
+                  <Editable
+                    ml="2"
+                    flex={1}
+                    value={word.text}
+                    onChange={(text) => {
+                      store.updateWord(target, word.id, {
+                        text,
+                      })
+                    }}
+                    selectAllOnFocus
+                    placeholder="Type new word here..."
+                  >
+                    <EditablePreview flex={1} width="100%" />
+                    <EditableInput placeholder="Type new word here..." />
+                  </Editable>
 
-                <WordDeleteButton
-                  isRound
-                  aria-label="Delete"
-                  ml="2"
-                  mr="2"
-                  icon="close"
-                  size="xs"
-                  onClick={() => store.deleteWord(target, word.id)}
-                  // variantColor="red"
-                >
-                  <Icon name="close" />
-                </WordDeleteButton>
-              </WordRow>
-            ))}
-          </WordList>
+                  {/* <ColorPicker value="#ff7777" mb="0" height="26px" /> */}
+
+                  <WordDeleteButton
+                    isRound
+                    aria-label="Delete"
+                    ml="2"
+                    mr="2"
+                    icon="close"
+                    size="xs"
+                    onClick={() => store.deleteWord(target, word.id)}
+                    // variantColor="red"
+                  >
+                    <Icon name="close" />
+                  </WordDeleteButton>
+                </WordRow>
+              ))}
+            </WordList>
+          )}
         </Stack>
 
         <Modal

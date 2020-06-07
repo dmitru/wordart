@@ -7,12 +7,7 @@ import {
   EditorInitParams,
   TargetKind,
 } from 'components/Editor/lib/editor'
-import {
-  EditorItem,
-  EditorItemConfig,
-  EditorItemConfigWord,
-  EditorItemId,
-} from 'components/Editor/lib/editor-item'
+import { EditorItemConfigWord } from 'components/Editor/lib/editor-item-word'
 import {
   applyTransformToObj,
   cloneObj,
@@ -42,7 +37,7 @@ import {
   WordListEntry,
   ColorString,
 } from 'components/Editor/style-options'
-import { FontConfig, FontId, fonts, FontStyleConfig } from 'data/fonts'
+import { FontConfig, fonts, FontStyleConfig, FontId } from 'data/fonts'
 import { shapes } from 'data/shapes'
 import { loadFont } from 'lib/wordart/fonts'
 import { sortBy, uniq, uniqBy, cloneDeep } from 'lodash'
@@ -54,6 +49,7 @@ import {
   PersistedItemWordV1,
   PersistedShapeConfV1,
   PersistedWordV1,
+  PersistedItemShapeV1,
 } from 'services/api/persisted/v1'
 import { EditorPersistedData } from 'services/api/types'
 import { RootStore } from 'services/root-store'
@@ -63,6 +59,13 @@ import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
 import { exhaustiveCheck } from 'utils/type-utils'
 import { waitAnimationFrame } from 'utils/async'
+import {
+  EditorItemId,
+  EditorItem,
+  EditorItemConfig,
+} from 'components/Editor/lib/editor-item'
+import { EditorItemConfigShape } from 'components/Editor/lib/editor-item-icon'
+import { createCanvas } from 'lib/wordart/canvas-utils'
 
 export type EditorMode = 'view' | 'edit items'
 
@@ -129,7 +132,7 @@ export class EditorStore {
           locked: item.locked,
           color: item.color,
           customColor: item.customColor,
-          customText: item.customText,
+          customText: item.kind === 'word' ? item.customText : '',
         }
       },
       onItemSelectionCleared: () => {
@@ -144,7 +147,7 @@ export class EditorStore {
           locked: item.locked,
           color: item.color,
           customColor: item.customColor,
-          customText: item.customText,
+          customText: item.kind === 'word' ? item.customText : '',
         }
       },
     })
@@ -295,6 +298,7 @@ export class EditorStore {
     bgStyle.items.dimSmallerItems = data.bgStyle.items.dimSmallerItems
     bgStyle.items.opacity = data.bgStyle.items.opacity
     bgStyle.items.placement = data.bgStyle.items.placement
+    bgStyle.items.icons.iconList = data.bgStyle.items.icons.iconList
     bgStyle.items.words.customAngles = data.bgStyle.items.words.angles
     bgStyle.items.words.wordList = data.bgStyle.items.words.wordList
     bgStyle.items.words.fontIds = data.bgStyle.items.words.fontIds
@@ -313,6 +317,7 @@ export class EditorStore {
     shapeStyle.items.dimSmallerItems = data.shapeStyle.items.dimSmallerItems
     shapeStyle.items.opacity = data.shapeStyle.items.opacity
     shapeStyle.items.placement = data.shapeStyle.items.placement
+    shapeStyle.items.icons.iconList = data.shapeStyle.items.icons.iconList
     shapeStyle.items.words.customAngles = data.shapeStyle.items.words.angles
     shapeStyle.items.words.wordList = data.shapeStyle.items.words.wordList
     shapeStyle.items.words.fontIds = data.shapeStyle.items.words.fontIds
@@ -392,7 +397,23 @@ export class EditorStore {
 
           result.push(wordItem)
         }
-        // TODO
+
+        if (item.k === 's') {
+          const shapeItem: EditorItemConfigShape = {
+            index: index,
+            color: item.c,
+            customColor: item.cc,
+            locked: item.l || false,
+            shapeColor: item.sc,
+            kind: 'shape',
+            transform: new paper.Matrix(item.t).prepend(
+              new paper.Matrix().scale(scale, new paper.Point(0, 0))
+            ),
+            shapeId: item.sId,
+          }
+
+          result.push(shapeItem)
+        }
       }
 
       return result
@@ -519,14 +540,18 @@ export class EditorStore {
                 ),
               } as PersistedItemWordV1
             }
-            // if (item.kind === 'symbol') {
-            //   return {
-            //     k: 's',
-            //     id: item.index,
-            //     t: serializeMatrix(item.transform),
-            //     sId: item.shapeId,
-            //   } as EditorPersistedSymbolV1
-            // }
+            if (item.kind === 'shape') {
+              return {
+                k: 's',
+                id: item.id,
+                t: serializeMatrix(item.transform),
+                sId: item.shapeId,
+                sc: item.shapeColor,
+                l: item.locked,
+                c: item.color,
+                cc: item.customColor,
+              } as PersistedItemShapeV1
+            }
 
             return null
           })

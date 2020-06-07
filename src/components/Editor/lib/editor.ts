@@ -2,13 +2,10 @@ import chroma from 'chroma-js'
 import { EditorStore } from 'components/Editor/editor-store'
 import { computeColorsMap } from 'components/Editor/lib/colormap'
 import {
-  EditorItem,
-  EditorItemConfig,
   EditorItemConfigWord,
-  EditorItemId,
   EditorItemWord,
   GlyphInfo,
-} from 'components/Editor/lib/editor-item'
+} from 'components/Editor/lib/editor-item-word'
 import {
   applyTransformToObj,
   cloneObj,
@@ -18,6 +15,7 @@ import {
   loadObjFromSvg,
   objAsCanvasElement,
   getObjTransformMatrix,
+  setFillColor,
 } from 'components/Editor/lib/fabric-utils'
 import { Font, Generator } from 'components/Editor/lib/generator'
 import { Shape, SvgShapeColorsMapEntry } from 'components/Editor/shape'
@@ -50,6 +48,15 @@ import { consoleLoggers } from 'utils/console-logger'
 import { UninqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { exhaustiveCheck } from 'utils/type-utils'
+import {
+  EditorItem,
+  EditorItemId,
+  EditorItemConfig,
+} from 'components/Editor/lib/editor-item'
+import {
+  EditorItemConfigShape,
+  EditorItemShape,
+} from 'components/Editor/lib/editor-item-icon'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -79,7 +86,7 @@ export class Editor {
   mode: EditorMode = 'view'
 
   private aspectRatio: number
-  private editorItemIdGen = new UninqIdGenerator(3)
+  private editorItemIdGen = new UninqIdGenerator(10)
 
   /** Info about the current shape */
   shape: null | Shape = null
@@ -225,7 +232,6 @@ export class Editor {
   }
 
   showLockBorders = () => {
-    console.log('showLockBorders')
     for (const [, item] of this.items.shape.itemsById) {
       item.setLockBorderVisibility(true)
     }
@@ -233,7 +239,6 @@ export class Editor {
   }
 
   hideLockBorders = () => {
-    console.log('hideLockBorders')
     for (const [, item] of this.items.shape.itemsById) {
       item.setLockBorderVisibility(false)
     }
@@ -318,9 +323,7 @@ export class Editor {
     }
 
     const shapeObj = this.shape.obj
-    const objects =
-      shapeObj instanceof fabric.Group ? shapeObj.getObjects() : [shapeObj]
-    objects.forEach((obj) => obj.set({ fill: config.textStyle.color }))
+    setFillColor(shapeObj, config.textStyle.color)
     this.canvas.requestRenderAll()
   }
 
@@ -363,16 +366,7 @@ export class Editor {
       })
     } else {
       this.logger.debug('>  Using single color')
-      const color = colors.color
-
-      const objects =
-        shapeObj instanceof fabric.Group ? shapeObj.getObjects() : [shapeObj]
-      objects.forEach((obj) => {
-        obj.set({ fill: color })
-        if (obj.stroke) {
-          obj.set({ stroke: color })
-        }
-      })
+      setFillColor(shapeObj, colors.color)
     }
 
     this.canvas.remove(this.shape.obj)
@@ -486,7 +480,7 @@ export class Editor {
         continue
       }
 
-      if (item.kind !== 'word' && item.kind !== 'symbol') {
+      if (item.kind !== 'word' && item.kind !== 'shape') {
         continue
       }
 
@@ -1018,6 +1012,12 @@ export class Editor {
           text: wordConfig.text,
           customColor: wordConfig.color,
         })
+      } else if (genItem.kind === 'shape') {
+        items.push({
+          ...genItem,
+          color: 'black',
+          locked: false,
+        })
       }
     }
 
@@ -1192,6 +1192,12 @@ export class Editor {
           text: wordConfig.text,
           customColor: wordConfig.color,
         })
+      } else if (genItem.kind === 'shape') {
+        items.push({
+          ...genItem,
+          color: 'black',
+          locked: false,
+        })
       }
     }
 
@@ -1294,9 +1300,11 @@ export class Editor {
     const itemsById: Map<EditorItemId, EditorItem> = new Map()
     const fabricObjToItem: Map<fabric.Object, EditorItem> = new Map()
 
+    // Process word items...
     const allWordItems = itemConfigs.filter(
       (item) => item.kind === 'word'
     ) as EditorItemConfigWord[]
+
     const wordItemsByFont = groupBy(allWordItems, 'fontId')
     const uniqFontIds = Object.keys(wordItemsByFont)
     await this.fetchFonts(uniqFontIds)
@@ -1365,6 +1373,42 @@ export class Editor {
         pathDatas.get(`${font.id}:${itemConfig.text}`)!,
         wordPathObjs.get(`${font.id}:${itemConfig.text}`)!,
         pathBounds.get(`${font.id}:${itemConfig.text}`)!
+      )
+      item.setSelectable(this.itemsSelection)
+
+      items.push(item)
+      itemsById.set(item.id, item)
+      fabricObjToItem.set(item.fabricObj, item)
+    }
+
+    // Process shape items...
+    const allIconItems = itemConfigs.filter(
+      (item) => item.kind === 'shape'
+    ) as EditorItemConfigShape[]
+
+    for (const [index, itemConfig] of allIconItems.entries()) {
+      if (index % 1 === 0) {
+        await waitAnimationFrame()
+      }
+
+      let shapeObj: fabric.Object | undefined
+      const shapeConf = this.store.getShapeConfById(itemConfig.shapeId)
+      if (shapeConf?.kind === 'svg') {
+        shapeObj = await loadObjFromSvg(shapeConf.url)
+      }
+
+      if (!shapeObj) {
+        continue
+      }
+
+      // shapeObj.set({ originX: 'center', originY: 'center' })
+      shapeObj.scale(100 / shapeObj.getBoundingRect().width)
+      shapeObj.setCoords()
+      const item = new EditorItemShape(
+        this.editorItemIdGen.get(),
+        this.canvas,
+        itemConfig,
+        shapeObj
       )
       item.setSelectable(this.itemsSelection)
 
