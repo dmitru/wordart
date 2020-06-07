@@ -484,7 +484,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         `}
                         py="1"
                         onClick={() => {
-                          store.enterEditItemsMode()
+                          store.enterEditItemsMode(state.targetTab)
                         }}
                       >
                         Edit Items
@@ -515,7 +515,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           py="1"
                           variantColor="green"
                           onClick={() => {
-                            store.enterViewMode()
+                            store.enterViewMode(state.targetTab)
                           }}
                         >
                           Done

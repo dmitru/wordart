@@ -86,7 +86,7 @@ export class Editor {
   mode: EditorMode = 'view'
 
   private aspectRatio: number
-  private editorItemIdGen = new UninqIdGenerator(10)
+  private editorItemIdGen = new UninqIdGenerator(3)
 
   /** Info about the current shape */
   shape: null | Shape = null
@@ -118,21 +118,27 @@ export class Editor {
 
     paper.setup(new paper.Size({ width: 1, height: 1 }))
     this.canvas = new fabric.Canvas(params.canvas.id)
+    this.canvas.selection = false
     this.aspectRatio = this.params.aspectRatio
 
     this.canvas.on('selection:created', () => {
       const target = this.canvas.getActiveObject()
-      const item = this.items.shape.fabricObjToItem.get(target)
-      if (item) {
-        params.onItemSelected(item)
+      for (const targetKind of ['shape', 'bg'] as TargetKind[]) {
+        const item = this.items[targetKind].fabricObjToItem.get(target)
+        if (item) {
+          params.onItemSelected(item)
+        }
       }
     })
 
     this.canvas.on('selection:updated', () => {
       const target = this.canvas.getActiveObject()
-      const item = this.items.shape.fabricObjToItem.get(target)
-      if (item) {
-        params.onItemSelected(item)
+      for (const targetKind of ['shape', 'bg'] as TargetKind[]) {
+        const item = this.items[targetKind].fabricObjToItem.get(target)
+
+        if (item) {
+          params.onItemSelected(item)
+        }
       }
     })
 
@@ -192,10 +198,12 @@ export class Editor {
 
         this.canvas.requestRenderAll()
       } else {
-        const item = this.items.shape.fabricObjToItem.get(target)
-        if (item) {
-          item.setLocked(true)
-          params.onItemUpdated(item)
+        for (const targetKind of ['shape', 'bg'] as TargetKind[]) {
+          const item = this.items[targetKind].fabricObjToItem.get(target)
+          if (item) {
+            item.setLocked(true)
+            params.onItemUpdated(item)
+          }
         }
       }
     })
@@ -245,9 +253,9 @@ export class Editor {
     this.canvas.requestRenderAll()
   }
 
-  enableItemsSelection = () => {
+  enableItemsSelection = (target: TargetKind) => {
     this.itemsSelection = true
-    for (const [, item] of this.items.shape.itemsById) {
+    for (const [, item] of this.items[target].itemsById) {
       if (item.fabricObj) {
         item.fabricObj.selectable = true
       }
@@ -255,9 +263,9 @@ export class Editor {
     this.enableSelectionMode()
     this.canvas.requestRenderAll()
   }
-  disableItemsSelection = () => {
+  disableItemsSelection = (target: TargetKind) => {
     this.itemsSelection = false
-    for (const [, item] of this.items.shape.itemsById) {
+    for (const [, item] of this.items[target].itemsById) {
       if (item.fabricObj) {
         item.fabricObj.selectable = false
       }
@@ -883,28 +891,27 @@ export class Editor {
     )
     copyCanvas(sceneCanvas.getContext('2d')!, sceneCanvasOriginalColors)
 
-    // TODO
-    // let canvasSubtract: HTMLCanvasElement | undefined
-    // const lockedItems = this.getItemsSorted('shape').filter((i) => i.locked)
-    // if (lockedItems.length > 0) {
-    //   canvasSubtract = createCanvas({
-    //     w: shapeCanvas.width,
-    //     h: shapeCanvas.height,
-    //   })
-    //   const ctx = canvasSubtract.getContext('2d')!
-    //   for (const item of lockedItems) {
-    //     ctx.save()
-    //     ctx.translate(
-    //       -shapeObj.getBoundingRect(true).left || 0,
-    //       -shapeObj.getBoundingRect(true).top || 0
-    //     )
-    //     const saved = item.isShowingLockBorder
-    //     item.setLockBorderVisibility(false)
-    //     item.fabricObj.drawObject(ctx)
-    //     item.setLockBorderVisibility(saved)
-    //     ctx.restore()
-    //   }
-    // }
+    let canvasSubtract: HTMLCanvasElement | undefined
+    const lockedItems = this.getItemsSorted('bg').filter((i) => i.locked)
+    if (lockedItems.length > 0) {
+      canvasSubtract = createCanvas({
+        w: sceneBounds.width,
+        h: sceneBounds.height,
+      })
+      const ctx = canvasSubtract.getContext('2d')!
+      for (const item of lockedItems) {
+        ctx.save()
+        // ctx.translate(
+        //   -shapeObj.getBoundingRect(true).left || 0,
+        //   -shapeObj.getBoundingRect(true).top || 0
+        // )
+        const saved = item.isShowingLockBorder
+        item.setLockBorderVisibility(false)
+        item.fabricObj.drawObject(ctx)
+        item.setLockBorderVisibility(saved)
+        ctx.restore()
+      }
+    }
 
     // shapeRaster = undefined
     const wordFonts: Font[] = await this.fetchFonts(style.items.words.fontIds)
@@ -918,7 +925,7 @@ export class Editor {
       {
         shape: {
           canvas: sceneCanvas,
-          // canvasSubtract,
+          canvasSubtract,
           shapeCanvasOriginalColors: sceneCanvasOriginalColors.canvas,
           bounds: sceneBounds,
           processing: {
@@ -1274,13 +1281,11 @@ export class Editor {
 
   disableSelectionMode = () => {
     this.canvas.skipTargetFind = true
-    this.canvas.selection = false
     this.canvas.requestRenderAll()
   }
 
   enableSelectionMode = () => {
     this.canvas.skipTargetFind = false
-    this.canvas.selection = true
     this.canvas.requestRenderAll()
   }
 

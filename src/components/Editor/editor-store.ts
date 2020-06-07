@@ -161,7 +161,7 @@ export class EditorStore {
       await this.selectShape(shapes[5].id)
     }
 
-    this.enterViewMode()
+    this.enterViewMode('shape')
 
     this.lifecycleState = 'initialized'
   }
@@ -201,17 +201,17 @@ export class EditorStore {
     this.editor?.canvas.requestRenderAll()
   }
 
-  @action enterEditItemsMode = () => {
+  @action enterEditItemsMode = (target: TargetKind) => {
     this.mode = 'edit items'
     if (!this.editor) {
       return
     }
     this.editor.showLockBorders()
-    this.editor.enableItemsSelection()
+    this.editor.enableItemsSelection(target)
     this.editor.enableSelectionMode()
   }
 
-  @action enterViewMode = () => {
+  @action enterViewMode = (target: TargetKind) => {
     this.mode = 'view'
     if (!this.editor) {
       return
@@ -219,7 +219,7 @@ export class EditorStore {
     this.selectedItemData = null
     this.selectedItem = null
     this.editor.hideLockBorders()
-    this.editor.disableItemsSelection()
+    this.editor.disableItemsSelection(target)
     this.editor.disableSelectionMode()
   }
 
