@@ -176,7 +176,7 @@ export class EditorStore {
   }
 
   resetAllItems = (target: TargetKind) => {
-    this.editor.resetAllItems(target)
+    this.editor?.resetAllItems(target)
     this.hasItemChanges = false
   }
 
