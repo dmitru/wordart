@@ -327,9 +327,23 @@ export class Editor {
     return [this.bgCanvas, this.canvas]
   }
 
+  removeSceneClipPath = () => {
+    this.canvas.clipPath = undefined
+  }
+
+  applySceneClipPath = () => {
+    const sceneClipPath = new fabric.Rect({
+      left: 0,
+      top: 0,
+      width: 1000,
+      height: 1000 / this.aspectRatio,
+      fill: 'black',
+    })
+    this.canvas.clipPath = sceneClipPath
+  }
+
   handleResize = () => {
     const wrapperBounds = this.params.canvasWrapperEl.getBoundingClientRect()
-    // wrapperBounds.width -= 40
 
     for (const canvas of this.canvases) {
       canvas.setWidth(wrapperBounds.width)
@@ -350,32 +364,7 @@ export class Editor {
       height: 1000 / this.aspectRatio,
     })
 
-    const sceneClipPath = new fabric.Rect({
-      left: 0,
-      top: 0,
-      width: 1000,
-      height: 1000 / this.aspectRatio,
-      fill: 'black',
-    })
-    this.canvas.clipPath = sceneClipPath
-
-    // this.viewport = {
-    //   x: 0,
-    //   y: 0,
-    //   w: 1000,
-    //   h: 1000 / this.aspectRatio,
-    // }
-
-    // Update view size
-    // if (wrapperBounds.width / wrapperBounds.height > this.aspectRatio) {
-    //   this.viewport.w = this.aspectRatio * wrapperBounds.height
-    //   this.viewport.h = wrapperBounds.height
-    // } else {
-    //   this.viewport.w = wrapperBounds.width
-    //   this.viewport.h = wrapperBounds.width / this.aspectRatio
-    // }
-
-    // // Update view transform to make sure the viewport includes the entire project bounds
+    this.applySceneClipPath()
 
     const pad = 20
     const zoomLevel = Math.min(
@@ -394,18 +383,6 @@ export class Editor {
 
       canvas.requestRenderAll()
     }
-
-    // this.canvas.clear()
-    // this.rect = new fabric.Rect({
-    //   left: this.projectBounds.x,
-    //   top: this.projectBounds.y,
-    //   width: this.projectBounds.width,
-    //   height: this.projectBounds.height,
-    //   fill: 'red',
-    //   strokeWidth: 3,
-    //   stroke: 'yellow',
-    // })
-    // this.canvas.add(this.rect)
   }
 
   setBgColor = (config: BgStyleConf['fill']) => {
@@ -574,6 +551,14 @@ export class Editor {
         const scaling = item.transform.scaling
         const wordH = (wordPathBb.y2 - wordPathBb.y1) * scaling.y
         const wordW = (wordPathBb.x2 - wordPathBb.x1) * scaling.x
+        const wordArea = Math.sqrt(wordH * wordW)
+        return wordArea
+      }
+      if (item.kind === 'shape') {
+        const bounds = item.bounds
+        const scaling = item.transform.scaling
+        const wordH = bounds.width * scaling.y
+        const wordW = bounds.height * scaling.x
         const wordArea = Math.sqrt(wordH * wordW)
         return wordArea
       }
@@ -1391,11 +1376,13 @@ export class Editor {
   }
 
   disableSelectionMode = () => {
+    this.applySceneClipPath()
     this.canvas.skipTargetFind = true
     this.canvas.requestRenderAll()
   }
 
   enableSelectionMode = () => {
+    this.removeSceneClipPath()
     this.canvas.skipTargetFind = false
     this.canvas.requestRenderAll()
   }

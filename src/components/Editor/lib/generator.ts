@@ -66,7 +66,7 @@ export class Generator {
 
     const shapeCanvasMaxExtent = 280
     const batchSize = 50
-    const nIter = 100
+    const nIter = 800
 
     const shapeCanvas = task.shape.canvas
     const shapeCanvasOriginalColors = task.shape.shapeCanvasOriginalColors

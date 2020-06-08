@@ -49,11 +49,10 @@ export class EditorItemShape {
   shapeObj: fabric.Object
   canvas: fabric.Canvas
 
-  path?: opentype.Path
-  pathBounds?: opentype.BoundingBox
   lockBorder: fabric.Group
 
   isShowingLockBorder = false
+  bounds: { left: number; top: number; width: number; height: number }
 
   constructor(
     id: EditorItemId,
@@ -102,6 +101,7 @@ export class EditorItemShape {
     this.shapeColor = conf.shapeColor
     this.shapeId = conf.shapeId
     this.placedIndex = conf.index
+    this.bounds = bounds
 
     this.setLocked(conf.locked)
 
