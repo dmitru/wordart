@@ -307,6 +307,7 @@ export class Editor {
         item.transform.values as MatrixSerialized
       )
       item.clearCustomColor()
+      item.setLocked(false)
     }
     this.canvas.requestRenderAll()
   }
