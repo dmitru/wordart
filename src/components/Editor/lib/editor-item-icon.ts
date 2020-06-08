@@ -8,6 +8,7 @@ import { MatrixSerialized } from 'services/api/persisted/v1'
 import { EditorItemId } from 'components/Editor/lib/editor-item'
 import { ShapeId } from 'components/Editor/shape-config'
 import { canvasToImgElement } from 'lib/wordart/canvas-utils'
+import { darken, lighten } from 'polished'
 
 export type EditorItemConfigShape = {
   kind: 'shape'
@@ -74,8 +75,9 @@ export class EditorItemShape {
           top: bounds.top,
           width: bounds.width,
           height: bounds.height,
-          strokeWidth: 0,
-          stroke: 'black',
+          strokeWidth: 1,
+          strokeDashArray: [5, 5],
+          stroke: '#0006',
           fill: 'rgba(255,255,255,0.3)',
           opacity: 0,
         }),
@@ -121,10 +123,12 @@ export class EditorItemShape {
   }
 
   private _updateColor = (color: string) => {
-    this.fabricObj.cornerColor = color
+    this.fabricObj.cornerColor = darken(0.3, color)
+    this.fabricObj.cornerStrokeColor = lighten(0.3, color)
     this.fabricObj.cornerStyle = 'circle'
     this.fabricObj.transparentCorners = false
-    this.fabricObj.borderColor = color
+    this.fabricObj.borderColor = darken(0.3, color)
+    this.fabricObj.borderDashArray = [5, 5]
     setFillColor(this.shapeObj, color)
     this.lockBorder.set({ stroke: color })
   }
