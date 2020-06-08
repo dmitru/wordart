@@ -60,6 +60,7 @@ import {
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
+  bgCanvas: HTMLCanvasElement
   canvasWrapperEl: HTMLElement
   aspectRatio: number
   store: EditorStore
@@ -110,6 +111,8 @@ export class Editor {
 
   itemsSelection = false
   shapeSelection = false
+  bgCanvas: fabric.Canvas
+  bgRect: fabric.Rect
 
   constructor(params: EditorInitParams) {
     this.params = params
@@ -117,9 +120,31 @@ export class Editor {
     this.generator = new Generator()
 
     paper.setup(new paper.Size({ width: 1, height: 1 }))
-    this.canvas = new fabric.Canvas(params.canvas.id)
+    this.bgCanvas = new fabric.Canvas(params.bgCanvas.id, {
+      interactive: false,
+      stopContextMenu: true,
+    })
+    this.canvas = new fabric.Canvas(params.canvas.id, {
+      stopContextMenu: true,
+      controlsAboveOverlay: true,
+    })
+
+    this.bgCanvas.getElement().parentElement!.style.position = 'absolute'
+    this.canvas.getElement().parentElement!.style.position = 'absolute'
+
     this.canvas.selection = false
+    this.bgCanvas.selection = false
     this.aspectRatio = this.params.aspectRatio
+
+    this.bgCanvas.clear()
+    this.bgRect = new fabric.Rect({
+      left: 0,
+      top: 0,
+      width: 1,
+      height: 1,
+      fill: 'white',
+    })
+    this.bgCanvas.add(this.bgRect)
 
     this.canvas.on('selection:created', () => {
       const target = this.canvas.getActiveObject()
@@ -273,6 +298,19 @@ export class Editor {
     this.deselectAll()
   }
 
+  resetAllItems = (target: TargetKind) => {
+    this.itemsSelection = false
+    for (const [, item] of this.items[target].itemsById) {
+      item.transform = item.generatedTransform
+      applyTransformToObj(
+        item.fabricObj,
+        item.transform.values as MatrixSerialized
+      )
+      item.clearCustomColor()
+    }
+    this.canvas.requestRenderAll()
+  }
+
   setAspectRatio = (aspect: number) => {
     this.aspectRatio = aspect
     this.projectBounds = new paper.Rectangle({
@@ -284,28 +322,104 @@ export class Editor {
     this.handleResize()
   }
 
+  get canvases() {
+    return [this.bgCanvas, this.canvas]
+  }
+
   handleResize = () => {
     const wrapperBounds = this.params.canvasWrapperEl.getBoundingClientRect()
-    wrapperBounds.width -= 40
-    wrapperBounds.height -= 40
+    // wrapperBounds.width -= 40
 
-    // Update view size
-    if (wrapperBounds.width / wrapperBounds.height > this.aspectRatio) {
-      this.canvas.setWidth(this.aspectRatio * wrapperBounds.height)
-      this.canvas.setHeight(wrapperBounds.height)
-    } else {
-      this.canvas.setWidth(wrapperBounds.width)
-      this.canvas.setHeight(wrapperBounds.width / this.aspectRatio)
+    for (const canvas of this.canvases) {
+      canvas.setWidth(wrapperBounds.width)
+      canvas.setHeight(wrapperBounds.height)
     }
 
+    const zoomLevel = Math.min(
+      this.canvas.getWidth() / 1000,
+      this.canvas.getHeight() / (1000 / this.aspectRatio)
+    )
+
+    console.log({ zoomLevel }, this.canvas.getWidth())
+
+    const pad = 0
+    this.projectBounds = new paper.Rectangle({
+      x: 0,
+      y: 0,
+      width: 1000 - zoomLevel * pad * 2,
+      height: 1000 / this.aspectRatio - zoomLevel * pad * 2,
+    })
+
+    this.bgRect.set({
+      left: 0,
+      top: 0,
+      width: 1000 - zoomLevel * pad * 2,
+      height: 1000 / this.aspectRatio - zoomLevel * pad * 2,
+    })
+
+    const sceneClipPath = new fabric.Rect({
+      left: 0,
+      top: 0,
+      width: 1000 - zoomLevel * pad * 2,
+      height: 1000 / this.aspectRatio - zoomLevel * pad * 2,
+      fill: 'black',
+    })
+    this.canvas.clipPath = sceneClipPath
+
+    // this.viewport = {
+    //   x: 0,
+    //   y: 0,
+    //   w: 1000,
+    //   h: 1000 / this.aspectRatio,
+    // }
+
+    // Update view size
+    // if (wrapperBounds.width / wrapperBounds.height > this.aspectRatio) {
+    //   this.viewport.w = this.aspectRatio * wrapperBounds.height
+    //   this.viewport.h = wrapperBounds.height
+    // } else {
+    //   this.viewport.w = wrapperBounds.width
+    //   this.viewport.h = wrapperBounds.width / this.aspectRatio
+    // }
+
     // // Update view transform to make sure the viewport includes the entire project bounds
-    this.canvas.setZoom(this.canvas.getWidth() / this.projectBounds.width)
+
+    for (const canvas of this.canvases) {
+      canvas.setZoom(zoomLevel)
+
+      // @ts-ignore
+      canvas.viewportTransform[4] =
+        (canvas.getWidth() - zoomLevel * (1000 - pad * 2)) / 2
+      // @ts-ignore
+      canvas.viewportTransform[5] =
+        (canvas.getHeight() - zoomLevel * (1000 / this.aspectRatio - pad * 2)) /
+        2
+
+      canvas.requestRenderAll()
+    }
+
+    // this.canvas.clear()
+    // this.rect = new fabric.Rect({
+    //   left: this.projectBounds.x,
+    //   top: this.projectBounds.y,
+    //   width: this.projectBounds.width,
+    //   height: this.projectBounds.height,
+    //   fill: 'red',
+    //   strokeWidth: 3,
+    //   stroke: 'yellow',
+    // })
+    // this.canvas.add(this.rect)
   }
 
   setBgColor = (config: BgStyleConf['fill']) => {
     this.logger.debug('setBgColor', toJS(config, { recurseEverything: true }))
-    this.canvas.backgroundColor =
-      config.kind === 'transparent' ? 'transparent' : config.color
+    this.bgCanvas.backgroundColor = '#ddd'
+    // this.canvas.backgroundColor =
+    //   config.kind === 'transparent' ? 'transparent' : config.color
+    this.bgRect.set({
+      fill: config.kind === 'transparent' ? 'transparent' : config.color,
+    })
+    this.bgCanvas.requestRenderAll()
     this.canvas.requestRenderAll()
   }
 
@@ -699,8 +813,8 @@ export class Editor {
     this.setBgColor(bgFillStyle)
     shapeObj.setPositionByOrigin(
       new fabric.Point(
-        defaultPadding + sceneBounds.width / 2,
-        defaultPadding + sceneBounds.height / 2
+        sceneBounds.left + sceneBounds.width / 2,
+        sceneBounds.top + sceneBounds.height / 2
       ),
       'center',
       'center'
@@ -736,8 +850,8 @@ export class Editor {
 
   getSceneBounds = (pad = 20): paper.Rectangle =>
     new paper.Rectangle({
-      x: pad,
-      y: pad,
+      x: this.projectBounds.left + pad,
+      y: this.projectBounds.top + pad,
       width: this.projectBounds.width - pad * 2,
       height: this.projectBounds.height - pad * 2,
     })

@@ -67,6 +67,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const aspectRatio = 4 / 3
     const [canvasSize] = useState<Dimensions>({ w: 900 * aspectRatio, h: 900 })
     const canvasRef = useRef<HTMLCanvasElement>(null)
+    const bgCanvasRef = useRef<HTMLCanvasElement>(null)
     const canvasWrapperRef = useRef<HTMLDivElement>(null)
     const { editorPageStore: store, wordcloudsStore } = useStore()
 
@@ -123,10 +124,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         if (
           authStore.hasInitialized &&
           canvasRef.current &&
+          bgCanvasRef.current &&
           store.lifecycleState !== 'initialized'
         ) {
           const editorParams: EditorStoreInitParams = {
             canvas: canvasRef.current,
+            bgCanvas: bgCanvasRef.current,
             canvasWrapperEl: canvasWrapperRef.current!,
             aspectRatio,
           }
@@ -154,7 +157,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       }
 
       init()
-    }, [props.wordcloudId, authStore.hasInitialized, canvasRef.current])
+    }, [
+      props.wordcloudId,
+      authStore.hasInitialized,
+      canvasRef.current,
+      bgCanvasRef.current,
+    ])
 
     useEffect(() => {
       return store.destroyEditor
@@ -526,7 +534,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           size="sm"
                           isDisabled={!store.hasItemChanges}
                           variant="ghost"
-                          onClick={store.resetAllItems}
+                          onClick={() => store.resetAllItems(state.targetTab)}
                         >
                           Reset All
                         </Button>
@@ -637,12 +645,20 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             </TopToolbar>
 
             <CanvasWrappper ref={canvasWrapperRef}>
-              <Canvas
-                width={canvasSize.w}
-                height={canvasSize.h}
-                ref={canvasRef}
-                id="scene"
-              />
+              <CanvasContainer>
+                <Canvas
+                  width={canvasSize.w}
+                  height={canvasSize.h}
+                  ref={bgCanvasRef}
+                  id="bg"
+                />
+                <Canvas
+                  width={canvasSize.w}
+                  height={canvasSize.h}
+                  ref={canvasRef}
+                  id="scene"
+                />
+              </CanvasContainer>
               {store.lifecycleState !== 'initialized' && (
                 <Box
                   position="absolute"
@@ -844,7 +860,6 @@ const CanvasWrappper = styled.div`
   flex: 1;
   height: calc(100vh - 100px);
   width: calc(100vw - 460px);
-  padding: 20px;
   display: flex;
   position: relative;
   justify-content: center;
@@ -852,11 +867,18 @@ const CanvasWrappper = styled.div`
   box-shadow: inset 0 0 5px 0 #00000033;
 `
 
-const Canvas = styled.canvas`
-  /* width: 100%; */
+const CanvasContainer = styled.div`
   height: 100%;
-  /* max-height: 100%; */
-  margin: auto;
+  width: 100%;
+  position: relative;
+`
+
+const Canvas = styled.canvas`
+  position: absolute !important;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
 `
 
 const state = observable({

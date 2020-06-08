@@ -71,7 +71,7 @@ export type EditorMode = 'view' | 'edit items'
 
 export type EditorStoreInitParams = Pick<
   EditorInitParams,
-  'aspectRatio' | 'canvas' | 'canvasWrapperEl' | 'serialized'
+  'aspectRatio' | 'canvas' | 'bgCanvas' | 'canvasWrapperEl' | 'serialized'
 >
 
 export class EditorStore {
@@ -175,8 +175,8 @@ export class EditorStore {
     this.editor?.canvas.requestRenderAll()
   }
 
-  // TODO
-  resetAllItems = () => {
+  resetAllItems = (target: TargetKind) => {
+    this.editor.resetAllItems(target)
     this.hasItemChanges = false
   }
 

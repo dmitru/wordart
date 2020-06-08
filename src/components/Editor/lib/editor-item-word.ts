@@ -7,6 +7,7 @@ import { MatrixSerialized } from 'services/api/persisted/v1'
 import { Font } from 'components/Editor/lib/generator'
 import { BoundingBox } from 'opentype.js'
 import { EditorItemId } from 'components/Editor/lib/editor-item'
+import { darken, lighten } from 'polished'
 
 export type EditorItemConfigWord = {
   kind: 'word'
@@ -100,6 +101,9 @@ export class EditorItemWord {
     // @ts-ignore
     path.pathOffset = wordPathObj.pathOffset
 
+    this.customColor = conf.customColor
+    this.color = conf.color || 'black'
+
     const wordGroup = new fabric.Group([
       new fabric.Rect().set({
         originX: 'center',
@@ -108,16 +112,14 @@ export class EditorItemWord {
         top: pathBounds.y1,
         width: pw + 2 * pad,
         height: ph + 2 * pad,
-        strokeWidth: 0,
-        stroke: 'black',
+        strokeWidth: 1,
+        strokeDashArray: [5, 5],
+        stroke: '#0006',
         fill: 'rgba(255,255,255,0.3)',
         opacity: 0,
       }),
       path,
     ])
-
-    this.customColor = conf.customColor
-    this.color = conf.color || 'black'
 
     this.fabricObj = wordGroup
     this.wordObj = wordGroup.item(1)
@@ -153,10 +155,12 @@ export class EditorItemWord {
   }
 
   private _updateColor = (color: string) => {
-    this.fabricObj.cornerColor = color
+    this.fabricObj.cornerColor = darken(0.3, color)
+    this.fabricObj.cornerStrokeColor = lighten(0.3, color)
     this.fabricObj.cornerStyle = 'circle'
     this.fabricObj.transparentCorners = false
-    this.fabricObj.borderColor = color
+    this.fabricObj.borderColor = darken(0.3, color)
+    this.fabricObj.borderDashArray = [5, 5]
     this.wordObj.set({ fill: color })
     this.lockBorder.set({ stroke: color })
   }
