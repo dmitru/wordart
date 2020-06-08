@@ -491,7 +491,7 @@ export class Generator {
             tx + (wordPathSize.w * pathScale) / 2,
             ty - (wordPathSize.h * pathScale) / 2
           )
-          // TODO: perhaps the transform is off...
+
           const wordCenterUnrotated = rotatedBoundsTransform.transform(
             wordCenterRotated
           )
@@ -718,10 +718,28 @@ export class Generator {
             iconBounds.h
           )
 
+          const wordCenterRotated = new paper.Point(
+            tx + (iconDims.w * iconScale) / 2,
+            ty + (iconDims.h * iconScale) / 2
+          )
+          const wordCenterUnrotated = rotatedBoundsTransform.transform(
+            wordCenterRotated
+          )
+          const col = Math.round(wordCenterUnrotated.x)
+          const row = Math.round(wordCenterUnrotated.y)
+
+          const colorSamplePixelIndex =
+            4 * (unrotatedCtxOriginalShape.canvas.width * row + col)
+          const r = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 0]
+          const g = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 1]
+          const b = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 2]
+
+          const shapeColor = chroma.rgb(r, g, b).hex()
+
           const item: ShapeGeneratedItem = {
             index: i,
             kind: 'shape',
-            shapeColor: 'black',
+            shapeColor,
             shapeId: icon.shape.id,
             transform: new paper.Matrix()
               .translate(task.shape.bounds.left, task.shape.bounds.top)
