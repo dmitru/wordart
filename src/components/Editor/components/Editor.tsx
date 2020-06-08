@@ -700,6 +700,7 @@ const EditorLayout = styled.div`
 `
 
 const TopToolbar = styled(Box)`
+  position: relative;
   z-index: 1;
   box-shadow: 0 0 5px 0 #00000033;
   height: 58px;

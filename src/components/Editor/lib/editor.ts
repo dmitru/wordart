@@ -336,33 +336,25 @@ export class Editor {
       canvas.setHeight(wrapperBounds.height)
     }
 
-    const zoomLevel = Math.min(
-      this.canvas.getWidth() / 1000,
-      this.canvas.getHeight() / (1000 / this.aspectRatio)
-    )
-
-    console.log({ zoomLevel }, this.canvas.getWidth())
-
-    const pad = 0
     this.projectBounds = new paper.Rectangle({
       x: 0,
       y: 0,
-      width: 1000 - zoomLevel * pad * 2,
-      height: 1000 / this.aspectRatio - zoomLevel * pad * 2,
+      width: 1000,
+      height: 1000 / this.aspectRatio,
     })
 
     this.bgRect.set({
       left: 0,
       top: 0,
-      width: 1000 - zoomLevel * pad * 2,
-      height: 1000 / this.aspectRatio - zoomLevel * pad * 2,
+      width: 1000,
+      height: 1000 / this.aspectRatio,
     })
 
     const sceneClipPath = new fabric.Rect({
       left: 0,
       top: 0,
-      width: 1000 - zoomLevel * pad * 2,
-      height: 1000 / this.aspectRatio - zoomLevel * pad * 2,
+      width: 1000,
+      height: 1000 / this.aspectRatio,
       fill: 'black',
     })
     this.canvas.clipPath = sceneClipPath
@@ -385,16 +377,20 @@ export class Editor {
 
     // // Update view transform to make sure the viewport includes the entire project bounds
 
+    const pad = 20
+    const zoomLevel = Math.min(
+      (this.canvas.getWidth() - 2 * pad) / 1000,
+      (this.canvas.getHeight() - 2 * pad) / (1000 / this.aspectRatio)
+    )
+
     for (const canvas of this.canvases) {
       canvas.setZoom(zoomLevel)
 
       // @ts-ignore
-      canvas.viewportTransform[4] =
-        (canvas.getWidth() - zoomLevel * (1000 - pad * 2)) / 2
+      canvas.viewportTransform[4] = (canvas.getWidth() - zoomLevel * 1000) / 2
       // @ts-ignore
       canvas.viewportTransform[5] =
-        (canvas.getHeight() - zoomLevel * (1000 / this.aspectRatio - pad * 2)) /
-        2
+        (canvas.getHeight() - zoomLevel * (1000 / this.aspectRatio)) / 2
 
       canvas.requestRenderAll()
     }
