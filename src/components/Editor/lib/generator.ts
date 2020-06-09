@@ -40,6 +40,8 @@ export class Generator {
   wordPaths: Map<WordInfoId, Path> = new Map()
   wasm?: WasmModule
 
+  isCancelled = false
+
   constructor() {}
 
   init = async () => {
@@ -62,6 +64,7 @@ export class Generator {
     if (!this.wasm) {
       throw new Error('call init() first')
     }
+    this.isCancelled = false
     this.logger.debug('Generator: generate', task)
 
     const shapeCanvasMaxExtent = 280
@@ -340,6 +343,14 @@ export class Generator {
 
     for (let i = 0; i < nIter; ++i) {
       let type: 'word' | 'icon' = 'word'
+
+      if (this.isCancelled) {
+        this.isCancelled = false
+        return {
+          generatedItems,
+          status: 'cancelled',
+        }
+      }
 
       if (hasWords && hasIcons) {
         type = Math.random() < task.iconProbability ? 'icon' : 'word'
@@ -805,6 +816,7 @@ export class Generator {
 
     return {
       generatedItems,
+      status: 'finished',
     }
   }
 }
@@ -872,6 +884,7 @@ export type FillShapeTaskIconConfig = {
 
 export type FillShapeTaskResult = {
   generatedItems: GeneratedItem[]
+  status: 'finished' | 'cancelled'
 }
 
 export type GeneratedItem =

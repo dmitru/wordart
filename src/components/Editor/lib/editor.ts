@@ -76,6 +76,8 @@ type FontInfo = {
   glyphs: Map<string, { glyph: Glyph; path: opentype.Path; pathData: string }>
 }
 
+const PROGRESS_REPORT_RAF_WAIT_COUNT = 3
+
 export type EditorMode = 'view' | 'edit'
 
 export class Editor {
@@ -939,6 +941,10 @@ export class Editor {
     }
   }
 
+  cancelVisualization = () => {
+    this.generator.isCancelled = true
+  }
+
   generateBgItems = async (params: { style: BgStyleConf }) => {
     const { style } = params
     const { coloring } = style.items
@@ -957,7 +963,7 @@ export class Editor {
 
     this.store.visualizingProgress = 0
     this.store.isVisualizing = true
-    for (let i = 0; i < 10; ++i) {
+    for (let i = 0; i < PROGRESS_REPORT_RAF_WAIT_COUNT; ++i) {
       await waitAnimationFrame()
     }
     await this.generator.init()
@@ -1099,9 +1105,16 @@ export class Editor {
         // )
         this.store.visualizingProgress = progressPercent
         // await this.setShapeItemsStyle(style.items)
-        await waitAnimationFrame()
+        for (let i = 0; i < PROGRESS_REPORT_RAF_WAIT_COUNT; ++i) {
+          await waitAnimationFrame()
+        }
       }
     )
+
+    if (result.status !== 'finished') {
+      this.store.isVisualizing = false
+      return
+    }
 
     const items: EditorItemConfig[] = []
 
@@ -1149,7 +1162,7 @@ export class Editor {
 
     this.store.visualizingProgress = 0
     this.store.isVisualizing = true
-    for (let i = 0; i < 10; ++i) {
+    for (let i = 0; i < PROGRESS_REPORT_RAF_WAIT_COUNT; ++i) {
       await waitAnimationFrame()
     }
     await this.generator.init()
@@ -1279,9 +1292,16 @@ export class Editor {
         // )
         this.store.visualizingProgress = progressPercent
         // await this.setShapeItemsStyle(style.items)
-        await waitAnimationFrame()
+        for (let i = 0; i < PROGRESS_REPORT_RAF_WAIT_COUNT; ++i) {
+          await waitAnimationFrame()
+        }
       }
     )
+
+    if (result.status !== 'finished') {
+      this.store.isVisualizing = false
+      return
+    }
 
     const items: EditorItemConfig[] = []
 

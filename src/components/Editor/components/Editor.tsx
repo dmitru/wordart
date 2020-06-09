@@ -14,6 +14,17 @@ import {
   Box,
   Select,
   Skeleton,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  Stack,
+  Progress,
+  FormControl,
+  FormLabel,
+  Input,
+  ModalFooter,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
@@ -75,6 +86,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const { authStore } = useStore()
     const router = useRouter()
+
+    const cancelVisualizationBtnRef = useRef<HTMLButtonElement>(null)
 
     const [isSaving, setIsSaving] = useState(false)
     const handleSaveClick = useCallback(() => {
@@ -149,10 +162,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           }
 
           await store.initEditor(editorParams)
-
-          // store.editor?.generateShapeItems({
-          //   style: mkShapeStyleConfFromOptions(store.styleOptions.shape),
-          // })
         }
       }
 
@@ -189,6 +198,17 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const leftTab =
       state.targetTab === 'bg' ? state.leftTabBg : state.leftTabShape
+
+    const cancelVisualization = () => {
+      store.editor?.cancelVisualization()
+      toast({
+        title: 'Visualization cancelled',
+        status: 'info',
+        duration: 2000,
+        position: 'bottom-right',
+        isClosable: true,
+      })
+    }
 
     return (
       <PageLayoutWrapper>
@@ -439,18 +459,50 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               p="2"
               pl="3"
             >
+              <Modal
+                initialFocusRef={cancelVisualizationBtnRef}
+                finalFocusRef={cancelVisualizationBtnRef}
+                isOpen={store.isVisualizing}
+                onClose={cancelVisualization}
+                closeOnOverlayClick={false}
+                closeOnEsc={false}
+              >
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>
+                    Visualizing:{' '}
+                    {Math.round(100 * (store.visualizingProgress || 0))}%
+                  </ModalHeader>
+                  <ModalBody pb={6}>
+                    <Stack>
+                      <Progress
+                        hasStripe
+                        color="accent"
+                        height="32px"
+                        value={(store.visualizingProgress || 0) * 100}
+                      />
+                      <Text fontSize="lg"></Text>
+                    </Stack>
+                  </ModalBody>
+
+                  <ModalFooter>
+                    <Button
+                      ref={cancelVisualizationBtnRef}
+                      onClick={cancelVisualization}
+                    >
+                      Cancel
+                    </Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+
               {store.lifecycleState === 'initialized' && (
                 <>
                   <Button
                     css={css`
                       width: 128px;
                     `}
-                    // accent
-                    // isDisabled={store.isVisualizing}
                     variantColor="accent"
-                    loadingText={`${Math.round(
-                      (store.visualizingProgress || 0) * 100
-                    )}%`}
                     isLoading={store.isVisualizing}
                     onClick={() => {
                       if (state.targetTab === 'shape') {
@@ -483,6 +535,24 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   <Tooltip label="Redo" aria-label="Redo" hasArrow zIndex={5}>
                     <IconButton ml="1" icon="arrow-forward" aria-label="Redo" />
                   </Tooltip>
+
+                  {store.mode === 'view' && (
+                    <Box mr="3" ml="3" display="flex" alignItems="center">
+                      <Text fontSize="md" mr="3" my="0">
+                        Layer:
+                      </Text>
+                      <Select
+                        isRequired
+                        value={state.targetTab}
+                        onChange={(e) => {
+                          state.targetTab = e.target.value as TargetKind
+                        }}
+                      >
+                        <option value="shape">Shape</option>
+                        <option value="bg">Background</option>
+                      </Select>
+                    </Box>
+                  )}
 
                   <Box mr="3" ml="3">
                     {store.mode === 'view' && hasItems && (
@@ -579,60 +649,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       </>
                     )}
                   </Box>
-
-                  {store.mode === 'view' && (
-                    <Box
-                      mr="3"
-                      ml="3"
-                      marginLeft="auto"
-                      display="flex"
-                      alignItems="center"
-                    >
-                      <Text fontSize="md" mr="3" my="0">
-                        Layer:
-                      </Text>
-                      <Select
-                        isRequired
-                        value={state.targetTab}
-                        onChange={(e) => {
-                          state.targetTab = e.target.value as TargetKind
-                        }}
-                      >
-                        <option value="shape">Shape</option>
-                        <option value="bg">Background</option>
-                      </Select>
-                      {/* <Button
-                    css={css`
-                      box-shadow: none !important;
-                    `}
-                    py="1"
-                    borderTopRightRadius="0"
-                    borderBottomRightRadius="0"
-                    variantColor="secondary"
-                    onClick={() => {
-                      state.targetTab = 'shape'
-                    }}
-                    variant={state.targetTab !== 'shape' ? 'outline' : 'solid'}
-                  >
-                    Shape
-                  </Button>
-                  <Button
-                    css={css`
-                      box-shadow: none !important;
-                    `}
-                    py="1"
-                    borderTopLeftRadius="0"
-                    borderBottomLeftRadius="0"
-                    variantColor="secondary"
-                    onClick={() => {
-                      state.targetTab = 'bg'
-                    }}
-                    variant={state.targetTab !== 'bg' ? 'outline' : 'solid'}
-                  >
-                    Background
-                  </Button> */}
-                    </Box>
-                  )}
                 </>
               )}
 
