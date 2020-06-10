@@ -96,11 +96,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           return
         }
         setIsSaving(true)
-        const thumbnail = store.editor.canvas.toDataURL({
-          multiplier: 0.25,
-          format: 'jpeg',
-          quality: 0.85,
-        })
+        const thumbnailCanvas = store.editor.exportAsRaster(120)
+        const thumbnail = thumbnailCanvas.toDataURL('image/jpeg', 0.85)
         const editorData = store.serialize()
 
         if (isNew) {
@@ -169,7 +166,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     }, [props.wordcloudId, authStore.hasInitialized, canvasRef.current])
 
     useEffect(() => {
-      return store.destroyEditor
+      return () => {
+        store.destroyEditor()
+        store.lifecycleState = 'initial'
+      }
     }, [])
 
     if (!router || !authStore.hasInitialized) {

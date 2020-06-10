@@ -35,6 +35,7 @@ import {
   processRasterImg,
   copyCanvas,
   createCanvasCtxCopy,
+  Dimensions,
 } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { flatten, groupBy, keyBy, max, min, sortBy } from 'lodash'
@@ -265,6 +266,55 @@ export class Editor {
 
     window.addEventListener('resize', this.handleResize)
     this.handleResize()
+  }
+
+  exportAsRaster = (maxDimension = 1024): HTMLCanvasElement => {
+    const aspect = this.projectBounds.width / this.projectBounds.height
+    const scale =
+      aspect > 1
+        ? maxDimension / this.projectBounds.width
+        : maxDimension / this.projectBounds.height
+    const resultCanvas = createCanvas({
+      w: this.projectBounds.width * scale,
+      h: this.projectBounds.height * scale,
+    })
+    console.log('FISH: ', resultCanvas.width, resultCanvas.height)
+    console.screenshot(this.bgCanvas.getElement(), 0.3)
+    console.screenshot(this.canvas.getElement(), 0.3)
+    copyCanvas(
+      this.bgCanvas.getElement().getContext('2d')!,
+      resultCanvas.getContext('2d')!,
+      {
+        x: this.bgCanvas.viewportTransform![4] / this.bgCanvas.getZoom(),
+        y: this.bgCanvas.viewportTransform![5] / this.bgCanvas.getZoom(),
+        w: this.projectBounds.width * this.bgCanvas.getZoom(),
+        h: this.projectBounds.height * this.bgCanvas.getZoom(),
+      },
+      {
+        x: 0,
+        y: 0,
+        w: resultCanvas.width,
+        h: resultCanvas.height,
+      }
+    )
+    copyCanvas(
+      this.canvas.getElement().getContext('2d')!,
+      resultCanvas.getContext('2d')!,
+      {
+        x: this.bgCanvas.viewportTransform![4] / this.bgCanvas.getZoom(),
+        y: this.bgCanvas.viewportTransform![5] / this.bgCanvas.getZoom(),
+        w: this.projectBounds.width * this.bgCanvas.getZoom(),
+        h: this.projectBounds.height * this.bgCanvas.getZoom(),
+      },
+      {
+        x: 0,
+        y: 0,
+        w: resultCanvas.width,
+        h: resultCanvas.height,
+      }
+    )
+    console.screenshot(resultCanvas, 0.3)
+    return resultCanvas
   }
 
   showLockBorders = (target: TargetKind) => {
