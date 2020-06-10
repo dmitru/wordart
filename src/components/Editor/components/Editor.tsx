@@ -9,6 +9,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  MenuDivider,
   useToast,
   Text,
   Box,
@@ -67,6 +68,20 @@ import {
   mkBgStyleConfFromOptions,
 } from 'components/Editor/style'
 import { Spinner } from 'components/Editor/components/Spinner'
+import {
+  FiSave,
+  FiEdit,
+  FiChevronLeft,
+  FiMenu,
+  FiDownload,
+  FiPrinter,
+  FiCopy,
+  FiFilePlus,
+  FiDelete,
+} from 'react-icons/fi'
+import { MdRemove, MdSettings } from 'react-icons/md'
+import { BsTrash, BsPlus } from 'react-icons/bs'
+import { IoMdResize } from 'react-icons/io'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -102,7 +117,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
         if (isNew) {
           const wordcloud = await wordcloudsStore.create({
-            title: state.title,
+            title: state.title || 'Untitled Design',
             editorData,
             thumbnail,
           })
@@ -111,7 +126,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           })
         } else {
           await wordcloudsStore.save(props.wordcloudId!, {
-            title: state.title,
+            title: state.title || 'Untitled Design',
             thumbnail,
             editorData,
           })
@@ -209,58 +224,173 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       <PageLayoutWrapper>
         <TopNavWrapper alignItems="center" display="flex">
           <Link href={Urls.dashboard} passHref>
-            <Button color="white" variant="ghost" leftIcon="chevron-left">
-              Back
-            </Button>
+            <TopNavButton variantColor="blue" mr="3">
+              <FiChevronLeft
+                css={css`
+                  margin-right: 4px;
+                `}
+              />
+              Home
+            </TopNavButton>
           </Link>
 
           <Menu>
-            <MenuButton
-              ml="4"
-              color="white"
-              as={Button}
-              // @ts-ignore
-              rightIcon="chevron-down"
-              variant="ghost"
-            >
-              Menu
+            <MenuButton mr="3" color="white" as={TopNavButton} variant="ghost">
+              <FiMenu
+                css={css`
+                  margin-right: 4px;
+                `}
+              />
+              File
             </MenuButton>
             <MenuList zIndex={4}>
+              <MenuItem>
+                <FiFilePlus
+                  css={css`
+                    margin-right: 4px;
+                  `}
+                />
+                New...
+              </MenuItem>
+              <MenuItem>
+                <FiSave
+                  css={css`
+                    margin-right: 4px;
+                  `}
+                />
+                Save
+              </MenuItem>
+              <MenuItem>
+                <FiCopy
+                  css={css`
+                    margin-right: 4px;
+                  `}
+                />
+                Make Copy
+              </MenuItem>
+              <MenuItem>
+                <FiEdit
+                  css={css`
+                    margin-right: 4px;
+                  `}
+                />
+                Rename
+              </MenuItem>
               <MenuItem
                 onClick={() => {
                   state.leftPanelContext = 'resize'
                 }}
               >
-                Change page size...
+                <IoMdResize
+                  css={css`
+                    margin-right: 4px;
+                  `}
+                />
+                Page Size...
+              </MenuItem>
+              <MenuDivider />
+              <MenuItem>
+                <FiPrinter
+                  css={css`
+                    margin-right: 4px;
+                  `}
+                />
+                Print
+              </MenuItem>
+              <MenuItem>
+                <FiDownload
+                  css={css`
+                    margin-right: 4px;
+                  `}
+                />{' '}
+                Download as Image
+              </MenuItem>
+              <MenuDivider />
+              <MenuItem>
+                <BsTrash
+                  css={css`
+                    margin-right: 4px;
+                  `}
+                />
+                Delete
+              </MenuItem>
+              <MenuDivider />
+              <MenuItem>
+                <FiChevronLeft
+                  css={css`
+                    margin-right: 4px;
+                  `}
+                />
+                Go back to My Designs
               </MenuItem>
             </MenuList>
           </Menu>
-          <Button
-            ml="4"
-            color="white"
+
+          <TopNavButton
             onClick={handleSaveClick}
             isLoading={isSaving}
             loadingText="Saving..."
-            variant="ghost"
+            mr="3"
           >
+            <FiSave
+              css={css`
+                margin-right: 4px;
+              `}
+            />
             Save
-          </Button>
+          </TopNavButton>
+
+          <TopNavButton
+            onClick={handleSaveClick}
+            isLoading={isSaving}
+            loadingText="Saving..."
+            mr="3"
+          >
+            <FiDownload
+              css={css`
+                margin-right: 4px;
+              `}
+            />
+            Download
+          </TopNavButton>
 
           <Editable
-            ml="4"
+            css={css`
+              background: #fff3;
+              padding: 2px 8px;
+              border-radius: 4px;
+              display: flex;
+            `}
             value={state.title}
             onChange={(value) => {
               state.title = value
             }}
-            placeholder="Enter name..."
+            selectAllOnFocus={false}
+            placeholder="Untitled Design"
             color="white"
             fontSize="xl"
             maxWidth="200px"
             flex={1}
           >
-            <EditablePreview width="100%" />
-            <EditableInput />
+            <EditablePreview
+              width="100%"
+              css={css`
+                text-overflow: ellipsis;
+                overflow-x: hidden;
+                white-space: nowrap;
+              `}
+            />
+            <EditableInput
+              css={css`
+                background-color: white;
+                color: black;
+              `}
+            />
           </Editable>
+
+          <Button variantColor="accent" ml="auto">
+            Upgrade to Pro
+          </Button>
         </TopNavWrapper>
 
         <EditorLayout>
@@ -542,9 +672,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
                   {store.mode === 'view' && (
                     <Box mr="3" ml="3" display="flex" alignItems="center">
-                      <Text fontSize="md" mr="3" my="0">
-                        Layer:
-                      </Text>
                       <Select
                         isRequired
                         value={state.targetTab}
@@ -552,8 +679,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           state.targetTab = e.target.value as TargetKind
                         }}
                       >
-                        <option value="shape">Shape</option>
-                        <option value="bg">Background</option>
+                        <option value="shape">Layer: Shape</option>
+                        <option value="bg">Layer: Background</option>
                       </Select>
                     </Box>
                   )}
@@ -701,6 +828,19 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       </PageLayoutWrapper>
     )
   }
+)
+
+const TopNavButton = styled(Button)(
+  {
+    color: 'white',
+  },
+  `
+
+  background-color: transparent;
+&:hover {
+  background-color: #0003;
+}
+`
 )
 
 const PageLayoutWrapper = styled.div`
