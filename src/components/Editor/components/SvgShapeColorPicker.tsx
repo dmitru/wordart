@@ -84,6 +84,7 @@ export const SvgShapeColorPicker: React.FC<{
                 onChange={(hex) => {
                   if (shape.config.processing.colors.kind === 'single-color') {
                     shape.config.processing.colors.color = chroma(hex).hex()
+                    shapeStyle.colors.color = chroma(hex).hex()
                   }
                 }}
                 onAfterChange={() => {
