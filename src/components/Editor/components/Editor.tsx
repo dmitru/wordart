@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Editable,
   EditableInput,
@@ -7,25 +8,21 @@ import {
   IconButton,
   Menu,
   MenuButton,
+  MenuDivider,
   MenuItem,
   MenuList,
-  MenuDivider,
-  useToast,
-  Text,
-  Box,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Progress,
   Select,
   Skeleton,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
   Stack,
-  Progress,
-  FormControl,
-  FormLabel,
-  Input,
-  ModalFooter,
+  Text,
+  useToast,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
@@ -42,14 +39,21 @@ import { LeftPanelIconsTab } from 'components/Editor/components/LeftPanelIconsTa
 import { LeftPanelLayoutTab } from 'components/Editor/components/LeftPanelLayoutTab'
 import { LeftPanelShapesTab } from 'components/Editor/components/LeftPanelShapesTab'
 import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTab'
+import { Spinner } from 'components/Editor/components/Spinner'
 import {
-  pageSizePresets,
   EditorStoreInitParams,
+  pageSizePresets,
 } from 'components/Editor/editor-store'
-import { EditorInitParams, TargetKind } from 'components/Editor/lib/editor'
+import { TargetKind } from 'components/Editor/lib/editor'
+import {
+  mkBgStyleConfFromOptions,
+  mkShapeStyleConfFromOptions,
+} from 'components/Editor/style'
 import { BaseBtn } from 'components/shared/BaseBtn'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 import { Tooltip } from 'components/shared/Tooltip'
+import { saveAs } from 'file-saver'
 import { Dimensions } from 'lib/wordart/canvas-utils'
 import 'lib/wordart/console-extensions'
 import { observable } from 'mobx'
@@ -58,30 +62,23 @@ import { useRouter } from 'next/dist/client/router'
 import Link from 'next/link'
 import { darken, desaturate } from 'polished'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { BsTrash } from 'react-icons/bs'
+import {
+  FiChevronLeft,
+  FiCopy,
+  FiDownload,
+  FiEdit,
+  FiFilePlus,
+  FiMenu,
+  FiPrinter,
+  FiSave,
+} from 'react-icons/fi'
+import { IoMdResize } from 'react-icons/io'
 import { Api } from 'services/api/api'
 import { WordcloudId } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
-import {
-  mkShapeStyleConfFromOptions,
-  mkBgStyleConfFromOptions,
-} from 'components/Editor/style'
-import { Spinner } from 'components/Editor/components/Spinner'
-import {
-  FiSave,
-  FiEdit,
-  FiChevronLeft,
-  FiMenu,
-  FiDownload,
-  FiPrinter,
-  FiCopy,
-  FiFilePlus,
-  FiDelete,
-} from 'react-icons/fi'
-import { MdRemove, MdSettings } from 'react-icons/md'
-import { BsTrash, BsPlus } from 'react-icons/bs'
-import { IoMdResize } from 'react-icons/io'
+import 'utils/canvas-to-blob'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -105,6 +102,21 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const cancelVisualizationBtnRef = useRef<HTMLButtonElement>(null)
 
     const [isSaving, setIsSaving] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+
+    const handleDownloadClick = useCallback(() => {
+      if (!store.editor) {
+        return
+      }
+      setIsLoading(true)
+      store.editor.exportAsRaster(4096).then((canvas) => {
+        canvas.toBlob((blob) => {
+          saveAs(blob, `${state.title || 'Untitled Design'}.png`)
+          setIsLoading(false)
+        }, 'image/png')
+      })
+    }, [store])
+
     const handleSaveClick = useCallback(() => {
       const save = async () => {
         if (isSaving || !store.editor) {
@@ -121,7 +133,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             editorData,
             thumbnail,
           })
-          router.push(Urls.editor._next, Urls.editor.edit(wordcloud.id), {
+          router.replace(Urls.editor._next, Urls.editor.edit(wordcloud.id), {
             shallow: true,
           })
         } else {
@@ -235,7 +247,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           </Link>
 
           <Menu>
-            <MenuButton mr="3" color="white" as={TopNavButton} variant="ghost">
+            <MenuButton mr="3" as={TopNavButton}>
               <FiMenu
                 css={css`
                   margin-right: 4px;
@@ -252,7 +264,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 />
                 New...
               </MenuItem>
-              <MenuItem>
+              <MenuItem onClick={handleSaveClick}>
                 <FiSave
                   css={css`
                     margin-right: 4px;
@@ -299,6 +311,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               </MenuItem>
               <MenuItem>
                 <FiDownload
+                  onClick={handleDownloadClick}
                   css={css`
                     margin-right: 4px;
                   `}
@@ -341,8 +354,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           </TopNavButton>
 
           <TopNavButton
-            onClick={handleSaveClick}
-            isLoading={isSaving}
+            onClick={handleDownloadClick}
+            isLoading={isLoading}
             loadingText="Saving..."
             mr="3"
           >
