@@ -211,7 +211,7 @@ export class EditorStore {
     if (!this.editor) {
       return
     }
-    this.editor.showLockBorders()
+    this.editor.showLockBorders(target)
     this.editor.enableItemsSelection(target)
     this.editor.enableSelectionMode()
   }
@@ -223,7 +223,7 @@ export class EditorStore {
     }
     this.selectedItemData = null
     this.selectedItem = null
-    this.editor.hideLockBorders()
+    this.editor.hideLockBorders(target)
     this.editor.disableItemsSelection(target)
     this.editor.disableSelectionMode()
   }

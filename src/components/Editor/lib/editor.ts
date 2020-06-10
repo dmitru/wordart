@@ -267,15 +267,15 @@ export class Editor {
     this.handleResize()
   }
 
-  showLockBorders = () => {
-    for (const [, item] of this.items.shape.itemsById) {
+  showLockBorders = (target: TargetKind) => {
+    for (const [, item] of this.items[target].itemsById) {
       item.setLockBorderVisibility(true)
     }
     this.canvas.requestRenderAll()
   }
 
-  hideLockBorders = () => {
-    for (const [, item] of this.items.shape.itemsById) {
+  hideLockBorders = (target: TargetKind) => {
+    for (const [, item] of this.items[target].itemsById) {
       item.setLockBorderVisibility(false)
     }
     this.canvas.requestRenderAll()
