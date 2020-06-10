@@ -203,11 +203,8 @@ export class Generator {
         (icon.shape as ShapeSvgConf).url
       )
       setFillColor(shapeItemGroup, 'black')
-      // shapeItemGroup.fillColor = new paper.Color('black')
-      // shapeItemGroup.strokeColor = new paper.Color('black')
-      // Scale the shape so that it's 100 in max dimension
-      // shapeItemGroup.set({ originX: 'center', originY: 'center' })
-      shapeItemGroup.scale(100 / shapeItemGroup.getBoundingRect().width)
+      // Scale the shape so that it's 100 in height (similar to word items having fontSize = 100
+      shapeItemGroup.scale(100 / shapeItemGroup.getBoundingRect().height)
       shapeItemGroup.setCoords()
 
       const rasterCanvas = objAsCanvasElement(shapeItemGroup)

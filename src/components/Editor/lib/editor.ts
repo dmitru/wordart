@@ -24,6 +24,7 @@ import {
   ShapeRasterConf,
   ShapeSvgConf,
   ShapeTextConf,
+  ShapeId,
 } from 'components/Editor/shape-config'
 import { BgStyleConf, ShapeStyleConf } from 'components/Editor/style'
 import { FontId } from 'data/fonts'
@@ -868,26 +869,26 @@ export class Editor {
     oldItemsToDelete.forEach((i) => this.items.shape.itemsById.delete(i.id))
   }
 
-  addShapeItems = async (itemConfigs: EditorItemConfig[]) => {
-    let { items, itemsById, fabricObjToItem } = await this.convertToEditorItems(
-      itemConfigs
-    )
-    const oldItemsToKeep = [...this.items.shape.items]
-    for (const item of oldItemsToKeep) {
-      itemsById.set(item.id, item)
-      fabricObjToItem.set(item.fabricObj, item)
-    }
+  // addShapeItems = async (itemConfigs: EditorItemConfig[]) => {
+  //   let { items, itemsById, fabricObjToItem } = await this.convertToEditorItems(
+  //     itemConfigs
+  //   )
+  //   const oldItemsToKeep = [...this.items.shape.items]
+  //   for (const item of oldItemsToKeep) {
+  //     itemsById.set(item.id, item)
+  //     fabricObjToItem.set(item.fabricObj, item)
+  //   }
 
-    const objs = items.map((item) => item.fabricObj)
-    this.canvas.add(...objs)
-    this.canvas.requestRenderAll()
+  //   const objs = items.map((item) => item.fabricObj)
+  //   this.canvas.add(...objs)
+  //   this.canvas.requestRenderAll()
 
-    this.items.shape = {
-      items: [...oldItemsToKeep, ...items],
-      itemsById,
-      fabricObjToItem,
-    }
-  }
+  //   this.items.shape = {
+  //     items: [...oldItemsToKeep, ...items],
+  //     itemsById,
+  //     fabricObjToItem,
+  //   }
+  // }
 
   setShapeItems = (itemConfigs: EditorItemConfig[]) =>
     this.setItems('shape', itemConfigs)
@@ -961,6 +962,7 @@ export class Editor {
       return
     }
 
+    this.store.visualizingStep = 'generating'
     this.store.visualizingProgress = 0
     this.store.isVisualizing = true
     for (let i = 0; i < PROGRESS_REPORT_RAF_WAIT_COUNT; ++i) {
@@ -1160,6 +1162,7 @@ export class Editor {
       return
     }
 
+    this.store.visualizingStep = 'generating'
     this.store.visualizingProgress = 0
     this.store.isVisualizing = true
     for (let i = 0; i < PROGRESS_REPORT_RAF_WAIT_COUNT; ++i) {
@@ -1419,6 +1422,9 @@ export class Editor {
     itemsById: Map<EditorItemId, EditorItem>
     fabricObjToItem: Map<fabric.Object, EditorItem>
   }> => {
+    this.store.visualizingStep = 'drawing'
+    this.store.visualizingProgress = 0
+
     const items: EditorItem[] = []
     const itemsById: Map<EditorItemId, EditorItem> = new Map()
     const fabricObjToItem: Map<fabric.Object, EditorItem> = new Map()
@@ -1427,6 +1433,10 @@ export class Editor {
     const allWordItems = itemConfigs.filter(
       (item) => item.kind === 'word'
     ) as EditorItemConfigWord[]
+
+    const allIconItems = itemConfigs.filter(
+      (item) => item.kind === 'shape'
+    ) as EditorItemConfigShape[]
 
     const wordItemsByFont = groupBy(allWordItems, 'fontId')
     const uniqFontIds = Object.keys(wordItemsByFont)
@@ -1479,8 +1489,12 @@ export class Editor {
 
     // Process all fonts...
     for (const [index, itemConfig] of allWordItems.entries()) {
-      if (index % 200 === 0) {
-        await waitAnimationFrame()
+      if (index % 50 === 0) {
+        this.store.visualizingProgress =
+          index / (allWordItems.length + allIconItems.length)
+        for (let i = 0; i < PROGRESS_REPORT_RAF_WAIT_COUNT; ++i) {
+          await waitAnimationFrame()
+        }
       }
 
       // Process items...
@@ -1505,33 +1519,53 @@ export class Editor {
     }
 
     // Process shape items...
-    const allIconItems = itemConfigs.filter(
-      (item) => item.kind === 'shape'
-    ) as EditorItemConfigShape[]
+    const shapesById = new Map<
+      ShapeId,
+      {
+        shapeObj: fabric.Object
+      }
+    >()
+    for (const [index, itemConfig] of allIconItems.entries()) {
+      const { shapeId } = itemConfig
+      if (shapesById.has(shapeId)) {
+        continue
+      }
+      const shapeConf = this.store.getShapeConfById(itemConfig.shapeId)
+      if (shapeConf?.kind === 'svg') {
+        const shapeObj = await loadObjFromSvg(shapeConf.url)
+        shapeObj.scale(100 / shapeObj.getBoundingRect().height)
+        shapeObj.setCoords()
+        shapesById.set(shapeId, {
+          shapeObj,
+        })
+      }
+    }
 
     for (const [index, itemConfig] of allIconItems.entries()) {
-      if (index % 1 === 0) {
-        await waitAnimationFrame()
+      if (index % 50 === 0) {
+        this.store.visualizingProgress =
+          index / (allWordItems.length + allIconItems.length)
+        for (let i = 0; i < PROGRESS_REPORT_RAF_WAIT_COUNT; ++i) {
+          await waitAnimationFrame()
+        }
       }
 
       let shapeObj: fabric.Object | undefined
       const shapeConf = this.store.getShapeConfById(itemConfig.shapeId)
       if (shapeConf?.kind === 'svg') {
-        shapeObj = await loadObjFromSvg(shapeConf.url)
+        shapeObj = shapesById.get(itemConfig.shapeId)!.shapeObj
       }
 
       if (!shapeObj) {
         continue
       }
 
-      // shapeObj.set({ originX: 'center', originY: 'center' })
-      shapeObj.scale(100 / shapeObj.getBoundingRect().width)
-      shapeObj.setCoords()
+      const shapeObjCopy = await cloneObj(shapeObj)
       const item = new EditorItemShape(
         this.editorItemIdGen.get(),
         this.canvas,
         itemConfig,
-        shapeObj
+        shapeObjCopy
       )
       item.setSelectable(this.itemsSelection)
 
@@ -1539,6 +1573,8 @@ export class Editor {
       itemsById.set(item.id, item)
       fabricObjToItem.set(item.fabricObj, item)
     }
+
+    this.store.visualizingProgress = 1
 
     return {
       items,

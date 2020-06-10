@@ -138,7 +138,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           authStore.hasInitialized &&
           canvasRef.current &&
           bgCanvasRef.current &&
-          store.lifecycleState !== 'initialized'
+          store.lifecycleState === 'initial'
         ) {
           const editorParams: EditorStoreInitParams = {
             canvas: canvasRef.current,
@@ -166,12 +166,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       }
 
       init()
-    }, [
-      props.wordcloudId,
-      authStore.hasInitialized,
-      canvasRef.current,
-      bgCanvasRef.current,
-    ])
+    }, [props.wordcloudId, authStore.hasInitialized, canvasRef.current])
 
     useEffect(() => {
       return store.destroyEditor
@@ -470,8 +465,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 <ModalOverlay />
                 <ModalContent>
                   <ModalHeader>
-                    Visualizing:{' '}
-                    {Math.round(100 * (store.visualizingProgress || 0))}%
+                    {store.visualizingStep === 'generating'
+                      ? 'Generating'
+                      : 'Visualizing'}
+                    : {Math.round(100 * (store.visualizingProgress || 0))}%
                   </ModalHeader>
                   <ModalBody pb={6}>
                     <Stack>

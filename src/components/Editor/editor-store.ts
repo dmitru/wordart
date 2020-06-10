@@ -76,8 +76,11 @@ export type EditorStoreInitParams = Pick<
 
 export class EditorStore {
   logger = consoleLoggers.editorStore
-  @observable lifecycleState: 'initializing' | 'initialized' | 'destroyed' =
-    'initializing'
+  @observable lifecycleState:
+    | 'initial'
+    | 'initializing'
+    | 'initialized'
+    | 'destroyed' = 'initial'
 
   rootStore: RootStore
   editor: Editor | null = null
@@ -85,6 +88,7 @@ export class EditorStore {
 
   @observable isVisualizing = false
   @observable visualizingProgress = null as number | null
+  @observable visualizingStep: 'generating' | 'drawing' | null = null
 
   @observable mode: EditorMode = 'view'
 
@@ -121,6 +125,7 @@ export class EditorStore {
 
   @action initEditor = async (params: EditorStoreInitParams) => {
     this.logger.debug('initEditor', params)
+    this.lifecycleState = 'initializing'
 
     this.editor = new Editor({
       ...params,
@@ -224,6 +229,10 @@ export class EditorStore {
   }
 
   @action private loadSerialized = async (serialized: EditorPersistedData) => {
+    this.isVisualizing = true
+    this.visualizingStep = 'drawing'
+    this.visualizingProgress = 0
+
     this.logger.debug('loadSerialized', serialized)
     if (!this.editor) {
       throw new Error('editor is not initialized')
@@ -449,9 +458,15 @@ export class EditorStore {
     )
 
     await this.updateShapeThumbnail()
+
+    this.visualizingProgress = 1
+
     for (let i = 0; i < 10; ++i) {
       await waitAnimationFrame()
     }
+
+    this.isVisualizing = false
+    this.visualizingStep = null
   }
 
   updateShapeThumbnail = async () => {
