@@ -268,27 +268,41 @@ export class Editor {
     this.handleResize()
   }
 
-  exportAsRaster = (maxDimension = 1024): HTMLCanvasElement => {
+  exportAsRaster = async (maxDimension = 1024): Promise<HTMLCanvasElement> => {
+    // Create a new Fabric canva
+
     const aspect = this.projectBounds.width / this.projectBounds.height
+    const canvasSize: Dimensions =
+      aspect > 1
+        ? {
+            w: maxDimension,
+            h: maxDimension / aspect,
+          }
+        : {
+            w: maxDimension * aspect,
+            h: maxDimension,
+          }
+
     const scale =
       aspect > 1
         ? maxDimension / this.projectBounds.width
         : maxDimension / this.projectBounds.height
+
     const resultCanvas = createCanvas({
       w: this.projectBounds.width * scale,
       h: this.projectBounds.height * scale,
     })
-    console.log('FISH: ', resultCanvas.width, resultCanvas.height)
-    console.screenshot(this.bgCanvas.getElement(), 0.3)
-    console.screenshot(this.canvas.getElement(), 0.3)
+
+    // @ts-ignore
+    const pixelRatio = fabric.devicePixelRatio as number
     copyCanvas(
       this.bgCanvas.getElement().getContext('2d')!,
       resultCanvas.getContext('2d')!,
       {
-        x: this.bgCanvas.viewportTransform![4] / this.bgCanvas.getZoom(),
-        y: this.bgCanvas.viewportTransform![5] / this.bgCanvas.getZoom(),
-        w: this.projectBounds.width * this.bgCanvas.getZoom(),
-        h: this.projectBounds.height * this.bgCanvas.getZoom(),
+        x: this.bgCanvas.viewportTransform![4] * pixelRatio,
+        y: this.bgCanvas.viewportTransform![5] * pixelRatio,
+        w: this.projectBounds.width * this.bgCanvas.getZoom() * pixelRatio,
+        h: this.projectBounds.height * this.bgCanvas.getZoom() * pixelRatio,
       },
       {
         x: 0,
@@ -301,10 +315,10 @@ export class Editor {
       this.canvas.getElement().getContext('2d')!,
       resultCanvas.getContext('2d')!,
       {
-        x: this.bgCanvas.viewportTransform![4] / this.bgCanvas.getZoom(),
-        y: this.bgCanvas.viewportTransform![5] / this.bgCanvas.getZoom(),
-        w: this.projectBounds.width * this.bgCanvas.getZoom(),
-        h: this.projectBounds.height * this.bgCanvas.getZoom(),
+        x: this.bgCanvas.viewportTransform![4] * pixelRatio,
+        y: this.bgCanvas.viewportTransform![5] * pixelRatio,
+        w: this.projectBounds.width * this.bgCanvas.getZoom() * pixelRatio,
+        h: this.projectBounds.height * this.bgCanvas.getZoom() * pixelRatio,
       },
       {
         x: 0,
@@ -313,7 +327,7 @@ export class Editor {
         h: resultCanvas.height,
       }
     )
-    console.screenshot(resultCanvas, 0.3)
+
     return resultCanvas
   }
 
