@@ -418,30 +418,52 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               <SectionLabel>Background Words & Icons</SectionLabel>
 
               {store?.editor && store.editor.items.bg.items.length > 0 ? (
-                <Flex direction="row" mb="3">
-                  <Slider
-                    css={css`
-                      flex: 1;
-                      margin-right: 20px;
-                    `}
-                    horizontal
-                    afterLabel="%"
-                    label="Opacity"
-                    value={100 * bgStyle.items.opacity}
-                    onChange={(value) => {
-                      bgStyle.items.opacity = value / 100
-                    }}
-                    onAfterChange={updateBgItemsColoring}
-                    min={0}
-                    max={100}
-                    step={1}
-                  />
+                <>
+                  <Flex direction="row" mb="3">
+                    <Slider
+                      css={css`
+                        flex: 1;
+                        margin-right: 20px;
+                      `}
+                      horizontal
+                      afterLabel="%"
+                      label="Opacity"
+                      value={100 * bgStyle.items.opacity}
+                      onChange={(value) => {
+                        bgStyle.items.opacity = value / 100
+                      }}
+                      onAfterChange={updateBgItemsColoring}
+                      min={0}
+                      max={100}
+                      step={1}
+                    />
 
-                  <BgItemsColorPicker
-                    bgStyle={bgStyle}
-                    onUpdate={updateBgItemsColoring}
-                  />
-                </Flex>
+                    <BgItemsColorPicker
+                      bgStyle={bgStyle}
+                      onUpdate={updateBgItemsColoring}
+                    />
+                  </Flex>
+
+                  <Box mb="4">
+                    <Slider
+                      css={css`
+                        flex: 1;
+                      `}
+                      horizontal
+                      label="Emphasize size"
+                      afterLabel="%"
+                      value={bgStyle.items.dimSmallerItems}
+                      onChange={(value) => {
+                        const val = (value as any) as number
+                        bgStyle.items.dimSmallerItems = val
+                      }}
+                      onAfterChange={updateBgItemsColoring}
+                      min={0}
+                      max={100}
+                      step={1}
+                    />
+                  </Box>
+                </>
               ) : (
                 <Text color="gray.500" fontSize="sm">
                   Background layer doens't have any items yet.

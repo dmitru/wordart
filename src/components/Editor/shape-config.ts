@@ -8,6 +8,7 @@ export type ShapeKind = ShapeConf['kind']
 export type ShapeSvgConf = {
   isCustom?: boolean
   id: ShapeId
+  categories?: string[]
   kind: 'svg'
   url: string
   thumbnailUrl: string
@@ -17,6 +18,7 @@ export type ShapeSvgConf = {
 }
 export type ShapeRasterConf = {
   isCustom?: boolean
+  categories?: string[]
   id: ShapeId
   kind: 'raster'
   url: string
@@ -27,6 +29,7 @@ export type ShapeRasterConf = {
 }
 export type ShapeTextConf = {
   isCustom?: boolean
+  categories?: string[]
   id: ShapeId
   title: string
   thumbnailUrl: string

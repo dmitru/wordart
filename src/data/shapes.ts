@@ -1,6 +1,8 @@
 import { iconsFaRegular } from 'data/icons-fa-regular'
 import { iconsFaSolid } from 'data/icons-fa-solid'
 import { ShapeConf } from 'components/Editor/shape-config'
+import animalsShapes from './shapes-animals'
+import geoShapes from './shapes-geo'
 
 const defaultEdgesProcessing = {
   amount: 80,
@@ -24,6 +26,7 @@ export const svgIcons: ShapeConf[] = [
             colors: { kind: 'original' },
             edges: defaultEdgesProcessing,
           },
+          categories: ['icon'],
         } as ShapeConf)
       : null
   )
@@ -44,6 +47,7 @@ export const svgIconsOutline: ShapeConf[] = [...iconsFaRegular.slice(0, 5)]
             colors: { kind: 'original' },
             edges: defaultEdgesProcessing,
           },
+          categories: ['icon'],
         } as ShapeConf)
       : null
   )
@@ -52,6 +56,8 @@ export const svgIconsOutline: ShapeConf[] = [...iconsFaRegular.slice(0, 5)]
 // @ts-ignore
 export const shapes: ShapeConf[] = [
   ...[
+    ...animalsShapes.map((s) => ({ ...s, categories: ['animals'] })),
+    ...geoShapes.map((s) => ({ ...s, categories: ['geo'] })),
     {
       kind: 'svg',
       title: 'Smile',
@@ -165,6 +171,7 @@ export const shapes: ShapeConf[] = [
       fill: 'green',
     },
   ].map((c, index) => ({
+    categories: ['other'],
     ...c,
     id: `${index + 1}`,
     thumbnailUrl: c.url,

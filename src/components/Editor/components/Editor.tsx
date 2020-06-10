@@ -476,7 +476,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   <ModalBody pb={6}>
                     <Stack>
                       <Progress
+                        isAnimated
                         hasStripe
+                        css={css`
+                          &,
+                          * {
+                            transition: all 0.2s !important;
+                          }
+                        `}
                         color="accent"
                         height="32px"
                         value={(store.visualizingProgress || 0) * 100}

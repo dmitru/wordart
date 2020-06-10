@@ -115,42 +115,51 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
       renderKey, // eslint-disable-line
     } = store
 
-    const [term, setTerm] = useState('')
-    const allOptions = [
-      'Animals',
-      'Baby',
-      'Birthday',
-      'Christmas',
-      'Clouds',
-      'Geometric Shapes',
-      'Emoji',
-      'Icons',
-      'Love & Wedding',
-      'Nature',
-      'Music',
-      'Money & Business',
-      'People',
-      'Education & School',
-      'Sports',
-      'Transport',
-      'Other',
-    ].map((value) => ({ value, label: value }))
+    const allCategoryOptions = [
+      ['animals', 'Animals & Pets'],
+      ['icons', 'Icons'],
+      ['geo', 'Countries & Earth'],
+      ['other', 'Others'],
+      // 'Baby',
+      // 'Birthday',
+      // 'Christmas',
+      // 'Clouds',
+      // 'Geometric Shapes',
+      // 'Emoji',
+      // 'Icons',
+      // 'Love & Wedding',
+      // 'Nature',
+      // 'Music',
+      // 'Money & Business',
+      // 'People',
+      // 'Education & School',
+      // 'Sports',
+      // 'Transport',
+      // 'Other',
+    ].map(([value, label]) => ({ value, label }))
 
-    const [options, setOptions] = useState(allOptions)
-    const [selectedOption, setSelectedOption] = useState<{
+    const [selectedCategory, setSelectedCategory] = useState<{
       value: string
+      label: string
     } | null>(null)
 
-    const visualize = useCallback(() => {
-      store.editor?.generateShapeItems({
-        style: mkShapeStyleConfFromOptions(shapeStyle),
-      })
-    }, [shapeStyle])
+    // const visualize = useCallback(() => {
+    //   store.editor?.generateShapeItems({
+    //     style: mkShapeStyleConfFromOptions(shapeStyle),
+    //   })
+    // }, [shapeStyle])
 
     const [query, setQuery] = useState('')
     const matchingShapes = store
       .getAvailableShapes()
-      .filter((s) => s.title.toLowerCase().includes(query.toLowerCase()))
+      .filter(
+        (s) =>
+          (!query ||
+            (query && s.title.toLowerCase().includes(query.toLowerCase()))) &&
+          (!selectedCategory ||
+            (selectedCategory &&
+              (s.categories || []).includes(selectedCategory.value)))
+      )
 
     const [updateShapeColoring] = useDebouncedCallback(
       async () => {
@@ -595,12 +604,12 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               color: 'red',
                             }}
                             placeholder="Search shapes..."
-                            value={term}
-                            onChange={(e: any) => setTerm(e.target.value)}
+                            value={query}
+                            onChange={(e: any) => setQuery(e.target.value)}
                           />
-                          {!!term && (
+                          {!!query && (
                             <InputRightElement
-                              onClick={() => setTerm('')}
+                              onClick={() => setQuery('')}
                               children={
                                 <IconButton
                                   aria-label="Clear"
@@ -632,7 +641,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               py="2"
                               px="3"
                             >
-                              {selectedOption ? selectedOption.value : 'All'}
+                              {selectedCategory
+                                ? selectedCategory.label
+                                : 'All'}
                             </MenuButton>
                             <MenuList
                               as="div"
@@ -646,28 +657,30 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                 overflow: auto;
                               `}
                             >
-                              <MenuItem onClick={() => setSelectedOption(null)}>
+                              <MenuItem
+                                onClick={() => setSelectedCategory(null)}
+                              >
                                 Show all
                               </MenuItem>
                               <MenuDivider />
-                              {options.map((item, index) => (
+                              {allCategoryOptions.map((item, index) => (
                                 <MenuItem
                                   key={item.value}
-                                  onClick={() => setSelectedOption(item)}
+                                  onClick={() => setSelectedCategory(item)}
                                 >
-                                  {item.value}
+                                  {item.label}
                                 </MenuItem>
                               ))}
                             </MenuList>
                           </Menu>
                         </Box>
 
-                        {!!selectedOption && (
+                        {!!selectedCategory && (
                           <Button
                             ml="3"
                             variant="link"
                             onClick={() => {
-                              setSelectedOption(null)
+                              setSelectedCategory(null)
                             }}
                           >
                             Show all
