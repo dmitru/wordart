@@ -23,6 +23,7 @@ import {
   Stack,
   Text,
   useToast,
+  Divider,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
@@ -102,20 +103,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const cancelVisualizationBtnRef = useRef<HTMLButtonElement>(null)
 
     const [isSaving, setIsSaving] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
-
-    const handleDownloadClick = useCallback(() => {
-      if (!store.editor) {
-        return
-      }
-      setIsLoading(true)
-      store.editor.exportAsRaster(4096).then((canvas) => {
-        canvas.toBlob((blob) => {
-          saveAs(blob as Blob, `${state.title || 'Untitled Design'}.png`)
-          setIsLoading(false)
-        }, 'image/png')
-      })
-    }, [store])
 
     const handleSaveClick = useCallback(() => {
       const save = async () => {
@@ -199,6 +186,56 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       }
     }, [])
 
+    //
+    // Exporting
+    //
+    const [isExporting, setIsExporting] = useState(false)
+    const handleDownloadClick = useCallback(
+      (dimension: number, format: 'svg' | 'png' | 'jpeg') => {
+        if (!store.editor) {
+          return
+        }
+        setIsExporting(true)
+
+        const mimeType =
+          {
+            png: 'image/png',
+            jpeg: 'image/jpeg',
+            svg: 'image/svg',
+          }[format] || 'image/png'
+
+        store.editor.exportAsRaster(dimension).then((canvas) => {
+          canvas.toBlob((blob) => {
+            saveAs(
+              blob as Blob,
+              `${state.title || 'Untitled Design'}.${format}`
+            )
+            setIsExporting(false)
+            state.isShowingExport = false
+          }, mimeType)
+        })
+      },
+      [store]
+    )
+
+    const closeExport = useCallback(() => {
+      state.isShowingExport = false
+    }, [])
+    const openExport = useCallback(() => {
+      state.isShowingExport = true
+    }, [])
+
+    const cancelVisualization = () => {
+      store.editor?.cancelVisualization()
+      toast({
+        title: 'Visualization cancelled',
+        status: 'info',
+        duration: 2000,
+        position: 'bottom-right',
+        isClosable: true,
+      })
+    }
+
     if (!router || !authStore.hasInitialized) {
       return <SpinnerSplashScreen />
     }
@@ -220,17 +257,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const leftTab =
       state.targetTab === 'bg' ? state.leftTabBg : state.leftTabShape
-
-    const cancelVisualization = () => {
-      store.editor?.cancelVisualization()
-      toast({
-        title: 'Visualization cancelled',
-        status: 'info',
-        duration: 2000,
-        position: 'bottom-right',
-        isClosable: true,
-      })
-    }
 
     return (
       <PageLayoutWrapper>
@@ -311,7 +337,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               </MenuItem>
               <MenuItem>
                 <FiDownload
-                  onClick={handleDownloadClick}
+                  onClick={openExport}
                   css={css`
                     margin-right: 4px;
                   `}
@@ -354,8 +380,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           </TopNavButton>
 
           <TopNavButton
-            onClick={handleDownloadClick}
-            isLoading={isLoading}
+            onClick={openExport}
+            isLoading={isExporting}
             loadingText="Saving..."
             mr="3"
           >
@@ -597,6 +623,77 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               p="2"
               pl="3"
             >
+              <Modal
+                initialFocusRef={cancelVisualizationBtnRef}
+                finalFocusRef={cancelVisualizationBtnRef}
+                isOpen={state.isShowingExport}
+                onClose={closeExport}
+              >
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Download Image</ModalHeader>
+                  <ModalBody pb={6}>
+                    {isExporting ? (
+                      <>
+                        <Spinner />
+                      </>
+                    ) : (
+                      <>
+                        <Text fontSize="lg">Standard Quality</Text>
+                        <Stack direction="row" spacing="3">
+                          <ExportButton
+                            onClick={() => handleDownloadClick(2048, 'png')}
+                          >
+                            <Text mt="0" fontSize="lg">
+                              PNG
+                            </Text>
+                            <Text mb="0" fontSize="sm">
+                              2048 px
+                            </Text>
+                          </ExportButton>
+                          <ExportButton
+                            onClick={() => handleDownloadClick(2048, 'jpeg')}
+                          >
+                            <Text mt="0" fontSize="lg">
+                              JPEG
+                            </Text>
+                            <Text mb="0" fontSize="sm">
+                              2048 px
+                            </Text>
+                          </ExportButton>
+                        </Stack>
+
+                        <Box mt="6">
+                          <Text fontSize="lg">High Quality</Text>
+                          <Stack direction="row" spacing="3">
+                            <ExportButton
+                              onClick={() => handleDownloadClick(4096, 'png')}
+                            >
+                              <Text mt="0" fontSize="lg">
+                                PNG (HD)
+                              </Text>
+                              <Text mb="0" fontSize="sm">
+                                4096 px
+                              </Text>
+                            </ExportButton>
+                            <ExportButton
+                              onClick={() => handleDownloadClick(4096, 'jpeg')}
+                            >
+                              <Text mt="0" fontSize="lg">
+                                JPEG (HD)
+                              </Text>
+                              <Text mb="0" fontSize="sm">
+                                4096 px
+                              </Text>
+                            </ExportButton>
+                          </Stack>
+                        </Box>
+                      </>
+                    )}
+                  </ModalBody>
+                </ModalContent>
+              </Modal>
+
               <Modal
                 initialFocusRef={cancelVisualizationBtnRef}
                 finalFocusRef={cancelVisualizationBtnRef}
@@ -843,6 +940,18 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
   }
 )
 
+const ExportButton = styled(Button)(
+  {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  `
+  height: 80px;
+  min-width: 150px;
+  `
+)
+
 const TopNavButton = styled(Button)(
   {
     color: 'white',
@@ -1061,6 +1170,7 @@ const state = observable({
   leftTabBg: 'words' as Omit<LeftPanelTab, 'shapes'>,
   targetTab: 'shape' as TargetTab,
   leftPanelContext: 'normal' as 'normal' | 'resize',
+  isShowingExport: false,
 })
 
 export type TargetTab = 'shape' | 'bg'
