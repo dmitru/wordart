@@ -24,6 +24,7 @@ import {
   Text,
   useToast,
   Divider,
+  ModalCloseButton,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
@@ -204,16 +205,25 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             svg: 'image/svg',
           }[format] || 'image/png'
 
-        store.editor.exportAsRaster(dimension).then((canvas) => {
-          canvas.toBlob((blob) => {
-            saveAs(
-              blob as Blob,
-              `${state.title || 'Untitled Design'}.${format}`
-            )
+        if (format === 'svg') {
+          store.editor.exportAsSvg().then((svg) => {
+            const svgBlob = new Blob([svg], { type: 'image/svg' })
+            saveAs(svgBlob, `${state.title || 'Untitled Design'}.svg`)
             setIsExporting(false)
             state.isShowingExport = false
-          }, mimeType)
-        })
+          })
+        } else {
+          store.editor.exportAsRaster(dimension).then((canvas) => {
+            canvas.toBlob((blob) => {
+              saveAs(
+                blob as Blob,
+                `${state.title || 'Untitled Design'}.${format}`
+              )
+              setIsExporting(false)
+              state.isShowingExport = false
+            }, mimeType)
+          })
+        }
       },
       [store]
     )
@@ -631,7 +641,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               >
                 <ModalOverlay />
                 <ModalContent>
-                  <ModalHeader>Download Image</ModalHeader>
+                  <ModalHeader>Choose Download Format</ModalHeader>
+                  <ModalCloseButton />
                   <ModalBody pb={6}>
                     {isExporting ? (
                       <>
@@ -639,8 +650,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       </>
                     ) : (
                       <>
-                        <Text fontSize="lg">Standard Quality</Text>
-                        <Stack direction="row" spacing="3">
+                        <Text fontSize="lg">
+                          <strong>Standard Quality:</strong> Personal Use Only
+                        </Text>
+                        <Stack direction="row" spacing="3" flexWrap="wrap">
                           <ExportButton
                             onClick={() => handleDownloadClick(2048, 'png')}
                           >
@@ -664,8 +677,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         </Stack>
 
                         <Box mt="6">
-                          <Text fontSize="lg">High Quality</Text>
-                          <Stack direction="row" spacing="3">
+                          <Text fontSize="lg">
+                            <strong>HD Quality:</strong> Personal or Commercial
+                            Use
+                          </Text>
+                          <Stack direction="row" spacing="3" flexWrap="wrap">
                             <ExportButton
                               onClick={() => handleDownloadClick(4096, 'png')}
                             >
@@ -676,6 +692,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                                 4096 px
                               </Text>
                             </ExportButton>
+
                             <ExportButton
                               onClick={() => handleDownloadClick(4096, 'jpeg')}
                             >
@@ -684,6 +701,17 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                               </Text>
                               <Text mb="0" fontSize="sm">
                                 4096 px
+                              </Text>
+                            </ExportButton>
+
+                            <ExportButton
+                              onClick={() => handleDownloadClick(4096, 'svg')}
+                            >
+                              <Text mt="0" fontSize="lg">
+                                SVG
+                              </Text>
+                              <Text mb="0" fontSize="sm">
+                                Vector format
                               </Text>
                             </ExportButton>
                           </Stack>
@@ -949,6 +977,7 @@ const ExportButton = styled(Button)(
   `
   height: 80px;
   min-width: 150px;
+  margin-bottom: 16px;
   `
 )
 

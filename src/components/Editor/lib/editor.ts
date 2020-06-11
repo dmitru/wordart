@@ -271,6 +271,12 @@ export class Editor {
     this.handleResize()
   }
 
+  exportAsSvg = async (): Promise<string> => {
+    const canvas = await cloneFabricCanvas(this.canvas)
+    canvas.backgroundColor = this.bgRect.fill || 'transparent'
+    return canvas.toSVG()
+  }
+
   exportAsRaster = async (maxDimension = 1024): Promise<HTMLCanvasElement> => {
     const aspect = this.projectBounds.width / this.projectBounds.height
     const resultCanvas = createCanvas(
