@@ -111,7 +111,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       setIsLoading(true)
       store.editor.exportAsRaster(4096).then((canvas) => {
         canvas.toBlob((blob) => {
-          saveAs(blob, `${state.title || 'Untitled Design'}.png`)
+          saveAs(blob as Blob, `${state.title || 'Untitled Design'}.png`)
           setIsLoading(false)
         }, 'image/png')
       })

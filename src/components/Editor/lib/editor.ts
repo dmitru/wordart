@@ -16,6 +16,7 @@ import {
   objAsCanvasElement,
   getObjTransformMatrix,
   setFillColor,
+  cloneFabricCanvas,
 } from 'components/Editor/lib/fabric-utils'
 import { Font, Generator } from 'components/Editor/lib/generator'
 import { Shape, SvgShapeColorsMapEntry } from 'components/Editor/shape'
@@ -36,6 +37,8 @@ import {
   copyCanvas,
   createCanvasCtxCopy,
   Dimensions,
+  imageDataToCanvasCtx,
+  loadImageUrlToCanvasCtx,
 } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { flatten, groupBy, keyBy, max, min, sortBy } from 'lodash'
@@ -269,10 +272,8 @@ export class Editor {
   }
 
   exportAsRaster = async (maxDimension = 1024): Promise<HTMLCanvasElement> => {
-    // Create a new Fabric canva
-
     const aspect = this.projectBounds.width / this.projectBounds.height
-    const canvasSize: Dimensions =
+    const resultCanvas = createCanvas(
       aspect > 1
         ? {
             w: maxDimension,
@@ -282,27 +283,41 @@ export class Editor {
             w: maxDimension * aspect,
             h: maxDimension,
           }
+    )
 
-    const scale =
-      aspect > 1
-        ? maxDimension / this.projectBounds.width
-        : maxDimension / this.projectBounds.height
+    const bgCanvas = await cloneFabricCanvas(this.bgCanvas)
+    const canvas = await cloneFabricCanvas(this.canvas)
 
-    const resultCanvas = createCanvas({
-      w: this.projectBounds.width * scale,
-      h: this.projectBounds.height * scale,
-    })
+    bgCanvas.viewportTransform![4] = 0
+    bgCanvas.viewportTransform![5] = 0
+    canvas.viewportTransform![4] = 0
+    canvas.viewportTransform![5] = 0
+    canvas.renderAll()
+    bgCanvas.renderAll()
 
-    // @ts-ignore
-    const pixelRatio = fabric.devicePixelRatio as number
+    const exportCanvasScale = resultCanvas.width / 1000 / canvas.getZoom()
+
+    const bgCanvasExported = (
+      await loadImageUrlToCanvasCtx(
+        bgCanvas.toDataURL({
+          left: this.projectBounds.left / exportCanvasScale,
+          top: this.projectBounds.top / exportCanvasScale,
+          width: this.projectBounds.width,
+          height: this.projectBounds.height,
+          multiplier: exportCanvasScale,
+        }),
+        {}
+      )
+    ).canvas
+
     copyCanvas(
-      this.bgCanvas.getElement().getContext('2d')!,
+      bgCanvasExported.getContext('2d')!,
       resultCanvas.getContext('2d')!,
       {
-        x: this.bgCanvas.viewportTransform![4] * pixelRatio,
-        y: this.bgCanvas.viewportTransform![5] * pixelRatio,
-        w: this.projectBounds.width * this.bgCanvas.getZoom() * pixelRatio,
-        h: this.projectBounds.height * this.bgCanvas.getZoom() * pixelRatio,
+        x: 0,
+        y: 0,
+        w: bgCanvasExported.width,
+        h: bgCanvasExported.height,
       },
       {
         x: 0,
@@ -311,14 +326,29 @@ export class Editor {
         h: resultCanvas.height,
       }
     )
+
+    const canvasExported = (
+      await loadImageUrlToCanvasCtx(
+        canvas.toDataURL({
+          left:
+            this.projectBounds.left / exportCanvasScale / bgCanvas.getZoom(),
+          top: this.projectBounds.top / exportCanvasScale / bgCanvas.getZoom(),
+          width: this.projectBounds.width,
+          height: this.projectBounds.height,
+          multiplier: exportCanvasScale,
+        }),
+        {}
+      )
+    ).canvas
+
     copyCanvas(
-      this.canvas.getElement().getContext('2d')!,
+      canvasExported.getContext('2d')!,
       resultCanvas.getContext('2d')!,
       {
-        x: this.bgCanvas.viewportTransform![4] * pixelRatio,
-        y: this.bgCanvas.viewportTransform![5] * pixelRatio,
-        w: this.projectBounds.width * this.bgCanvas.getZoom() * pixelRatio,
-        h: this.projectBounds.height * this.bgCanvas.getZoom() * pixelRatio,
+        x: 0,
+        y: 0,
+        w: canvasExported.width,
+        h: canvasExported.height,
       },
       {
         x: 0,
