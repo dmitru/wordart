@@ -454,7 +454,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 margin-right: 4px;
               `}
             />
-            Order Printed
+            Order Prints
           </TopNavButton>
 
           <TopNavButton mr="1" ml="auto">

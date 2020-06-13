@@ -647,7 +647,8 @@ export class EditorStore {
     }
 
     // Shape
-    this.selectShape(state.shapeId, false, false)
+    this.selectedShapeId = state.shapeId
+    this.updateShapeThumbnail()
 
     // Active layer
     this.targetTab = state.activeLayer
