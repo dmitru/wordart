@@ -40,7 +40,7 @@ import {
 import { FontConfig, fonts, FontStyleConfig, FontId } from 'data/fonts'
 import { shapes } from 'data/shapes'
 import { loadFont } from 'lib/wordart/fonts'
-import { sortBy, uniq, uniqBy, cloneDeep } from 'lodash'
+import { sortBy, uniq, uniqBy, cloneDeep, isEqual } from 'lodash'
 import { action, observable, set } from 'mobx'
 import paper from 'paper'
 import {
@@ -229,7 +229,7 @@ export class EditorStore {
     this.editor.disableSelectionMode()
   }
 
-  @action private loadSerialized = async (serialized: EditorPersistedData) => {
+  @action loadSerialized = async (serialized: EditorPersistedData) => {
     this.isVisualizing = true
     this.visualizingStep = 'drawing'
     this.visualizingProgress = 0
@@ -241,7 +241,8 @@ export class EditorStore {
 
     const { data } = serialized
     this.editor.setAspectRatio(
-      serialized.data.sceneSize.w / serialized.data.sceneSize.h
+      serialized.data.sceneSize.w / serialized.data.sceneSize.h,
+      false
     )
     this.availableShapes = this.availableShapes.filter((s) => !s.isCustom)
 
@@ -255,7 +256,7 @@ export class EditorStore {
         processedThumbnailUrl: data.shape.url,
         processing: data.shape.processing,
       })
-      await this.selectShape(customImgId, false)
+      await this.selectShape(customImgId, false, false)
     } else if (data.shape.kind === 'custom-text') {
       const customImgId = this.addCustomShapeText({
         kind: 'text',
@@ -266,12 +267,12 @@ export class EditorStore {
         text: data.shape.text,
         textStyle: data.shape.textStyle,
       })
-      await this.selectShape(customImgId, false)
+      await this.selectShape(customImgId, false, false)
     } else if (
       (data.shape.kind === 'raster' || data.shape.kind === 'svg') &&
       data.shape.shapeId != null
     ) {
-      await this.selectShape(data.shape.shapeId, false)
+      await this.selectShape(data.shape.shapeId, false, false)
     }
 
     const shape = this.editor.shape
@@ -299,14 +300,16 @@ export class EditorStore {
     const sceneSize = this.editor.getSceneBounds(0)
     const scale = sceneSize.width / serialized.data.sceneSize.w
 
-    // Restore BG style options
+    const bgStyle = this.styleOptions.bg
+    const shapeStyle = this.styleOptions.shape
+
+    // // Restore BG style options
     if (data.bgStyle.fill.kind === 'color') {
       this.styleOptions.bg.fill.color = data.bgStyle.fill
     } else if (data.bgStyle.fill.kind === 'transparent') {
       this.styleOptions.bg.fill.kind = 'transparent'
     }
 
-    const bgStyle = this.styleOptions.bg
     bgStyle.items.dimSmallerItems = data.bgStyle.items.dimSmallerItems
     bgStyle.items.opacity = data.bgStyle.items.opacity
     bgStyle.items.placement = data.bgStyle.items.placement
@@ -324,7 +327,6 @@ export class EditorStore {
     }
 
     // Restore Shape style options
-    const shapeStyle = this.styleOptions.shape
 
     shapeStyle.items.dimSmallerItems = data.shapeStyle.items.dimSmallerItems
     shapeStyle.items.opacity = data.shapeStyle.items.opacity
@@ -443,29 +445,32 @@ export class EditorStore {
         words: data.bgItems.words,
       }),
     ])
-    this.editor.setShapeOpacity(shapeStyle.opacity)
-    await this.editor.setShapeItems(shapeItems)
-    await this.editor.setBgItems(bgItems)
+    this.editor.setShapeOpacity(shapeStyle.opacity, false)
+    await this.editor.setShapeItems(shapeItems, false)
+    await this.editor.setBgItems(bgItems, false)
 
-    this.editor.setBgColor(mkBgStyleConfFromOptions(this.styleOptions.bg).fill)
+    this.editor.setBgColor(
+      mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
+      false
+    )
     const shapeConf = this.getShapeConfById(this.selectedShapeId)!
-    await this.editor.updateShapeColors(shapeConf)
+    await this.editor.updateShapeColors(shapeConf, false)
 
     await this.editor.setShapeItemsStyle(
-      mkShapeStyleConfFromOptions(this.styleOptions.shape).items
+      mkShapeStyleConfFromOptions(this.styleOptions.shape).items,
+      false
     )
     await this.editor.setBgItemsStyle(
-      mkBgStyleConfFromOptions(this.styleOptions.bg).items
+      mkBgStyleConfFromOptions(this.styleOptions.bg).items,
+      false
     )
 
     await this.updateShapeThumbnail()
 
+    this.editor.bgCanvas.requestRenderAll()
+    this.editor.canvas.requestRenderAll()
+
     this.visualizingProgress = 1
-
-    for (let i = 0; i < 10; ++i) {
-      await waitAnimationFrame()
-    }
-
     this.isVisualizing = false
     this.visualizingStep = null
   }
@@ -734,6 +739,12 @@ export class EditorStore {
   }
 
   addCustomShapeImg = (shape: Omit<ShapeRasterConf, 'id'>) => {
+    const matchedShape = this.availableShapes.find(
+      (s) => s.kind === shape.kind && s.url === shape.url
+    )
+    if (matchedShape) {
+      return matchedShape.id
+    }
     const id = this.customImgIdGen.get()
 
     this.availableShapes.push({
@@ -745,6 +756,15 @@ export class EditorStore {
   }
 
   addCustomShapeText = (shape: Omit<ShapeTextConf, 'id'>) => {
+    const matchedShape = this.availableShapes.find(
+      (s) =>
+        s.kind === shape.kind &&
+        s.text === shape.text &&
+        isEqual(s.textStyle, shape.textStyle)
+    )
+    if (matchedShape) {
+      return matchedShape.id
+    }
     const id = this.customImgIdGen.get()
     this.availableShapes.push({
       ...shape,
@@ -796,7 +816,11 @@ export class EditorStore {
   getSelectedShapeConf = () =>
     this.availableShapes.find((s) => s.id === this.selectedShapeId)!
 
-  @action selectShape = async (shapeId: ShapeId, updateShapeColors = true) => {
+  @action selectShape = async (
+    shapeId: ShapeId,
+    updateShapeColors = true,
+    render = true
+  ) => {
     if (!this.editor) {
       return
     }
@@ -809,6 +833,7 @@ export class EditorStore {
       shapeStyle: mkShapeStyleConfFromOptions(this.styleOptions.shape),
       clear: true,
       updateShapeColors,
+      render,
     })
 
     if (this.editor.shape?.kind === 'svg') {

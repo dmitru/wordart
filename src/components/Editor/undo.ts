@@ -1,9 +1,13 @@
+import { EditorPersistedData } from 'services/api/types'
+
 export type UndoFrameKind = UndoFrame['kind']
 
 export type UndoFrame = UndoVisualizeFrame
 
 export type UndoVisualizeFrame = {
   kind: 'visualize'
+  before: EditorPersistedData
+  after: EditorPersistedData
 }
 
 export class UndoStack {
@@ -48,7 +52,7 @@ export class UndoStack {
     if (!this.canRedo()) {
       throw new Error('redo stack is empty')
     }
-    const frame = this.frames[this.nextFrame - 1]
+    const frame = this.frames[this.nextFrame]
     this.nextFrame++
     return frame
   }

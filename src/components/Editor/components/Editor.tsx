@@ -803,7 +803,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     Visualize
                   </Button>
 
-                  <Tooltip label="Undo" aria-label="Undo" hasArrow zIndex={5}>
+                  <Tooltip
+                    label="Undo"
+                    aria-label="Undo"
+                    hasArrow
+                    zIndex={5}
+                    isDisabled={!store.editor?.canUndo()}
+                  >
                     <IconButton
                       ml="3"
                       icon="arrow-back"
@@ -812,7 +818,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       onClick={store.editor?.undo}
                     />
                   </Tooltip>
-                  <Tooltip label="Redo" aria-label="Redo" hasArrow zIndex={5}>
+                  <Tooltip
+                    label="Redo"
+                    aria-label="Redo"
+                    hasArrow
+                    zIndex={5}
+                    isDisabled={!store.editor?.canRedo()}
+                  >
                     <IconButton
                       ml="1"
                       icon="arrow-forward"

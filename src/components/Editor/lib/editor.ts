@@ -276,7 +276,7 @@ export class Editor {
 
   exportAsSvg = async (): Promise<string> => {
     const canvas = await cloneFabricCanvas(this.canvas)
-    canvas.backgroundColor = this.bgRect.fill || 'transparent'
+    canvas.backgroundColor = (this.bgRect.fill as string) || 'transparent'
     return canvas.toSVG()
   }
 
@@ -294,6 +294,7 @@ export class Editor {
           }
     )
 
+    // TODO: optimize this!
     const bgCanvas = await cloneFabricCanvas(this.bgCanvas)
     const canvas = await cloneFabricCanvas(this.canvas)
 
@@ -418,7 +419,7 @@ export class Editor {
     this.canvas.requestRenderAll()
   }
 
-  setAspectRatio = (aspect: number) => {
+  setAspectRatio = (aspect: number, render = true) => {
     this.aspectRatio = aspect
     this.projectBounds = new paper.Rectangle({
       x: 0,
@@ -426,7 +427,7 @@ export class Editor {
       width: 1000,
       height: 1000 / this.aspectRatio,
     })
-    this.handleResize()
+    this.handleResize(render)
   }
 
   get canvases() {
@@ -448,12 +449,16 @@ export class Editor {
     this.canvas.clipPath = sceneClipPath
   }
 
-  handleResize = () => {
+  handleResize = (render = true) => {
     const wrapperBounds = this.params.canvasWrapperEl.getBoundingClientRect()
 
     for (const canvas of this.canvases) {
-      canvas.setWidth(wrapperBounds.width)
-      canvas.setHeight(wrapperBounds.height)
+      if (wrapperBounds.width !== canvas.getWidth()) {
+        canvas.setWidth(wrapperBounds.width)
+      }
+      if (wrapperBounds.height !== canvas.getHeight()) {
+        canvas.setHeight(wrapperBounds.height)
+      }
     }
 
     this.projectBounds = new paper.Rectangle({
@@ -487,20 +492,28 @@ export class Editor {
       canvas.viewportTransform[5] =
         (canvas.getHeight() - zoomLevel * (1000 / this.aspectRatio)) / 2
 
-      canvas.requestRenderAll()
+      if (render) {
+        canvas.requestRenderAll()
+      }
     }
   }
 
-  setBgColor = (config: BgStyleConf['fill']) => {
-    this.logger.debug('setBgColor', toJS(config, { recurseEverything: true }))
+  setBgColor = (config: BgStyleConf['fill'], render = true) => {
+    this.logger.debug(
+      'setBgColor',
+      toJS(config, { recurseEverything: true }),
+      render
+    )
     this.bgCanvas.backgroundColor = '#ddd'
-    // this.canvas.backgroundColor =
-    //   config.kind === 'transparent' ? 'transparent' : config.color
+    this.canvas.backgroundColor =
+      config.kind === 'transparent' ? 'transparent' : config.color
     this.bgRect.set({
       fill: config.kind === 'transparent' ? 'transparent' : config.color,
     })
-    this.bgCanvas.requestRenderAll()
-    this.canvas.requestRenderAll()
+    if (render) {
+      this.bgCanvas.requestRenderAll()
+      this.canvas.requestRenderAll()
+    }
   }
 
   updateRasterShapeColors = (config: ShapeRasterConf) => {
@@ -526,7 +539,6 @@ export class Editor {
 
     const shapeObj = this.shape.obj
     setFillColor(shapeObj, config.textStyle.color)
-    this.canvas.requestRenderAll()
   }
 
   updateSvgShapeColors = async (config: ShapeSvgConf) => {
@@ -575,11 +587,9 @@ export class Editor {
     this.canvas.insertAt(shapeObj, 0, false)
 
     this.shape.obj = shapeObj
-
-    this.canvas.requestRenderAll()
   }
 
-  updateShapeColors = async (config: ShapeConf) => {
+  updateShapeColors = async (config: ShapeConf, render = true) => {
     this.logger.debug(
       'updateShapeColors',
       toJS(config, { recurseEverything: true })
@@ -597,6 +607,9 @@ export class Editor {
     if (config.kind === 'text' && this.shape.kind === 'text') {
       return this.updateTextShapeColors(config)
     }
+    if (render) {
+      this.canvas.requestRenderAll()
+    }
   }
 
   setShapeObj = (shape: fabric.Object) => {
@@ -607,25 +620,34 @@ export class Editor {
     this.shape.obj = shape
   }
 
-  setShapeOpacity = (opacity: number) => {
+  setShapeOpacity = (opacity: number, render = true) => {
     this.logger.debug('setShapeOpacity', opacity)
     if (!this.shape) {
       return
     }
     this.shape.obj.set({ opacity })
-    this.canvas.requestRenderAll()
+    if (render) {
+      this.canvas.requestRenderAll()
+    }
   }
 
-  setBgItemsStyle = async (itemsStyleConf: BgStyleConf['items']) => {
-    this.setItemsStyle('bg', itemsStyleConf)
+  setBgItemsStyle = async (
+    itemsStyleConf: BgStyleConf['items'],
+    render = true
+  ) => {
+    this.setItemsStyle('bg', itemsStyleConf, render)
   }
-  setShapeItemsStyle = async (itemsStyleConf: ShapeStyleConf['items']) => {
-    this.setItemsStyle('shape', itemsStyleConf)
+  setShapeItemsStyle = async (
+    itemsStyleConf: ShapeStyleConf['items'],
+    render = true
+  ) => {
+    this.setItemsStyle('shape', itemsStyleConf, render)
   }
 
   setItemsStyle = async (
     target: TargetKind,
-    itemsStyleConf: BgStyleConf['items'] | ShapeStyleConf['items']
+    itemsStyleConf: BgStyleConf['items'] | ShapeStyleConf['items'],
+    render = true
   ) => {
     const { coloring, dimSmallerItems } = itemsStyleConf
     const { items } = this.items[target]
@@ -782,7 +804,10 @@ export class Editor {
           itemsStyleConf.opacity
       )
     }
-    this.canvas.requestRenderAll()
+
+    if (render) {
+      this.canvas.requestRenderAll()
+    }
   }
 
   /** Sets the shape, clearing the project */
@@ -792,9 +817,10 @@ export class Editor {
     shapeStyle: ShapeStyleConf
     clear: boolean
     updateShapeColors?: boolean
+    render?: boolean
   }) => {
     console.log('setShape', params)
-    const { shapeConfig, updateShapeColors = true } = params
+    const { shapeConfig, updateShapeColors = true, render = true } = params
 
     if (!shapeConfig) {
       throw new Error('Missing shape config')
@@ -893,12 +919,12 @@ export class Editor {
     }
 
     if (params.clear) {
-      this.clear()
+      this.clear(params.render)
     }
 
     const { shapeStyle, bgFillStyle } = params
 
-    this.setBgColor(bgFillStyle)
+    this.setBgColor(bgFillStyle, render)
     shapeObj.setPositionByOrigin(
       new fabric.Point(
         sceneBounds.left + sceneBounds.width / 2,
@@ -929,7 +955,11 @@ export class Editor {
     this.shape.transform = getObjTransformMatrix(this.shape.obj)
 
     if (updateShapeColors) {
-      this.updateShapeColors(this.shape.config)
+      this.updateShapeColors(this.shape.config, render)
+    }
+
+    if (render) {
+      this.canvas.clear()
       this.canvas.requestRenderAll()
     }
 
@@ -993,15 +1023,16 @@ export class Editor {
   //   }
   // }
 
-  setShapeItems = (itemConfigs: EditorItemConfig[]) =>
-    this.setItems('shape', itemConfigs)
+  setShapeItems = (itemConfigs: EditorItemConfig[], render = true) =>
+    this.setItems('shape', itemConfigs, render)
 
-  setBgItems = (itemConfigs: EditorItemConfig[]) =>
-    this.setItems('bg', itemConfigs)
+  setBgItems = (itemConfigs: EditorItemConfig[], render = true) =>
+    this.setItems('bg', itemConfigs, render)
 
   private setItems = async (
     target: TargetKind,
-    itemConfigs: EditorItemConfig[]
+    itemConfigs: EditorItemConfig[],
+    render = true
   ) => {
     if (!this.shape?.obj) {
       console.error('No shape')
@@ -1036,7 +1067,9 @@ export class Editor {
 
     const objs = items.map((item) => item.fabricObj)
     this.canvas.add(...objs)
-    this.canvas.requestRenderAll()
+    if (render) {
+      this.canvas.requestRenderAll()
+    }
 
     this.items[target] = {
       items,
@@ -1057,6 +1090,9 @@ export class Editor {
       console.error('No shape obj')
       return
     }
+
+    const persistedDataBefore = this.store.serialize()
+
     const shapeObj = this.shape.obj
     const shapeOriginalColorsObj =
       this.shape.kind === 'svg' ? this.shape.objOriginalColors : this.shape.obj
@@ -1246,6 +1282,14 @@ export class Editor {
     await this.setBgItemsStyle(style.items)
     this.store.isVisualizing = false
 
+    const persistedDataAfter = this.store.serialize()
+
+    this.pushUndoFrame({
+      kind: 'visualize',
+      before: persistedDataBefore,
+      after: persistedDataAfter,
+    })
+
     this.store.renderKey++
   }
 
@@ -1256,6 +1300,9 @@ export class Editor {
       console.error('No shape obj')
       return
     }
+
+    const persistedDataBefore = this.store.serialize()
+
     const shapeObj = this.shape.obj
     const shapeOriginalColorsObj =
       this.shape.kind === 'svg' ? this.shape.objOriginalColors : this.shape.obj
@@ -1433,8 +1480,12 @@ export class Editor {
     await this.setShapeItemsStyle(style.items)
     this.store.isVisualizing = false
 
+    const persistedDataAfter = this.store.serialize()
+
     this.pushUndoFrame({
       kind: 'visualize',
+      before: persistedDataBefore,
+      after: persistedDataAfter,
     })
 
     this.store.renderKey++
@@ -1447,20 +1498,30 @@ export class Editor {
 
   undo = (): UndoFrame => {
     const frame = this.undoStack.undo()
+    if (frame.kind === 'visualize') {
+      this.store.loadSerialized(frame.before)
+    }
     this.store.renderKey++
     return frame
   }
   redo = (): UndoFrame => {
     const frame = this.undoStack.redo()
+    if (frame.kind === 'visualize') {
+      this.store.loadSerialized(frame.after)
+    }
     this.store.renderKey++
     return frame
   }
   canUndo = (): boolean => this.undoStack.canUndo()
   canRedo = (): boolean => this.undoStack.canRedo()
 
-  clear = async () => {
+  clear = async (clearCanvas = true) => {
     this.logger.debug('Editor: clear')
-    this.canvas.clear()
+    if (clearCanvas) {
+      this.canvas.clear()
+    } else {
+      this.canvas._objects = []
+    }
 
     this.shape = null
 
