@@ -1,3 +1,4 @@
+import { TargetTab } from 'components/Editor/components/Editor'
 import {
   defaultBgStyleOptions,
   defaultShapeStyleOptions,
@@ -7,15 +8,21 @@ import {
   EditorInitParams,
   TargetKind,
 } from 'components/Editor/lib/editor'
+import {
+  EditorItem,
+  EditorItemConfig,
+  EditorItemId,
+} from 'components/Editor/lib/editor-item'
+import { EditorItemConfigShape } from 'components/Editor/lib/editor-item-icon'
 import { EditorItemConfigWord } from 'components/Editor/lib/editor-item-word'
 import {
   applyTransformToObj,
   cloneObj,
-  objAsCanvasElement,
   getObjTransformMatrix,
+  objAsCanvasElement,
 } from 'components/Editor/lib/fabric-utils'
 import { Font } from 'components/Editor/lib/generator'
-import { Shape, SvgShapeColorsMapEntry } from 'components/Editor/shape'
+import { Shape } from 'components/Editor/shape'
 import {
   ShapeConf,
   ShapeId,
@@ -35,39 +42,32 @@ import {
   ItemsColoringShapeConf,
   ShapeStyleOptions,
   WordListEntry,
-  ColorString,
 } from 'components/Editor/style-options'
-import { FontConfig, fonts, FontStyleConfig, FontId } from 'data/fonts'
+import { ItemUpdateUndoData } from 'components/Editor/undo'
+import { FontConfig, FontId, fonts, FontStyleConfig } from 'data/fonts'
 import { shapes } from 'data/shapes'
 import { loadFont } from 'lib/wordart/fonts'
-import { sortBy, uniq, uniqBy, cloneDeep, isEqual } from 'lodash'
+import { cloneDeep, isEqual, sortBy, uniq, uniqBy } from 'lodash'
 import { action, observable, set } from 'mobx'
 import paper from 'paper'
 import {
   MatrixSerialized,
+  PersistedItemShapeV1,
   PersistedItemV1,
   PersistedItemWordV1,
   PersistedShapeConfV1,
   PersistedWordV1,
-  PersistedItemShapeV1,
+  PersistedCustomFontV1,
 } from 'services/api/persisted/v1'
 import { EditorPersistedData } from 'services/api/types'
 import { RootStore } from 'services/root-store'
+import { arrayBufferToDataUri } from 'utils/buffers'
 import { consoleLoggers } from 'utils/console-logger'
 import { UninqIdGenerator as UniqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
 import { exhaustiveCheck } from 'utils/type-utils'
-import { waitAnimationFrame } from 'utils/async'
-import {
-  EditorItemId,
-  EditorItem,
-  EditorItemConfig,
-} from 'components/Editor/lib/editor-item'
-import { EditorItemConfigShape } from 'components/Editor/lib/editor-item-icon'
 import { createCanvas } from 'lib/wordart/canvas-utils'
-import { UndoStack, ItemUpdateUndoData } from 'components/Editor/undo'
-import { TargetTab } from 'components/Editor/components/Editor'
 
 export type EditorMode = 'view' | 'edit'
 
@@ -94,6 +94,8 @@ export class EditorStore {
 
   @observable mode: EditorMode = 'view'
 
+  @observable customFonts: FontConfig[] = []
+
   /** Ui state of the various settings of the editor */
   @observable styleOptions = {
     bg: defaultBgStyleOptions,
@@ -113,6 +115,7 @@ export class EditorStore {
 
   wordIdGen = new UniqIdGenerator(3)
   customImgIdGen = new UniqIdGenerator(3)
+  customFontIdGen = new UniqIdGenerator(4)
 
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
@@ -227,13 +230,13 @@ export class EditorStore {
     this.editor?.canvas.requestRenderAll()
   }
 
-  resetAllItems = (target: TargetKind) => {
-    const dataBefore = this.serialize()
+  resetAllItems = async (target: TargetKind) => {
+    const dataBefore = await this.serialize()
     const stateBefore = this.getStateSnapshot()
     this.editor?.resetAllItems(target)
     this.editor?.canvas.discardActiveObject(new Event('no-callbacks'))
 
-    const dataAfter = this.serialize()
+    const dataAfter = await this.serialize()
     const stateAfter = this.getStateSnapshot()
 
     this.editor?.undoStack.push({
@@ -334,6 +337,10 @@ export class EditorStore {
       false
     )
     this.availableShapes = this.availableShapes.filter((s) => !s.isCustom)
+
+    for (const font of serialized.data.customFonts) {
+      await this.addCustomFont(font)
+    }
 
     if (data.shape.kind === 'custom-raster') {
       const customImgId = this.addCustomShapeImg({
@@ -668,7 +675,7 @@ export class EditorStore {
     this.editor.canvas.requestRenderAll()
   }
 
-  serialize = (): EditorPersistedData => {
+  serialize = async (): Promise<EditorPersistedData> => {
     this.logger.debug('serialize')
     if (!this.editor) {
       throw new Error('editor is not initialized')
@@ -850,9 +857,23 @@ export class EditorStore {
       exhaustiveCheck(fill.kind)
     }
 
+    const fontsIds = new Set([
+      ...this.styleOptions.shape.items.words.fontIds,
+      ...this.styleOptions.bg.items.words.fontIds,
+    ])
+
     const serializedData: EditorPersistedData = {
       version: 1,
       data: {
+        customFonts: await Promise.all(
+          this.customFonts
+            .filter((f) => fontsIds.has(f.styles[0].fontId))
+            .map(async (f) => ({
+              fontUrl: f.styles[0].url,
+              title: f.title,
+              fontId: f.styles[0].fontId,
+            }))
+        ),
         sceneSize: {
           w: roundFloat(this.editor.getSceneBounds(0).width, 3),
           h: roundFloat(this.editor.getSceneBounds(0).height, 3),
@@ -915,6 +936,37 @@ export class EditorStore {
     this.styleOptions.bg = cloneDeep(defaultBgStyleOptions)
   }
 
+  addCustomFont = async (fontConfig: PersistedCustomFontV1) => {
+    const font = await loadFont(fontConfig.fontUrl)
+    const fontTitle = fontConfig.title || 'Custom'
+    const fontPath = font.getPath(fontTitle, 0, 0, 300)
+    const bounds = fontPath.getBoundingBox()
+
+    const canvas = createCanvas({
+      w: bounds.x2 - bounds.x1,
+      h: bounds.y2 - bounds.y1,
+    })
+    const ctx = canvas.getContext('2d')!
+    ctx.translate(-bounds.x1, -bounds.y1)
+    fontPath.draw(ctx)
+
+    const thumbnailUrl = canvas.toDataURL()
+
+    const fontStyle: FontStyleConfig = {
+      fontId: fontConfig.fontId,
+      title: fontTitle,
+      url: fontConfig.fontUrl,
+      glyphRanges: [],
+      thumbnail: thumbnailUrl,
+    }
+    this.customFonts.push({
+      title: fontTitle,
+      isCustom: true,
+      categories: ['custom'],
+      styles: [fontStyle],
+    })
+  }
+
   addCustomShapeImg = (shape: Omit<ShapeRasterConf, 'id'>) => {
     const matchedShape = this.availableShapes.find(
       (s) => s.kind === shape.kind && s.url === shape.url
@@ -966,7 +1018,9 @@ export class EditorStore {
 
   getAvailableFonts = (): { font: FontConfig; style: FontStyleConfig }[] => {
     const result: { font: FontConfig; style: FontStyleConfig }[] = []
-    for (const font of fonts) {
+
+    // Add custom fonts
+    for (const font of [...this.customFonts, ...fonts]) {
       for (const style of font.styles) {
         result.push({ font, style })
       }
@@ -976,7 +1030,7 @@ export class EditorStore {
   getFontById = (
     fontId: FontId
   ): { font: FontConfig; style: FontStyleConfig } | undefined => {
-    for (const font of fonts) {
+    for (const font of [...this.customFonts, ...fonts]) {
       for (const style of font.styles) {
         if (style.fontId === fontId) {
           return { font, style }
@@ -987,7 +1041,9 @@ export class EditorStore {
   }
   fetchFontById = (fontId: FontId) =>
     this.getFontById(fontId)
-      ? loadFont(this.getFontById(fontId)!.style.url)
+      ? this.getFontById(fontId)!.style.url
+        ? loadFont(this.getFontById(fontId)!.style.url!)
+        : Promise.resolve(this.getFontById(fontId)!.style.font!)
       : Promise.resolve(null)
 
   getSelectedShapeConf = () =>
@@ -1000,9 +1056,9 @@ export class EditorStore {
   ) => {
     const stateBefore = this.getStateSnapshot()
 
-    const persistedDataBefore = this.serialize()
+    const persistedDataBefore = await this.serialize()
     await this.selectShape(shapeId, updateShapeColors, render)
-    const persistedDataAfter = this.serialize()
+    const persistedDataAfter = await this.serialize()
     if (!this.editor) {
       return
     }

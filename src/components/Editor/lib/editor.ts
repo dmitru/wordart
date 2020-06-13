@@ -1100,7 +1100,7 @@ export class Editor {
     }
 
     const stateBefore = this.store.getStateSnapshot()
-    const persistedDataBefore = this.store.serialize()
+    const persistedDataBefore = await this.store.serialize()
 
     const shapeObj = this.shape.obj
     const shapeOriginalColorsObj =
@@ -1291,7 +1291,7 @@ export class Editor {
     await this.setBgItemsStyle(style.items)
     this.store.isVisualizing = false
 
-    const persistedDataAfter = this.store.serialize()
+    const persistedDataAfter = await this.store.serialize()
 
     this.pushUndoFrame({
       kind: 'visualize',
@@ -1313,7 +1313,7 @@ export class Editor {
     }
 
     const stateBefore = this.store.getStateSnapshot()
-    const persistedDataBefore = this.store.serialize()
+    const persistedDataBefore = await this.store.serialize()
 
     const shapeObj = this.shape.obj
     const shapeOriginalColorsObj =
@@ -1492,7 +1492,7 @@ export class Editor {
     await this.setShapeItemsStyle(style.items)
     this.store.isVisualizing = false
 
-    const persistedDataAfter = this.store.serialize()
+    const persistedDataAfter = await this.store.serialize()
 
     this.pushUndoFrame({
       kind: 'visualize',
@@ -1835,7 +1835,7 @@ export class Editor {
         }
         const { style } = this.store.getFontById(fontId)!
         const font: Font = {
-          otFont: await loadFont(style.url),
+          otFont: style.url ? await loadFont(style.url) : style.font!,
           id: fontId,
           isCustom: false,
         }

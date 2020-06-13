@@ -10,3 +10,6 @@ export const loadFont = (path: string): Promise<opentype.Font> =>
       resolve(font)
     })
   )
+
+export const parseFontFromBuffer = (buffer: ArrayBuffer): opentype.Font =>
+  opentype.parse(buffer)

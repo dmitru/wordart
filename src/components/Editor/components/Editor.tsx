@@ -117,7 +117,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         setIsSaving(true)
         const thumbnailCanvas = await store.editor.exportAsRaster(240)
         const thumbnail = thumbnailCanvas.toDataURL('image/jpeg', 0.85)
-        const editorData = store.serialize()
+        const editorData = await store.serialize()
 
         if (isNew) {
           const wordcloud = await wordcloudsStore.create({

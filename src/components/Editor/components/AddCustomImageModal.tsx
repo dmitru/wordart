@@ -1,30 +1,25 @@
-import { observer, useAsObservableSource, useLocalStore } from 'mobx-react'
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Button,
   Box,
+  Button,
   Checkbox,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
 } from '@chakra-ui/core'
-import { useThrottleCallback } from '@react-hook/throttle'
-import { useDropzone } from 'react-dropzone'
-import { useDebouncedCallback } from 'use-debounce'
-import { useState, useRef, useCallback } from 'react'
+import css from '@emotion/css'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
+import { Slider } from 'components/shared/Slider'
 import {
-  loadImageUrlToCanvasCtx,
-  removeLightPixels,
-  invertImageMask,
   loadImageUrlToCanvasCtxWithMaxSize,
   processRasterImg,
 } from 'lib/wordart/canvas-utils'
-import { Slider } from 'components/shared/Slider'
-import css from '@emotion/css'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
+import { observer, useLocalStore } from 'mobx-react'
+import { useRef } from 'react'
+import { useDropzone } from 'react-dropzone'
 
 export type AddCustomImageModalProps = {
   isOpen: boolean

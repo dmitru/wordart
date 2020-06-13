@@ -1,49 +1,46 @@
 import {
   Box,
   Button,
+  Checkbox,
+  Editable,
+  EditableInput,
+  EditablePreview,
   Icon,
   IconButton,
-  Editable,
-  EditablePreview,
-  EditableInput,
+  Input,
   InputGroup,
   InputLeftElement,
-  Input,
-  Stack,
+  Link,
   Menu,
   MenuButton,
-  MenuList,
-  MenuItem,
-  MenuGroup,
   MenuDivider,
+  MenuGroup,
+  MenuItem,
+  MenuList,
   Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Tabs,
-  TabList,
-  TabPanels,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
   Tab,
-  Link,
-  Text,
+  TabList,
   TabPanel,
+  TabPanels,
+  Tabs,
+  Text,
   Textarea,
-  Checkbox,
 } from '@chakra-ui/core'
-import { capitalize } from 'lodash'
-import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import styled from '@emotion/styled'
-import * as evaicons from '@styled-icons/evaicons-outline'
+import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import { TargetKind } from 'components/Editor/lib/editor'
+import { Tooltip } from 'components/shared/Tooltip'
+import { capitalize } from 'lodash'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
-import { FiUploadCloud } from 'react-icons/fi'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
-import { Tooltip } from 'components/shared/Tooltip'
 import stopword from 'stopword'
 
 export type LeftPanelWordsTabProps = {

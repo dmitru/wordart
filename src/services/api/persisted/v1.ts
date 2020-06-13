@@ -16,6 +16,7 @@ export type EditorPersistedDataV1 = {
 
     shape: PersistedShapeConfV1
     shapeStyle: PersistedShapeStyleConfV1
+    customFonts: PersistedCustomFontV1[]
     shapeItems: {
       items: PersistedItemV1[]
       words: PersistedWordV1[]
@@ -29,6 +30,12 @@ export type EditorPersistedDataV1 = {
       fontIds: FontId[]
     }
   }
+}
+
+export type PersistedCustomFontV1 = {
+  fontUrl: string
+  fontId: string
+  title: string
 }
 
 export type PersistedShapeConfV1 =

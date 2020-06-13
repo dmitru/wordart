@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   Icon,
@@ -21,57 +22,19 @@ import { uniq } from 'lodash'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
+import { AddCustomFontModal } from 'components/Editor/components/AddCustomFontModal'
+import { FontStyleConfig } from 'data/fonts'
+import { Font } from 'opentype.js'
 
 export type LeftPanelFontsTabProps = {
   target: TargetKind
 }
 
-const FontDeleteButton = styled(IconButton)``
-
-const FontButton = styled(BaseBtn)`
-  border: none;
-  flex: 1;
-  display: inline-flex;
-  height: 38px;
-
-  img {
-    height: 30px;
-    margin: 0;
-    object-fit: contain;
-  }
-`
-
-const FontButtonContainer = styled(Box)<{ theme: any; selected?: boolean }>`
-  ${FontDeleteButton} {
-    opacity: 0;
-    transition: 0.2s opacity;
-  }
-
-  transition: 0.1s background;
-
-  ${(p) => (p.selected ? `background: ${p.theme.colors.blue['100']};` : '')}
-
-  &:hover {
-    background: ${(p) =>
-      p.selected
-        ? `${p.theme.colors.blue['50']}`
-        : p.theme.colors.blackAlpha['50']};
-    ${FontDeleteButton} {
-      opacity: 1;
-    }
-  }
-`
-FontButtonContainer.defaultProps = {
-  display: 'flex',
-  alignItems: 'center',
-}
-
 const state = observable({
   isAddingFont: false,
   replacingFontIndex: undefined as undefined | number,
+  isAddingCustomFont: false,
 })
-
-const Toolbar = styled(Box)``
 
 export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
   ({ target }) => {
@@ -80,6 +43,31 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
     const words = style.items.words
 
     const fonts = store.getAvailableFonts()
+
+    const handleCustomFontSubmit = ({
+      url,
+      title,
+      thumbnailUrl,
+    }: {
+      url: string
+      title: string
+      thumbnailUrl: string
+    }) => {
+      const fontId = store.customFontIdGen.get()
+      const fontStyle: FontStyleConfig = {
+        fontId,
+        glyphRanges: [],
+        title,
+        thumbnail: thumbnailUrl,
+        url: url,
+      }
+      store.customFonts.push({
+        isCustom: true,
+        styles: [fontStyle],
+        title,
+        categories: ['custom'],
+      })
+    }
 
     return (
       <>
@@ -102,7 +90,13 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                 <DotsThreeVertical size={18} />
               </MenuButton>
               <MenuList>
-                <MenuItem>Upload custom font...</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    state.isAddingCustomFont = true
+                  }}
+                >
+                  Upload custom font...
+                </MenuItem>
                 <MenuItem>Reset defaults</MenuItem>
               </MenuList>
             </Menu>
@@ -142,13 +136,70 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                     }}
                   >
                     <img src={fontStyle.thumbnail} />
+                    {font.font.isCustom && (
+                      <Badge mr="2" ml="auto" variantColor="purple">
+                        custom
+                      </Badge>
+                    )}
                   </FontButton>
                 </FontButtonContainer>
               )
             })}
           </Box>
         </Stack>
+
+        <AddCustomFontModal
+          isOpen={state.isAddingCustomFont}
+          onClose={() => {
+            state.isAddingCustomFont = false
+          }}
+          onSubmit={handleCustomFontSubmit}
+        />
       </>
     )
   }
 )
+
+const Toolbar = styled(Box)``
+
+const FontDeleteButton = styled(IconButton)``
+
+const FontButton = styled(BaseBtn)`
+  border: none;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+
+  img {
+    max-width: 270px;
+    height: 30px;
+    margin: 0;
+    object-fit: contain;
+  }
+`
+
+const FontButtonContainer = styled(Box)<{ theme: any; selected?: boolean }>`
+  ${FontDeleteButton} {
+    opacity: 0;
+    transition: 0.2s opacity;
+  }
+
+  transition: 0.1s background;
+
+  ${(p) => (p.selected ? `background: ${p.theme.colors.blue['100']};` : '')}
+
+  &:hover {
+    background: ${(p) =>
+      p.selected
+        ? `${p.theme.colors.blue['50']}`
+        : p.theme.colors.blackAlpha['50']};
+    ${FontDeleteButton} {
+      opacity: 1;
+    }
+  }
+`
+FontButtonContainer.defaultProps = {
+  display: 'flex',
+  alignItems: 'center',
+}
