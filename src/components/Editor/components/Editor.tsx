@@ -7,6 +7,7 @@ import {
   Heading,
   IconButton,
   Menu,
+  Icon,
   MenuButton,
   MenuDivider,
   MenuItem,
@@ -26,6 +27,7 @@ import {
   Divider,
   ModalCloseButton,
 } from '@chakra-ui/core'
+import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
 import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
@@ -272,7 +274,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       <PageLayoutWrapper>
         <TopNavWrapper alignItems="center" display="flex">
           <Link href={Urls.dashboard} passHref>
-            <TopNavButton variantColor="blue" mr="3">
+            <TopNavButton variantColor="blue" mr="1">
               <FiChevronLeft
                 css={css`
                   margin-right: 4px;
@@ -283,7 +285,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           </Link>
 
           <Menu>
-            <MenuButton mr="3" as={TopNavButton}>
+            <MenuButton mr="1" as={TopNavButton}>
               <FiMenu
                 css={css`
                   margin-right: 4px;
@@ -379,7 +381,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             onClick={handleSaveClick}
             isLoading={isSaving}
             loadingText="Saving..."
-            mr="3"
+            mr="1"
           >
             <FiSave
               css={css`
@@ -393,7 +395,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             onClick={openExport}
             isLoading={isExporting}
             loadingText="Saving..."
-            mr="3"
+            mr="1"
           >
             <FiDownload
               css={css`
@@ -808,48 +810,51 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     <IconButton ml="1" icon="arrow-forward" aria-label="Redo" />
                   </Tooltip>
 
-                  {store.mode === 'view' && (
-                    <Box mr="3" ml="3" display="flex" alignItems="center">
-                      <Select
-                        isRequired
-                        value={state.targetTab}
-                        onChange={(e) => {
-                          state.targetTab = e.target.value as TargetKind
-                        }}
-                      >
-                        <option value="shape">Layer: Shape</option>
-                        <option value="bg">Layer: Background</option>
-                      </Select>
-                    </Box>
-                  )}
-
                   <Box mr="3" ml="3">
                     {store.mode === 'view' && hasItems && (
-                      <Button
-                        css={css`
-                          box-shadow: none !important;
-                        `}
-                        py="1"
-                        onClick={() => {
-                          store.enterEditItemsMode(state.targetTab)
-                        }}
-                      >
-                        Edit Items
-                      </Button>
-                    )}
-                    {store.mode === 'view' && hasItems && (
-                      <Button
-                        css={css`
-                          box-shadow: none !important;
-                        `}
-                        variant="ghost"
-                        py="1"
-                        onClick={() => {
-                          store.editor?.clearItems(state.targetTab, true)
-                        }}
-                      >
-                        Clear All
-                      </Button>
+                      <>
+                        <Button
+                          css={css`
+                            box-shadow: none !important;
+                          `}
+                          py="1"
+                          onClick={() => {
+                            store.enterEditItemsMode(state.targetTab)
+                          }}
+                        >
+                          Edit Items
+                        </Button>
+
+                        <Menu>
+                          <MenuButton
+                            ml="2"
+                            as={Button}
+                            outline="none"
+                            aria-label="menu"
+                            color="black"
+                            variant="ghost"
+                            px="1"
+                            display="inline-flex"
+                          >
+                            <DotsThreeVertical size={18} />
+                          </MenuButton>
+                          <MenuList>
+                            <MenuItem
+                              onClick={() => {
+                                store.editor?.clearItems(state.targetTab, true)
+                              }}
+                            >
+                              <Icon
+                                name="small-close"
+                                size="20px"
+                                color="gray.500"
+                                mr="2"
+                              />
+                              Clear all
+                            </MenuItem>
+                          </MenuList>
+                        </Menu>
+                      </>
                     )}
 
                     {store.mode === 'edit items' && (
@@ -918,6 +923,21 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       </>
                     )}
                   </Box>
+
+                  {store.mode === 'view' && (
+                    <Box mr="3" ml="auto" display="flex" alignItems="center">
+                      <Select
+                        isRequired
+                        value={state.targetTab}
+                        onChange={(e) => {
+                          state.targetTab = e.target.value as TargetKind
+                        }}
+                      >
+                        <option value="shape">Layer: Shape</option>
+                        <option value="bg">Layer: Background</option>
+                      </Select>
+                    </Box>
+                  )}
                 </>
               )}
 
