@@ -35,6 +35,7 @@ export class EditorItemShape {
   generatedTransform = new paper.Matrix()
   /** Current transform of the item */
   transform = new paper.Matrix()
+  prevTransform = new paper.Matrix()
   /** Is position locked? */
   locked = false
 
@@ -85,6 +86,7 @@ export class EditorItemShape {
       {
         originX: 'center',
         originY: 'center',
+        lockUniScaling: true,
       }
     )
 
@@ -97,6 +99,7 @@ export class EditorItemShape {
     this.shapeObj.set({ fill: this.color })
 
     this.transform = new paper.Matrix(conf.transform)
+    this.prevTransform = this.transform
     this.generatedTransform = new paper.Matrix(conf.transform)
     this.shapeColor = conf.shapeColor
     this.shapeId = conf.shapeId
@@ -106,6 +109,7 @@ export class EditorItemShape {
     this.setLocked(conf.locked)
 
     shapeGroup.on('modified', () => {
+      this.prevTransform = this.transform
       this.transform = new paper.Matrix(shapeGroup.calcOwnMatrix())
     })
     shapeGroup.on('selected', () => {

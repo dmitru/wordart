@@ -66,7 +66,7 @@ import {
 } from 'components/Editor/lib/editor-item'
 import { EditorItemConfigShape } from 'components/Editor/lib/editor-item-icon'
 import { createCanvas } from 'lib/wordart/canvas-utils'
-import { UndoStack } from 'components/Editor/undo'
+import { UndoStack, ItemUpdateUndoData } from 'components/Editor/undo'
 import { TargetTab } from 'components/Editor/components/Editor'
 
 export type EditorMode = 'view' | 'edit'
@@ -121,6 +121,7 @@ export class EditorStore {
   @observable selectedItemData: {
     id: EditorItemId
     locked: boolean
+    transform: MatrixSerialized
     color: string
     customColor: string | undefined
     customText: string | undefined
@@ -135,29 +136,63 @@ export class EditorStore {
       ...params,
       store: this,
       onItemSelected: (item) => {
+        const selectionBefore = this.getStateSnapshot().selection
+
         this.selectedItem = item
         this.selectedItemData = {
           id: item.id,
           locked: item.locked,
           color: item.color,
+          transform: item.transform.values as MatrixSerialized,
           customColor: item.customColor,
           customText: item.kind === 'word' ? item.customText : '',
         }
+
+        const selectionAfter = this.getStateSnapshot().selection
+        this.editor?.pushUndoFrame({
+          kind: 'selection-change',
+          before: selectionBefore,
+          after: selectionAfter,
+        })
       },
       onItemSelectionCleared: () => {
+        const selectionBefore = this.getStateSnapshot().selection
         this.selectedItemData = null
         this.selectedItem = null
+        this.editor?.pushUndoFrame({
+          kind: 'selection-change',
+          before: selectionBefore,
+          after: null,
+        })
       },
-      onItemUpdated: (item) => {
+      onItemUpdated: (item, newTransform) => {
+        // TODO
+        console.log('onItemUpdated', item.transform)
+        const before: ItemUpdateUndoData = {
+          customColor: item.customColor,
+          locked: item.locked,
+          transform: [...item.transform.values] as MatrixSerialized,
+        }
         this.hasItemChanges = true
         this.selectedItem = item
         this.selectedItemData = {
           id: item.id,
+          transform: newTransform,
           locked: item.locked,
           color: item.color,
           customColor: item.customColor,
           customText: item.kind === 'word' ? item.customText : '',
         }
+        const after: ItemUpdateUndoData = {
+          ...before,
+          transform: newTransform,
+        }
+        this.editor?.pushUndoFrame({
+          kind: 'item-update',
+          item,
+          before,
+          after,
+        })
       },
     })
     this.editor.setBgColor(mkBgStyleConfFromOptions(this.styleOptions.bg).fill)
@@ -179,13 +214,36 @@ export class EditorStore {
     if (!this.selectedItem || !this.selectedItemData) {
       return
     }
+    const before = this.getSelectedItemUndoData()
     this.selectedItem.setLocked(lockValue)
     this.selectedItemData.locked = lockValue
+    const after = this.getSelectedItemUndoData()
+    this.editor?.pushUndoFrame({
+      kind: 'item-update',
+      item: this.selectedItem,
+      before,
+      after,
+    })
     this.editor?.canvas.requestRenderAll()
   }
 
   resetAllItems = (target: TargetKind) => {
+    const dataBefore = this.serialize()
+    const stateBefore = this.getStateSnapshot()
     this.editor?.resetAllItems(target)
+    this.editor?.canvas.discardActiveObject(new Event('no-callbacks'))
+
+    const dataAfter = this.serialize()
+    const stateAfter = this.getStateSnapshot()
+
+    this.editor?.undoStack.push({
+      kind: 'visualize',
+      dataAfter,
+      dataBefore,
+      stateAfter,
+      stateBefore,
+    })
+
     this.hasItemChanges = false
   }
 
@@ -193,12 +251,34 @@ export class EditorStore {
     if (!this.selectedItem || !this.selectedItemData) {
       return
     }
+
+    const before = this.getSelectedItemUndoData()
+
     this.hasItemChanges = true
     this.selectedItem.setCustomColor(color)
     this.selectedItem.setLocked(true)
     this.selectedItemData.customColor = color
     this.selectedItemData.locked = true
     this.editor?.canvas.requestRenderAll()
+
+    const after = this.getSelectedItemUndoData()
+
+    this.editor?.pushUndoFrame({
+      kind: 'item-update',
+      item: this.selectedItem,
+      before,
+      after,
+    })
+  }
+  private getSelectedItemUndoData = (): ItemUpdateUndoData => {
+    if (!this.selectedItem) {
+      throw new Error('no selected item')
+    }
+    return {
+      customColor: this.selectedItem.customColor,
+      locked: this.selectedItem.locked,
+      transform: [...this.selectedItem.transform.values] as MatrixSerialized,
+    }
   }
 
   resetItemCustomColor = () => {
@@ -526,6 +606,32 @@ export class EditorStore {
     }
   }
 
+  restoreSelection = (selection: EditorStateSnapshot['selection']) => {
+    if (!this.editor) {
+      return
+    }
+    if (!selection) {
+      this.editor.canvas.discardActiveObject(new Event('no-callbacks'))
+    } else if (selection.kind === 'item') {
+      this.editor.canvas.setActiveObject(
+        selection.item.fabricObj,
+        new Event('no-callbacks')
+      )
+      this.selectedItem = selection.item
+      this.selectedItemData = {
+        id: selection.item.id,
+        transform: selection.item.transform.values as MatrixSerialized,
+        locked: selection.item.locked,
+        color: selection.item.color,
+        customColor: selection.item.customColor,
+        customText:
+          selection.item.kind === 'word' ? selection.item.customText : '',
+      }
+    } else if (selection.kind === 'shape') {
+      this.editor.selectShape()
+    }
+  }
+
   /** Used for undo/redo */
   restoreStateSnapshot = (state: EditorStateSnapshot) => {
     if (!this.editor) {
@@ -547,14 +653,7 @@ export class EditorStore {
     this.targetTab = state.activeLayer
 
     // Selection
-    if (!state.selection) {
-      this.editor.deselectAll()
-      this.editor.deselectShape()
-    } else if (state.selection.kind === 'item') {
-      this.editor.canvas.setActiveObject(state.selection.item.fabricObj)
-    } else if (state.selection.kind === 'shape') {
-      this.editor.selectShape()
-    }
+    this.restoreSelection(state.selection)
 
     // Left shape tab
     this.leftTabIsTransformingShape = state.leftTabIsTransformingShape

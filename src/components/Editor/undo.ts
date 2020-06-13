@@ -1,9 +1,15 @@
 import { EditorPersistedData } from 'services/api/types'
 import { EditorStateSnapshot } from 'components/Editor/editor-store'
+import { EditorItemId, EditorItem } from 'components/Editor/lib/editor-item'
+import { ColorString } from 'components/Editor/style-options'
+import { MatrixSerialized } from 'services/api/persisted/v1'
 
 export type UndoFrameKind = UndoFrame['kind']
 
-export type UndoFrame = UndoVisualizeFrame
+export type UndoFrame =
+  | UndoVisualizeFrame
+  | UndoItemUpdateFrme
+  | UndoSelectionChangeFrame
 
 export type UndoVisualizeFrame = {
   kind: 'visualize'
@@ -11,6 +17,25 @@ export type UndoVisualizeFrame = {
   dataAfter: EditorPersistedData
   stateBefore: EditorStateSnapshot
   stateAfter: EditorStateSnapshot
+}
+
+export type UndoSelectionChangeFrame = {
+  kind: 'selection-change'
+  before: EditorStateSnapshot['selection']
+  after: EditorStateSnapshot['selection']
+}
+
+export type UndoItemUpdateFrme = {
+  kind: 'item-update'
+  item: EditorItem
+  before: ItemUpdateUndoData
+  after: ItemUpdateUndoData
+}
+
+export type ItemUpdateUndoData = {
+  customColor: ColorString | undefined
+  locked: boolean
+  transform: MatrixSerialized
 }
 
 export class UndoStack {

@@ -86,13 +86,13 @@ export const defaultBgStyleOptions: BgStyleOptions = {
     kind: 'color',
   },
   items: {
-    dimSmallerItems: 20,
+    dimSmallerItems: 65,
     opacity: 20,
     coloring: {
       kind: 'color',
       color: {
         kind: 'color',
-        color: 'black',
+        color: '#1C1C32',
       },
       gradient: {
         kind: 'gradient',
@@ -118,7 +118,7 @@ export const defaultBgStyleOptions: BgStyleOptions = {
       iconsMaxSize: 30,
       iconsProportion: 20,
       shapePadding: 15,
-      itemDensity: 95,
+      itemDensity: 85,
       wordsMaxSize: 70,
     },
   },

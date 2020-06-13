@@ -76,6 +76,8 @@ import {
   FiMenu,
   FiPrinter,
   FiSave,
+  FiHelpCircle,
+  FiShoppingCart,
 } from 'react-icons/fi'
 import { IoMdResize } from 'react-icons/io'
 import { Api } from 'services/api/api'
@@ -377,11 +379,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             </MenuList>
           </Menu>
 
-          <TopNavButton
+          <Button
+            variantColor="accent"
+            variant="solid"
             onClick={handleSaveClick}
             isLoading={isSaving}
-            loadingText="Saving..."
-            mr="1"
+            mr="3"
           >
             <FiSave
               css={css`
@@ -389,21 +392,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               `}
             />
             Save
-          </TopNavButton>
-
-          <TopNavButton
-            onClick={openExport}
-            isLoading={isExporting}
-            loadingText="Saving..."
-            mr="1"
-          >
-            <FiDownload
-              css={css`
-                margin-right: 4px;
-              `}
-            />
-            Download
-          </TopNavButton>
+          </Button>
 
           <Editable
             css={css`
@@ -421,6 +410,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             color="white"
             fontSize="xl"
             maxWidth="200px"
+            mr="3"
             flex={1}
           >
             <EditablePreview
@@ -439,9 +429,44 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             />
           </Editable>
 
-          <Button variantColor="accent" ml="auto">
-            Upgrade to Pro
-          </Button>
+          <TopNavButton
+            onClick={openExport}
+            isLoading={isExporting}
+            loadingText="Saving..."
+            mr="1"
+          >
+            <FiDownload
+              css={css`
+                margin-right: 4px;
+              `}
+            />
+            Download
+          </TopNavButton>
+
+          <TopNavButton
+            onClick={openExport}
+            isLoading={isExporting}
+            loadingText="Saving..."
+            mr="1"
+          >
+            <FiShoppingCart
+              css={css`
+                margin-right: 4px;
+              `}
+            />
+            Order Printed
+          </TopNavButton>
+
+          <TopNavButton mr="1" ml="auto">
+            <FiHelpCircle
+              css={css`
+                margin-right: 4px;
+              `}
+            />
+            Help & Tutorials
+          </TopNavButton>
+
+          <Button variantColor="accent">Upgrade to Pro</Button>
         </TopNavWrapper>
 
         <EditorLayout>

@@ -62,7 +62,11 @@ import {
   EditorItemConfigShape,
   EditorItemShape,
 } from 'components/Editor/lib/editor-item-icon'
-import { UndoStack, UndoFrame } from 'components/Editor/undo'
+import {
+  UndoStack,
+  UndoFrame,
+  UndoItemUpdateFrme,
+} from 'components/Editor/undo'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -72,7 +76,7 @@ export type EditorInitParams = {
   store: EditorStore
   serialized?: EditorPersistedData
 
-  onItemUpdated: (item: EditorItem) => void
+  onItemUpdated: (item: EditorItem, newTransform: MatrixSerialized) => void
   onItemSelected: (item: EditorItem) => void
   onItemSelectionCleared: () => void
 }
@@ -101,6 +105,7 @@ export class Editor {
   shape: null | Shape = null
 
   undoStack = new UndoStack()
+  isUndoing = false
 
   items: {
     shape: {
@@ -156,29 +161,31 @@ export class Editor {
     })
     this.bgCanvas.add(this.bgRect)
 
-    this.canvas.on('selection:created', () => {
+    this.canvas.on('selection:created', ({ e }) => {
       const target = this.canvas.getActiveObject()
       for (const targetKind of ['shape', 'bg'] as TargetKind[]) {
         const item = this.items[targetKind].fabricObjToItem.get(target)
-        if (item) {
+        if (item && e?.type !== 'no-callbacks') {
           params.onItemSelected(item)
         }
       }
     })
 
-    this.canvas.on('selection:updated', () => {
+    this.canvas.on('selection:updated', ({ e }) => {
       const target = this.canvas.getActiveObject()
       for (const targetKind of ['shape', 'bg'] as TargetKind[]) {
         const item = this.items[targetKind].fabricObjToItem.get(target)
 
-        if (item) {
+        if (item && e?.type !== 'no-callbacks') {
           params.onItemSelected(item)
         }
       }
     })
 
-    this.canvas.on('selection:cleared', () => {
-      params.onItemSelectionCleared()
+    this.canvas.on('selection:cleared', ({ e }) => {
+      if (e?.type !== 'no-callbacks') {
+        params.onItemSelectionCleared()
+      }
     })
 
     this.canvas.on('object:moving', (evt) => {
@@ -217,6 +224,7 @@ export class Editor {
 
     this.canvas.on('object:modified', (evt) => {
       const target = evt.target
+      console.log('obj:modified')
       if (!target) {
         return
       }
@@ -237,7 +245,8 @@ export class Editor {
           const item = this.items[targetKind].fabricObjToItem.get(target)
           if (item) {
             item.setLocked(true)
-            params.onItemUpdated(item)
+            const transform = getObjTransformMatrix(item.fabricObj)
+            params.onItemUpdated(item, transform)
           }
         }
       }
@@ -505,8 +514,7 @@ export class Editor {
       render
     )
     this.bgCanvas.backgroundColor = '#ddd'
-    this.canvas.backgroundColor =
-      config.kind === 'transparent' ? 'transparent' : config.color
+    this.canvas.backgroundColor = 'transparent'
     this.bgRect.set({
       fill: config.kind === 'transparent' ? 'transparent' : config.color,
     })
@@ -1499,29 +1507,68 @@ export class Editor {
 
   pushUndoFrame = (frame: UndoFrame) => {
     this.undoStack.push(frame)
+    console.log('pushUndoFrame', frame)
     this.store.renderKey++
   }
 
-  undo = (): UndoFrame => {
+  private applyItemUpdateUndoFrame = (
+    frame: UndoItemUpdateFrme,
+    direction: 'forward' | 'back'
+  ) => {
+    const data = direction === 'back' ? frame.before : frame.after
+    frame.item.setLocked(data.locked)
+    if (data.customColor) {
+      frame.item.setCustomColor(data.customColor)
+    } else {
+      frame.item.clearCustomColor()
+    }
+    frame.item.transform = new paper.Matrix(data.transform)
+    applyTransformToObj(frame.item.fabricObj, data.transform)
+
+    if (this.store.selectedItemData) {
+      this.store.selectedItemData.locked = data.locked
+      this.store.selectedItemData.customColor = data.customColor
+    }
+
+    this.canvas.requestRenderAll()
+  }
+
+  undo = async () => {
+    this.isUndoing = true
+    this.store.renderKey++
     const frame = this.undoStack.undo()
+    console.log('undo', frame)
     if (frame.kind === 'visualize') {
-      this.store.loadSerialized(frame.dataBefore)
+      await this.store.loadSerialized(frame.dataBefore)
       this.store.restoreStateSnapshot(frame.stateBefore)
+    } else if (frame.kind === 'selection-change') {
+      this.store.restoreSelection(frame.before)
+    } else if (frame.kind === 'item-update') {
+      this.applyItemUpdateUndoFrame(frame, 'back')
     }
+    this.isUndoing = false
+    this.canvas.requestRenderAll()
     this.store.renderKey++
-    return frame
   }
-  redo = (): UndoFrame => {
+  redo = async () => {
     const frame = this.undoStack.redo()
-    if (frame.kind === 'visualize') {
-      this.store.loadSerialized(frame.dataAfter)
-      this.store.restoreStateSnapshot(frame.stateAfter)
-    }
+    this.isUndoing = true
     this.store.renderKey++
-    return frame
+    console.log('redo', frame)
+    if (frame.kind === 'visualize') {
+      await this.store.loadSerialized(frame.dataAfter)
+      this.store.restoreStateSnapshot(frame.stateAfter)
+    } else if (frame.kind === 'selection-change') {
+      this.store.restoreSelection(frame.after)
+    } else if (frame.kind === 'item-update') {
+      this.applyItemUpdateUndoFrame(frame, 'forward')
+    }
+    this.isUndoing = false
+    this.canvas.requestRenderAll()
+    this.store.renderKey++
   }
-  canUndo = (): boolean => this.undoStack.canUndo()
-  canRedo = (): boolean => this.undoStack.canRedo()
+  canUndo = (): boolean => !this.isUndoing && this.undoStack.canUndo()
+  canRedo = (): boolean => !this.isUndoing && this.undoStack.canRedo()
 
   clear = async (clearCanvas = true) => {
     this.logger.debug('Editor: clear')
@@ -1543,6 +1590,9 @@ export class Editor {
   }
 
   clearItems = (target: TargetKind, removeLocked = false) => {
+    if (this.items[target].items.length === 0) {
+      return
+    }
     const nonLockedItems = [
       ...(target === 'shape'
         ? this.items.shape.itemsById.values()

@@ -65,6 +65,7 @@ export class EditorItemWord {
   lockBorder: fabric.Group
 
   isShowingLockBorder = false
+  prevTransform: paper.Matrix
 
   constructor(
     id: EditorItemId,
@@ -104,28 +105,32 @@ export class EditorItemWord {
     this.customColor = conf.customColor
     this.color = conf.color || 'black'
 
-    const wordGroup = new fabric.Group([
-      new fabric.Rect().set({
-        originX: 'center',
-        originY: 'center',
-        left: pathBounds.x1,
-        top: pathBounds.y1,
-        width: pw + 2 * pad,
-        height: ph + 2 * pad,
-        strokeWidth: 1,
-        strokeDashArray: [5, 5],
-        stroke: '#0006',
-        fill: 'rgba(255,255,255,0.3)',
-        opacity: 0,
-      }),
-      path,
-    ])
+    const wordGroup = new fabric.Group(
+      [
+        new fabric.Rect().set({
+          originX: 'center',
+          originY: 'center',
+          left: pathBounds.x1,
+          top: pathBounds.y1,
+          width: pw + 2 * pad,
+          height: ph + 2 * pad,
+          strokeWidth: 1,
+          strokeDashArray: [5, 5],
+          stroke: '#0006',
+          fill: 'rgba(255,255,255,0.3)',
+          opacity: 0,
+        }),
+        path,
+      ],
+      { lockUniScaling: true }
+    )
 
     this.fabricObj = wordGroup
     this.wordObj = wordGroup.item(1)
     this.lockBorder = wordGroup.item(0)
     this.wordObj.set({ fill: this.color })
 
+    this.prevTransform = conf.transform
     this.transform = conf.transform
     this.generatedTransform = conf.transform
     this.defaultText = conf.text
@@ -138,6 +143,7 @@ export class EditorItemWord {
     this.setLocked(conf.locked)
 
     wordGroup.on('modified', () => {
+      this.prevTransform = this.transform
       this.transform = new paper.Matrix(wordGroup.calcOwnMatrix())
     })
     wordGroup.on('selected', () => {
