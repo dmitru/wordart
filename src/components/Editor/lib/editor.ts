@@ -270,7 +270,7 @@ export class Editor {
       },
     }
 
-    window.addEventListener('resize', this.handleResize)
+    window.addEventListener('resize', () => this.handleResize(true))
     this.handleResize()
   }
 
@@ -1091,6 +1091,7 @@ export class Editor {
       return
     }
 
+    const stateBefore = this.store.getStateSnapshot()
     const persistedDataBefore = this.store.serialize()
 
     const shapeObj = this.shape.obj
@@ -1286,8 +1287,10 @@ export class Editor {
 
     this.pushUndoFrame({
       kind: 'visualize',
-      before: persistedDataBefore,
-      after: persistedDataAfter,
+      dataBefore: persistedDataBefore,
+      dataAfter: persistedDataAfter,
+      stateBefore,
+      stateAfter: this.store.getStateSnapshot(),
     })
 
     this.store.renderKey++
@@ -1301,6 +1304,7 @@ export class Editor {
       return
     }
 
+    const stateBefore = this.store.getStateSnapshot()
     const persistedDataBefore = this.store.serialize()
 
     const shapeObj = this.shape.obj
@@ -1484,8 +1488,10 @@ export class Editor {
 
     this.pushUndoFrame({
       kind: 'visualize',
-      before: persistedDataBefore,
-      after: persistedDataAfter,
+      dataBefore: persistedDataBefore,
+      dataAfter: persistedDataAfter,
+      stateAfter: this.store.getStateSnapshot(),
+      stateBefore,
     })
 
     this.store.renderKey++
@@ -1499,7 +1505,8 @@ export class Editor {
   undo = (): UndoFrame => {
     const frame = this.undoStack.undo()
     if (frame.kind === 'visualize') {
-      this.store.loadSerialized(frame.before)
+      this.store.loadSerialized(frame.dataBefore)
+      this.store.restoreStateSnapshot(frame.stateBefore)
     }
     this.store.renderKey++
     return frame
@@ -1507,7 +1514,8 @@ export class Editor {
   redo = (): UndoFrame => {
     const frame = this.undoStack.redo()
     if (frame.kind === 'visualize') {
-      this.store.loadSerialized(frame.after)
+      this.store.loadSerialized(frame.dataAfter)
+      this.store.restoreStateSnapshot(frame.stateAfter)
     }
     this.store.renderKey++
     return frame
@@ -1558,7 +1566,7 @@ export class Editor {
   }
 
   destroy = () => {
-    window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener('resize', () => this.handleResize(true))
     this.undoStack.clear()
   }
 

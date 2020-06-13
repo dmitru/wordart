@@ -27,8 +27,6 @@ export type Wordcloud = {
 
 export type EditorPersistedData = EditorPersistedDataV1
 
-// export type SerializedItem = SerializedWordItem
-
 export type CreateWordcloudDto = {
   title: string
   thumbnail: string

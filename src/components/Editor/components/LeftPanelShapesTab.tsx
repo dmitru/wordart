@@ -15,48 +15,35 @@ import {
   MenuItem,
   MenuList,
   Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
   Text,
-  Checkbox,
   Textarea,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
-import { useThrottleCallback } from '@react-hook/throttle'
-import chroma from 'chroma-js'
-import paper from 'paper'
 import { AddCustomImageModal } from 'components/Editor/components/AddCustomImageModal'
+import { CustomizeRasterImageModal } from 'components/Editor/components/CustomizeRasterImageModal'
 import {
   ShapeSelector,
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
-import { SectionLabel } from 'components/Editor/components/shared'
+import { SvgShapeColorPickerCollapse } from 'components/Editor/components/SvgShapeColorPicker'
+import {
+  applyTransformToObj,
+  createMultilineFabricTextGroup,
+} from 'components/Editor/lib/fabric-utils'
+import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'
+import { fabric } from 'fabric'
 import { AnimatePresence, motion } from 'framer-motion'
+import { createCanvas } from 'lib/wordart/canvas-utils'
+import { isEqual } from 'lodash'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
-import { CustomizeRasterImageModal } from 'components/Editor/components/CustomizeRasterImageModal'
-import { createCanvas } from 'lib/wordart/canvas-utils'
-import { fabric } from 'fabric'
-import {
-  createMultilineFabricTextGroup,
-  applyTransformToObj,
-} from 'components/Editor/lib/fabric-utils'
-import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
-import {
-  SvgShapeColorPickerPopover,
-  SvgShapeColorPickerCollapse,
-} from 'components/Editor/components/SvgShapeColorPicker'
-import { MatrixSerialized } from 'services/api/persisted/v1'
-import { isEqual } from 'lodash'
 
 export type LeftPanelShapesTabProps = {}
 
@@ -66,7 +53,6 @@ const initialState = {
   mode: 'home' as TabMode,
   isShowingAddCustomImage: false,
   isShowingCustomizeImage: false,
-  isTransforming: false,
   textShape: {
     thumbnailPreview: '',
     text: '',
@@ -143,12 +129,6 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
       label: string
     } | null>(null)
 
-    // const visualize = useCallback(() => {
-    //   store.editor?.generateShapeItems({
-    //     style: mkShapeStyleConfFromOptions(shapeStyle),
-    //   })
-    // }, [shapeStyle])
-
     const [query, setQuery] = useState('')
     const matchingShapes = store
       .getAvailableShapes()
@@ -182,10 +162,11 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
     useEffect(() => {
       return () => {
-        if (state.isTransforming) {
+        if (store.leftTabIsTransformingShape) {
           store.editor?.deselectShape()
         }
         Object.assign(state, initialState)
+        store.leftTabIsTransformingShape = false
       }
     }, [])
 
@@ -317,14 +298,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                       variantColor="green"
                       onClick={() => {
                         state.mode = 'home'
-                        if (state.isTransforming) {
-                          state.isTransforming = false
+                        if (store.leftTabIsTransformingShape) {
+                          store.leftTabIsTransformingShape = false
                           store.editor?.deselectShape()
-                          store.editor?.generateShapeItems({
-                            style: mkShapeStyleConfFromOptions(
-                              store.styleOptions.shape
-                            ),
-                          })
                         }
                       }}
                     >
@@ -404,7 +380,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                 state.textShape.thumbnailPreview,
                             })
                             state.mode = 'home'
-                            await store.selectShape(shapeId)
+                            await store.selectShapeAndSaveUndo(shapeId)
                             store.updateShapeThumbnail()
                           }}
                         >
@@ -512,7 +488,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         <Heading size="md" m="0" display="flex">
                           Resize, rotate, transform
                         </Heading>
-                        {!state.isTransforming && (
+                        {!store.leftTabIsTransformingShape && (
                           <>
                             <Text mt="2" color="gray.500" fontSize="sm">
                               All unlocked words will be removed.
@@ -521,7 +497,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               <Button
                                 variantColor="accent"
                                 onClick={() => {
-                                  state.isTransforming = true
+                                  store.leftTabIsTransformingShape = true
                                   store.editor?.selectShape()
                                 }}
                               >
@@ -532,7 +508,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           </>
                         )}
 
-                        {state.isTransforming && (
+                        {store.leftTabIsTransformingShape && (
                           <>
                             <Text mt="2">
                               Drag the shape to move or rotate it.
@@ -541,7 +517,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               <Button
                                 variantColor="accent"
                                 onClick={() => {
-                                  state.isTransforming = false
+                                  store.leftTabIsTransformingShape = false
                                   store.editor?.deselectShape()
                                   store.editor?.clearItems('shape')
                                   store.editor?.clearItems('bg')
@@ -694,9 +670,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         width="345px"
                         overflowY="scroll"
                         shapes={matchingShapes}
-                        onSelected={(shapeConfig) => {
+                        onSelected={async (shapeConfig) => {
                           if (store.selectedShapeId !== shapeConfig.id) {
-                            store.selectShape(shapeConfig.id)
+                            await store.selectShapeAndSaveUndo(shapeConfig.id)
                           }
                         }}
                         selectedShapeId={store.getSelectedShapeConf().id}
@@ -767,7 +743,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                 },
               },
             })
-            store.selectShape(customImgId)
+            store.selectShapeAndSaveUndo(customImgId)
           }}
         />
       </>

@@ -67,8 +67,9 @@ import {
 import { EditorItemConfigShape } from 'components/Editor/lib/editor-item-icon'
 import { createCanvas } from 'lib/wordart/canvas-utils'
 import { UndoStack } from 'components/Editor/undo'
+import { TargetTab } from 'components/Editor/components/Editor'
 
-export type EditorMode = 'view' | 'edit items'
+export type EditorMode = 'view' | 'edit'
 
 export type EditorStoreInitParams = Pick<
   EditorInitParams,
@@ -104,6 +105,8 @@ export class EditorStore {
     preset: pageSizePresets[1],
   }
 
+  @observable leftTabIsTransformingShape = false
+  @observable targetTab = 'shape' as TargetTab
   @observable hasItemChanges = false
   @observable availableShapes: ShapeConf[] = shapes
   @observable selectedShapeId: ShapeId = shapes[4].id
@@ -208,7 +211,7 @@ export class EditorStore {
   }
 
   @action enterEditItemsMode = (target: TargetKind) => {
-    this.mode = 'edit items'
+    this.mode = 'edit'
     if (!this.editor) {
       return
     }
@@ -230,9 +233,15 @@ export class EditorStore {
   }
 
   @action loadSerialized = async (serialized: EditorPersistedData) => {
-    this.isVisualizing = true
-    this.visualizingStep = 'drawing'
-    this.visualizingProgress = 0
+    const shouldShowModal =
+      serialized.data.bgItems.items.length > 0 ||
+      serialized.data.shapeItems.items.length > 0
+
+    if (shouldShowModal) {
+      this.isVisualizing = true
+      this.visualizingStep = 'drawing'
+      this.visualizingProgress = 0
+    }
 
     this.logger.debug('loadSerialized', serialized)
     if (!this.editor) {
@@ -470,9 +479,11 @@ export class EditorStore {
     this.editor.bgCanvas.requestRenderAll()
     this.editor.canvas.requestRenderAll()
 
-    this.visualizingProgress = 1
-    this.isVisualizing = false
-    this.visualizingStep = null
+    if (shouldShowModal) {
+      this.visualizingProgress = 1
+      this.isVisualizing = false
+      this.visualizingStep = null
+    }
   }
 
   updateShapeThumbnail = async () => {
@@ -489,6 +500,72 @@ export class EditorStore {
       currentShapeConf.thumbnailUrl = canvas.toDataURL()
     }
     currentShapeConf.processedThumbnailUrl = canvas.toDataURL()
+  }
+
+  /** Used for undo/redo */
+  getStateSnapshot = (): EditorStateSnapshot => {
+    if (!this.editor) {
+      throw new Error('editor not initialized')
+    }
+
+    let selection: EditorStateSnapshot['selection'] = null
+    if (this.selectedItem) {
+      selection = { kind: 'item', item: this.selectedItem }
+    } else if (
+      this.editor.canvas.getActiveObject() === this.editor.shape?.obj
+    ) {
+      selection = { kind: 'shape' }
+    }
+
+    return {
+      mode: this.editor.mode,
+      shapeId: this.selectedShapeId,
+      activeLayer: this.targetTab,
+      selection,
+      leftTabIsTransformingShape: this.leftTabIsTransformingShape,
+    }
+  }
+
+  /** Used for undo/redo */
+  restoreStateSnapshot = (state: EditorStateSnapshot) => {
+    if (!this.editor) {
+      return
+    }
+
+    // Edit / view mode
+    this.enterViewMode('shape')
+    this.enterViewMode('bg')
+
+    if (state.mode === 'edit') {
+      this.enterEditItemsMode(state.activeLayer)
+    }
+
+    // Shape
+    this.selectShape(state.shapeId, false, false)
+
+    // Active layer
+    this.targetTab = state.activeLayer
+
+    // Selection
+    if (!state.selection) {
+      this.editor.deselectAll()
+      this.editor.deselectShape()
+    } else if (state.selection.kind === 'item') {
+      this.editor.canvas.setActiveObject(state.selection.item.fabricObj)
+    } else if (state.selection.kind === 'shape') {
+      this.editor.selectShape()
+    }
+
+    // Left shape tab
+    this.leftTabIsTransformingShape = state.leftTabIsTransformingShape
+    if (this.leftTabIsTransformingShape) {
+      this.editor.selectShape()
+    } else {
+      this.editor.deselectShape()
+    }
+
+    this.editor.bgCanvas.requestRenderAll()
+    this.editor.canvas.requestRenderAll()
   }
 
   serialize = (): EditorPersistedData => {
@@ -816,6 +893,28 @@ export class EditorStore {
   getSelectedShapeConf = () =>
     this.availableShapes.find((s) => s.id === this.selectedShapeId)!
 
+  selectShapeAndSaveUndo = async (
+    shapeId: ShapeId,
+    updateShapeColors = true,
+    render = true
+  ) => {
+    const stateBefore = this.getStateSnapshot()
+
+    const persistedDataBefore = this.serialize()
+    await this.selectShape(shapeId, updateShapeColors, render)
+    const persistedDataAfter = this.serialize()
+    if (!this.editor) {
+      return
+    }
+    this.editor.pushUndoFrame({
+      kind: 'visualize',
+      dataBefore: persistedDataBefore,
+      dataAfter: persistedDataAfter,
+      stateAfter: this.getStateSnapshot(),
+      stateBefore,
+    })
+  }
+
   @action selectShape = async (
     shapeId: ShapeId,
     updateShapeColors = true,
@@ -954,3 +1053,19 @@ export const pageSizePresets: PageSizePreset[] = [
     aspect: 3 / 4,
   },
 ]
+
+export type EditorStateSnapshot = {
+  mode: EditorMode
+  shapeId: ShapeId
+  activeLayer: TargetTab
+  leftTabIsTransformingShape: boolean
+  selection:
+    | {
+        kind: 'item'
+        item: EditorItem
+      }
+    | {
+        kind: 'shape'
+      }
+    | null
+}

@@ -1,4 +1,5 @@
 import { EditorPersistedData } from 'services/api/types'
+import { EditorStateSnapshot } from 'components/Editor/editor-store'
 
 export type UndoFrameKind = UndoFrame['kind']
 
@@ -6,8 +7,10 @@ export type UndoFrame = UndoVisualizeFrame
 
 export type UndoVisualizeFrame = {
   kind: 'visualize'
-  before: EditorPersistedData
-  after: EditorPersistedData
+  dataBefore: EditorPersistedData
+  dataAfter: EditorPersistedData
+  stateBefore: EditorStateSnapshot
+  stateAfter: EditorStateSnapshot
 }
 
 export class UndoStack {

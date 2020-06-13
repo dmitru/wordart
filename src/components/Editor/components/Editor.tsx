@@ -262,13 +262,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       renderKey, // eslint-disable-line
     } = store
     const hasItems = store.editor
-      ? state.targetTab === 'bg'
+      ? store.targetTab === 'bg'
         ? store.editor.items.bg.items.length > 0
         : store.editor.items.shape.items.length > 0
       : false
 
     const leftTab =
-      state.targetTab === 'bg' ? state.leftTabBg : state.leftTabShape
+      store.targetTab === 'bg' ? state.leftTabBg : state.leftTabShape
 
     return (
       <PageLayoutWrapper>
@@ -449,14 +449,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             <LeftBottomWrapper>
               <SideNavbar
                 activeIndex={
-                  state.targetTab === 'shape'
+                  store.targetTab === 'shape'
                     ? leftPanelShapeTabs.findIndex(
                         (s) => s === state.leftTabShape
                       )
                     : leftPanelBgTabs.findIndex((s) => s === state.leftTabBg)
                 }
               >
-                {state.targetTab !== 'bg' && (
+                {store.targetTab !== 'bg' && (
                   <LeftNavbarBtn
                     onClick={() => {
                       state.leftTabShape = 'shapes'
@@ -594,23 +594,23 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           {leftTab === 'shapes' && <LeftPanelShapesTab />}
                           {leftTab === 'words' && (
                             <>
-                              <LeftPanelWordsTab target={state.targetTab} />
+                              <LeftPanelWordsTab target={store.targetTab} />
                             </>
                           )}
                           {leftTab === 'fonts' && (
                             <>
-                              <LeftPanelFontsTab target={state.targetTab} />
+                              <LeftPanelFontsTab target={store.targetTab} />
                             </>
                           )}
                           {leftTab === 'symbols' && (
-                            <LeftPanelIconsTab target={state.targetTab} />
+                            <LeftPanelIconsTab target={store.targetTab} />
                           )}
                           {leftTab === 'colors' && (
-                            <LeftPanelColorsTab target={state.targetTab} />
+                            <LeftPanelColorsTab target={store.targetTab} />
                           )}
 
                           {leftTab === 'layout' && (
-                            <LeftPanelLayoutTab target={state.targetTab} />
+                            <LeftPanelLayoutTab target={store.targetTab} />
                           )}
                         </>
                       )}
@@ -779,7 +779,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     variantColor="accent"
                     isLoading={store.isVisualizing}
                     onClick={() => {
-                      if (state.targetTab === 'shape') {
+                      if (store.targetTab === 'shape') {
                         store.editor?.generateShapeItems({
                           style: mkShapeStyleConfFromOptions(
                             store.styleOptions.shape
@@ -843,7 +843,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           `}
                           py="1"
                           onClick={() => {
-                            store.enterEditItemsMode(state.targetTab)
+                            store.enterEditItemsMode(store.targetTab)
                           }}
                         >
                           Edit Items
@@ -866,7 +866,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           <MenuList>
                             <MenuItem
                               onClick={() => {
-                                store.editor?.clearItems(state.targetTab, true)
+                                store.editor?.clearItems(store.targetTab, true)
                               }}
                             >
                               <Icon
@@ -882,7 +882,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       </>
                     )}
 
-                    {store.mode === 'edit items' && (
+                    {store.mode === 'edit' && (
                       <>
                         <Button
                           css={css`
@@ -892,7 +892,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           py="1"
                           variantColor="green"
                           onClick={() => {
-                            store.enterViewMode(state.targetTab)
+                            store.enterViewMode(store.targetTab)
                           }}
                         >
                           Done
@@ -903,7 +903,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           size="sm"
                           isDisabled={!store.hasItemChanges}
                           variant="ghost"
-                          onClick={() => store.resetAllItems(state.targetTab)}
+                          onClick={() => store.resetAllItems(store.targetTab)}
                         >
                           Reset All
                         </Button>
@@ -953,9 +953,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     <Box mr="3" ml="auto" display="flex" alignItems="center">
                       <Select
                         isRequired
-                        value={state.targetTab}
+                        value={store.targetTab}
                         onChange={(e) => {
-                          state.targetTab = e.target.value as TargetKind
+                          store.targetTab = e.target.value as TargetKind
                         }}
                       >
                         <option value="shape">Layer: Shape</option>
@@ -1242,7 +1242,6 @@ const state = observable({
   title: 'New wordart',
   leftTabShape: 'shapes' as LeftPanelTab,
   leftTabBg: 'words' as Omit<LeftPanelTab, 'shapes'>,
-  targetTab: 'shape' as TargetTab,
   leftPanelContext: 'normal' as 'normal' | 'resize',
   isShowingExport: false,
 })
