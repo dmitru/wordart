@@ -832,6 +832,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                             outline="none"
                             aria-label="menu"
                             color="black"
+                            // @ts-ignore
                             variant="ghost"
                             px="1"
                             display="inline-flex"
