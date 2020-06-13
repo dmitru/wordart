@@ -66,6 +66,7 @@ import {
 } from 'components/Editor/lib/editor-item'
 import { EditorItemConfigShape } from 'components/Editor/lib/editor-item-icon'
 import { createCanvas } from 'lib/wordart/canvas-utils'
+import { UndoStack } from 'components/Editor/undo'
 
 export type EditorMode = 'view' | 'edit items'
 

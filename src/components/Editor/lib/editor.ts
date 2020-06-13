@@ -62,6 +62,7 @@ import {
   EditorItemConfigShape,
   EditorItemShape,
 } from 'components/Editor/lib/editor-item-icon'
+import { UndoStack, UndoFrame } from 'components/Editor/undo'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -98,6 +99,8 @@ export class Editor {
 
   /** Info about the current shape */
   shape: null | Shape = null
+
+  undoStack = new UndoStack()
 
   items: {
     shape: {
@@ -1248,7 +1251,6 @@ export class Editor {
 
   generateShapeItems = async (params: { style: ShapeStyleConf }) => {
     const { style } = params
-    const { coloring } = style.items
     this.logger.debug('generateShapeItems')
     if (!this.shape?.obj) {
       console.error('No shape obj')
@@ -1431,8 +1433,30 @@ export class Editor {
     await this.setShapeItemsStyle(style.items)
     this.store.isVisualizing = false
 
+    this.pushUndoFrame({
+      kind: 'visualize',
+    })
+
     this.store.renderKey++
   }
+
+  pushUndoFrame = (frame: UndoFrame) => {
+    this.undoStack.push(frame)
+    this.store.renderKey++
+  }
+
+  undo = (): UndoFrame => {
+    const frame = this.undoStack.undo()
+    this.store.renderKey++
+    return frame
+  }
+  redo = (): UndoFrame => {
+    const frame = this.undoStack.redo()
+    this.store.renderKey++
+    return frame
+  }
+  canUndo = (): boolean => this.undoStack.canUndo()
+  canRedo = (): boolean => this.undoStack.canRedo()
 
   clear = async () => {
     this.logger.debug('Editor: clear')
@@ -1474,6 +1498,7 @@ export class Editor {
 
   destroy = () => {
     window.removeEventListener('resize', this.handleResize)
+    this.undoStack.clear()
   }
 
   selectShape = () => {

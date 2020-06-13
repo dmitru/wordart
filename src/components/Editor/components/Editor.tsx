@@ -804,10 +804,22 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   </Button>
 
                   <Tooltip label="Undo" aria-label="Undo" hasArrow zIndex={5}>
-                    <IconButton ml="3" icon="arrow-back" aria-label="Undo" />
+                    <IconButton
+                      ml="3"
+                      icon="arrow-back"
+                      aria-label="Undo"
+                      isDisabled={!store.editor?.canUndo()}
+                      onClick={store.editor?.undo}
+                    />
                   </Tooltip>
                   <Tooltip label="Redo" aria-label="Redo" hasArrow zIndex={5}>
-                    <IconButton ml="1" icon="arrow-forward" aria-label="Redo" />
+                    <IconButton
+                      ml="1"
+                      icon="arrow-forward"
+                      aria-label="Redo"
+                      isDisabled={!store.editor?.canRedo()}
+                      onClick={store.editor?.redo}
+                    />
                   </Tooltip>
 
                   <Box mr="3" ml="3">
