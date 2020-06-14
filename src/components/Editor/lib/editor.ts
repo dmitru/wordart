@@ -304,25 +304,31 @@ export class Editor {
     )
 
     // TODO: optimize this!
-    const bgCanvas = await cloneFabricCanvas(this.bgCanvas)
-    const canvas = await cloneFabricCanvas(this.canvas)
+    // const bgCanvas = await cloneFabricCanvas(this.bgCanvas)
+    // const canvas = await cloneFabricCanvas(this.canvas)
+    const bgCanvas = this.bgCanvas
+    const canvas = this.canvas
 
-    bgCanvas.viewportTransform![4] = 0
-    bgCanvas.viewportTransform![5] = 0
-    canvas.viewportTransform![4] = 0
-    canvas.viewportTransform![5] = 0
-    canvas.renderAll()
-    bgCanvas.renderAll()
+    // bgCanvas.viewportTransform![4] = 0
+    // bgCanvas.viewportTransform![5] = 0
+    // canvas.viewportTransform![4] = 0
+    // canvas.viewportTransform![5] = 0
+    // canvas.renderAll()
+    // bgCanvas.renderAll()
 
     const exportCanvasScale = resultCanvas.width / 1000 / canvas.getZoom()
 
     const bgCanvasExported = (
       await loadImageUrlToCanvasCtx(
         bgCanvas.toDataURL({
-          left: this.projectBounds.left / exportCanvasScale,
-          top: this.projectBounds.top / exportCanvasScale,
-          width: this.projectBounds.width,
-          height: this.projectBounds.height,
+          left:
+            this.projectBounds.left / exportCanvasScale +
+            bgCanvas.viewportTransform![4],
+          top:
+            this.projectBounds.top / exportCanvasScale +
+            bgCanvas.viewportTransform![5],
+          width: this.projectBounds.width * canvas.getZoom(),
+          height: this.projectBounds.height * canvas.getZoom(),
           multiplier: exportCanvasScale,
         }),
         {}
@@ -350,10 +356,13 @@ export class Editor {
       await loadImageUrlToCanvasCtx(
         canvas.toDataURL({
           left:
-            this.projectBounds.left / exportCanvasScale / bgCanvas.getZoom(),
-          top: this.projectBounds.top / exportCanvasScale / bgCanvas.getZoom(),
-          width: this.projectBounds.width,
-          height: this.projectBounds.height,
+            this.projectBounds.left / exportCanvasScale +
+            bgCanvas.viewportTransform![4],
+          top:
+            this.projectBounds.top / exportCanvasScale +
+            bgCanvas.viewportTransform![5],
+          width: this.projectBounds.width * canvas.getZoom(),
+          height: this.projectBounds.height * canvas.getZoom(),
           multiplier: exportCanvasScale,
         }),
         {}
