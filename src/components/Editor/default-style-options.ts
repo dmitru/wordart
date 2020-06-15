@@ -1,4 +1,3 @@
-import { fonts } from 'data/fonts'
 import {
   WordListEntry,
   ShapeStyleOptions,
@@ -58,7 +57,7 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
     },
 
     words: {
-      fontIds: [fonts[3].styles[0].fontId, fonts[2].styles[0].fontId],
+      fontIds: [],
       wordList: defaultWordsList,
       anglesPreset: 'horizontal',
       customAngles: [0],
@@ -105,7 +104,7 @@ export const defaultBgStyleOptions: BgStyleOptions = {
     },
 
     words: {
-      fontIds: [fonts[3].styles[0].fontId, fonts[2].styles[0].fontId],
+      fontIds: [],
       wordList: defaultWordsListBackground,
       anglesPreset: 'horizontal',
       customAngles: [0],

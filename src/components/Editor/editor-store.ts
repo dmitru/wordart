@@ -44,7 +44,7 @@ import {
   WordListEntry,
 } from 'components/Editor/style-options'
 import { ItemUpdateUndoData } from 'components/Editor/undo'
-import { FontConfig, FontId, fonts, FontStyleConfig } from 'data/fonts'
+import { FontConfig, FontId, fonts, FontStyleConfig, loadFontsConfig } from 'data/fonts'
 import { shapes } from 'data/shapes'
 import { loadFont } from 'lib/wordart/fonts'
 import { cloneDeep, isEqual, sortBy, uniq, uniqBy } from 'lodash'
@@ -134,6 +134,9 @@ export class EditorStore {
   @action initEditor = async (params: EditorStoreInitParams) => {
     this.logger.debug('initEditor', params)
     this.lifecycleState = 'initializing'
+    if (fonts.length === 0) {
+      await loadFontsConfig()
+    }
 
     this.editor = new Editor({
       ...params,
@@ -1023,6 +1026,7 @@ export class EditorStore {
     for (const font of [...this.customFonts, ...fonts]) {
       for (const style of font.styles) {
         result.push({ font, style })
+        break
       }
     }
     return result
