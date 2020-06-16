@@ -329,7 +329,7 @@ const main = async () => {
 
       const fontOutPath = path.join(fontsOutDir, `${fontId}.ttf`)
 
-      await download(ttfUrl, fontOutPath)
+      // await download(ttfUrl, fontOutPath)
       console.log(`Saved ${fontOutPath}`)
       const font = opentype.loadSync(fontOutPath)
 
@@ -345,11 +345,15 @@ const main = async () => {
 
       // 3. generate thumbnail
       const fontPath = font.getPath(fontFamily, 0, 0, 50)
+      const pad = 5
       const bounds = fontPath.getBoundingBox()
 
-      const canvas = createCanvas(bounds.x2 - bounds.x1, bounds.y2 - bounds.y1)
+      const canvas = createCanvas(
+        bounds.x2 - bounds.x1 + 2 * pad,
+        bounds.y2 - bounds.y1 + 2 * pad
+      )
       const ctx = canvas.getContext('2d')
-      ctx.translate(-bounds.x1, -bounds.y1)
+      ctx.translate(-bounds.x1 + pad, -bounds.y1 + pad)
       fontPath.draw(ctx)
 
       const imgFilename = `${fontId}.png`
@@ -374,9 +378,8 @@ const main = async () => {
       popularity: fontData.popularity,
       subsets: fontData.subsets,
       title: fontFamily,
-      categories: fontData.categories,
+      categories: [fontData.category],
       styles: processedStyles,
-      glyphRanges,
     })
   }
 
@@ -402,37 +405,12 @@ const main = async () => {
     // }
   }
 
-  const exportString = `
-  export type FontId = string
-
-  export type FontStyleConfig = {
-    fontId: FontId
-    title: string
-    url: string
-    thumbnail: string
-    fontStyle: string
-    fontWeight: string
-  }
-  
-  export type FontConfig = {
-    title: string
-    popularity: number
-    categories?: string[]
-    styles: FontStyleConfig[]
-    subsets: string[]
-    glyphRanges: number[][]
-  }
-  
-  export const fonts: FontConfig[] = [${processedConfigs
-    .map((fc) => {
-      return JSON.stringify(fc, null, 2)
-    })
-    .join(',\n')}]
-  `
-
-  const resultFile = path.join(__dirname, '..', 'src/data/fonts.ts')
+  const resultFile = path.join(__dirname, '..', 'public/fonts/config.json')
   console.log(`Writing out data to ${resultFile}`)
-  await fs.promises.writeFile(resultFile, exportString)
+  await fs.promises.writeFile(
+    resultFile,
+    JSON.stringify(processedConfigs, null, 2)
+  )
 }
 
 main()
