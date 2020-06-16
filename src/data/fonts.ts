@@ -1,4 +1,3 @@
-
 export type FontId = string
 
 export type FontStyleConfig = {
@@ -12,16 +11,16 @@ export type FontStyleConfig = {
 
 export type FontConfig = {
   title: string
+  isCustom?: boolean
   popularity: number
   categories?: string[]
   styles: FontStyleConfig[]
   subsets: string[]
-  glyphRanges: number[][]
 }
 
 export let fonts: FontConfig[] = []
 
 export const loadFontsConfig = async () => {
-  const fontsData = await fetch('/fonts/config.json').then(res => res.json())
+  const fontsData = await fetch('/fonts/config.json').then((res) => res.json())
   fonts.push(...fontsData)
 }
