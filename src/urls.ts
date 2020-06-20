@@ -7,6 +7,7 @@ export const Urls = {
 
   profile: '/profile',
   dashboard: '/dashboard',
+  pricing: '/pricing',
 
   editor: {
     _next: '/editor/[...id]',

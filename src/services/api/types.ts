@@ -38,3 +38,18 @@ export type SaveWordcloudDto = {
   thumbnail: string
   editorData: EditorPersistedData
 }
+
+export type Order = {
+  orderId: string
+  createdAt: string
+  updatedAt: string
+  productId: number
+  receiptUrl: string
+  amount: number
+  currency: string
+  status: string
+}
+
+export type ProcessOrderDto = {
+  orderId: number
+}

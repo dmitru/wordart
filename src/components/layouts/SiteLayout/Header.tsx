@@ -33,6 +33,9 @@ export const Header: React.FC<HeaderProps> = observer(() => {
               <Link href={Urls.editor._next} as={Urls.editor.create} passHref>
                 <Button variantColor="accent">Create</Button>
               </Link>
+              <Link href={Urls.pricing} passHref>
+                <Button>Pricing</Button>
+              </Link>
               <Link href={Urls.dashboard} passHref>
                 <Button>My Designs</Button>
               </Link>

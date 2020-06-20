@@ -18,6 +18,7 @@ export default class MyDocument extends Document {
     return (
       <html>
         <Head>
+          <script src="https://cdn.paddle.com/paddle/paddle.js"></script>
           <style
           // @ts-ignore
           // data-emotion-css={this.props.ids.join(' ')}

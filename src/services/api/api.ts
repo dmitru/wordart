@@ -6,6 +6,8 @@ import {
   EditorPersistedData,
   WordcloudId,
   SaveWordcloudDto,
+  Order,
+  ProcessOrderDto,
 } from 'services/api/types'
 import { apiClient } from './api-client'
 
@@ -31,6 +33,17 @@ export const Api = {
     async fetchEditorData(id: WordcloudId): Promise<EditorPersistedData> {
       const response = await apiClient.get(`/wordclouds/${id}/editorData`)
       return response.data as EditorPersistedData
+    },
+  },
+
+  orders: {
+    async fetchMy(): Promise<Order[]> {
+      const response = await apiClient.get(`/users/orders`)
+      return response.data as Order[]
+    },
+    async process(data: ProcessOrderDto): Promise<MyProfile> {
+      const response = await apiClient.post('/users/orders', data)
+      return response.data as MyProfile
     },
   },
 
