@@ -5,7 +5,7 @@ export const Urls = {
   privacyPolicy: '/legal/privacy',
   termsOfUse: '/legal/terms',
 
-  profile: '/profile',
+  account: '/account',
   dashboard: '/dashboard',
   pricing: '/pricing',
 
