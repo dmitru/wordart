@@ -22,7 +22,7 @@ export const PricingPage = observer(() => {
             {plan.price && `${plan.price.price.net} ${plan.price.currency}`}
             <Button
               onClick={() => {
-                ;(window as any)['Paddle'].Checkout.open({
+                window.Paddle.Checkout.open({
                   product: plan.id,
                   email: profile?.email,
                 })

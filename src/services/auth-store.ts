@@ -7,6 +7,7 @@ import { AuthTokenStore } from 'services/auth-token-store'
 import jsonp from 'jsonp'
 import { plans, PricingPlanWithPrice, LocalizedPrice } from 'plans'
 import { keyBy } from 'lodash'
+import { config } from 'config'
 
 const IS_SSR = typeof window === 'undefined'
 
@@ -34,13 +35,12 @@ export class AuthStore {
 
     if (!IS_SSR) {
       window.Paddle.Setup({
-        vendor: 597590,
-        eventCallback: (data: any) => {
-          console.log('data = ', data)
+        vendor: config.paddle.vendorId,
+        eventCallback: async (data: any) => {
           if (data.event === 'Checkout.Complete') {
-            console.log(data.eventData)
             const checkoutId = data.eventData.checkout.id
-            // TODO: pass to backend, update profile
+            const updatedProfile = await Api.orders.process({ checkoutId })
+            this.profile = updatedProfile
           }
         },
       })
