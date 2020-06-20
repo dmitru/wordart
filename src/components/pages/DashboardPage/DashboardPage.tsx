@@ -133,7 +133,7 @@ export const DashboardPage = observer(() => {
     <SiteLayout>
       <Box>
         <Heading size="lg" mb="4">
-          My Designs
+          Your Designs
         </Heading>
 
         <Box mb="4">

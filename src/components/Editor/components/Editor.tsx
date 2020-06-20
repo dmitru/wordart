@@ -374,7 +374,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     margin-right: 4px;
                   `}
                 />
-                Go back to My Designs
+                Go Back to Your Designs
               </MenuItem>
             </MenuList>
           </Menu>

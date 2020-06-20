@@ -7,7 +7,7 @@ import { Box, Button, Spinner } from '@chakra-ui/core'
 import { Order } from 'services/api/types'
 import { Api } from 'services/api/api'
 
-export const ProfilePage = observer(() => {
+export const AccountPage = observer(() => {
   const { authStore } = useStore()
   const state = useLocalStore<{ orders: null | Order[] }>(() => ({
     orders: null,
@@ -22,11 +22,10 @@ export const ProfilePage = observer(() => {
   return (
     <SiteLayout>
       <Box>
-        <h1>Profile</h1>
-
+        <h1>Your Account</h1>
         <pre>{JSON.stringify(authStore.profile, null, 2)}</pre>
 
-        <h1>My orders</h1>
+        <h1>Your Orders</h1>
         {state.orders == null && <Spinner />}
         {state.orders && state.orders.length === 0 && (
           <>
