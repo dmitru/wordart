@@ -1,11 +1,13 @@
 import styled from '@emotion/styled'
 import { Text } from '@chakra-ui/core'
 
-export const SectionLabel = styled(Text)<{ theme: any }>`
-  text-transform: uppercase;
-  font-weight: 600 !important;
-  font-size: 0.9em;
+export const SectionLabel = styled(Text)<{ theme: any }>(
+  `
+  // text-transform: uppercase;
+  font-weight: 500 !important;
+  font-size: 1.1em;
   margin: 0;
   margin-bottom: 8px;
-  color: #888;
+  color: #777;
 `
+)

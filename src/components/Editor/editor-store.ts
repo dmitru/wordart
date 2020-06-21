@@ -93,6 +93,11 @@ export class EditorStore {
   editor: Editor | null = null
   @observable renderKey = 1
 
+  @observable leftColorTab = {
+    showShapeItemsAdvanced: false,
+    showBgItemsAdvanced: false,
+  }
+
   @observable isVisualizing = false
   @observable visualizingProgress = null as number | null
   @observable visualizingStep: 'generating' | 'drawing' | null = null

@@ -189,7 +189,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
               >
                 <DotsThreeVertical size={18} />
               </MenuButton>
-              <MenuList>
+              <MenuList placement="bottom-end">
                 <MenuItem
                   onClick={() => {
                     shapeStyle.items.coloring.color.colors.length = 1
@@ -240,7 +240,7 @@ export const ShapeItemsColorPickerInlineImpl: React.FC<{
             <>
               {shapeStyle.items.coloring.color.colors.map((color, index) => (
                 <Box
-                  mb="4"
+                  mb="2"
                   key={index}
                   display="inline-flex"
                   alignItems="center"

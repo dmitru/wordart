@@ -58,6 +58,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
               Helvetica, Arial, sans-serif, 'Apple Color Emoji',
               'Segoe UI Emoji', 'Segoe UI Symbol';
             font-weight: 600;
+            font-size: 0.9rem;
             margin-bottom: -4px;
             ${horizontal
               ? `

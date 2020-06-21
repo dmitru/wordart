@@ -22,7 +22,9 @@ export const theme = {
     dark2: '#444',
     dark3: '#555',
     dark4: '#666',
-    muted: '#ccc',
+    muted: {
+      500: '#999',
+    },
   },
   zIndices: {
     ...chakraTheme.zIndices,

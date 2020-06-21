@@ -1,4 +1,16 @@
-import { Box, Button, Flex, Stack, Text } from '@chakra-ui/core'
+import {
+  Box,
+  Button,
+  Flex,
+  Stack,
+  Text,
+  Collapse,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Icon,
+} from '@chakra-ui/core'
 import css from '@emotion/css'
 import { useThrottleCallback } from '@react-hook/throttle'
 import chroma from 'chroma-js'
@@ -26,8 +38,9 @@ import { toJS } from 'mobx'
 import { observer, useLocalStore } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
-import { FaQuestionCircle } from 'react-icons/fa'
+import { FaQuestionCircle, FaCog } from 'react-icons/fa'
 import { Tooltip } from 'components/shared/Tooltip'
+import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -249,8 +262,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   py="3"
                   width="100%"
                 >
-                  <Box mb="5">
+                  <Box mb="5" display="flex">
                     <Button
+                      flex="1"
                       marginLeft="auto"
                       variant="solid"
                       variantColor="accent"
@@ -272,6 +286,34 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     >
                       Explore Color Themes
                     </Button>
+
+                    <Menu>
+                      <MenuButton
+                        marginLeft="2"
+                        as={Button}
+                        outline="none"
+                        aria-label="menu"
+                        color="black"
+                        display="inline-flex"
+                      >
+                        <DotsThreeVertical size={18} />
+                      </MenuButton>
+                      <MenuList placement="bottom-end">
+                        <MenuItem
+                          onClick={() => {
+                            // TODO
+                          }}
+                        >
+                          <Icon
+                            name="add"
+                            size="20px"
+                            color="gray.500"
+                            mr="2"
+                          />
+                          Save as new theme
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
                   </Box>
 
                   {/* <shape-color> */}
@@ -344,9 +386,138 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   </Box>
                   {/* </shape-color> */}
 
+                  {/* <shape-items> */}
+                  <Box mt="2.5rem">
+                    <Box display="flex" alignItems="center">
+                      <SectionLabel
+                        css={css`
+                          margin-bottom: 0;
+                        `}
+                      >
+                        Shape Words & Icons
+                      </SectionLabel>
+                      <Button
+                        size="xs"
+                        ml="auto"
+                        variantColor={
+                          store.leftColorTab.showShapeItemsAdvanced
+                            ? 'blue'
+                            : 'gray'
+                        }
+                        onClick={() => {
+                          store.leftColorTab.showShapeItemsAdvanced = !store
+                            .leftColorTab.showShapeItemsAdvanced
+                        }}
+                      >
+                        <FaCog
+                          style={{ color: 'currentColor', marginRight: '5px' }}
+                        />{' '}
+                        Advanced
+                      </Button>
+                    </Box>
+
+                    <Box mt="3">
+                      <ShapeItemsColorPickerInline
+                        shapeStyle={shapeStyle}
+                        onUpdate={updateShapeItemsColoring}
+                      />
+                    </Box>
+
+                    <Collapse
+                      isOpen={store.leftColorTab.showShapeItemsAdvanced}
+                    >
+                      <Box pb="0.5rem">
+                        <Flex direction="row" mb="0">
+                          <Slider
+                            css={css`
+                              flex: 1;
+                            `}
+                            afterLabel="%"
+                            labelCss="width: 60px"
+                            horizontal
+                            label="Opacity"
+                            value={100 * shapeStyle.items.opacity}
+                            onChange={(value) => {
+                              shapeStyle.items.opacity = value / 100
+                            }}
+                            onAfterChange={updateShapeItemsColoring}
+                            min={0}
+                            max={100}
+                            step={1}
+                          />
+                        </Flex>
+
+                        {/* <Box mb="0">
+                        {shapeStyle.items.coloring.kind === 'shape' && (
+                <Box mb="4">
+                  <Slider
+                    css={css`
+                      width: 50%;
+                    `}
+                    label="Brightness"
+                    value={shapeStyle.items.coloring.shape.shapeBrightness}
+                    onChange={(value) => {
+                      const val = (value as any) as number
+                      shapeStyle.items.coloring.shape.shapeBrightness = val
+                    }}
+                    onAfterChange={updateShapeItemsColoring}
+                    min={-100}
+                    max={100}
+                    step={1}
+                  />
+                </Box>
+              )}
+                      </Box> */}
+
+                        <Box mb="2">
+                          <Slider
+                            css={css`
+                              flex: 1;
+                            `}
+                            horizontal
+                            label={
+                              <>
+                                <Box display="flex" alignItems="center">
+                                  Emphasize size{' '}
+                                  <Tooltip
+                                    label="Make larger words brighter and smaller words dimmer"
+                                    zIndex={100}
+                                    showDelay={200}
+                                  >
+                                    <Text
+                                      my="0"
+                                      color="blue"
+                                      cursor="help"
+                                      ml="2"
+                                    >
+                                      <FaQuestionCircle
+                                        style={{ color: '#999' }}
+                                      />
+                                    </Text>
+                                  </Tooltip>
+                                </Box>
+                              </>
+                            }
+                            afterLabel="%"
+                            value={shapeStyle.items.dimSmallerItems}
+                            onChange={(value) => {
+                              const val = (value as any) as number
+                              shapeStyle.items.dimSmallerItems = val
+                            }}
+                            onAfterChange={updateShapeItemsColoring}
+                            min={0}
+                            max={100}
+                            step={1}
+                          />
+                        </Box>
+                      </Box>
+                    </Collapse>
+                  </Box>
+                  {/* </shape-items> */}
+
                   {/* <background> */}
 
-                  <Box mt="2.5rem">
+                  <Box mt="1.5rem">
                     <SectionLabel>Background</SectionLabel>
                     <Stack direction="row" spacing="3">
                       <Box display="flex" alignItems="flex-start">
@@ -367,106 +538,46 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     </Stack>
                   </Box>
 
-                  {/* <shape-items> */}
-                  <Box mt="2.5rem">
-                    <SectionLabel>Shape Words & Icons</SectionLabel>
-
-                    <Box>
-                      <ShapeItemsColorPickerInline
-                        shapeStyle={shapeStyle}
-                        onUpdate={updateShapeItemsColoring}
-                      />
-                    </Box>
-
-                    <Flex direction="row" mb="0">
-                      <Slider
-                        css={css`
-                          flex: 1;
-                        `}
-                        afterLabel="%"
-                        labelCss="width: 60px"
-                        horizontal
-                        label="Opacity"
-                        value={100 * shapeStyle.items.opacity}
-                        onChange={(value) => {
-                          shapeStyle.items.opacity = value / 100
-                        }}
-                        onAfterChange={updateShapeItemsColoring}
-                        min={0}
-                        max={100}
-                        step={1}
-                      />
-                    </Flex>
-
-                    <Box mb="0">
-                      {/* {shapeStyle.items.coloring.kind === 'shape' && (
-              <Box mb="4">
-                <Slider
-                  css={css`
-                    width: 50%;
-                  `}
-                  label="Brightness"
-                  value={shapeStyle.items.coloring.shape.shapeBrightness}
-                  onChange={(value) => {
-                    const val = (value as any) as number
-                    shapeStyle.items.coloring.shape.shapeBrightness = val
-                  }}
-                  onAfterChange={updateShapeItemsColoring}
-                  min={-100}
-                  max={100}
-                  step={1}
-                />
-              </Box>
-            )} */}
-                    </Box>
-                  </Box>
-
-                  <Box mb="2">
-                    <Slider
-                      css={css`
-                        flex: 1;
-                      `}
-                      horizontal
-                      label={
-                        <>
-                          <Box display="flex" alignItems="center">
-                            Emphasize size{' '}
-                            <Tooltip
-                              label="Make larger words brighter and smaller words dimmer"
-                              zIndex={100}
-                              showDelay={200}
-                            >
-                              <Text my="0" color="blue" cursor="help" ml="2">
-                                <FaQuestionCircle style={{ color: '#999' }} />
-                              </Text>
-                            </Tooltip>
-                          </Box>
-                        </>
-                      }
-                      afterLabel="%"
-                      value={shapeStyle.items.dimSmallerItems}
-                      onChange={(value) => {
-                        const val = (value as any) as number
-                        shapeStyle.items.dimSmallerItems = val
-                      }}
-                      onAfterChange={updateShapeItemsColoring}
-                      min={0}
-                      max={100}
-                      step={1}
-                    />
-                  </Box>
-                  {/* </shape-items> */}
-
                   {store?.editor && store.editor.items.bg.items.length > 0 && (
                     <Box mt="2.5rem">
-                      <SectionLabel>Background Words & Icons</SectionLabel>
+                      <SectionLabel display="flex" alignItems="center">
+                        Background Words & Icons
+                        <Button
+                          size="xs"
+                          ml="auto"
+                          variant={
+                            store.leftColorTab.showBgItemsAdvanced
+                              ? 'solid'
+                              : 'ghost'
+                          }
+                          variantColor={
+                            store.leftColorTab.showBgItemsAdvanced
+                              ? 'primary'
+                              : undefined
+                          }
+                          onClick={() => {
+                            store.leftColorTab.showBgItemsAdvanced = !store
+                              .leftColorTab.showBgItemsAdvanced
+                          }}
+                        >
+                          <FaCog
+                            style={{
+                              color: 'currentColor',
+                              marginRight: '5px',
+                            }}
+                          />{' '}
+                          Advanced
+                        </Button>
+                      </SectionLabel>
 
-                      <BgItemsColorPickerInline
-                        bgStyle={bgStyle}
-                        onUpdate={updateBgItemsColoring}
-                      />
+                      <Box mt="3">
+                        <BgItemsColorPickerInline
+                          bgStyle={bgStyle}
+                          onUpdate={updateBgItemsColoring}
+                        />
+                      </Box>
 
-                      <>
+                      <Collapse isOpen={store.leftColorTab.showBgItemsAdvanced}>
                         <Flex direction="row" mb="0">
                           <Slider
                             css={css`
@@ -527,7 +638,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                             step={1}
                           />
                         </Box>
-                      </>
+                      </Collapse>
                     </Box>
                   )}
                   {/* </background> */}
