@@ -1,29 +1,23 @@
 import {
   Box,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
   Button,
-  Text,
-  Collapse,
   ButtonProps,
   Menu,
   MenuButton,
-  MenuList,
   MenuItem,
-  MenuDivider,
+  MenuList,
+  Text,
+  IconButton,
+  Icon,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
-import { ChoiceButtons } from 'components/Editor/components/ChoiceButtons'
 import { ShapeStyleOptions } from 'components/Editor/style-options'
-import { ColorPicker } from 'components/shared/ColorPicker'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { ColorSwatchButton } from 'components/shared/ColorSwatchButton'
 import { observer, Observer } from 'mobx-react'
-import React, { useRef, useState } from 'react'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
+import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
+import React, { useState } from 'react'
 
 export const ShapeItemsColorPickerSwatch = React.forwardRef<
   HTMLElement,
@@ -46,8 +40,8 @@ export const ShapeItemsColorPickerSwatch = React.forwardRef<
                 width: 80px;
               `}
               borderRadius="none"
-              color={shapeStyle.items.coloring.color.color}
-              kind="color"
+              colors={shapeStyle.items.coloring.color.colors}
+              kind="colors"
               ref={ref}
               {...props}
             />
@@ -85,107 +79,6 @@ export const ShapeItemsColorPickerSwatch = React.forwardRef<
         return trigger
       }}
     </Observer>
-  )
-})
-
-export const ShapeItemsColorPicker: React.FC<{
-  shapeStyle: ShapeStyleOptions
-  onUpdate: () => void
-  children?: React.ReactNode
-}> = observer(({ shapeStyle, onUpdate, children, ...props }) => {
-  const [multicolorIndex, setMulticolorIndex] = useState(0)
-
-  return (
-    <>
-      <Box
-        mb="2"
-        mt="2"
-        display="flex"
-        flexDirection="row"
-        alignItems="flex-start"
-      >
-        <Box>
-          <Box mb="2">
-            <ChoiceButtons
-              choices={[
-                { title: 'Shape Colors', value: 'shape' },
-                { title: 'Gradient', value: 'gradient' },
-                { title: 'Color', value: 'color' },
-              ]}
-              value={shapeStyle.items.coloring.kind}
-              onChange={(value) => {
-                if (value === 'shape') {
-                  shapeStyle.items.coloring.kind = 'shape'
-                } else if (value === 'gradient') {
-                  shapeStyle.items.coloring.kind = 'gradient'
-                } else if (value === 'color') {
-                  shapeStyle.items.coloring.kind = 'color'
-                }
-                onUpdate()
-              }}
-            />
-          </Box>
-
-          {shapeStyle.items.coloring.kind === 'color' && (
-            <ColorPicker
-              disableAlpha
-              value={shapeStyle.items.coloring.color.color}
-              onChange={(hex) => {
-                shapeStyle.items.coloring.color.color = hex
-              }}
-              onAfterChange={onUpdate}
-            />
-          )}
-          {shapeStyle.items.coloring.kind === 'gradient' && (
-            <>
-              <Box mt="2">
-                {[
-                  shapeStyle.items.coloring.gradient.gradient.from,
-                  shapeStyle.items.coloring.gradient.gradient.to,
-                ].map((color, index) => (
-                  <Box mr="1" key={index} display="inline-block">
-                    <ColorSwatchButton
-                      kind="color"
-                      color={
-                        index === 0
-                          ? shapeStyle.items.coloring.gradient.gradient.from
-                          : shapeStyle.items.coloring.gradient.gradient.to
-                      }
-                      onClick={() => setMulticolorIndex(index)}
-                    />
-                  </Box>
-                ))}
-
-                <Box mt="3">
-                  <ColorPicker
-                    disableAlpha
-                    value={chroma(
-                      multicolorIndex === 0
-                        ? shapeStyle.items.coloring.gradient.gradient.from
-                        : shapeStyle.items.coloring.gradient.gradient.to
-                    )
-                      .alpha(1)
-                      .hex()}
-                    onChange={(hex) => {
-                      const color = chroma(hex).hex()
-                      if (multicolorIndex === 0) {
-                        shapeStyle.items.coloring.gradient.gradient.from = color
-                      } else {
-                        shapeStyle.items.coloring.gradient.gradient.to = color
-                      }
-                    }}
-                    onAfterChange={() => {
-                      onUpdate()
-                    }}
-                  />
-                </Box>
-              </Box>
-            </>
-          )}
-        </Box>
-      </Box>
-      {children}
-    </>
   )
 })
 
@@ -263,6 +156,55 @@ export const ShapeItemsColorPickerInline: React.FC<{
             </MenuItem>
           </MenuList>
         </Menu>
+
+        {shapeStyle.items.coloring.kind === 'color' && (
+          <>
+            <Button
+              isDisabled={shapeStyle.items.coloring.color.colors.length >= 8}
+              variantColor="green"
+              leftIcon="add"
+              onClick={() => {
+                const color = chroma.random().hex()
+                shapeStyle.items.coloring.color.colors.push(color)
+                onUpdate()
+              }}
+              size="sm"
+              ml="auto"
+            >
+              Add
+            </Button>
+
+            <Menu>
+              <MenuButton
+                marginLeft="2"
+                as={Button}
+                size="sm"
+                outline="none"
+                aria-label="menu"
+                color="black"
+                display="inline-flex"
+              >
+                <DotsThreeVertical size={18} />
+              </MenuButton>
+              <MenuList>
+                <MenuItem
+                  onClick={() => {
+                    shapeStyle.items.coloring.color.colors.length = 1
+                    onUpdate()
+                  }}
+                >
+                  <Icon
+                    name="small-close"
+                    size="20px"
+                    color="gray.500"
+                    mr="2"
+                  />
+                  Clear all
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </>
+        )}
       </Box>
 
       <ShapeItemsColorPickerInlineImpl
@@ -290,16 +232,53 @@ export const ShapeItemsColorPickerInlineImpl: React.FC<{
         flexDirection="row"
         alignItems="flex-start"
       >
-        <Box>
+        <Box display="flex" flexWrap="wrap">
           {shapeStyle.items.coloring.kind === 'color' && (
-            <ColorPickerPopover
-              disableAlpha
-              value={shapeStyle.items.coloring.color.color}
-              onChange={(hex) => {
-                shapeStyle.items.coloring.color.color = hex
-              }}
-              onAfterChange={onUpdate}
-            />
+            <>
+              {shapeStyle.items.coloring.color.colors.map((color, index) => (
+                <Box
+                  mb="4"
+                  mr="3"
+                  key={index}
+                  display="inline-flex"
+                  alignItems="center"
+                >
+                  <ColorPickerPopover
+                    css={css`
+                      width: 52px;
+                    `}
+                    disableAlpha
+                    value={chroma(shapeStyle.items.coloring.color.colors[index])
+                      .alpha(1)
+                      .hex()}
+                    onChange={(hex) => {
+                      const color = chroma(hex).hex()
+                      shapeStyle.items.coloring.color.colors[index] = color
+                    }}
+                    onAfterChange={() => {
+                      onUpdate()
+                    }}
+                    color={shapeStyle.items.coloring.color.colors[index]}
+                    onClick={() => setMulticolorIndex(index)}
+                  />
+
+                  {shapeStyle.items.coloring.color.colors.length > 1 && (
+                    <IconButton
+                      isRound
+                      aria-label="Delete"
+                      ml="2px"
+                      mr="2"
+                      icon="close"
+                      size="xs"
+                      onClick={() => {
+                        shapeStyle.items.coloring.color.colors.splice(index, 1)
+                        onUpdate()
+                      }}
+                    />
+                  )}
+                </Box>
+              ))}
+            </>
           )}
           {shapeStyle.items.coloring.kind === 'gradient' && (
             <>
@@ -350,91 +329,6 @@ export const ShapeItemsColorPickerInlineImpl: React.FC<{
         </Box>
       </Box>
       {children}
-    </>
-  )
-})
-
-export const ShapeItemsColorPickerCollapse: React.FC<{
-  shapeStyle: ShapeStyleOptions
-  label: string
-  onUpdate: () => void
-  children?: React.ReactNode
-}> = observer(({ label, shapeStyle, onUpdate, children }) => {
-  const [openShapeColors, setOpenShapeColors] = useState(false)
-
-  return (
-    <Box>
-      <Box display="flex" alignItems="center">
-        <Text
-          mr="3"
-          my="0"
-          css={css`
-            font-weight: 600;
-          `}
-        >
-          {label}
-        </Text>
-        <Button
-          rightIcon={openShapeColors ? 'chevron-up' : 'chevron-down'}
-          variant="ghost"
-          onClick={() => setOpenShapeColors(!openShapeColors)}
-        >
-          <ShapeItemsColorPickerSwatch as="span" shapeStyle={shapeStyle} />
-        </Button>
-      </Box>
-
-      <ShapeItemsColorPicker
-        shapeStyle={shapeStyle}
-        children={children}
-        onUpdate={onUpdate}
-      />
-    </Box>
-  )
-})
-
-export const ShapeItemsColorPickerPopover: React.FC<{
-  shapeStyle: ShapeStyleOptions
-  onUpdate: () => void
-  children?: React.ReactNode
-}> = observer(({ shapeStyle, onUpdate, children, ...props }) => {
-  const initialFocusRef = useRef(null)
-
-  const trigger = <ShapeItemsColorPickerSwatch shapeStyle={shapeStyle} />
-
-  return (
-    <>
-      <Popover
-        initialFocusRef={initialFocusRef}
-        placement="bottom"
-        closeOnBlur
-        closeOnEsc
-        usePortal
-      >
-        <PopoverTrigger>
-          <Box>{trigger}</Box>
-        </PopoverTrigger>
-
-        <PopoverContent
-          zIndex={4000}
-          css={css`
-            /* width: 250px; */
-          `}
-        >
-          <PopoverArrow />
-          <PopoverBody
-            p={2}
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-          >
-            <ShapeItemsColorPicker
-              shapeStyle={shapeStyle}
-              children={children}
-              onUpdate={onUpdate}
-            />
-          </PopoverBody>
-        </PopoverContent>
-      </Popover>
     </>
   )
 })

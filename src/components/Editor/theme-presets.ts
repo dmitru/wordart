@@ -11,7 +11,7 @@ export const themePresets: ThemePreset[] = [
     shapeFill: 'red',
     bgItemsColoring: {
       kind: 'color',
-      color: 'white',
+      colors: ['white'],
     },
     shapeItemsColoring: {
       kind: 'shape',
@@ -28,7 +28,7 @@ export const themePresets: ThemePreset[] = [
     shapeFill: 'yellow',
     bgItemsColoring: {
       kind: 'color',
-      color: 'white',
+      colors: ['white'],
     },
     shapeItemsColoring: {
       kind: 'shape',
@@ -45,7 +45,7 @@ export const themePresets: ThemePreset[] = [
     shapeFill: 'blue',
     bgItemsColoring: {
       kind: 'color',
-      color: '#aaa',
+      colors: ['#aaa'],
     },
     shapeItemsColoring: {
       kind: 'gradient',
@@ -66,7 +66,7 @@ export const themePresets: ThemePreset[] = [
     shapeFill: 'magenta',
     bgItemsColoring: {
       kind: 'color',
-      color: '#aaa',
+      colors: ['#aaa'],
     },
     shapeItemsColoring: {
       kind: 'gradient',

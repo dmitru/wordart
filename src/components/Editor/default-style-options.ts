@@ -40,14 +40,16 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
       kind: 'shape',
       color: {
         kind: 'color',
-        color: 'black',
+        colors: '#54bfa5 #222 #d6125c #38b3f6 #e9c028 #545006 #3da4de #4c0e27'.split(
+          ' '
+        ),
       },
       gradient: {
         kind: 'gradient',
         gradient: {
           assignBy: 'random',
-          from: 'red',
-          to: 'blue',
+          from: '#F92E2E',
+          to: '#4763AE',
         },
       },
       shape: {
@@ -91,7 +93,7 @@ export const defaultBgStyleOptions: BgStyleOptions = {
       kind: 'color',
       color: {
         kind: 'color',
-        color: '#1C1C32',
+        colors: ['#1C1C32'],
       },
       gradient: {
         kind: 'gradient',

@@ -696,7 +696,7 @@ export class Editor {
     let colors: string[] = []
     if (coloring.kind === 'gradient' || coloring.kind === 'color') {
       if (coloring.kind === 'color') {
-        colors = [coloring.color]
+        colors = coloring.colors
       } else if (coloring.kind === 'gradient') {
         const scale = chroma.scale([
           coloring.gradient.from,
