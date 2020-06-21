@@ -21,6 +21,7 @@ export type BgStyleOptions = {
 
     opacity: number
     dimSmallerItems: number
+    brightness: number
 
     coloring: {
       kind: (ItemsColoringColorConf | ItemsColoringGradientConf)['kind']
@@ -45,6 +46,7 @@ export type ShapeStyleOptions = {
 
     opacity: number
     dimSmallerItems: number
+    brightness: number
 
     coloring: {
       kind: (
@@ -85,8 +87,6 @@ export type ItemsColoringGradientConf = {
 
 export type ItemsColoringShapeConf = {
   kind: 'shape'
-  /** -100 .. +100, 0 means precisely the shape color */
-  shapeBrightness: number
 }
 
 export type WordItemsOptions = {
@@ -173,13 +173,14 @@ export type ItemsColoring =
 export type ItemsShapeColoring = {
   kind: 'shape'
   dimSmallerItems: number
-  shapeBrightness: number
+  brightness: number
 }
 
 export type ItemsSingleColorColoring = {
   kind: 'single-color'
   color: ColorString
   dimSmallerItems: number
+  brightness: number
 }
 
 export type ItemsGradientColoring = {
@@ -188,4 +189,5 @@ export type ItemsGradientColoring = {
   colorTo: string
   assignColorBy: 'random' | 'size'
   dimSmallerItems: number
+  brightness: number
 }

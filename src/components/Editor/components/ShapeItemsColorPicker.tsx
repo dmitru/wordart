@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  ButtonProps,
   Menu,
   MenuButton,
   MenuItem,
@@ -12,85 +11,42 @@ import {
 } from '@chakra-ui/core'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
-import { ShapeStyleOptions } from 'components/Editor/style-options'
+import {
+  ShapeStyleOptions,
+  BgStyleOptions,
+} from 'components/Editor/style-options'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
-import { ColorSwatchButton } from 'components/shared/ColorSwatchButton'
-import { observer, Observer } from 'mobx-react'
+import { observer } from 'mobx-react'
 import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import React, { useState } from 'react'
-
-export const ShapeItemsColorPickerSwatch = React.forwardRef<
-  HTMLElement,
-  {
-    shapeStyle: ShapeStyleOptions
-  } & Partial<ButtonProps>
->(({ shapeStyle, ...props }, ref) => {
-  return (
-    // @ts-ignore
-    <Observer>
-      {/* 
-      // @ts-ignore
-       */}
-      {() => {
-        let trigger: React.ReactNode = <span>open</span>
-        if (shapeStyle.items.coloring.kind === 'color') {
-          trigger = (
-            <ColorSwatchButton
-              css={css`
-                width: 80px;
-              `}
-              borderRadius="none"
-              colors={shapeStyle.items.coloring.color.colors}
-              kind="colors"
-              ref={ref}
-              {...props}
-            />
-          )
-        } else if (shapeStyle.items.coloring.kind === 'gradient') {
-          trigger = (
-            <ColorSwatchButton
-              css={css`
-                width: 80px;
-              `}
-              borderRadius="none"
-              colors={[
-                shapeStyle.items.coloring.gradient.gradient.from,
-                shapeStyle.items.coloring.gradient.gradient.to,
-              ]}
-              kind="gradient"
-              ref={ref}
-              {...props}
-            />
-          )
-        } else if (shapeStyle.items.coloring.kind === 'shape') {
-          trigger = (
-            <ColorSwatchButton
-              css={css`
-                width: 80px;
-              `}
-              borderRadius="none"
-              kind="spectrum"
-              ref={ref}
-              {...props}
-            />
-          )
-        }
-
-        return trigger
-      }}
-    </Observer>
-  )
-})
+import { Tooltip } from 'components/shared/Tooltip'
+import { FiRefreshCw } from 'react-icons/fi'
 
 export const ShapeItemsColorPickerInline: React.FC<{
   shapeStyle: ShapeStyleOptions
+  bgFill: BgStyleOptions['fill']
   label?: string
   onUpdate: () => void
   children?: React.ReactNode
   renderToolbar?: () => React.ReactNode
 }> = observer(
-  ({ renderToolbar = () => null, label, shapeStyle, onUpdate, children }) => {
-    const [openShapeColors, setOpenShapeColors] = useState(false)
+  ({
+    renderToolbar = () => null,
+    bgFill,
+    label,
+    shapeStyle,
+    onUpdate,
+    children,
+  }) => {
+    const isDarkBg =
+      bgFill.kind === 'color' && chroma(bgFill.color.color).luminance() < 0.5
+
+    const getRandomColor = () =>
+      chroma
+        .random()
+        .luminance(isDarkBg ? 0.65 : 0.35)
+        .saturate(isDarkBg ? 0.3 : 0.4)
+        .hex()
 
     return (
       <Box>
@@ -163,28 +119,11 @@ export const ShapeItemsColorPickerInline: React.FC<{
             </MenuList>
           </Menu>
 
-          {shapeStyle.items.coloring.kind === 'color' ? (
-            <>
-              <Button
-                isDisabled={shapeStyle.items.coloring.color.colors.length >= 8}
-                variantColor="primary"
-                leftIcon="add"
-                onClick={() => {
-                  const color = chroma.random().hex()
-                  shapeStyle.items.coloring.color.colors.push(color)
-                  onUpdate()
-                }}
-                size="sm"
-                ml="auto"
-              >
-                Add
-              </Button>
-
-              {renderToolbar()}
-
+          {shapeStyle.items.coloring.kind === 'color' && (
+            <Box ml="auto">
               <Menu>
                 <MenuButton
-                  ml="2"
+                  ml="1"
                   as={Button}
                   size="sm"
                   outline="none"
@@ -213,8 +152,69 @@ export const ShapeItemsColorPickerInline: React.FC<{
                   </MenuItem>
                 </MenuList>
               </Menu>
-            </>
-          ) : (
+
+              {renderToolbar()}
+
+              <Tooltip label="Randomize" placement="top">
+                <Button
+                  variant="outline"
+                  isDisabled={
+                    shapeStyle.items.coloring.color.colors.length === 0
+                  }
+                  onClick={() => {
+                    shapeStyle.items.coloring.color.colors = shapeStyle.items.coloring.color.colors.map(
+                      () => getRandomColor()
+                    )
+                    onUpdate()
+                  }}
+                  size="sm"
+                  ml="1"
+                >
+                  <FiRefreshCw />
+                </Button>
+              </Tooltip>
+
+              <Button
+                isDisabled={shapeStyle.items.coloring.color.colors.length >= 8}
+                variantColor="primary"
+                leftIcon="add"
+                onClick={() => {
+                  shapeStyle.items.coloring.color.colors.push(getRandomColor())
+                  onUpdate()
+                }}
+                size="sm"
+                ml="1"
+              >
+                Add
+              </Button>
+            </Box>
+          )}
+
+          {shapeStyle.items.coloring.kind === 'gradient' && (
+            <Box ml="auto">
+              <Tooltip label="Randomize" placement="top">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    shapeStyle.items.coloring.gradient.gradient = {
+                      from: getRandomColor(),
+                      to: getRandomColor(),
+                      assignBy: 'random',
+                    }
+                    onUpdate()
+                  }}
+                  size="sm"
+                  ml="1"
+                >
+                  <FiRefreshCw />
+                </Button>
+              </Tooltip>
+
+              {renderToolbar()}
+            </Box>
+          )}
+
+          {shapeStyle.items.coloring.kind === 'shape' && (
             <Box ml="auto">{renderToolbar()}</Box>
           )}
         </Box>

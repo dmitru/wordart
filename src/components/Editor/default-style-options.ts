@@ -35,6 +35,7 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
   },
   items: {
     dimSmallerItems: 20,
+    brightness: 0,
     opacity: 100,
     coloring: {
       kind: 'shape',
@@ -54,7 +55,6 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
       },
       shape: {
         kind: 'shape',
-        shapeBrightness: 20,
       },
     },
 
@@ -88,6 +88,7 @@ export const defaultBgStyleOptions: BgStyleOptions = {
   },
   items: {
     dimSmallerItems: 65,
+    brightness: 0,
     opacity: 20,
     coloring: {
       kind: 'color',

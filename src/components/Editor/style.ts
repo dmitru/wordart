@@ -40,6 +40,7 @@ export type BgStyleConf = {
 
     opacity: number
     dimSmallerItems: number
+    brightness: number
 
     coloring: ItemsColoringColorConf | ItemsColoringGradientConf
   }
@@ -53,6 +54,7 @@ export const mkBgStyleConfFromOptions = (
     words: mkWordItemsConfFromOptions(opts.items.words),
     icons: opts.items.icons,
     dimSmallerItems: opts.items.dimSmallerItems,
+    brightness: opts.items.brightness,
     opacity: opts.items.opacity,
     placement: opts.items.placement,
     coloring:
@@ -72,6 +74,7 @@ export type ShapeStyleConf = {
 
     opacity: number
     dimSmallerItems: number
+    brightness: number
 
     coloring:
       | ItemsColoringColorConf
@@ -88,6 +91,7 @@ export const mkShapeStyleConfFromOptions = (
     words: mkWordItemsConfFromOptions(opts.items.words),
     icons: opts.items.icons,
     dimSmallerItems: opts.items.dimSmallerItems,
+    brightness: opts.items.brightness,
     opacity: opts.items.opacity,
     placement: opts.items.placement,
     coloring:

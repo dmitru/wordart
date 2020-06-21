@@ -1,4 +1,4 @@
-import chroma from 'chroma-js'
+import chroma, { Color } from 'chroma-js'
 import { EditorStore } from 'components/Editor/editor-store'
 import { computeColorsMap } from 'components/Editor/lib/colormap'
 import {
@@ -684,7 +684,7 @@ export class Editor {
     itemsStyleConf: BgStyleConf['items'] | ShapeStyleConf['items'],
     render = true
   ) => {
-    const { coloring, dimSmallerItems } = itemsStyleConf
+    const { coloring, dimSmallerItems, brightness } = itemsStyleConf
     const { items } = this.items[target]
     this.logger.debug(
       'setItemsStyle',
@@ -722,14 +722,16 @@ export class Editor {
         const scaling = item.transform.scaling
         const wordH = bounds.width * scaling.y
         const wordW = bounds.height * scaling.x
-        const wordArea = Math.sqrt(wordH * wordW)
+        const wordArea = Math.sqrt(Math.sqrt(wordH * wordW))
         return wordArea
       }
       return 0
     })
     const maxArea = max(itemAreas)!
     const minArea = min(itemAreas)!
-    const rng = seedrandom('fill color')
+    let colorIndex = 0
+
+    // const rng = seedrandom('fill color')
     let shapeRaster: fabric.Image | undefined
     let shapeRasterImgData: ImageData | undefined
     const dimSmallerFactor = dimSmallerItems / 100
@@ -751,26 +753,23 @@ export class Editor {
         continue
       }
 
+      let color: Color
+
       if (coloring.kind === 'gradient' || coloring.kind === 'color') {
-        const index = Math.floor(rng() * colors.length)
-        item.setColor(colors[index])
+        // const index = Math.floor(rng() * colors.length)
+        color = chroma(colors[colorIndex])
+        colorIndex = (colorIndex + 1) % colors.length
       } else if (coloring.kind === 'shape') {
-        // TODO
         if (shape.kind === 'svg') {
           if (shape.config.processing.colors.kind === 'single-color') {
             const shapeColor = new paper.Color(
               shape.config.processing.colors.color
             )
-            let color = chroma.rgb(
+            color = chroma.rgb(
               255 * shapeColor.red,
               255 * shapeColor.green,
               255 * shapeColor.blue
             )
-            if (coloring.shapeBrightness != 0) {
-              color = color.brighten(coloring.shapeBrightness / 100)
-            }
-            const hex = color.hex()
-            item.setColor(hex)
           } else if (shape.config.processing.colors.kind === 'color-map') {
             const colorMapSorted = sortBy(
               shape.originalColors.map((color, index) => ({
@@ -783,55 +782,45 @@ export class Editor {
             const shapeColorString =
               shape.config.processing.colors.colors[shapeColorStringIndex]
             const shapeColor = new paper.Color(shapeColorString)
-            let color = chroma.rgb(
+            color = chroma.rgb(
               255 * shapeColor.red,
               255 * shapeColor.green,
               255 * shapeColor.blue
             )
-            if (coloring.shapeBrightness != 0) {
-              color = color.brighten(coloring.shapeBrightness / 100)
-            }
-            const hex = color.hex()
-            item.setColor(hex)
           } else if (shape.config.processing.colors.kind === 'original') {
             const shapeColor = new paper.Color(item.shapeColor)
-            let color = chroma.rgb(
+            color = chroma.rgb(
               255 * shapeColor.red,
               255 * shapeColor.green,
               255 * shapeColor.blue
             )
-            if (coloring.shapeBrightness != 0) {
-              color = color.brighten(coloring.shapeBrightness / 100)
-            }
-            const hex = color.hex()
-            item.setColor(hex)
           }
         } else if (shape.kind === 'raster') {
           let colorString = item.shapeColor
           if (shape.config.processing?.invert) {
             colorString = shape.config.processing.invert.color
           }
-          let color = chroma(colorString)
-          if (coloring.shapeBrightness != 0) {
-            color = color.brighten(coloring.shapeBrightness / 100)
-          }
-          item.setColor(color.hex())
+          color = chroma(colorString)
         } else if (shape.kind === 'text') {
           const shapeColor = new paper.Color(shape.config.textStyle.color)
-          let color = chroma.rgb(
+          color = chroma.rgb(
             255 * shapeColor.red,
             255 * shapeColor.green,
             255 * shapeColor.blue
           )
-          if (coloring.shapeBrightness != 0) {
-            color = color.brighten(coloring.shapeBrightness / 100)
-          }
-          const hex = color.hex()
-          item.setColor(hex)
         }
       } else {
         exhaustiveCheck(coloring)
       }
+
+      if (brightness != 0) {
+        color = color!
+          .brighten((2 * brightness) / 100)
+          .saturate(-(0.2 * brightness) / 100)
+      }
+
+      const hex = color!.hex()
+      item.setColor(hex)
 
       item.setOpacity(
         ((dimSmallerFactor * (area - minArea)) / (maxArea - minArea) +

@@ -1110,6 +1110,7 @@ const TopNavWrapper = styled(Box)`
 `
 
 const LeftWrapper = styled.div`
+  user-select: none;
   height: 100%;
   background: white;
   max-width: 460px;

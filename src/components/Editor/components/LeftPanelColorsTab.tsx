@@ -10,6 +10,7 @@ import {
   MenuList,
   MenuItem,
   Icon,
+  Checkbox,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { useThrottleCallback } from '@react-hook/throttle'
@@ -117,9 +118,11 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
       // <update-styles>
       // Shape
       shapeStyle.opacity = theme.shapeOpacity
+      shapeStyle.items.brightness = 0
 
       // Bg
       bgStyle.fill.kind = 'color'
+      bgStyle.items.brightness = 0
       bgStyle.fill.color = {
         kind: 'color',
         color: theme.bgFill,
@@ -158,7 +161,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
       bgStyle.items.dimSmallerItems = theme.bgDimSmallerItems
       // </update-styles>
 
-      updateAllStyles()
+      return updateAllStyles()
     }
 
     return (
@@ -187,7 +190,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                       leftIcon="chevron-left"
                       onClick={() => {
                         state.view = 'normal'
-                        if (state.savedStyle) {
+                        if (state.savedStyle && state.selectedThemeTitle) {
                           store.styleOptions.shape = state.savedStyle.shapeStyle
                           store.styleOptions.bg = state.savedStyle.bgStyle
                           // @ts-ignore
@@ -198,21 +201,32 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     >
                       Back
                     </Button>
-                    {state.selectedThemeTitle && (
-                      <Button
-                        ml="3"
-                        width="100%"
-                        variantColor="green"
-                        variant="solid"
-                        isDisabled={!state.selectedThemeTitle}
-                        onClick={() => {
-                          state.view = 'normal'
-                          state.savedStyle = null
-                        }}
-                      >
-                        Apply Theme
-                      </Button>
-                    )}
+                    <AnimatePresence>
+                      {state.selectedThemeTitle && (
+                        <motion.div
+                          key="btn"
+                          style={{ display: 'flex', flex: '1' }}
+                          initial={{ x: 0, y: 0, opacity: 0, scale: 1.4 }}
+                          transition={{ ease: 'easeInOut', duration: 0.2 }}
+                          animate={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                        >
+                          <Button
+                            ml="3"
+                            flex="1"
+                            // width="100%"
+                            variantColor="accent"
+                            variant="solid"
+                            isDisabled={!state.selectedThemeTitle}
+                            onClick={() => {
+                              state.view = 'normal'
+                              state.savedStyle = null
+                            }}
+                          >
+                            Apply Theme
+                          </Button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </Flex>
 
                   <Text fontSize="xl">Try a color theme</Text>
@@ -266,7 +280,6 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     <Button
                       flex="1"
                       marginLeft="auto"
-                      variant="solid"
                       variantColor="accent"
                       rightIcon="chevron-right"
                       onClick={() => {
@@ -400,13 +413,14 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                           margin-bottom: 0;
                         `}
                       >
-                        Shape Words & Icons
+                        Shape Items
                       </SectionLabel>
                     </Box>
 
-                    <Box mt="3">
+                    <Box mt="2">
                       <ShapeItemsColorPickerInline
                         shapeStyle={shapeStyle}
+                        bgFill={bgStyle.fill}
                         onUpdate={updateShapeItemsColoring}
                         renderToolbar={() => (
                           <Tooltip
@@ -419,7 +433,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                                 width: 40px;
                               `}
                               size="sm"
-                              ml="2"
+                              ml="1"
                               variant={
                                 store.leftColorTab.showShapeItemsAdvanced
                                   ? 'solid'
@@ -427,7 +441,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                               }
                               variantColor={
                                 store.leftColorTab.showShapeItemsAdvanced
-                                  ? 'blue'
+                                  ? 'primary'
                                   : 'gray'
                               }
                               onClick={() => {
@@ -450,6 +464,23 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                       isOpen={store.leftColorTab.showShapeItemsAdvanced}
                     >
                       <Box pb="0.5rem" pr="3">
+                        <Box>
+                          <Slider
+                            afterLabel="%"
+                            horizontal
+                            label="Brightness"
+                            value={shapeStyle.items.brightness}
+                            onChange={(value) => {
+                              const val = (value as any) as number
+                              shapeStyle.items.brightness = val
+                            }}
+                            onAfterChange={updateShapeItemsColoring}
+                            min={-100}
+                            max={100}
+                            step={1}
+                          />
+                        </Box>
+
                         <Flex direction="row" mb="0">
                           <Slider
                             css={css`
@@ -469,28 +500,6 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                             step={1}
                           />
                         </Flex>
-
-                        {/* <Box mb="0">
-                        {shapeStyle.items.coloring.kind === 'shape' && (
-                <Box mb="4">
-                  <Slider
-                    css={css`
-                      width: 50%;
-                    `}
-                    label="Brightness"
-                    value={shapeStyle.items.coloring.shape.shapeBrightness}
-                    onChange={(value) => {
-                      const val = (value as any) as number
-                      shapeStyle.items.coloring.shape.shapeBrightness = val
-                    }}
-                    onAfterChange={updateShapeItemsColoring}
-                    min={-100}
-                    max={100}
-                    step={1}
-                  />
-                </Box>
-              )}
-                      </Box> */}
 
                         <Box mb="2">
                           <Slider
@@ -564,7 +573,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   {store?.editor && store.editor.items.bg.items.length > 0 && (
                     <Box mt="2.5rem">
                       <SectionLabel display="flex" alignItems="center">
-                        Background Words & Icons
+                        Background Items
                         <Button
                           size="xs"
                           ml="auto"
@@ -593,7 +602,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                         </Button>
                       </SectionLabel>
 
-                      <Box mt="3">
+                      <Box mt="0">
                         <BgItemsColorPickerInline
                           bgStyle={bgStyle}
                           onUpdate={updateBgItemsColoring}

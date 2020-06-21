@@ -457,7 +457,10 @@ export class EditorStore {
 
     if (data.bgStyle.items.coloring.kind === 'color') {
       bgStyle.items.coloring.kind = 'color'
-      bgStyle.items.coloring.color = data.bgStyle.items.coloring
+      bgStyle.items.coloring.color = {
+        ...bgStyle.items.coloring.color,
+        ...data.bgStyle.items.coloring,
+      }
     } else if (data.bgStyle.items.coloring.kind === 'gradient') {
       bgStyle.items.coloring.kind = 'gradient'
       bgStyle.items.coloring.gradient = data.bgStyle.items.coloring
@@ -476,7 +479,10 @@ export class EditorStore {
 
     if (data.shapeStyle.items.coloring.kind === 'color') {
       shapeStyle.items.coloring.kind = 'color'
-      shapeStyle.items.coloring.color = data.shapeStyle.items.coloring
+      shapeStyle.items.coloring.color = {
+        ...shapeStyle.items.coloring.color,
+        ...data.shapeStyle.items.coloring,
+      }
     } else if (data.shapeStyle.items.coloring.kind === 'gradient') {
       shapeStyle.items.coloring.kind = 'gradient'
       shapeStyle.items.coloring.gradient = data.shapeStyle.items.coloring
