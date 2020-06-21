@@ -119,21 +119,10 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
       store.animateVisualize(false)
     }, [])
 
-    // return null
-
     return (
       <Box px="3" py="5">
         <Box mb="2.5rem">
           <SectionLabel>Placement</SectionLabel>
-          {/* <Checkbox
-            id="fit-shape"
-            label="Allow words to go beyond shape"
-            value={!style.fitWithinShape}
-            onChange={(value) => {
-              style.fitWithinShape = !value
-            }}
-            mb="3"
-          /> */}
           <Slider
             horizontal
             label="Density"
