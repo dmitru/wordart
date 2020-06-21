@@ -28,10 +28,16 @@ export type FontPickerProps = {
   selectedFontId: string
   onCancel: () => void
   onSelected: (font: FontConfig, fontStyle: FontStyleConfig) => void
+  onHighlighted: (font: FontConfig, fontStyle: FontStyleConfig) => void
 }
 
 export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
-  const { selectedFontId: initSelectedFontId, onSelected, onCancel } = props
+  const {
+    selectedFontId: initSelectedFontId,
+    onSelected,
+    onHighlighted,
+    onCancel,
+  } = props
   const { editorPageStore: store } = useStore()
 
   const state = useLocalStore(() => ({
@@ -82,6 +88,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
           style,
           onClick: () => {
             state.selectedFontId = fontStyle.fontId
+            onHighlighted(font.font, fontStyle)
           },
         }}
       />

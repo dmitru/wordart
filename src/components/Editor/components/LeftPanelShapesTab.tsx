@@ -231,6 +231,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
               store.editor?.clearItems('bg')
               applyTransformToObj(shape.obj, shape.originalTransform)
               shape.transform = [...shape.originalTransform] as MatrixSerialized
+              store.renderKey++
             }}
           >
             Reset original
@@ -240,7 +241,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
     return (
       <>
-        <Box>
+        <Box p="3">
           <>
             <Box display="flex" alignItems="flex-start" mb="3">
               {shape && (
@@ -545,6 +546,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                   store.editor?.deselectShape()
                                   store.editor?.clearItems('shape')
                                   store.editor?.clearItems('bg')
+                                  store.animateVisualize(false)
                                 }}
                               >
                                 Apply
@@ -694,6 +696,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           if (store.selectedShapeId !== shapeConfig.id) {
                             await store.selectShapeAndSaveUndo(shapeConfig.id)
                           }
+                          store.animateVisualize(false)
                         }}
                         selectedShapeId={store.getSelectedShapeConf().id}
                       />

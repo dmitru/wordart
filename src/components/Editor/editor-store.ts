@@ -73,6 +73,7 @@ import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
 import { exhaustiveCheck } from 'utils/type-utils'
 import { createCanvas } from 'lib/wordart/canvas-utils'
+import { animateElement } from 'utils/animation'
 
 export type EditorMode = 'view' | 'edit'
 
@@ -97,6 +98,8 @@ export class EditorStore {
     showShapeItemsAdvanced: false,
     showBgItemsAdvanced: false,
   }
+
+  visualizeAnimatedLastTime: Date | null = null
 
   @observable isVisualizing = false
   @observable visualizingProgress = null as number | null
@@ -1229,6 +1232,20 @@ export class EditorStore {
         ? pageSize.preset.aspect
         : pageSize.width / pageSize.height
     this.editor.setAspectRatio(aspect)
+  }
+
+  animateVisualize = (debounce = true) => {
+    if (
+      (debounce &&
+        (!this.visualizeAnimatedLastTime ||
+          (this.visualizeAnimatedLastTime != null &&
+            new Date().getTime() - this.visualizeAnimatedLastTime.getTime() >
+              5000))) ||
+      !debounce
+    ) {
+      this.visualizeAnimatedLastTime = new Date()
+      animateElement(document.getElementById('btn-visualize')!)
+    }
   }
 }
 

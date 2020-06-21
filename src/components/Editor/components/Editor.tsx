@@ -588,6 +588,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                               key={preset.id}
                               onClick={() => {
                                 store.setPageSize({ kind: 'preset', preset })
+                                store.animateVisualize(false)
                               }}
                             >
                               {preset.title}
@@ -810,6 +811,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               {store.lifecycleState === 'initialized' && (
                 <>
                   <Button
+                    id="btn-visualize"
                     css={css`
                       width: 128px;
                     `}

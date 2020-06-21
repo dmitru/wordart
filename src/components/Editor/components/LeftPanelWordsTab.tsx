@@ -92,7 +92,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     const fonts = store.getAvailableFonts()
 
     return (
-      <Box mb="5">
+      <Box mb="5" p="3">
         <Stack spacing="0">
           <Stack direction="row" mb="2" spacing="0">
             <Tooltip label="Open words editor..." showDelay={300}>
@@ -130,6 +130,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                         ...w,
                         text: capitalize(w.text),
                       }))
+                      store.animateVisualize(false)
                     }}
                   >
                     Capitalize
@@ -140,6 +141,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                         ...w,
                         text: w.text.toLocaleUpperCase(),
                       }))
+                      store.animateVisualize(false)
                     }}
                   >
                     UPPERCASE
@@ -150,6 +152,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                         ...w,
                         text: w.text.toLocaleLowerCase(),
                       }))
+                      store.animateVisualize(false)
                     }}
                   >
                     lowercase
@@ -175,7 +178,10 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             <Button
               variantColor="green"
               leftIcon="add"
-              onClick={() => store.addWord(target)}
+              onClick={() => {
+                store.addWord(target)
+                store.animateVisualize(false)
+              }}
             >
               Add
             </Button>
@@ -204,6 +210,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                       store.updateWord(target, word.id, {
                         text,
                       })
+                      store.animateVisualize(false)
                     }}
                     selectAllOnFocus
                     placeholder="Type new word here..."
@@ -221,7 +228,10 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     mr="2"
                     icon="close"
                     size="xs"
-                    onClick={() => store.deleteWord(target, word.id)}
+                    onClick={() => {
+                      store.deleteWord(target, word.id)
+                      store.animateVisualize(false)
+                    }}
                     // variantColor="red"
                   >
                     <Icon name="close" />
@@ -317,6 +327,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     store.addWord(target, word)
                   }
                   state.isShowingImport = false
+                  store.animateVisualize(false)
                 }}
               >
                 Import

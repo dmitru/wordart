@@ -37,7 +37,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
       .filter((s) => s.kind === 'svg')
 
     return (
-      <>
+      <Box p="3">
         <Toolbar display="flex" alignItems="center">
           {!state.isAdding && (
             <>
@@ -96,6 +96,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                   'shapeId'
                 )
                 state.isAdding = false
+                store.animateVisualize(false)
               }}
             />
           </>
@@ -114,6 +115,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                       style.items.icons.iconList = style.items.icons.iconList.filter(
                         (i) => i.shapeId !== icon.shapeId
                       )
+                      store.animateVisualize(false)
                     }}
                     backgroundColor="white"
                     url={
@@ -137,6 +139,9 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                     const val = (value as any) as number
                     style.items.placement.iconsMaxSize = val
                   }}
+                  onAfterChange={() => {
+                    store.animateVisualize(false)
+                  }}
                   min={20}
                   max={100}
                   step={1}
@@ -150,6 +155,9 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                     const val = (value as any) as number
                     style.items.placement.iconsProportion = val
                   }}
+                  onAfterChange={() => {
+                    store.animateVisualize(false)
+                  }}
                   min={0}
                   max={100}
                   step={1}
@@ -162,7 +170,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
             )}
           </>
         )}
-      </>
+      </Box>
     )
   }
 )

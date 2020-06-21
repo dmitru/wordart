@@ -1111,6 +1111,7 @@ export class Editor {
   generateBgItems = async (params: { style: BgStyleConf }) => {
     const { style } = params
     const { coloring } = style.items
+    this.store.visualizeAnimatedLastTime = new Date()
     this.logger.debug('generateBgItems')
     if (!this.shape?.obj) {
       console.error('No shape obj')
@@ -1328,6 +1329,7 @@ export class Editor {
   generateShapeItems = async (params: { style: ShapeStyleConf }) => {
     const { style } = params
     this.logger.debug('generateShapeItems')
+    this.store.visualizeAnimatedLastTime = new Date()
     if (!this.shape?.obj) {
       console.error('No shape obj')
       return

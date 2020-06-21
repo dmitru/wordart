@@ -40,6 +40,7 @@ import CustomImg from './img/custom.svg'
 import RandomImg from './img/random.svg'
 import styled from '@emotion/styled'
 import css from '@emotion/css'
+import { animateElement } from 'utils/animation'
 
 const anglePresets: {
   kind: WordAnglesPresetKind
@@ -111,17 +112,17 @@ export type LeftPanelLayoutTabProps = {
 
 export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
   ({ target }) => {
-    const { editorPageStore } = useStore()
-    const style = editorPageStore.styleOptions[target]
+    const { editorPageStore: store } = useStore()
+    const style = store.styleOptions[target]
 
-    const visualize = useCallback(() => {
-      // editorPageStore.editor?.generateShapeItems({ style })
+    const animateVisualize = useCallback(() => {
+      store.animateVisualize(false)
     }, [])
 
     // return null
 
     return (
-      <>
+      <Box p="3">
         <Box mb="2.5rem">
           <SectionLabel>Placement</SectionLabel>
           {/* <Checkbox
@@ -142,7 +143,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
               const val = (value as any) as number
               style.items.placement.itemDensity = val
             }}
-            onAfterChange={visualize}
+            onAfterChange={animateVisualize}
             min={0}
             max={100}
             step={1}
@@ -157,7 +158,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
               const val = (value as any) as number
               style.items.placement.shapePadding = val
             }}
-            onAfterChange={visualize}
+            onAfterChange={animateVisualize}
             min={0}
             max={100}
             step={1}
@@ -179,7 +180,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                     const val = (value as any) as number
                     style.items.placement.wordsMaxSize = val
                   }}
-                  onAfterChange={visualize}
+                  onAfterChange={animateVisualize}
                   min={20}
                   max={100}
                   step={1}
@@ -193,6 +194,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                       active={preset.kind === style.items.words.anglesPreset}
                       onClick={() => {
                         style.items.words.anglesPreset = preset.kind
+                        store.animateVisualize()
                       }}
                     >
                       {preset.Svg && <preset.Svg width="100%" height="100%" />}
@@ -301,7 +303,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
             />
           </Box>
         )}
-      </>
+      </Box>
     )
   }
 )

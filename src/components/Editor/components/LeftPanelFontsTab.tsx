@@ -78,6 +78,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
           overflow="hidden"
           width="100%"
           height="calc(100vh - 120px)"
+          p="3"
         >
           <AnimatePresence initial={false}>
             {state.view === 'font-list' && (
@@ -188,6 +189,16 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                       onCancel={() => {
                         state.view = 'font-list'
                       }}
+                      onHighlighted={(font, fontStyle) => {
+                        if (state.replacingFontIndex != null) {
+                          style.items.words.fontIds[state.replacingFontIndex] =
+                            fontStyle.fontId
+                          style.items.words.fontIds = uniq(
+                            style.items.words.fontIds
+                          )
+                        }
+                        store.animateVisualize(false)
+                      }}
                       onSelected={(font, fontStyle) => {
                         if (state.isAddingFont) {
                           style.items.words.fontIds = uniq([
@@ -202,6 +213,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                           )
                         }
                         state.view = 'font-list'
+                        store.animateVisualize(false)
                       }}
                     />
                   </Box>
