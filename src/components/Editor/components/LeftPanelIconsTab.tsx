@@ -28,13 +28,11 @@ const state = observable({
 
 export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
   ({ target }) => {
-    const { editorPageStore } = useStore()
-    const style = editorPageStore.styleOptions[target]
+    const { editorPageStore: store } = useStore()
+    const style = store.styleOptions[target]
     const icons = style.items.icons.iconList
 
-    const shapes = editorPageStore
-      .getAvailableShapes()
-      .filter((s) => s.kind === 'svg')
+    const shapes = store.getAvailableShapes().filter((s) => s.kind === 'svg')
 
     return (
       <Box p="3">
@@ -54,6 +52,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 variant="ghost"
                 onClick={() => {
                   style.items.icons.iconList = []
+                  store.animateVisualize(false)
                 }}
               >
                 Clear
@@ -118,10 +117,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                       store.animateVisualize(false)
                     }}
                     backgroundColor="white"
-                    url={
-                      editorPageStore.getShapeConfById(icon.shapeId)!
-                        .thumbnailUrl
-                    }
+                    url={store.getShapeConfById(icon.shapeId)!.thumbnailUrl}
                   />
                 ))}
               </ShapeThumbnails>
