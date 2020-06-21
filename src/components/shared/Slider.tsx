@@ -16,7 +16,7 @@ import { Text, Box } from '@chakra-ui/core'
 
 export type SliderProps = {
   value: number
-  label?: string
+  label?: React.ReactNode
   labelRight?: string
   onChange?: (value: number) => void
   onAfterChange?: (value: number) => void

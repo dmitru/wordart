@@ -43,6 +43,7 @@ import { observer } from 'mobx-react'
 import React, { useEffect, useState } from 'react'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
+import { FaCog } from 'react-icons/fa'
 import { useDebouncedCallback } from 'use-debounce/lib'
 
 export type LeftPanelShapesTabProps = {}
@@ -123,6 +124,13 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
       // 'Transport',
       // 'Other',
     ].map(([value, label]) => ({ value, label }))
+
+    const shapesPerCategoryCounts = allCategoryOptions.map(
+      ({ value }) =>
+        store
+          .getAvailableShapes()
+          .filter((s) => (s.categories || []).includes(value)).length
+    )
 
     const [selectedCategory, setSelectedCategory] = useState<{
       value: string
@@ -210,25 +218,25 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
       c.dispose()
     }
 
-    const resetTransformBtn = shape ? (
-      <Tooltip
-        label="Center shape and restore its original size"
-        isDisabled={isEqual(shape.originalTransform, shape.transform)}
-      >
-        <Button
-          ml="3"
+    const resetTransformBtn =
+      shape && !isEqual(shape.originalTransform, shape.transform) ? (
+        <Tooltip
+          label="Center shape and restore its original size"
           isDisabled={isEqual(shape.originalTransform, shape.transform)}
-          onClick={() => {
-            store.editor?.clearItems('shape')
-            store.editor?.clearItems('bg')
-            applyTransformToObj(shape.obj, shape.originalTransform)
-            shape.transform = [...shape.originalTransform] as MatrixSerialized
-          }}
         >
-          Reset original
-        </Button>
-      </Tooltip>
-    ) : null
+          <Button
+            ml="3"
+            onClick={() => {
+              store.editor?.clearItems('shape')
+              store.editor?.clearItems('bg')
+              applyTransformToObj(shape.obj, shape.originalTransform)
+              shape.transform = [...shape.originalTransform] as MatrixSerialized
+            }}
+          >
+            Reset original
+          </Button>
+        </Tooltip>
+      ) : null
 
     return (
       <>
@@ -275,7 +283,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                   )}
                 </Box>
 
-                <Flex marginTop="70px">
+                <Flex marginTop="70px" width="100%">
                   {state.mode === 'home' && (
                     <Tooltip
                       label="Customize colors, size and position"
@@ -284,10 +292,13 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                       <Button
                         mr="2"
                         variant="solid"
+                        display="flex"
+                        flex="1"
                         onClick={() => {
                           state.mode = 'customize shape'
                         }}
                       >
+                        <FaCog style={{ marginRight: '5px' }} />
                         Customize
                       </Button>
                     </Tooltip>
@@ -295,6 +306,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
                   {state.mode === 'customize shape' && (
                     <Button
+                      flex="1"
                       variantColor="green"
                       onClick={() => {
                         state.mode = 'home'
@@ -490,15 +502,27 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         </Heading>
                         {!store.leftTabIsTransformingShape && (
                           <>
-                            <Text mt="2" color="gray.500" fontSize="sm">
-                              All unlocked words will be removed.
-                            </Text>
                             <Stack direction="row" mt="3" spacing="3">
                               <Button
                                 variantColor="accent"
                                 onClick={() => {
+                                  if (!store.editor) {
+                                    return
+                                  }
+                                  const totalItemsCount =
+                                    (store.editor.items.shape.items.length ||
+                                      0) +
+                                    (store.editor.items.bg.items.length || 0)
+                                  if (
+                                    totalItemsCount > 0 &&
+                                    !window.confirm(
+                                      'All unlocked words will be removed. Do you want to continue?'
+                                    )
+                                  ) {
+                                    return
+                                  }
                                   store.leftTabIsTransformingShape = true
-                                  store.editor?.selectShape()
+                                  store.editor.selectShape()
                                 }}
                               >
                                 Transform shape
@@ -576,9 +600,6 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         <InputGroup size="sm">
                           <InputLeftElement children={<Icon name="search" />} />
                           <Input
-                            _placeholder={{
-                              color: 'red',
-                            }}
                             placeholder="Search shapes..."
                             value={query}
                             onChange={(e: any) => setQuery(e.target.value)}
@@ -602,10 +623,6 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                       </Flex>
 
                       <Flex align="center" mt="2" mb="1">
-                        <Text my="0" mr="2" fontWeight="600">
-                          Category:
-                        </Text>
-
                         <Box flex={1}>
                           <Menu>
                             <MenuButton
@@ -617,12 +634,14 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               py="2"
                               px="3"
                             >
+                              {'Category: '}
                               {selectedCategory
                                 ? selectedCategory.label
                                 : 'All'}
                             </MenuButton>
                             <MenuList
                               as="div"
+                              placement="bottom-start"
                               css={css`
                                 background: white;
                                 position: absolute;
@@ -636,7 +655,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               <MenuItem
                                 onClick={() => setSelectedCategory(null)}
                               >
-                                Show all
+                                Show all ({store.getAvailableShapes().length})
                               </MenuItem>
                               <MenuDivider />
                               {allCategoryOptions.map((item, index) => (
@@ -644,7 +663,8 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                   key={item.value}
                                   onClick={() => setSelectedCategory(item)}
                                 >
-                                  {item.label}
+                                  {item.label} ({shapesPerCategoryCounts[index]}
+                                  )
                                 </MenuItem>
                               ))}
                             </MenuList>

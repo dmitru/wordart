@@ -1,20 +1,14 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Flex,
-  Stack,
-  Text,
-  Collapse,
-} from '@chakra-ui/core'
+import { Box, Button, Flex, Stack, Text } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { useThrottleCallback } from '@react-hook/throttle'
 import chroma from 'chroma-js'
+import { BgItemsColorPicker } from 'components/Editor/components/BgItemsColorPicker'
 import {
-  SvgShapeColorPicker,
-  SvgShapeColorPickerSwatch,
-  SvgShapeColorPickerCollapse,
-} from 'components/Editor/components/SvgShapeColorPicker'
+  ShapeItemsColorPickerCollapse,
+  ShapeItemsColorPickerInline,
+} from 'components/Editor/components/ShapeItemsColorPicker'
+import { SectionLabel } from 'components/Editor/components/shared'
+import { SvgShapeColorPickerCollapse } from 'components/Editor/components/SvgShapeColorPicker'
 import {
   ThemePresetThumbnail,
   ThemePresetThumbnailContainer,
@@ -34,11 +28,8 @@ import { toJS } from 'mobx'
 import { observer, useLocalStore } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
-import { ChoiceButtons } from 'components/Editor/components/ChoiceButtons'
-import { ShapeItemsColorPicker } from 'components/Editor/components/ShapeItemsColorPicker'
-import { BgItemsColorPicker } from 'components/Editor/components/BgItemsColorPicker'
-import { useState } from 'react'
-import { SectionLabel } from 'components/Editor/components/shared'
+import { FaQuestionCircle } from 'react-icons/fa'
+import { Tooltip } from 'components/shared/Tooltip'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -344,6 +335,15 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             {/* <shape-items> */}
             <Box mt="2.5rem">
               <SectionLabel>Shape Words & Icons</SectionLabel>
+
+              <Box>
+                <ShapeItemsColorPickerInline
+                  label="Color"
+                  shapeStyle={shapeStyle}
+                  onUpdate={updateShapeItemsColoring}
+                />
+              </Box>
+
               <Flex direction="row" mb="0">
                 <Slider
                   css={css`
@@ -362,11 +362,6 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   min={0}
                   max={100}
                   step={1}
-                />
-
-                <ShapeItemsColorPicker
-                  shapeStyle={shapeStyle}
-                  onUpdate={updateShapeItemsColoring}
                 />
               </Flex>
 
@@ -399,7 +394,22 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   flex: 1;
                 `}
                 horizontal
-                label="Emphasize size"
+                label={
+                  <>
+                    <Box display="flex" alignItems="center">
+                      Emphasize size{' '}
+                      <Tooltip
+                        label="Make larger words brighter and smaller words dimmer"
+                        zIndex={100}
+                        showDelay={200}
+                      >
+                        <Text my="0" color="blue" cursor="help" ml="2">
+                          <FaQuestionCircle style={{ color: '#999' }} />
+                        </Text>
+                      </Tooltip>
+                    </Box>
+                  </>
+                }
                 afterLabel="%"
                 value={shapeStyle.items.dimSmallerItems}
                 onChange={(value) => {
@@ -414,10 +424,10 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
             </Box>
             {/* </shape-items> */}
 
-            <Box mt="3.5rem">
-              <SectionLabel>Background Words & Icons</SectionLabel>
+            {store?.editor && store.editor.items.bg.items.length > 0 && (
+              <Box mt="3.5rem">
+                <SectionLabel>Background Words & Icons</SectionLabel>
 
-              {store?.editor && store.editor.items.bg.items.length > 0 ? (
                 <>
                   <Flex direction="row" mb="3">
                     <Slider
@@ -464,12 +474,8 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     />
                   </Box>
                 </>
-              ) : (
-                <Text color="gray.500" fontSize="sm">
-                  Background layer doens't have any items yet.
-                </Text>
-              )}
-            </Box>
+              </Box>
+            )}
             {/* </background> */}
           </>
         )}
