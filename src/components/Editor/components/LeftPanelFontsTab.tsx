@@ -78,7 +78,8 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
           overflow="hidden"
           width="100%"
           height="calc(100vh - 120px)"
-          p="3"
+          px="3"
+          py="5"
         >
           <AnimatePresence initial={false}>
             {state.view === 'font-list' && (
@@ -120,7 +121,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                         state.view = 'choose-font'
                       }}
                       leftIcon="add"
-                      variantColor="primary"
+                      variantColor="teal"
                     >
                       Add more fonts
                       <Tag

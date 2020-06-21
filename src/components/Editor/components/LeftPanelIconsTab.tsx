@@ -41,7 +41,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
             <>
               <Button
                 mr="3"
-                variantColor="primary"
+                variantColor="teal"
                 onClick={() => {
                   state.isAdding = true
                 }}

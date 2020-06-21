@@ -16,7 +16,10 @@ import css from '@emotion/css'
 import { useThrottleCallback } from '@react-hook/throttle'
 import chroma from 'chroma-js'
 import { BgItemsColorPickerInline } from 'components/Editor/components/BgItemsColorPicker'
-import { ShapeItemsColorPickerInline } from 'components/Editor/components/ShapeItemsColorPicker'
+import {
+  ShapeItemsColorPickerInline,
+  ShapeItemsColorPickerKindDropdown,
+} from 'components/Editor/components/ShapeItemsColorPicker'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { SvgShapeColorPickerCollapse } from 'components/Editor/components/SvgShapeColorPicker'
 import {
@@ -417,46 +420,50 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                       </SectionLabel>
                     </Box>
 
+                    <Box mt="2" mb="4" display="flex" alignItems="center">
+                      <Box>
+                        <ShapeItemsColorPickerKindDropdown
+                          shapeStyle={shapeStyle}
+                          onUpdate={updateShapeItemsColoring}
+                        />
+                      </Box>
+
+                      <Button
+                        css={css`
+                          width: 120px;
+                        `}
+                        ml="auto"
+                        size="sm"
+                        variant={
+                          store.leftColorTab.showShapeItemsAdvanced
+                            ? 'solid'
+                            : 'ghost'
+                        }
+                        variantColor={
+                          store.leftColorTab.showShapeItemsAdvanced
+                            ? 'primary'
+                            : 'gray'
+                        }
+                        onClick={() => {
+                          store.leftColorTab.showShapeItemsAdvanced = !store
+                            .leftColorTab.showShapeItemsAdvanced
+                        }}
+                      >
+                        <FaCog
+                          style={{
+                            color: 'currentColor',
+                            marginRight: '5px',
+                          }}
+                        />
+                        Advanced
+                      </Button>
+                    </Box>
+
                     <Box mt="2">
                       <ShapeItemsColorPickerInline
                         shapeStyle={shapeStyle}
                         bgFill={bgStyle.fill}
                         onUpdate={updateShapeItemsColoring}
-                        renderToolbar={() => (
-                          <Tooltip
-                            label="Show advanced options"
-                            placement="top"
-                            showDelay={300}
-                          >
-                            <Button
-                              css={css`
-                                width: 40px;
-                              `}
-                              size="sm"
-                              ml="1"
-                              variant={
-                                store.leftColorTab.showShapeItemsAdvanced
-                                  ? 'solid'
-                                  : 'outline'
-                              }
-                              variantColor={
-                                store.leftColorTab.showShapeItemsAdvanced
-                                  ? 'primary'
-                                  : 'gray'
-                              }
-                              onClick={() => {
-                                store.leftColorTab.showShapeItemsAdvanced = !store
-                                  .leftColorTab.showShapeItemsAdvanced
-                              }}
-                            >
-                              <FaCog
-                                style={{
-                                  color: 'currentColor',
-                                }}
-                              />{' '}
-                            </Button>
-                          </Tooltip>
-                        )}
                       />
                     </Box>
 
@@ -585,7 +592,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                           variantColor={
                             store.leftColorTab.showBgItemsAdvanced
                               ? 'primary'
-                              : undefined
+                              : 'muted'
                           }
                           onClick={() => {
                             store.leftColorTab.showBgItemsAdvanced = !store

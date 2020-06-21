@@ -122,7 +122,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
     // return null
 
     return (
-      <Box p="3">
+      <Box px="3" py="5">
         <Box mb="2.5rem">
           <SectionLabel>Placement</SectionLabel>
           {/* <Checkbox
@@ -207,7 +207,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                   <Box mt="3">
                     <Button
                       mr="3"
-                      variantColor="primary"
+                      variantColor="teal"
                       isDisabled={style.items.words.customAngles.length >= 8}
                       size="sm"
                       leftIcon="add"
@@ -254,7 +254,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                           {style.items.words.customAngles.length > 1 && (
                             <Button
                               size="xs"
-                              variant="outline"
+                              variant="ghost"
                               onClick={() => {
                                 style.items.words.customAngles.splice(index, 1)
                               }}

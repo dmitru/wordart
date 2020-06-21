@@ -176,7 +176,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
           <Stack direction="row" mb="2" mt="2">
             <Button
-              variantColor="primary"
+              variantColor="teal"
               leftIcon="add"
               onClick={() => {
                 store.addWord(target)

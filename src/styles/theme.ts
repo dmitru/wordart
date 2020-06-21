@@ -23,7 +23,7 @@ export const theme = {
     dark3: '#555',
     dark4: '#666',
     muted: {
-      500: '#999',
+      500: '#666',
     },
   },
   zIndices: {

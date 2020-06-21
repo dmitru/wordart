@@ -573,7 +573,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         <Tooltip label="Add custom image...">
                           <Button
                             leftIcon="add"
-                            variantColor="primary"
+                            variantColor="teal"
                             size="sm"
                             mr="2"
                             onClick={() => {
@@ -587,7 +587,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         <Tooltip label="Use text as a shape...">
                           <Button
                             leftIcon="add"
-                            variantColor="primary"
+                            variantColor="teal"
                             size="sm"
                             mr="2"
                             onClick={() => {
@@ -629,8 +629,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           <Menu>
                             <MenuButton
                               // @ts-ignore
-                              variant="link"
-                              variantColor="primary"
+                              variant="outline"
                               as={Button}
                               rightIcon="chevron-down"
                               py="2"
@@ -648,6 +647,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                 background: white;
                                 position: absolute;
                                 top: 0px !important;
+                                left: 10px;
                                 margin-top: 0 !important;
                                 z-index: 5000 !important;
                                 max-height: 300px;
