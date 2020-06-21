@@ -38,7 +38,7 @@ import { toJS } from 'mobx'
 import { observer, useLocalStore } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
-import { FaQuestionCircle, FaCog } from 'react-icons/fa'
+import { FaQuestionCircle, FaCog, FaSave } from 'react-icons/fa'
 import { Tooltip } from 'components/shared/Tooltip'
 import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 
@@ -287,7 +287,13 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                       Explore Color Themes
                     </Button>
 
-                    <Menu>
+                    <Tooltip label="Save current settings as a new theme">
+                      <Button ml="2" variant="outline">
+                        <FaSave />
+                      </Button>
+                    </Tooltip>
+
+                    {/* <Menu>
                       <MenuButton
                         marginLeft="2"
                         as={Button}
@@ -313,7 +319,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                           Save as new theme
                         </MenuItem>
                       </MenuList>
-                    </Menu>
+                    </Menu> */}
                   </Box>
 
                   {/* <shape-color> */}
@@ -396,37 +402,54 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                       >
                         Shape Words & Icons
                       </SectionLabel>
-                      <Button
-                        size="xs"
-                        ml="auto"
-                        variantColor={
-                          store.leftColorTab.showShapeItemsAdvanced
-                            ? 'blue'
-                            : 'gray'
-                        }
-                        onClick={() => {
-                          store.leftColorTab.showShapeItemsAdvanced = !store
-                            .leftColorTab.showShapeItemsAdvanced
-                        }}
-                      >
-                        <FaCog
-                          style={{ color: 'currentColor', marginRight: '5px' }}
-                        />{' '}
-                        Advanced
-                      </Button>
                     </Box>
 
                     <Box mt="3">
                       <ShapeItemsColorPickerInline
                         shapeStyle={shapeStyle}
                         onUpdate={updateShapeItemsColoring}
+                        renderToolbar={() => (
+                          <Tooltip
+                            label="Show advanced options"
+                            placement="top"
+                            showDelay={300}
+                          >
+                            <Button
+                              css={css`
+                                width: 40px;
+                              `}
+                              size="sm"
+                              ml="2"
+                              variant={
+                                store.leftColorTab.showShapeItemsAdvanced
+                                  ? 'solid'
+                                  : 'outline'
+                              }
+                              variantColor={
+                                store.leftColorTab.showShapeItemsAdvanced
+                                  ? 'blue'
+                                  : 'gray'
+                              }
+                              onClick={() => {
+                                store.leftColorTab.showShapeItemsAdvanced = !store
+                                  .leftColorTab.showShapeItemsAdvanced
+                              }}
+                            >
+                              <FaCog
+                                style={{
+                                  color: 'currentColor',
+                                }}
+                              />{' '}
+                            </Button>
+                          </Tooltip>
+                        )}
                       />
                     </Box>
 
                     <Collapse
                       isOpen={store.leftColorTab.showShapeItemsAdvanced}
                     >
-                      <Box pb="0.5rem">
+                      <Box pb="0.5rem" pr="3">
                         <Flex direction="row" mb="0">
                           <Slider
                             css={css`

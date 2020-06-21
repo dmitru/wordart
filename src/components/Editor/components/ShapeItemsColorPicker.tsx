@@ -87,137 +87,147 @@ export const ShapeItemsColorPickerInline: React.FC<{
   label?: string
   onUpdate: () => void
   children?: React.ReactNode
-}> = observer(({ label, shapeStyle, onUpdate, children }) => {
-  const [openShapeColors, setOpenShapeColors] = useState(false)
+  renderToolbar?: () => React.ReactNode
+}> = observer(
+  ({ renderToolbar = () => null, label, shapeStyle, onUpdate, children }) => {
+    const [openShapeColors, setOpenShapeColors] = useState(false)
 
-  return (
-    <Box>
-      <Box display="flex" alignItems="center">
-        {label && (
-          <Text
-            mr="3"
-            my="0"
-            css={css`
-              font-weight: 600;
-            `}
-          >
-            {label}
-          </Text>
-        )}
+    return (
+      <Box>
+        <Box display="flex" alignItems="center">
+          {label && (
+            <Text
+              mr="3"
+              my="0"
+              css={css`
+                font-weight: 600;
+              `}
+            >
+              {label}
+            </Text>
+          )}
 
-        <Menu>
-          <MenuButton
-            // @ts-ignore
-            variant="link"
-            variantColor="primary"
-            as={Button}
-            rightIcon="chevron-down"
-            py="2"
-            px="3"
-          >
-            {shapeStyle.items.coloring.kind === 'shape' &&
-              'Color: same as shape'}
-            {shapeStyle.items.coloring.kind === 'color' && 'Color: custom'}
-            {shapeStyle.items.coloring.kind === 'gradient' && 'Color: gradient'}
-          </MenuButton>
-          <MenuList
-            as="div"
-            placement="bottom-start"
-            css={css`
-              background: white;
-              position: absolute;
-              top: 0px !important;
-              margin-top: 0 !important;
-              z-index: 5000 !important;
-              max-height: 300px;
-              overflow: auto;
-            `}
-          >
-            <MenuItem
-              onClick={() => {
-                shapeStyle.items.coloring.kind = 'shape'
-                onUpdate()
-              }}
+          <Menu>
+            <MenuButton
+              // @ts-ignore
+              variant="link"
+              variantColor="primary"
+              as={Button}
+              rightIcon="chevron-down"
+              py="2"
+              px="3"
             >
-              Same as shape
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                shapeStyle.items.coloring.kind = 'color'
-                onUpdate()
-              }}
+              {shapeStyle.items.coloring.kind === 'shape' &&
+                'Color: same as shape'}
+              {shapeStyle.items.coloring.kind === 'color' && 'Color: custom'}
+              {shapeStyle.items.coloring.kind === 'gradient' &&
+                'Color: gradient'}
+            </MenuButton>
+            <MenuList
+              as="div"
+              placement="bottom-start"
+              css={css`
+                background: white;
+                position: absolute;
+                top: 0px !important;
+                margin-top: 0 !important;
+                z-index: 5000 !important;
+                max-height: 300px;
+                overflow: auto;
+              `}
             >
-              Custom colors
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                shapeStyle.items.coloring.kind = 'gradient'
-                onUpdate()
-              }}
-            >
-              Color gradient
-            </MenuItem>
-          </MenuList>
-        </Menu>
-
-        {shapeStyle.items.coloring.kind === 'color' && (
-          <>
-            <Button
-              isDisabled={shapeStyle.items.coloring.color.colors.length >= 8}
-              variantColor="green"
-              leftIcon="add"
-              onClick={() => {
-                const color = chroma.random().hex()
-                shapeStyle.items.coloring.color.colors.push(color)
-                onUpdate()
-              }}
-              size="sm"
-              ml="auto"
-            >
-              Add
-            </Button>
-
-            <Menu>
-              <MenuButton
-                marginLeft="2"
-                as={Button}
-                size="sm"
-                outline="none"
-                aria-label="menu"
-                color="black"
-                display="inline-flex"
+              <MenuItem
+                onClick={() => {
+                  shapeStyle.items.coloring.kind = 'shape'
+                  onUpdate()
+                }}
               >
-                <DotsThreeVertical size={18} />
-              </MenuButton>
-              <MenuList placement="bottom-end">
-                <MenuItem
-                  onClick={() => {
-                    shapeStyle.items.coloring.color.colors.length = 1
-                    onUpdate()
-                  }}
-                >
-                  <Icon
-                    name="small-close"
-                    size="20px"
-                    color="gray.500"
-                    mr="2"
-                  />
-                  Clear all
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </>
-        )}
-      </Box>
+                Same as shape
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  shapeStyle.items.coloring.kind = 'color'
+                  onUpdate()
+                }}
+              >
+                Custom colors
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  shapeStyle.items.coloring.kind = 'gradient'
+                  onUpdate()
+                }}
+              >
+                Color gradient
+              </MenuItem>
+            </MenuList>
+          </Menu>
 
-      <ShapeItemsColorPickerInlineImpl
-        shapeStyle={shapeStyle}
-        children={children}
-        onUpdate={onUpdate}
-      />
-    </Box>
-  )
-})
+          {shapeStyle.items.coloring.kind === 'color' ? (
+            <>
+              <Button
+                isDisabled={shapeStyle.items.coloring.color.colors.length >= 8}
+                variantColor="primary"
+                leftIcon="add"
+                onClick={() => {
+                  const color = chroma.random().hex()
+                  shapeStyle.items.coloring.color.colors.push(color)
+                  onUpdate()
+                }}
+                size="sm"
+                ml="auto"
+              >
+                Add
+              </Button>
+
+              {renderToolbar()}
+
+              <Menu>
+                <MenuButton
+                  ml="2"
+                  as={Button}
+                  size="sm"
+                  outline="none"
+                  aria-label="menu"
+                  color="black"
+                  // @ts-ignore
+                  variant="outline"
+                  display="inline-flex"
+                >
+                  <DotsThreeVertical size={18} />
+                </MenuButton>
+                <MenuList placement="bottom-end">
+                  <MenuItem
+                    onClick={() => {
+                      shapeStyle.items.coloring.color.colors.length = 1
+                      onUpdate()
+                    }}
+                  >
+                    <Icon
+                      name="small-close"
+                      size="20px"
+                      color="gray.500"
+                      mr="2"
+                    />
+                    Clear all
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </>
+          ) : (
+            <Box ml="auto">{renderToolbar()}</Box>
+          )}
+        </Box>
+
+        <ShapeItemsColorPickerInlineImpl
+          shapeStyle={shapeStyle}
+          children={children}
+          onUpdate={onUpdate}
+        />
+      </Box>
+    )
+  }
+)
 
 export const ShapeItemsColorPickerInlineImpl: React.FC<{
   shapeStyle: ShapeStyleOptions
@@ -268,6 +278,7 @@ export const ShapeItemsColorPickerInlineImpl: React.FC<{
                     <IconButton
                       isRound
                       aria-label="Delete"
+                      variant="outline"
                       ml="2px"
                       mr="2"
                       icon="close"

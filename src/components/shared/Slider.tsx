@@ -11,7 +11,7 @@ import {
 } from 'react-compound-slider'
 import { noop } from 'lodash'
 import { css } from '@emotion/core'
-import { darken } from 'polished'
+import { darken, lighten } from 'polished'
 import { Text, Box } from '@chakra-ui/core'
 
 export type SliderProps = {
@@ -168,12 +168,12 @@ export const SliderRail: React.FC<SliderRailProps> = ({ getRailProps }) => {
         css={(theme) =>
           css({
             position: 'absolute',
-            top: 13,
+            top: 14,
             width: '100%',
-            height: 8,
-            borderRadius: theme.radii.default,
+            height: 6,
+            borderRadius: '4px',
             pointerEvents: 'none',
-            backgroundColor: '#e8e8e8',
+            backgroundColor: '#ddd',
           })
         }
       />
@@ -218,11 +218,9 @@ export const KeyboardHandle: React.FC<HandleProps> = ({
         cursor: 'pointer',
         transform: 'translate(-50%, 0)',
         zIndex: 2,
-        border: 'none',
         top: 4,
         whiteSpace: 'nowrap',
-        color: theme.colors.textLight,
-        minWidth: 36,
+        minWidth: 40,
         width: 'auto',
         fontSize: 12,
         display: 'flex-inline',
@@ -230,11 +228,14 @@ export const KeyboardHandle: React.FC<HandleProps> = ({
         justifyContent: 'center',
         height: 24,
         borderRadius: 8,
-        backgroundColor: disabled ? '#666' : theme.colors.secondary['500'],
+        color: '#555',
+        fontWeight: 600,
+        border: '1px solid #999',
+        boxShadow: '0 0 2px 0 #0004',
+        backgroundColor: disabled ? '#666' : '#fff',
+        transition: 'border 0.1s',
         '&:hover, &:focus': {
-          backgroundColor: disabled
-            ? '#666'
-            : darken(0.05, theme.colors.secondary['500']),
+          border: `3px solid ${lighten(0.15, theme.colors.primary['500'])}`,
         },
       })}
       {...getHandleProps(id)}
