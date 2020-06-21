@@ -5,20 +5,38 @@ import { ThemePreset } from 'components/Editor/style'
 export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
   theme,
 }) => {
-  let shapeItemsColor = 'black'
+  let shapeItemsColors = ['black']
   if (theme.shapeItemsColoring.kind === 'color') {
-    shapeItemsColor = theme.shapeItemsColoring.color
+    shapeItemsColors = theme.shapeItemsColoring.colors
   } else if (theme.shapeItemsColoring.kind === 'gradient') {
-    shapeItemsColor = theme.shapeItemsColoring.gradient.from
+    shapeItemsColors = [
+      theme.shapeItemsColoring.gradient.from,
+      theme.shapeItemsColoring.gradient.to,
+    ]
   } else if (theme.shapeItemsColoring.kind === 'shape') {
-    shapeItemsColor = theme.shapeFill
+    shapeItemsColors = [theme.shapeFill]
   }
 
-  let bgItemsColor = 'black'
+  let bgItemsColors = ['black']
   if (theme.bgItemsColoring.kind === 'color') {
-    bgItemsColor = theme.bgItemsColoring.color
+    bgItemsColors = theme.bgItemsColoring.colors
   } else if (theme.bgItemsColoring.kind === 'gradient') {
-    bgItemsColor = theme.bgItemsColoring.gradient.from
+    bgItemsColors = [
+      theme.bgItemsColoring.gradient.from,
+      theme.bgItemsColoring.gradient.to,
+    ]
+  }
+
+  let shapeItemsColorIndex = 0
+  const getShapeItemsColor = () => {
+    shapeItemsColorIndex = (shapeItemsColorIndex + 1) % shapeItemsColors.length
+    return shapeItemsColors[shapeItemsColorIndex]
+  }
+
+  let bgItemsColorIndex = 0
+  const getBgItemsColor = () => {
+    bgItemsColorIndex = (bgItemsColorIndex + 1) % bgItemsColors.length
+    return bgItemsColors[bgItemsColorIndex]
   }
 
   return (
@@ -58,7 +76,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
             ></rect>
             <rect
               id="Rectangle"
-              fill={shapeItemsColor}
+              fill={getShapeItemsColor()}
               x="16"
               y="29"
               width="112"
@@ -67,7 +85,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
             ></rect>
             <rect
               id="Rectangle"
-              fill={shapeItemsColor}
+              fill={getShapeItemsColor()}
               x="68"
               y="67"
               width="84"
@@ -76,7 +94,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
             ></rect>
             <rect
               id="Rectangle"
-              fill={shapeItemsColor}
+              fill={getShapeItemsColor()}
               x="56"
               y="99"
               width="72"
@@ -85,7 +103,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
             ></rect>
             <rect
               id="Rectangle"
-              fill={shapeItemsColor}
+              fill={getShapeItemsColor()}
               x="152"
               y="33"
               width="54"
@@ -94,7 +112,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
             ></rect>
             <rect
               id="Rectangle"
-              fill={shapeItemsColor}
+              fill={getShapeItemsColor()}
               x="168"
               y="80"
               width="23"
@@ -103,7 +121,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
             ></rect>
             <rect
               id="Rectangle"
-              fill={shapeItemsColor}
+              fill={getShapeItemsColor()}
               x="17"
               y="65"
               width="23"
@@ -113,7 +131,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
           </g>
           <rect
             id="Rectangle"
-            fill={bgItemsColor}
+            fill={getBgItemsColor()}
             x="149"
             y="15"
             width="83"
@@ -122,7 +140,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
           ></rect>
           <rect
             id="Rectangle"
-            fill={bgItemsColor}
+            fill={getBgItemsColor()}
             x="66"
             y="204"
             width="83"
@@ -131,7 +149,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
           ></rect>
           <rect
             id="Rectangle"
-            fill={bgItemsColor}
+            fill={getBgItemsColor()}
             x="16"
             y="20"
             width="23"
@@ -140,7 +158,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
           ></rect>
           <rect
             id="Rectangle"
-            fill={bgItemsColor}
+            fill={getBgItemsColor()}
             x="14"
             y="185"
             width="25"
@@ -149,7 +167,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
           ></rect>
           <rect
             id="Rectangle"
-            fill={bgItemsColor}
+            fill={getBgItemsColor()}
             x="279"
             y="32"
             width="25"
@@ -158,7 +176,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
           ></rect>
           <rect
             id="Rectangle"
-            fill={bgItemsColor}
+            fill={getBgItemsColor()}
             x="279"
             y="147"
             width="25"
@@ -185,10 +203,11 @@ export const ThemePresetThumbnailContainer = styled(Box)`
 
 export const ThemePresetThumbnails = styled(Box)`
   margin: 0 -10px;
+  padding-top: 10px;
 
   > * {
-    margin-right: 10px;
-    margin-left: 10px;
+    margin-right: 8px;
+    margin-left: 8px;
     margin-bottom: 16px;
   }
 `

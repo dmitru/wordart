@@ -84,7 +84,7 @@ export const ShapeItemsColorPickerSwatch = React.forwardRef<
 
 export const ShapeItemsColorPickerInline: React.FC<{
   shapeStyle: ShapeStyleOptions
-  label: string
+  label?: string
   onUpdate: () => void
   children?: React.ReactNode
 }> = observer(({ label, shapeStyle, onUpdate, children }) => {
@@ -93,15 +93,17 @@ export const ShapeItemsColorPickerInline: React.FC<{
   return (
     <Box>
       <Box display="flex" alignItems="center">
-        <Text
-          mr="3"
-          my="0"
-          css={css`
-            font-weight: 600;
-          `}
-        >
-          {label}
-        </Text>
+        {label && (
+          <Text
+            mr="3"
+            my="0"
+            css={css`
+              font-weight: 600;
+            `}
+          >
+            {label}
+          </Text>
+        )}
 
         <Menu>
           <MenuButton
@@ -113,9 +115,10 @@ export const ShapeItemsColorPickerInline: React.FC<{
             py="2"
             px="3"
           >
-            {shapeStyle.items.coloring.kind === 'shape' && 'Same as shape'}
-            {shapeStyle.items.coloring.kind === 'color' && 'Custom colors'}
-            {shapeStyle.items.coloring.kind === 'gradient' && 'Color gradient'}
+            {shapeStyle.items.coloring.kind === 'shape' &&
+              'Color: same as shape'}
+            {shapeStyle.items.coloring.kind === 'color' && 'Color: custom'}
+            {shapeStyle.items.coloring.kind === 'gradient' && 'Color: gradient'}
           </MenuButton>
           <MenuList
             as="div"
@@ -238,7 +241,6 @@ export const ShapeItemsColorPickerInlineImpl: React.FC<{
               {shapeStyle.items.coloring.color.colors.map((color, index) => (
                 <Box
                   mb="4"
-                  mr="3"
                   key={index}
                   display="inline-flex"
                   alignItems="center"

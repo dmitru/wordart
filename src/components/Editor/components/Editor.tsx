@@ -116,7 +116,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           return
         }
         setIsSaving(true)
-        const thumbnailCanvas = await store.editor.exportAsRaster(240)
+        const thumbnailCanvas = await store.editor.exportAsRaster(380)
         const thumbnail = thumbnailCanvas.toDataURL('image/jpeg', 0.85)
         const editorData = await store.serialize()
 
@@ -566,14 +566,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               <LeftPanel>
                 <LeftPanelContent
                   id="left-panel-content"
-                  px="3"
-                  py="3"
                   noScroll={leftTab === 'shapes'}
                 >
                   {store.lifecycleState === 'initialized' ? (
                     <>
                       {state.leftPanelContext === 'resize' && (
-                        <Box>
+                        <Box px="3" py="3">
                           <Heading size="md" mt="0" mb="3">
                             Page Size
                           </Heading>

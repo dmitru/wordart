@@ -2,10 +2,7 @@ import { Box, Button, Flex, Stack, Text } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { useThrottleCallback } from '@react-hook/throttle'
 import chroma from 'chroma-js'
-import {
-  BgItemsColorPicker,
-  BgItemsColorPickerInline,
-} from 'components/Editor/components/BgItemsColorPicker'
+import { BgItemsColorPickerInline } from 'components/Editor/components/BgItemsColorPicker'
 import { ShapeItemsColorPickerInline } from 'components/Editor/components/ShapeItemsColorPicker'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { SvgShapeColorPickerCollapse } from 'components/Editor/components/SvgShapeColorPicker'
@@ -14,6 +11,7 @@ import {
   ThemePresetThumbnailContainer,
   ThemePresetThumbnails,
 } from 'components/Editor/components/ThemePresetThumbnail'
+import { AnimatePresence, motion } from 'framer-motion'
 import { TargetKind } from 'components/Editor/lib/editor'
 import {
   mkBgStyleConfFromOptions,
@@ -89,10 +87,10 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
     })
 
     const updateAllStyles = async () => {
-      const shape = store.getShape()
       const shapeStyle = store.styleOptions.shape
       const bgStyle = store.styleOptions.bg
       await onUpdateImmediately()
+      store.editor?.setShapeOpacity(shapeStyle.opacity)
       await store.editor?.setShapeItemsStyle(
         mkShapeStyleConfFromOptions(shapeStyle).items
       )
@@ -152,136 +150,171 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
     return (
       <>
-        {state.view === 'themes' && (
-          <Box>
-            <Flex mb="5">
-              <Button
-                leftIcon="chevron-left"
-                onClick={() => {
-                  state.view = 'normal'
-                  if (state.savedStyle) {
-                    store.styleOptions.shape = state.savedStyle.shapeStyle
-                    store.styleOptions.bg = state.savedStyle.bgStyle
-                    // @ts-ignore
-                    shape.config = state.savedStyle.shapeConfig
-                    updateAllStyles()
-                  }
-                }}
+        <Box
+          position="relative"
+          overflow="hidden"
+          width="100%"
+          height="calc(100vh - 50px)"
+        >
+          <AnimatePresence initial={false}>
+            {state.view === 'themes' && (
+              <motion.div
+                key="themes"
+                initial={{ x: 355, y: 0, opacity: 0 }}
+                transition={{ ease: 'easeInOut', duration: 0.2 }}
+                animate={{ x: 0, y: 0, opacity: 1 }}
+                exit={{ x: 355, y: 0, opacity: 0 }}
               >
-                Back
-              </Button>
-              {state.selectedThemeTitle && (
-                <Button
-                  marginLeft="auto"
-                  variantColor="accent"
-                  variant="solid"
-                  isDisabled={!state.selectedThemeTitle}
-                  onClick={() => {
-                    state.view = 'normal'
-                    state.savedStyle = null
-                  }}
-                >
-                  Apply Theme
-                </Button>
-              )}
-            </Flex>
+                <Box position="absolute" height="100%" px="3" py="3">
+                  <Flex mb="5">
+                    <Button
+                      css={css`
+                        min-width: 120px;
+                      `}
+                      leftIcon="chevron-left"
+                      onClick={() => {
+                        state.view = 'normal'
+                        if (state.savedStyle) {
+                          store.styleOptions.shape = state.savedStyle.shapeStyle
+                          store.styleOptions.bg = state.savedStyle.bgStyle
+                          // @ts-ignore
+                          shape.config = state.savedStyle.shapeConfig
+                          updateAllStyles()
+                        }
+                      }}
+                    >
+                      Back
+                    </Button>
+                    {state.selectedThemeTitle && (
+                      <Button
+                        ml="3"
+                        width="100%"
+                        variantColor="green"
+                        variant="solid"
+                        isDisabled={!state.selectedThemeTitle}
+                        onClick={() => {
+                          state.view = 'normal'
+                          state.savedStyle = null
+                        }}
+                      >
+                        Apply Theme
+                      </Button>
+                    )}
+                  </Flex>
 
-            <Text fontSize="xl">Choose a theme</Text>
-            <ThemePresetThumbnails
-              display="flex"
-              flexDirection="row"
-              flexWrap="wrap"
-            >
-              {themePresets.map((theme) => (
-                <ThemePresetThumbnailContainer
-                  aria-role="button"
-                  key={theme.title}
-                  css={css`
-                    ${state.selectedThemeTitle === theme.title &&
-                    'transform: scale(1.05); svg { outline: 5px solid #d53f8c; }'}
-                  `}
-                  onClick={() => {
-                    state.selectedThemeTitle = theme.title
-                    applyTheme(theme)
-                  }}
-                >
-                  <ThemePresetThumbnail theme={theme} />
-                  {theme.title}
-                </ThemePresetThumbnailContainer>
-              ))}
-            </ThemePresetThumbnails>
-          </Box>
-        )}
+                  <Text fontSize="xl">Try a color theme</Text>
+                  <ThemePresetThumbnails
+                    css={css`
+                      height: calc(100vh - 180px);
+                    `}
+                    display="flex"
+                    flexDirection="row"
+                    flexWrap="wrap"
+                    overflowY="scroll"
+                  >
+                    {themePresets.map((theme) => (
+                      <ThemePresetThumbnailContainer
+                        aria-role="button"
+                        key={theme.title}
+                        css={css`
+                          ${state.selectedThemeTitle === theme.title &&
+                          'transform: scale(1.05); svg { outline: 5px solid #d53f8c; }'}
+                        `}
+                        onClick={() => {
+                          state.selectedThemeTitle = theme.title
+                          applyTheme(theme)
+                        }}
+                      >
+                        <ThemePresetThumbnail theme={theme} />
+                      </ThemePresetThumbnailContainer>
+                    ))}
+                  </ThemePresetThumbnails>
+                </Box>
+              </motion.div>
+            )}
 
-        {state.view === 'normal' && (
-          <>
-            <Box mb="5">
-              <Button
-                marginLeft="auto"
-                variant="solid"
-                variantColor="accent"
-                rightIcon="chevron-right"
-                onClick={() => {
-                  state.view = 'themes'
-                  state.selectedThemeTitle = ''
-                  state.savedStyle = cloneDeep({
-                    shapeStyle: toJS(shapeStyle, {
-                      recurseEverything: true,
-                      exportMapsAsObjects: false,
-                    }),
-                    bgStyle: toJS(bgStyle, { recurseEverything: true }),
-                    shapeConfig: toJS(shape!.config, {
-                      recurseEverything: true,
-                    }),
-                  })
-                }}
+            {state.view === 'normal' && (
+              <motion.div
+                key="normal"
+                initial={{ x: -355, y: 0, opacity: 0 }}
+                transition={{ ease: 'easeInOut', duration: 0.2 }}
+                animate={{ x: 0, y: 0, opacity: 1 }}
+                exit={{ x: -355, y: 0, opacity: 0 }}
               >
-                See Color Themes
-              </Button>
-            </Box>
+                <Box
+                  position="absolute"
+                  height="calc(100vh - 50px)"
+                  overflowY="auto"
+                  px="3"
+                  py="3"
+                  width="100%"
+                >
+                  <Box mb="5">
+                    <Button
+                      marginLeft="auto"
+                      variant="solid"
+                      variantColor="accent"
+                      rightIcon="chevron-right"
+                      onClick={() => {
+                        state.view = 'themes'
+                        state.selectedThemeTitle = ''
+                        state.savedStyle = cloneDeep({
+                          shapeStyle: toJS(shapeStyle, {
+                            recurseEverything: true,
+                            exportMapsAsObjects: false,
+                          }),
+                          bgStyle: toJS(bgStyle, { recurseEverything: true }),
+                          shapeConfig: toJS(shape!.config, {
+                            recurseEverything: true,
+                          }),
+                        })
+                      }}
+                    >
+                      Explore Color Themes
+                    </Button>
+                  </Box>
 
-            {/* <shape-color> */}
-            <Box mb="0">
-              <SectionLabel>Shape</SectionLabel>
+                  {/* <shape-color> */}
+                  <Box mb="0">
+                    <SectionLabel>Shape</SectionLabel>
 
-              <Flex direction="column">
-                {/* <Box display="flex">
+                    <Flex direction="column">
+                      {/* <Box display="flex">
                   <Text fontSize="xl" mb="0">
                     Shape
                   </Text>
                 </Box> */}
 
-                <Slider
-                  css={css`
-                    flex: 1;
-                    margin-right: 20px;
-                  `}
-                  horizontal
-                  afterLabel="%"
-                  label="Opacity"
-                  value={100 * shapeStyle.opacity}
-                  onChange={(value) => {
-                    shapeStyle.opacity = value / 100
-                  }}
-                  onAfterChange={(value) => {
-                    store.editor?.setShapeOpacity(value / 100)
-                  }}
-                  min={0}
-                  max={100}
-                  step={1}
-                />
+                      <Slider
+                        css={css`
+                          flex: 1;
+                          margin-right: 20px;
+                        `}
+                        horizontal
+                        afterLabel="%"
+                        label="Opacity"
+                        value={100 * shapeStyle.opacity}
+                        onChange={(value) => {
+                          shapeStyle.opacity = value / 100
+                        }}
+                        onAfterChange={(value) => {
+                          store.editor?.setShapeOpacity(value / 100)
+                        }}
+                        min={0}
+                        max={100}
+                        step={1}
+                      />
 
-                {shape?.kind === 'svg' && (
-                  <>
-                    <SvgShapeColorPickerCollapse
-                      shape={shape}
-                      onUpdate={onUpdate}
-                      label="Color"
-                    />
-                  </>
-                )}
+                      {shape?.kind === 'svg' && (
+                        <>
+                          <SvgShapeColorPickerCollapse
+                            shape={shape}
+                            onUpdate={onUpdate}
+                          />
+                        </>
+                      )}
 
-                {/* {shape?.kind === 'text' && (
+                      {/* {shape?.kind === 'text' && (
                   <Box mb="5">
                     <ColorPicker
                       value={chroma(shape.config.textStyle.color)
@@ -298,66 +331,75 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   </Box>
                 )} */}
 
-                {/* <svg-shape */}
-                {shape?.kind === 'svg' && (
-                  <>
-                    {/* <svg-color-options> */}
+                      {/* <svg-shape */}
+                      {shape?.kind === 'svg' && (
+                        <>
+                          {/* <svg-color-options> */}
 
-                    {/* <svg-color-options> */}
-                  </>
-                )}
-                {/* </svg-shape> */}
-              </Flex>
-            </Box>
-            {/* </shape-color> */}
+                          {/* <svg-color-options> */}
+                        </>
+                      )}
+                      {/* </svg-shape> */}
+                    </Flex>
+                  </Box>
+                  {/* </shape-color> */}
 
-            {/* <background> */}
+                  {/* <background> */}
 
-            <Box mt="2.5rem">
-              <SectionLabel>Background</SectionLabel>
-              <Stack direction="row" spacing="3">
-                <Box display="flex" alignItems="flex-start">
-                  <Text my="0" fontWeight="600" mr="3">
-                    Color
-                  </Text>
+                  <Box mt="2.5rem">
+                    <SectionLabel>Background</SectionLabel>
+                    <Stack direction="row" spacing="3">
+                      <Box display="flex" alignItems="flex-start">
+                        <Text my="0" fontWeight="600" mr="3">
+                          Color
+                        </Text>
 
-                  <ColorPickerPopover
-                    value={chroma(bgStyle.fill.color.color).alpha(1).hex()}
-                    onChange={(hex) => {
-                      bgStyle.fill.color.color = chroma(hex).hex()
-                      store.editor?.setBgColor(bgStyle.fill.color)
-                    }}
-                  />
-                </Box>
-              </Stack>
-            </Box>
+                        <ColorPickerPopover
+                          value={chroma(bgStyle.fill.color.color)
+                            .alpha(1)
+                            .hex()}
+                          onChange={(hex) => {
+                            bgStyle.fill.color.color = chroma(hex).hex()
+                            store.editor?.setBgColor(bgStyle.fill.color)
+                          }}
+                        />
+                      </Box>
+                    </Stack>
+                  </Box>
 
-            {/* <shape-items> */}
-            <Box mt="2.5rem">
-              <SectionLabel>Shape Words & Icons</SectionLabel>
+                  {/* <shape-items> */}
+                  <Box mt="2.5rem">
+                    <SectionLabel>Shape Words & Icons</SectionLabel>
 
-              <Flex direction="row" mb="0">
-                <Slider
-                  css={css`
-                    flex: 1;
-                  `}
-                  afterLabel="%"
-                  labelCss="width: 60px"
-                  horizontal
-                  label="Opacity"
-                  value={100 * shapeStyle.items.opacity}
-                  onChange={(value) => {
-                    shapeStyle.items.opacity = value / 100
-                  }}
-                  onAfterChange={updateShapeItemsColoring}
-                  min={0}
-                  max={100}
-                  step={1}
-                />
-              </Flex>
+                    <Box>
+                      <ShapeItemsColorPickerInline
+                        shapeStyle={shapeStyle}
+                        onUpdate={updateShapeItemsColoring}
+                      />
+                    </Box>
 
-              <Box mb="0">
-                {/* {shapeStyle.items.coloring.kind === 'shape' && (
+                    <Flex direction="row" mb="0">
+                      <Slider
+                        css={css`
+                          flex: 1;
+                        `}
+                        afterLabel="%"
+                        labelCss="width: 60px"
+                        horizontal
+                        label="Opacity"
+                        value={100 * shapeStyle.items.opacity}
+                        onChange={(value) => {
+                          shapeStyle.items.opacity = value / 100
+                        }}
+                        onAfterChange={updateShapeItemsColoring}
+                        min={0}
+                        max={100}
+                        step={1}
+                      />
+                    </Flex>
+
+                    <Box mb="0">
+                      {/* {shapeStyle.items.coloring.kind === 'shape' && (
               <Box mb="4">
                 <Slider
                   css={css`
@@ -376,78 +418,10 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                 />
               </Box>
             )} */}
-              </Box>
-            </Box>
-
-            <Box mb="2">
-              <Slider
-                css={css`
-                  flex: 1;
-                `}
-                horizontal
-                label={
-                  <>
-                    <Box display="flex" alignItems="center">
-                      Emphasize size{' '}
-                      <Tooltip
-                        label="Make larger words brighter and smaller words dimmer"
-                        zIndex={100}
-                        showDelay={200}
-                      >
-                        <Text my="0" color="blue" cursor="help" ml="2">
-                          <FaQuestionCircle style={{ color: '#999' }} />
-                        </Text>
-                      </Tooltip>
                     </Box>
-                  </>
-                }
-                afterLabel="%"
-                value={shapeStyle.items.dimSmallerItems}
-                onChange={(value) => {
-                  const val = (value as any) as number
-                  shapeStyle.items.dimSmallerItems = val
-                }}
-                onAfterChange={updateShapeItemsColoring}
-                min={0}
-                max={100}
-                step={1}
-              />
-            </Box>
+                  </Box>
 
-            <Box>
-              <ShapeItemsColorPickerInline
-                label="Color"
-                shapeStyle={shapeStyle}
-                onUpdate={updateShapeItemsColoring}
-              />
-            </Box>
-            {/* </shape-items> */}
-
-            {store?.editor && store.editor.items.bg.items.length > 0 && (
-              <Box mt="2.5rem">
-                <SectionLabel>Background Words & Icons</SectionLabel>
-
-                <>
-                  <Flex direction="row" mb="0">
-                    <Slider
-                      css={css`
-                        flex: 1;
-                      `}
-                      horizontal
-                      afterLabel="%"
-                      label="Opacity"
-                      value={100 * bgStyle.items.opacity}
-                      onChange={(value) => {
-                        bgStyle.items.opacity = value / 100
-                      }}
-                      onAfterChange={updateBgItemsColoring}
-                      min={0}
-                      max={100}
-                      step={1}
-                    />
-                  </Flex>
-
-                  <Box mb="4">
+                  <Box mb="2">
                     <Slider
                       css={css`
                         flex: 1;
@@ -470,29 +444,98 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                         </>
                       }
                       afterLabel="%"
-                      value={bgStyle.items.dimSmallerItems}
+                      value={shapeStyle.items.dimSmallerItems}
                       onChange={(value) => {
                         const val = (value as any) as number
-                        bgStyle.items.dimSmallerItems = val
+                        shapeStyle.items.dimSmallerItems = val
                       }}
-                      onAfterChange={updateBgItemsColoring}
+                      onAfterChange={updateShapeItemsColoring}
                       min={0}
                       max={100}
                       step={1}
                     />
                   </Box>
+                  {/* </shape-items> */}
 
-                  <BgItemsColorPickerInline
-                    label="Color"
-                    bgStyle={bgStyle}
-                    onUpdate={updateBgItemsColoring}
-                  />
-                </>
-              </Box>
+                  {store?.editor && store.editor.items.bg.items.length > 0 && (
+                    <Box mt="2.5rem">
+                      <SectionLabel>Background Words & Icons</SectionLabel>
+
+                      <BgItemsColorPickerInline
+                        bgStyle={bgStyle}
+                        onUpdate={updateBgItemsColoring}
+                      />
+
+                      <>
+                        <Flex direction="row" mb="0">
+                          <Slider
+                            css={css`
+                              flex: 1;
+                            `}
+                            horizontal
+                            afterLabel="%"
+                            label="Opacity"
+                            value={100 * bgStyle.items.opacity}
+                            onChange={(value) => {
+                              bgStyle.items.opacity = value / 100
+                            }}
+                            onAfterChange={updateBgItemsColoring}
+                            min={0}
+                            max={100}
+                            step={1}
+                          />
+                        </Flex>
+
+                        <Box mb="4">
+                          <Slider
+                            css={css`
+                              flex: 1;
+                            `}
+                            horizontal
+                            label={
+                              <>
+                                <Box display="flex" alignItems="center">
+                                  Emphasize size{' '}
+                                  <Tooltip
+                                    label="Make larger words brighter and smaller words dimmer"
+                                    zIndex={100}
+                                    showDelay={200}
+                                  >
+                                    <Text
+                                      my="0"
+                                      color="blue"
+                                      cursor="help"
+                                      ml="2"
+                                    >
+                                      <FaQuestionCircle
+                                        style={{ color: '#999' }}
+                                      />
+                                    </Text>
+                                  </Tooltip>
+                                </Box>
+                              </>
+                            }
+                            afterLabel="%"
+                            value={bgStyle.items.dimSmallerItems}
+                            onChange={(value) => {
+                              const val = (value as any) as number
+                              bgStyle.items.dimSmallerItems = val
+                            }}
+                            onAfterChange={updateBgItemsColoring}
+                            min={0}
+                            max={100}
+                            step={1}
+                          />
+                        </Box>
+                      </>
+                    </Box>
+                  )}
+                  {/* </background> */}
+                </Box>
+              </motion.div>
             )}
-            {/* </background> */}
-          </>
-        )}
+          </AnimatePresence>
+        </Box>
       </>
     )
   }

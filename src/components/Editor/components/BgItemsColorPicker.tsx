@@ -84,7 +84,7 @@ export const BgItemsColorPickerSwatch = React.forwardRef<
 
 export const BgItemsColorPickerInline: React.FC<{
   bgStyle: BgStyleOptions
-  label: string
+  label?: string
   onUpdate: () => void
   children?: React.ReactNode
 }> = observer(({ label, bgStyle, onUpdate, children }) => {
@@ -93,15 +93,17 @@ export const BgItemsColorPickerInline: React.FC<{
   return (
     <Box>
       <Box display="flex" alignItems="center">
-        <Text
-          mr="3"
-          my="0"
-          css={css`
-            font-weight: 600;
-          `}
-        >
-          {label}
-        </Text>
+        {label && (
+          <Text
+            mr="3"
+            my="0"
+            css={css`
+              font-weight: 600;
+            `}
+          >
+            {label}
+          </Text>
+        )}
 
         <Menu>
           <MenuButton
@@ -113,9 +115,9 @@ export const BgItemsColorPickerInline: React.FC<{
             py="2"
             px="3"
           >
-            {bgStyle.items.coloring.kind === 'shape' && 'Same as shape'}
-            {bgStyle.items.coloring.kind === 'color' && 'Custom colors'}
-            {bgStyle.items.coloring.kind === 'gradient' && 'Color gradient'}
+            {bgStyle.items.coloring.kind === 'shape' && 'Color: same as shape'}
+            {bgStyle.items.coloring.kind === 'color' && 'Color: custom'}
+            {bgStyle.items.coloring.kind === 'gradient' && 'Color: gradient'}
           </MenuButton>
           <MenuList
             as="div"
@@ -238,7 +240,6 @@ export const BgItemsColorPickerInlineImpl: React.FC<{
               {bgStyle.items.coloring.color.colors.map((color, index) => (
                 <Box
                   mb="4"
-                  mr="3"
                   key={index}
                   display="inline-flex"
                   alignItems="center"
