@@ -166,6 +166,7 @@ export class Editor {
       fill: 'white',
     })
     this.bgCanvas.add(this.bgRect)
+    this.bgRect.sendToBack()
 
     this.canvas.on('selection:created', ({ e }) => {
       const target = this.canvas.getActiveObject()
@@ -504,6 +505,7 @@ export class Editor {
       width: 1000,
       height: 1000 / this.aspectRatio,
     })
+    this.bgRect.sendToBack()
 
     this.applySceneClipPath()
 
@@ -539,6 +541,7 @@ export class Editor {
     this.bgRect.set({
       fill: config.kind === 'transparent' ? 'transparent' : config.color,
     })
+    this.bgRect.sendToBack()
     if (render) {
       this.bgCanvas.requestRenderAll()
       this.canvas.requestRenderAll()
@@ -641,14 +644,6 @@ export class Editor {
     }
 
     this.version++
-  }
-
-  setShapeObj = (shape: fabric.Object) => {
-    if (!this.shape) {
-      throw new Error('no shape')
-    }
-    shape.set({ selectable: this.shapeSelection })
-    this.shape.obj = shape
   }
 
   setShapeOpacity = (opacity: number, render = true) => {
@@ -964,8 +959,12 @@ export class Editor {
       opacity: shapeStyle.opacity,
       selectable: false,
     })
+    shapeObj.bringToFront()
     if (this.shape?.obj) {
       this.canvas.remove(this.shape.obj)
+    }
+    if (render) {
+      this.canvas.clear()
     }
     this.canvas.add(shapeObj)
 
@@ -985,7 +984,6 @@ export class Editor {
     }
 
     if (render) {
-      this.canvas.clear()
       this.canvas.requestRenderAll()
     }
 
