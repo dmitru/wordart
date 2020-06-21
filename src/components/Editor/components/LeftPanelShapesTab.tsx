@@ -630,6 +630,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                             <MenuButton
                               // @ts-ignore
                               variant="outline"
+                              variantColor={
+                                selectedCategory ? 'accent' : undefined
+                              }
                               as={Button}
                               rightIcon="chevron-down"
                               py="2"

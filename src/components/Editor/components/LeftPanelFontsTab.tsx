@@ -172,14 +172,13 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                 exit={{ x: 355, y: 0, opacity: 0 }}
               >
                 <Box
-                  position="absolute"
-                  width="100%"
                   height="calc(100vh - 120px)"
                   display="flex"
                   flexDirection="column"
                 >
                   <Box flex="1">
                     <FontPicker
+                      showCancel={state.replacingFontIndex == null}
                       selectedFontId={
                         style.items.words.fontIds[
                           state.replacingFontIndex != null

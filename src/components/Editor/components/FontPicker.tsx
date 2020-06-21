@@ -6,6 +6,7 @@ import {
   InputGroup,
   InputLeftElement,
   Icon,
+  Text,
   Input,
   InputRightElement,
   Select,
@@ -13,6 +14,8 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  Heading,
+  Stack,
 } from '@chakra-ui/core'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import styled from '@emotion/styled'
@@ -23,9 +26,12 @@ import { useStore } from 'services/root-store'
 import { useEffect, useMemo } from 'react'
 import { FontConfig, FontStyleConfig } from 'data/fonts'
 import { uniq, flatten, capitalize } from 'lodash'
+import { SectionLabel } from 'components/Editor/components/shared'
+import css from '@emotion/css'
 
 export type FontPickerProps = {
   selectedFontId: string
+  showCancel?: boolean
   onCancel: () => void
   onSelected: (font: FontConfig, fontStyle: FontStyleConfig) => void
   onHighlighted: (font: FontConfig, fontStyle: FontStyleConfig) => void
@@ -33,6 +39,7 @@ export type FontPickerProps = {
 
 export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
   const {
+    showCancel = true,
     selectedFontId: initSelectedFontId,
     onSelected,
     onHighlighted,
@@ -102,40 +109,108 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
 
   return (
     <>
-      <Box display="flex">
+      <Stack direction="row" spacing="2" display="flex">
+        {showCancel && (
+          <Button
+            flex="1"
+            onClick={() => {
+              onCancel()
+            }}
+          >
+            Cancel
+          </Button>
+        )}
         <Button
-          flex="1"
+          flex="2"
           onClick={() => {
             if (!selectedFont) {
               return
             }
             onSelected(selectedFont.font, selectedFont.style)
           }}
-          variantColor="green"
+          variantColor="accent"
         >
           Done
         </Button>
-        <Button
-          ml="3"
-          flex="1"
-          onClick={() => {
-            onCancel()
-          }}
-        >
-          Cancel
-        </Button>
-      </Box>
+      </Stack>
 
       <Box display="flex" flexDirection="column" height="100%">
         {selectedFont && (
           <>
             <Box>
-              <SelectedFontThumbnail mb="4" mt="4" p="3">
+              <SelectedFontThumbnail mb="0" mt="4" p="3">
                 <img src={selectedFont.style.thumbnail} />
               </SelectedFontThumbnail>
             </Box>
           </>
         )}
+
+        <Box mt="5">
+          <Heading size="lg" mb="4">
+            Fonts Catalog
+          </Heading>
+
+          <Box mb="3" display="flex" flexWrap="wrap" alignItems="flex-start">
+            {styleOptions.map((option) => (
+              <Button
+                key={option}
+                size="xs"
+                mr="2"
+                mb="1"
+                variant={state.style === option ? 'solid' : 'outline'}
+                variantColor={state.style === option ? 'accent' : undefined}
+                onClick={() => {
+                  state.style = option
+                }}
+              >
+                {option === 'all' ? 'All styles' : capitalize(option)}
+              </Button>
+            ))}
+          </Box>
+
+          <Menu>
+            <MenuButton
+              mr="1"
+              size="xs"
+              as={Button}
+              variantColor={state.language === 'any' ? undefined : 'accent'}
+              variant={state.language === 'any' ? 'ghost' : 'solid'}
+              rightIcon="chevron-down"
+            >
+              {'Language: '}
+              {state.language === 'any'
+                ? 'Any'
+                : `${capitalize(state.language)}`}
+            </MenuButton>
+            <MenuList
+              placement="bottom-start"
+              maxHeight="200px"
+              overflowY="auto"
+            >
+              {langOptions.map((option) => (
+                <MenuItem
+                  key={option}
+                  onClick={() => {
+                    state.language = option
+                  }}
+                >
+                  {option === 'any' ? 'Any language' : capitalize(option)}
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Menu>
+          {state.language !== 'any' && (
+            <Button
+              size="xs"
+              variant="ghost"
+              onClick={() => {
+                state.language = 'any'
+              }}
+            >
+              <Icon name="close" />
+            </Button>
+          )}
+        </Box>
 
         <InputGroup mt="5">
           <InputLeftElement children={<Icon name="search" />} />
@@ -168,76 +243,39 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
           )}
         </InputGroup>
 
-        <Box mt="3">
-          <Menu>
-            <MenuButton
-              mr="1"
-              size="sm"
-              as={Button}
-              variantColor={state.style === 'all' ? undefined : 'teal'}
-              variant={state.style === 'all' ? 'ghost' : 'solid'}
-              rightIcon="chevron-down"
-            >
-              {state.style === 'all'
-                ? 'Style'
-                : `Style: ${capitalize(state.style)}`}
-            </MenuButton>
-            <MenuList placement="bottom-start">
-              {styleOptions.map((option) => (
-                <MenuItem
-                  key={option}
-                  onClick={() => {
-                    state.style = option
-                  }}
-                >
-                  {capitalize(option)}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-
-          <Menu>
-            <MenuButton
-              mr="1"
-              size="sm"
-              as={Button}
-              variantColor={state.language === 'any' ? undefined : 'teal'}
-              variant={state.language === 'any' ? 'ghost' : 'solid'}
-              rightIcon="chevron-down"
-            >
-              {state.language === 'any'
-                ? 'Language'
-                : `${capitalize(state.language)}`}
-            </MenuButton>
-            <MenuList placement="bottom-start">
-              {langOptions.map((option) => (
-                <MenuItem
-                  key={option}
-                  onClick={() => {
-                    state.language = option
-                  }}
-                >
-                  {capitalize(option)}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-        </Box>
-
         <Box mt="5" flex="1">
-          <AutoSizer defaultWidth={900} defaultHeight={700}>
-            {({ height }) => (
-              <List
-                overscanCount={20}
-                height={height}
-                itemCount={fonts.length}
-                itemSize={35}
-                width={340}
+          {fonts.length > 0 && (
+            <AutoSizer defaultWidth={900} defaultHeight={700}>
+              {({ height }) => (
+                <List
+                  overscanCount={20}
+                  height={height}
+                  itemCount={fonts.length}
+                  itemSize={35}
+                  width={340}
+                >
+                  {FontListRow}
+                </List>
+              )}
+            </AutoSizer>
+          )}
+
+          {fonts.length === 0 && (
+            <>
+              <Text>No fonts found for your search criteria.</Text>
+              <Button
+                mt="3"
+                width="100%"
+                onClick={() => {
+                  state.language = 'any'
+                  state.style = 'all'
+                  state.query = ''
+                }}
               >
-                {FontListRow}
-              </List>
-            )}
-          </AutoSizer>
+                Show all fonts
+              </Button>
+            </>
+          )}
         </Box>
       </Box>
     </>
