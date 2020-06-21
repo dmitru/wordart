@@ -31,7 +31,6 @@ export class AuthStore {
 
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
-    this.fetchLocalizedPrices()
 
     if (!IS_SSR) {
       window.Paddle.Setup({
@@ -44,6 +43,7 @@ export class AuthStore {
           }
         },
       })
+      this.fetchLocalizedPrices()
     }
   }
 

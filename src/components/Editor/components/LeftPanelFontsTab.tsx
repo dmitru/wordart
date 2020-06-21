@@ -4,12 +4,14 @@ import {
   Button,
   IconButton,
   Menu,
+  Icon,
   MenuButton,
   MenuItem,
   MenuList,
   Tag,
   TagLabel,
 } from '@chakra-ui/core'
+import css from '@emotion/css'
 import styled from '@emotion/styled'
 import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import { AddCustomFontModal } from 'components/Editor/components/AddCustomFontModal'
@@ -77,7 +79,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
           position="relative"
           overflow="hidden"
           width="100%"
-          height="calc(100vh - 120px)"
+          height="calc(100vh - 50px)"
           px="3"
           py="5"
         >
@@ -92,7 +94,16 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
               >
                 <Box position="absolute" width="100%">
                   <SectionLabel>Selected Fonts</SectionLabel>
-                  <Box mt="3" mb="6">
+                  <Box
+                    mt="3"
+                    mb="6"
+                    p="3"
+                    css={css`
+                      width: 340px;
+                      border-radius: 4px;
+                      box-shadow: 0 0 4px 0 #0004;
+                    `}
+                  >
                     {fonts.map((font, index) => {
                       return (
                         <FontListButton
@@ -100,12 +111,26 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                           thumbnail={font.style.thumbnail}
                           title={font.font.title}
                           isCustom={font.font.isCustom}
+                          showDelete={style.items.words.fontIds.length > 1}
                           containerProps={{
-                            onClick: () => {
+                            onClick: (e) => {
+                              if (e.isPropagationStopped()) {
+                                return
+                              }
                               state.isAddingFont = false
                               state.replacingFontIndex = index
                               state.view = 'choose-font'
                             },
+                          }}
+                          onChangeClick={() => {
+                            state.isAddingFont = false
+                            state.replacingFontIndex = index
+                            state.view = 'choose-font'
+                          }}
+                          onDeleteClick={() => {
+                            style.items.words.fontIds = style.items.words.fontIds.filter(
+                              (id) => id !== font.style.fontId
+                            )
                           }}
                         />
                       )
@@ -131,7 +156,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                         variant="solid"
                         variantColor="light"
                       >
-                        <TagLabel>{fonts.length} / 8</TagLabel>
+                        <TagLabel>{(fonts || []).length} / 8</TagLabel>
                       </Tag>
                     </Button>
 
@@ -178,7 +203,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                 >
                   <Box flex="1">
                     <FontPicker
-                      showCancel={state.replacingFontIndex == null}
+                      showCancel={state.isAddingFont}
                       selectedFontId={
                         style.items.words.fontIds[
                           state.replacingFontIndex != null
@@ -196,8 +221,8 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                           style.items.words.fontIds = uniq(
                             style.items.words.fontIds
                           )
+                          store.animateVisualize(false)
                         }
-                        store.animateVisualize(false)
                       }}
                       onSelected={(font, fontStyle) => {
                         if (state.isAddingFont) {
@@ -240,6 +265,9 @@ export type FontListButtonProps = {
   thumbnail: string
   isCustom?: boolean
   isSelected?: boolean
+  showDelete: boolean
+  onDeleteClick: () => void
+  onChangeClick: () => void
   containerProps?: React.HTMLAttributes<HTMLDivElement>
 }
 
@@ -247,6 +275,9 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
   title,
   isCustom,
   isSelected,
+  showDelete,
+  onDeleteClick,
+  onChangeClick,
   thumbnail,
   containerProps = {},
 }) => {
@@ -264,13 +295,59 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
           </Badge>
         )}
       </FontButton>
+
+      <FontChangeButton
+        variantColor="accent"
+        aria-label="Delete"
+        size="sm"
+        ml="2"
+        mr="2"
+        onClickCapture={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          e.nativeEvent.stopImmediatePropagation()
+          e.nativeEvent.stopPropagation()
+          onChangeClick()
+        }}
+      >
+        Change
+      </FontChangeButton>
+
+      {showDelete && (
+        <FontDeleteButton
+          isRound
+          aria-label="Delete"
+          ml="2"
+          mr="2"
+          icon="close"
+          size="xs"
+          onClickCapture={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            e.nativeEvent.stopImmediatePropagation()
+            e.nativeEvent.stopPropagation()
+            onDeleteClick()
+          }}
+        >
+          <Icon name="close" />
+        </FontDeleteButton>
+      )}
     </FontButtonContainer>
   )
 }
 
+const FontChangeButton = styled(Button)`
+  position: absolute;
+  right: 50px;
+`
+
 const Toolbar = styled(Box)``
 
-const FontDeleteButton = styled(IconButton)``
+const FontDeleteButton = styled(IconButton)`
+  position: absolute;
+  right: 20px;
+  width: 30px;
+`
 
 const FontButton = styled(BaseBtn)`
   border: none;
@@ -288,7 +365,9 @@ const FontButton = styled(BaseBtn)`
 `
 
 const FontButtonContainer = styled(Box)<{ theme: any; selected?: boolean }>`
-  ${FontDeleteButton} {
+  position: relative;
+
+  ${FontDeleteButton}, ${FontChangeButton} {
     opacity: 0;
     transition: 0.2s opacity;
   }
@@ -302,7 +381,8 @@ const FontButtonContainer = styled(Box)<{ theme: any; selected?: boolean }>`
       p.selected
         ? `${p.theme.colors.blue['50']}`
         : p.theme.colors.blackAlpha['50']};
-    ${FontDeleteButton} {
+
+    ${FontDeleteButton}, ${FontChangeButton} {
       opacity: 1;
     }
   }

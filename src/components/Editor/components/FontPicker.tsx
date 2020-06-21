@@ -26,6 +26,7 @@ import { useStore } from 'services/root-store'
 import { useEffect, useMemo } from 'react'
 import { FontConfig, FontStyleConfig } from 'data/fonts'
 import { uniq, flatten, capitalize } from 'lodash'
+import { animateElement } from 'utils/animation'
 import { SectionLabel } from 'components/Editor/components/shared'
 import css from '@emotion/css'
 
@@ -96,6 +97,12 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
           onClick: () => {
             state.selectedFontId = fontStyle.fontId
             onHighlighted(font.font, fontStyle)
+            if (showCancel) {
+              animateElement(
+                document.getElementById('font-picker-done')!,
+                'pulsate-fwd-subtle'
+              )
+            }
           },
         }}
       />
@@ -129,8 +136,9 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
             onSelected(selectedFont.font, selectedFont.style)
           }}
           variantColor="accent"
+          id="font-picker-done"
         >
-          Done
+          {showCancel ? 'Add this font' : 'Done'}
         </Button>
       </Stack>
 
@@ -145,10 +153,41 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
           </>
         )}
 
-        <Box mt="5">
-          <Heading size="lg" mb="4">
+        <Box mt="2rem">
+          <Heading size="lg" mb="4" mt="0">
             Fonts Catalog
           </Heading>
+
+          <InputGroup mt="5" size="sm" mb="3">
+            <InputLeftElement children={<Icon name="search" />} />
+            <Input
+              _placeholder={{
+                color: 'red',
+              }}
+              placeholder="Find font..."
+              value={state.query}
+              onChange={(e: any) => {
+                state.query = e.target.value
+              }}
+            />
+            {!!state.query && (
+              <InputRightElement
+                onClick={() => {
+                  state.query = ''
+                }}
+                children={
+                  <IconButton
+                    aria-label="Clear"
+                    icon="close"
+                    color="gray"
+                    isRound
+                    variant="ghost"
+                    size="sm"
+                  />
+                }
+              />
+            )}
+          </InputGroup>
 
           <Box mb="3" display="flex" flexWrap="wrap" alignItems="flex-start">
             {styleOptions.map((option) => (
@@ -166,82 +205,51 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
                 {option === 'all' ? 'All styles' : capitalize(option)}
               </Button>
             ))}
+
+            <Menu>
+              <MenuButton
+                mr="1"
+                size="xs"
+                as={Button}
+                variantColor={state.language === 'any' ? undefined : 'accent'}
+                variant={state.language === 'any' ? 'ghost' : 'solid'}
+                rightIcon="chevron-down"
+              >
+                {state.language === 'any'
+                  ? 'Language: Any'
+                  : `${capitalize(state.language)}`}
+              </MenuButton>
+              <MenuList
+                placement="bottom-start"
+                maxHeight="200px"
+                overflowY="auto"
+                zIndex={100000}
+              >
+                {langOptions.map((option) => (
+                  <MenuItem
+                    key={option}
+                    onClick={() => {
+                      state.language = option
+                    }}
+                  >
+                    {option === 'any' ? 'Any language' : capitalize(option)}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+            {state.language !== 'any' && (
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={() => {
+                  state.language = 'any'
+                }}
+              >
+                <Icon name="close" />
+              </Button>
+            )}
           </Box>
-
-          <Menu>
-            <MenuButton
-              mr="1"
-              size="xs"
-              as={Button}
-              variantColor={state.language === 'any' ? undefined : 'accent'}
-              variant={state.language === 'any' ? 'ghost' : 'solid'}
-              rightIcon="chevron-down"
-            >
-              {'Language: '}
-              {state.language === 'any'
-                ? 'Any'
-                : `${capitalize(state.language)}`}
-            </MenuButton>
-            <MenuList
-              placement="bottom-start"
-              maxHeight="200px"
-              overflowY="auto"
-            >
-              {langOptions.map((option) => (
-                <MenuItem
-                  key={option}
-                  onClick={() => {
-                    state.language = option
-                  }}
-                >
-                  {option === 'any' ? 'Any language' : capitalize(option)}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-          {state.language !== 'any' && (
-            <Button
-              size="xs"
-              variant="ghost"
-              onClick={() => {
-                state.language = 'any'
-              }}
-            >
-              <Icon name="close" />
-            </Button>
-          )}
         </Box>
-
-        <InputGroup mt="5">
-          <InputLeftElement children={<Icon name="search" />} />
-          <Input
-            _placeholder={{
-              color: 'red',
-            }}
-            placeholder="Find font..."
-            value={state.query}
-            onChange={(e: any) => {
-              state.query = e.target.value
-            }}
-          />
-          {!!state.query && (
-            <InputRightElement
-              onClick={() => {
-                state.query = ''
-              }}
-              children={
-                <IconButton
-                  aria-label="Clear"
-                  icon="close"
-                  color="gray"
-                  isRound
-                  variant="ghost"
-                  size="sm"
-                />
-              }
-            />
-          )}
-        </InputGroup>
 
         <Box mt="5" flex="1">
           {fonts.length > 0 && (
@@ -340,6 +348,9 @@ const SelectedFontThumbnail = styled(Box)`
   display: block;
   align-items: center;
   width: 100%;
+
+  border-radius: 4px;
+  box-shadow: 0 0 4px 0 #0004;
 
   img {
     max-width: 270px;
