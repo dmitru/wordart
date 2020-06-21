@@ -120,7 +120,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                         state.view = 'choose-font'
                       }}
                       leftIcon="add"
-                      variantColor="green"
+                      variantColor="primary"
                     >
                       Add more fonts
                       <Tag

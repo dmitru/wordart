@@ -194,7 +194,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                       active={preset.kind === style.items.words.anglesPreset}
                       onClick={() => {
                         style.items.words.anglesPreset = preset.kind
-                        store.animateVisualize()
+                        animateVisualize()
                       }}
                     >
                       {preset.Svg && <preset.Svg width="100%" height="100%" />}
@@ -207,7 +207,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                   <Box mt="3">
                     <Button
                       mr="3"
-                      variantColor="green"
+                      variantColor="primary"
                       isDisabled={style.items.words.customAngles.length >= 8}
                       size="sm"
                       leftIcon="add"
@@ -230,7 +230,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                     </Button>
                   </Box>
 
-                  <Box mt="2" paddingLeft="30px">
+                  <Box mt="2" px="20px">
                     {style.items.words.customAngles.map((angle, index) => (
                       <Flex direction="row" key={index}>
                         <Slider
@@ -244,16 +244,17 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                             const val = (value as any) as number
                             style.items.words.customAngles[index] = val
                           }}
+                          onAfterChange={animateVisualize}
                           min={-90}
                           max={90}
                           step={1}
                           afterLabel="°"
                         />
-                        <Box width="30px">
+                        <Box width="30px" ml="4">
                           {style.items.words.customAngles.length > 1 && (
                             <Button
-                              size="sm"
-                              variant="ghost"
+                              size="xs"
+                              variant="outline"
                               onClick={() => {
                                 style.items.words.customAngles.splice(index, 1)
                               }}
@@ -284,6 +285,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                 const val = (value as any) as number
                 style.items.placement.iconsMaxSize = val
               }}
+              onAfterChange={animateVisualize}
               min={20}
               max={100}
               step={1}
@@ -297,6 +299,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                 const val = (value as any) as number
                 style.items.placement.iconsProportion = val
               }}
+              onAfterChange={animateVisualize}
               min={0}
               max={100}
               step={1}
