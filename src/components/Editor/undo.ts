@@ -8,7 +8,7 @@ export type UndoFrameKind = UndoFrame['kind']
 
 export type UndoFrame =
   | UndoVisualizeFrame
-  | UndoItemUpdateFrme
+  | UndoItemUpdateFrame
   | UndoSelectionChangeFrame
 
 export type UndoVisualizeFrame = {
@@ -17,6 +17,8 @@ export type UndoVisualizeFrame = {
   dataAfter: EditorPersistedData
   stateBefore: EditorStateSnapshot
   stateAfter: EditorStateSnapshot
+  versionBefore: number
+  versionAfter: number
 }
 
 export type UndoSelectionChangeFrame = {
@@ -25,11 +27,13 @@ export type UndoSelectionChangeFrame = {
   after: EditorStateSnapshot['selection']
 }
 
-export type UndoItemUpdateFrme = {
+export type UndoItemUpdateFrame = {
   kind: 'item-update'
   item: EditorItem
   before: ItemUpdateUndoData
   after: ItemUpdateUndoData
+  versionBefore: number
+  versionAfter: number
 }
 
 export type ItemUpdateUndoData = {

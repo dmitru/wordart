@@ -103,6 +103,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const isNew = props.wordcloudId == null
 
     const { authStore } = useStore()
+    const { profile } = authStore
     const router = useRouter()
 
     const cancelVisualizationBtnRef = useRef<HTMLButtonElement>(null)
@@ -196,38 +197,56 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     //
     const [isExporting, setIsExporting] = useState(false)
     const handleDownloadClick = useCallback(
-      (dimension: number, format: 'svg' | 'png' | 'jpeg') => {
-        if (!store.editor) {
-          return
-        }
-        setIsExporting(true)
+      (hd = false, format: 'svg' | 'png' | 'jpeg') => {
+        const startExport = async () => {
+          const dimension = hd ? 4096 : 1024
+          if (!store.editor) {
+            return
+          }
 
-        const mimeType =
-          {
-            png: 'image/png',
-            jpeg: 'image/jpeg',
-            svg: 'image/svg',
-          }[format] || 'image/png'
+          setIsExporting(true)
 
-        if (format === 'svg') {
-          store.editor.exportAsSvg().then((svg) => {
-            const svgBlob = new Blob([svg], { type: 'image/svg' })
-            saveAs(svgBlob, `${state.title || 'Untitled Design'}.svg`)
+          try {
+            // TODO: hit API for HD download
+            if (hd) {
+              const result = await Api.wordclouds.hdDownload({
+                wordcloudVersion: store.editor.version,
+                wordloudKey: store.editor.key,
+              })
+
+              if (!result.canDownload) {
+                console.log('Can not download! :(')
+                // TODO: open upgrade / buy modal
+                return
+              }
+            }
+
+            const mimeType =
+              {
+                png: 'image/png',
+                jpeg: 'image/jpeg',
+                svg: 'image/svg',
+              }[format] || 'image/png'
+
+            if (format === 'svg') {
+              const svg = await store.editor.exportAsSvg()
+              const svgBlob = new Blob([svg], { type: 'image/svg' })
+              saveAs(svgBlob, `${state.title || 'Untitled Design'}.svg`)
+            } else {
+              const canvas = await store.editor.exportAsRaster(dimension)
+              canvas.toBlob((blob) => {
+                saveAs(
+                  blob as Blob,
+                  `${state.title || 'Untitled Design'}.${format}`
+                )
+              }, mimeType)
+            }
+          } finally {
             setIsExporting(false)
-            state.isShowingExport = false
-          })
-        } else {
-          store.editor.exportAsRaster(dimension).then((canvas) => {
-            canvas.toBlob((blob) => {
-              saveAs(
-                blob as Blob,
-                `${state.title || 'Untitled Design'}.${format}`
-              )
-              setIsExporting(false)
-              state.isShowingExport = false
-            }, mimeType)
-          })
+          }
         }
+
+        startExport()
       },
       [store]
     )
@@ -293,7 +312,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   margin-right: 4px;
                 `}
               />
-              File
+              Menu
             </MenuButton>
             <MenuList zIndex={4}>
               <MenuItem>
@@ -384,7 +403,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             variant="solid"
             onClick={handleSaveClick}
             isLoading={isSaving}
-            mr="3"
+            mr="1"
           >
             <FiSave
               css={css`
@@ -393,6 +412,15 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             />
             Save
           </Button>
+
+          <TopNavButton onClick={openExport} mr="1">
+            <FiDownload
+              css={css`
+                margin-right: 4px;
+              `}
+            />
+            Download
+          </TopNavButton>
 
           <Editable
             css={css`
@@ -429,21 +457,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             />
           </Editable>
 
-          <TopNavButton
-            onClick={openExport}
-            isLoading={isExporting}
-            loadingText="Saving..."
-            mr="1"
-          >
-            <FiDownload
-              css={css`
-                margin-right: 4px;
-              `}
-            />
-            Download
-          </TopNavButton>
-
-          <TopNavButton
+          {/* <TopNavButton
             onClick={openExport}
             isLoading={isExporting}
             loadingText="Saving..."
@@ -455,7 +469,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               `}
             />
             Order Prints
-          </TopNavButton>
+          </TopNavButton> */}
 
           <TopNavButton mr="1" ml="auto">
             <FiHelpCircle
@@ -466,7 +480,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             Help & Tutorials
           </TopNavButton>
 
-          <Button variantColor="accent">Upgrade to Pro</Button>
+          <Button variantColor="accent">Upgrade</Button>
         </TopNavWrapper>
 
         <EditorLayout>
@@ -678,39 +692,39 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     ) : (
                       <>
                         <Text fontSize="lg">
-                          <strong>Standard Quality:</strong> Personal Use Only
+                          <strong>Standard Download,</strong> personal use only
                         </Text>
                         <Stack direction="row" spacing="3" flexWrap="wrap">
                           <ExportButton
-                            onClick={() => handleDownloadClick(2048, 'png')}
+                            onClick={() => handleDownloadClick(false, 'png')}
                           >
                             <Text mt="0" fontSize="lg">
                               PNG
                             </Text>
                             <Text mb="0" fontSize="sm">
-                              2048 px
+                              1024 px
                             </Text>
                           </ExportButton>
                           <ExportButton
-                            onClick={() => handleDownloadClick(2048, 'jpeg')}
+                            onClick={() => handleDownloadClick(false, 'jpeg')}
                           >
                             <Text mt="0" fontSize="lg">
                               JPEG
                             </Text>
                             <Text mb="0" fontSize="sm">
-                              2048 px
+                              1024 px
                             </Text>
                           </ExportButton>
                         </Stack>
 
                         <Box mt="6">
                           <Text fontSize="lg">
-                            <strong>HD Quality:</strong> Personal or Commercial
-                            Use
+                            <strong>HD Download,</strong> personal or commercial
+                            use
                           </Text>
                           <Stack direction="row" spacing="3" flexWrap="wrap">
                             <ExportButton
-                              onClick={() => handleDownloadClick(4096, 'png')}
+                              onClick={() => handleDownloadClick(true, 'png')}
                             >
                               <Text mt="0" fontSize="lg">
                                 PNG (HD)
@@ -721,7 +735,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                             </ExportButton>
 
                             <ExportButton
-                              onClick={() => handleDownloadClick(4096, 'jpeg')}
+                              onClick={() => handleDownloadClick(true, 'jpeg')}
                             >
                               <Text mt="0" fontSize="lg">
                                 JPEG (HD)
@@ -732,7 +746,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                             </ExportButton>
 
                             <ExportButton
-                              onClick={() => handleDownloadClick(4096, 'svg')}
+                              onClick={() => handleDownloadClick(true, 'svg')}
                             >
                               <Text mt="0" fontSize="lg">
                                 SVG

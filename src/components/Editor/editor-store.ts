@@ -67,9 +67,8 @@ import {
 } from 'services/api/persisted/v1'
 import { EditorPersistedData } from 'services/api/types'
 import { RootStore } from 'services/root-store'
-import { arrayBufferToDataUri } from 'utils/buffers'
 import { consoleLoggers } from 'utils/console-logger'
-import { UninqIdGenerator as UniqIdGenerator } from 'utils/ids'
+import { UniqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
 import { exhaustiveCheck } from 'utils/type-utils'
@@ -206,12 +205,18 @@ export class EditorStore {
           ...before,
           transform: newTransform,
         }
-        this.editor?.pushUndoFrame({
+        if (!this.editor) {
+          return
+        }
+        this.editor.pushUndoFrame({
           kind: 'item-update',
           item,
           before,
           after,
+          versionBefore: this.editor.version,
+          versionAfter: this.editor.version + 1,
         })
+        this.editor.version++
       },
     })
     this.editor.setBgColor(mkBgStyleConfFromOptions(this.styleOptions.bg).fill)
@@ -237,40 +242,53 @@ export class EditorStore {
     this.selectedItem.setLocked(lockValue)
     this.selectedItemData.locked = lockValue
     const after = this.getSelectedItemUndoData()
-    this.editor?.pushUndoFrame({
+    if (!this.editor) {
+      return
+    }
+    this.editor.pushUndoFrame({
       kind: 'item-update',
       item: this.selectedItem,
       before,
       after,
+      versionAfter: this.editor.version,
+      versionBefore: this.editor.version,
     })
-    this.editor?.canvas.requestRenderAll()
+    this.editor.canvas.requestRenderAll()
   }
 
   resetAllItems = async (target: TargetKind) => {
+    if (!this.editor) {
+      return
+    }
+
+    const versionBefore = this.editor.version
     const dataBefore = await this.serialize()
     const stateBefore = this.getStateSnapshot()
-    this.editor?.resetAllItems(target)
-    this.editor?.canvas.discardActiveObject(new Event('no-callbacks'))
+    this.editor.resetAllItems(target)
+    this.editor.canvas.discardActiveObject(new Event('no-callbacks'))
 
     const dataAfter = await this.serialize()
     const stateAfter = this.getStateSnapshot()
 
-    this.editor?.undoStack.push({
+    this.editor.undoStack.push({
       kind: 'visualize',
       dataAfter,
       dataBefore,
       stateAfter,
       stateBefore,
+      versionAfter: this.editor.version,
+      versionBefore,
     })
 
     this.hasItemChanges = false
   }
 
   setItemCustomColor = (color: string) => {
-    if (!this.selectedItem || !this.selectedItemData) {
+    if (!this.selectedItem || !this.selectedItemData || !this.editor) {
       return
     }
 
+    const versionBefore = this.editor.version
     const before = this.getSelectedItemUndoData()
 
     this.hasItemChanges = true
@@ -278,15 +296,17 @@ export class EditorStore {
     this.selectedItem.setLocked(true)
     this.selectedItemData.customColor = color
     this.selectedItemData.locked = true
-    this.editor?.canvas.requestRenderAll()
+    this.editor.canvas.requestRenderAll()
 
     const after = this.getSelectedItemUndoData()
 
-    this.editor?.pushUndoFrame({
+    this.editor.pushUndoFrame({
       kind: 'item-update',
       item: this.selectedItem,
       before,
       after,
+      versionBefore,
+      versionAfter: this.editor.version,
     })
   }
   private getSelectedItemUndoData = (): ItemUpdateUndoData => {
@@ -581,6 +601,9 @@ export class EditorStore {
 
     this.editor.bgCanvas.requestRenderAll()
     this.editor.canvas.requestRenderAll()
+
+    this.editor.key = data.key
+    this.editor.version = data.version
 
     if (shouldShowModal) {
       this.visualizingProgress = 1
@@ -881,6 +904,8 @@ export class EditorStore {
     const serializedData: EditorPersistedData = {
       version: 1,
       data: {
+        key: this.editor.key,
+        version: this.editor.version,
         customFonts: await Promise.all(
           this.customFonts
             .filter((f) => fontsIds.has(f.styles[0].fontId))
@@ -972,14 +997,17 @@ export class EditorStore {
       fontId: fontConfig.fontId,
       title: fontTitle,
       url: fontConfig.fontUrl,
-      glyphRanges: [],
       thumbnail: thumbnailUrl,
+      fontStyle: 'regular',
+      fontWeight: 'normal',
     }
     this.customFonts.push({
       title: fontTitle,
       isCustom: true,
       categories: ['custom'],
       styles: [fontStyle],
+      popularity: 1,
+      subsets: ['custom'],
     })
   }
 
@@ -1058,9 +1086,7 @@ export class EditorStore {
   }
   fetchFontById = (fontId: FontId) =>
     this.getFontById(fontId)
-      ? this.getFontById(fontId)!.style.url
-        ? loadFont(this.getFontById(fontId)!.style.url!)
-        : Promise.resolve(this.getFontById(fontId)!.style.font!)
+      ? loadFont(this.getFontById(fontId)!.style.url!)
       : Promise.resolve(null)
 
   getSelectedShapeConf = () =>
@@ -1071,21 +1097,25 @@ export class EditorStore {
     updateShapeColors = true,
     render = true
   ) => {
+    if (!this.editor) {
+      return
+    }
+    const versionBefore = this.editor.version
     const stateBefore = this.getStateSnapshot()
 
     const persistedDataBefore = await this.serialize()
     await this.selectShape(shapeId, updateShapeColors, render)
     const persistedDataAfter = await this.serialize()
-    if (!this.editor) {
-      return
-    }
     this.editor.pushUndoFrame({
       kind: 'visualize',
       dataBefore: persistedDataBefore,
       dataAfter: persistedDataAfter,
       stateAfter: this.getStateSnapshot(),
       stateBefore,
+      versionAfter: this.editor.version,
+      versionBefore,
     })
+    this.editor.version++
   }
 
   @action selectShape = async (
@@ -1118,6 +1148,7 @@ export class EditorStore {
     }
 
     this.selectedShapeId = shapeId
+    this.editor.version++
 
     this.updateShapeThumbnail()
   }

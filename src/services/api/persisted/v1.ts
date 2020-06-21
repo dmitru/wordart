@@ -12,6 +12,9 @@ import { EditorItemId } from 'components/Editor/lib/editor-item'
 export type EditorPersistedDataV1 = {
   version: 1
   data: {
+    key: string
+    version: number
+
     sceneSize: Dimensions
 
     shape: PersistedShapeConfV1

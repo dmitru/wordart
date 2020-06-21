@@ -8,6 +8,8 @@ import {
   SaveWordcloudDto,
   Order,
   ProcessOrderDto,
+  HdDownloadDto,
+  HdDownloadResult,
 } from 'services/api/types'
 import { apiClient } from './api-client'
 
@@ -33,6 +35,10 @@ export const Api = {
     async fetchEditorData(id: WordcloudId): Promise<EditorPersistedData> {
       const response = await apiClient.get(`/wordclouds/${id}/editorData`)
       return response.data as EditorPersistedData
+    },
+    async hdDownload(data: HdDownloadDto): Promise<HdDownloadResult> {
+      const response = await apiClient.post(`/wordclouds/hd-download`, data)
+      return response.data as HdDownloadResult
     },
   },
 

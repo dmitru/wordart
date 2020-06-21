@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid/non-secure'
 
-export class UninqIdGenerator {
+export class UniqIdGenerator {
   curLen: number
   startLen: number
   ids = new Set<string>()

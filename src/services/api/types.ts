@@ -4,6 +4,8 @@ export type MyProfile = {
   id: UserId
   username: string
   email: string
+  paddleUserId?: number
+  hdDownloadsLeft?: number
 }
 
 export type UserProfile = {
@@ -18,6 +20,8 @@ export type WordcloudId = string
 
 export type Wordcloud = {
   id: WordcloudId
+  key: string
+  version: number
   title: string
   thumbnail: string
   author: string
@@ -39,6 +43,15 @@ export type SaveWordcloudDto = {
   editorData: EditorPersistedData
 }
 
+export type HdDownloadDto = {
+  wordloudKey: string
+  wordcloudVersion: number
+}
+
+export type HdDownloadResult = {
+  canDownload: boolean
+}
+
 export type Order = {
   orderId: string
   createdAt: string
@@ -51,5 +64,5 @@ export type Order = {
 }
 
 export type ProcessOrderDto = {
-  orderId: number
+  checkoutId: string
 }

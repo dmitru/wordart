@@ -50,7 +50,7 @@ import { MatrixSerialized } from 'services/api/persisted/v1'
 import { EditorPersistedData } from 'services/api/types'
 import { waitAnimationFrame } from 'utils/async'
 import { consoleLoggers } from 'utils/console-logger'
-import { UninqIdGenerator } from 'utils/ids'
+import { UniqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { exhaustiveCheck } from 'utils/type-utils'
 import {
@@ -65,8 +65,9 @@ import {
 import {
   UndoStack,
   UndoFrame,
-  UndoItemUpdateFrme,
+  UndoItemUpdateFrame,
 } from 'components/Editor/undo'
+import { nanoid } from 'nanoid/non-secure'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -99,7 +100,12 @@ export class Editor {
   mode: EditorMode = 'view'
 
   private aspectRatio: number
-  private editorItemIdGen = new UninqIdGenerator(3)
+  private editorItemIdGen = new UniqIdGenerator(3)
+
+  /** Gets incremented after each change */
+  version: number = 1
+  /** Stable unique id of this wordlcoud */
+  key = nanoid(32)
 
   /** Info about the current shape */
   shape: null | Shape = null
@@ -240,6 +246,8 @@ export class Editor {
         this.store.renderKey++
 
         this.canvas.requestRenderAll()
+
+        this.version++
       } else {
         for (const targetKind of ['shape', 'bg'] as TargetKind[]) {
           const item = this.items[targetKind].fabricObjToItem.get(target)
@@ -249,6 +257,8 @@ export class Editor {
             params.onItemUpdated(item, transform)
           }
         }
+
+        this.version++
       }
     })
     this.canvas.renderOnAddRemove = false
@@ -435,6 +445,7 @@ export class Editor {
       item.setLocked(false)
     }
     this.canvas.requestRenderAll()
+    this.version++
   }
 
   setAspectRatio = (aspect: number, render = true) => {
@@ -446,6 +457,7 @@ export class Editor {
       height: 1000 / this.aspectRatio,
     })
     this.handleResize(render)
+    this.version++
   }
 
   get canvases() {
@@ -627,6 +639,8 @@ export class Editor {
     if (render) {
       this.canvas.requestRenderAll()
     }
+
+    this.version++
   }
 
   setShapeObj = (shape: fabric.Object) => {
@@ -646,6 +660,8 @@ export class Editor {
     if (render) {
       this.canvas.requestRenderAll()
     }
+
+    this.version++
   }
 
   setBgItemsStyle = async (
@@ -653,12 +669,14 @@ export class Editor {
     render = true
   ) => {
     this.setItemsStyle('bg', itemsStyleConf, render)
+    this.version++
   }
   setShapeItemsStyle = async (
     itemsStyleConf: ShapeStyleConf['items'],
     render = true
   ) => {
     this.setItemsStyle('shape', itemsStyleConf, render)
+    this.version++
   }
 
   setItemsStyle = async (
@@ -825,6 +843,8 @@ export class Editor {
     if (render) {
       this.canvas.requestRenderAll()
     }
+
+    this.version++
   }
 
   /** Sets the shape, clearing the project */
@@ -1308,7 +1328,10 @@ export class Editor {
       dataAfter: persistedDataAfter,
       stateBefore,
       stateAfter: this.store.getStateSnapshot(),
+      versionAfter: this.version + 1,
+      versionBefore: this.version,
     })
+    this.version++
 
     this.store.renderKey++
   }
@@ -1509,19 +1532,20 @@ export class Editor {
       dataAfter: persistedDataAfter,
       stateAfter: this.store.getStateSnapshot(),
       stateBefore,
+      versionAfter: this.version + 1,
+      versionBefore: this.version,
     })
-
+    this.version++
     this.store.renderKey++
   }
 
   pushUndoFrame = (frame: UndoFrame) => {
     this.undoStack.push(frame)
-    console.log('pushUndoFrame', frame)
     this.store.renderKey++
   }
 
   private applyItemUpdateUndoFrame = (
-    frame: UndoItemUpdateFrme,
+    frame: UndoItemUpdateFrame,
     direction: 'forward' | 'back'
   ) => {
     const data = direction === 'back' ? frame.before : frame.after
@@ -1550,15 +1574,18 @@ export class Editor {
     if (frame.kind === 'visualize') {
       await this.store.loadSerialized(frame.dataBefore)
       this.store.restoreStateSnapshot(frame.stateBefore)
+      this.version = frame.versionBefore
     } else if (frame.kind === 'selection-change') {
       this.store.restoreSelection(frame.before)
     } else if (frame.kind === 'item-update') {
       this.applyItemUpdateUndoFrame(frame, 'back')
+      this.version = frame.versionBefore
     }
     this.isUndoing = false
     this.canvas.requestRenderAll()
     this.store.renderKey++
   }
+
   redo = async () => {
     const frame = this.undoStack.redo()
     this.isUndoing = true
@@ -1567,15 +1594,18 @@ export class Editor {
     if (frame.kind === 'visualize') {
       await this.store.loadSerialized(frame.dataAfter)
       this.store.restoreStateSnapshot(frame.stateAfter)
+      this.version = frame.versionAfter
     } else if (frame.kind === 'selection-change') {
       this.store.restoreSelection(frame.after)
     } else if (frame.kind === 'item-update') {
       this.applyItemUpdateUndoFrame(frame, 'forward')
+      this.version = frame.versionAfter
     }
     this.isUndoing = false
     this.canvas.requestRenderAll()
     this.store.renderKey++
   }
+
   canUndo = (): boolean => !this.isUndoing && this.undoStack.canUndo()
   canRedo = (): boolean => !this.isUndoing && this.undoStack.canRedo()
 
@@ -1844,7 +1874,7 @@ export class Editor {
         }
         const { style } = this.store.getFontById(fontId)!
         const font: Font = {
-          otFont: style.url ? await loadFont(style.url) : style.font!,
+          otFont: await loadFont(style.url)!,
           id: fontId,
           isCustom: false,
         }
