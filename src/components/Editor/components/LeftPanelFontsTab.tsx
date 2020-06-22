@@ -338,14 +338,14 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
 
 const FontChangeButton = styled(Button)`
   position: absolute;
-  right: 50px;
+  right: 40px;
 `
 
 const Toolbar = styled(Box)``
 
 const FontDeleteButton = styled(IconButton)`
   position: absolute;
-  right: 20px;
+  right: 0;
   width: 30px;
 `
 
