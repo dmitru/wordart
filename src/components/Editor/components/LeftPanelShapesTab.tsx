@@ -45,6 +45,8 @@ import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { FaCog } from 'react-icons/fa'
 import { useDebouncedCallback } from 'use-debounce/lib'
+import { FontPicker } from 'components/Editor/components/FontPicker'
+import { SectionLabel } from 'components/Editor/components/shared'
 
 export type LeftPanelShapesTabProps = {}
 
@@ -61,7 +63,7 @@ const initialState = {
     color: {
       kind: 'single',
       invert: false,
-      color: 'red',
+      color: 'black',
     } as
       | {
           kind: 'single'
@@ -137,6 +139,8 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
       label: string
     } | null>(null)
 
+    const fonts = store.getAvailableFonts()
+    const [selectedFontId, setSelectedFontId] = useState(fonts[0].style.fontId)
     const [query, setQuery] = useState('')
     const matchingShapes = store
       .getAvailableShapes()
@@ -179,7 +183,10 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
     }, [])
 
     const updateTextThumbnailPreview = async () => {
-      const fontInfo = store.getAvailableFonts()[4]
+      const fontInfo = store.getFontById(selectedFontId)
+      if (!fontInfo) {
+        return
+      }
       const font = await store.fetchFontById(fontInfo.style.fontId)
       if (!font) {
         return
@@ -217,6 +224,10 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
       state.textShape.thumbnailPreview = c.toDataURL()
       c.dispose()
     }
+
+    useEffect(() => {
+      updateTextThumbnailPreview()
+    }, [selectedFontId])
 
     const resetTransformBtn =
       shape && !isEqual(shape.originalTransform, shape.transform) ? (
@@ -341,9 +352,11 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                     exit={{ x: 355, y: 0, opacity: 0 }}
                   >
                     <Stack mb="4" p="2" position="absolute" width="100%">
-                      <Heading size="md" m="0" mb="3" display="flex">
+                      {/* <Heading size="md" m="0" mb="3" display="flex">
                         Add Text Shape
-                      </Heading>
+                      </Heading> */}
+                      <SectionLabel>Add Text Shape</SectionLabel>
+
                       <Textarea
                         autoFocus
                         value={state.textShape.text}
@@ -353,38 +366,68 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         }}
                         placeholder="Type text here..."
                       />
-                      <ColorPickerPopover
-                        value={
-                          state.textShape.color.kind === 'single'
-                            ? state.textShape.color.color
-                            : state.textShape.color.colors[0]
-                        }
-                        onChange={(color) => {
-                          state.textShape.color = {
-                            kind: 'single',
-                            color,
-                            invert: false,
-                          }
-                          updateTextThumbnailPreview()
-                        }}
-                      />
 
-                      <Box mt="3">
+                      <Box display="flex">
+                        <Text my="0" mr="3">
+                          Color:
+                        </Text>
+                        <ColorPickerPopover
+                          value={
+                            state.textShape.color.kind === 'single'
+                              ? state.textShape.color.color
+                              : state.textShape.color.colors[0]
+                          }
+                          onChange={(color) => {
+                            state.textShape.color = {
+                              kind: 'single',
+                              color,
+                              invert: false,
+                            }
+                            updateTextThumbnailPreview()
+                          }}
+                        />
+                      </Box>
+
+                      <Box
+                        display="flex"
+                        flexDirection="column"
+                        css={css`
+                          min-height: 300px;
+                          height: calc(100vh - 520px);
+                        `}
+                      >
+                        <FontPicker
+                          selectedFontId={selectedFontId}
+                          onHighlighted={(font, style) =>
+                            setSelectedFontId(style.fontId)
+                          }
+                        />
+                      </Box>
+
+                      <Box mt="3" display="flex">
                         <Button
+                          flex="1"
+                          mr="3"
+                          onClick={() => {
+                            state.mode = 'home'
+                          }}
+                        >
+                          Cancel
+                        </Button>
+
+                        <Button
+                          flex="2"
                           variantColor="accent"
-                          size="lg"
                           onClick={async () => {
                             const shapeId = store.addCustomShapeText({
                               kind: 'text',
                               text: state.textShape.text,
                               textStyle: {
-                                // TODO
                                 color:
                                   state.textShape.color.kind === 'single'
                                     ? state.textShape.color.color
                                     : 'red',
-                                fontId: store.getAvailableFonts()[2].style
-                                  .fontId,
+                                fontId: selectedFontId,
                               },
                               title: 'Custom text',
                               isCustom: true,
@@ -398,15 +441,6 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           }}
                         >
                           Done
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="lg"
-                          onClick={() => {
-                            state.mode = 'home'
-                          }}
-                        >
-                          Cancel
                         </Button>
                       </Box>
                     </Stack>
@@ -435,6 +469,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                 shape.config.text = e.target.value
                                 await store.updateShape()
                                 store.updateShapeThumbnail()
+                                store.animateVisualize()
                               }}
                               placeholder="Type text here..."
                             />
@@ -452,6 +487,25 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               }}
                             />
                           </Stack>
+
+                          <Box
+                            display="flex"
+                            flexDirection="column"
+                            css={css`
+                              min-height: 300px;
+                              height: calc(100vh - 720px);
+                            `}
+                          >
+                            <FontPicker
+                              selectedFontId={selectedFontId}
+                              onHighlighted={async (font, style) => {
+                                shape.config.textStyle.fontId = style.fontId
+                                await store.updateShape()
+                                store.updateShapeThumbnail()
+                                store.animateVisualize()
+                              }}
+                            />
+                          </Box>
                         </>
                       )}
 

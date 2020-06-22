@@ -24,6 +24,7 @@ import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList as List, ListProps } from 'react-window'
 import { useStore } from 'services/root-store'
 import { animateElement } from 'utils/animation'
+import css from '@emotion/css'
 
 export type FontPickerProps = {
   selectedFontId: string | null
@@ -139,53 +140,59 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
             </Button>
           ))}
 
-          <Menu>
-            <MenuButton
-              mr="1"
-              size="xs"
-              as={Button}
-              // @ts-expect-error
-              variantColor={state.language === 'any' ? undefined : 'accent'}
-              variant={state.language === 'any' ? 'ghost' : 'solid'}
-              rightIcon="chevron-down"
-            >
-              {state.language === 'any'
-                ? 'Language: Any'
-                : `${capitalize(state.language)}`}
-            </MenuButton>
-            <MenuList
-              placement="bottom-start"
-              maxHeight="200px"
-              overflowY="auto"
-              zIndex={100000}
-            >
-              {langOptions.map((option) => (
-                <MenuItem
-                  key={option}
-                  onClick={() => {
-                    state.language = option
-                  }}
-                >
-                  {option === 'any' ? 'Any language' : capitalize(option)}
-                </MenuItem>
-              ))}
-            </MenuList>
-          </Menu>
-          {state.language !== 'any' && (
-            <Button
-              size="xs"
-              variant="ghost"
-              onClick={() => {
-                state.language = 'any'
-              }}
-            >
-              <Icon name="close" />
-            </Button>
-          )}
+          <span
+            css={css`
+              white-space: nowrap;
+            `}
+          >
+            <Menu>
+              <MenuButton
+                mr="1"
+                size="xs"
+                as={Button}
+                // @ts-expect-error
+                variantColor={state.language === 'any' ? undefined : 'accent'}
+                variant={state.language === 'any' ? 'ghost' : 'solid'}
+                rightIcon="chevron-down"
+              >
+                {state.language === 'any'
+                  ? 'Language'
+                  : `${capitalize(state.language)}`}
+              </MenuButton>
+              <MenuList
+                placement="bottom-start"
+                maxHeight="200px"
+                overflowY="auto"
+                zIndex={100000}
+              >
+                {langOptions.map((option) => (
+                  <MenuItem
+                    key={option}
+                    onClick={() => {
+                      state.language = option
+                    }}
+                  >
+                    {option === 'any' ? 'Any language' : capitalize(option)}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+            {state.language !== 'any' && (
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={() => {
+                  state.language = 'any'
+                }}
+              >
+                <Icon name="close" />
+              </Button>
+            )}
+          </span>
         </Box>
       </Box>
 
-      <Box mt="5" flex="1">
+      <Box mt="2" flex="1">
         {fonts.length > 0 && (
           <AutoSizer defaultWidth={900} defaultHeight={700}>
             {({ height }) => (
