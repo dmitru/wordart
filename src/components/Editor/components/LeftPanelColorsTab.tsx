@@ -210,7 +210,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                           key="btn"
                           style={{ display: 'flex', flex: '1' }}
                           initial={{ x: 0, y: 0, opacity: 0, scale: 1.4 }}
-                          transition={{ ease: 'easeInOut', duration: 0.2 }}
+                          transition={{ ease: 'easeInOut', duration: 0.4 }}
                           animate={{ x: 0, y: 0, opacity: 1, scale: 1 }}
                         >
                           <Button
