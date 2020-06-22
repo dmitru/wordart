@@ -15,7 +15,6 @@ import css from '@emotion/css'
 import styled from '@emotion/styled'
 import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import { AddCustomFontModal } from 'components/Editor/components/AddCustomFontModal'
-import { FontPicker } from 'components/Editor/components/FontPicker'
 import { TargetKind } from 'components/Editor/lib/editor'
 import { FontStyleConfig } from 'data/fonts'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -24,6 +23,7 @@ import { BaseBtn } from 'components/shared/BaseBtn'
 import { observer, useLocalStore } from 'mobx-react'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { keyBy, uniq } from 'lodash'
+import { LeftPanelFontPicker } from 'components/Editor/components/LeftPanelFontPicker'
 
 export type LeftPanelFontsTabProps = {
   target: TargetKind
@@ -201,47 +201,45 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                   display="flex"
                   flexDirection="column"
                 >
-                  <Box flex="1">
-                    <FontPicker
-                      showCancel={state.isAddingFont}
-                      selectedFontId={
-                        style.items.words.fontIds[
-                          state.replacingFontIndex != null
-                            ? state.replacingFontIndex
-                            : 0
-                        ]
-                      }
-                      onCancel={() => {
-                        state.view = 'font-list'
-                      }}
-                      onHighlighted={(font, fontStyle) => {
-                        if (state.replacingFontIndex != null) {
-                          style.items.words.fontIds[state.replacingFontIndex] =
-                            fontStyle.fontId
-                          style.items.words.fontIds = uniq(
-                            style.items.words.fontIds
-                          )
-                          store.animateVisualize(false)
-                        }
-                      }}
-                      onSelected={(font, fontStyle) => {
-                        if (state.isAddingFont) {
-                          style.items.words.fontIds = uniq([
-                            ...style.items.words.fontIds,
-                            fontStyle.fontId,
-                          ])
-                        } else if (state.replacingFontIndex != null) {
-                          style.items.words.fontIds[state.replacingFontIndex] =
-                            fontStyle.fontId
-                          style.items.words.fontIds = uniq(
-                            style.items.words.fontIds
-                          )
-                        }
-                        state.view = 'font-list'
+                  <LeftPanelFontPicker
+                    showCancel={state.isAddingFont}
+                    selectedFontId={
+                      style.items.words.fontIds[
+                        state.replacingFontIndex != null
+                          ? state.replacingFontIndex
+                          : 0
+                      ]
+                    }
+                    onCancel={() => {
+                      state.view = 'font-list'
+                    }}
+                    onHighlighted={(font, fontStyle) => {
+                      if (state.replacingFontIndex != null) {
+                        style.items.words.fontIds[state.replacingFontIndex] =
+                          fontStyle.fontId
+                        style.items.words.fontIds = uniq(
+                          style.items.words.fontIds
+                        )
                         store.animateVisualize(false)
-                      }}
-                    />
-                  </Box>
+                      }
+                    }}
+                    onSelected={(font, fontStyle) => {
+                      if (state.isAddingFont) {
+                        style.items.words.fontIds = uniq([
+                          ...style.items.words.fontIds,
+                          fontStyle.fontId,
+                        ])
+                      } else if (state.replacingFontIndex != null) {
+                        style.items.words.fontIds[state.replacingFontIndex] =
+                          fontStyle.fontId
+                        style.items.words.fontIds = uniq(
+                          style.items.words.fontIds
+                        )
+                      }
+                      state.view = 'font-list'
+                      store.animateVisualize(false)
+                    }}
+                  />
                 </Box>
               </motion.div>
             )}
