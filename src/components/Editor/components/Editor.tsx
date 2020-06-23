@@ -404,6 +404,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             onClick={handleSaveClick}
             isLoading={isSaving}
             mr="1"
+            css={css`
+              width: 105px;
+            `}
           >
             <FiSave
               css={css`

@@ -49,13 +49,16 @@ export type BgStyleConf = {
 export const mkBgStyleConfFromOptions = (
   opts: BgStyleOptions
 ): BgStyleConf => ({
-  fill: opts.fill.kind === 'color' ? opts.fill.color : { kind: 'transparent' },
+  fill:
+    opts.fill.kind === 'color'
+      ? { ...opts.fill.color, opacity: opts.fill.color.opacity / 100 }
+      : { kind: 'transparent' },
   items: {
     words: mkWordItemsConfFromOptions(opts.items.words),
     icons: opts.items.icons,
     dimSmallerItems: opts.items.dimSmallerItems,
     brightness: opts.items.brightness,
-    opacity: opts.items.opacity,
+    opacity: opts.items.opacity / 100,
     placement: opts.items.placement,
     coloring:
       opts.items.coloring.kind === 'color'
@@ -86,13 +89,13 @@ export type ShapeStyleConf = {
 export const mkShapeStyleConfFromOptions = (
   opts: ShapeStyleOptions
 ): ShapeStyleConf => ({
-  opacity: opts.opacity,
+  opacity: opts.opacity / 100,
   items: {
     words: mkWordItemsConfFromOptions(opts.items.words),
     icons: opts.items.icons,
     dimSmallerItems: opts.items.dimSmallerItems,
     brightness: opts.items.brightness,
-    opacity: opts.items.opacity,
+    opacity: opts.items.opacity / 100,
     placement: opts.items.placement,
     coloring:
       opts.items.coloring.kind === 'color'

@@ -597,10 +597,13 @@ export class EditorStore {
         words: data.bgItems.words,
       }),
     ])
-    this.editor.setShapeOpacity(shapeStyle.opacity, false)
+    this.editor.setShapeOpacity(shapeStyle.opacity / 100, false)
     await this.editor.setShapeItems(shapeItems, false)
     await this.editor.setBgItems(bgItems, false)
 
+    this.editor.setBgOpacity(
+      bgStyle.fill.kind === 'transparent' ? 0 : bgStyle.fill.color.opacity / 100
+    )
     this.editor.setBgColor(
       mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
       false

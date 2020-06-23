@@ -328,9 +328,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                         horizontal
                         afterLabel="%"
                         label="Opacity"
-                        value={100 * shapeStyle.opacity}
+                        value={shapeStyle.opacity}
                         onChange={(value) => {
-                          shapeStyle.opacity = value / 100
+                          shapeStyle.opacity = value
                         }}
                         onAfterChange={(value) => {
                           store.editor?.setShapeOpacity(value / 100)
@@ -435,9 +435,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                             labelCss="width: 60px"
                             horizontal
                             label="Opacity"
-                            value={100 * shapeStyle.items.opacity}
+                            value={shapeStyle.items.opacity}
                             onChange={(value) => {
-                              shapeStyle.items.opacity = value / 100
+                              shapeStyle.items.opacity = value
                             }}
                             onAfterChange={updateShapeItemsColoring}
                             min={0}
@@ -559,9 +559,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                             horizontal
                             afterLabel="%"
                             label="Opacity"
-                            value={100 * bgStyle.items.opacity}
+                            value={bgStyle.items.opacity}
                             onChange={(value) => {
-                              bgStyle.items.opacity = value / 100
+                              bgStyle.items.opacity = value
                             }}
                             onAfterChange={updateBgItemsColoring}
                             min={0}

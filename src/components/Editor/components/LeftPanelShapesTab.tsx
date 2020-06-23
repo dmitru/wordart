@@ -85,9 +85,9 @@ const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
   <Slider
     label="Opacity"
     afterLabel="%"
-    value={100 * style.opacity}
+    value={style.opacity}
     onChange={(value) => {
-      style.opacity = value / 100
+      style.opacity = value
     }}
     onAfterChange={onAfterChange}
     min={0}
