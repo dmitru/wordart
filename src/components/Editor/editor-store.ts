@@ -54,7 +54,7 @@ import {
 import { shapes } from 'data/shapes'
 import { loadFont } from 'lib/wordart/fonts'
 import { cloneDeep, isEqual, sortBy, uniq, uniqBy } from 'lodash'
-import { action, observable, set } from 'mobx'
+import { action, observable, set, toJS } from 'mobx'
 import paper from 'paper'
 import {
   MatrixSerialized,
@@ -227,7 +227,13 @@ export class EditorStore {
         this.editor.version++
       },
     })
+
     this.editor.setBgColor(mkBgStyleConfFromOptions(this.styleOptions.bg).fill)
+    if (this.styleOptions.bg.fill.kind === 'transparent') {
+      this.editor.setBgOpacity(0)
+    } else if (this.styleOptions.bg.fill.kind === 'color') {
+      this.editor.setBgOpacity(this.styleOptions.bg.fill.color.opacity / 100)
+    }
     // @ts-ignore
     window['editor'] = this.editor
 
@@ -977,7 +983,10 @@ export class EditorStore {
       },
     }
 
-    this.logger.debug('serialized: ', serializedData)
+    this.logger.debug(
+      'serialized: ',
+      toJS(serializedData, { recurseEverything: true })
+    )
 
     return serializedData
   }

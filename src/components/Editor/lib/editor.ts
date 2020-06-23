@@ -2,50 +2,62 @@ import chroma, { Color } from 'chroma-js'
 import { EditorStore } from 'components/Editor/editor-store'
 import { computeColorsMap } from 'components/Editor/lib/colormap'
 import {
+  EditorItem,
+  EditorItemConfig,
+  EditorItemId,
+} from 'components/Editor/lib/editor-item'
+import {
+  EditorItemConfigShape,
+  EditorItemShape,
+} from 'components/Editor/lib/editor-item-icon'
+import {
   EditorItemConfigWord,
   EditorItemWord,
   GlyphInfo,
 } from 'components/Editor/lib/editor-item-word'
 import {
   applyTransformToObj,
+  cloneFabricCanvas,
   cloneObj,
   cloneObjAsImage,
   createMultilineFabricTextGroup,
+  getObjTransformMatrix,
   loadObjFromImg,
   loadObjFromSvg,
   objAsCanvasElement,
-  getObjTransformMatrix,
   setFillColor,
-  cloneFabricCanvas,
 } from 'components/Editor/lib/fabric-utils'
 import { Font, Generator } from 'components/Editor/lib/generator'
 import { Shape, SvgShapeColorsMapEntry } from 'components/Editor/shape'
 import {
   ShapeConf,
+  ShapeId,
   ShapeRasterConf,
   ShapeSvgConf,
   ShapeTextConf,
-  ShapeId,
 } from 'components/Editor/shape-config'
 import { BgStyleConf, ShapeStyleConf } from 'components/Editor/style'
+import {
+  UndoFrame,
+  UndoItemUpdateFrame,
+  UndoStack,
+} from 'components/Editor/undo'
 import { FontId } from 'data/fonts'
 import { fabric } from 'fabric'
 import {
   canvasToImgElement,
-  createCanvas,
-  processRasterImg,
   copyCanvas,
+  createCanvas,
   createCanvasCtxCopy,
-  Dimensions,
-  imageDataToCanvasCtx,
   loadImageUrlToCanvasCtx,
+  processRasterImg,
 } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { flatten, groupBy, keyBy, max, min, sortBy } from 'lodash'
 import { toJS } from 'mobx'
-import { Glyph, BoundingBox } from 'opentype.js'
+import { nanoid } from 'nanoid/non-secure'
+import { BoundingBox, Glyph } from 'opentype.js'
 import paper from 'paper'
-import seedrandom from 'seedrandom'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { EditorPersistedData } from 'services/api/types'
 import { waitAnimationFrame } from 'utils/async'
@@ -53,21 +65,6 @@ import { consoleLoggers } from 'utils/console-logger'
 import { UniqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { exhaustiveCheck } from 'utils/type-utils'
-import {
-  EditorItem,
-  EditorItemId,
-  EditorItemConfig,
-} from 'components/Editor/lib/editor-item'
-import {
-  EditorItemConfigShape,
-  EditorItemShape,
-} from 'components/Editor/lib/editor-item-icon'
-import {
-  UndoStack,
-  UndoFrame,
-  UndoItemUpdateFrame,
-} from 'components/Editor/undo'
-import { nanoid } from 'nanoid/non-secure'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -133,7 +130,9 @@ export class Editor {
   itemsSelection = false
   shapeSelection = false
   bgCanvas: fabric.Canvas
+  bgTransparentRect: fabric.Rect
   bgRect: fabric.Rect
+  bgTransparentPattern: fabric.Pattern | undefined
 
   constructor(params: EditorInitParams) {
     this.params = params
@@ -158,6 +157,13 @@ export class Editor {
     this.aspectRatio = this.params.aspectRatio
 
     this.bgCanvas.clear()
+    this.bgTransparentRect = new fabric.Rect({
+      left: 0,
+      top: 0,
+      width: 1,
+      height: 1,
+      fill: 'transparent',
+    })
     this.bgRect = new fabric.Rect({
       left: 0,
       top: 0,
@@ -165,8 +171,8 @@ export class Editor {
       height: 1,
       fill: 'white',
     })
+    this.bgCanvas.add(this.bgTransparentRect)
     this.bgCanvas.add(this.bgRect)
-    this.bgRect.sendToBack()
 
     this.canvas.on('selection:created', ({ e }) => {
       const target = this.canvas.getActiveObject()
@@ -289,6 +295,19 @@ export class Editor {
         fabricObjToItem: new Map(),
       },
     }
+
+    fabric.util.loadImage('/images/editor/transparent-bg.svg', (img) => {
+      this.bgTransparentRect.set(
+        'fill',
+        new fabric.Pattern({
+          source: img,
+          repeat: 'repeat',
+          patternTransform: new paper.Matrix().scale(0.4)
+            .values as MatrixSerialized,
+        })
+      )
+      this.bgCanvas.requestRenderAll()
+    })
 
     window.addEventListener('resize', () => this.handleResize(true))
     this.handleResize()
@@ -505,7 +524,12 @@ export class Editor {
       width: 1000,
       height: 1000 / this.aspectRatio,
     })
-    this.bgRect.sendToBack()
+    this.bgTransparentRect.set({
+      left: 0,
+      top: 0,
+      width: 1000,
+      height: 1000 / this.aspectRatio,
+    })
 
     this.applySceneClipPath()
 
@@ -530,6 +554,17 @@ export class Editor {
     }
   }
 
+  setBgOpacity = (opacity: number, render = true) => {
+    this.logger.debug('setBgOpacity', opacity, render)
+
+    this.bgRect.set({
+      opacity,
+    })
+    if (render) {
+      this.bgCanvas.requestRenderAll()
+    }
+  }
+
   setBgColor = (config: BgStyleConf['fill'], render = true) => {
     this.logger.debug(
       'setBgColor',
@@ -541,7 +576,7 @@ export class Editor {
     this.bgRect.set({
       fill: config.kind === 'transparent' ? 'transparent' : config.color,
     })
-    this.bgRect.sendToBack()
+
     if (render) {
       this.bgCanvas.requestRenderAll()
       this.canvas.requestRenderAll()

@@ -14,6 +14,7 @@ import { SketchPicker } from 'react-color'
 
 export type ColorPickerPopoverProps = {
   value: string
+  colorSwatchOpacity?: number
   disableAlpha?: boolean
   onChange?: (hex: string) => void
   onAfterChange?: (hex: string) => void
@@ -26,6 +27,7 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
   onAfterChange,
   onChange,
   children,
+  colorSwatchOpacity = 1,
   ...props
 }) => {
   const initialFocusRef = useRef(null)
@@ -41,7 +43,13 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
         usePortal
       >
         <PopoverTrigger>
-          <ColorSwatchButton kind="color" color={value} ref={ref} {...props} />
+          <ColorSwatchButton
+            kind="color"
+            color={value}
+            ref={ref}
+            {...props}
+            opacity={colorSwatchOpacity}
+          />
         </PopoverTrigger>
         <PopoverContent
           outline="none"

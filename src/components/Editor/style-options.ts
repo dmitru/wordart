@@ -68,6 +68,7 @@ export type BgFillKind = BgFill['kind']
 export type BgFillColor = {
   kind: 'color'
   color: ColorString
+  opacity: number
 }
 
 export type BgFillTransparent = {

@@ -25,7 +25,7 @@ import {
   SvgShapeColorPickerCollapse,
   SvgShapeColorKindDropdown,
   ShapeColorOptions,
-} from 'components/Editor/components/SvgShapeColorPicker'
+} from 'components/Editor/components/ShapeColorOptions'
 import {
   ThemePresetThumbnail,
   ThemePresetThumbnailContainer,
@@ -49,6 +49,7 @@ import { useDebouncedCallback } from 'use-debounce/lib'
 import { FaQuestionCircle, FaCog, FaSave } from 'react-icons/fa'
 import { Tooltip } from 'components/shared/Tooltip'
 import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
+import { BackgroundColorOptions } from 'components/Editor/components/BackgroundColorOptions'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -495,23 +496,19 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
                   <Box mt="1.5rem">
                     <SectionLabel>Background</SectionLabel>
-                    <Stack direction="row" spacing="3">
-                      <Box display="flex" alignItems="flex-start">
-                        <Text my="0" fontWeight="600" mr="3">
-                          Color
-                        </Text>
 
-                        <ColorPickerPopover
-                          value={chroma(bgStyle.fill.color.color)
-                            .alpha(1)
-                            .hex()}
-                          onChange={(hex) => {
-                            bgStyle.fill.color.color = chroma(hex).hex()
-                            store.editor?.setBgColor(bgStyle.fill.color)
-                          }}
-                        />
-                      </Box>
-                    </Stack>
+                    <BackgroundColorOptions
+                      onUpdate={() => {
+                        if (bgStyle.fill.kind === 'color') {
+                          store.editor?.setBgOpacity(
+                            bgStyle.fill.color.opacity / 100
+                          )
+                          store.editor?.setBgColor(bgStyle.fill.color, true)
+                        } else {
+                          store.editor?.setBgOpacity(0, true)
+                        }
+                      }}
+                    />
                   </Box>
 
                   {store?.editor && store.editor.items.bg.items.length > 0 && (

@@ -28,7 +28,7 @@ import {
 import {
   SvgShapeColorPickerCollapse,
   ShapeColorOptions,
-} from 'components/Editor/components/SvgShapeColorPicker'
+} from 'components/Editor/components/ShapeColorOptions'
 import {
   applyTransformToObj,
   createMultilineFabricTextGroup,

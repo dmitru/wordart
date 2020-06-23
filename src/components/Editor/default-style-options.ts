@@ -81,6 +81,7 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
 export const defaultBgStyleOptions: BgStyleOptions = {
   fill: {
     color: {
+      opacity: 1,
       kind: 'color',
       color: 'white',
     },

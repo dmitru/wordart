@@ -3,27 +3,28 @@ import { Button, ButtonProps } from '@chakra-ui/core'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
 
-export type ColorSwatchButtonProps = Omit<ButtonProps, 'children' | 'color'> & {
+export type ColorSwatchButtonProps = Omit<
+  ButtonProps,
+  'children' | 'color' | 'opacity'
+> & {
   kind: 'color' | 'colors' | 'spectrum' | 'gradient'
+  opacity?: number
   color?: string
   colors?: string[]
 }
 
 export const ColorSwatchButton = React.forwardRef<any, ColorSwatchButtonProps>(
-  ({ kind, color = 'red', colors = ['red'], ...props }, ref) => {
+  ({ kind, opacity = 1, color = 'red', colors = ['red'], ...props }, ref) => {
     if (kind === 'color') {
       return (
-        <ColorSwatchButtonStyled
-          {...props}
-          ref={ref}
-          css={css`
-            &,
-            &:hover {
+        <ColorSwatchButtonStyled {...props} ref={ref}>
+          <ColorSwatchButtonStyledTransparentBg />
+          <ColorSwatchButtonStyledBg
+            css={css`
               background: ${color};
-            }
-          `}
-        >
-          {null}
+              opacity: ${opacity};
+            `}
+          />
         </ColorSwatchButtonStyled>
       )
     }
@@ -115,4 +116,27 @@ const ColorSwatchButtonStyled = styled(Button)<{ theme: any }>`
   width: 60px;
   display: inline-block;
   transition: 0.15s background;
+  position: relative;
+  background: transparent;
+`
+
+const ColorSwatchButtonStyledBg = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+`
+
+const ColorSwatchButtonStyledTransparentBg = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background-image: url(/images/editor/transparent-bg.svg);
+  background-repeat: repeat;
+  background-size: 15px;
 `
