@@ -1,317 +1,182 @@
-import React from 'react'
 import {
   Box,
   Button,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
-  ButtonProps,
-  Collapse,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Text,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
-import { ShapeSvg } from 'components/Editor/shape'
-import { ColorPicker } from 'components/shared/ColorPicker'
-import { ColorSwatchButton } from 'components/shared/ColorSwatchButton'
-import { isEqual } from 'lodash'
-import { observer, Observer } from 'mobx-react'
-import { useRef, useState } from 'react'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
+import { observer } from 'mobx-react'
+import React from 'react'
 import { useStore } from 'services/root-store'
-import { ChoiceButtons } from 'components/Editor/components/ChoiceButtons'
 
-export const SvgShapeColorPicker: React.FC<{
-  shape: ShapeSvg
+export const SvgShapeColorKindDropdown: React.FC<{
   onUpdate: () => void
-}> = observer(({ shape, onUpdate, children, ...props }) => {
+}> = observer(({ onUpdate }) => {
   const { editorPageStore: store } = useStore()
   const shapeStyle = store.styleOptions.shape
+  const shape = store.getShape()
+  if (!shape || shape.kind !== 'svg') {
+    return <></>
+  }
+  return (
+    <Menu>
+      <MenuButton
+        // @ts-ignore
+        variant="outline"
+        as={Button}
+        rightIcon="chevron-down"
+        py="2"
+        px="3"
+      >
+        {shape.config.processing.colors.kind === 'original' &&
+          'Colors: Original'}
+        {shape.config.processing.colors.kind === 'color-map' &&
+          'Colors: Multicolor'}
+        {shape.config.processing.colors.kind === 'single-color' &&
+          'Colors: Single color'}
+      </MenuButton>
+      <MenuList
+        as="div"
+        placement="bottom-start"
+        css={css`
+          background: white;
+          position: absolute;
+          top: 0px !important;
+          margin-top: 0 !important;
+          z-index: 5000 !important;
+          max-height: 300px;
+          overflow: auto;
+        `}
+      >
+        <MenuItem
+          onClick={() => {
+            shape.config.processing.colors = {
+              kind: 'original',
+            }
+            onUpdate()
+          }}
+        >
+          Original
+        </MenuItem>
 
-  const ref = useRef(null)
+        <MenuItem
+          onClick={() => {
+            shape.config.processing.colors = {
+              kind: 'single-color',
+              color: shapeStyle.colors.color,
+            }
+            onUpdate()
+          }}
+        >
+          <Box display="flex" flexDirection="column" py="2">
+            <Text my="0">Single Color</Text>
+            <Text my="0" fontSize="xs" color="gray.500">
+              Choose a custom color to fill the entire shape
+            </Text>
+          </Box>
+        </MenuItem>
 
-  const [multicolorIndex, setMulticolorIndex] = useState(0)
+        {shape.colorMap.length > 1 && (
+          <MenuItem
+            onClick={() => {
+              shape.config.processing.colors = {
+                kind: 'color-map',
+                colors: shapeStyle.colors.colorMaps.get(shape.id)!,
+              }
+              onUpdate()
+            }}
+          >
+            <Box display="flex" flexDirection="column" py="2">
+              <Text my="0">Multicolor</Text>
+              <Text my="0" fontSize="xs" color="gray.500">
+                Customize individual colors of the shape
+              </Text>
+            </Box>
+          </MenuItem>
+        )}
+      </MenuList>
+    </Menu>
+  )
+})
+
+export const SvgShapeColorOptions: React.FC<{
+  onUpdate: () => void
+}> = observer(({ onUpdate }) => {
+  const { editorPageStore: store } = useStore()
+  const shapeStyle = store.styleOptions.shape
+  const shape = store.getShape()
+  if (!shape || shape.kind !== 'svg') {
+    return <></>
+  }
 
   return (
     <>
-      <Box
-        mb="2"
-        mt="2"
-        display="flex"
-        flexDirection="row"
-        alignItems="flex-start"
-      >
+      <Box mt="2" mb="4">
+        <SvgShapeColorKindDropdown onUpdate={onUpdate} />
+      </Box>
+
+      {shape.config.processing.colors.kind === 'single-color' && (
+        <ColorPickerPopover
+          disableAlpha
+          value={chroma(shape.config.processing.colors.color).alpha(1).hex()}
+          onChange={(hex) => {
+            if (shape.config.processing.colors.kind === 'single-color') {
+              shape.config.processing.colors.color = chroma(hex).hex()
+              shapeStyle.colors.color = chroma(hex).hex()
+            }
+          }}
+          onAfterChange={() => {
+            onUpdate()
+          }}
+        />
+      )}
+
+      {shape.config.processing.colors.kind === 'color-map' && (
         <Box>
-          <Box mb="2">
-            <ChoiceButtons
-              choices={[
-                { title: 'Original', value: 'original' },
-                ...(shape.originalColors.length > 1
-                  ? [{ title: 'Multicolor', value: 'color-map' }]
-                  : []),
-                { title: 'Single color', value: 'single-color' },
-              ]}
-              value={shape.config.processing.colors.kind}
-              onChange={(value) => {
-                if (value === 'original') {
-                  shape.config.processing.colors = {
-                    kind: 'original',
-                  }
-                } else if (value === 'color-map') {
-                  shape.config.processing.colors = {
-                    kind: 'color-map',
-                    colors: shapeStyle.colors.colorMaps.get(shape.id)!,
-                  }
-                } else if (value === 'single-color') {
-                  shape.config.processing.colors = {
-                    kind: 'single-color',
-                    color: shapeStyle.colors.color,
-                  }
-                }
-                onUpdate()
-              }}
-            />
-          </Box>
-
-          {shape.config.processing.colors.kind === 'single-color' && (
-            <Box mb="4">
-              <ColorPicker
-                disableAlpha
-                value={chroma(shape.config.processing.colors.color)
-                  .alpha(1)
-                  .hex()}
-                onChange={(hex) => {
-                  if (shape.config.processing.colors.kind === 'single-color') {
-                    shape.config.processing.colors.color = chroma(hex).hex()
-                    shapeStyle.colors.color = chroma(hex).hex()
-                  }
-                }}
-                onAfterChange={() => {
-                  onUpdate()
-                }}
-              />
-            </Box>
-          )}
-
-          {shape.config.processing.colors.kind === 'color-map' && (
-            <Box>
-              {shape.config.processing.colors.colors.map((color, index) => (
-                <Box mr="1" key={index} display="inline-block">
-                  {shape.config.processing.colors.kind === 'color-map' && (
-                    <ColorSwatchButton
-                      kind="color"
-                      color={shape.config.processing.colors.colors[index]}
-                      onClick={() => setMulticolorIndex(index)}
-                      css={css`
-                        outline: ${multicolorIndex === index
-                          ? '3px solid pink'
-                          : 'none'};
-                      `}
-                    />
-                  )}
-                </Box>
-              ))}
-
-              <Box mt="3">
-                <ColorPicker
+          {shape.config.processing.colors.colors.map((color, index) => (
+            <Box mr="1" key={index} display="inline-block">
+              {shape.config.processing.colors.kind === 'color-map' && (
+                <ColorPickerPopover
                   disableAlpha
-                  value={chroma(
-                    shape.config.processing.colors.colors[multicolorIndex]
-                  )
+                  value={chroma(shape.config.processing.colors.colors[index])
                     .alpha(1)
                     .hex()}
                   onChange={(hex) => {
                     if (shape.config.processing.colors.kind === 'color-map') {
-                      shape.config.processing.colors.colors[
-                        multicolorIndex
-                      ] = chroma(hex).hex()
+                      shape.config.processing.colors.colors[index] = chroma(
+                        hex
+                      ).hex()
                     }
                   }}
                   onAfterChange={() => {
                     onUpdate()
                   }}
                 />
-              </Box>
-
-              {shape.config.processing.colors.kind === 'color-map' && (
-                <Button
-                  mt="3"
-                  size="sm"
-                  isDisabled={isEqual(
-                    shape.config.processing.colors.colors,
-                    shape.originalColors
-                  )}
-                  onClick={() => {
-                    shape.config.processing.colors = {
-                      kind: 'color-map',
-                      colors: shape.originalColors,
-                    }
-                    onUpdate()
-                  }}
-                >
-                  Reset Default Colors
-                </Button>
               )}
             </Box>
-          )}
+          ))}
         </Box>
-      </Box>
+      )}
     </>
   )
 })
 
-export const SvgShapeColorPickerCollapse: React.FC<{
-  shape: ShapeSvg
+export const ShapeColorOptions: React.FC<{
   onUpdate: () => void
-  label?: string
-}> = observer(({ label = 'Shape Color', shape, onUpdate }) => {
-  const [openShapeColors, setOpenShapeColors] = useState(false)
-
-  return (
-    <Box>
-      <Box display="flex" alignItems="center">
-        <Text
-          mr="3"
-          my="0"
-          css={css`
-            font-weight: 600;
-          `}
-        >
-          {label}
-        </Text>
-        <Button
-          rightIcon={openShapeColors ? 'chevron-up' : 'chevron-down'}
-          variant="ghost"
-          onClick={() => setOpenShapeColors(!openShapeColors)}
-        >
-          <SvgShapeColorPickerSwatch as="span" shape={shape} />
-        </Button>
-      </Box>
-
-      <Collapse isOpen={openShapeColors}>
-        <Box
-          css={css`
-            padding: 8px 16px;
-            box-shadow: inset 0 0 8px 0px #0002;
-          `}
-        >
-          <SvgShapeColorPicker shape={shape} onUpdate={onUpdate} />
-        </Box>
-      </Collapse>
-    </Box>
-  )
-})
-
-export const SvgShapeColorPickerSwatch = React.forwardRef<
-  HTMLElement,
-  {
-    shape: ShapeSvg
-  } & Partial<ButtonProps>
->(({ shape, ...props }, ref) => {
-  {
-    /* 
-  // @ts-ignore */
+}> = observer(({ onUpdate }) => {
+  const { editorPageStore: store } = useStore()
+  const shape = store.getShape()
+  if (!shape) {
+    return <></>
   }
-  return (
-    // @ts-ignore
-    <Observer>
-      {/* 
-  // @ts-ignore */}
-      {() => {
-        const {
-          editorPageStore: { renderKey },
-        } = useStore()
+  if (shape.kind === 'svg') {
+    return <SvgShapeColorOptions onUpdate={onUpdate} />
+  }
 
-        let trigger: React.ReactNode = <span>open</span>
-        if (shape.config.processing.colors.kind === 'single-color') {
-          trigger = (
-            <ColorSwatchButton
-              css={css`
-                width: 80px;
-              `}
-              borderRadius="none"
-              color={shape.config.processing.colors.color}
-              kind="color"
-              ref={ref}
-              {...props}
-            />
-          )
-        } else if (shape.config.processing.colors.kind === 'original') {
-          trigger = (
-            <ColorSwatchButton
-              css={css`
-                width: 80px;
-              `}
-              borderRadius="none"
-              colors={shape.originalColors}
-              kind="colors"
-              ref={ref}
-              {...props}
-            />
-          )
-        } else if (shape.config.processing.colors.kind === 'color-map') {
-          trigger = (
-            <ColorSwatchButton
-              css={css`
-                width: 80px;
-              `}
-              borderRadius="none"
-              colors={shape.config.processing.colors.colors}
-              kind="colors"
-              ref={ref}
-              {...props}
-            />
-          )
-        }
-
-        return trigger
-      }}
-    </Observer>
-  )
-})
-
-export const SvgShapeColorPickerPopover: React.FC<{
-  shape: ShapeSvg
-  onUpdate: () => void
-  children?: React.ReactNode
-}> = observer(({ shape, onUpdate, children, ...props }) => {
-  const initialFocusRef = useRef(null)
-
-  const trigger = <SvgShapeColorPickerSwatch shape={shape} />
-
-  return (
-    <>
-      <Popover
-        initialFocusRef={initialFocusRef}
-        placement="left-start"
-        closeOnBlur
-        closeOnEsc
-        usePortal
-      >
-        <PopoverTrigger>
-          <Box display="inline-block" width="80px">
-            {trigger}
-          </Box>
-        </PopoverTrigger>
-
-        <PopoverContent
-          zIndex={4000}
-          css={css`
-            /* width: 250px; */
-          `}
-        >
-          <PopoverArrow />
-          <PopoverBody
-            p={2}
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-          >
-            <SvgShapeColorPicker onUpdate={onUpdate} shape={shape} />
-          </PopoverBody>
-        </PopoverContent>
-      </Popover>
-    </>
-  )
+  return <></>
 })

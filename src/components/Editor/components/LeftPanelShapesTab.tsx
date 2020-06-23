@@ -25,7 +25,10 @@ import {
   ShapeSelector,
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
-import { SvgShapeColorPickerCollapse } from 'components/Editor/components/SvgShapeColorPicker'
+import {
+  SvgShapeColorPickerCollapse,
+  ShapeColorOptions,
+} from 'components/Editor/components/SvgShapeColorPicker'
 import {
   applyTransformToObj,
   createMultilineFabricTextGroup,
@@ -509,29 +512,8 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         </>
                       )}
 
-                      {shape.kind === 'svg' && (
-                        <>
-                          <SvgShapeColorPickerCollapse
-                            shape={shape}
-                            label="Customize color"
-                            onUpdate={updateShapeColoring}
-                          />
-                        </>
-                      )}
-                      {/* {shapeConf.kind === 'svg' &&
-                        shapeStyle.fill.colorMap.length === 1 && (
-                          <ColorPicker
-                            disableAlpha
-                            value={chroma(shapeStyle.fill.color).alpha(1).hex()}
-                            onChange={(hex) => {
-                              shapeStyle.fill.kind = 'single-color'
-                              shapeStyle.fill.color = chroma(hex).hex()
-                            }}
-                            onAfterChange={() => {
-                              updateShapeColoring()
-                            }}
-                          />
-                        )} */}
+                      <ShapeColorOptions onUpdate={updateShapeColoring} />
+
                       {shape.kind === 'raster' && (
                         <>
                           <Heading size="md" m="0" mb="3" display="flex">

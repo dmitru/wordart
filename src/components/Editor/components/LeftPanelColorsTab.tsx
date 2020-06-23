@@ -21,7 +21,11 @@ import {
   ShapeItemsColorPickerKindDropdown,
 } from 'components/Editor/components/ShapeItemsColorPicker'
 import { SectionLabel } from 'components/Editor/components/shared'
-import { SvgShapeColorPickerCollapse } from 'components/Editor/components/SvgShapeColorPicker'
+import {
+  SvgShapeColorPickerCollapse,
+  SvgShapeColorKindDropdown,
+  ShapeColorOptions,
+} from 'components/Editor/components/SvgShapeColorPicker'
 import {
   ThemePresetThumbnail,
   ThemePresetThumbnailContainer,
@@ -303,52 +307,18 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                       Explore Color Themes
                     </Button>
 
-                    <Tooltip label="Save current settings as a new theme">
+                    {/* <Tooltip label="Save current settings as a new theme">
                       <Button ml="2" variant="outline">
                         <FaSave />
                       </Button>
-                    </Tooltip>
-
-                    {/* <Menu>
-                      <MenuButton
-                        marginLeft="2"
-                        as={Button}
-                        outline="none"
-                        aria-label="menu"
-                        color="black"
-                        display="inline-flex"
-                      >
-                        <DotsThreeVertical size={18} />
-                      </MenuButton>
-                      <MenuList placement="bottom-end">
-                        <MenuItem
-                          onClick={() => {
-                            // TODO
-                          }}
-                        >
-                          <Icon
-                            name="add"
-                            size="20px"
-                            color="gray.500"
-                            mr="2"
-                          />
-                          Save as new theme
-                        </MenuItem>
-                      </MenuList>
-                    </Menu> */}
+                    </Tooltip> */}
                   </Box>
 
                   {/* <shape-color> */}
                   <Box mb="0">
                     <SectionLabel>Shape</SectionLabel>
 
-                    <Flex direction="column">
-                      {/* <Box display="flex">
-                  <Text fontSize="xl" mb="0">
-                    Shape
-                  </Text>
-                </Box> */}
-
+                    <Box mb="4">
                       <Slider
                         css={css`
                           flex: 1;
@@ -368,43 +338,10 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                         max={100}
                         step={1}
                       />
+                    </Box>
 
-                      {shape?.kind === 'svg' && (
-                        <>
-                          <SvgShapeColorPickerCollapse
-                            shape={shape}
-                            onUpdate={onUpdate}
-                          />
-                        </>
-                      )}
-
-                      {/* {shape?.kind === 'text' && (
-                  <Box mb="5">
-                    <ColorPicker
-                      value={chroma(shape.config.textStyle.color)
-                        .alpha(1)
-                        .hex()}
-                      onChange={(hex) => {
-                        shape.config.textStyle.color = chroma(hex).hex()
-                        onUpdate(false)
-                      }}
-                      onAfterChange={() => {
-                        onUpdate()
-                      }}
-                    />
-                  </Box>
-                )} */}
-
-                      {/* <svg-shape */}
-                      {shape?.kind === 'svg' && (
-                        <>
-                          {/* <svg-color-options> */}
-
-                          {/* <svg-color-options> */}
-                        </>
-                      )}
-                      {/* </svg-shape> */}
-                    </Flex>
+                    <ShapeColorOptions onUpdate={onUpdate} />
+                    {/* </svg-shape> */}
                   </Box>
                   {/* </shape-color> */}
 

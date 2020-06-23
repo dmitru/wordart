@@ -86,6 +86,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
   onUpdate: () => void
   children?: React.ReactNode
 }> = observer(({ bgFill, shapeStyle, onUpdate, children }) => {
+  const [multicolorIndex, setMulticolorIndex] = useState(0)
   const isDarkBg =
     bgFill.kind === 'color' && chroma(bgFill.color.color).luminance() < 0.5
 
@@ -166,145 +167,120 @@ export const ShapeItemsColorPickerInline: React.FC<{
       </Box>
 
       {shapeStyle.items.coloring.kind !== 'shape' && (
-        <ShapeItemsColorPickerInlineImpl
-          shapeStyle={shapeStyle}
-          bgFill={bgFill}
-          children={children}
-          onUpdate={onUpdate}
-        />
-      )}
-    </Box>
-  )
-})
-
-export const ShapeItemsColorPickerInlineImpl: React.FC<{
-  shapeStyle: ShapeStyleOptions
-  bgFill: BgStyleOptions['fill']
-  onUpdate: () => void
-  children?: React.ReactNode
-}> = observer(({ shapeStyle, bgFill, onUpdate, children, ...props }) => {
-  const [multicolorIndex, setMulticolorIndex] = useState(0)
-
-  const isDarkBg =
-    bgFill.kind === 'color' && chroma(bgFill.color.color).luminance() < 0.5
-
-  const getRandomColor = () =>
-    chroma
-      .random()
-      .luminance(isDarkBg ? 0.65 : 0.35)
-      .saturate(isDarkBg ? 0.3 : 0.4)
-      .hex()
-
-  return (
-    <>
-      <Box mb="2" display="flex" flexDirection="row" alignItems="flex-start">
-        {shapeStyle.items.coloring.kind === 'color' && (
-          <Box mt="2" display="flex" flexWrap="wrap">
-            {shapeStyle.items.coloring.color.colors.map((color, index) => (
-              <Box mb="2" key={index} display="inline-flex" alignItems="center">
-                <ColorPickerPopover
-                  css={css`
-                    width: 52px;
-                  `}
-                  disableAlpha
-                  value={chroma(shapeStyle.items.coloring.color.colors[index])
-                    .alpha(1)
-                    .hex()}
-                  onChange={(hex) => {
-                    const color = chroma(hex).hex()
-                    shapeStyle.items.coloring.color.colors[index] = color
-                  }}
-                  onAfterChange={() => {
-                    onUpdate()
-                  }}
-                  color={shapeStyle.items.coloring.color.colors[index]}
-                  onClick={() => setMulticolorIndex(index)}
-                />
-
-                {shapeStyle.items.coloring.color.colors.length > 1 && (
-                  <IconButton
-                    isRound
-                    aria-label="Delete"
-                    variant="outline"
-                    ml="2px"
-                    mr="2"
-                    icon="close"
-                    size="xs"
-                    onClick={() => {
-                      shapeStyle.items.coloring.color.colors.splice(index, 1)
+        <Box mb="2" display="flex" flexDirection="row" alignItems="flex-start">
+          {shapeStyle.items.coloring.kind === 'color' && (
+            <Box mt="2" display="flex" flexWrap="wrap">
+              {shapeStyle.items.coloring.color.colors.map((color, index) => (
+                <Box
+                  mb="2"
+                  key={index}
+                  display="inline-flex"
+                  alignItems="center"
+                >
+                  <ColorPickerPopover
+                    css={css`
+                      width: 52px;
+                    `}
+                    disableAlpha
+                    value={chroma(shapeStyle.items.coloring.color.colors[index])
+                      .alpha(1)
+                      .hex()}
+                    onChange={(hex) => {
+                      const color = chroma(hex).hex()
+                      shapeStyle.items.coloring.color.colors[index] = color
+                    }}
+                    onAfterChange={() => {
                       onUpdate()
                     }}
+                    color={shapeStyle.items.coloring.color.colors[index]}
+                    onClick={() => setMulticolorIndex(index)}
                   />
-                )}
-              </Box>
-            ))}
-          </Box>
-        )}
-        {shapeStyle.items.coloring.kind === 'gradient' && (
-          <>
-            <Box mt="0" display="flex" alignItems="center">
-              {[
-                shapeStyle.items.coloring.gradient.gradient.from,
-                shapeStyle.items.coloring.gradient.gradient.to,
-              ].map((color, index) => (
-                <React.Fragment key={index}>
-                  <Box mr="2">{index === 1 ? 'To:' : 'From:'}</Box>
-                  <Box mr="3">
-                    <ColorPickerPopover
-                      disableAlpha
-                      value={chroma(
-                        multicolorIndex === 0
-                          ? shapeStyle.items.coloring.gradient.gradient.from
-                          : shapeStyle.items.coloring.gradient.gradient.to
-                      )
-                        .alpha(1)
-                        .hex()}
-                      onChange={(hex) => {
-                        const color = chroma(hex).hex()
-                        if (multicolorIndex === 0) {
-                          shapeStyle.items.coloring.gradient.gradient.from = color
-                        } else {
-                          shapeStyle.items.coloring.gradient.gradient.to = color
-                        }
-                      }}
-                      onAfterChange={() => {
+
+                  {shapeStyle.items.coloring.color.colors.length > 1 && (
+                    <IconButton
+                      isRound
+                      aria-label="Delete"
+                      variant="outline"
+                      ml="2px"
+                      mr="2"
+                      icon="close"
+                      size="xs"
+                      onClick={() => {
+                        shapeStyle.items.coloring.color.colors.splice(index, 1)
                         onUpdate()
                       }}
-                      color={
-                        index === 0
-                          ? shapeStyle.items.coloring.gradient.gradient.from
-                          : shapeStyle.items.coloring.gradient.gradient.to
-                      }
-                      onClick={() => setMulticolorIndex(index)}
                     />
-                  </Box>
-                </React.Fragment>
-              ))}
-              {shapeStyle.items.coloring.kind === 'gradient' && (
-                <Box>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      shapeStyle.items.coloring.gradient.gradient = {
-                        from: getRandomColor(),
-                        to: getRandomColor(),
-                        assignBy: 'random',
-                      }
-                      onUpdate()
-                    }}
-                    size="sm"
-                    ml="1"
-                  >
-                    <FiRefreshCw style={{ marginRight: '5px' }} />
-                    Randomize
-                  </Button>
+                  )}
                 </Box>
-              )}
+              ))}
             </Box>
-          </>
-        )}
-      </Box>
-      {children}
-    </>
+          )}
+          {shapeStyle.items.coloring.kind === 'gradient' && (
+            <>
+              <Box mt="0" display="flex" alignItems="center">
+                {[
+                  shapeStyle.items.coloring.gradient.gradient.from,
+                  shapeStyle.items.coloring.gradient.gradient.to,
+                ].map((color, index) => (
+                  <React.Fragment key={index}>
+                    <Box mr="2">{index === 1 ? 'To:' : 'From:'}</Box>
+                    <Box mr="3">
+                      <ColorPickerPopover
+                        disableAlpha
+                        value={chroma(
+                          multicolorIndex === 0
+                            ? shapeStyle.items.coloring.gradient.gradient.from
+                            : shapeStyle.items.coloring.gradient.gradient.to
+                        )
+                          .alpha(1)
+                          .hex()}
+                        onChange={(hex) => {
+                          const color = chroma(hex).hex()
+                          if (multicolorIndex === 0) {
+                            shapeStyle.items.coloring.gradient.gradient.from = color
+                          } else {
+                            shapeStyle.items.coloring.gradient.gradient.to = color
+                          }
+                        }}
+                        onAfterChange={() => {
+                          onUpdate()
+                        }}
+                        color={
+                          index === 0
+                            ? shapeStyle.items.coloring.gradient.gradient.from
+                            : shapeStyle.items.coloring.gradient.gradient.to
+                        }
+                        onClick={() => setMulticolorIndex(index)}
+                      />
+                    </Box>
+                  </React.Fragment>
+                ))}
+                {shapeStyle.items.coloring.kind === 'gradient' && (
+                  <Box>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        shapeStyle.items.coloring.gradient.gradient = {
+                          from: getRandomColor(),
+                          to: getRandomColor(),
+                          assignBy: 'random',
+                        }
+                        onUpdate()
+                      }}
+                      size="sm"
+                      ml="1"
+                    >
+                      <FiRefreshCw style={{ marginRight: '5px' }} />
+                      Randomize
+                    </Button>
+                  </Box>
+                )}
+              </Box>
+            </>
+          )}
+          {children}
+        </Box>
+      )}
+    </Box>
   )
 })
