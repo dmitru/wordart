@@ -239,12 +239,13 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
           isDisabled={isEqual(shape.originalTransform, shape.transform)}
         >
           <Button
-            ml="3"
+            ml="2"
             onClick={() => {
               store.editor?.clearItems('shape')
               store.editor?.clearItems('bg')
               applyTransformToObj(shape.obj, shape.originalTransform)
               shape.transform = [...shape.originalTransform] as MatrixSerialized
+              store.editor?.canvas.requestRenderAll()
               store.renderKey++
             }}
           >
@@ -255,7 +256,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
     return (
       <>
-        <Box p="3">
+        <Box px="5" py="6">
           <>
             <Box display="flex" alignItems="flex-start" mb="3">
               {shape && (
@@ -322,7 +323,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                   {state.mode === 'customize shape' && (
                     <Button
                       flex="1"
-                      variantColor="green"
+                      variantColor="accent"
                       onClick={() => {
                         state.mode = 'home'
                         if (store.leftTabIsTransformingShape) {
@@ -541,7 +542,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           <>
                             <Stack direction="row" mt="3" spacing="3">
                               <Button
-                                variantColor="accent"
+                                variantColor="primary"
                                 onClick={() => {
                                   if (!store.editor) {
                                     return
@@ -570,11 +571,11 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         )}
 
                         {store.leftTabIsTransformingShape && (
-                          <>
+                          <Box>
                             <Text mt="2">
                               Drag the shape to move or rotate it.
                             </Text>
-                            <Stack direction="row" mt="3" spacing="3">
+                            <Stack direction="row" mt="3" spacing="2">
                               <Button
                                 variantColor="accent"
                                 onClick={() => {
@@ -589,7 +590,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               </Button>
                               {resetTransformBtn}
                             </Stack>
-                          </>
+                          </Box>
                         )}
                       </Box>
                     </Stack>
@@ -609,7 +610,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         <Tooltip label="Add custom image...">
                           <Button
                             leftIcon="add"
-                            variantColor="teal"
+                            variantColor="primary"
                             size="sm"
                             mr="2"
                             onClick={() => {
@@ -623,7 +624,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         <Tooltip label="Use text as a shape...">
                           <Button
                             leftIcon="add"
-                            variantColor="teal"
+                            variantColor="primary"
                             size="sm"
                             mr="2"
                             onClick={() => {
@@ -661,16 +662,17 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                       </Flex>
 
                       <Flex align="center" mt="2" mb="1">
-                        <Box flex={1}>
+                        <Box>
                           <Menu>
                             <MenuButton
                               // @ts-ignore
-                              variant="outline"
+                              variant={selectedCategory ? 'solid' : 'outline'}
                               variantColor={
                                 selectedCategory ? 'accent' : undefined
                               }
                               as={Button}
                               rightIcon="chevron-down"
+                              size="sm"
                               py="2"
                               px="3"
                             >
@@ -714,13 +716,14 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
                         {!!selectedCategory && (
                           <Button
-                            ml="3"
-                            variant="link"
+                            size="sm"
+                            variant="ghost"
+                            ml="2"
                             onClick={() => {
                               setSelectedCategory(null)
                             }}
                           >
-                            Show all
+                            <Icon name="close" />
                           </Button>
                         )}
                       </Flex>

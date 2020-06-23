@@ -104,7 +104,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
           <Box>
             <Button
               isDisabled={shapeStyle.items.coloring.color.colors.length >= 8}
-              variantColor="teal"
+              variant="outline"
               leftIcon="add"
               onClick={() => {
                 shapeStyle.items.coloring.color.colors.push(getRandomColor())
@@ -128,7 +128,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
               ml="1"
             >
               <FiRefreshCw style={{ marginRight: '5px' }} />
-              Randomize
+              Random
             </Button>
 
             <Menu>
@@ -145,7 +145,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
               >
                 <DotsThreeVertical size={18} />
               </MenuButton>
-              <MenuList placement="bottom">
+              <MenuList placement="bottom" zIndex={1000}>
                 <MenuItem
                   onClick={() => {
                     shapeStyle.items.coloring.color.colors.length = 1
@@ -169,7 +169,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
       {shapeStyle.items.coloring.kind !== 'shape' && (
         <Box mb="2" display="flex" flexDirection="row" alignItems="flex-start">
           {shapeStyle.items.coloring.kind === 'color' && (
-            <Box mt="2" display="flex" flexWrap="wrap">
+            <Box mt="4" display="flex" flexWrap="wrap">
               {shapeStyle.items.coloring.color.colors.map((color, index) => (
                 <Box
                   mb="2"
@@ -179,7 +179,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
                 >
                   <ColorPickerPopover
                     css={css`
-                      width: 52px;
+                      width: 48px;
                     `}
                     disableAlpha
                     value={chroma(shapeStyle.items.coloring.color.colors[index])
@@ -271,7 +271,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
                       ml="1"
                     >
                       <FiRefreshCw style={{ marginRight: '5px' }} />
-                      Randomize
+                      Random
                     </Button>
                   </Box>
                 )}

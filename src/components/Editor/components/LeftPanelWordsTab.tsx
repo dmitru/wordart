@@ -95,11 +95,9 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
       <Box mb="5" p="3">
         <Stack spacing="0">
           <Stack direction="row" mb="2" spacing="0">
-            <Tooltip label="Open words editor..." showDelay={300}>
-              <Button leftIcon="edit" variantColor="accent">
-                Edit words...
-              </Button>
-            </Tooltip>
+            <Button leftIcon="edit" variantColor="accent">
+              Edit words...
+            </Button>
 
             <Button
               ml="2"

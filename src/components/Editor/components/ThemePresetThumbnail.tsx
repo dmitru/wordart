@@ -189,15 +189,22 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
   )
 }
 
-export const ThemePresetThumbnailContainer = styled(Box)`
+export const ThemePresetThumbnailContainer = styled(Box)<{ isActive: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
 
+  ${(p) =>
+    p.isActive &&
+    `
+    svg { 
+      outline: 5px solid ${p.theme.colors.accent['500']}; 
+    }`}
+
   transition: 0.2s transform;
   &:hover {
-    transform: scale(1.05);
+    transform: translateY(-4px);
   }
 `
 

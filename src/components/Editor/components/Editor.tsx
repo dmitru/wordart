@@ -398,14 +398,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             </MenuList>
           </Menu>
 
-          <Button
-            variantColor="accent"
-            variant="solid"
+          <TopNavButton
             onClick={handleSaveClick}
             isLoading={isSaving}
             mr="1"
+            isBordered
             css={css`
-              width: 105px;
+              width: 90px;
             `}
           >
             <FiSave
@@ -414,7 +413,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               `}
             />
             Save
-          </Button>
+          </TopNavButton>
 
           <TopNavButton onClick={openExport} mr="1">
             <FiDownload
@@ -431,6 +430,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               padding: 2px 8px;
               border-radius: 4px;
               display: flex;
+
+              &:hover {
+                background: #ffffff15;
+              }
             `}
             value={state.title}
             onChange={(value) => {
@@ -441,7 +444,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             color="white"
             fontSize="xl"
             maxWidth="200px"
-            mr="3"
+            ml="2"
             flex={1}
           >
             <EditablePreview
@@ -474,7 +477,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             Order Prints
           </TopNavButton> */}
 
-          <TopNavButton mr="1" ml="auto">
+          <TopNavButton isBordered mr="2" ml="auto">
             <FiHelpCircle
               css={css`
                 margin-right: 4px;
@@ -669,13 +672,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           </LeftWrapper>
 
           <RightWrapper>
-            <TopToolbar
-              display="flex"
-              alignItems="center"
-              bg="light"
-              p="2"
-              pl="3"
-            >
+            <TopToolbar display="flex" alignItems="center" bg="light" px="5">
               <Modal
                 initialFocusRef={cancelVisualizationBtnRef}
                 finalFocusRef={cancelVisualizationBtnRef}
@@ -856,6 +853,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       ml="3"
                       icon="arrow-back"
                       aria-label="Undo"
+                      variant="outline"
                       isDisabled={!store.editor?.canUndo()}
                       onClick={store.editor?.undo}
                     />
@@ -871,6 +869,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       ml="1"
                       icon="arrow-forward"
                       aria-label="Redo"
+                      variant="outline"
                       isDisabled={!store.editor?.canRedo()}
                       onClick={store.editor?.redo}
                     />
@@ -1108,18 +1107,21 @@ const ExportButton = styled(Button)(
   `
 )
 
-const TopNavButton = styled(Button)(
-  {
-    color: 'white',
-  },
-  `
+const TopNavButton = styled<{ isBordered: boolean }>(Button)`
+  color: white;
+
+  ${(p) =>
+    p.isBordered &&
+    `
+    border: 1px solid #fff7;
+  `}
 
   background-color: transparent;
-&:hover {
-  background-color: #0003;
-}
+  &:hover {
+    background-color: #0003;
+    ${(p) => p.isBordered && `border: 1px solid #fffa;`}
+  }
 `
-)
 
 const PageLayoutWrapper = styled.div`
   display: flex;
@@ -1141,17 +1143,17 @@ const TopToolbar = styled(Box)`
   position: relative;
   z-index: 1;
   box-shadow: 0 0 5px 0 #00000033;
-  height: 58px;
+  height: 60px;
 `
 
 const TopNavWrapper = styled(Box)`
-  height: 50px;
-  padding: 20px;
-  /* font-size: 1.5em; */
-  /* font-weight: 400; */
-  /* background: linear-gradient(90deg, #21c5be, #697af5); */
-  background: linear-gradient(90deg, #80578e, #3b458c);
-  /* color: white; */
+  height: 60px;
+  padding: 20px 10px;
+  background: linear-gradient(
+    -90deg,
+    hsla(262, 40%, 39%, 1),
+    hsla(239, 33%, 44%, 1)
+  );
 `
 
 const LeftWrapper = styled.div`
@@ -1164,32 +1166,17 @@ const LeftWrapper = styled.div`
   z-index: 3;
   display: flex;
   flex-direction: column;
-  /* box-shadow: 0 0 5px 0 #00000033; */
 `
 
-const LeftTopWrapper = styled(Box)`
-  height: 58px;
-  background: white;
-  position: relative;
-  z-index: 4;
-
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  box-shadow: -3px 1px 2px 1px #00000033;
-  /* box-shadow: 0 0 5px 0 #00000033; */
-`
-
-const LeftBottomWrapper = styled.div`
+const LeftBottomWrapper = styled.div<{ theme: any }>`
   flex: 1;
   display: flex;
   flex-direction: row;
-  background: #606060;
-  /* box-shadow: 0 0 5px 0 #00000033; */
+  background: ${(p) => p.theme.colors.leftPanel['600']};
 `
 
 const LeftPanel = styled(Box)`
+  z-index: 2;
   flex: 1;
   width: 350px;
 `
@@ -1213,14 +1200,14 @@ const SideNavbar = styled.div<{ theme: any; activeIndex: number }>`
     content: '';
     display: block;
     transition: 0.2s transform;
-    transform: translateY(${(p) => p.activeIndex * 70}px);
+    transform: translateY(${(p) => p.activeIndex * 75}px);
     top: 0;
     left: 0;
     position: absolute;
-    height: 70px;
+    height: 75px;
     width: 100%;
     z-index: 0;
-    background: ${(p) => p.theme.colors.light};
+    background: ${(p) => p.theme.colors.leftPanel['200']};
     border-left: 8px solid ${(p) => p.theme.colors.primary}; 
   }
 `
@@ -1228,7 +1215,7 @@ const SideNavbar = styled.div<{ theme: any; activeIndex: number }>`
 const LeftNavbarBtn = styled(BaseBtn)<{ theme: any; active: boolean }>`
   min-width: 20%;
   font-weight: 500;
-  height: 70px;
+  height: 75px;
   padding: 0 20px 0 20px;
   text-transform: uppercase;
   position: relative;
@@ -1237,12 +1224,9 @@ const LeftNavbarBtn = styled(BaseBtn)<{ theme: any; active: boolean }>`
   justify-content: center;
   align-items: center;
   font-size: 12px;
-  /* background: ${(p) => p.theme.colors.light1}; */
-  /* background: #dedede; */
   border-radius: 0;
-  color: ${(p) => p.theme.colors.textLight};
+  color: ${(p) => p.theme.colors.leftPanel.textInactive};
   outline: none;
-  /* border: 1px solid #cecece; */
   border: none;
   border-radius: 0;
   z-index: 1;
@@ -1253,11 +1237,9 @@ const LeftNavbarBtn = styled(BaseBtn)<{ theme: any; active: boolean }>`
     active &&
     `
     z-index: 1;
-    color: ${theme.colors.text};
+    color: white;
+    box-shadow: 0 0 10px 0 #0004;
     background: transparent;
-    // transform: translateY(-3px);
-    // border: 1px solid #cecece;
-    // box-shadow: 0 0 2px 0 #00000033;
   `}
 
   .icon {
@@ -1270,12 +1252,11 @@ const LeftNavbarBtn = styled(BaseBtn)<{ theme: any; active: boolean }>`
 
   &:hover,
   &:focus {
-    background: #0001;
+    background: ${(p) => p.theme.colors.leftPanel['700']};
     ${({ theme, active }) =>
       active &&
       `
-      background: transparent;
-    color: ${theme.colors.text};
+      background: ${theme.colors.leftPanel['300']};
     `}
   }
 `

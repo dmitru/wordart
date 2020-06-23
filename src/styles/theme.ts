@@ -1,18 +1,39 @@
 import { theme as chakraTheme } from '@chakra-ui/core'
 
+const teal = {
+  ...chakraTheme.colors.teal,
+  // 500: 'hsla(178, 39%, 51%, 1)',
+}
+
+const accent = {
+  ...chakraTheme.colors.orange,
+  500: 'rgb(237, 93, 97)',
+}
+
 export const theme = {
   ...chakraTheme,
   colors: {
+    leftPanel: {
+      textInactive: 'hsl(240, 10%, 91%)',
+      200: 'hsla(240, 42%, 64%, 1)',
+      300: 'hsla(240, 42%, 60%, 1)',
+      600: 'hsla(240, 33%, 51%, 1)',
+      700: 'hsla(240, 33%, 47%, 1)',
+    },
     ...chakraTheme.colors,
-    primary: chakraTheme.colors.blue,
-    accent: chakraTheme.colors.pink,
-    secondary: chakraTheme.colors.teal,
+    primary: {
+      ...chakraTheme.colors.purple,
+      500: 'hsla(239, 44%, 57%, 1)',
+    },
+    accent,
+    secondary: chakraTheme.colors.whatsapp,
     success: chakraTheme.colors.green,
     danger: chakraTheme.colors.red,
     info: chakraTheme.colors.blue,
     //
     textLight: 'white',
     text: '#222',
+    teal: chakraTheme.colors.whatsapp,
     //
     light: 'white',
     light1: '#eaeaea',

@@ -189,7 +189,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                 animate={{ x: 0, y: 0, opacity: 1 }}
                 exit={{ x: 355, y: 0, opacity: 0 }}
               >
-                <Box position="absolute" height="100%" px="3" py="3">
+                <Box position="absolute" height="100%" px="5" py="6">
                   <Flex mb="5">
                     <Button
                       css={css`
@@ -246,15 +246,13 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     flexDirection="row"
                     flexWrap="wrap"
                     overflowY="scroll"
+                    pb="4rem"
                   >
                     {themePresets.map((theme) => (
                       <ThemePresetThumbnailContainer
                         aria-role="button"
                         key={theme.title}
-                        css={css`
-                          ${state.selectedThemeTitle === theme.title &&
-                          'transform: scale(1.05); svg { outline: 5px solid #d53f8c; }'}
-                        `}
+                        isActive={state.selectedThemeTitle === theme.title}
                         onClick={() => {
                           state.selectedThemeTitle = theme.title
                           applyTheme(theme)
@@ -280,15 +278,14 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   position="absolute"
                   height="calc(100vh - 50px)"
                   overflowY="auto"
-                  px="3"
-                  py="3"
+                  px="5"
+                  py="6"
+                  pb="5rem"
                   width="100%"
                 >
                   <Box mb="5" display="flex">
                     <Button
-                      flex="1"
-                      marginLeft="auto"
-                      variantColor="accent"
+                      variantColor="secondary"
                       rightIcon="chevron-right"
                       onClick={() => {
                         state.view = 'themes'
@@ -348,7 +345,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
                   {/* <shape-items> */}
                   <Box mt="2.5rem">
-                    <Box display="flex" alignItems="center">
+                    <Box display="flex" alignItems="flex-end">
                       <SectionLabel
                         css={css`
                           margin-bottom: 0;
@@ -367,11 +364,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                       </Box>
 
                       <Button
-                        css={css`
-                          width: 120px;
-                        `}
                         ml="auto"
-                        size="sm"
                         variant={
                           store.leftColorTab.showShapeItemsAdvanced
                             ? 'solid'
@@ -390,10 +383,8 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                         <FaCog
                           style={{
                             color: 'currentColor',
-                            marginRight: '5px',
                           }}
                         />
-                        Advanced
                       </Button>
                     </Box>
 
@@ -408,7 +399,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     <Collapse
                       isOpen={store.leftColorTab.showShapeItemsAdvanced}
                     >
-                      <Box pb="0.5rem" pr="3">
+                      <Box pb="0.5rem" pt="4" pr="3">
                         <Box>
                           <Slider
                             afterLabel="%"
@@ -515,8 +506,15 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     <Box mt="2.5rem">
                       <SectionLabel display="flex" alignItems="center">
                         Background Items
+                      </SectionLabel>
+
+                      <Box mt="0">
+                        <BgItemsColorPickerInline
+                          bgStyle={bgStyle}
+                          onUpdate={updateBgItemsColoring}
+                        />
+
                         <Button
-                          size="xs"
                           ml="auto"
                           variant={
                             store.leftColorTab.showBgItemsAdvanced
@@ -538,16 +536,8 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                               color: 'currentColor',
                               marginRight: '5px',
                             }}
-                          />{' '}
-                          Advanced
+                          />
                         </Button>
-                      </SectionLabel>
-
-                      <Box mt="0">
-                        <BgItemsColorPickerInline
-                          bgStyle={bgStyle}
-                          onUpdate={updateBgItemsColoring}
-                        />
                       </Box>
 
                       <Collapse isOpen={store.leftColorTab.showBgItemsAdvanced}>
