@@ -4,32 +4,30 @@ import {
   EditableInput,
   EditablePreview,
   Heading,
+  Icon,
   IconButton,
   Menu,
-  Icon,
   MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
   Modal,
   ModalBody,
+  ModalCloseButton,
   ModalContent,
   ModalFooter,
   ModalHeader,
   ModalOverlay,
   Progress,
-  Select,
   Skeleton,
   Stack,
   Text,
   useToast,
-  Divider,
-  ModalCloseButton,
 } from '@chakra-ui/core'
-import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
 import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
+import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
 import { Shapes } from '@styled-icons/fa-solid/Shapes'
 import { Font } from '@styled-icons/icomoon/Font'
@@ -47,12 +45,12 @@ import {
   EditorStoreInitParams,
   pageSizePresets,
 } from 'components/Editor/editor-store'
-import { TargetKind } from 'components/Editor/lib/editor'
 import {
   mkBgStyleConfFromOptions,
   mkShapeStyleConfFromOptions,
 } from 'components/Editor/style'
 import { BaseBtn } from 'components/shared/BaseBtn'
+import { Button } from 'components/shared/Button'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 import { Tooltip } from 'components/shared/Tooltip'
@@ -72,11 +70,10 @@ import {
   FiDownload,
   FiEdit,
   FiFilePlus,
+  FiHelpCircle,
   FiMenu,
   FiPrinter,
   FiSave,
-  FiHelpCircle,
-  FiShoppingCart,
 } from 'react-icons/fi'
 import { IoMdResize } from 'react-icons/io'
 import { Api } from 'services/api/api'
@@ -84,7 +81,6 @@ import { WordcloudId } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import 'utils/canvas-to-blob'
-import { Button } from 'components/shared/Button'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -306,7 +302,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           </Link>
 
           <Menu>
-            <MenuButton mr="1" as={TopNavButton}>
+            <MenuButton mr="1" as={TopNavButton} isAccented>
               <FiMenu
                 css={css`
                   margin-right: 4px;
@@ -402,7 +398,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             onClick={handleSaveClick}
             isLoading={isSaving}
             mr="1"
-            isBordered
             css={css`
               width: 90px;
             `}
@@ -430,6 +425,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               padding: 2px 8px;
               border-radius: 4px;
               display: flex;
+              height: 40px;
 
               &:hover {
                 background: #ffffff15;
@@ -477,7 +473,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             Order Prints
           </TopNavButton> */}
 
-          <TopNavButton isBordered mr="2" ml="auto">
+          <TopNavButton isAccented mr="2" ml="auto">
             <FiHelpCircle
               css={css`
                 margin-right: 4px;
@@ -1123,27 +1119,28 @@ const ExportButton = styled(Button)(
   `
 )
 
-const TopNavButton = styled<{ isBordered: boolean }>(Button)`
+const TopNavButton = styled(Button)<{ isAccented: boolean }>`
   color: white;
 
-  ${(p) =>
-    p.isBordered &&
-    `
-    border: 1px solid #ffffff2e;
-  `}
-
   color: #fefeff;
-  background-color: transparent;
-  border-bottom: 3px solid #0002;
-  background-color: #ffffff1f;
-  /* width: 93px; */
-  box-shadow: 0 0 10px 0 #0003;
+  background: #ffffff45;
   margin-right: 10px;
 
-  background-color: transparent;
+  ${(p) =>
+    p.isAccented &&
+    `
+    background: #fff;
+    color: #333;
+  `}
+
   &:hover {
-    background-color: #0003;
-    ${(p) => p.isBordered && `border: 1px solid #fffa;`}
+    background-color: #fff2;
+
+    ${(p) =>
+      p.isAccented &&
+      `
+    background: #fffb;
+  `}
   }
 `
 
@@ -1172,7 +1169,8 @@ const TopToolbar = styled(Box)`
 
 const TopNavWrapper = styled(Box)<{ theme: any }>`
   height: 60px;
-  padding: 20px 10px;
+  padding: 10px 20px;
+  padding-left: 90px;
   background: ${(p) => p.theme.colors.header.bg};
 `
 

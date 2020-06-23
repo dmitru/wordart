@@ -140,7 +140,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
     } | null>(null)
 
     const fonts = store.getAvailableFonts()
-    const [selectedFontId, setSelectedFontId] = useState(fonts[0].style.fontId)
+    const [selectedFontId, setSelectedFontId] = useState(
+      fonts[0].defaultStyle.fontId
+    )
     const [query, setQuery] = useState('')
     const matchingShapes = store
       .getAvailableShapes()
@@ -298,23 +300,18 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
                 <Flex marginTop="70px" width="100%">
                   {state.mode === 'home' && (
-                    <Tooltip
-                      label="Customize colors, size and position"
-                      isDisabled={(state.mode as TabMode) === 'customize shape'}
+                    <Button
+                      mr="2"
+                      variant="outline"
+                      display="flex"
+                      flex="1"
+                      onClick={() => {
+                        state.mode = 'customize shape'
+                      }}
                     >
-                      <Button
-                        mr="2"
-                        variant="outline"
-                        display="flex"
-                        flex="1"
-                        onClick={() => {
-                          state.mode = 'customize shape'
-                        }}
-                      >
-                        <FaCog style={{ marginRight: '5px' }} />
-                        Customize
-                      </Button>
-                    </Tooltip>
+                      <FaCog style={{ marginRight: '5px' }} />
+                      Customize
+                    </Button>
                   )}
 
                   {state.mode === 'customize shape' && (

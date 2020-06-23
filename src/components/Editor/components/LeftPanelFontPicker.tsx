@@ -2,34 +2,24 @@ import {
   Badge,
   Box,
   IconButton,
-  InputGroup,
-  InputLeftElement,
-  Icon,
-  Text,
-  Input,
-  InputRightElement,
-  Select,
   Menu,
   MenuButton,
-  MenuList,
   MenuItem,
-  Heading,
+  MenuList,
   Stack,
 } from '@chakra-ui/core'
-import AutoSizer from 'react-virtualized-auto-sizer'
-import styled from '@emotion/styled'
-import { Button } from 'components/shared/Button'
-import { BaseBtn } from 'components/shared/BaseBtn'
-import { observer, useLocalStore } from 'mobx-react'
-import { FixedSizeList as List, ListProps } from 'react-window'
-import { useStore } from 'services/root-store'
-import { useEffect, useMemo } from 'react'
-import { FontConfig, FontStyleConfig } from 'data/fonts'
-import { uniq, flatten, capitalize } from 'lodash'
-import { animateElement } from 'utils/animation'
-import { SectionLabel } from 'components/Editor/components/shared'
 import css from '@emotion/css'
+import styled from '@emotion/styled'
 import { FontPicker } from 'components/Editor/components/FontPicker'
+import { SectionLabel } from 'components/Editor/components/shared'
+import { BaseBtn } from 'components/shared/BaseBtn'
+import { Button } from 'components/shared/Button'
+import { FontConfig, FontStyleConfig } from 'data/fonts'
+import { sortBy, capitalize } from 'lodash'
+import { observer, useLocalStore } from 'mobx-react'
+import { useEffect, useMemo } from 'react'
+import { useStore } from 'services/root-store'
+import { animateElement } from 'utils/animation'
 
 export type LeftPanelFontPickerProps = {
   selectedFontId: string
@@ -61,8 +51,20 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
     const allFonts = store.getAvailableFonts()
 
     const selectedFont = useMemo(
-      () => allFonts.find((f) => f.style.fontId === state.selectedFontId),
+      () =>
+        allFonts.find((f) =>
+          f.font.styles.find((s) => s.fontId === state.selectedFontId)
+        ),
       [state.selectedFontId]
+    )
+    const selectedFontStyle = useMemo(
+      () =>
+        selectedFont
+          ? selectedFont.font.styles.find(
+              (s) => s.fontId === state.selectedFontId
+            )
+          : undefined,
+      [selectedFont]
     )
 
     return (
@@ -84,7 +86,7 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
               if (!selectedFont) {
                 return
               }
-              onSelected(selectedFont.font, selectedFont.style)
+              onSelected(selectedFont.font, selectedFontStyle)
             }}
             variantColor="accent"
             id="font-picker-done"
@@ -97,9 +99,55 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
           {selectedFont && (
             <>
               <Box>
-                <SelectedFontThumbnail mb="0" mt="4" p="3">
-                  <img src={selectedFont.style.thumbnail} />
-                </SelectedFontThumbnail>
+                {selectedFontStyle && (
+                  <SelectedFontThumbnail mb="0" mt="4" p="3">
+                    <img src={selectedFontStyle.thumbnail} />
+                  </SelectedFontThumbnail>
+                )}
+
+                <Box mt="3">
+                  <Menu>
+                    <MenuButton
+                      isDisabled={selectedFont.font.styles.length < 2}
+                      marginLeft="auto"
+                      as={Button}
+                      outline="none"
+                      // @ts-expect-error
+                      variant="outline"
+                      aria-label="menu"
+                      rightIcon="chevron-down"
+                      color="black"
+                      display="inline-flex"
+                    >
+                      {'Style: '}
+                      {selectedFontStyle &&
+                        capitalize(selectedFontStyle.fontStyle)}
+                      {', '}
+                      {selectedFontStyle && selectedFontStyle.fontWeight}
+                    </MenuButton>
+
+                    <MenuList zIndex={100} placement="bottom-start">
+                      {sortBy(
+                        selectedFont.font.styles,
+                        (fs) => fs.fontStyle,
+                        (fs) => fs.fontWeight
+                      ).map((style) => (
+                        <MenuItem
+                          key={style.fontId}
+                          onClick={() => {
+                            console.log(state.selectedFontId, style.fontId)
+                            state.selectedFontId = style.fontId
+                            onHighlighted(selectedFont.font, style)
+                          }}
+                        >
+                          {capitalize(style.fontStyle)}
+                          {', '}
+                          {style.fontWeight}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </Menu>
+                </Box>
               </Box>
             </>
           )}

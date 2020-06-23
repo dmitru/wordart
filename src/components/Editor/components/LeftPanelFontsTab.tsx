@@ -21,7 +21,7 @@ import { useStore } from 'services/root-store'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import { observer, useLocalStore } from 'mobx-react'
 import { SectionLabel } from 'components/Editor/components/shared'
-import { keyBy, uniq } from 'lodash'
+import { uniq } from 'lodash'
 import { LeftPanelFontPicker } from 'components/Editor/components/LeftPanelFontPicker'
 import { Button } from 'components/shared/Button'
 
@@ -41,9 +41,10 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
       isAddingCustomFont: false,
     }))
 
-    const allFonts = store.getAvailableFonts()
-    const fontsById = keyBy(allFonts, (f) => f.style.fontId)
-    const fonts = style.items.words.fontIds.map((fontId) => fontsById[fontId])
+    const fontStylesById = store.getAvailableFontStyles()
+    const fonts = style.items.words.fontIds
+      .map((fontId) => fontStylesById[fontId])
+      .filter((f) => f != null)
 
     const handleCustomFontSubmit = ({
       url,
@@ -62,6 +63,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
         fontWeight: '400',
         thumbnail: thumbnailUrl,
         url: url,
+        isCustom: true,
       }
       store.customFonts.push({
         popularity: 999,
@@ -103,13 +105,13 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                       /* box-shadow: 0 0 4px 0 #0004; */
                     `}
                   >
-                    {fonts.map((font, index) => {
+                    {fonts.map((fontStyle, index) => {
                       return (
                         <FontListButton
-                          key={font.style.fontId}
-                          thumbnail={font.style.thumbnail}
-                          title={font.font.title}
-                          isCustom={font.font.isCustom}
+                          key={fontStyle.fontId}
+                          thumbnail={fontStyle.thumbnail}
+                          title={fontStyle.title}
+                          isCustom={fontStyle.isCustom}
                           showDelete={style.items.words.fontIds.length > 1}
                           containerProps={{
                             onClick: (e) => {
@@ -128,7 +130,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                           }}
                           onDeleteClick={() => {
                             style.items.words.fontIds = style.items.words.fontIds.filter(
-                              (id) => id !== font.style.fontId
+                              (id) => id !== fontStyle.fontId
                             )
                           }}
                         />
@@ -225,6 +227,8 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                       }
                     }}
                     onSelected={(font, fontStyle) => {
+                      console.log('onSelected', font, fontStyle)
+
                       if (state.isAddingFont) {
                         style.items.words.fontIds = uniq([
                           ...style.items.words.fontIds,
@@ -301,7 +305,7 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
         size="sm"
         ml="2"
         mr="2"
-        onClickCapture={(e) => {
+        onClickCapture={(e: any) => {
           e.preventDefault()
           e.stopPropagation()
           e.nativeEvent.stopImmediatePropagation()

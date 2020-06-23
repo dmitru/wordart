@@ -105,7 +105,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
           <Box>
             <Button
               isDisabled={shapeStyle.items.coloring.color.colors.length >= 8}
-              variantColor="secondary"
+              variantColor="primary"
               leftIcon="add"
               onClick={() => {
                 shapeStyle.items.coloring.color.colors.push(getRandomColor())

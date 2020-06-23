@@ -170,8 +170,8 @@ const createPreset = (conf: ThemePresetConfig, title: string): ThemePreset => {
     title,
     bgDimSmallerItems: 20,
     shapeDimSmallerItems: 20,
-    shapeOpacity: 0.2,
-    itemsOpacity: 1.0,
+    shapeOpacity: (conf.shapeOpacity || 0.2) * 100,
+    itemsOpacity: 100,
     bgFill: conf.bgColor,
     shapeFill: conf.shapeColor,
     bgItemsColoring: {
@@ -191,8 +191,8 @@ export const themePresets: ThemePreset[] = [
     title: 'Dark',
     bgDimSmallerItems: 20,
     shapeDimSmallerItems: 20,
-    shapeOpacity: 0.2,
-    itemsOpacity: 1.0,
+    shapeOpacity: 20,
+    itemsOpacity: 100,
     bgFill: '#252431',
     shapeFill: 'red',
     bgItemsColoring: {
@@ -208,8 +208,8 @@ export const themePresets: ThemePreset[] = [
     title: 'Dark 2',
     bgDimSmallerItems: 20,
     shapeDimSmallerItems: 20,
-    shapeOpacity: 0.2,
-    itemsOpacity: 1.0,
+    shapeOpacity: 20,
+    itemsOpacity: 100,
     bgFill: '#252431',
     shapeFill: 'yellow',
     bgItemsColoring: {

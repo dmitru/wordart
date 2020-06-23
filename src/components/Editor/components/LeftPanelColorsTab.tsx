@@ -112,7 +112,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
       const shapeStyle = store.styleOptions.shape
       const bgStyle = store.styleOptions.bg
       await onUpdateImmediately()
-      store.editor?.setShapeOpacity(shapeStyle.opacity)
+      store.editor?.setShapeOpacity(shapeStyle.opacity / 100)
       await store.editor?.setShapeItemsStyle(
         mkShapeStyleConfFromOptions(shapeStyle).items
       )
@@ -120,11 +120,17 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
         mkBgStyleConfFromOptions(bgStyle).items
       )
       store.editor?.setBgColor(bgStyle.fill.color)
+      if (bgStyle.fill.kind === 'color') {
+        store.editor?.setBgOpacity(bgStyle.fill.color.opacity / 100)
+      } else {
+        store.editor?.setBgOpacity(0)
+      }
     }
 
     const applyTheme = (theme: ThemePreset) => {
       // <update-styles>
       // Shape
+      console.log('applyTheme', theme)
       shapeStyle.opacity = theme.shapeOpacity
       shapeStyle.items.brightness = 0
 
@@ -134,6 +140,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
       bgStyle.fill.color = {
         kind: 'color',
         color: theme.bgFill,
+        opacity: 100,
       }
 
       // Shape fill
@@ -165,6 +172,8 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
         shapeStyle.items.coloring.gradient = theme.bgItemsColoring
       }
 
+      shapeStyle.items.opacity = theme.itemsOpacity
+      bgStyle.items.opacity = theme.itemsOpacity
       shapeStyle.items.dimSmallerItems = theme.shapeDimSmallerItems
       bgStyle.items.dimSmallerItems = theme.bgDimSmallerItems
       // </update-styles>
@@ -305,7 +314,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                 >
                   <Box mb="5" display="flex">
                     <Button
-                      variantColor="secondary"
+                      variantColor="primary"
                       rightIcon="chevron-right"
                       onClick={() => {
                         state.view = 'themes'

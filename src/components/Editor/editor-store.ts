@@ -152,10 +152,10 @@ export class EditorStore {
     }
 
     this.styleOptions.shape.items.words.fontIds = [
-      this.getAvailableFonts()[0].style.fontId,
+      this.getAvailableFonts()[0].defaultStyle.fontId,
     ]
     this.styleOptions.bg.items.words.fontIds = [
-      this.getAvailableFonts()[0].style.fontId,
+      this.getAvailableFonts()[0].defaultStyle.fontId,
     ]
 
     this.editor = new Editor({
@@ -1086,18 +1086,45 @@ export class EditorStore {
   }
   getShapeConf = (): ShapeConf | undefined => this.getShape()?.config
 
-  getAvailableFonts = (): { font: FontConfig; style: FontStyleConfig }[] => {
-    const result: { font: FontConfig; style: FontStyleConfig }[] = []
+  getDefaultStyleForFont = (font: FontConfig): FontStyleConfig => {
+    let normalStyles = font.styles.filter((fs) => fs.fontStyle === 'normal')
+    if (normalStyles.length < 1) {
+      normalStyles = font.styles
+    }
 
-    // Add custom fonts
+    normalStyles.sort(
+      (fs1, fs2) => parseInt(fs1.fontWeight) - parseInt(fs2.fontWeight)
+    )
+    const middleIndex = Math.min(
+      Math.ceil(normalStyles.length / 2),
+      normalStyles.length - 1
+    )
+    return normalStyles[middleIndex]
+  }
+
+  getAvailableFonts = (): {
+    font: FontConfig
+    defaultStyle: FontStyleConfig
+  }[] => {
+    const result: { font: FontConfig; defaultStyle: FontStyleConfig }[] = []
+
     for (const font of [...this.customFonts, ...fonts]) {
-      for (const style of font.styles) {
-        result.push({ font, style })
-        break
+      result.push({ font, defaultStyle: this.getDefaultStyleForFont(font) })
+    }
+    return result
+  }
+
+  getAvailableFontStyles = (): { [fontId in FontId]: FontStyleConfig } => {
+    const result: { [fontId in FontId]: FontStyleConfig } = {}
+
+    for (const font of [...this.customFonts, ...fonts]) {
+      for (const fs of font.styles) {
+        result[fs.fontId] = fs
       }
     }
     return result
   }
+
   getFontById = (
     fontId: FontId
   ): { font: FontConfig; style: FontStyleConfig } | undefined => {

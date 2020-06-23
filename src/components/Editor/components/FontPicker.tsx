@@ -63,15 +63,23 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
         .startsWith(state.query.toLocaleLowerCase())
   )
 
+  const selectedFont = useMemo(
+    () =>
+      fonts.find(
+        (f) => f.font.styles.find((s) => s.fontId === selectedFontId) != null
+      ),
+    [selectedFontId]
+  )
+
   const FontListRow: ListProps['children'] = ({ index, style }) => {
     const font = fonts[index]
-    const fontStyle = font.style
+    const fontStyle = font.defaultStyle
     const isSelected =
       selectedFont && selectedFont.font.title === font.font.title
     return (
       <FontListButton
         isSelected={isSelected}
-        thumbnail={font.style.thumbnail}
+        thumbnail={font.defaultStyle.thumbnail}
         title={font.font.title}
         isCustom={font.font.isCustom}
         containerProps={{
@@ -83,11 +91,6 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
       />
     )
   }
-
-  const selectedFont = useMemo(
-    () => fonts.find((f) => f.style.fontId === selectedFontId),
-    [selectedFontId]
-  )
 
   return (
     <>

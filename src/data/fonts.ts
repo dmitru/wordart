@@ -2,6 +2,7 @@ export type FontId = string
 
 export type FontStyleConfig = {
   fontId: FontId
+  isCustom?: boolean
   title: string
   url: string
   thumbnail: string

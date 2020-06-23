@@ -67,7 +67,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
             <rect
               id="Rectangle"
               fill={theme.shapeFill}
-              opacity={theme.shapeOpacity}
+              opacity={theme.shapeOpacity / 100}
               x="0"
               y="0"
               width="218"
