@@ -1700,6 +1700,7 @@ export class Editor {
     if (!this.shape) {
       return
     }
+    this.applySceneClipPath()
     this.shapeSelection = false
     this.shape.obj.selectable = false
     this.deselectAll()
@@ -1718,6 +1719,7 @@ export class Editor {
   }
 
   deselectAll = () => {
+    this.applySceneClipPath()
     this.canvas.discardActiveObject()
     this.canvas.requestRenderAll()
   }
