@@ -305,7 +305,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                 >
                   <Box mb="5" display="flex">
                     <Button
-                      variantColor="primary"
+                      variantColor="secondary"
                       rightIcon="chevron-right"
                       onClick={() => {
                         state.view = 'themes'
@@ -385,14 +385,17 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
                       <Button
                         ml="auto"
+                        css={css`
+                          width: 50px;
+                        `}
                         variant={
                           store.leftColorTab.showShapeItemsAdvanced
                             ? 'solid'
-                            : 'ghost'
+                            : 'outline'
                         }
                         variantColor={
                           store.leftColorTab.showShapeItemsAdvanced
-                            ? 'primary'
+                            ? 'secondary'
                             : 'gray'
                         }
                         onClick={() => {

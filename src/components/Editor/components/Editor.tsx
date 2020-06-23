@@ -660,7 +660,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       )}
                     </>
                   ) : (
-                    <Box>
+                    <Box px="5" py="6">
                       <Skeleton height="50px" my="10px" />
                       <Skeleton height="30px" my="10px" />
                       <Skeleton height="300px" my="10px" />
@@ -680,9 +680,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 onClose={closeExport}
               >
                 <ModalOverlay />
-                <ModalContent>
+                <ModalContent
+                  css={css`
+                    max-width: 530px;
+                  `}
+                >
                   <ModalHeader>Choose Download Format</ModalHeader>
-                  <ModalCloseButton />
                   <ModalBody pb={6}>
                     {isExporting ? (
                       <>
@@ -695,23 +698,31 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         </Text>
                         <Stack direction="row" spacing="3" flexWrap="wrap">
                           <ExportButton
+                            variant="outline"
                             onClick={() => handleDownloadClick(false, 'png')}
                           >
-                            <Text mt="0" fontSize="lg">
+                            <Text mt="0" fontSize="lg" fontWeight="bold">
                               PNG
                             </Text>
-                            <Text mb="0" fontSize="sm">
+                            <Text mb="0" fontSize="sm" fontWeight="normal">
                               1024 px
+                            </Text>
+                            <Text mb="0" fontSize="sm" fontWeight="normal">
+                              Higher quality
                             </Text>
                           </ExportButton>
                           <ExportButton
+                            variant="outline"
                             onClick={() => handleDownloadClick(false, 'jpeg')}
                           >
-                            <Text mt="0" fontSize="lg">
+                            <Text mt="0" fontSize="lg" fontWeight="bold">
                               JPEG
                             </Text>
-                            <Text mb="0" fontSize="sm">
+                            <Text mb="0" fontSize="sm" fontWeight="normal">
                               1024 px
+                            </Text>
+                            <Text mb="0" fontSize="sm" fontWeight="normal">
+                              Smaller file size
                             </Text>
                           </ExportButton>
                         </Stack>
@@ -723,6 +734,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           </Text>
                           <Stack direction="row" spacing="3" flexWrap="wrap">
                             <ExportButton
+                              variant="outline"
                               onClick={() => handleDownloadClick(true, 'png')}
                             >
                               <Text mt="0" fontSize="lg">
@@ -734,6 +746,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                             </ExportButton>
 
                             <ExportButton
+                              variant="outline"
                               onClick={() => handleDownloadClick(true, 'jpeg')}
                             >
                               <Text mt="0" fontSize="lg">
@@ -745,6 +758,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                             </ExportButton>
 
                             <ExportButton
+                              variant="outline"
                               onClick={() => handleDownloadClick(true, 'svg')}
                             >
                               <Text mt="0" fontSize="lg">
@@ -759,6 +773,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       </>
                     )}
                   </ModalBody>
+                  <ModalCloseButton />
                 </ModalContent>
               </Modal>
 
@@ -1102,7 +1117,7 @@ const ExportButton = styled(Button)(
     alignItems: 'center',
   },
   `
-  height: 80px;
+  height: 100px;
   min-width: 150px;
   margin-bottom: 16px;
   `

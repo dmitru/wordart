@@ -59,7 +59,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
               'Segoe UI Emoji', 'Segoe UI Symbol';
             font-weight: 600;
             font-size: 0.9rem;
-            margin-bottom: -4px;
+            margin-bottom: 0;
             ${horizontal
               ? `
               margin-right: 16px;
@@ -168,9 +168,9 @@ export const SliderRail: React.FC<SliderRailProps> = ({ getRailProps }) => {
         css={(theme) =>
           css({
             position: 'absolute',
-            top: 14,
+            top: 15,
             width: '100%',
-            height: 6,
+            height: 4,
             borderRadius: '4px',
             pointerEvents: 'none',
             backgroundColor: '#ddd',
@@ -218,20 +218,20 @@ export const KeyboardHandle: React.FC<HandleProps> = ({
         cursor: 'pointer',
         transform: 'translate(-50%, 0)',
         zIndex: 2,
-        top: 4,
+        top: 2,
         whiteSpace: 'nowrap',
-        minWidth: 40,
+        minWidth: 44,
         width: 'auto',
         fontSize: 12,
         display: 'flex-inline',
         alignItems: 'center',
         justifyContent: 'center',
-        height: 24,
+        height: 30,
         borderRadius: 8,
         color: '#555',
         fontWeight: 600,
-        border: '1px solid #999',
-        boxShadow: '0 0 2px 0 #0004',
+        border: '1px solid #cfcfcf',
+        boxShadow: '0 0 6px 0 #0002',
         backgroundColor: disabled ? '#666' : '#fff',
         transition: 'border 0.1s',
         '&:hover, &:focus': {

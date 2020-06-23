@@ -19,6 +19,7 @@ import { observer } from 'mobx-react'
 import React, { useState } from 'react'
 import { FiRefreshCw } from 'react-icons/fi'
 import { Button } from 'components/shared/Button'
+import { DeleteButton } from 'components/shared/DeleteButton'
 
 export const ShapeItemsColorPickerKindDropdown: React.FC<{
   shapeStyle: ShapeStyleOptions
@@ -104,13 +105,12 @@ export const ShapeItemsColorPickerInline: React.FC<{
           <Box>
             <Button
               isDisabled={shapeStyle.items.coloring.color.colors.length >= 8}
-              variant="outline"
+              variantColor="secondary"
               leftIcon="add"
               onClick={() => {
                 shapeStyle.items.coloring.color.colors.push(getRandomColor())
                 onUpdate()
               }}
-              size="sm"
             >
               Add
             </Button>
@@ -124,7 +124,6 @@ export const ShapeItemsColorPickerInline: React.FC<{
                 )
                 onUpdate()
               }}
-              size="sm"
               ml="1"
             >
               <FiRefreshCw style={{ marginRight: '5px' }} />
@@ -135,7 +134,6 @@ export const ShapeItemsColorPickerInline: React.FC<{
               <MenuButton
                 ml="1"
                 as={Button}
-                size="sm"
                 outline="none"
                 aria-label="menu"
                 color="black"
@@ -179,7 +177,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
                 >
                   <ColorPickerPopover
                     css={css`
-                      width: 48px;
+                      width: 44px;
                     `}
                     disableAlpha
                     value={chroma(shapeStyle.items.coloring.color.colors[index])
@@ -197,14 +195,10 @@ export const ShapeItemsColorPickerInline: React.FC<{
                   />
 
                   {shapeStyle.items.coloring.color.colors.length > 1 && (
-                    <IconButton
-                      isRound
-                      aria-label="Delete"
-                      variant="outline"
+                    <DeleteButton
+                      size="xs"
                       ml="2px"
                       mr="2"
-                      icon="close"
-                      size="xs"
                       onClick={() => {
                         shapeStyle.items.coloring.color.colors.splice(index, 1)
                         onUpdate()

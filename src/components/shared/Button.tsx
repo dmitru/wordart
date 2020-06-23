@@ -15,7 +15,7 @@ export const Button = React.forwardRef<ButtonProps, any>((props, ref) => (
       &,
       &:focus,
       &:active {
-        box-shadow: 0 0 10px 0 #0002 !important;
+        box-shadow: 0 0 8px 0 #00000015 !important;
       }
     `}
   />

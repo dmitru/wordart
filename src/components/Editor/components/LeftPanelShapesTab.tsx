@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Flex,
   Heading,
   Icon,
@@ -18,6 +17,7 @@ import {
   Text,
   Textarea,
 } from '@chakra-ui/core'
+import { Button } from 'components/shared/Button'
 import { css } from '@emotion/core'
 import { AddCustomImageModal } from 'components/Editor/components/AddCustomImageModal'
 import { CustomizeRasterImageModal } from 'components/Editor/components/CustomizeRasterImageModal'
@@ -25,10 +25,7 @@ import {
   ShapeSelector,
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
-import {
-  SvgShapeColorPickerCollapse,
-  ShapeColorOptions,
-} from 'components/Editor/components/ShapeColorOptions'
+import { ShapeColorOptions } from 'components/Editor/components/ShapeColorOptions'
 import {
   applyTransformToObj,
   createMultilineFabricTextGroup,

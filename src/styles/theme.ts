@@ -31,7 +31,7 @@ export const theme = {
       500: 'hsla(227, 40%, 63%, 1)',
     },
     accent,
-    secondary: chakraTheme.colors.teal,
+    secondary: teal,
     success: chakraTheme.colors.green,
     danger: chakraTheme.colors.red,
     info: chakraTheme.colors.blue,

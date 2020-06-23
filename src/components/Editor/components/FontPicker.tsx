@@ -1,7 +1,6 @@
 import {
   Badge,
   Box,
-  Button,
   Icon,
   IconButton,
   Input,
@@ -15,6 +14,7 @@ import {
   Text,
 } from '@chakra-ui/core'
 import styled from '@emotion/styled'
+import { Button } from 'components/shared/Button'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import { FontConfig, FontStyleConfig } from 'data/fonts'
 import { capitalize, flatten, uniq } from 'lodash'
@@ -200,7 +200,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
                 overscanCount={20}
                 height={height}
                 itemCount={fonts.length}
-                itemSize={35}
+                itemSize={45}
                 width={340}
               >
                 {FontListRow}

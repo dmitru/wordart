@@ -1,18 +1,12 @@
 import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { Slider } from 'components/shared/Slider'
+import { Button } from 'components/shared/Button'
+import { DeleteButton } from 'components/shared/DeleteButton'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { useCallback } from 'react'
 import { TargetKind } from 'components/Editor/lib/editor'
-import {
-  Text,
-  Box,
-  Heading,
-  Button,
-  Flex,
-  Icon,
-  Divider,
-} from '@chakra-ui/core'
+import { Text, Box, Heading, Flex, Icon, Divider } from '@chakra-ui/core'
 import { WordAnglesPresetKind } from 'components/Editor/style-options'
 // @ts-ignore
 import VerImg from './img/ver.svg'
@@ -91,19 +85,18 @@ const PresetBtn = styled(Box)<{ active: boolean; theme: any }>`
   display: inline-block;
   width: 78px;
   height: 78px;
-  margin: 0px 2px;
-  border: 1px solid #aaa;
+  margin: 2px;
+  border: 1px solid #dedede;
   padding: 6px;
-
-&:hover {
-  transform: scale(1.05);
-}
+  box-shadow: 0 0 4px 0 #00000015;
 
   transition: transform 0.2s;
 
+  &:hover {
+    transform: translateY(-2px);
+  }
+
   ${(p) => p.active && `outline: 3px solid ${p.theme.colors.accent['500']};`}
-  ${(p) => p.active && `background: #d7eaff;`}
-  ${(p) => p.active && `transform: scale(1.05);`}
 `
 
 export type LeftPanelLayoutTabProps = {
@@ -120,7 +113,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
     }, [])
 
     return (
-      <Box px="3" py="5">
+      <Box px="5" py="6">
         <Box mb="2.5rem">
           <SectionLabel>Placement</SectionLabel>
           <Slider
@@ -215,7 +208,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                         style.items.words.customAngles = [0]
                       }}
                     >
-                      Clear
+                      Reset
                     </Button>
                   </Box>
 
@@ -241,15 +234,11 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                         />
                         <Box width="30px" ml="4">
                           {style.items.words.customAngles.length > 1 && (
-                            <Button
-                              size="xs"
-                              variant="ghost"
+                            <DeleteButton
                               onClick={() => {
                                 style.items.words.customAngles.splice(index, 1)
                               }}
-                            >
-                              <Icon name="close" />
-                            </Button>
+                            />
                           )}
                         </Box>
                       </Flex>

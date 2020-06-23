@@ -1,7 +1,6 @@
 import {
   Badge,
   Box,
-  Button,
   IconButton,
   InputGroup,
   InputLeftElement,
@@ -19,6 +18,7 @@ import {
 } from '@chakra-ui/core'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import styled from '@emotion/styled'
+import { Button } from 'components/shared/Button'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import { observer, useLocalStore } from 'mobx-react'
 import { FixedSizeList as List, ListProps } from 'react-window'
@@ -105,9 +105,13 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
           )}
 
           <Box mt="2rem" display="flex" flexDirection="column" flex="1">
-            <Heading size="lg" mb="4" mt="0">
+            <SectionLabel
+              css={css`
+                margin-bottom: 0;
+              `}
+            >
               Fonts Catalog
-            </Heading>
+            </SectionLabel>
 
             <FontPicker
               onHighlighted={(font, fontStyle) => {

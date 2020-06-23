@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Menu,
   MenuButton,
   MenuItem,
@@ -13,6 +12,7 @@ import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { observer } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
+import { Button } from 'components/shared/Button'
 
 export const SvgShapeColorKindDropdown: React.FC<{
   onUpdate: () => void

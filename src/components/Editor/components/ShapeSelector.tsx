@@ -81,7 +81,7 @@ const ShapeThumbnailBtnInner = styled.button<{
 }>`
   width: 106px;
   height: 106px;
-  border: 1px solid #ddd;
+  border: 1px solid #e9e9e9;
   outline: none;
   background: white;
   display: inline-flex;

@@ -1,7 +1,6 @@
 import {
   Badge,
   Box,
-  Button,
   IconButton,
   Menu,
   Icon,
@@ -24,6 +23,7 @@ import { observer, useLocalStore } from 'mobx-react'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { keyBy, uniq } from 'lodash'
 import { LeftPanelFontPicker } from 'components/Editor/components/LeftPanelFontPicker'
+import { Button } from 'components/shared/Button'
 
 export type LeftPanelFontsTabProps = {
   target: TargetKind
@@ -80,8 +80,8 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
           overflow="hidden"
           width="100%"
           height="calc(100vh - 50px)"
-          px="3"
-          py="3"
+          px="5"
+          py="6"
         >
           <AnimatePresence initial={false}>
             {state.view === 'font-list' && (
@@ -97,11 +97,10 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                   <Box
                     mt="3"
                     mb="6"
-                    p="3"
                     css={css`
                       width: 340px;
-                      border-radius: 4px;
-                      box-shadow: 0 0 4px 0 #0004;
+                      /* border-radius: 4px; */
+                      /* box-shadow: 0 0 4px 0 #0004; */
                     `}
                   >
                     {fonts.map((font, index) => {
@@ -146,7 +145,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                         state.view = 'choose-font'
                       }}
                       leftIcon="add"
-                      variantColor="teal"
+                      variantColor="secondary"
                     >
                       Add more fonts
                       <Tag
@@ -165,6 +164,8 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                         marginLeft="auto"
                         as={Button}
                         outline="none"
+                        // @ts-expect-error
+                        variant="outline"
                         aria-label="menu"
                         color="black"
                         display="inline-flex"
@@ -295,7 +296,7 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
       </FontButton>
 
       <FontChangeButton
-        variantColor="accent"
+        variantColor="secondary"
         aria-label="Delete"
         size="sm"
         ml="2"
@@ -316,6 +317,7 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
           isRound
           aria-label="Delete"
           ml="2"
+          variant="outline"
           mr="2"
           icon="close"
           size="xs"
@@ -352,11 +354,11 @@ const FontButton = styled(BaseBtn)`
   flex: 1;
   display: inline-flex;
   align-items: center;
-  height: 38px;
+  height: 48px;
 
   img {
     max-width: 270px;
-    height: 30px;
+    height: 38px;
     margin: 0;
     object-fit: contain;
   }
@@ -364,6 +366,9 @@ const FontButton = styled(BaseBtn)`
 
 const FontButtonContainer = styled(Box)<{ theme: any; selected?: boolean }>`
   position: relative;
+  box-shadow: 0 0 4px 0 #0004;
+  padding: 0.25rem 0.75rem;
+  margin-bottom: 1rem;
 
   ${FontDeleteButton}, ${FontChangeButton} {
     opacity: 0;
