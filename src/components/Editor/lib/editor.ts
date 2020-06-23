@@ -659,6 +659,7 @@ export class Editor {
   updateShapeColors = async (config: ShapeConf, render = true) => {
     this.logger.debug(
       'updateShapeColors',
+      render,
       toJS(config, { recurseEverything: true })
     )
     if (!this.shape) {
@@ -666,13 +667,13 @@ export class Editor {
       return
     }
     if (config.kind === 'raster' && this.shape.kind === 'raster') {
-      return this.updateRasterShapeColors(config)
+      this.updateRasterShapeColors(config)
     }
     if (config.kind === 'svg' && this.shape.kind === 'svg') {
-      return this.updateSvgShapeColors(config)
+      this.updateSvgShapeColors(config)
     }
     if (config.kind === 'text' && this.shape.kind === 'text') {
-      return this.updateTextShapeColors(config)
+      this.updateTextShapeColors(config)
     }
     if (render) {
       this.canvas.requestRenderAll()
@@ -1430,6 +1431,14 @@ export class Editor {
 
     let addedFirstBatch = false
 
+    let shouldRemoveEdges = false
+    if (
+      this.shape.kind === 'raster' ||
+      (this.shape.kind === 'svg' && this.shape.colorMap.length > 1)
+    ) {
+      shouldRemoveEdges = this.shape.config.processing?.edges != null
+    }
+
     const result = await this.generator.fillShape(
       {
         shape: {
@@ -1447,10 +1456,7 @@ export class Editor {
               amount: style.items.placement.shapePadding,
             },
             edges: {
-              enabled:
-                this.shape.kind === 'raster' || this.shape.kind === 'svg'
-                  ? this.shape.config.processing?.edges != null
-                  : false,
+              enabled: shouldRemoveEdges,
               blur:
                 17 *
                 (1 -

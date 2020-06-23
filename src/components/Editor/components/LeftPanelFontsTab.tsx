@@ -81,7 +81,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
           width="100%"
           height="calc(100vh - 50px)"
           px="3"
-          py="5"
+          py="3"
         >
           <AnimatePresence initial={false}>
             {state.view === 'font-list' && (

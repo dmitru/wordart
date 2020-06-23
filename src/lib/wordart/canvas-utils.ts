@@ -231,6 +231,7 @@ export const shrinkShape = (canvas: HTMLCanvasElement, radius = 10) => {
   ctx.shadowBlur = radius
   ctx.shadowColor = 'black'
   copyCanvas(scratchCtx, ctx, undefined, undefined, 'destination-out')
+
   ctx.restore()
 
   clampPixelOpacityDown(ctx.canvas)

@@ -162,7 +162,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
           return
         }
         const style = mkShapeStyleConfFromOptions(shapeStyle)
-        await store.editor?.updateShapeColors(shape.config)
+        await store.editor?.updateShapeColors(shape.config, true)
         store.updateShapeThumbnail()
         if (style.items.coloring.kind === 'shape') {
           store.editor?.setShapeItemsStyle(style.items)
