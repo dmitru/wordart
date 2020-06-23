@@ -993,16 +993,56 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
                   {store.mode === 'view' && (
                     <Box mr="3" ml="auto" display="flex" alignItems="center">
-                      <Select
-                        isRequired
-                        value={store.targetTab}
-                        onChange={(e) => {
-                          store.targetTab = e.target.value as TargetKind
-                        }}
-                      >
-                        <option value="shape">Layer: Shape</option>
-                        <option value="bg">Layer: Background</option>
-                      </Select>
+                      <Menu>
+                        <MenuButton
+                          // @ts-ignore
+                          variant="outline"
+                          as={Button}
+                          rightIcon="chevron-down"
+                          py="2"
+                          px="3"
+                        >
+                          {store.targetTab === 'shape' ? 'Layer: Shape' : ''}
+                          {store.targetTab === 'bg' ? 'Layer: Background' : ''}
+                        </MenuButton>
+                        <MenuList
+                          as="div"
+                          placement="bottom-end"
+                          css={css`
+                            max-height: 300px;
+                            max-width: 260px;
+                            right: 200px;
+                          `}
+                        >
+                          <MenuItem
+                            onClick={() => {
+                              store.targetTab = 'shape'
+                            }}
+                          >
+                            <Box display="flex" flexDirection="column" py="2">
+                              <Text my="0">Layer: Shape</Text>
+                              <Text my="0" fontSize="xs" color="gray.500">
+                                Use this layer to place words and icons on the
+                                shape.
+                              </Text>
+                            </Box>
+                          </MenuItem>
+
+                          <MenuItem
+                            onClick={() => {
+                              store.targetTab = 'bg'
+                            }}
+                          >
+                            <Box display="flex" flexDirection="column" py="2">
+                              <Text my="0">Layer: Background</Text>
+                              <Text my="0" fontSize="xs" color="gray.500">
+                                Use this layer to place words and icons on the
+                                background.
+                              </Text>
+                            </Box>
+                          </MenuItem>
+                        </MenuList>
+                      </Menu>
                     </Box>
                   )}
                 </>
