@@ -20,6 +20,7 @@ import React, { useState } from 'react'
 import { FiRefreshCw } from 'react-icons/fi'
 import { Button } from 'components/shared/Button'
 import { DeleteButton } from 'components/shared/DeleteButton'
+import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 
 export const ShapeItemsColorPickerKindDropdown: React.FC<{
   shapeStyle: ShapeStyleOptions
@@ -102,7 +103,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
     <Box>
       <Box display="flex" alignItems="center">
         {shapeStyle.items.coloring.kind === 'color' && (
-          <Box>
+          <Box mt="3">
             <Button
               isDisabled={shapeStyle.items.coloring.color.colors.length >= 8}
               variantColor="primary"
@@ -124,26 +125,21 @@ export const ShapeItemsColorPickerInline: React.FC<{
                 )
                 onUpdate()
               }}
-              ml="1"
+              ml="2"
             >
               <FiRefreshCw style={{ marginRight: '5px' }} />
               Random
             </Button>
 
             <Menu>
-              <MenuButton
-                ml="1"
-                as={Button}
-                outline="none"
-                aria-label="menu"
-                color="black"
-                // @ts-ignore
-                variant="ghost"
-                display="inline-flex"
+              <MenuButton ml="2" as={MenuDotsButton} />
+              <MenuList
+                placement="bottom-end"
+                zIndex={1000}
+                css={css`
+                  right: 30px;
+                `}
               >
-                <DotsThreeVertical size={18} />
-              </MenuButton>
-              <MenuList placement="bottom" zIndex={1000}>
                 <MenuItem
                   onClick={() => {
                     shapeStyle.items.coloring.color.colors.length = 1
@@ -165,9 +161,9 @@ export const ShapeItemsColorPickerInline: React.FC<{
       </Box>
 
       {shapeStyle.items.coloring.kind !== 'shape' && (
-        <Box mb="2" display="flex" flexDirection="row" alignItems="flex-start">
+        <Box mb="3" display="flex" flexDirection="row" alignItems="flex-start">
           {shapeStyle.items.coloring.kind === 'color' && (
-            <Box mt="4" display="flex" flexWrap="wrap">
+            <Box mt="3" display="flex" flexWrap="wrap">
               {shapeStyle.items.coloring.color.colors.map((color, index) => (
                 <Box
                   mb="2"
@@ -211,7 +207,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
           )}
           {shapeStyle.items.coloring.kind === 'gradient' && (
             <>
-              <Box mt="0" display="flex" alignItems="center">
+              <Box mt="3" display="flex" alignItems="center">
                 {[
                   shapeStyle.items.coloring.gradient.gradient.from,
                   shapeStyle.items.coloring.gradient.gradient.to,

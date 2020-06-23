@@ -81,6 +81,7 @@ import { WordcloudId } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import 'utils/canvas-to-blob'
+import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -903,19 +904,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         </Button>
 
                         <Menu>
-                          <MenuButton
-                            ml="2"
-                            as={Button}
-                            outline="none"
-                            aria-label="menu"
-                            color="black"
-                            // @ts-ignore
-                            variant="ghost"
-                            px="1"
-                            display="inline-flex"
-                          >
-                            <DotsThreeVertical size={18} />
-                          </MenuButton>
+                          <MenuButton ml="2" as={MenuDotsButton} />
                           <MenuList>
                             <MenuItem
                               onClick={() => {

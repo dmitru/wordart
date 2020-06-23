@@ -1,19 +1,18 @@
 import { Button, ButtonProps } from 'components/shared/Button'
-import { Icon } from '@chakra-ui/core'
+import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import css from '@emotion/css'
 
-export const DeleteButton: React.FC<Omit<ButtonProps, 'children'>> = (
-  props
-) => (
+export const MenuDotsButton: React.FC<ButtonProps> = (props) => (
   <Button
-    size="xs"
     variant="ghost"
+    aria-label="Menu"
     {...props}
+    px="2"
     css={css`
       box-shadow: none !important;
       border: none;
     `}
   >
-    <Icon name="close" />
+    <DotsThreeVertical size={18} />
   </Button>
 )

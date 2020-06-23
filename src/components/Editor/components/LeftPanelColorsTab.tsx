@@ -1,36 +1,19 @@
-import {
-  Box,
-  Flex,
-  Stack,
-  Text,
-  Collapse,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Icon,
-  Checkbox,
-} from '@chakra-ui/core'
+import { Box, Collapse, Flex, Text } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { useThrottleCallback } from '@react-hook/throttle'
-import chroma from 'chroma-js'
+import { BackgroundColorOptions } from 'components/Editor/components/BackgroundColorOptions'
 import { BgItemsColorPickerInline } from 'components/Editor/components/BgItemsColorPicker'
+import { ShapeColorOptions } from 'components/Editor/components/ShapeColorOptions'
 import {
   ShapeItemsColorPickerInline,
   ShapeItemsColorPickerKindDropdown,
 } from 'components/Editor/components/ShapeItemsColorPicker'
 import { SectionLabel } from 'components/Editor/components/shared'
 import {
-  SvgShapeColorPickerCollapse,
-  SvgShapeColorKindDropdown,
-  ShapeColorOptions,
-} from 'components/Editor/components/ShapeColorOptions'
-import {
   ThemePresetThumbnail,
   ThemePresetThumbnailContainer,
   ThemePresetThumbnails,
 } from 'components/Editor/components/ThemePresetThumbnail'
-import { AnimatePresence, motion } from 'framer-motion'
 import { TargetKind } from 'components/Editor/lib/editor'
 import {
   mkBgStyleConfFromOptions,
@@ -38,18 +21,16 @@ import {
   ThemePreset,
 } from 'components/Editor/style'
 import { themePresets } from 'components/Editor/theme-presets'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
+import { Button } from 'components/shared/Button'
 import { Slider } from 'components/shared/Slider'
+import { Tooltip } from 'components/shared/Tooltip'
+import { AnimatePresence, motion } from 'framer-motion'
 import { cloneDeep } from 'lodash'
 import { toJS } from 'mobx'
 import { observer, useLocalStore } from 'mobx-react'
+import { FaCog, FaQuestionCircle } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
-import { FaQuestionCircle, FaCog, FaSave } from 'react-icons/fa'
-import { Tooltip } from 'components/shared/Tooltip'
-import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
-import { BackgroundColorOptions } from 'components/Editor/components/BackgroundColorOptions'
-import { Button } from 'components/shared/Button'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -396,15 +377,16 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                         ml="auto"
                         css={css`
                           width: 50px;
+                          box-shadow: none !important;
                         `}
                         variant={
                           store.leftColorTab.showShapeItemsAdvanced
                             ? 'solid'
-                            : 'outline'
+                            : 'ghost'
                         }
                         variantColor={
                           store.leftColorTab.showShapeItemsAdvanced
-                            ? 'secondary'
+                            ? 'primary'
                             : 'gray'
                         }
                         onClick={() => {
@@ -431,7 +413,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     <Collapse
                       isOpen={store.leftColorTab.showShapeItemsAdvanced}
                     >
-                      <Box pb="0.5rem" pt="4" pr="3">
+                      <Box pb="0.5rem" pt="4">
                         <Box>
                           <Slider
                             afterLabel="%"
@@ -443,6 +425,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                               shapeStyle.items.brightness = val
                             }}
                             onAfterChange={updateShapeItemsColoring}
+                            resetValue={0}
                             min={-100}
                             max={100}
                             step={1}
@@ -463,6 +446,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                               shapeStyle.items.opacity = value
                             }}
                             onAfterChange={updateShapeItemsColoring}
+                            resetValue={100}
                             min={0}
                             max={100}
                             step={1}
@@ -506,6 +490,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                             }}
                             onAfterChange={updateShapeItemsColoring}
                             min={0}
+                            resetValue={40}
                             max={100}
                             step={1}
                           />

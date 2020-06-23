@@ -13,6 +13,7 @@ import { noop } from 'lodash'
 import { css } from '@emotion/core'
 import { darken, lighten } from 'polished'
 import { Text, Box } from '@chakra-ui/core'
+import { DeleteButton } from 'components/shared/DeleteButton'
 
 export type SliderProps = {
   value: number
@@ -20,6 +21,7 @@ export type SliderProps = {
   labelRight?: string
   onChange?: (value: number) => void
   onAfterChange?: (value: number) => void
+  resetValue?: number | undefined
   min: number
   max: number
   step: number
@@ -36,6 +38,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
     value,
     label,
     labelRight,
+    resetValue = undefined,
     horizontal = false,
     onChange = noop,
     onAfterChange = noop,
@@ -122,6 +125,20 @@ export const Slider: React.FC<SliderProps> = (props) => {
           )}
         </Tracks>
       </SliderImpl>
+
+      {resetValue != null && (
+        <DeleteButton
+          ml="2"
+          css={css`
+            visibility: ${value === resetValue ? 'hidden' : 'visible'};
+          `}
+          onClick={() => {
+            onChange(resetValue)
+            onAfterChange(resetValue)
+          }}
+        />
+      )}
+
       {labelRight && (
         <Text
           css={css`

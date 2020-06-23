@@ -1,9 +1,11 @@
-import { Button as ChakraButton } from '@chakra-ui/core'
-import React from 'react'
-import styled from '@emotion/styled'
+import {
+  Button as ChakraButton,
+  ButtonProps as ChakraButtonProps,
+} from '@chakra-ui/core'
 import { css } from '@emotion/core'
+import React from 'react'
 
-export type ButtonProps = {}
+export type ButtonProps = ChakraButtonProps
 
 export const Button = React.forwardRef<ButtonProps, any>((props, ref) => (
   <ChakraButton
@@ -15,7 +17,7 @@ export const Button = React.forwardRef<ButtonProps, any>((props, ref) => (
       &,
       &:focus,
       &:active {
-        box-shadow: 0 0 8px 0 #00000015 !important;
+        box-shadow: 0 0 8px 0 #00000015;
       }
     `}
   />
