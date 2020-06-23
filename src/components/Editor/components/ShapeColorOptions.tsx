@@ -116,25 +116,29 @@ export const SvgShapeColorOptions: React.FC<{
 
   return (
     <>
-      <Box mt="2" mb="4">
+      <Box mt="2" mb="4" display="flex" alignItems="center">
         <SvgShapeColorKindDropdown onUpdate={onUpdate} />
-      </Box>
 
-      {shape.config.processing.colors.kind === 'single-color' && (
-        <ColorPickerPopover
-          disableAlpha
-          value={chroma(shape.config.processing.colors.color).alpha(1).hex()}
-          onChange={(hex) => {
-            if (shape.config.processing.colors.kind === 'single-color') {
-              shape.config.processing.colors.color = chroma(hex).hex()
-              shapeStyle.colors.color = chroma(hex).hex()
-            }
-          }}
-          onAfterChange={() => {
-            onUpdate()
-          }}
-        />
-      )}
+        {shape.config.processing.colors.kind === 'single-color' && (
+          <Box ml="auto">
+            <ColorPickerPopover
+              disableAlpha
+              value={chroma(shape.config.processing.colors.color)
+                .alpha(1)
+                .hex()}
+              onChange={(hex) => {
+                if (shape.config.processing.colors.kind === 'single-color') {
+                  shape.config.processing.colors.color = chroma(hex).hex()
+                  shapeStyle.colors.color = chroma(hex).hex()
+                }
+              }}
+              onAfterChange={() => {
+                onUpdate()
+              }}
+            />
+          </Box>
+        )}
+      </Box>
 
       {shape.config.processing.colors.kind === 'color-map' && (
         <Box>

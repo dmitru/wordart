@@ -194,6 +194,7 @@ export const ThemePresetThumbnailContainer = styled(Box)<{ isActive: boolean }>`
   flex-direction: column;
   align-items: center;
   cursor: pointer;
+  width: 95px;
 
   ${(p) =>
     p.isActive &&
@@ -201,6 +202,8 @@ export const ThemePresetThumbnailContainer = styled(Box)<{ isActive: boolean }>`
     svg { 
       outline: 5px solid ${p.theme.colors.accent['500']}; 
     }`}
+
+  box-shadow: 0 0 10px 0 #0002;
 
   transition: 0.2s transform;
   &:hover {

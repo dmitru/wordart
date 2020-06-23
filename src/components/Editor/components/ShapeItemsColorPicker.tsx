@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Icon,
   IconButton,
   Menu,
@@ -19,6 +18,7 @@ import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { observer } from 'mobx-react'
 import React, { useState } from 'react'
 import { FiRefreshCw } from 'react-icons/fi'
+import { Button } from 'components/shared/Button'
 
 export const ShapeItemsColorPickerKindDropdown: React.FC<{
   shapeStyle: ShapeStyleOptions
@@ -223,7 +223,6 @@ export const ShapeItemsColorPickerInline: React.FC<{
                   shapeStyle.items.coloring.gradient.gradient.to,
                 ].map((color, index) => (
                   <React.Fragment key={index}>
-                    <Box mr="2">{index === 1 ? 'To:' : 'From:'}</Box>
                     <Box mr="3">
                       <ColorPickerPopover
                         disableAlpha
@@ -267,7 +266,6 @@ export const ShapeItemsColorPickerInline: React.FC<{
                         }
                         onUpdate()
                       }}
-                      size="sm"
                       ml="1"
                     >
                       <FiRefreshCw style={{ marginRight: '5px' }} />

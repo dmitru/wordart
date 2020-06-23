@@ -307,7 +307,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                     >
                       <Button
                         mr="2"
-                        variant="solid"
+                        variant="outline"
                         display="flex"
                         flex="1"
                         onClick={() => {

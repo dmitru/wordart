@@ -1,7 +1,8 @@
 import React from 'react'
-import { Button, ButtonProps } from '@chakra-ui/core'
+import { ButtonProps } from '@chakra-ui/core'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
+import { Button } from 'components/shared/Button'
 
 export type ColorSwatchButtonProps = Omit<
   ButtonProps,
@@ -103,25 +104,28 @@ export const ColorSwatchButton = React.forwardRef<any, ColorSwatchButtonProps>(
 ColorSwatchButton.defaultProps = {
   mb: '3',
   mr: '2',
-  height: '30px',
-  borderRadius: 'none',
 }
 
 const ColorSwatchButtonStyled = styled(Button)<{ theme: any }>`
-  border: 1px solid ${(p) => p.theme.colors.dark4};
-  cursor: pointer;
-  outline: none;
+  border: 1px solid #aaa;
   padding: 0;
+  height: 40px;
+  border-radius: 4px;
   margin: 0;
   width: 60px;
   display: inline-block;
-  transition: 0.15s background;
+  transition: 0.15s background, 0.1s box-shadow, 0.2s transition;
   position: relative;
   background: transparent;
+
+  &:hover {
+    transform: scale(1.05);
+  }
 `
 
 const ColorSwatchButtonStyledBg = styled.div`
   position: absolute;
+  border-radius: 4px;
   left: 0;
   top: 0;
   width: 100%;
@@ -131,6 +135,7 @@ const ColorSwatchButtonStyledBg = styled.div`
 
 const ColorSwatchButtonStyledTransparentBg = styled.div`
   position: absolute;
+  border-radius: 4px;
   left: 0;
   top: 0;
   width: 100%;

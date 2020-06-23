@@ -2,31 +2,36 @@ import { theme as chakraTheme } from '@chakra-ui/core'
 
 const teal = {
   ...chakraTheme.colors.teal,
-  // 500: 'hsla(178, 39%, 51%, 1)',
+  500: 'hsl(180, 52%, 47%)',
 }
 
 const accent = {
   ...chakraTheme.colors.orange,
-  500: 'rgb(237, 93, 97)',
+  500: 'hsl(358, 80%, 65%)',
 }
 
 export const theme = {
   ...chakraTheme,
   colors: {
+    header: {
+      bg:
+        'linear-gradient( -90deg,hsla(224, 37%, 55%, 1),hsla(237, 41%, 59%, 1))',
+    },
     leftPanel: {
-      textInactive: 'hsl(240, 10%, 91%)',
-      200: 'hsla(240, 42%, 64%, 1)',
-      300: 'hsla(240, 42%, 60%, 1)',
-      600: 'hsla(240, 33%, 51%, 1)',
-      700: 'hsla(240, 33%, 47%, 1)',
+      bg: 'hsla(0, 0%, 44%, 1)',
+      bgHover: 'hsla(0, 0%, 37%, 1)',
+      bgActive: 'hsla(227, 40%, 63%, 1)',
+      bgActiveHover: 'hsla(227, 40%, 56%, 1)',
+      textInactive: 'hsl(240,10%,91%)',
+      textActive: '#fff',
     },
     ...chakraTheme.colors,
     primary: {
       ...chakraTheme.colors.purple,
-      500: 'hsla(239, 44%, 57%, 1)',
+      500: 'hsla(227, 40%, 63%, 1)',
     },
     accent,
-    secondary: chakraTheme.colors.whatsapp,
+    secondary: chakraTheme.colors.teal,
     success: chakraTheme.colors.green,
     danger: chakraTheme.colors.red,
     info: chakraTheme.colors.blue,

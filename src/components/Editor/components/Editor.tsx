@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Editable,
   EditableInput,
   EditablePreview,
@@ -85,6 +84,7 @@ import { WordcloudId } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import 'utils/canvas-to-blob'
+import { Button } from 'components/shared/Button'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -295,7 +295,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       <PageLayoutWrapper>
         <TopNavWrapper alignItems="center" display="flex">
           <Link href={Urls.dashboard} passHref>
-            <TopNavButton variantColor="blue" mr="1">
+            <TopNavButton mr="1">
               <FiChevronLeft
                 css={css`
                   margin-right: 4px;
@@ -879,6 +879,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     {store.mode === 'view' && hasItems && (
                       <>
                         <Button
+                          variant="outline"
                           css={css`
                             box-shadow: none !important;
                           `}
@@ -1113,8 +1114,16 @@ const TopNavButton = styled<{ isBordered: boolean }>(Button)`
   ${(p) =>
     p.isBordered &&
     `
-    border: 1px solid #fff7;
+    border: 1px solid #ffffff2e;
   `}
+
+  color: #fefeff;
+  background-color: transparent;
+  border-bottom: 3px solid #0002;
+  background-color: #ffffff1f;
+  /* width: 93px; */
+  box-shadow: 0 0 10px 0 #0003;
+  margin-right: 10px;
 
   background-color: transparent;
   &:hover {
@@ -1146,14 +1155,10 @@ const TopToolbar = styled(Box)`
   height: 60px;
 `
 
-const TopNavWrapper = styled(Box)`
+const TopNavWrapper = styled(Box)<{ theme: any }>`
   height: 60px;
   padding: 20px 10px;
-  background: linear-gradient(
-    -90deg,
-    hsla(262, 40%, 39%, 1),
-    hsla(239, 33%, 44%, 1)
-  );
+  background: ${(p) => p.theme.colors.header.bg};
 `
 
 const LeftWrapper = styled.div`
@@ -1172,7 +1177,7 @@ const LeftBottomWrapper = styled.div<{ theme: any }>`
   flex: 1;
   display: flex;
   flex-direction: row;
-  background: ${(p) => p.theme.colors.leftPanel['600']};
+  background: ${(p) => p.theme.colors.leftPanel.bg};
 `
 
 const LeftPanel = styled(Box)`
@@ -1207,7 +1212,7 @@ const SideNavbar = styled.div<{ theme: any; activeIndex: number }>`
     height: 75px;
     width: 100%;
     z-index: 0;
-    background: ${(p) => p.theme.colors.leftPanel['200']};
+    background: ${(p) => p.theme.colors.leftPanel.bgActive};
     border-left: 8px solid ${(p) => p.theme.colors.primary}; 
   }
 `
@@ -1252,11 +1257,11 @@ const LeftNavbarBtn = styled(BaseBtn)<{ theme: any; active: boolean }>`
 
   &:hover,
   &:focus {
-    background: ${(p) => p.theme.colors.leftPanel['700']};
+    background: ${(p) => p.theme.colors.leftPanel.bgHover};
     ${({ theme, active }) =>
       active &&
       `
-      background: ${theme.colors.leftPanel['300']};
+      background: ${theme.colors.leftPanel.bgActiveHover};
     `}
   }
 `

@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Flex,
   Stack,
   Text,
@@ -50,6 +49,7 @@ import { FaQuestionCircle, FaCog, FaSave } from 'react-icons/fa'
 import { Tooltip } from 'components/shared/Tooltip'
 import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import { BackgroundColorOptions } from 'components/Editor/components/BackgroundColorOptions'
+import { Button } from 'components/shared/Button'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -179,6 +179,15 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           overflow="hidden"
           width="100%"
           height="calc(100vh - 50px)"
+          css={css`
+            &::-webkit-scrollbar {
+              display: none; /* Chrome Safari */
+            }
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE 10+ */
+            overflow-y: scroll;
+            overflow-x: hidden;
+          `}
         >
           <AnimatePresence initial={false}>
             {state.view === 'themes' && (
@@ -195,6 +204,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                       css={css`
                         min-width: 120px;
                       `}
+                      variant="outline"
                       leftIcon="chevron-left"
                       onClick={() => {
                         state.view = 'normal'
@@ -237,10 +247,11 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     </AnimatePresence>
                   </Flex>
 
-                  <Text fontSize="xl">Try a color theme</Text>
+                  <SectionLabel>Color themes</SectionLabel>
+
                   <ThemePresetThumbnails
                     css={css`
-                      height: calc(100vh - 180px);
+                      height: calc(100vh - 200px);
                     `}
                     display="flex"
                     flexDirection="row"
@@ -282,10 +293,19 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   py="6"
                   pb="5rem"
                   width="100%"
+                  css={css`
+                    &::-webkit-scrollbar {
+                      display: none; /* Chrome Safari */
+                    }
+                    scrollbar-width: none; /* Firefox */
+                    -ms-overflow-style: none; /* IE 10+ */
+                    overflow-y: scroll;
+                    overflow-x: hidden;
+                  `}
                 >
                   <Box mb="5" display="flex">
                     <Button
-                      variantColor="secondary"
+                      variantColor="primary"
                       rightIcon="chevron-right"
                       onClick={() => {
                         state.view = 'themes'
@@ -313,7 +333,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   </Box>
 
                   {/* <shape-color> */}
-                  <Box mb="0">
+                  <Box mb="2rem">
                     <SectionLabel>Shape</SectionLabel>
 
                     <Box mb="4">
@@ -344,11 +364,11 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   {/* </shape-color> */}
 
                   {/* <shape-items> */}
-                  <Box mt="2.5rem">
+                  <Box mb="2rem">
                     <Box display="flex" alignItems="flex-end">
                       <SectionLabel
                         css={css`
-                          margin-bottom: 0;
+                          flex: 1;
                         `}
                       >
                         Shape Items
@@ -485,7 +505,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
                   {/* <background> */}
 
-                  <Box mt="1.5rem">
+                  <Box mb="2rem">
                     <SectionLabel>Background</SectionLabel>
 
                     <BackgroundColorOptions
@@ -503,7 +523,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   </Box>
 
                   {store?.editor && store.editor.items.bg.items.length > 0 && (
-                    <Box mt="2.5rem">
+                    <Box mb="2rem">
                       <SectionLabel display="flex" alignItems="center">
                         Background Items
                       </SectionLabel>
