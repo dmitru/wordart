@@ -82,6 +82,7 @@ import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import 'utils/canvas-to-blob'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
+import { TopNavButton } from 'components/shared/TopNavButton'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -1107,31 +1108,6 @@ const ExportButton = styled(Button)(
   margin-bottom: 16px;
   `
 )
-
-const TopNavButton = styled(Button)<{ isAccented: boolean }>`
-  color: white;
-
-  color: #fefeff;
-  background: #ffffff45;
-  margin-right: 10px;
-
-  ${(p) =>
-    p.isAccented &&
-    `
-    background: #fff;
-    color: #333;
-  `}
-
-  &:hover {
-    background-color: #fff2;
-
-    ${(p) =>
-      p.isAccented &&
-      `
-    background: #fffb;
-  `}
-  }
-`
 
 const PageLayoutWrapper = styled.div`
   display: flex;

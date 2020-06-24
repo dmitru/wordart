@@ -1,5 +1,18 @@
 import { theme as chakraTheme } from '@chakra-ui/core'
 
+const primary = {
+  ...chakraTheme.colors.purple,
+  100: 'hsl(200, 45%, 75%)',
+  200: 'hsl(200, 45%, 67%)',
+  300: 'hsl(200, 45%, 60%)',
+  400: 'hsl(200, 45%, 54%)',
+  500: 'hsl(200, 45%, 48%)',
+  600: 'hsl(200, 45%, 45%)',
+  700: 'hsl(200, 45%, 40%)',
+  800: 'hsl(200, 45%, 35%)',
+  900: 'hsl(200, 45%, 30%)',
+}
+
 const teal = {
   ...chakraTheme.colors.teal,
   500: 'hsl(180, 52%, 47%)',
@@ -14,31 +27,20 @@ export const theme = {
   ...chakraTheme,
   colors: {
     header: {
-      bg: 'linear-gradient( -90deg,hsl(231, 35%, 39%),hsla(231, 35%, 49%, 1))',
+      bg: 'linear-gradient(90deg,hsl(200,45%,48%),hsla(219, 45%, 54%, 1))',
     },
     leftPanel: {
-      bg: 'hsla(231, 15%, 33%, 1)',
-      bgHover: 'hsla(231, 15%, 28%, 1)',
-      bgActive: 'hsla(227, 40%, 63%, 1)',
-      bgActiveHover: 'hsla(227, 40%, 56%, 1)',
-      textInactive: 'hsl(240,10%,91%)',
+      bg: 'hsla(200, 15%, 33%, 1)',
+      bgHover: 'hsla(200, 15%, 28%, 1)',
+      bgActive: 'hsla(200, 45%, 48%, 1)',
+      bgActiveHover: 'hsla(200, 45%, 43%, 1)',
+      textInactive: 'hsl(200,10%,91%)',
       textActive: '#fff',
     },
     ...chakraTheme.colors,
-    primary: {
-      ...chakraTheme.colors.purple,
-      100: 'hsl(231, 30%, 78%)',
-      200: 'hsl(231, 30%, 74%)',
-      300: 'hsl(231, 30%, 69%)',
-      400: 'hsl(231, 30%, 66%)',
-      500: 'hsl(231, 30%, 61%)',
-      600: 'hsl(231, 30%, 51%)',
-      700: 'hsl(231, 30%, 46%)',
-      800: 'hsl(231, 30%, 41%)',
-      900: 'hsl(231, 30%, 37%)',
-    },
+    primary,
     accent,
-    secondary: teal,
+    secondary: primary,
     success: chakraTheme.colors.green,
     danger: chakraTheme.colors.red,
     info: chakraTheme.colors.blue,

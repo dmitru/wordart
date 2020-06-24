@@ -3,8 +3,10 @@ import styled from '@emotion/styled'
 import Link from 'next/link'
 import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
-import { Box, Button } from '@chakra-ui/core'
+import { Box } from '@chakra-ui/core'
 import { Urls } from 'urls'
+import { TopNavButton } from 'components/shared/TopNavButton'
+import { Button } from 'components/shared/Button'
 
 export type HeaderProps = {}
 
@@ -31,16 +33,18 @@ export const Header: React.FC<HeaderProps> = observer(() => {
           {isLoggedIn && (
             <>
               <Link href={Urls.editor._next} as={Urls.editor.create} passHref>
-                <Button variantColor="accent">Create</Button>
-              </Link>
-              <Link href={Urls.pricing} passHref>
-                <Button>Pricing</Button>
+                <Button variantColor="accent" leftIcon="add" mr="3">
+                  Create
+                </Button>
               </Link>
               <Link href={Urls.dashboard} passHref>
-                <Button>Your Designs</Button>
+                <TopNavButton isAccented>Your Designs</TopNavButton>
+              </Link>
+              <Link href={Urls.pricing} passHref>
+                <TopNavButton>Pricing</TopNavButton>
               </Link>
               <Link href={Urls.account} passHref>
-                <Button>Your Account</Button>
+                <TopNavButton>Your Account</TopNavButton>
               </Link>
             </>
           )}
@@ -61,19 +65,14 @@ export const Header: React.FC<HeaderProps> = observer(() => {
 })
 
 export const HeaderWrapper = styled(Box)<{ theme: any }>`
-  background: ${(p) => p.theme.colors.light1};
+  background: ${(p) => p.theme.colors.header.bg};
 `
 
-export const ContentContainer = styled(Box)`
+export const ContentContainer = styled(Box)<{ theme: any }>`
   display: flex;
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
   padding: 10px 20px;
   height: 60px;
-`
-
-export const HeaderLink = styled.a<{ theme: any }>`
-  padding: 10px;
-  color: ${({ theme }) => theme.colors.primary};
 `

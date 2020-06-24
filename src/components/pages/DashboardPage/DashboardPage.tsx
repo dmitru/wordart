@@ -25,6 +25,8 @@ import { Wordcloud } from 'services/api/types'
 import { Button, IconButton, Tooltip } from '@chakra-ui/core'
 import Link from 'next/link'
 import { Urls } from 'urls'
+import { MenuDotsButton } from 'components/shared/MenuDotsButton'
+import styled from '@emotion/styled'
 
 export type WordcloudThumbnailProps = {
   wordcloud: Wordcloud
@@ -37,9 +39,9 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
 }) => {
   return (
     <Box
-      p={3}
-      maxWidth="200px"
-      minWidth="200px"
+      p={4}
+      maxWidth="220px"
+      minWidth="220px"
       flex="1"
       borderWidth="1px"
       borderRadius="sm"
@@ -47,6 +49,7 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
       mr="4"
       mb="6"
       css={css`
+        position: relative;
         transition: all 0.13s;
         box-shadow: 0 0px 25px -5px rgba(0, 0, 0, 0.05),
           0 0px 10px -5px rgba(0, 0, 0, 0.03);
@@ -62,9 +65,50 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
           img {
             transform: scale(1.2);
           }
+
+          ${ThumbnailMenuButton} {
+            opacity: 1;
+          }
+        }
+
+        ${ThumbnailMenuButton} {
+          opacity: 0;
+          z-index: 100;
+          position: absolute;
+          top: 8px;
+          right: 8px;
         }
       `}
     >
+      <Menu>
+        <MenuButton
+          as={ThumbnailMenuButton}
+          noShadows={false}
+          variant="outline"
+        />
+        <MenuList
+          hasArrow
+          css={css`
+            top: 50px;
+          `}
+        >
+          <PopoverArrow />
+          <MenuItem>
+            <Icon name="folder" size="20px" color="gray.500" mr="2" />
+            Move to folder...
+          </MenuItem>
+          <MenuItem onClick={() => {}}>
+            <Icon name="check" size="20px" color="gray.500" mr="2" />
+            Select
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem onClick={onDeleteClick}>
+            <Icon name="small-close" size="20px" color="gray.500" mr="2" />
+            Remove
+          </MenuItem>
+        </MenuList>
+      </Menu>
+
       <Box cursor="pointer">
         <Link
           as={Urls.editor.edit(wordcloud.id)}
@@ -72,59 +116,22 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
           passHref
         >
           <div>
-            <Text fontSize="lg" fontWeight="semibold">
-              {wordcloud.title}
-            </Text>
-            <AspectRatioBox maxW="200px" ratio={4 / 3} overflow="hidden">
+            <AspectRatioBox maxW="220px" ratio={4 / 3} overflow="hidden">
               <Image src={wordcloud.thumbnail} objectFit="contain" />
             </AspectRatioBox>
+            <Text mt="3" mb="0" fontSize="lg" fontWeight="semibold">
+              {wordcloud.title}
+            </Text>
           </div>
         </Link>
-
-        <Divider />
-
-        <Box mt="3">
-          <Link
-            as={Urls.editor.edit(wordcloud.id)}
-            href={Urls.editor._next}
-            passHref
-          >
-            <Button variantColor="accent">Edit</Button>
-          </Link>
-
-          <Menu>
-            <MenuButton
-              ml="3"
-              as={Button}
-              outline="none"
-              aria-label="menu"
-              color="black"
-              display="inline-flex"
-            >
-              <DotsThreeVertical size={18} />
-            </MenuButton>
-            <MenuList hasArrow>
-              <PopoverArrow />
-              <MenuItem>
-                <Icon name="folder" size="20px" color="gray.500" mr="2" />
-                Move to folder...
-              </MenuItem>
-              <MenuItem onClick={() => {}}>
-                <Icon name="check" size="20px" color="gray.500" mr="2" />
-                Select
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem onClick={onDeleteClick}>
-                <Icon name="small-close" size="20px" color="gray.500" mr="2" />
-                Remove
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </Box>
       </Box>
     </Box>
   )
 }
+
+const ThumbnailMenuButton = styled(MenuDotsButton)`
+  background: #fff;
+`
 
 export const DashboardPage = observer(() => {
   const { wordcloudsStore } = useStore()
