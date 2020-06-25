@@ -45,6 +45,7 @@ import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { SectionLabel } from 'components/Editor/components/shared'
 import css from '@emotion/css'
 import { TargetKind } from 'components/Editor/lib/editor'
+import { DeleteButton } from 'components/shared/DeleteButton'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -55,12 +56,14 @@ const WordList = styled(Box)`
   overflow: auto;
 `
 
-const WordDeleteButton = styled(IconButton)``
+const WordDeleteButton = styled(DeleteButton)``
 
 const WordRow = styled(Box)`
   width: 100%;
-  padding: 4px 0;
+  padding: 5px 0;
   display: flex;
+
+  border-bottom: 1px solid #eee;
 
   ${WordDeleteButton} {
     opacity: 0;
@@ -68,7 +71,7 @@ const WordRow = styled(Box)`
   }
 
   &:hover {
-    background: #eee;
+    background: hsla(200, 81%, 97%, 1);
     ${WordDeleteButton} {
       opacity: 1;
     }
@@ -220,20 +223,13 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                   {/* <ColorPicker value="#ff7777" mb="0" height="26px" /> */}
 
                   <WordDeleteButton
-                    isRound
-                    aria-label="Delete"
                     ml="2"
                     mr="2"
-                    icon="close"
-                    size="xs"
                     onClick={() => {
                       store.deleteWord(target, word.id)
                       store.animateVisualize(false)
                     }}
-                    // variantColor="red"
-                  >
-                    <Icon name="close" />
-                  </WordDeleteButton>
+                  />
                 </WordRow>
               ))}
             </WordList>

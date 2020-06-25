@@ -278,9 +278,13 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                       height: 165px;
                     }
 
-                    background-image: url(/images/editor/transparent-bg.svg);
-                    background-repeat: repeat;
-                    background-size: 15px;
+                    &,
+                    &:hover,
+                    &:focus {
+                      background-image: url(/images/editor/transparent-bg.svg);
+                      background-repeat: repeat;
+                      background-size: 15px;
+                    }
 
                     position: relative;
 

@@ -433,7 +433,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             color="white"
             fontSize="xl"
             maxWidth="200px"
-            ml="2"
+            ml="1"
             flex={1}
           >
             <EditablePreview
@@ -452,7 +452,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             />
           </Editable>
 
-          <TopNavButton onClick={openExport} mr="1" variant="secondary">
+          <TopNavButton onClick={openExport} ml="1" variant="secondary">
             <FiDownload
               css={css`
                 margin-right: 4px;
@@ -1003,8 +1003,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           py="2"
                           px="3"
                         >
-                          {store.targetTab === 'shape' ? 'Layer: Shape' : ''}
-                          {store.targetTab === 'bg' ? 'Layer: Background' : ''}
+                          {store.targetTab === 'shape' ? 'Shape layer' : ''}
+                          {store.targetTab === 'bg' ? 'Background layer' : ''}
                         </MenuButton>
                         <MenuList
                           as="div"
@@ -1021,7 +1021,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                             }}
                           >
                             <Box display="flex" flexDirection="column" py="2">
-                              <Text my="0">Layer: Shape</Text>
+                              <Text my="0" fontWeight="semibold">
+                                Shape
+                              </Text>
                               <Text my="0" fontSize="xs" color="gray.500">
                                 Use this layer to place words and icons on the
                                 shape.
@@ -1035,7 +1037,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                             }}
                           >
                             <Box display="flex" flexDirection="column" py="2">
-                              <Text my="0">Layer: Background</Text>
+                              <Text my="0" fontWeight="semibold">
+                                Background
+                              </Text>
                               <Text my="0" fontSize="xs" color="gray.500">
                                 Use this layer to place words and icons on the
                                 background.
