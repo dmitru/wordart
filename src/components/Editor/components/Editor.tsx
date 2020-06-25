@@ -893,9 +893,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       <>
                         <Button
                           variant="outline"
-                          css={css`
-                            box-shadow: none !important;
-                          `}
                           py="1"
                           onClick={() => {
                             store.enterEditItemsMode(store.targetTab)
@@ -928,9 +925,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     {store.mode === 'edit' && (
                       <>
                         <Button
-                          css={css`
-                            box-shadow: none !important;
-                          `}
                           mr="2"
                           py="1"
                           variantColor="green"

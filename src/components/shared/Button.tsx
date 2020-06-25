@@ -19,7 +19,7 @@ export const Button = React.forwardRef<ButtonProps, any>((props, ref) => (
       &:active {
         box-shadow: 0 0 8px 0 #00000013;
 
-        ${props.variant === 'solid' &&
+        ${(!props.variant || props.variant === 'solid') &&
         props.variantColor === 'accent' &&
         'box-shadow: 0 0 8px 0 #00000023;'}
       }
