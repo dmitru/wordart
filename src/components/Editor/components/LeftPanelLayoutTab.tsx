@@ -96,7 +96,12 @@ const PresetBtn = styled(Box)<{ active: boolean; theme: any }>`
     transform: translateY(-2px);
   }
 
-  ${(p) => p.active && `outline: 3px solid ${p.theme.colors.accent['500']};`}
+  ${(p) =>
+    p.active &&
+    `
+  outline: 3px solid ${p.theme.colors.accent['500']};
+  background: #ffe9ea;
+  `}
 `
 
 export type LeftPanelLayoutTabProps = {
@@ -189,7 +194,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                   <Box mt="3">
                     <Button
                       mr="3"
-                      variantColor="teal"
+                      variantColor="secondary"
                       isDisabled={style.items.words.customAngles.length >= 8}
                       size="sm"
                       leftIcon="add"
@@ -212,7 +217,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                     </Button>
                   </Box>
 
-                  <Box mt="2" px="20px">
+                  <Box mt="4" pl="20px">
                     {style.items.words.customAngles.map((angle, index) => (
                       <Flex direction="row" key={index}>
                         <Slider

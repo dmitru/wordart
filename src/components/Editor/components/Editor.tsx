@@ -293,7 +293,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       <PageLayoutWrapper>
         <TopNavWrapper alignItems="center" display="flex">
           <Link href={Urls.dashboard} passHref>
-            <TopNavButton mr="1">
+            <TopNavButton mr="1" variant="secondary">
               <FiChevronLeft
                 css={css`
                   margin-right: 4px;
@@ -304,7 +304,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           </Link>
 
           <Menu>
-            <MenuButton mr="1" as={TopNavButton} isAccented>
+            <MenuButton mr="1" as={TopNavButton} variant="accent">
               <FiMenu
                 css={css`
                   margin-right: 4px;
@@ -412,15 +412,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             Save
           </TopNavButton>
 
-          <TopNavButton onClick={openExport} mr="1">
-            <FiDownload
-              css={css`
-                margin-right: 4px;
-              `}
-            />
-            Download
-          </TopNavButton>
-
           <Editable
             css={css`
               background: #fff3;
@@ -461,6 +452,15 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             />
           </Editable>
 
+          <TopNavButton onClick={openExport} mr="1" variant="secondary">
+            <FiDownload
+              css={css`
+                margin-right: 4px;
+              `}
+            />
+            Download
+          </TopNavButton>
+
           {/* <TopNavButton
             onClick={openExport}
             isLoading={isExporting}
@@ -475,7 +475,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             Order Prints
           </TopNavButton> */}
 
-          <TopNavButton isAccented mr="2" ml="auto">
+          <TopNavButton variant mr="2" ml="auto">
             <FiHelpCircle
               css={css`
                 margin-right: 4px;
@@ -1135,7 +1135,7 @@ const TopToolbar = styled(Box)`
 const TopNavWrapper = styled(Box)<{ theme: any }>`
   height: 60px;
   padding: 10px 20px;
-  padding-left: 90px;
+  /* padding-left: 90px; */
   background: ${(p) => p.theme.colors.header.bg};
 `
 
@@ -1251,6 +1251,12 @@ const LeftPanelContent = styled(Box)<{ theme: any; noScroll: boolean }>`
   background: ${(p) => p.theme.colors.light};
   z-index: 2;
   box-shadow: 0 0 5px 0 #00000033;
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome Safari */
+  }
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
 `
 
 const RightWrapper = styled.div`

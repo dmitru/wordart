@@ -33,12 +33,10 @@ export const SvgShapeColorKindDropdown: React.FC<{
         py="2"
         px="3"
       >
-        {shape.config.processing.colors.kind === 'original' &&
-          'Colors: Original'}
-        {shape.config.processing.colors.kind === 'color-map' &&
-          'Colors: Multicolor'}
+        {shape.config.processing.colors.kind === 'original' && 'Original Color'}
+        {shape.config.processing.colors.kind === 'color-map' && 'Multicolor'}
         {shape.config.processing.colors.kind === 'single-color' &&
-          'Colors: Custom color'}
+          'Custom color'}
       </MenuButton>
       <MenuList
         as="div"
@@ -76,7 +74,7 @@ export const SvgShapeColorKindDropdown: React.FC<{
           <Box display="flex" flexDirection="column" py="2">
             <Text my="0">Custom color</Text>
             <Text my="0" fontSize="xs" color="gray.500">
-              Choose a custom color to fill the entire shape
+              Choose one color to fill the whole shape
             </Text>
           </Box>
         </MenuItem>
@@ -120,7 +118,7 @@ export const SvgShapeColorOptions: React.FC<{
         <SvgShapeColorKindDropdown onUpdate={onUpdate} />
 
         {shape.config.processing.colors.kind === 'single-color' && (
-          <Box ml="auto">
+          <Box ml="3">
             <ColorPickerPopover
               disableAlpha
               value={chroma(shape.config.processing.colors.color)

@@ -38,7 +38,7 @@ export const Header: React.FC<HeaderProps> = observer(() => {
                 </Button>
               </Link>
               <Link href={Urls.dashboard} passHref>
-                <TopNavButton isAccented>Your Designs</TopNavButton>
+                <TopNavButton variant>Your Designs</TopNavButton>
               </Link>
               <Link href={Urls.pricing} passHref>
                 <TopNavButton>Pricing</TopNavButton>

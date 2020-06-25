@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Checkbox,
   Editable,
   EditableInput,
@@ -35,13 +34,17 @@ import {
 } from '@chakra-ui/core'
 import styled from '@emotion/styled'
 import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
-import { TargetKind } from 'components/Editor/lib/editor'
 import { Tooltip } from 'components/shared/Tooltip'
+import { Button } from 'components/shared/Button'
 import { capitalize } from 'lodash'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import stopword from 'stopword'
+import { MenuDotsButton } from 'components/shared/MenuDotsButton'
+import { SectionLabel } from 'components/Editor/components/shared'
+import css from '@emotion/css'
+import { TargetKind } from 'components/Editor/lib/editor'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -92,15 +95,18 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     const fonts = store.getAvailableFonts()
 
     return (
-      <Box mb="5" p="3">
+      <Box mb="5" px="5" py="6">
+        <SectionLabel>Words list</SectionLabel>
+
         <Stack spacing="0">
           <Stack direction="row" mb="2" spacing="0">
-            <Button leftIcon="edit" variantColor="accent">
+            <Button leftIcon="edit" variantColor="primary">
               Edit words...
             </Button>
 
             <Button
               ml="2"
+              variant="outline"
               leftIcon="arrow-up"
               onClick={() => {
                 state.isShowingImport = true
@@ -109,73 +115,67 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               Import
             </Button>
 
-            <Menu>
-              <MenuButton
-                marginLeft="auto"
-                as={Button}
-                outline="none"
-                aria-label="menu"
-                color="black"
-                display="inline-flex"
-              >
-                <DotsThreeVertical size={18} />
-              </MenuButton>
-              <MenuList>
-                <MenuGroup title="Formatting">
-                  <MenuItem
-                    onClick={() => {
-                      words.wordList = words.wordList.map((w) => ({
-                        ...w,
-                        text: capitalize(w.text),
-                      }))
-                      store.animateVisualize(false)
-                    }}
-                  >
-                    Capitalize
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      words.wordList = words.wordList.map((w) => ({
-                        ...w,
-                        text: w.text.toLocaleUpperCase(),
-                      }))
-                      store.animateVisualize(false)
-                    }}
-                  >
-                    UPPERCASE
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      words.wordList = words.wordList.map((w) => ({
-                        ...w,
-                        text: w.text.toLocaleLowerCase(),
-                      }))
-                      store.animateVisualize(false)
-                    }}
-                  >
-                    lowercase
-                  </MenuItem>
-                </MenuGroup>
+            <Box marginLeft="auto">
+              <Menu>
+                <MenuButton as={MenuDotsButton} />
+                <MenuList zIndex={1000} placement="bottom-end">
+                  <MenuGroup title="Formatting">
+                    <MenuItem
+                      onClick={() => {
+                        words.wordList = words.wordList.map((w) => ({
+                          ...w,
+                          text: capitalize(w.text),
+                        }))
+                        store.animateVisualize(false)
+                      }}
+                    >
+                      Capitalize
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        words.wordList = words.wordList.map((w) => ({
+                          ...w,
+                          text: w.text.toLocaleUpperCase(),
+                        }))
+                        store.animateVisualize(false)
+                      }}
+                    >
+                      UPPERCASE
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        words.wordList = words.wordList.map((w) => ({
+                          ...w,
+                          text: w.text.toLocaleLowerCase(),
+                        }))
+                        store.animateVisualize(false)
+                      }}
+                    >
+                      lowercase
+                    </MenuItem>
+                  </MenuGroup>
 
-                <MenuDivider />
+                  <MenuDivider />
 
-                <MenuItem onClick={() => store.clearWords(target)}>
-                  <Icon
-                    name="small-close"
-                    size="20px"
-                    color="gray.500"
-                    mr="2"
-                  />
-                  Clear all
-                </MenuItem>
-              </MenuList>
-            </Menu>
+                  <MenuItem onClick={() => store.clearWords(target)}>
+                    <Icon
+                      name="small-close"
+                      size="20px"
+                      color="gray.500"
+                      mr="2"
+                    />
+                    Clear all
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </Box>
           </Stack>
 
-          <Stack direction="row" mb="2" mt="2">
+          <Stack direction="row" mb="4" mt="2">
             <Button
-              variantColor="teal"
+              variantColor="secondary"
               leftIcon="add"
+              size="sm"
               onClick={() => {
                 store.addWord(target)
                 store.animateVisualize(false)
@@ -184,7 +184,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               Add
             </Button>
 
-            <InputGroup flex={1}>
+            <InputGroup flex={1} size="sm">
               <InputLeftElement children={<Icon name="search" />} />
               <Input placeholder="Filter..." />
             </InputGroup>

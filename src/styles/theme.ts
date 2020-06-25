@@ -1,13 +1,26 @@
 import { theme as chakraTheme } from '@chakra-ui/core'
 
 const primary = {
-  ...chakraTheme.colors.purple,
+  50: 'hsl(200, 45%, 90%)',
   100: 'hsl(200, 45%, 75%)',
   200: 'hsl(200, 45%, 67%)',
   300: 'hsl(200, 45%, 60%)',
   400: 'hsl(200, 45%, 54%)',
-  500: 'hsl(200, 45%, 48%)',
+  500: 'hsl(200, 50%, 52%)',
   600: 'hsl(200, 45%, 45%)',
+  700: 'hsl(200, 45%, 40%)',
+  800: 'hsl(200, 45%, 35%)',
+  900: 'hsl(200, 45%, 30%)',
+}
+
+const secondary = {
+  50: 'hsl(200, 45%, 90%)',
+  100: 'hsl(200, 45%, 75%)',
+  200: 'hsl(200, 45%, 67%)',
+  300: 'hsl(200, 45%, 60%)',
+  400: 'hsl(200, 45%, 54%)',
+  500: 'hsl(187, 53%, 55%);',
+  600: 'hsl(200, 45%, 75%)',
   700: 'hsl(200, 45%, 40%)',
   800: 'hsl(200, 45%, 35%)',
   900: 'hsl(200, 45%, 30%)',
@@ -40,7 +53,7 @@ export const theme = {
     ...chakraTheme.colors,
     primary,
     accent,
-    secondary: primary,
+    secondary,
     success: chakraTheme.colors.green,
     danger: chakraTheme.colors.red,
     info: chakraTheme.colors.blue,

@@ -106,8 +106,9 @@ export const ShapeItemsColorPickerInline: React.FC<{
           <Box mt="3">
             <Button
               isDisabled={shapeStyle.items.coloring.color.colors.length >= 8}
-              variantColor="primary"
+              variantColor="secondary"
               leftIcon="add"
+              size="sm"
               onClick={() => {
                 shapeStyle.items.coloring.color.colors.push(getRandomColor())
                 onUpdate()
@@ -117,7 +118,8 @@ export const ShapeItemsColorPickerInline: React.FC<{
             </Button>
 
             <Button
-              variant="outline"
+              variant="ghost"
+              size="sm"
               isDisabled={shapeStyle.items.coloring.color.colors.length === 0}
               onClick={() => {
                 shapeStyle.items.coloring.color.colors = shapeStyle.items.coloring.color.colors.map(
@@ -132,7 +134,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
             </Button>
 
             <Menu>
-              <MenuButton ml="2" as={MenuDotsButton} />
+              <MenuButton ml="2" as={MenuDotsButton} size="sm" />
               <MenuList
                 placement="bottom-end"
                 zIndex={1000}
@@ -247,7 +249,8 @@ export const ShapeItemsColorPickerInline: React.FC<{
                 {shapeStyle.items.coloring.kind === 'gradient' && (
                   <Box>
                     <Button
-                      variant="outline"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => {
                         shapeStyle.items.coloring.gradient.gradient = {
                           from: getRandomColor(),
@@ -256,7 +259,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
                         }
                         onUpdate()
                       }}
-                      ml="1"
+                      ml="2"
                     >
                       <FiRefreshCw style={{ marginRight: '5px' }} />
                       Random

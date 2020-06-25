@@ -95,53 +95,37 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
   return (
     <>
       <Box>
-        <InputGroup mt="5" size="sm" mb="3">
-          <InputLeftElement children={<Icon name="search" />} />
-          <Input
-            _placeholder={{
-              color: 'red',
-            }}
-            placeholder="Find font..."
-            value={state.query}
-            onChange={(e: any) => {
-              state.query = e.target.value
-            }}
-          />
-          {!!state.query && (
-            <InputRightElement
-              onClick={() => {
-                state.query = ''
+        <Box display="flex" mt="5" mb="3">
+          <InputGroup size="sm">
+            <InputLeftElement children={<Icon name="search" />} />
+            <Input
+              _placeholder={{
+                color: 'red',
               }}
-              children={
-                <IconButton
-                  aria-label="Clear"
-                  icon="close"
-                  color="gray"
-                  isRound
-                  variant="ghost"
-                  size="sm"
-                />
-              }
+              placeholder="Find font..."
+              value={state.query}
+              onChange={(e: any) => {
+                state.query = e.target.value
+              }}
             />
-          )}
-        </InputGroup>
-
-        <Box mb="3" display="flex" flexWrap="wrap" alignItems="flex-start">
-          {styleOptions.map((option) => (
-            <Button
-              key={option}
-              size="xs"
-              mr="2"
-              mb="1"
-              variant={state.style === option ? 'solid' : 'outline'}
-              variantColor={state.style === option ? 'accent' : undefined}
-              onClick={() => {
-                state.style = option
-              }}
-            >
-              {option === 'all' ? 'All styles' : capitalize(option)}
-            </Button>
-          ))}
+            {!!state.query && (
+              <InputRightElement
+                onClick={() => {
+                  state.query = ''
+                }}
+                children={
+                  <IconButton
+                    aria-label="Clear"
+                    icon="close"
+                    color="gray"
+                    isRound
+                    variant="ghost"
+                    size="sm"
+                  />
+                }
+              />
+            )}
+          </InputGroup>
 
           <span
             css={css`
@@ -151,10 +135,11 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
             <Menu>
               <MenuButton
                 mr="1"
-                size="xs"
+                ml="2"
+                size="sm"
                 as={Button}
                 // @ts-expect-error
-                variantColor={state.language === 'any' ? undefined : 'accent'}
+                variantColor={state.language === 'any' ? undefined : 'primary'}
                 variant={state.language === 'any' ? 'ghost' : 'solid'}
                 rightIcon="chevron-down"
               >
@@ -163,7 +148,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
                   : `${capitalize(state.language)}`}
               </MenuButton>
               <MenuList
-                placement="bottom-start"
+                placement="bottom-end"
                 maxHeight="200px"
                 overflowY="auto"
                 zIndex={100000}
@@ -193,6 +178,24 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
             )}
           </span>
         </Box>
+
+        <Box mb="3" display="flex" flexWrap="wrap" alignItems="flex-start">
+          {styleOptions.map((option) => (
+            <Button
+              key={option}
+              size="xs"
+              mr="2"
+              mb="1"
+              variant={state.style === option ? 'solid' : 'outline'}
+              variantColor={state.style === option ? 'primary' : undefined}
+              onClick={() => {
+                state.style = option
+              }}
+            >
+              {option === 'all' ? 'All styles' : capitalize(option)}
+            </Button>
+          ))}
+        </Box>
       </Box>
 
       <Box mt="2" flex="1">
@@ -218,6 +221,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
             <Button
               mt="3"
               width="100%"
+              variant="outline"
               onClick={() => {
                 state.language = 'any'
                 state.style = 'all'

@@ -24,6 +24,7 @@ import { SectionLabel } from 'components/Editor/components/shared'
 import { uniq } from 'lodash'
 import { LeftPanelFontPicker } from 'components/Editor/components/LeftPanelFontPicker'
 import { Button } from 'components/shared/Button'
+import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 
 export type LeftPanelFontsTabProps = {
   target: TargetKind
@@ -147,7 +148,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                         state.view = 'choose-font'
                       }}
                       leftIcon="add"
-                      variantColor="secondary"
+                      variantColor="primary"
                     >
                       Add more fonts
                       <Tag
@@ -162,18 +163,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                     </Button>
 
                     <Menu>
-                      <MenuButton
-                        marginLeft="auto"
-                        as={Button}
-                        outline="none"
-                        // @ts-expect-error
-                        variant="outline"
-                        aria-label="menu"
-                        color="black"
-                        display="inline-flex"
-                      >
-                        <DotsThreeVertical size={18} />
-                      </MenuButton>
+                      <MenuButton marginLeft="auto" as={MenuDotsButton} />
 
                       <MenuList>
                         <MenuItem
@@ -300,7 +290,7 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
       </FontButton>
 
       <FontChangeButton
-        variantColor="secondary"
+        variantColor="primary"
         aria-label="Delete"
         size="sm"
         ml="2"

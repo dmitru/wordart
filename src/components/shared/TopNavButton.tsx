@@ -1,7 +1,9 @@
 import styled from '@emotion/styled'
 import { Button } from 'components/shared/Button'
 
-export const TopNavButton = styled(Button)<{ isAccented?: boolean }>`
+export const TopNavButton = styled(Button)<{
+  variant?: 'accent' | 'secondary' | 'primary'
+}>`
   color: white;
 
   color: #fefeff;
@@ -9,19 +11,33 @@ export const TopNavButton = styled(Button)<{ isAccented?: boolean }>`
   margin-right: 10px;
 
   ${(p) =>
-    p.isAccented &&
+    p.variant === 'accent' &&
     `
-  background: #fff;
-  color: #333;
-`}
+      background: #fff;
+      color: #333;
+    `}
+
+  ${(p) =>
+    p.variant === 'secondary' &&
+    `
+        background: transparent;
+        color: #fff;
+        box-shadow: none !important;
+        border: none;
+      `}
 
   &:hover {
-    background-color: #fff2;
+    background: #fff2;
 
     ${(p) =>
-      p.isAccented &&
+      p.variant === 'accent' &&
       `
-  background: #fffb;
-`}
+        background: #fffb;
+    `}
+    ${(p) =>
+      p.variant === 'secondary' &&
+      `
+        background: #00000014;
+    `}
   }
 `

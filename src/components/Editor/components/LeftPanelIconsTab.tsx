@@ -35,28 +35,35 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
     const shapes = store.getAvailableShapes().filter((s) => s.kind === 'svg')
 
     return (
-      <Box p="3">
+      <Box px="5" py="6">
+        <SectionLabel>
+          {state.isAdding ? 'Choose an Icon' : 'Added Icons'}
+        </SectionLabel>
+
         <Toolbar display="flex" alignItems="center">
           {!state.isAdding && (
             <>
               <Button
                 mr="3"
-                variantColor="teal"
+                flex="1"
+                variantColor="primary"
                 onClick={() => {
                   state.isAdding = true
                 }}
               >
                 <evaicons.PlusOutline size="20" /> Add
               </Button>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  style.items.icons.iconList = []
-                  store.animateVisualize(false)
-                }}
-              >
-                Clear
-              </Button>
+              {icons.length > 0 && (
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    style.items.icons.iconList = []
+                    store.animateVisualize(false)
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
             </>
           )}
 
@@ -128,7 +135,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 <SectionLabel>Icons Settings</SectionLabel>
                 <Slider
                   horizontal
-                  label="Max. size"
+                  label="Size"
                   afterLabel="%"
                   value={style.items.placement.iconsMaxSize}
                   onChange={(value) => {

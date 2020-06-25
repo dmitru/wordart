@@ -47,6 +47,8 @@ import { FaCog } from 'react-icons/fa'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { FontPicker } from 'components/Editor/components/FontPicker'
 import { SectionLabel } from 'components/Editor/components/shared'
+import { DeleteButton } from 'components/shared/DeleteButton'
+import { SecondaryButton } from 'components/shared/SecondaryButton'
 
 export type LeftPanelShapesTabProps = {}
 
@@ -264,10 +266,34 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                     width: 180px;
                     height: 180px;
                     min-width: 180px;
+                    cursor: default !important;
+
+                    padding: 10px;
+                    border: 2px solid #e9e9e9;
 
                     img {
-                      width: 175px;
-                      height: 175px;
+                      position: relative;
+                      z-index: 2;
+                      width: 165px;
+                      height: 165px;
+                    }
+
+                    background-image: url(/images/editor/transparent-bg.svg);
+                    background-repeat: repeat;
+                    background-size: 15px;
+
+                    position: relative;
+
+                    &:after {
+                      position: absolute;
+                      content: '';
+                      width: 100%;
+                      height: 100%;
+                      top: 0;
+                      left: 0;
+                      z-index: 1;
+                      background: white !important;
+                      opacity: 0.6;
                     }
                   `}
                   backgroundColor="white"
@@ -603,8 +629,8 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                       <Flex mt="5">
                         <Tooltip label="Add custom image...">
                           <Button
-                            leftIcon="add"
                             variantColor="primary"
+                            leftIcon="add"
                             size="sm"
                             mr="2"
                             onClick={() => {
@@ -617,8 +643,8 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
                         <Tooltip label="Use text as a shape...">
                           <Button
+                            variantColor="secondary"
                             leftIcon="add"
-                            variantColor="primary"
                             size="sm"
                             mr="2"
                             onClick={() => {
@@ -655,7 +681,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         </InputGroup>
                       </Flex>
 
-                      <Flex align="center" mt="2" mb="1">
+                      <Flex align="center" mt="2" mb="4">
                         <Box>
                           <Menu>
                             <MenuButton
@@ -670,10 +696,9 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               py="2"
                               px="3"
                             >
-                              {'Category: '}
                               {selectedCategory
                                 ? selectedCategory.label
-                                : 'All'}
+                                : 'All categories'}
                             </MenuButton>
                             <MenuList
                               as="div"
@@ -709,16 +734,12 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         </Box>
 
                         {!!selectedCategory && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
+                          <DeleteButton
                             ml="2"
                             onClick={() => {
                               setSelectedCategory(null)
                             }}
-                          >
-                            <Icon name="close" />
-                          </Button>
+                          />
                         )}
                       </Flex>
 
