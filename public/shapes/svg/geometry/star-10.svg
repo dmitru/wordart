@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="126px" height="120px" viewBox="0 0 126 120" version="1.1" 
+    xmlns="http://www.w3.org/2000/svg" 
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 62 (91390) - https://sketch.com -->
+    <title>Star</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Geometry" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <polygon id="Star" fill="#39799a" points="63 111.719238 43.5319294 119.916561 32.6001945 101.841743 12.0319294 97.0304709 13.8120814 75.9821236 0 60 13.8120814 44.0178764 12.0319294 22.9695291 32.6001945 18.1582573 43.5319294 0.0834394734 63 8.28076172 82.4680706 0.0834394734 93.3998055 18.1582573 113.968071 22.9695291 112.187919 44.0178764 126 60 112.187919 75.9821236 113.968071 97.0304709 93.3998055 101.841743 82.4680706 119.916561"></polygon>
+    </g>
+</svg>

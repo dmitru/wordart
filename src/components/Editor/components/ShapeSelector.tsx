@@ -4,6 +4,8 @@ import { noop } from 'lodash'
 import { darken } from 'polished'
 import { Box, BoxProps } from '@chakra-ui/core'
 import { ShapeConf, ShapeId } from 'components/Editor/shape-config'
+import AutoSizer from 'react-virtualized-auto-sizer'
+import { FixedSizeList as List, ListProps } from 'react-window'
 
 export type ShapeSelectorProps = {
   shapes: ShapeConf[]
@@ -20,12 +22,24 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
     onSelected = noop,
     ...rest
   }) => {
-    return (
-      <>
-        <ShapeThumbnails mt="2" {...rest}>
-          {shapes.map((shape) => (
+    const cols = 3
+    const rows = Math.ceil(shapes.length / cols)
+
+    const itemWidth = 106
+    const itemHeight = 106
+
+    const ThumbnailsRow: ListProps['children'] = ({ index, style }) => {
+      const rowShapes = [
+        shapes[cols * index],
+        shapes[cols * index + 1],
+        shapes[cols * index + 2],
+      ].filter((s) => s != null)
+
+      return (
+        <div style={style}>
+          {rowShapes.map((shape, i) => (
             <ShapeThumbnailBtn
-              key={shape.id}
+              key={`${index}-${i}`}
               onClick={() => {
                 onSelected(shape)
               }}
@@ -38,7 +52,27 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
               }
             />
           ))}
-        </ShapeThumbnails>
+        </div>
+      )
+    }
+
+    return (
+      <>
+        <Box flex="1" width="340px">
+          <AutoSizer defaultWidth={300} defaultHeight={600}>
+            {({ height }) => (
+              <List
+                overscanCount={5}
+                height={height}
+                itemCount={rows}
+                itemSize={itemHeight}
+                width={itemWidth * cols + 26}
+              >
+                {ThumbnailsRow}
+              </List>
+            )}
+          </AutoSizer>
+        </Box>
       </>
     )
   }

@@ -3,6 +3,7 @@ import { iconsFaSolid } from 'data/icons-fa-solid'
 import { ShapeConf } from 'components/Editor/shape-config'
 import animalsShapes from './shapes-animals'
 import geoShapes from './shapes-geo'
+import geometryShapes from './shapes-geometry'
 
 const defaultEdgesProcessing = {
   amount: 80,
@@ -56,8 +57,9 @@ export const svgIconsOutline: ShapeConf[] = [...iconsFaRegular.slice(0, 5)]
 // @ts-ignore
 export const shapes: ShapeConf[] = [
   ...[
-    ...animalsShapes.map((s) => ({ ...s, categories: ['animals'] })),
+    ...geometryShapes.map((s) => ({ ...s, categories: ['geometry'] })),
     ...geoShapes.map((s) => ({ ...s, categories: ['geo'] })),
+    ...animalsShapes.map((s) => ({ ...s, categories: ['animals'] })),
     {
       kind: 'svg',
       title: 'Smile',

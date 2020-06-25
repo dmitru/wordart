@@ -33,6 +33,7 @@ import {
   getAnglesForPreset,
   mkBgStyleConfFromOptions,
   mkShapeStyleConfFromOptions,
+  ThemePreset,
 } from 'components/Editor/style'
 import {
   BgFill,
@@ -74,6 +75,7 @@ import { roundFloat } from 'utils/round-float'
 import { exhaustiveCheck } from 'utils/type-utils'
 import { createCanvas } from 'lib/wordart/canvas-utils'
 import { animateElement } from 'utils/animation'
+import { themePresets } from 'components/Editor/theme-presets'
 
 export type EditorMode = 'view' | 'edit'
 
@@ -240,6 +242,7 @@ export class EditorStore {
     if (params.serialized) {
       await this.loadSerialized(params.serialized)
     } else {
+      await this.applyColorTheme(themePresets[0])
       await this.selectShape(shapes[5].id)
     }
 
@@ -1075,9 +1078,19 @@ export class EditorStore {
   getAvailableShapes = (): ShapeConf[] =>
     sortBy(
       this.availableShapes,
+      (s) => (s.categories ? this.getCategoryOrder(s.categories[0]) : 999999),
       (s) => (s.isCustom ? -1 : 1),
       (s) => s.title
     )
+
+  getCategoryOrder = (category: string): number => {
+    const map: { [category: string]: number } = {
+      geometry: 10,
+      geo: 200,
+    }
+    return map[category] || 999999
+  }
+
   getShapeConfById = (shapeId: ShapeId): ShapeConf | undefined =>
     this.availableShapes.find((s) => s.id === shapeId)
   getShape = (): Shape | undefined => {
@@ -1284,6 +1297,72 @@ export class EditorStore {
     ) {
       this.visualizeAnimatedLastTime = new Date()
       animateElement(document.getElementById('btn-visualize')!)
+    }
+  }
+
+  applyColorTheme = async (theme: ThemePreset) => {
+    const shape = this.getShape()
+    const { shape: shapeStyle, bg: bgStyle } = this.styleOptions
+
+    // Shape
+    console.log('applyTheme', theme)
+    shapeStyle.opacity = theme.shapeOpacity
+    shapeStyle.items.brightness = 0
+
+    // Bg
+    bgStyle.fill.kind = 'color'
+    bgStyle.items.brightness = 0
+    bgStyle.fill.color = {
+      kind: 'color',
+      color: theme.bgFill,
+      opacity: 100,
+    }
+
+    // Shape fill
+    if (shape?.kind === 'svg') {
+      shape.config.processing.colors = {
+        kind: 'single-color',
+        color: theme.shapeFill,
+      }
+      shapeStyle.colors.color = theme.shapeFill
+    } else if (shape?.kind === 'text') {
+      shape.config.textStyle.color = theme.shapeFill
+    }
+
+    // Shape items coloring
+    shapeStyle.items.coloring.kind = theme.shapeItemsColoring.kind
+    if (theme.shapeItemsColoring.kind === 'color') {
+      shapeStyle.items.coloring.color = theme.shapeItemsColoring
+    } else if (theme.shapeItemsColoring.kind === 'gradient') {
+      shapeStyle.items.coloring.gradient = theme.shapeItemsColoring
+    } else if (theme.shapeItemsColoring.kind === 'shape') {
+      shapeStyle.items.coloring.shape = theme.shapeItemsColoring
+    }
+
+    // Bg items coloring
+    bgStyle.items.coloring.kind = theme.bgItemsColoring.kind
+    if (theme.bgItemsColoring.kind === 'color') {
+      bgStyle.items.coloring.color = theme.bgItemsColoring
+    } else if (theme.bgItemsColoring.kind === 'gradient') {
+      shapeStyle.items.coloring.gradient = theme.bgItemsColoring
+    }
+
+    shapeStyle.items.opacity = theme.itemsOpacity
+    bgStyle.items.opacity = theme.itemsOpacity
+    shapeStyle.items.dimSmallerItems = theme.shapeDimSmallerItems
+    bgStyle.items.dimSmallerItems = theme.bgDimSmallerItems
+    // </update-styles>
+
+    this.editor?.setShapeOpacity(shapeStyle.opacity / 100)
+    await this.editor?.setShapeItemsStyle(
+      mkShapeStyleConfFromOptions(shapeStyle).items
+    )
+    await this.editor?.setBgItemsStyle(mkBgStyleConfFromOptions(bgStyle).items)
+    this.editor?.setBgColor(bgStyle.fill.color)
+    if (bgStyle.fill.kind === 'color') {
+      this.editor?.setBgOpacity(bgStyle.fill.color.opacity / 100)
+    } else {
+      this.editor?.setBgOpacity(0)
     }
   }
 }

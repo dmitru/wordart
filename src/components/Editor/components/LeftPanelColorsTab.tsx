@@ -109,57 +109,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
     }
 
     const applyTheme = (theme: ThemePreset) => {
-      // <update-styles>
-      // Shape
-      console.log('applyTheme', theme)
-      shapeStyle.opacity = theme.shapeOpacity
-      shapeStyle.items.brightness = 0
-
-      // Bg
-      bgStyle.fill.kind = 'color'
-      bgStyle.items.brightness = 0
-      bgStyle.fill.color = {
-        kind: 'color',
-        color: theme.bgFill,
-        opacity: 100,
-      }
-
-      // Shape fill
-      if (shape?.kind === 'svg') {
-        shape.config.processing.colors = {
-          kind: 'single-color',
-          color: theme.shapeFill,
-        }
-        shapeStyle.colors.color = theme.shapeFill
-      } else if (shape?.kind === 'text') {
-        shape.config.textStyle.color = theme.shapeFill
-      }
-
-      // Shape items coloring
-      shapeStyle.items.coloring.kind = theme.shapeItemsColoring.kind
-      if (theme.shapeItemsColoring.kind === 'color') {
-        shapeStyle.items.coloring.color = theme.shapeItemsColoring
-      } else if (theme.shapeItemsColoring.kind === 'gradient') {
-        shapeStyle.items.coloring.gradient = theme.shapeItemsColoring
-      } else if (theme.shapeItemsColoring.kind === 'shape') {
-        shapeStyle.items.coloring.shape = theme.shapeItemsColoring
-      }
-
-      // Bg items coloring
-      bgStyle.items.coloring.kind = theme.bgItemsColoring.kind
-      if (theme.bgItemsColoring.kind === 'color') {
-        bgStyle.items.coloring.color = theme.bgItemsColoring
-      } else if (theme.bgItemsColoring.kind === 'gradient') {
-        shapeStyle.items.coloring.gradient = theme.bgItemsColoring
-      }
-
-      shapeStyle.items.opacity = theme.itemsOpacity
-      bgStyle.items.opacity = theme.itemsOpacity
-      shapeStyle.items.dimSmallerItems = theme.shapeDimSmallerItems
-      bgStyle.items.dimSmallerItems = theme.bgDimSmallerItems
-      // </update-styles>
-
-      return updateAllStyles()
+      store.applyColorTheme(theme)
     }
 
     return (

@@ -2,7 +2,7 @@ const path = require('path')
 const fs = require('fs')
 const _ = require('lodash')
 
-const categories = ['animals', 'geo']
+const categories = ['animals', 'geo', 'geometry']
 
 async function processIcons(dirPath) {
   const dir = await fs.promises.opendir(
@@ -12,13 +12,15 @@ async function processIcons(dirPath) {
   const icons = []
   for await (const dirent of dir) {
     const filename = dirent.name
-    const fullPath = path.join(dirPath, filename)
-    console.log(`Processing: ${fullPath}`)
-    icons.push({
-      title: _.capitalize(filename.replace('-', ' ').replace('.svg', '')),
-      kind: 'svg',
-      url: `/${fullPath}`,
-    })
+    if (filename.endsWith('.svg') || filename.endsWith('.png')) {
+      const fullPath = path.join(dirPath, filename)
+      console.log(`Processing: ${fullPath}`)
+      icons.push({
+        title: _.capitalize(filename.replace('-', ' ').replace('.svg', '')),
+        kind: 'svg',
+        url: `/${fullPath}`,
+      })
+    }
   }
 
   return icons

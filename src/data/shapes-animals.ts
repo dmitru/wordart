@@ -11,11 +11,6 @@
   "url": "/shapes/svg/animals/dog-side-3.svg"
 },
 {
-  "title": "Bee",
-  "kind": "svg",
-  "url": "/shapes/svg/animals/bee.svg"
-},
-{
   "title": "Owl",
   "kind": "svg",
   "url": "/shapes/svg/animals/owl.svg"
@@ -26,11 +21,6 @@
   "url": "/shapes/svg/animals/dog-side-2.svg"
 },
 {
-  "title": "Paws",
-  "kind": "svg",
-  "url": "/shapes/svg/animals/paws.svg"
-},
-{
   "title": "Lion face",
   "kind": "svg",
   "url": "/shapes/svg/animals/lion-face.svg"
@@ -39,11 +29,6 @@
   "title": "Dragon 2",
   "kind": "svg",
   "url": "/shapes/svg/animals/dragon-2.svg"
-},
-{
-  "title": "Butterfly",
-  "kind": "svg",
-  "url": "/shapes/svg/animals/butterfly.svg"
 },
 {
   "title": "Dragon 3",
@@ -76,11 +61,6 @@
   "url": "/shapes/svg/animals/dragon.svg"
 },
 {
-  "title": "Bunny",
-  "kind": "svg",
-  "url": "/shapes/svg/animals/bunny.svg"
-},
-{
   "title": "Eagle",
   "kind": "svg",
   "url": "/shapes/svg/animals/eagle.svg"
@@ -109,16 +89,6 @@
   "title": "Horse",
   "kind": "svg",
   "url": "/shapes/svg/animals/horse.svg"
-},
-{
-  "title": "Parrot",
-  "kind": "svg",
-  "url": "/shapes/svg/animals/parrot.svg"
-},
-{
-  "title": "Bird 3",
-  "kind": "svg",
-  "url": "/shapes/svg/animals/bird-3.svg"
 },
 {
   "title": "Fish",
@@ -151,11 +121,6 @@
   "url": "/shapes/svg/animals/bird-2.svg"
 },
 {
-  "title": "Cat 1",
-  "kind": "svg",
-  "url": "/shapes/svg/animals/cat-1.svg"
-},
-{
   "title": "Dog paw",
   "kind": "svg",
   "url": "/shapes/svg/animals/dog-paw.svg"
@@ -164,11 +129,6 @@
   "title": "Cat paw",
   "kind": "svg",
   "url": "/shapes/svg/animals/cat-paw.svg"
-},
-{
-  "title": "Butterfly 4",
-  "kind": "svg",
-  "url": "/shapes/svg/animals/butterfly-4.svg"
 },
 {
   "title": "Cat side",
@@ -181,11 +141,6 @@
   "url": "/shapes/svg/animals/bone.svg"
 },
 {
-  "title": "Dog 1",
-  "kind": "svg",
-  "url": "/shapes/svg/animals/dog-1.svg"
-},
-{
   "title": "Horse 4",
   "kind": "svg",
   "url": "/shapes/svg/animals/horse-4.svg"
@@ -196,19 +151,9 @@
   "url": "/shapes/svg/animals/lizard.svg"
 },
 {
-  "title": "Dog face-1",
-  "kind": "svg",
-  "url": "/shapes/svg/animals/dog-face-1.svg"
-},
-{
   "title": "Lion side-2",
   "kind": "svg",
   "url": "/shapes/svg/animals/lion-side-2.svg"
-},
-{
-  "title": "Dog 3",
-  "kind": "svg",
-  "url": "/shapes/svg/animals/dog-3.svg"
 },
 {
   "title": "Dog 2",
@@ -224,11 +169,6 @@
   "title": "Wolf",
   "kind": "svg",
   "url": "/shapes/svg/animals/wolf.svg"
-},
-{
-  "title": "Bird 3.png",
-  "kind": "svg",
-  "url": "/shapes/svg/animals/bird-3.png"
 },
 {
   "title": "Horse 3",

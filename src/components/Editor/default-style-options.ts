@@ -61,7 +61,7 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
     words: {
       fontIds: [],
       wordList: defaultWordsList,
-      anglesPreset: 'horizontal',
+      anglesPreset: '15',
       customAngles: [0],
     },
     icons: {

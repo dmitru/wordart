@@ -48,7 +48,6 @@ import { useDebouncedCallback } from 'use-debounce/lib'
 import { FontPicker } from 'components/Editor/components/FontPicker'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { DeleteButton } from 'components/shared/DeleteButton'
-import { SecondaryButton } from 'components/shared/SecondaryButton'
 
 export type LeftPanelShapesTabProps = {}
 
@@ -107,6 +106,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
     } = store
 
     const allCategoryOptions = [
+      ['geometry', 'Geometric Shapes'],
       ['animals', 'Animals & Pets'],
       ['icons', 'Icons'],
       ['geo', 'Countries & Earth'],
@@ -363,13 +363,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
               </Box>
             </Box>
 
-            <Box
-              position="relative"
-              overflow="auto"
-              overflowX="hidden"
-              width="100%"
-              height="calc(100vh - 255px)"
-            >
+            <Box position="relative" width="100%" height="calc(100vh - 295px)">
               <AnimatePresence initial={false}>
                 {state.mode === 'add text shape' && (
                   <motion.div
@@ -629,7 +623,13 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                     animate={{ x: 0, y: 0, opacity: 1 }}
                     exit={{ x: -400, y: 0, opacity: 0 }}
                   >
-                    <Box position="absolute" width="100%" height="100%">
+                    <Box
+                      position="absolute"
+                      width="100%"
+                      height="100%"
+                      display="flex"
+                      flexDirection="column"
+                    >
                       <Flex mt="5">
                         <Tooltip label="Add custom image...">
                           <Button
@@ -748,10 +748,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                       </Flex>
 
                       <ShapeSelector
-                        height="calc(100vh - 370px)"
                         showProcessedThumbnails
-                        width="345px"
-                        overflowY="scroll"
                         shapes={matchingShapes}
                         onSelected={async (shapeConfig) => {
                           if (store.selectedShapeId !== shapeConfig.id) {
