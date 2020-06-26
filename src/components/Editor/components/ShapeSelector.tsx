@@ -6,6 +6,7 @@ import { Box, BoxProps } from '@chakra-ui/core'
 import { ShapeConf, ShapeId } from 'components/Editor/shape-config'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList as List, ListProps } from 'react-window'
+import css from '@emotion/css'
 
 export type ShapeSelectorProps = {
   shapes: ShapeConf[]
@@ -36,7 +37,18 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
       ].filter((s) => s != null)
 
       return (
-        <div style={style}>
+        <Box
+          style={style}
+          px="3px"
+          css={css`
+            &:first-child {
+              padding-top: 3px;
+            }
+            &:last-child {
+              padding-bottom: 3px;
+            }
+          `}
+        >
           {rowShapes.map((shape, i) => (
             <ShapeThumbnailBtn
               key={`${index}-${i}`}
@@ -52,14 +64,14 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
               }
             />
           ))}
-        </div>
+        </Box>
       )
     }
 
     return (
       <>
-        <Box flex="1" width="340px">
-          <AutoSizer defaultWidth={300} defaultHeight={600}>
+        <Box flex="1" width="346px">
+          <AutoSizer defaultWidth={346} defaultHeight={600}>
             {({ height }) => (
               <List
                 overscanCount={5}
@@ -115,7 +127,7 @@ const ShapeThumbnailBtnInner = styled.button<{
 }>`
   width: 106px;
   height: 106px;
-  border: 1px solid #e9e9e9;
+  border: 1px solid #efefef;
   outline: none;
   background: white;
   display: inline-flex;
@@ -131,11 +143,13 @@ const ShapeThumbnailBtnInner = styled.button<{
 
   img {
     margin: 0;
+    filter: drop-shadow(0px 0px 4px #0003);
   }
 
   svg {
     width: 90px;
     height: 90px;
+    filter: drop-shadow(0px 0px 4px #0003);
 
     * {
       ${({ fill }) => fill && `fill: ${fill}`};
@@ -155,8 +169,11 @@ const ShapeThumbnailBtnInner = styled.button<{
   ${({ theme, active }) =>
     active &&
     `
-    border: 1px solid ${theme.colors.accent};
-    background-color: #c8e8ff;
+    background-color: hsla(358, 80%, 65%, 0.14);
+    outline: 3px solid ${theme.colors.accent['500']};
+    z-index: 1;
+    overflow: visible;
+    position: relative;
   `}
 
   &:hover,
@@ -167,9 +184,8 @@ const ShapeThumbnailBtnInner = styled.button<{
     ${({ theme, active }) =>
       active &&
       `
-      border: 1px solid ${theme.colors.accent}; 
       z-index: 2;
-      background: ${darken(0.1, '#c8e8ff')};
+      background: hsla(358, 80%, 65%, 0.14);
       `}
   }
 `

@@ -195,6 +195,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
                   {shapeStyle.items.coloring.color.colors.length > 1 && (
                     <DeleteButton
                       size="xs"
+                      color="gray.400"
                       ml="2px"
                       mr="2"
                       onClick={() => {

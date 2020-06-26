@@ -12,6 +12,7 @@ import {
   MenuItem,
   MenuList,
   Text,
+  MenuDivider,
 } from '@chakra-ui/core'
 import styled from '@emotion/styled'
 import { Button } from 'components/shared/Button'
@@ -25,6 +26,7 @@ import { FixedSizeList as List, ListProps } from 'react-window'
 import { useStore } from 'services/root-store'
 import { animateElement } from 'utils/animation'
 import css from '@emotion/css'
+import { DeleteButton } from 'components/shared/DeleteButton'
 
 export type FontPickerProps = {
   selectedFontId: string | null
@@ -37,7 +39,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
 
   const state = useLocalStore(() => ({
     query: '',
-    style: 'all',
+    style: 'popular',
     language: 'any',
   }))
 
@@ -47,7 +49,6 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
     flatten(allFonts.map((f) => f.font.categories || []))
   )
   styleOptions.sort()
-  styleOptions.unshift('all')
 
   const langOptions = uniq(flatten(allFonts.map((f) => f.font.subsets || [])))
   langOptions.sort()
@@ -57,7 +58,9 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
     (f) =>
       (state.language === 'any' ||
         (f.font.subsets || []).includes(state.language)) &&
-      (state.style === 'all' || (f.font.categories || [])[0] === state.style) &&
+      ((state.style === 'popular' && f.font.isPopular) ||
+        (state.style !== 'popular' &&
+          (f.font.categories || [])[0] === state.style)) &&
       f.font.title
         .toLocaleLowerCase()
         .startsWith(state.query.toLocaleLowerCase())
@@ -94,8 +97,127 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
 
   return (
     <>
-      <Box>
-        <Box display="flex" mt="5" mb="3">
+      <Box mt="4">
+        <Box display="flex" flexWrap="wrap" alignItems="flex-start">
+          <Box
+            css={css`
+              white-space: nowrap;
+            `}
+            mr="3"
+            mb="2"
+          >
+            <Menu>
+              <MenuButton
+                // @ts-ignore
+                variant={state.style !== 'popular' ? 'solid' : 'ghost'}
+                variantColor={state.style !== 'popular' ? 'accent' : undefined}
+                as={Button}
+                rightIcon="chevron-down"
+                size="xs"
+                mr="1"
+              >
+                {state.style === 'popular'
+                  ? 'Popular fonts'
+                  : capitalize(state.style)}
+              </MenuButton>
+              <MenuList
+                as="div"
+                placement="bottom-start"
+                css={css`
+                  background: white;
+                  position: absolute;
+                  top: 0px !important;
+                  left: 10px;
+                  margin-top: 0 !important;
+                  z-index: 5000 !important;
+                  max-height: 300px;
+                  overflow: auto;
+                `}
+              >
+                <MenuItem
+                  onClick={() => {
+                    state.style = 'popular'
+                  }}
+                >
+                  Popular
+                </MenuItem>
+                <MenuDivider />
+                {styleOptions.map((option, index) => (
+                  <MenuItem
+                    key={option}
+                    onClick={() => {
+                      state.style = option
+                    }}
+                  >
+                    {option === 'popular'
+                      ? 'Popular fonts'
+                      : capitalize(option)}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+
+            {state.style !== 'popular' && (
+              <DeleteButton
+                size="xs"
+                onClick={() => {
+                  state.style = 'popular'
+                }}
+              />
+            )}
+          </Box>
+
+          <Box
+            css={css`
+              white-space: nowrap;
+            `}
+            mr="3"
+            mb="2"
+          >
+            <Menu>
+              <MenuButton
+                mr="1"
+                size="xs"
+                as={Button}
+                // @ts-expect-error
+                variantColor={state.language === 'any' ? undefined : 'accent'}
+                variant={state.language === 'any' ? 'ghost' : 'solid'}
+                rightIcon="chevron-down"
+              >
+                {state.language === 'any'
+                  ? 'Any language'
+                  : `${capitalize(state.language)}`}
+              </MenuButton>
+              <MenuList
+                placement="bottom-start"
+                maxHeight="200px"
+                overflowY="auto"
+                zIndex={100000}
+              >
+                {langOptions.map((option) => (
+                  <MenuItem
+                    key={option}
+                    onClick={() => {
+                      state.language = option
+                    }}
+                  >
+                    {option === 'any' ? 'Any language' : capitalize(option)}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+            {state.language !== 'any' && (
+              <DeleteButton
+                size="xs"
+                onClick={() => {
+                  state.language = 'any'
+                }}
+              />
+            )}
+          </Box>
+        </Box>
+
+        <Box display="flex" mb="3">
           <InputGroup size="sm">
             <InputLeftElement children={<Icon name="search" />} />
             <Input
@@ -126,75 +248,6 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
               />
             )}
           </InputGroup>
-
-          <span
-            css={css`
-              white-space: nowrap;
-            `}
-          >
-            <Menu>
-              <MenuButton
-                mr="1"
-                ml="2"
-                size="sm"
-                as={Button}
-                // @ts-expect-error
-                variantColor={state.language === 'any' ? undefined : 'primary'}
-                variant={state.language === 'any' ? 'ghost' : 'solid'}
-                rightIcon="chevron-down"
-              >
-                {state.language === 'any'
-                  ? 'Language'
-                  : `${capitalize(state.language)}`}
-              </MenuButton>
-              <MenuList
-                placement="bottom-end"
-                maxHeight="200px"
-                overflowY="auto"
-                zIndex={100000}
-              >
-                {langOptions.map((option) => (
-                  <MenuItem
-                    key={option}
-                    onClick={() => {
-                      state.language = option
-                    }}
-                  >
-                    {option === 'any' ? 'Any language' : capitalize(option)}
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Menu>
-            {state.language !== 'any' && (
-              <Button
-                size="xs"
-                variant="ghost"
-                onClick={() => {
-                  state.language = 'any'
-                }}
-              >
-                <Icon name="close" />
-              </Button>
-            )}
-          </span>
-        </Box>
-
-        <Box mb="3" display="flex" flexWrap="wrap" alignItems="flex-start">
-          {styleOptions.map((option) => (
-            <Button
-              key={option}
-              size="xs"
-              mr="2"
-              mb="1"
-              variant={state.style === option ? 'solid' : 'outline'}
-              variantColor={state.style === option ? 'primary' : undefined}
-              onClick={() => {
-                state.style = option
-              }}
-            >
-              {option === 'all' ? 'All styles' : capitalize(option)}
-            </Button>
-          ))}
         </Box>
       </Box>
 
@@ -217,18 +270,20 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
 
         {fonts.length === 0 && (
           <>
-            <Text>No fonts found for your search criteria.</Text>
+            <Text textAlign="center" color="gray.500" fontSize="lg">
+              No fonts found for your search criteria.
+            </Text>
             <Button
               mt="3"
               width="100%"
-              variant="outline"
+              variantColor="secondary"
               onClick={() => {
                 state.language = 'any'
-                state.style = 'all'
+                state.style = 'popular'
                 state.query = ''
               }}
             >
-              Show all fonts
+              Clear filters
             </Button>
           </>
         )}

@@ -1,5 +1,5 @@
 import { Button, ButtonProps } from 'components/shared/Button'
-import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
+import { DotsThreeHorizontal } from '@styled-icons/entypo/DotsThreeHorizontal'
 import css from '@emotion/css'
 
 export const MenuDotsButton: React.FC<
@@ -18,6 +18,6 @@ export const MenuDotsButton: React.FC<
     `}
     `}
   >
-    <DotsThreeVertical size={18} />
+    <DotsThreeHorizontal size={18} />
   </Button>
 )

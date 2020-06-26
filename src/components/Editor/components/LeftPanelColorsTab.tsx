@@ -420,13 +420,12 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                                   >
                                     <Text
                                       my="0"
-                                      color="blue"
                                       cursor="help"
                                       ml="2"
+                                      fontSize="lg"
+                                      color="gray.400"
                                     >
-                                      <FaQuestionCircle
-                                        style={{ color: '#999' }}
-                                      />
+                                      <FaQuestionCircle />
                                     </Text>
                                   </Tooltip>
                                 </Box>

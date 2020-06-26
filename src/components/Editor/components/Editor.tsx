@@ -31,7 +31,7 @@ import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
 import { Shapes } from '@styled-icons/fa-solid/Shapes'
 import { Font } from '@styled-icons/icomoon/Font'
-import { Face } from '@styled-icons/material/Face'
+import { SmileBeam } from '@styled-icons/fa-solid/SmileBeam'
 import { TextFields } from '@styled-icons/material/TextFields'
 import { LayoutMasonry } from '@styled-icons/remix-fill/LayoutMasonry'
 import { LeftPanelColorsTab } from 'components/Editor/components/LeftPanelColorsTab'
@@ -396,10 +396,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             </MenuList>
           </Menu>
 
-          <TopNavButton
+          <Button
+            variantColor="accent"
             onClick={handleSaveClick}
             isLoading={isSaving}
-            mr="1"
+            mr="2"
             css={css`
               width: 90px;
             `}
@@ -410,7 +411,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               `}
             />
             Save
-          </TopNavButton>
+          </Button>
 
           <Editable
             css={css`
@@ -433,8 +434,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             color="white"
             fontSize="xl"
             maxWidth="200px"
-            ml="1"
             flex={1}
+            mr="2"
           >
             <EditablePreview
               width="100%"
@@ -452,7 +453,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             />
           </Editable>
 
-          <TopNavButton onClick={openExport} ml="1" variant="secondary">
+          <TopNavButton onClick={openExport} variant="secondary">
             <FiDownload
               css={css`
                 margin-right: 4px;
@@ -540,7 +541,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   }}
                   active={leftTab === 'symbols'}
                 >
-                  <Face className="icon" />
+                  <SmileBeam className="icon" />
                   Icons
                 </LeftNavbarBtn>
 

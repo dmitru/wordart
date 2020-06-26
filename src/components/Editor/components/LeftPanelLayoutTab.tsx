@@ -100,7 +100,7 @@ const PresetBtn = styled(Box)<{ active: boolean; theme: any }>`
     p.active &&
     `
   outline: 3px solid ${p.theme.colors.accent['500']};
-  background: #ffe9ea;
+  background: hsla(358, 80%, 65%, 0.14);
   `}
 `
 
@@ -193,7 +193,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                 <>
                   <Box mt="3">
                     <Button
-                      mr="3"
+                      mr="1"
                       variantColor="secondary"
                       isDisabled={style.items.words.customAngles.length >= 8}
                       size="sm"

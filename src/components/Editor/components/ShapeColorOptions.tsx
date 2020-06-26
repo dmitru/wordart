@@ -59,7 +59,7 @@ export const SvgShapeColorKindDropdown: React.FC<{
             onUpdate()
           }}
         >
-          Original
+          Original color
         </MenuItem>
 
         <MenuItem

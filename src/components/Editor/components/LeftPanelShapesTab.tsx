@@ -240,7 +240,8 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
           isDisabled={isEqual(shape.originalTransform, shape.transform)}
         >
           <Button
-            ml="2"
+            ml="1"
+            variant="outline"
             onClick={() => {
               store.editor?.clearItems('shape')
               store.editor?.clearItems('bg')

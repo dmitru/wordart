@@ -96,7 +96,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                 exit={{ x: -355, y: 0, opacity: 0 }}
               >
                 <Box position="absolute" width="100%">
-                  <SectionLabel>Selected Fonts</SectionLabel>
+                  <SectionLabel>Fonts to use</SectionLabel>
                   <Box
                     mt="3"
                     mb="6"
@@ -290,7 +290,7 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
       </FontButton>
 
       <FontChangeButton
-        variantColor="primary"
+        variantColor="accent"
         aria-label="Delete"
         size="sm"
         ml="2"

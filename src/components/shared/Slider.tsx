@@ -67,7 +67,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
               ? `
               margin-right: 16px;
             `
-              : ''}
+              : 'margin-bottom: 0.5rem;'}
             ${labelCss}
           `}
         >
@@ -128,6 +128,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
 
       {resetValue != null && (
         <DeleteButton
+          color="gray.400"
           ml="2"
           css={css`
             visibility: ${value === resetValue ? 'hidden' : 'visible'};
