@@ -1,11 +1,6 @@
 import {
   Box,
-  Editable,
-  EditableInput,
-  EditablePreview,
   Icon,
-  InputGroup,
-  InputLeftElement,
   Menu,
   MenuButton,
   MenuDivider,
@@ -14,24 +9,23 @@ import {
   MenuList,
   Stack,
   Text,
-  InputRightElement,
 } from '@chakra-ui/core'
 import styled from '@emotion/styled'
 import { TextFields } from '@styled-icons/material-twotone/TextFields'
 import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
 import { SectionLabel } from 'components/Editor/components/shared'
+import { WordsEditorModal } from 'components/Editor/components/WordsEditorModal'
 import { TargetKind } from 'components/Editor/lib/editor'
 import { Button } from 'components/shared/Button'
-import { Input } from 'components/shared/Input'
 import { DeleteButton } from 'components/shared/DeleteButton'
+import { Input } from 'components/shared/Input'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
+import { SearchInput } from 'components/shared/SearchInput'
 import { capitalize } from 'lodash'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
-import { useStore } from 'services/root-store'
-import { WordsEditorModal } from 'components/Editor/components/WordsEditorModal'
 import { useRef } from 'react'
-import { SearchInput } from 'components/shared/SearchInput'
+import { useStore } from 'services/root-store'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -108,20 +102,19 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               Edit words
             </Button>
 
-            <Button
-              size="sm"
-              variant="ghost"
-              leftIcon="arrow-up"
-              onClick={() => {
-                state.isShowingImport = true
-              }}
-            >
-              Import
-            </Button>
+            <Box ml="auto">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  state.isShowingImport = true
+                }}
+              >
+                Import
+              </Button>
 
-            <Box marginLeft="auto">
               <Menu>
-                <MenuButton as={MenuDotsButton} size="sm" />
+                <MenuButton as={MenuDotsButton} size="sm" ml="2" />
                 <MenuList zIndex={1000} placement="bottom-end">
                   <MenuGroup title="Formatting">
                     <MenuItem

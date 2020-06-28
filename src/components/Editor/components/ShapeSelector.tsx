@@ -143,13 +143,13 @@ const ShapeThumbnailBtnInner = styled.button<{
 
   img {
     margin: 0;
-    filter: drop-shadow(0px 0px 4px #0003);
+    // filter: drop-shadow(0px 0px 4px #0003);
   }
 
   svg {
     width: 90px;
     height: 90px;
-    filter: drop-shadow(0px 0px 4px #0003);
+    // filter: drop-shadow(0px 0px 4px #0003);
 
     * {
       ${({ fill }) => fill && `fill: ${fill}`};

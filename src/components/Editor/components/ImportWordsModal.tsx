@@ -52,6 +52,7 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
                 <TabPanel>
                   <Textarea
                     mt="4"
+                    autoFocus
                     minHeight="200px"
                     placeholder="Enter text..."
                     value={state.textInput}

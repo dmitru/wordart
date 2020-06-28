@@ -48,6 +48,7 @@ import { useDebouncedCallback } from 'use-debounce/lib'
 import { FontPicker } from 'components/Editor/components/FontPicker'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { DeleteButton } from 'components/shared/DeleteButton'
+import { SearchInput } from 'components/shared/SearchInput'
 
 export type LeftPanelShapesTabProps = {}
 
@@ -661,29 +662,11 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           </Button>
                         </Tooltip>
 
-                        <InputGroup size="sm">
-                          <InputLeftElement children={<Icon name="search" />} />
-                          <Input
-                            placeholder="Search shapes..."
-                            value={query}
-                            onChange={(e: any) => setQuery(e.target.value)}
-                          />
-                          {!!query && (
-                            <InputRightElement
-                              onClick={() => setQuery('')}
-                              children={
-                                <IconButton
-                                  aria-label="Clear"
-                                  icon="close"
-                                  color="gray"
-                                  isRound
-                                  variant="ghost"
-                                  size="sm"
-                                />
-                              }
-                            />
-                          )}
-                        </InputGroup>
+                        <SearchInput
+                          placeholder="Search shapes..."
+                          value={query}
+                          onChange={setQuery}
+                        />
                       </Flex>
 
                       <Flex align="center" mt="2" mb="4">
