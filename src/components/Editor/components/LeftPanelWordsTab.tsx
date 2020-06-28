@@ -274,13 +274,14 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                       ref={provided.innerRef}
                                       {...provided.draggableProps}
                                       {...provided.dragHandleProps}
-                                      tabIndex="-1"
+                                      tabIndex={-1}
                                       css={css`
                                         ${snapshot.isDragging &&
-                                        `box-shadow: 0 0 10px 0 #0003;
-                              border-bottom: none !important;
-                              background: white;
-                              `}
+                                        `
+                                          box-shadow: 0 0 10px 0 #0003;
+                                          border-bottom: none !important;
+                                          background: white;
+                                        `}
                                       `}
                                     >
                                       <Box color="gray.400">
