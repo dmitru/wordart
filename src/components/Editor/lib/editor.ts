@@ -1267,14 +1267,16 @@ export class Editor {
         itemPadding: Math.max(1, 100 - style.items.placement.itemDensity),
         // Words
         wordsMaxSize: style.items.placement.wordsMaxSize,
-        words: style.items.words.wordList.map((wc) => ({
-          wordConfigId: wc.id,
-          text: wc.text,
-          angles: style.items.words.angles,
-          fillColors: ['red'],
-          // fonts: [fonts[0], fonts[1], fonts[2]],
-          fonts: wordFonts,
-        })),
+        words: style.items.words.wordList
+          .filter((wc) => wc.text.trim())
+          .map((wc) => ({
+            wordConfigId: wc.id,
+            text: wc.text,
+            angles: style.items.words.angles,
+            fillColors: ['red'],
+            // fonts: [fonts[0], fonts[1], fonts[2]],
+            fonts: wordFonts,
+          })),
         // Icons
         icons: style.items.icons.iconList.map((shape) => ({
           shape: this.store.getShapeConfById(shape.shapeId)!,
@@ -1477,14 +1479,16 @@ export class Editor {
         itemPadding: Math.max(1, 100 - style.items.placement.itemDensity),
         // Words
         wordsMaxSize: style.items.placement.wordsMaxSize,
-        words: style.items.words.wordList.map((wc) => ({
-          wordConfigId: wc.id,
-          text: wc.text,
-          angles: style.items.words.angles,
-          fillColors: ['red'],
-          // fonts: [fonts[0], fonts[1], fonts[2]],
-          fonts: wordFonts,
-        })),
+        words: style.items.words.wordList
+          .filter((wc) => wc.text.trim())
+          .map((wc) => ({
+            wordConfigId: wc.id,
+            text: wc.text,
+            angles: style.items.words.angles,
+            fillColors: ['red'],
+            // fonts: [fonts[0], fonts[1], fonts[2]],
+            fonts: wordFonts,
+          })),
         // Icons
         icons: style.items.icons.iconList.map((shape) => ({
           shape: this.store.getShapeConfById(shape.shapeId)!,

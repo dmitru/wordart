@@ -103,65 +103,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
           </Box>
         )}
 
-        {!state.isAdding && icons.length === 0 && (
-          <Box
-            mt="2rem"
-            display="flex"
-            alignItems="center"
-            flexDirection="column"
-            boxShadow="sm"
-            borderColor="gray.100"
-            borderWidth="1px"
-            p="6"
-          >
-            <Box
-              mb="1rem"
-              bg="primary.50"
-              color="primary.400"
-              width="90px"
-              height="90px"
-              borderRadius="100%"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <SmileBeam size={60} />
-            </Box>
-
-            <Text
-              fontSize="xl"
-              flex={1}
-              textAlign="center"
-              color="gray.600"
-              mb="0"
-            >
-              When words aren't enough
-            </Text>
-
-            <Text
-              mt="4"
-              fontSize="md"
-              flex={1}
-              textAlign="center"
-              color="gray.500"
-            >
-              Combine icons and words in your designs, or go with just icons!
-            </Text>
-
-            <Button
-              mr="3"
-              mt="6"
-              // flex="1"
-              size="lg"
-              variantColor="primary"
-              onClick={() => {
-                state.isAdding = true
-              }}
-            >
-              <evaicons.PlusOutline size="20" /> Add Icons
-            </Button>
-          </Box>
-        )}
+        {!state.isAdding && icons.length === 0 && <EmptyStateShapesUi />}
 
         {!state.isAdding && icons.length > 0 && (
           <>
@@ -249,4 +191,52 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
       </Box>
     )
   }
+)
+
+const EmptyStateShapesUi = () => (
+  <Box
+    mt="2rem"
+    display="flex"
+    alignItems="center"
+    flexDirection="column"
+    boxShadow="sm"
+    borderColor="gray.100"
+    borderWidth="1px"
+    p="6"
+  >
+    <Box
+      mb="1rem"
+      bg="primary.50"
+      color="primary.400"
+      width="90px"
+      height="90px"
+      borderRadius="100%"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+    >
+      <SmileBeam size={60} />
+    </Box>
+
+    <Text fontSize="xl" flex={1} textAlign="center" color="gray.600" mb="0">
+      When words aren't enough
+    </Text>
+
+    <Text mt="4" fontSize="md" flex={1} textAlign="center" color="gray.500">
+      Combine icons and words in your designs, or go with just icons!
+    </Text>
+
+    <Button
+      mr="3"
+      mt="6"
+      // flex="1"
+      size="lg"
+      variantColor="primary"
+      onClick={() => {
+        state.isAdding = true
+      }}
+    >
+      <evaicons.PlusOutline size="20" /> Add Icons
+    </Button>
+  </Box>
 )

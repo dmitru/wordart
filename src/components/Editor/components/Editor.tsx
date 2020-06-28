@@ -1158,7 +1158,8 @@ const LeftBottomWrapper = styled.div<{ theme: any }>`
 `
 
 const LeftPanel = styled(Box)`
-  z-index: 2;
+  z-index: 20;
+  box-shadow: 0 0 5px 0 #00000033;
   flex: 1;
   width: 350px;
 `
@@ -1248,8 +1249,6 @@ const LeftPanelContent = styled(Box)<{ theme: any; noScroll: boolean }>`
   height: ${(p) => (p.noScroll ? '100%' : 'calc(100vh - 50px)')};
   overflow: auto;
   background: ${(p) => p.theme.colors.light};
-  z-index: 2;
-  box-shadow: 0 0 5px 0 #00000033;
 
   &::-webkit-scrollbar {
     display: none; /* Chrome Safari */
