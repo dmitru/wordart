@@ -25,6 +25,7 @@ import { uniq } from 'lodash'
 import { LeftPanelFontPicker } from 'components/Editor/components/LeftPanelFontPicker'
 import { Button } from 'components/shared/Button'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
+import { DeleteButton } from 'components/shared/DeleteButton'
 
 export type LeftPanelFontsTabProps = {
   target: TargetKind
@@ -308,13 +309,10 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
 
       {showDelete && (
         <FontDeleteButton
-          isRound
           aria-label="Delete"
+          color="gray.600"
           ml="2"
-          variant="outline"
           mr="2"
-          icon="close"
-          size="xs"
           onClickCapture={(e) => {
             e.preventDefault()
             e.stopPropagation()
@@ -322,9 +320,7 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
             e.nativeEvent.stopPropagation()
             onDeleteClick()
           }}
-        >
-          <Icon name="close" />
-        </FontDeleteButton>
+        />
       )}
     </FontButtonContainer>
   )
@@ -337,7 +333,7 @@ const FontChangeButton = styled(Button)`
 
 const Toolbar = styled(Box)``
 
-const FontDeleteButton = styled(IconButton)`
+const FontDeleteButton = styled(DeleteButton)`
   position: absolute;
   right: 0;
   width: 30px;

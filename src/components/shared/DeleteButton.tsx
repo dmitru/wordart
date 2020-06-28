@@ -8,6 +8,7 @@ export const DeleteButton: React.FC<Omit<ButtonProps, 'children'>> = (
   <Button
     size="xs"
     variant="ghost"
+    color="gray.500"
     {...props}
     css={css`
       box-shadow: none !important;

@@ -24,7 +24,8 @@ export const Button = React.forwardRef<ButtonProps, any>((props, ref) => (
         'box-shadow: 0 0 8px 0 #00000023;'}
       }
 
-      ${props.variant === 'ghost' && 'box-shadow: none !important;'}
+      ${props.variant === 'ghost' &&
+      `box-shadow: none !important; color: #485660;`}
     `}
   />
 ))

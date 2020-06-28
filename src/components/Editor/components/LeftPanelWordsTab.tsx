@@ -4,7 +4,6 @@ import {
   EditableInput,
   EditablePreview,
   Icon,
-  Input,
   InputGroup,
   InputLeftElement,
   Menu,
@@ -23,6 +22,7 @@ import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { TargetKind } from 'components/Editor/lib/editor'
 import { Button } from 'components/shared/Button'
+import { Input } from 'components/shared/Input'
 import { DeleteButton } from 'components/shared/DeleteButton'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { capitalize } from 'lodash'
@@ -31,7 +31,7 @@ import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { WordsEditorModal } from 'components/Editor/components/WordsEditorModal'
 import { useRef } from 'react'
-import { fireEventForEl } from 'utils/dom'
+import { SearchInput } from 'components/shared/SearchInput'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -41,7 +41,6 @@ const state = observable({
   isShowingImport: false,
   isShowingEditor: false,
   textFilter: '',
-  isForcedHideEmptyUi: false,
   newWordText: '',
 })
 
@@ -55,11 +54,15 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
     const newWordInputRef = useRef<HTMLInputElement>(null)
 
+    const focusNewWordInput = () => {
+      console.log(newWordInputRef.current)
+      newWordInputRef.current?.focus()
+    }
+
     const handleAddWord = (word = '') => {
-      state.isForcedHideEmptyUi = false
       store.addWord(target, word)
       store.animateVisualize(false)
-      newWordInputRef.current?.focus()
+      focusNewWordInput()
     }
 
     const handleNewWordInputSubmit = () => {
@@ -82,180 +85,167 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
     return (
       <Box mb="5" px="5" py="6">
-        {(allWords.length > 0 || state.isForcedHideEmptyUi) && (
-          <>
-            <SectionLabel>Words list</SectionLabel>
-            <Stack direction="row" mb="3" spacing="1">
-              <Button
-                size="sm"
-                variantColor="secondary"
-                leftIcon="add"
-                onClick={() => handleAddWord()}
-              >
-                Add
-              </Button>
+        <>
+          <SectionLabel>Words list</SectionLabel>
+          <Stack direction="row" mb="3" spacing="1">
+            <Button
+              size="sm"
+              variantColor="secondary"
+              leftIcon="add"
+              onClick={focusNewWordInput}
+            >
+              Add
+            </Button>
 
-              <Button
-                size="sm"
-                leftIcon="edit"
-                variantColor="primary"
-                onClick={() => {
-                  state.isShowingEditor = true
-                }}
-              >
-                Edit words
-              </Button>
+            <Button
+              size="sm"
+              leftIcon="edit"
+              variantColor="primary"
+              onClick={() => {
+                state.isShowingEditor = true
+              }}
+            >
+              Edit words
+            </Button>
 
-              <Button
-                size="sm"
-                variant="outline"
-                leftIcon="arrow-up"
-                onClick={() => {
-                  state.isShowingImport = true
-                }}
-              >
-                Import
-              </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              leftIcon="arrow-up"
+              onClick={() => {
+                state.isShowingImport = true
+              }}
+            >
+              Import
+            </Button>
 
-              <Box marginLeft="auto">
-                <Menu>
-                  <MenuButton as={MenuDotsButton} size="sm" />
-                  <MenuList zIndex={1000} placement="bottom-end">
-                    <MenuGroup title="Formatting">
-                      <MenuItem
-                        onClick={() => {
-                          words.wordList = words.wordList.map((w) => ({
-                            ...w,
-                            text: capitalize(w.text),
-                          }))
-                          store.animateVisualize(false)
-                        }}
-                      >
-                        Capitalize
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() => {
-                          words.wordList = words.wordList.map((w) => ({
-                            ...w,
-                            text: w.text.toLocaleUpperCase(),
-                          }))
-                          store.animateVisualize(false)
-                        }}
-                      >
-                        UPPERCASE
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() => {
-                          words.wordList = words.wordList.map((w) => ({
-                            ...w,
-                            text: w.text.toLocaleLowerCase(),
-                          }))
-                          store.animateVisualize(false)
-                        }}
-                      >
-                        lowercase
-                      </MenuItem>
-                    </MenuGroup>
-
-                    <MenuDivider />
-
-                    <MenuItem onClick={() => store.clearWords(target)}>
-                      <Icon
-                        name="small-close"
-                        size="20px"
-                        color="gray.500"
-                        mr="2"
-                      />
-                      Clear all
+            <Box marginLeft="auto">
+              <Menu>
+                <MenuButton as={MenuDotsButton} size="sm" />
+                <MenuList zIndex={1000} placement="bottom-end">
+                  <MenuGroup title="Formatting">
+                    <MenuItem
+                      onClick={() => {
+                        words.wordList = words.wordList.map((w) => ({
+                          ...w,
+                          text: capitalize(w.text),
+                        }))
+                        store.animateVisualize(false)
+                      }}
+                    >
+                      Capitalize
                     </MenuItem>
-                  </MenuList>
-                </Menu>
-              </Box>
-            </Stack>
-            <Stack direction="row" mb="4" mt="2">
-              <InputGroup flex={1} size="sm">
-                <InputLeftElement children={<Icon name="search" />} />
-                <Input
-                  placeholder="Filter..."
-                  value={state.textFilter}
-                  onChange={(e: any) => {
-                    state.textFilter = e.target.value
-                  }}
-                />
-                {!!state.textFilter && (
-                  <InputRightElement
+                    <MenuItem
+                      onClick={() => {
+                        words.wordList = words.wordList.map((w) => ({
+                          ...w,
+                          text: w.text.toLocaleUpperCase(),
+                        }))
+                        store.animateVisualize(false)
+                      }}
+                    >
+                      UPPERCASE
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        words.wordList = words.wordList.map((w) => ({
+                          ...w,
+                          text: w.text.toLocaleLowerCase(),
+                        }))
+                        store.animateVisualize(false)
+                      }}
+                    >
+                      lowercase
+                    </MenuItem>
+                  </MenuGroup>
+
+                  <MenuDivider />
+
+                  <MenuItem
                     onClick={() => {
-                      state.textFilter = ''
+                      store.clearWords(target)
+                      focusNewWordInput()
                     }}
-                    children={<DeleteButton size="sm" aria-label="Clear" />}
-                  />
-                )}
-              </InputGroup>
-            </Stack>
+                  >
+                    <Icon
+                      name="small-close"
+                      size="20px"
+                      color="gray.500"
+                      mr="2"
+                    />
+                    Clear all
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </Box>
+          </Stack>
+          <Stack direction="row" mb="4" mt="2" maxWidth="185px">
+            <SearchInput
+              placeholder="Filter..."
+              value={state.textFilter}
+              onChange={(value) => {
+                state.textFilter = value
+              }}
+            />
+          </Stack>
 
-            <WordList mt="2" id="words-list">
-              {filteredWords.map((word, index) => (
+          <WordList mt="2" id="words-list">
+            {filteredWords.map((word, index) => {
+              const handleSubmit = () => {
+                const text = word.text.trim()
+                if (text === '') {
+                  store.deleteWord(target, word.id)
+                  store.animateVisualize(false)
+                } else if (text !== word.text) {
+                  store.updateWord(target, word.id, {
+                    text,
+                  })
+                  store.animateVisualize(false)
+                }
+              }
+
+              return (
                 <WordRow key={word.id} aria-label="">
-                  <Editable
-                    ref={(ref) => {
-                      // @ts-ignore
-                      window['ref'] = ref
-                    }}
+                  <WordInput
                     ml="2"
-                    flex={1}
+                    flex="1"
                     value={word.text}
-                    startWithEditView={!word.text}
-                    isPreviewFocusable
-                    onSubmit={() => {
-                      const text = word.text.trim()
-                      if (text === '') {
-                        store.deleteWord(target, word.id)
-                      } else {
-                        store.updateWord(target, word.id, {
-                          text,
-                        })
-
-                        if (index === filteredWords.length - 1) {
-                          store.addWord(target)
-                        }
-                      }
-                      store.animateVisualize(false)
-                    }}
-                    onChange={(text) => {
+                    onChange={(e: any) => {
                       store.updateWord(target, word.id, {
-                        text,
+                        text: e.target.value,
                       })
                     }}
-                    selectAllOnFocus={false}
-                    placeholder="Type word here..."
-                  >
-                    <EditablePreview
-                      flex={1}
-                      width="100%"
-                      py="2"
-                      className="word-preview"
-                    />
-                    <EditableInput
-                      className="word-input"
-                      placeholder="Type word here..."
-                      my="2"
-                    />
-                  </Editable>
+                    onBlur={() => {
+                      handleSubmit()
+                    }}
+                    onKeyDown={(e: React.KeyboardEvent) => {
+                      if (e.key === 'Enter') {
+                        handleSubmit()
+                      }
+                    }}
+                    placeholder="Type here..."
+                  />
 
                   <WordDeleteButton
+                    tabIndex={-1}
                     ml="2"
                     mr="2"
                     onClick={() => {
                       store.deleteWord(target, word.id)
                       store.animateVisualize(false)
+                      if (words.wordList.length === 0) {
+                        focusNewWordInput()
+                      }
                     }}
                   />
                 </WordRow>
-              ))}
+              )
+            })}
 
-              <WordRow>
-                <Input
-                  ml="2"
+            {/* NEW WORD INPUT */}
+            {!state.textFilter && (
+              <WordRowNewInput>
+                <WordInput
                   flex="1"
                   ref={newWordInputRef}
                   autoFocus
@@ -282,28 +272,12 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                   }}
                   placeholder="Type new word here..."
                 />
-              </WordRow>
-            </WordList>
-          </>
-        )}
+              </WordRowNewInput>
+            )}
+          </WordList>
+        </>
 
-        {allWords.length === 0 && !state.isForcedHideEmptyUi && (
-          <EmptyStateWordsUi>
-            <Button
-              mr="3"
-              mt="6"
-              // flex="1"
-              size="lg"
-              variantColor="primary"
-              leftIcon="add"
-              onClick={() => {
-                state.isForcedHideEmptyUi = true
-              }}
-            >
-              Add Words
-            </Button>
-          </EmptyStateWordsUi>
-        )}
+        {allWords.length === 0 && <EmptyStateWordsUi />}
 
         <ImportWordsModal
           isOpen={state.isShowingImport}
@@ -332,8 +306,14 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
   }
 )
 
+const WordInput = styled(Input)`
+  &:not(:focus) {
+    border: none;
+  }
+`
+
 const WordList = styled(Box)`
-  height: calc(100vh - 210px);
+  /* height: calc(100vh - 210px); */
   overflow: auto;
 `
 
@@ -353,11 +333,16 @@ const WordRow = styled(Box)`
   }
 
   &:hover {
-    background: hsla(200, 81%, 97%, 1);
+    /* background: hsla(200, 81%, 97%, 1); */
     ${WordDeleteButton} {
       opacity: 1;
     }
   }
+`
+
+const WordRowNewInput = styled(WordRow)`
+  padding: 2px;
+  border: none;
 `
 
 const EmptyStateWordsUi: React.FC<{ children?: React.ReactNode }> = ({
