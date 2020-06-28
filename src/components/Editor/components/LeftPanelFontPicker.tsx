@@ -69,33 +69,6 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
 
     return (
       <>
-        <Stack direction="row" spacing="2" display="flex" mb="5">
-          {showCancel && (
-            <Button
-              flex="1"
-              variant="outline"
-              onClick={() => {
-                onCancel()
-              }}
-            >
-              Cancel
-            </Button>
-          )}
-          <Button
-            flex="2"
-            onClick={() => {
-              if (!selectedFont) {
-                return
-              }
-              onSelected(selectedFont.font, selectedFontStyle)
-            }}
-            variantColor="accent"
-            id="font-picker-done"
-          >
-            {showCancel ? 'Add this font' : 'Done'}
-          </Button>
-        </Stack>
-
         <SectionLabel>Selected Font</SectionLabel>
 
         <Box display="flex" flexDirection="column" height="100%">
@@ -154,6 +127,33 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
               </Box>
             </>
           )}
+
+          <Stack direction="row" spacing="2" display="flex" mt="3" mb="0">
+            {showCancel && (
+              <Button
+                flex="1"
+                variant="outline"
+                onClick={() => {
+                  onCancel()
+                }}
+              >
+                Cancel
+              </Button>
+            )}
+            <Button
+              flex="2"
+              onClick={() => {
+                if (!selectedFont) {
+                  return
+                }
+                onSelected(selectedFont.font, selectedFontStyle)
+              }}
+              variantColor="accent"
+              id="font-picker-done"
+            >
+              {showCancel ? 'Add this font' : 'Done'}
+            </Button>
+          </Stack>
 
           <Box mt="1.5rem" display="flex" flexDirection="column" flex="1">
             <SectionLabel

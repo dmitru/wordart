@@ -26,12 +26,21 @@ import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { SearchInput } from 'components/shared/SearchInput'
 import { capitalize } from 'lodash'
 import { observable } from 'mobx'
-import { observer } from 'mobx-react'
-import { useRef } from 'react'
+import { Observer, observer } from 'mobx-react'
+import { useRef, useState } from 'react'
 import { useStore } from 'services/root-store'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
+}
+
+const reorder = (list: any[], startIndex: number, endIndex: number) => {
+  const result = Array.from(list)
+  const [removed] = result.splice(startIndex, 1)
+  result.splice(endIndex, 0, removed)
+
+  return result
 }
 
 const state = observable({
@@ -80,12 +89,14 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         )
       : allWords
 
+    const [isDragging, setIsDragging] = useState(false)
+
     return (
-      <Box mb="5" px="5" py="6">
+      <Box px="5" py="6" overflow="hidden" height="calc(100vh - 60px)">
         <>
-          <Stack direction="row" mb="6" spacing="1">
+          <Stack direction="row" mb="6" spacing="2">
             <Button
-              variantColor="secondary"
+              variantColor="primary"
               leftIcon="add"
               onClick={focusNewWordInput}
             >
@@ -94,7 +105,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
             <Button
               leftIcon="edit"
-              variantColor="primary"
+              variantColor="secondary"
               onClick={() => {
                 state.isShowingEditor = true
               }}
@@ -114,22 +125,28 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             </Box>
           </Stack>
 
-          <SectionLabel>Words list</SectionLabel>
+          {/* <SectionLabel>Words list</SectionLabel> */}
 
           {allWords.length > 0 && (
             <Stack
               direction="row"
+              alignItems="center"
               mb="4"
               mt="2"
               css={css`
-                padding-left: 21px;
                 margin-bottom: 0;
+                margin: 0 -20px;
+                padding: 0 20px;
+                padding-left: 38px;
+                background: #eff1f7;
               `}
             >
-              <Checkbox size="lg" />
+              <Checkbox size="lg" bg="white" />
               <Box maxWidth="185px">
                 <SearchInput
-                  size="md"
+                  css={css`
+                    border-bottom: 1px solid transparent !important;
+                  `}
                   placeholder="Filter..."
                   value={state.textFilter}
                   onChange={(value) => {
@@ -200,117 +217,175 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             </Stack>
           )}
 
-          <WordList mt="2" id="words-list">
-            {filteredWords.map((word, index) => {
-              const handleSubmit = () => {
-                const text = word.text.trim()
-                if (text === '') {
-                  store.deleteWord(target, word.id)
-                  store.animateVisualize(false)
-                } else if (text !== word.text) {
-                  store.updateWord(target, word.id, {
-                    text,
-                  })
-                  store.animateVisualize(false)
+          <Box overflowY="hidden" overflowX="hidden" mx="-20px" px="20px">
+            <DragDropContext
+              onBeforeDragStart={() => setIsDragging(true)}
+              onDragEnd={(result) => {
+                setIsDragging(false)
+                if (!result.destination) {
+                  return
                 }
-              }
 
-              return (
-                <WordRow key={word.id} aria-label="">
-                  <Box color="gray.500">
-                    <DragIndicator
-                      size="20px"
-                      css={css`
-                        visibility: ${state.textFilter ? 'hidden' : 'visible'};
-                        position: relative;
-                        top: -2px;
-                        cursor: grab;
-                      `}
-                    />
-                  </Box>
+                words.wordList = reorder(
+                  words.wordList,
+                  result.source.index,
+                  result.destination.index
+                )
+              }}
+            >
+              <Droppable droppableId="droppable">
+                {(provided, snapshot) => (
+                  <Observer>
+                    {() => (
+                      <WordList
+                        mt="2"
+                        overflowY="auto"
+                        id="words-list"
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                      >
+                        {filteredWords.map((word, index) => {
+                          const handleSubmit = () => {
+                            const text = word.text.trim()
+                            if (text === '') {
+                              store.deleteWord(target, word.id)
+                              store.animateVisualize(false)
+                            } else if (text !== word.text) {
+                              store.updateWord(target, word.id, {
+                                text,
+                              })
+                              store.animateVisualize(false)
+                            }
+                          }
 
-                  <Checkbox p="10px" px="8px" size="lg" />
+                          return (
+                            <Draggable
+                              key={word.id}
+                              draggableId={word.id}
+                              index={index}
+                            >
+                              {(provided, snapshot) => (
+                                <Observer>
+                                  {() => (
+                                    <WordRow
+                                      aria-label=""
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      css={css`
+                                        ${snapshot.isDragging &&
+                                        `box-shadow: 0 0 10px 0 #0003;
+                              border-bottom: none !important;
+                              background: white;
+                              `}
+                                      `}
+                                    >
+                                      <Box color="gray.400">
+                                        <DragIndicator
+                                          size="20px"
+                                          css={css`
+                                            visibility: ${state.textFilter
+                                              ? 'hidden'
+                                              : 'visible'};
+                                            position: relative;
+                                            top: -2px;
+                                            cursor: grab;
+                                          `}
+                                        />
+                                      </Box>
 
-                  <WordInput
-                    pl="8px"
-                    flex="1"
-                    value={word.text}
-                    onChange={(e: any) => {
-                      store.updateWord(target, word.id, {
-                        text: e.target.value,
-                      })
-                    }}
-                    onBlur={() => {
-                      handleSubmit()
-                    }}
-                    onKeyDown={(e: React.KeyboardEvent) => {
-                      if (e.key === 'Enter') {
-                        handleSubmit()
-                      }
-                    }}
-                    placeholder="Type here..."
-                  />
+                                      <Checkbox p="10px" px="8px" size="lg" />
 
-                  <WordMenuButton
-                    tabIndex={-1}
-                    mr="1"
-                    size="sm"
-                    onClick={() => {
-                      store.deleteWord(target, word.id)
-                      store.animateVisualize(false)
-                      if (words.wordList.length === 0) {
-                        focusNewWordInput()
-                      }
-                    }}
-                  />
+                                      <WordInput
+                                        pl="8px"
+                                        flex="1"
+                                        value={word.text}
+                                        onChange={(e: any) => {
+                                          store.updateWord(target, word.id, {
+                                            text: e.target.value,
+                                          })
+                                        }}
+                                        onBlur={() => {
+                                          handleSubmit()
+                                        }}
+                                        onKeyDown={(e: React.KeyboardEvent) => {
+                                          if (e.key === 'Enter') {
+                                            handleSubmit()
+                                          }
+                                        }}
+                                        placeholder="Type here..."
+                                      />
 
-                  <WordDeleteButton
-                    tabIndex={-1}
-                    size="sm"
-                    onClick={() => {
-                      store.deleteWord(target, word.id)
-                      store.animateVisualize(false)
-                      if (words.wordList.length === 0) {
-                        focusNewWordInput()
-                      }
-                    }}
-                  />
-                </WordRow>
-              )
-            })}
+                                      <WordMenuButton
+                                        tabIndex={-1}
+                                        mr="1"
+                                        size="sm"
+                                        onClick={() => {
+                                          store.deleteWord(target, word.id)
+                                          store.animateVisualize(false)
+                                          if (words.wordList.length === 0) {
+                                            focusNewWordInput()
+                                          }
+                                        }}
+                                      />
 
-            {/* NEW WORD INPUT */}
-            {!state.textFilter && (
-              <WordRowNewInput>
-                <WordInput
-                  flex="1"
-                  ref={newWordInputRef}
-                  value={state.newWordText}
-                  onChange={(e: any) => {
-                    state.newWordText = e.target.value
-                  }}
-                  onBlur={() => {
-                    if (!ignoreBlur) {
-                      handleNewWordInputSubmit()
-                    }
-                  }}
-                  onKeyDown={(e: React.KeyboardEvent) => {
-                    if (e.key === 'Enter') {
-                      handleNewWordInputSubmit()
-                    } else if (e.key === 'Escape') {
-                      ignoreBlur = true
-                      state.newWordText = ''
-                      newWordInputRef.current?.blur()
-                      setTimeout(() => {
-                        ignoreBlur = false
-                      }, 100)
-                    }
-                  }}
-                  placeholder="Type new word here..."
-                />
-              </WordRowNewInput>
-            )}
-          </WordList>
+                                      <WordDeleteButton
+                                        tabIndex={-1}
+                                        size="sm"
+                                        onClick={() => {
+                                          store.deleteWord(target, word.id)
+                                          store.animateVisualize(false)
+                                          if (words.wordList.length === 0) {
+                                            focusNewWordInput()
+                                          }
+                                        }}
+                                      />
+                                    </WordRow>
+                                  )}
+                                </Observer>
+                              )}
+                            </Draggable>
+                          )
+                        })}
+
+                        {/* NEW WORD INPUT */}
+                        {!state.textFilter && !isDragging && (
+                          <WordRowNewInput>
+                            <WordInput
+                              flex="1"
+                              ref={newWordInputRef}
+                              value={state.newWordText}
+                              onChange={(e: any) => {
+                                state.newWordText = e.target.value
+                              }}
+                              onBlur={() => {
+                                if (!ignoreBlur) {
+                                  handleNewWordInputSubmit()
+                                }
+                              }}
+                              onKeyDown={(e: React.KeyboardEvent) => {
+                                if (e.key === 'Enter') {
+                                  handleNewWordInputSubmit()
+                                } else if (e.key === 'Escape') {
+                                  ignoreBlur = true
+                                  state.newWordText = ''
+                                  newWordInputRef.current?.blur()
+                                  setTimeout(() => {
+                                    ignoreBlur = false
+                                  }, 100)
+                                }
+                              }}
+                              placeholder="Type new word here..."
+                            />
+                          </WordRowNewInput>
+                        )}
+                      </WordList>
+                    )}
+                  </Observer>
+                )}
+              </Droppable>
+            </DragDropContext>
+          </Box>
         </>
 
         {allWords.length === 0 && <EmptyStateWordsUi />}
@@ -343,18 +418,19 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 )
 
 const WordInput = styled(Input)`
+  background: transparent;
   &:not(:focus) {
     border-color: transparent;
   }
 `
 
 const WordList = styled(Box)`
-  /* height: calc(100vh - 210px); */
-  overflow: auto;
-  margin-left: -16px;
+  margin-left: -20px;
+  height: calc(100vh - 200px);
   /* padding-left: 16px; */
-  margin-right: -16px;
+  margin-right: -20px;
   /* padding-right: 16px; */
+  padding-bottom: 80px;
   /* overflow: visible; */
 `
 
@@ -365,7 +441,7 @@ const WordRow = styled(Box)`
   width: 100%;
   padding: 0;
   padding-left: 10px;
-  padding-right: 16px;
+  padding-right: 20px;
 
   display: flex;
   align-items: center;
@@ -390,7 +466,7 @@ const WordRow = styled(Box)`
 `
 
 const WordRowNewInput = styled(WordRow)`
-  padding: 2px 16px;
+  padding: 8px 16px;
   border: none;
 `
 

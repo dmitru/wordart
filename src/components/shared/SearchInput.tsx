@@ -20,15 +20,16 @@ export const SearchInput: React.FC<
     <InputLeftElement children={<Icon color="gray.400" name="search" />} />
     <Input
       paddingLeft={size === 'sm' ? '30px' : '38px'}
-      {...props}
       onChange={(e: any) => onChange(e.target.value as string)}
       css={css`
+        background: transparent;
         border: none;
         border-bottom: 1px solid transparent !important;
         &:not(:focus) {
-          border-bottom: 1px solid #eee !important;
+          border-bottom: 1px solid #eee;
         }
       `}
+      {...props}
     />
     {!!props.value && (
       <InputRightElement
