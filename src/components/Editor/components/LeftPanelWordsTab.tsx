@@ -203,7 +203,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     ml="2"
                     flex={1}
                     value={word.text}
-                    onChange={(text) => {
+                    onSubmit={(text) => {
                       text = text.trim()
                       if (text === '') {
                         store.deleteWord(target, word.id)
@@ -213,6 +213,11 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                         })
                       }
                       store.animateVisualize(false)
+                    }}
+                    onChange={(text) => {
+                      store.updateWord(target, word.id, {
+                        text,
+                      })
                     }}
                     selectAllOnFocus
                     placeholder="Type new word here..."
