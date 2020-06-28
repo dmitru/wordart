@@ -49,19 +49,48 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         <SectionLabel>Words list</SectionLabel>
 
         <Stack spacing="0">
-          <Stack direction="row" mb="2" spacing="0">
+          <Stack direction="row" mb="3" spacing="1">
             <Button
+              size="sm"
+              variantColor="secondary"
+              leftIcon="add"
+              onClick={() => {
+                const wordsList = document.getElementById('words-list')
+                const inputs = wordsList
+                  ? wordsList.getElementsByClassName('word-input')
+                  : []
+                const previews = wordsList
+                  ? wordsList.getElementsByClassName('word-preview')
+                  : []
+                const firstInput = inputs[0] as HTMLInputElement
+                const firstPreview = previews[0] as HTMLElement
+                console.log(firstPreview)
+                if (firstInput) {
+                  firstInput.focus()
+                } else if (firstPreview) {
+                  firstPreview.click()
+                } else {
+                  store.addWord(target)
+                  store.animateVisualize(false)
+                }
+              }}
+            >
+              Add
+            </Button>
+
+            <Button
+              size="sm"
               leftIcon="edit"
               variantColor="primary"
               onClick={() => {
                 state.isShowingEditor = true
               }}
             >
-              Edit words...
+              Edit words
             </Button>
 
             <Button
-              ml="2"
+              size="sm"
               variant="outline"
               leftIcon="arrow-up"
               onClick={() => {
@@ -73,7 +102,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
             <Box marginLeft="auto">
               <Menu>
-                <MenuButton as={MenuDotsButton} />
+                <MenuButton as={MenuDotsButton} size="sm" />
                 <MenuList zIndex={1000} placement="bottom-end">
                   <MenuGroup title="Formatting">
                     <MenuItem
@@ -128,34 +157,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
           </Stack>
 
           <Stack direction="row" mb="4" mt="2">
-            <Button
-              variantColor="secondary"
-              leftIcon="add"
-              size="sm"
-              onClick={() => {
-                const wordsList = document.getElementById('words-list')
-                const inputs = wordsList
-                  ? wordsList.getElementsByClassName('word-input')
-                  : []
-                const previews = wordsList
-                  ? wordsList.getElementsByClassName('word-preview')
-                  : []
-                const firstInput = inputs[0] as HTMLInputElement
-                const firstPreview = previews[0] as HTMLElement
-                console.log(firstPreview)
-                if (firstInput) {
-                  firstInput.focus()
-                } else if (firstPreview) {
-                  firstPreview.click()
-                } else {
-                  store.addWord(target)
-                  store.animateVisualize(false)
-                }
-              }}
-            >
-              Add
-            </Button>
-
             <InputGroup flex={1} size="sm">
               <InputLeftElement children={<Icon name="search" />} />
               <Input placeholder="Filter..." />
