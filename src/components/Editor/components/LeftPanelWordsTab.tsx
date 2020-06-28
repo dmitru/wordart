@@ -15,6 +15,7 @@ import {
   MenuList,
   Stack,
   Text,
+  InputRightElement,
 } from '@chakra-ui/core'
 import styled from '@emotion/styled'
 import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
@@ -36,6 +37,7 @@ export type LeftPanelWordsTabProps = {
 const state = observable({
   isShowingImport: false,
   isShowingEditor: false,
+  textFilter: '',
 })
 
 export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
@@ -43,6 +45,35 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     const { editorPageStore: store } = useStore()
     const style = store.styleOptions[target]
     const words = style.items.words
+
+    const handleAddWordClick = () => {
+      const wordsList = document.getElementById('words-list')
+      const inputs = wordsList
+        ? wordsList.getElementsByClassName('word-input')
+        : []
+      const previews = wordsList
+        ? wordsList.getElementsByClassName('word-preview')
+        : []
+      const firstInput = inputs[0] as HTMLInputElement
+      const firstPreview = previews[0] as HTMLElement
+      console.log(firstPreview)
+      if (firstInput) {
+        firstInput.focus()
+      } else if (firstPreview) {
+        firstPreview.click()
+      } else {
+        store.addWord(target)
+        store.animateVisualize(false)
+      }
+    }
+
+    const textFilterValue = state.textFilter.trim().toLocaleLowerCase()
+    const allWords = words.wordList
+    const filteredWords = textFilterValue
+      ? words.wordList.filter((w) =>
+          w.text.trim().toLocaleLowerCase().includes(textFilterValue)
+        )
+      : allWords
 
     return (
       <Box mb="5" px="5" py="6">
@@ -54,26 +85,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               size="sm"
               variantColor="secondary"
               leftIcon="add"
-              onClick={() => {
-                const wordsList = document.getElementById('words-list')
-                const inputs = wordsList
-                  ? wordsList.getElementsByClassName('word-input')
-                  : []
-                const previews = wordsList
-                  ? wordsList.getElementsByClassName('word-preview')
-                  : []
-                const firstInput = inputs[0] as HTMLInputElement
-                const firstPreview = previews[0] as HTMLElement
-                console.log(firstPreview)
-                if (firstInput) {
-                  firstInput.focus()
-                } else if (firstPreview) {
-                  firstPreview.click()
-                } else {
-                  store.addWord(target)
-                  store.animateVisualize(false)
-                }
-              }}
+              onClick={handleAddWordClick}
             >
               Add
             </Button>
@@ -159,28 +171,47 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
           <Stack direction="row" mb="4" mt="2">
             <InputGroup flex={1} size="sm">
               <InputLeftElement children={<Icon name="search" />} />
-              <Input placeholder="Filter..." />
+              <Input
+                placeholder="Filter..."
+                value={state.textFilter}
+                onChange={(e: any) => {
+                  state.textFilter = e.target.value
+                }}
+              />
+              {!!state.textFilter && (
+                <InputRightElement
+                  onClick={() => {
+                    state.textFilter = ''
+                  }}
+                  children={<DeleteButton size="sm" aria-label="Clear" />}
+                />
+              )}
             </InputGroup>
           </Stack>
 
-          {words.wordList.length === 0 && (
+          {allWords.length === 0 && (
             <Text mt="4" size="lg">
               You haven't added any words yet.
             </Text>
           )}
 
-          {words.wordList.length > 0 && (
+          {filteredWords.length > 0 && (
             <WordList mt="2" id="words-list">
-              {words.wordList.map((word) => (
+              {filteredWords.map((word) => (
                 <WordRow key={word.id} aria-label="">
                   <Editable
                     ml="2"
                     flex={1}
                     value={word.text}
                     onChange={(text) => {
-                      store.updateWord(target, word.id, {
-                        text,
-                      })
+                      text = text.trim()
+                      if (text === '') {
+                        store.deleteWord(target, word.id)
+                      } else {
+                        store.updateWord(target, word.id, {
+                          text,
+                        })
+                      }
                       store.animateVisualize(false)
                     }}
                     selectAllOnFocus
