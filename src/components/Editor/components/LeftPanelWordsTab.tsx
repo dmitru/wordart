@@ -1,93 +1,42 @@
 import {
   Box,
-  Checkbox,
   Editable,
   EditableInput,
   EditablePreview,
   Icon,
-  IconButton,
   Input,
   InputGroup,
   InputLeftElement,
-  Link,
   Menu,
   MenuButton,
   MenuDivider,
   MenuGroup,
   MenuItem,
   MenuList,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
   Text,
-  Textarea,
 } from '@chakra-ui/core'
 import styled from '@emotion/styled'
-import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
-import { Tooltip } from 'components/shared/Tooltip'
+import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
+import { SectionLabel } from 'components/Editor/components/shared'
+import { TargetKind } from 'components/Editor/lib/editor'
 import { Button } from 'components/shared/Button'
+import { DeleteButton } from 'components/shared/DeleteButton'
+import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { capitalize } from 'lodash'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
-import stopword from 'stopword'
-import { MenuDotsButton } from 'components/shared/MenuDotsButton'
-import { SectionLabel } from 'components/Editor/components/shared'
-import css from '@emotion/css'
-import { TargetKind } from 'components/Editor/lib/editor'
-import { DeleteButton } from 'components/shared/DeleteButton'
+import { WordsEditorModal } from 'components/Editor/components/WordsEditorModal'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
 }
 
-const WordList = styled(Box)`
-  height: calc(100vh - 210px);
-  overflow: auto;
-`
-
-const WordDeleteButton = styled(DeleteButton)``
-
-const WordRow = styled(Box)`
-  width: 100%;
-  padding: 5px 0;
-  display: flex;
-
-  border-bottom: 1px solid #eee;
-
-  ${WordDeleteButton} {
-    opacity: 0;
-    transition: 0.2s opacity;
-  }
-
-  &:hover {
-    background: hsla(200, 81%, 97%, 1);
-    ${WordDeleteButton} {
-      opacity: 1;
-    }
-  }
-`
-
 const state = observable({
   isShowingImport: false,
-  editor: {
-    import: {
-      textInput: '',
-    },
-  },
+  isShowingEditor: false,
 })
-
-const Toolbar = styled(Box)``
 
 export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
   ({ target }) => {
@@ -95,15 +44,19 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     const style = store.styleOptions[target]
     const words = style.items.words
 
-    const fonts = store.getAvailableFonts()
-
     return (
       <Box mb="5" px="5" py="6">
         <SectionLabel>Words list</SectionLabel>
 
         <Stack spacing="0">
           <Stack direction="row" mb="2" spacing="0">
-            <Button leftIcon="edit" variantColor="primary">
+            <Button
+              leftIcon="edit"
+              variantColor="primary"
+              onClick={() => {
+                state.isShowingEditor = true
+              }}
+            >
               Edit words...
             </Button>
 
@@ -180,8 +133,24 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               leftIcon="add"
               size="sm"
               onClick={() => {
-                store.addWord(target)
-                store.animateVisualize(false)
+                const wordsList = document.getElementById('words-list')
+                const inputs = wordsList
+                  ? wordsList.getElementsByClassName('word-input')
+                  : []
+                const previews = wordsList
+                  ? wordsList.getElementsByClassName('word-preview')
+                  : []
+                const firstInput = inputs[0] as HTMLInputElement
+                const firstPreview = previews[0] as HTMLElement
+                console.log(firstPreview)
+                if (firstInput) {
+                  firstInput.focus()
+                } else if (firstPreview) {
+                  firstPreview.click()
+                } else {
+                  store.addWord(target)
+                  store.animateVisualize(false)
+                }
               }}
             >
               Add
@@ -200,7 +169,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
           )}
 
           {words.wordList.length > 0 && (
-            <WordList mt="2">
+            <WordList mt="2" id="words-list">
               {words.wordList.map((word) => (
                 <WordRow key={word.id} aria-label="">
                   <Editable
@@ -216,11 +185,18 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     selectAllOnFocus
                     placeholder="Type new word here..."
                   >
-                    <EditablePreview flex={1} width="100%" />
-                    <EditableInput placeholder="Type new word here..." />
+                    <EditablePreview
+                      flex={1}
+                      width="100%"
+                      py="2"
+                      className={word.text ? '' : 'word-preview'}
+                    />
+                    <EditableInput
+                      className="word-input"
+                      placeholder="Type new word here..."
+                      my="2"
+                    />
                   </Editable>
-
-                  {/* <ColorPicker value="#ff7777" mb="0" height="26px" /> */}
 
                   <WordDeleteButton
                     ml="2"
@@ -236,100 +212,57 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
           )}
         </Stack>
 
-        <Modal
-          size="lg"
+        <ImportWordsModal
           isOpen={state.isShowingImport}
           onClose={() => {
             state.isShowingImport = false
           }}
-        >
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Import Words</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <Tabs size="md" variant="enclosed">
-                <TabList>
-                  <Tab>Text</Tab>
-                  <Tab>CSV / Excel</Tab>
-                  <Tab>Web</Tab>
-                </TabList>
-                <TabPanels>
-                  <TabPanel>
-                    <Textarea
-                      mt="4"
-                      minHeight="200px"
-                      placeholder="Enter text..."
-                      value={state.editor.import.textInput}
-                      onChange={(evt: any) => {
-                        state.editor.import.textInput = evt.target.value
-                      }}
-                    />
-                    <Box mt="4" mb="4">
-                      <Stack direction="row" spacing="5">
-                        <Checkbox>Remove common words</Checkbox>
-                        <Checkbox>Remove numbers</Checkbox>
-                      </Stack>
-                      <Box>
-                        <Checkbox>
-                          Word stemming (e.g. treat “love” and “loves” as one
-                          word)
-                        </Checkbox>
-                      </Box>
-                    </Box>
-                  </TabPanel>
-                  <TabPanel>
-                    <Box mt="4">
-                      <Text>
-                        <Link>Learn more</Link> about importing words from CSV,
-                        Excel or Google Sheets.
-                      </Text>
-                      <Textarea
-                        mt="3"
-                        placeholder="Paste CSV..."
-                        value={state.editor.import.textInput}
-                        onChange={(evt: any) => {
-                          state.editor.import.textInput = evt.target.value
-                        }}
-                      />
-                      <Box mt="3">
-                        <Text>
-                          Or you can choose a CSV file:{' '}
-                          <Button>Open CSV file...</Button>
-                        </Text>
-                      </Box>
-                    </Box>
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            </ModalBody>
+          onImported={(words) => {
+            for (const word of words) {
+              store.addWord(target, word)
+            }
 
-            <ModalFooter>
-              <Checkbox marginRight="auto">
-                Clear word list before importing
-              </Checkbox>
-              <Button
-                ml="3"
-                variantColor="accent"
-                onClick={() => {
-                  const rawWords = state.editor.import.textInput
-                    .split(' ')
-                    .map((word) => word.toLocaleLowerCase().trim())
-                  const processedWords = stopword.removeStopwords(rawWords)
+            store.animateVisualize(false)
+            state.isShowingImport = false
+          }}
+        />
 
-                  for (const word of processedWords) {
-                    store.addWord(target, word)
-                  }
-                  state.isShowingImport = false
-                  store.animateVisualize(false)
-                }}
-              >
-                Import
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+        <WordsEditorModal
+          target={target}
+          isOpen={state.isShowingEditor}
+          onClose={() => {
+            state.isShowingEditor = false
+          }}
+        />
       </Box>
     )
   }
 )
+
+const WordList = styled(Box)`
+  height: calc(100vh - 210px);
+  overflow: auto;
+`
+
+const WordDeleteButton = styled(DeleteButton)``
+
+const WordRow = styled(Box)`
+  width: 100%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+
+  border-bottom: 1px solid #eee;
+
+  ${WordDeleteButton} {
+    opacity: 0;
+    transition: 0.2s opacity;
+  }
+
+  &:hover {
+    background: hsla(200, 81%, 97%, 1);
+    ${WordDeleteButton} {
+      opacity: 1;
+    }
+  }
+`
