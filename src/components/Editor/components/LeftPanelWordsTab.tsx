@@ -7,6 +7,8 @@ import {
   MenuGroup,
   MenuItem,
   MenuList,
+  InputGroup,
+  InputRightElement,
   Stack,
   Checkbox,
   Text,
@@ -272,6 +274,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                       ref={provided.innerRef}
                                       {...provided.draggableProps}
                                       {...provided.dragHandleProps}
+                                      tabIndex="-1"
                                       css={css`
                                         ${snapshot.isDragging &&
                                         `box-shadow: 0 0 10px 0 #0003;
@@ -294,7 +297,12 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                         />
                                       </Box>
 
-                                      <Checkbox p="10px" px="8px" size="lg" />
+                                      <Checkbox
+                                        p="10px"
+                                        px="8px"
+                                        size="lg"
+                                        tabIndex={-1}
+                                      />
 
                                       <WordInput
                                         pl="8px"
@@ -351,33 +359,51 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                         {/* NEW WORD INPUT */}
                         {!state.textFilter && !isDragging && (
                           <WordRowNewInput>
-                            <WordInput
-                              flex="1"
-                              ref={newWordInputRef}
-                              value={state.newWordText}
-                              onChange={(e: any) => {
-                                state.newWordText = e.target.value
-                              }}
-                              onBlur={() => {
-                                if (!ignoreBlur) {
-                                  handleNewWordInputSubmit()
+                            <InputGroup flex={1}>
+                              <WordInput
+                                flex="1"
+                                ref={newWordInputRef}
+                                value={state.newWordText}
+                                onChange={(e: any) => {
+                                  state.newWordText = e.target.value
+                                }}
+                                onKeyDown={(e: React.KeyboardEvent) => {
+                                  if (e.key === 'Enter') {
+                                    handleNewWordInputSubmit()
+                                  } else if (e.key === 'Escape') {
+                                    ignoreBlur = true
+                                    state.newWordText = ''
+                                    newWordInputRef.current?.blur()
+                                    setTimeout(() => {
+                                      ignoreBlur = false
+                                    }, 100)
+                                  }
+                                }}
+                                hasBorder
+                                placeholder="Type new word here..."
+                              />
+                              <InputRightElement
+                                width="80px"
+                                children={
+                                  <Button
+                                    px="3"
+                                    width="100%"
+                                    // leftIcon="add"
+                                    variantColor="primary"
+                                    onClick={() => handleNewWordInputSubmit()}
+                                  >
+                                    Add
+                                  </Button>
                                 }
-                              }}
-                              onKeyDown={(e: React.KeyboardEvent) => {
-                                if (e.key === 'Enter') {
-                                  handleNewWordInputSubmit()
-                                } else if (e.key === 'Escape') {
-                                  ignoreBlur = true
-                                  state.newWordText = ''
-                                  newWordInputRef.current?.blur()
-                                  setTimeout(() => {
-                                    ignoreBlur = false
-                                  }, 100)
-                                }
-                              }}
-                              placeholder="Type new word here..."
-                            />
+                              />
+                            </InputGroup>
                           </WordRowNewInput>
+                        )}
+
+                        {allWords.length === 0 && (
+                          <Box px="20px">
+                            <EmptyStateWordsUi target={target} />
+                          </Box>
                         )}
                       </WordList>
                     )}
@@ -387,8 +413,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             </DragDropContext>
           </Box>
         </>
-
-        {allWords.length === 0 && <EmptyStateWordsUi />}
 
         <ImportWordsModal
           isOpen={state.isShowingImport}
@@ -417,11 +441,14 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
   }
 )
 
-const WordInput = styled(Input)`
+const WordInput = styled(Input)<{ hasBorder: boolean }>`
   background: transparent;
   &:not(:focus) {
     border-color: transparent;
   }
+
+  ${(p) =>
+    p.hasBorder && `border-color: ${p.theme.colors.primary['500']} !important;`}
 `
 
 const WordList = styled(Box)`
@@ -470,9 +497,10 @@ const WordRowNewInput = styled(WordRow)`
   border: none;
 `
 
-const EmptyStateWordsUi: React.FC<{ children?: React.ReactNode }> = ({
-  children,
-}) => (
+const EmptyStateWordsUi: React.FC<{
+  target: TargetKind
+  children?: React.ReactNode
+}> = ({ target, children }) => (
   <Box
     mt="2rem"
     display="flex"
@@ -498,14 +526,12 @@ const EmptyStateWordsUi: React.FC<{ children?: React.ReactNode }> = ({
     </Box>
 
     <Text fontSize="xl" flex={1} textAlign="center" color="gray.600" mb="0">
-      It all began with a word...
+      Add words to {target === 'shape' ? 'the shape' : 'the background'}
     </Text>
 
     <Text mt="4" fontSize="md" flex={1} textAlign="center" color="gray.500">
-      Wordcloudy is all about using words to generate beautiful designs.
-      <br />
-      <br />
-      Add a few words and hit Visualize!
+      When ready, hit Visualize
+      <br /> to see the result!
     </Text>
 
     {children}

@@ -1,14 +1,17 @@
 import { Button, ButtonProps } from 'components/shared/Button'
 import { DotsThreeHorizontal } from '@styled-icons/entypo/DotsThreeHorizontal'
 import css from '@emotion/css'
+import React from 'react'
 
-export const MenuDotsButton: React.FC<
+export const MenuDotsButton = React.forwardRef<
+  any,
   ButtonProps & { noShadows?: boolean }
-> = ({ noShadows = true, ...props }) => (
+>(({ noShadows = true, ...props }, ref) => (
   <Button
     variant="ghost"
     aria-label="Menu"
     {...props}
+    ref={ref}
     px="2"
     css={css`
       ${noShadows &&
@@ -20,4 +23,4 @@ export const MenuDotsButton: React.FC<
   >
     <DotsThreeHorizontal size={18} />
   </Button>
-)
+))
