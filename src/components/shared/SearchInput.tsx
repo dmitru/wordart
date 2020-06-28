@@ -4,18 +4,22 @@ import {
   InputLeftElement,
   Icon,
   InputRightElement,
+  InputGroupProps,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { DeleteButton } from 'components/shared/DeleteButton'
 import { Input } from 'components/shared/Input'
 
 export const SearchInput: React.FC<
-  Omit<CInputProps, 'onChange'> & { onChange: (value: string) => void }
-> = ({ onChange, ...props }) => (
-  <InputGroup flex={1} size="sm">
+  Omit<CInputProps, 'onChange' | 'size'> & {
+    size?: InputGroupProps['size']
+    onChange: (value: string) => void
+  }
+> = ({ onChange, size = 'sm', ...props }) => (
+  <InputGroup flex={1} size={size}>
     <InputLeftElement children={<Icon color="gray.400" name="search" />} />
     <Input
-      paddingLeft="30px"
+      paddingLeft={size === 'sm' ? '30px' : '38px'}
       {...props}
       onChange={(e: any) => onChange(e.target.value as string)}
       css={css`

@@ -476,7 +476,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             Order Prints
           </TopNavButton> */}
 
-          <TopNavButton variant mr="2" ml="auto">
+          <TopNavButton variant="secondary" mr="2" ml="auto">
             <FiHelpCircle
               css={css`
                 margin-right: 4px;
