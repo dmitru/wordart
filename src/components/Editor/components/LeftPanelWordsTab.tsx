@@ -421,7 +421,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                           handleSubmit()
                                         }}
                                         onKeyDown={(e: React.KeyboardEvent) => {
-                                          console.log(e.key)
                                           if (e.key === 'Enter') {
                                             handleSubmit()
                                             focusNextField()
@@ -429,8 +428,10 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                             handleSubmit()
                                             focusNextField()
                                           } else if (e.key === 'ArrowUp') {
+                                            e.nativeEvent.preventDefault()
                                             focusPrevField()
                                           } else if (e.key === 'ArrowDown') {
+                                            e.nativeEvent.preventDefault()
                                             focusNextField()
                                           }
                                         }}
@@ -495,8 +496,10 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                       ignoreBlur = false
                                     }, 100)
                                   } else if (e.key === 'ArrowUp') {
+                                    e.nativeEvent.preventDefault()
                                     focusPrevField()
                                   } else if (e.key === 'ArrowDown') {
+                                    e.nativeEvent.preventDefault()
                                     focusNextField()
                                   }
                                 }}
