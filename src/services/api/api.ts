@@ -17,6 +17,19 @@ export const Api = {
   setAuthToken: apiClient.setAuthToken,
   clearAuthToken: apiClient.clearAuthToken,
 
+  extractor: {
+    async fromUrl(data: {
+      url: string
+      removeCommon?: boolean
+      removeNumbers?: boolean
+      stemming?: boolean
+      limit?: number
+    }): Promise<{ words: string[]; counts: number[] }> {
+      const response = await apiClient.post('/extract/url', data)
+      return response.data as { words: string[]; counts: number[] }
+    },
+  },
+
   wordclouds: {
     async create(data: CreateWordcloudDto): Promise<Wordcloud> {
       const response = await apiClient.post('/wordclouds', data)

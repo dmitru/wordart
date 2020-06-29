@@ -1263,6 +1263,16 @@ export class EditorStore {
     style.items.words.wordList = []
   }
 
+  @action addWords = (target: TargetKind, words: string[]) => {
+    const style = this.styleOptions[target]
+    for (const text of words) {
+      style.items.words.wordList.push({
+        id: this.wordIdGen.get(),
+        text,
+      })
+    }
+  }
+
   @action addWord = (target: TargetKind, text = '') => {
     const style = this.styleOptions[target]
     style.items.words.wordList.push({

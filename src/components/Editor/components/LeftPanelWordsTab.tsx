@@ -85,6 +85,11 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
       } else {
         handleAddWord(text)
         state.newWordText = ''
+
+        newWordInputRef.current?.blur()
+        setTimeout(() => {
+          newWordInputRef.current?.focus()
+        }, 10)
       }
     }
 
@@ -554,10 +559,11 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
           onClose={() => {
             state.isShowingImport = false
           }}
-          onImported={(words) => {
-            for (const word of words) {
-              store.addWord(target, word)
+          onImported={({ words, clearExistingBeforeImporting }) => {
+            if (clearExistingBeforeImporting) {
+              style.items.words.wordList = []
             }
+            store.addWords(target, words)
 
             store.animateVisualize(false)
             state.isShowingImport = false

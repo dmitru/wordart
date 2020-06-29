@@ -100,11 +100,12 @@ export type WordItemsOptions = {
 export type WordListEntry = {
   id: WordConfigId
   text: string
-  /** word-specific angle */
+  repeat?: boolean
+  /** custom angle for this word */
   angle?: number
-  /** word-specific font */
+  /** custom font for this word */
   fontId?: FontId
-  /** word-specific color */
+  /** custom color for this word */
   color?: string
 }
 
