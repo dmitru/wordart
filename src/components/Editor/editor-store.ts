@@ -460,6 +460,7 @@ export class EditorStore {
     }
 
     bgStyle.items.dimSmallerItems = data.bgStyle.items.dimSmallerItems
+    bgStyle.items.brightness = data.bgStyle.items.brightness
     bgStyle.items.opacity = data.bgStyle.items.opacity
     bgStyle.items.placement = data.bgStyle.items.placement
     bgStyle.items.icons.iconList = data.bgStyle.items.icons.iconList
@@ -481,6 +482,7 @@ export class EditorStore {
     // Restore Shape style options
 
     shapeStyle.items.dimSmallerItems = data.shapeStyle.items.dimSmallerItems
+    shapeStyle.items.brightness = data.shapeStyle.items.brightness
     shapeStyle.items.opacity = data.shapeStyle.items.opacity
     shapeStyle.items.placement = data.shapeStyle.items.placement
     shapeStyle.items.icons.iconList = data.shapeStyle.items.icons.iconList
