@@ -308,8 +308,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           style: mkShapeStyleConfFromOptions(store.styleOptions.shape),
         })
       } else {
-        const wordsCount = store.styleOptions.shape.items.words.wordList.length
-        const itemsCount = store.styleOptions.shape.items.icons.iconList.length
+        const wordsCount = store.styleOptions.bg.items.words.wordList.length
+        const itemsCount = store.styleOptions.bg.items.icons.iconList.length
 
         if (wordsCount + itemsCount === 0) {
           setIsShowingEmptyIconsWarning(true)
@@ -430,7 +430,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           </Menu>
 
           <Button
-            variantColor="accent"
+            variantColor="secondary"
             onClick={handleSaveClick}
             isLoading={isSaving}
             mr="2"

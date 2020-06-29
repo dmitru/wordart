@@ -3,9 +3,12 @@
     xmlns="http://www.w3.org/2000/svg" 
     xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 62 (91390) - https://sketch.com -->
-    <title>Oval</title>
+    <title>Group 2</title>
     <desc>Created with Sketch.</desc>
     <g id="Geometry" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <circle id="Oval" fill="hsl(205, 61%, 63%)" cx="71" cy="71" r="71"></circle>
+        <g id="Group-2" fill="hsl(205, 61%, 63%)">
+            <rect id="Rectangle" x="53" y="0" width="36" height="142"></rect>
+            <rect id="Rectangle" transform="translate(71.000000, 71.000000) rotate(90.000000) translate(-71.000000, -71.000000) " x="53" y="0" width="36" height="142"></rect>
+        </g>
     </g>
 </svg>

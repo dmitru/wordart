@@ -36,8 +36,6 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
 
     const shapes = store.getAvailableShapes().filter((s) => s.kind === 'svg')
 
-    console.log(shapes)
-
     return (
       <Box
         px="5"

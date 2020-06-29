@@ -6,6 +6,6 @@
     <title>Polygon</title>
     <desc>Created with Sketch.</desc>
     <g id="Geometry" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <polygon id="Polygon" fill="#39799a" points="77.5 0 155.011106 56.315115 125.404498 147.434885 29.5955019 147.434885 -0.0111060781 56.315115"></polygon>
+        <polygon id="Polygon" fill="hsl(205, 61%, 63%)" points="77.5 0 155.011106 56.315115 125.404498 147.434885 29.5955019 147.434885 -0.0111060781 56.315115"></polygon>
     </g>
 </svg>

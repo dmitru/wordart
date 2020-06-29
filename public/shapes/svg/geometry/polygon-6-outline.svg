@@ -3,9 +3,9 @@
     xmlns="http://www.w3.org/2000/svg" 
     xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 62 (91390) - https://sketch.com -->
-    <title>Polygon</title>
+    <title>Combined Shape</title>
     <desc>Created with Sketch.</desc>
     <g id="Geometry" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <polygon id="Polygon" fill="hsl(205, 61%, 63%)" points="71.5 0 142.08107 40.75 142.08107 122.25 71.5 163 0.918929592 122.25 0.918929592 40.75"></polygon>
+        <path d="M71.5,0 L142.08107,40.75 L142.08107,122.25 L71.5,163 L0.918929592,122.25 L0.918929592,40.75 L71.5,0 Z M71.5,14 L13.0432852,47.75 L13.0432852,115.25 L71.5,149 L129.956715,115.25 L129.956715,47.75 L71.5,14 Z" id="Combined-Shape" fill="hsl(205, 61%, 63%)"></path>
     </g>
 </svg>

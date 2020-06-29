@@ -1,6 +1,5 @@
 import {
   Box,
-  Icon,
   Menu,
   MenuButton,
   MenuDivider,
@@ -359,9 +358,22 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                           background: white;
                                         `}
 
+                                        &:hover, &:focus-within {
+                                          background-color: hsla(
+                                            220,
+                                            71%,
+                                            98%,
+                                            1
+                                          );
+                                        }
+
                                         ${state.selectedWords.has(word.id) &&
                                         `
                                           background-color: hsla(220, 71%, 95%, 1);
+
+                                          &:hover, &:focus-within {
+                                            background-color: hsla(220, 71%, 94%, 1);
+                                          }
                                         `}
                                       `}
                                     >

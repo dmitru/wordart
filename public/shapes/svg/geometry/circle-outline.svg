@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="142px" height="142px" viewBox="0 0 142 142" version="1.1" 
+    xmlns="http://www.w3.org/2000/svg" 
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 62 (91390) - https://sketch.com -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Geometry" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group" fill="hsl(205, 61%, 63%)">
+            <path d="M71,0 C110.212217,0 142,31.7877828 142,71 C142,110.212217 110.212217,142 71,142 C31.7877828,142 0,110.212217 0,71 C0,31.7877828 31.7877828,0 71,0 Z M71,15 C40.072054,15 15,40.072054 15,71 C15,101.927946 40.072054,127 71,127 C101.927946,127 127,101.927946 127,71 C127,40.072054 101.927946,15 71,15 Z" id="Combined-Shape"></path>
+        </g>
+    </g>
+</svg>

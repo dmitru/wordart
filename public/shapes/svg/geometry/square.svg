@@ -6,6 +6,6 @@
     <title>Rectangle</title>
     <desc>Created with Sketch.</desc>
     <g id="Geometry" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <rect id="Rectangle" fill="#39799a" x="0" y="0" width="121" height="121"></rect>
+        <rect id="Rectangle" fill="hsl(205, 61%, 63%)" x="0" y="0" width="121" height="121"></rect>
     </g>
 </svg>

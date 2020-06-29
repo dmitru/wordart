@@ -84,7 +84,7 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
                     />
                     <Box mt="3">
                       <Text>Or you can choose a CSV file: </Text>
-                      <Button variant="outline">Open CSV file...</Button>
+                      <Button variantColor="secondary">Open CSV file...</Button>
                     </Box>
                   </Box>
                 </TabPanel>
@@ -98,7 +98,7 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
             </Checkbox>
             <Button
               ml="3"
-              variantColor="accent"
+              variantColor="primary"
               onClick={() => {
                 const rawWords = state.textInput
                   .split(' ')
