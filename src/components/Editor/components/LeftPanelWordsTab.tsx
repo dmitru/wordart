@@ -70,7 +70,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     const newWordInputRef = useRef<HTMLInputElement>(null)
 
     const focusNewWordInput = () => {
-      console.log(newWordInputRef.current)
       newWordInputRef.current?.focus()
     }
 
