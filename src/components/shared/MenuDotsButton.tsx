@@ -4,8 +4,8 @@ import css from '@emotion/css'
 import React from 'react'
 
 export const MenuDotsButton = React.forwardRef<
-  any,
-  ButtonProps & { noShadows?: boolean }
+  Omit<ButtonProps, 'children'> & { noShadows?: boolean },
+  any
 >(({ noShadows = true, ...props }, ref) => (
   <Button
     variant="ghost"

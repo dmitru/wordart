@@ -29,9 +29,11 @@ import { SearchInput } from 'components/shared/SearchInput'
 import { capitalize } from 'lodash'
 import { observable } from 'mobx'
 import { Observer, observer } from 'mobx-react'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useStore } from 'services/root-store'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+import { WordConfigId } from 'components/Editor/editor-store'
+import pluralize from 'pluralize'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -50,6 +52,7 @@ const state = observable({
   isShowingEditor: false,
   textFilter: '',
   newWordText: '',
+  selectedWords: new Set<WordConfigId>(),
 })
 
 let ignoreBlur = false
@@ -59,6 +62,10 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     const { editorPageStore: store } = useStore()
     const style = store.styleOptions[target]
     const words = style.items.words
+
+    useEffect(() => {
+      state.selectedWords.clear()
+    }, [target])
 
     const newWordInputRef = useRef<HTMLInputElement>(null)
 
@@ -92,6 +99,21 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
       : allWords
 
     const [isDragging, setIsDragging] = useState(false)
+
+    const selectedCount = state.selectedWords.size
+    const wordsToProcess =
+      selectedCount === 0
+        ? allWords
+        : allWords.filter((w) => state.selectedWords.has(w.id))
+
+    const updateSelectedWords = () => {
+      const existingWordIds = new Set(allWords)
+      state.selectedWords = new Set(
+        [...state.selectedWords.values()].filter((wId) =>
+          existingWordIds.has(wId)
+        )
+      )
+    }
 
     return (
       <Box px="5" py="6" overflow="hidden" height="calc(100vh - 60px)">
@@ -135,15 +157,27 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               alignItems="center"
               mb="4"
               mt="2"
+              height="40px"
               css={css`
                 margin-bottom: 0;
                 margin: 0 -20px;
                 padding: 0 20px;
                 padding-left: 38px;
-                background: #eff1f7;
+                background: hsla(225, 0%, 95%, 1);
               `}
             >
-              <Checkbox size="lg" bg="white" />
+              <Checkbox
+                size="lg"
+                bg="white"
+                isChecked={state.selectedWords.size === allWords.length}
+                onChange={() => {
+                  if (state.selectedWords.size === 0) {
+                    state.selectedWords = new Set(allWords.map((w) => w.id))
+                  } else {
+                    state.selectedWords.clear()
+                  }
+                }}
+              />
               <Box maxWidth="185px">
                 <SearchInput
                   css={css`
@@ -159,59 +193,84 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
               <Box flex="1" ml="auto" display="flex" justifyContent="flex-end">
                 <Menu>
-                  <MenuButton as={MenuDotsButton} size="md" />
+                  {selectedCount === 0 && <MenuButton as={MenuDotsButton} />}
+                  {selectedCount > 0 && (
+                    <MenuButton
+                      as={Button}
+                      variantColor="accent"
+                      rightIcon="chevron-down"
+                      size="sm"
+                    >
+                      {selectedCount} {pluralize('words', selectedCount)}
+                    </MenuButton>
+                  )}
                   <MenuList zIndex={1000} placement="bottom-end">
-                    <MenuGroup title="Formatting">
-                      <MenuItem
-                        onClick={() => {
-                          words.wordList = words.wordList.map((w) => ({
-                            ...w,
-                            text: capitalize(w.text),
-                          }))
-                          store.animateVisualize(false)
-                        }}
-                      >
-                        Capitalize
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() => {
-                          words.wordList = words.wordList.map((w) => ({
-                            ...w,
-                            text: w.text.toLocaleUpperCase(),
-                          }))
-                          store.animateVisualize(false)
-                        }}
-                      >
-                        UPPERCASE
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() => {
-                          words.wordList = words.wordList.map((w) => ({
-                            ...w,
-                            text: w.text.toLocaleLowerCase(),
-                          }))
-                          store.animateVisualize(false)
-                        }}
-                      >
-                        lowercase
-                      </MenuItem>
-                    </MenuGroup>
+                    <MenuItem
+                      onClick={() => {
+                        for (const w of wordsToProcess) {
+                          w.text = capitalize(w.text)
+                        }
+                        store.animateVisualize(false)
+                      }}
+                    >
+                      Capitalize
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        for (const w of wordsToProcess) {
+                          w.text = w.text.toLocaleUpperCase()
+                        }
+                        store.animateVisualize(false)
+                      }}
+                    >
+                      UPPERCASE
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        for (const w of wordsToProcess) {
+                          w.text = w.text.toLocaleLowerCase()
+                        }
+                        store.animateVisualize(false)
+                      }}
+                    >
+                      lowercase
+                    </MenuItem>
+
+                    {selectedCount === 0 && (
+                      <>
+                        <MenuDivider />
+                        <MenuItem>Import CSV...</MenuItem>
+                        <MenuItem>Export CSV...</MenuItem>
+
+                        <MenuDivider />
+                        <MenuItem>Find and replace...</MenuItem>
+                      </>
+                    )}
 
                     <MenuDivider />
 
                     <MenuItem
                       onClick={() => {
-                        store.clearWords(target)
-                        focusNewWordInput()
+                        if (selectedCount > 0) {
+                          for (const w of wordsToProcess) {
+                            store.deleteWord(target, w.id)
+                          }
+                        } else {
+                          if (
+                            window.confirm(
+                              'Are you sure you want to remove all words?'
+                            )
+                          ) {
+                            store.clearWords(target)
+                          }
+                        }
+                        updateSelectedWords()
+                        if (words.wordList.length === 0) {
+                          focusNewWordInput()
+                        }
                       }}
                     >
-                      <Icon
-                        name="small-close"
-                        size="20px"
-                        color="gray.500"
-                        mr="2"
-                      />
-                      Clear all
+                      {selectedCount > 0 ? 'Delete' : 'Delete all'}
                     </MenuItem>
                   </MenuList>
                 </Menu>
@@ -282,6 +341,11 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                           border-bottom: none !important;
                                           background: white;
                                         `}
+
+                                        ${state.selectedWords.has(word.id) &&
+                                        `
+                                          background-color: hsla(220, 71%, 95%, 1);
+                                        `}
                                       `}
                                     >
                                       <Box color="gray.400">
@@ -299,6 +363,18 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                       </Box>
 
                                       <Checkbox
+                                        isChecked={state.selectedWords.has(
+                                          word.id
+                                        )}
+                                        onChange={() => {
+                                          if (
+                                            state.selectedWords.has(word.id)
+                                          ) {
+                                            state.selectedWords.delete(word.id)
+                                          } else {
+                                            state.selectedWords.add(word.id)
+                                          }
+                                        }}
                                         p="10px"
                                         px="8px"
                                         size="lg"
@@ -306,6 +382,9 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                       />
 
                                       <WordInput
+                                        autocomplete="off"
+                                        spellcheck="false"
+                                        autocorrect="off"
                                         pl="8px"
                                         flex="1"
                                         value={word.text}
@@ -325,7 +404,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                         placeholder="Type here..."
                                       />
 
-                                      <WordMenuButton
+                                      {/* <WordMenuButton
                                         tabIndex={-1}
                                         mr="1"
                                         size="sm"
@@ -336,7 +415,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                             focusNewWordInput()
                                           }
                                         }}
-                                      />
+                                      /> */}
 
                                       <WordDeleteButton
                                         tabIndex={-1}
@@ -362,6 +441,9 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                           <WordRowNewInput>
                             <InputGroup flex={1}>
                               <WordInput
+                                autocomplete="off"
+                                spellcheck="false"
+                                autocorrect="off"
                                 flex="1"
                                 ref={newWordInputRef}
                                 value={state.newWordText}
@@ -448,8 +530,7 @@ const WordInput = styled(Input)<{ hasBorder: boolean }>`
     border-color: transparent;
   }
 
-  ${(p) =>
-    p.hasBorder && `border-color: ${p.theme.colors.primary['500']} !important;`}
+  ${(p) => p.hasBorder && `border-color: hsl(205, 18%, 72%) !important;`}
 `
 
 const WordList = styled(Box)`
@@ -473,8 +554,6 @@ const WordRow = styled(Box)`
 
   display: flex;
   align-items: center;
-
-  border-bottom: 1px solid #eee;
 
   ${WordDeleteButton} {
     opacity: 0;
@@ -531,7 +610,7 @@ const EmptyStateWordsUi: React.FC<{
     </Text>
 
     <Text mt="4" fontSize="md" flex={1} textAlign="center" color="gray.500">
-      When ready, hit Visualize
+      After adding words, hit Visualize
       <br /> to see the result!
     </Text>
 
