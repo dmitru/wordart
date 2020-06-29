@@ -83,8 +83,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
           position="relative"
           overflow="hidden"
           height="calc(100vh - 50px)"
-          px="5"
-          py="6"
+          width="100%"
         >
           <AnimatePresence initial={false}>
             {state.view === 'font-list' && (
@@ -95,7 +94,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                 animate={{ x: 0, y: 0, opacity: 1 }}
                 exit={{ x: -355, y: 0, opacity: 0 }}
               >
-                <Box position="absolute" width="100%">
+                <Box height="100%" px="5" py="6" position="absolute">
                   <SectionLabel>Fonts to use</SectionLabel>
                   <Box
                     mt="3"
@@ -191,7 +190,11 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                 exit={{ x: 355, y: 0, opacity: 0 }}
               >
                 <Box
+                  width="100%"
                   height="calc(100vh - 100px)"
+                  px="5"
+                  py="6"
+                  position="absolute"
                   display="flex"
                   flexDirection="column"
                 >
