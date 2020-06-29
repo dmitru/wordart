@@ -83,6 +83,7 @@ import { Urls } from 'urls'
 import 'utils/canvas-to-blob'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { TopNavButton } from 'components/shared/TopNavButton'
+import { WarningModal } from 'components/Editor/components/WarningModal'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -107,6 +108,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const cancelVisualizationBtnRef = useRef<HTMLButtonElement>(null)
 
     const [isSaving, setIsSaving] = useState(false)
+    const [
+      isShowingEmptyIconsWarning,
+      setIsShowingEmptyIconsWarning,
+    ] = useState(false)
 
     const handleSaveClick = useCallback(() => {
       const save = async () => {
@@ -288,6 +293,34 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const leftTab =
       store.targetTab === 'bg' ? state.leftTabBg : state.leftTabShape
+
+    const handleVisualizeClick = () => {
+      if (store.targetTab === 'shape') {
+        const wordsCount = store.styleOptions.shape.items.words.wordList.length
+        const itemsCount = store.styleOptions.shape.items.icons.iconList.length
+
+        if (wordsCount + itemsCount === 0) {
+          setIsShowingEmptyIconsWarning(true)
+          return
+        }
+
+        store.editor?.generateShapeItems({
+          style: mkShapeStyleConfFromOptions(store.styleOptions.shape),
+        })
+      } else {
+        const wordsCount = store.styleOptions.shape.items.words.wordList.length
+        const itemsCount = store.styleOptions.shape.items.icons.iconList.length
+
+        if (wordsCount + itemsCount === 0) {
+          setIsShowingEmptyIconsWarning(true)
+          return
+        }
+
+        store.editor?.generateBgItems({
+          style: mkBgStyleConfFromOptions(store.styleOptions.bg),
+        })
+      }
+    }
 
     return (
       <PageLayoutWrapper>
@@ -831,21 +864,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     `}
                     variantColor="accent"
                     isLoading={store.isVisualizing}
-                    onClick={() => {
-                      if (store.targetTab === 'shape') {
-                        store.editor?.generateShapeItems({
-                          style: mkShapeStyleConfFromOptions(
-                            store.styleOptions.shape
-                          ),
-                        })
-                      } else {
-                        store.editor?.generateBgItems({
-                          style: mkBgStyleConfFromOptions(
-                            store.styleOptions.bg
-                          ),
-                        })
-                      }
-                    }}
+                    onClick={handleVisualizeClick}
                   >
                     <MagicWand
                       size={24}
@@ -1090,6 +1109,15 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             </CanvasWrappper>
           </RightWrapper>
         </EditorLayout>
+
+        <WarningModal
+          isOpen={isShowingEmptyIconsWarning}
+          onClose={() => {
+            setIsShowingEmptyIconsWarning(false)
+          }}
+          header="There is no items to visualize"
+          content="Please add some words or icons to your design before visualizing."
+        />
       </PageLayoutWrapper>
     )
   }

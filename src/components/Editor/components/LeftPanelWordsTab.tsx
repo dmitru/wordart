@@ -169,8 +169,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             </Box>
           </Stack>
 
-          {/* <SectionLabel>Words list</SectionLabel> */}
-
           {allWords.length > 0 && (
             <Stack
               direction="row"
@@ -189,7 +187,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               <Checkbox
                 size="lg"
                 bg="white"
-                isChecked={state.selectedWords.size === allWords.length}
+                isChecked={state.selectedWords.size > 0}
                 onChange={() => {
                   if (state.selectedWords.size === 0) {
                     state.selectedWords = new Set(allWords.map((w) => w.id))

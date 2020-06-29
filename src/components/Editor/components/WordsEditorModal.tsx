@@ -1,7 +1,8 @@
 import {
   Box,
-  Checkbox,
-  Link,
+  Editable,
+  EditableInput,
+  EditablePreview,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -9,26 +10,14 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  Textarea,
-  Editable,
-  EditablePreview,
-  EditableInput,
 } from '@chakra-ui/core'
+import styled from '@emotion/styled'
+import { TargetKind } from 'components/Editor/lib/editor'
 import { Button } from 'components/shared/Button'
+import { DeleteButton } from 'components/shared/DeleteButton'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
-import stopword from 'stopword'
-import { TargetKind } from 'components/Editor/lib/editor'
 import { useStore } from 'services/root-store'
-import styled from '@emotion/styled'
-import { DeleteButton } from 'components/shared/DeleteButton'
 
 export type WordsEditorModalProps = {
   target: TargetKind
