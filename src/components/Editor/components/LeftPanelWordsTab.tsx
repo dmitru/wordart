@@ -1,25 +1,26 @@
 import {
   Box,
+  Checkbox,
+  InputGroup,
+  InputProps,
+  InputRightElement,
   Menu,
   MenuButton,
   MenuDivider,
-  MenuGroup,
   MenuItem,
   MenuList,
-  InputGroup,
-  InputRightElement,
   Stack,
-  Checkbox,
   Text,
 } from '@chakra-ui/core'
-import styled from '@emotion/styled'
 import css from '@emotion/css'
-import { DragIndicator } from '@styled-icons/material/DragIndicator'
+import styled from '@emotion/styled'
 import { TextFields } from '@styled-icons/material-twotone/TextFields'
+import { DragIndicator } from '@styled-icons/material/DragIndicator'
 import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
-import { SectionLabel } from 'components/Editor/components/shared'
 import { WordsEditorModal } from 'components/Editor/components/WordsEditorModal'
+import { WordConfigId } from 'components/Editor/editor-store'
 import { TargetKind } from 'components/Editor/lib/editor'
+import { WordListEntry } from 'components/Editor/style-options'
 import { Button } from 'components/shared/Button'
 import { DeleteButton } from 'components/shared/DeleteButton'
 import { Input } from 'components/shared/Input'
@@ -27,12 +28,17 @@ import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { SearchInput } from 'components/shared/SearchInput'
 import { capitalize } from 'lodash'
 import { observable } from 'mobx'
-import { Observer, observer } from 'mobx-react'
-import { useRef, useState, useEffect } from 'react'
-import { useStore } from 'services/root-store'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
-import { WordConfigId } from 'components/Editor/editor-store'
+import { observer, Observer } from 'mobx-react'
 import pluralize from 'pluralize'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  DragDropContext,
+  Draggable,
+  DraggableStateSnapshot,
+  Droppable,
+  DraggableProvidedDraggableProps,
+} from 'react-beautiful-dnd'
+import { useStore } from 'services/root-store'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -110,17 +116,22 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         : allWords.filter((w) => state.selectedWords.has(w.id))
 
     const updateSelectedWords = () => {
-      const existingWordIds = new Set(allWords)
-      state.selectedWords = new Set(
+      const existingWordIds = new Set(allWords.map((w) => w.id))
+      const newSelectedWordIds = new Set(
         [...state.selectedWords.values()].filter((wId) =>
           existingWordIds.has(wId)
         )
       )
+      if (newSelectedWordIds.size !== state.selectedWords.size) {
+        state.selectedWords = newSelectedWordIds
+      }
     }
 
     const focusNextField = () => {
       const focusedEl = document.querySelector('.word-input:focus')
-      const wordInputs = [...document.getElementsByClassName('word-input')]
+      const wordInputs = [
+        ...document.getElementsByClassName('word-input'),
+      ] as HTMLInputElement[]
       const currentInputIndex = wordInputs.findIndex((el) => focusedEl === el)
       if (currentInputIndex > -1) {
         wordInputs[currentInputIndex + 1]?.focus()
@@ -130,7 +141,9 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
     const focusPrevField = () => {
       const focusedEl = document.querySelector('.word-input:focus')
-      const wordInputs = [...document.getElementsByClassName('word-input')]
+      const wordInputs = [
+        ...document.getElementsByClassName('word-input'),
+      ] as HTMLInputElement[]
       const currentInputIndex = wordInputs.findIndex((el) => focusedEl === el)
       if (currentInputIndex > -1) {
         wordInputs[currentInputIndex - 1]?.focus()
@@ -138,166 +151,212 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
       }
     }
 
+    const topToolbar = (
+      <Stack direction="row" mb="6" spacing="2">
+        <Button
+          variantColor="primary"
+          leftIcon="add"
+          onClick={focusNewWordInput}
+        >
+          Add
+        </Button>
+
+        <Button
+          leftIcon="edit"
+          variantColor="secondary"
+          onClick={() => {
+            state.isShowingEditor = true
+          }}
+        >
+          Edit words
+        </Button>
+
+        <Box ml="auto">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              state.isShowingImport = true
+            }}
+          >
+            Import
+          </Button>
+        </Box>
+      </Stack>
+    )
+
+    const toolbar = (
+      <Stack
+        direction="row"
+        alignItems="center"
+        mb="4"
+        mt="2"
+        height="40px"
+        css={css`
+          margin-bottom: 0;
+          margin: 0 -20px;
+          padding: 0 20px;
+          padding-left: 38px;
+          background: hsla(225, 0%, 95%, 1);
+        `}
+      >
+        <Checkbox
+          size="lg"
+          bg="white"
+          isChecked={state.selectedWords.size > 0}
+          onChange={() => {
+            if (state.selectedWords.size === 0) {
+              state.selectedWords = new Set(allWords.map((w) => w.id))
+            } else {
+              state.selectedWords.clear()
+            }
+          }}
+        />
+        <Box maxWidth="185px">
+          <SearchInput
+            css={css`
+              border-bottom: 1px solid transparent !important;
+            `}
+            placeholder="Filter..."
+            value={state.textFilter}
+            onChange={(value) => {
+              state.textFilter = value
+            }}
+          />
+        </Box>
+
+        <Box flex="1" ml="auto" display="flex" justifyContent="flex-end">
+          <Menu>
+            {selectedCount === 0 && <MenuButton as={MenuDotsButton} />}
+            {selectedCount > 0 && (
+              <MenuButton
+                as={Button}
+                variantColor="accent"
+                rightIcon="chevron-down"
+                size="sm"
+              >
+                {selectedCount} {pluralize('words', selectedCount)}
+              </MenuButton>
+            )}
+            <MenuList zIndex={1000} placement="bottom-end">
+              <MenuItem
+                onClick={() => {
+                  for (const w of wordsToProcess) {
+                    w.text = capitalize(w.text)
+                  }
+                  store.animateVisualize(false)
+                }}
+              >
+                Capitalize
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  for (const w of wordsToProcess) {
+                    w.text = w.text.toLocaleUpperCase()
+                  }
+                  store.animateVisualize(false)
+                }}
+              >
+                UPPERCASE
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  for (const w of wordsToProcess) {
+                    w.text = w.text.toLocaleLowerCase()
+                  }
+                  store.animateVisualize(false)
+                }}
+              >
+                lowercase
+              </MenuItem>
+
+              {selectedCount === 0 && (
+                <>
+                  <MenuDivider />
+                  <MenuItem>Import CSV...</MenuItem>
+                  <MenuItem>Export CSV...</MenuItem>
+
+                  <MenuDivider />
+                  <MenuItem>Find and replace...</MenuItem>
+                </>
+              )}
+
+              <MenuDivider />
+
+              <MenuItem
+                onClick={() => {
+                  if (selectedCount > 0) {
+                    for (const w of wordsToProcess) {
+                      store.deleteWord(target, w.id)
+                    }
+                  } else {
+                    if (
+                      window.confirm(
+                        'Are you sure you want to remove all words?'
+                      )
+                    ) {
+                      store.clearWords(target)
+                    }
+                  }
+                  updateSelectedWords()
+                  if (words.wordList.length === 0) {
+                    focusNewWordInput()
+                  }
+                }}
+              >
+                {selectedCount > 0 ? 'Delete' : 'Delete all'}
+              </MenuItem>
+            </MenuList>
+          </Menu>
+        </Box>
+      </Stack>
+    )
+
+    const handleWordDelete = useCallback(
+      (word: WordListEntry) => {
+        store.deleteWord(target, word.id)
+        store.animateVisualize(false)
+        if (words.wordList.length === 0) {
+          focusNewWordInput()
+        }
+        updateSelectedWords()
+      },
+      [target]
+    )
+
+    const handleWordEditsSubmit = useCallback(
+      (word: WordListEntry) => {
+        const text = word.text.trim()
+        if (text === '') {
+          store.deleteWord(target, word.id)
+          store.animateVisualize(false)
+        } else if (text !== word.text) {
+          store.updateWord(target, word.id, {
+            text,
+          })
+          store.animateVisualize(false)
+        }
+        updateSelectedWords()
+      },
+      [target]
+    )
+
+    const handleSelectionChange = useCallback(
+      (word: WordListEntry, isSelected: boolean) => {
+        if (isSelected) {
+          state.selectedWords.add(word.id)
+        } else {
+          state.selectedWords.delete(word.id)
+        }
+      },
+      [target]
+    )
+
     return (
       <Box px="5" py="6" overflow="hidden" height="calc(100vh - 60px)">
         <>
-          <Stack direction="row" mb="6" spacing="2">
-            <Button
-              variantColor="primary"
-              leftIcon="add"
-              onClick={focusNewWordInput}
-            >
-              Add
-            </Button>
+          {topToolbar}
 
-            <Button
-              leftIcon="edit"
-              variantColor="secondary"
-              onClick={() => {
-                state.isShowingEditor = true
-              }}
-            >
-              Edit words
-            </Button>
-
-            <Box ml="auto">
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  state.isShowingImport = true
-                }}
-              >
-                Import
-              </Button>
-            </Box>
-          </Stack>
-
-          {allWords.length > 0 && (
-            <Stack
-              direction="row"
-              alignItems="center"
-              mb="4"
-              mt="2"
-              height="40px"
-              css={css`
-                margin-bottom: 0;
-                margin: 0 -20px;
-                padding: 0 20px;
-                padding-left: 38px;
-                background: hsla(225, 0%, 95%, 1);
-              `}
-            >
-              <Checkbox
-                size="lg"
-                bg="white"
-                isChecked={state.selectedWords.size > 0}
-                onChange={() => {
-                  if (state.selectedWords.size === 0) {
-                    state.selectedWords = new Set(allWords.map((w) => w.id))
-                  } else {
-                    state.selectedWords.clear()
-                  }
-                }}
-              />
-              <Box maxWidth="185px">
-                <SearchInput
-                  css={css`
-                    border-bottom: 1px solid transparent !important;
-                  `}
-                  placeholder="Filter..."
-                  value={state.textFilter}
-                  onChange={(value) => {
-                    state.textFilter = value
-                  }}
-                />
-              </Box>
-
-              <Box flex="1" ml="auto" display="flex" justifyContent="flex-end">
-                <Menu>
-                  {selectedCount === 0 && <MenuButton as={MenuDotsButton} />}
-                  {selectedCount > 0 && (
-                    <MenuButton
-                      as={Button}
-                      variantColor="accent"
-                      rightIcon="chevron-down"
-                      size="sm"
-                    >
-                      {selectedCount} {pluralize('words', selectedCount)}
-                    </MenuButton>
-                  )}
-                  <MenuList zIndex={1000} placement="bottom-end">
-                    <MenuItem
-                      onClick={() => {
-                        for (const w of wordsToProcess) {
-                          w.text = capitalize(w.text)
-                        }
-                        store.animateVisualize(false)
-                      }}
-                    >
-                      Capitalize
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        for (const w of wordsToProcess) {
-                          w.text = w.text.toLocaleUpperCase()
-                        }
-                        store.animateVisualize(false)
-                      }}
-                    >
-                      UPPERCASE
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        for (const w of wordsToProcess) {
-                          w.text = w.text.toLocaleLowerCase()
-                        }
-                        store.animateVisualize(false)
-                      }}
-                    >
-                      lowercase
-                    </MenuItem>
-
-                    {selectedCount === 0 && (
-                      <>
-                        <MenuDivider />
-                        <MenuItem>Import CSV...</MenuItem>
-                        <MenuItem>Export CSV...</MenuItem>
-
-                        <MenuDivider />
-                        <MenuItem>Find and replace...</MenuItem>
-                      </>
-                    )}
-
-                    <MenuDivider />
-
-                    <MenuItem
-                      onClick={() => {
-                        if (selectedCount > 0) {
-                          for (const w of wordsToProcess) {
-                            store.deleteWord(target, w.id)
-                          }
-                        } else {
-                          if (
-                            window.confirm(
-                              'Are you sure you want to remove all words?'
-                            )
-                          ) {
-                            store.clearWords(target)
-                          }
-                        }
-                        updateSelectedWords()
-                        if (words.wordList.length === 0) {
-                          focusNewWordInput()
-                        }
-                      }}
-                    >
-                      {selectedCount > 0 ? 'Delete' : 'Delete all'}
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
-              </Box>
-            </Stack>
-          )}
+          {allWords.length > 0 && toolbar}
 
           <Box overflowY="hidden" overflowX="hidden" mx="-20px" px="20px">
             <DragDropContext
@@ -317,237 +376,80 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             >
               <Droppable droppableId="droppable">
                 {(provided, snapshot) => (
-                  <Observer>
-                    {() => (
-                      <WordList
-                        mt="2"
-                        overflowY="auto"
-                        id="words-list"
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                      >
-                        {filteredWords.map((word, index) => {
-                          const handleSubmit = () => {
-                            const text = word.text.trim()
-                            if (text === '') {
-                              store.deleteWord(target, word.id)
-                              store.animateVisualize(false)
-                            } else if (text !== word.text) {
-                              store.updateWord(target, word.id, {
-                                text,
-                              })
-                              store.animateVisualize(false)
-                            }
-                            updateSelectedWords()
-                          }
+                  <WordList
+                    mt="2"
+                    overflowY="auto"
+                    id="words-list"
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                  >
+                    {filteredWords.map((word, index) => {
+                      return (
+                        <Draggable
+                          key={word.id}
+                          draggableId={word.id}
+                          index={index}
+                        >
+                          {(provided, snapshot) => (
+                            <WordListRow
+                              provided={provided}
+                              snapshot={snapshot}
+                              word={word}
+                              showDragHandle={!state.textFilter}
+                              isSelected={state.selectedWords.has(word.id)}
+                              onSelectedChange={handleSelectionChange}
+                              focusNextField={focusNextField}
+                              focusPrevField={focusPrevField}
+                              onDelete={handleWordDelete}
+                              onSubmit={handleWordEditsSubmit}
+                            />
+                          )}
+                        </Draggable>
+                      )
+                    })}
 
-                          return (
-                            <Draggable
-                              key={word.id}
-                              draggableId={word.id}
-                              index={index}
-                            >
-                              {(provided, snapshot) => (
-                                <Observer>
-                                  {() => (
-                                    <WordRow
-                                      aria-label=""
-                                      ref={provided.innerRef}
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
-                                      tabIndex={-1}
-                                      css={css`
-                                        ${snapshot.isDragging &&
-                                        `
-                                          box-shadow: 0 0 10px 0 #0003;
-                                          border-bottom: none !important;
-                                          background: white;
-                                        `}
-
-                                        &:hover, &:focus-within {
-                                          background-color: hsla(
-                                            220,
-                                            71%,
-                                            98%,
-                                            1
-                                          );
-                                        }
-
-                                        ${state.selectedWords.has(word.id) &&
-                                        `
-                                          background-color: hsla(220, 71%, 95%, 1);
-
-                                          &:hover, &:focus-within {
-                                            background-color: hsla(220, 71%, 94%, 1);
-                                          }
-                                        `}
-                                      `}
-                                    >
-                                      <Box color="gray.400">
-                                        <DragIndicator
-                                          size="20px"
-                                          css={css`
-                                            visibility: ${state.textFilter
-                                              ? 'hidden'
-                                              : 'visible'};
-                                            position: relative;
-                                            top: -2px;
-                                            cursor: grab;
-                                          `}
-                                        />
-                                      </Box>
-
-                                      <Checkbox
-                                        isChecked={state.selectedWords.has(
-                                          word.id
-                                        )}
-                                        onChange={() => {
-                                          if (
-                                            state.selectedWords.has(word.id)
-                                          ) {
-                                            state.selectedWords.delete(word.id)
-                                          } else {
-                                            state.selectedWords.add(word.id)
-                                          }
-                                        }}
-                                        p="10px"
-                                        px="8px"
-                                        size="lg"
-                                        tabIndex={-1}
-                                      />
-
-                                      <WordInput
-                                        className="word-input"
-                                        autocomplete="off"
-                                        spellcheck="false"
-                                        autocorrect="off"
-                                        pl="8px"
-                                        flex="1"
-                                        value={word.text}
-                                        onFocus={(e: any) => {
-                                          e.target?.select()
-                                        }}
-                                        onChange={(e: any) => {
-                                          store.updateWord(target, word.id, {
-                                            text: e.target.value,
-                                          })
-                                        }}
-                                        onBlur={() => {
-                                          handleSubmit()
-                                        }}
-                                        onKeyDown={(e: React.KeyboardEvent) => {
-                                          if (e.key === 'Enter') {
-                                            handleSubmit()
-                                            focusNextField()
-                                          } else if (e.key === 'Tab') {
-                                            handleSubmit()
-                                            focusNextField()
-                                          } else if (e.key === 'ArrowUp') {
-                                            e.nativeEvent.preventDefault()
-                                            focusPrevField()
-                                          } else if (e.key === 'ArrowDown') {
-                                            e.nativeEvent.preventDefault()
-                                            focusNextField()
-                                          }
-                                        }}
-                                        placeholder="Type here..."
-                                      />
-
-                                      {/* <WordMenuButton
-                                        tabIndex={-1}
-                                        mr="1"
-                                        size="sm"
-                                        onClick={() => {
-                                          store.deleteWord(target, word.id)
-                                          store.animateVisualize(false)
-                                          if (words.wordList.length === 0) {
-                                            focusNewWordInput()
-                                          }
-                                        }}
-                                      /> */}
-
-                                      <WordDeleteButton
-                                        tabIndex={-1}
-                                        size="sm"
-                                        onClick={() => {
-                                          store.deleteWord(target, word.id)
-                                          store.animateVisualize(false)
-                                          if (words.wordList.length === 0) {
-                                            focusNewWordInput()
-                                          }
-                                          updateSelectedWords()
-                                        }}
-                                      />
-                                    </WordRow>
-                                  )}
-                                </Observer>
-                              )}
-                            </Draggable>
-                          )
-                        })}
-
-                        {/* NEW WORD INPUT */}
-                        {!state.textFilter && !isDragging && (
-                          <WordRowNewInput>
-                            <InputGroup flex={1}>
-                              <WordInput
-                                className="word-input"
-                                autocomplete="off"
-                                spellcheck="false"
-                                autocorrect="off"
-                                flex="1"
-                                ref={newWordInputRef}
-                                value={state.newWordText}
-                                onChange={(e: any) => {
-                                  state.newWordText = e.target.value
-                                }}
-                                onKeyDown={(e: React.KeyboardEvent) => {
-                                  if (e.key === 'Enter') {
-                                    handleNewWordInputSubmit()
-                                  } else if (e.key === 'Escape') {
-                                    ignoreBlur = true
-                                    state.newWordText = ''
-                                    newWordInputRef.current?.blur()
-                                    setTimeout(() => {
-                                      ignoreBlur = false
-                                    }, 100)
-                                  } else if (e.key === 'ArrowUp') {
-                                    e.nativeEvent.preventDefault()
-                                    focusPrevField()
-                                  } else if (e.key === 'ArrowDown') {
-                                    e.nativeEvent.preventDefault()
-                                    focusNextField()
-                                  }
-                                }}
-                                hasBorder
-                                placeholder="Type new word here..."
-                              />
-                              <InputRightElement
-                                width="80px"
-                                children={
-                                  <Button
-                                    px="3"
-                                    width="100%"
-                                    // leftIcon="add"
-                                    variantColor="primary"
-                                    onClick={() => handleNewWordInputSubmit()}
-                                  >
-                                    Add
-                                  </Button>
+                    {/* NEW WORD INPUT */}
+                    {!state.textFilter && !isDragging && (
+                      <Observer>
+                        {() => (
+                          <NewWordInput
+                            onAddClick={() => handleNewWordInputSubmit()}
+                            inputRef={newWordInputRef}
+                            inputProps={{
+                              value: state.newWordText,
+                              onChange: (e: any) => {
+                                state.newWordText = e.target.value
+                              },
+                              onKeyDown: (e: React.KeyboardEvent) => {
+                                if (e.key === 'Enter') {
+                                  handleNewWordInputSubmit()
+                                } else if (e.key === 'Escape') {
+                                  ignoreBlur = true
+                                  state.newWordText = ''
+                                  newWordInputRef.current?.blur()
+                                  setTimeout(() => {
+                                    ignoreBlur = false
+                                  }, 100)
+                                } else if (e.key === 'ArrowUp') {
+                                  e.nativeEvent.preventDefault()
+                                  focusPrevField()
+                                } else if (e.key === 'ArrowDown') {
+                                  e.nativeEvent.preventDefault()
+                                  focusNextField()
                                 }
-                              />
-                            </InputGroup>
-                          </WordRowNewInput>
+                              },
+                            }}
+                          />
                         )}
-
-                        {allWords.length === 0 && (
-                          <Box px="20px">
-                            <EmptyStateWordsUi target={target} />
-                          </Box>
-                        )}
-                      </WordList>
+                      </Observer>
                     )}
-                  </Observer>
+
+                    {allWords.length === 0 && (
+                      <Box px="20px">
+                        <EmptyStateWordsUi target={target} />
+                      </Box>
+                    )}
+                  </WordList>
                 )}
               </Droppable>
             </DragDropContext>
@@ -582,7 +484,178 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
   }
 )
 
-const WordInput = styled(Input)<{ hasBorder: boolean }>`
+const WordListRow: React.FC<{
+  isSelected: boolean
+  onSelectedChange: (word: WordListEntry, isSelected: boolean) => void
+  provided: DraggableProvided
+  snapshot: DraggableStateSnapshot
+  word: WordListEntry
+  showDragHandle?: boolean
+  onDelete: (word: WordListEntry) => void
+  onSubmit: (word: WordListEntry) => void
+  focusNextField: () => void
+  focusPrevField: () => void
+}> = observer(
+  ({
+    word,
+    isSelected,
+    onSelectedChange,
+    showDragHandle = true,
+    provided,
+    snapshot,
+    onSubmit,
+    onDelete,
+    focusNextField,
+    focusPrevField,
+  }) => {
+    return (
+      <WordRow
+        aria-label=""
+        ref={provided.innerRef}
+        {...provided.draggableProps}
+        {...provided.dragHandleProps}
+        tabIndex={-1}
+        css={css`
+          ${snapshot.isDragging &&
+          `
+          box-shadow: 0 0 10px 0 #0003;
+          border-bottom: none !important;
+          background: white;
+        `}
+
+          &:hover, &:focus-within {
+            background-color: hsla(220, 71%, 98%, 1);
+          }
+
+          ${isSelected &&
+          `
+            background-color: hsla(220, 71%, 95%, 1);
+
+            &:hover, &:focus-within {
+              background-color: hsla(220, 71%, 94%, 1);
+            }
+          `}
+        `}
+      >
+        <Box color="gray.400">
+          <DragIndicator
+            size="20px"
+            css={css`
+              visibility: ${!showDragHandle ? 'hidden' : 'visible'};
+              position: relative;
+              top: -2px;
+              cursor: grab;
+            `}
+          />
+        </Box>
+
+        <Checkbox
+          isChecked={isSelected}
+          onChange={() => {
+            onSelectedChange(word, !isSelected)
+          }}
+          p="10px"
+          px="8px"
+          size="lg"
+          tabIndex={-1}
+        />
+
+        <WordInput
+          className="word-input"
+          autocomplete="off"
+          spellcheck="false"
+          autocorrect="off"
+          pl="8px"
+          flex="1"
+          value={word.text}
+          onFocus={(e: any) => {
+            e.target?.select()
+          }}
+          onChange={(e: any) => {
+            word.text = e.target.value
+          }}
+          onBlur={() => {
+            onSubmit(word)
+          }}
+          onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === 'Enter') {
+              onSubmit(word)
+              focusNextField()
+            } else if (e.key === 'Tab') {
+              onSubmit(word)
+              focusNextField()
+            } else if (e.key === 'ArrowUp') {
+              e.nativeEvent.preventDefault()
+              focusPrevField()
+            } else if (e.key === 'ArrowDown') {
+              e.nativeEvent.preventDefault()
+              focusNextField()
+            }
+          }}
+          placeholder="Type here..."
+        />
+
+        {/* <WordMenuButton
+          tabIndex={-1}
+          mr="1"
+          size="sm"
+          onClick={() => {
+            store.deleteWord(target, word.id)
+            store.animateVisualize(false)
+            if (words.wordList.length === 0) {
+              focusNewWordInput()
+            }
+          }}
+        /> */}
+
+        <WordDeleteButton
+          tabIndex={-1}
+          size="sm"
+          onClick={() => onDelete(word)}
+        />
+      </WordRow>
+    )
+  }
+)
+
+const NewWordInput: React.FC<{
+  inputRef: any
+  inputProps: InputProps
+  onAddClick: () => void
+}> = ({ inputProps, inputRef, onAddClick }) => {
+  return (
+    <WordRowNewInput>
+      <InputGroup flex={1}>
+        <WordInput
+          {...inputProps}
+          className="word-input"
+          autocomplete="off"
+          spellcheck="false"
+          autocorrect="off"
+          flex="1"
+          ref={inputRef}
+          hasBorder
+          placeholder="Type new word here..."
+        />
+        <InputRightElement
+          width="80px"
+          children={
+            <Button
+              px="3"
+              width="100%"
+              variantColor="primary"
+              onClick={onAddClick}
+            >
+              Add
+            </Button>
+          }
+        />
+      </InputGroup>
+    </WordRowNewInput>
+  )
+}
+
+const WordInput = styled(Input)<{ hasBorder?: boolean }>`
   background: transparent;
   &:not(:focus) {
     border-color: transparent;
