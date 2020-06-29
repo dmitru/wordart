@@ -333,6 +333,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                               })
                               store.animateVisualize(false)
                             }
+                            updateSelectedWords()
                           }
 
                           return (
@@ -469,6 +470,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                           if (words.wordList.length === 0) {
                                             focusNewWordInput()
                                           }
+                                          updateSelectedWords()
                                         }}
                                       />
                                     </WordRow>

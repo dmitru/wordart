@@ -1294,7 +1294,7 @@ const RightWrapper = styled.div`
 
 const CanvasWrappper = styled.div`
   flex: 1;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 120px);
   width: calc(100vw - 460px);
   display: flex;
   position: relative;

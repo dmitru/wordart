@@ -27,6 +27,7 @@ import { useStore } from 'services/root-store'
 import { animateElement } from 'utils/animation'
 import css from '@emotion/css'
 import { DeleteButton } from 'components/shared/DeleteButton'
+import { SearchInput } from 'components/shared/SearchInput'
 
 export type FontPickerProps = {
   selectedFontId: string | null
@@ -97,7 +98,17 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
 
   return (
     <>
-      <Box mt="4">
+      <Box mt="2">
+        <Box display="flex" mb="1">
+          <SearchInput
+            placeholder="Find font..."
+            value={state.query}
+            onChange={(value) => {
+              state.query = value
+            }}
+          />
+        </Box>
+
         <Box display="flex" flexWrap="wrap" alignItems="flex-start">
           <Box
             css={css`
@@ -215,39 +226,6 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
               />
             )}
           </Box>
-        </Box>
-
-        <Box display="flex" mb="3">
-          <InputGroup size="sm">
-            <InputLeftElement children={<Icon name="search" />} />
-            <Input
-              _placeholder={{
-                color: 'red',
-              }}
-              placeholder="Find font..."
-              value={state.query}
-              onChange={(e: any) => {
-                state.query = e.target.value
-              }}
-            />
-            {!!state.query && (
-              <InputRightElement
-                onClick={() => {
-                  state.query = ''
-                }}
-                children={
-                  <IconButton
-                    aria-label="Clear"
-                    icon="close"
-                    color="gray"
-                    isRound
-                    variant="ghost"
-                    size="sm"
-                  />
-                }
-              />
-            )}
-          </InputGroup>
         </Box>
       </Box>
 

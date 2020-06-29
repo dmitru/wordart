@@ -109,7 +109,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
     const allCategoryOptions = [
       ['geometry', 'Geometric Shapes'],
       ['animals', 'Animals & Pets'],
-      ['icons', 'Icons'],
+      ['icon', 'Icons'],
       ['geo', 'Countries & Earth'],
       ['other', 'Others'],
       // 'Baby',

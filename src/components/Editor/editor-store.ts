@@ -1089,6 +1089,7 @@ export class EditorStore {
     const map: { [category: string]: number } = {
       geometry: 10,
       geo: 200,
+      icon: 99999999,
     }
     return map[category] || 999999
   }

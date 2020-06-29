@@ -69,7 +69,7 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
 
     return (
       <>
-        <SectionLabel>Selected Font</SectionLabel>
+        {/* <SectionLabel>Selected Font</SectionLabel> */}
 
         <Box display="flex" flexDirection="column" height="100%">
           {selectedFont && (
@@ -93,6 +93,7 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
                       aria-label="menu"
                       rightIcon="chevron-down"
                       color="black"
+                      size="sm"
                       display="inline-flex"
                     >
                       {'Style: '}
@@ -155,14 +156,20 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
             </Button>
           </Stack>
 
-          <Box mt="1.5rem" display="flex" flexDirection="column" flex="1">
-            <SectionLabel
+          <Box
+            mt="1rem"
+            display="flex"
+            flexDirection="column"
+            flex="1"
+            borderTop="1px solid #efefef"
+          >
+            {/* <SectionLabel
               css={css`
                 margin-bottom: 0;
               `}
             >
               Fonts Catalog
-            </SectionLabel>
+            </SectionLabel> */}
 
             <FontPicker
               onHighlighted={(font, fontStyle) => {

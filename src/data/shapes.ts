@@ -9,15 +9,12 @@ const defaultEdgesProcessing = {
   amount: 80,
 }
 
-export const svgIcons: ShapeConf[] = [
-  iconsFaSolid.find((i) => i.title === 'Square full'),
-  ...iconsFaSolid.slice(0, 5),
-]
+export const svgIcons: ShapeConf[] = [...iconsFaSolid.slice(0, 10000)]
   .filter((i) => i != null)
   .map((icon, index) =>
     icon
       ? ({
-          id: `i-${100 + index}`,
+          id: `fa-${index}`,
           kind: 'svg',
           title: icon.title,
           url: icon.url,
@@ -33,12 +30,12 @@ export const svgIcons: ShapeConf[] = [
   )
   .filter((x) => x != null) as ShapeConf[]
 
-export const svgIconsOutline: ShapeConf[] = [...iconsFaRegular.slice(0, 5)]
+export const svgIconsOutline: ShapeConf[] = [...iconsFaRegular.slice(0, 10000)]
   .filter((i) => i != null)
   .map((icon, index) =>
     icon
       ? ({
-          id: `io-${1000 + index}`,
+          id: `fa-outline-${index}`,
           kind: 'svg',
           title: icon.title,
           url: icon.url,
