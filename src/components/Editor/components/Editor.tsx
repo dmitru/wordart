@@ -935,7 +935,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                                 color="gray.500"
                                 mr="2"
                               />
-                              Clear all
+                              Remove all items
                             </MenuItem>
                           </MenuList>
                         </Menu>

@@ -187,7 +187,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
         <Box ml="auto">
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={() => {
               state.isShowingImport = true
             }}
