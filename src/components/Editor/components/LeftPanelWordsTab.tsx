@@ -26,17 +26,25 @@ import { DeleteButton } from 'components/shared/DeleteButton'
 import { Input } from 'components/shared/Input'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { SearchInput } from 'components/shared/SearchInput'
-import { capitalize } from 'lodash'
+import { capitalize, noop } from 'lodash'
 import { observable } from 'mobx'
 import { observer, Observer } from 'mobx-react'
 import pluralize from 'pluralize'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import AutoSizer from 'react-virtualized-auto-sizer'
+import {
+  FixedSizeList as List,
+  ListProps,
+  ListChildComponentProps,
+  areEqual,
+} from 'react-window'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   DragDropContext,
   Draggable,
   DraggableStateSnapshot,
   Droppable,
   DraggableProvidedDraggableProps,
+  DraggableProvided,
 } from 'react-beautiful-dnd'
 import { useStore } from 'services/root-store'
 
@@ -72,6 +80,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
       state.selectedWords.clear()
     }, [target])
 
+    const listRef = useRef<List>(null)
     const newWordInputRef = useRef<HTMLInputElement>(null)
 
     const focusNewWordInput = () => {
@@ -81,6 +90,11 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     const handleAddWord = (word = '') => {
       store.addWord(target, word)
       store.animateVisualize(false)
+      setTimeout(
+        () => listRef.current?.scrollToItem(words.wordList.length - 1),
+        10
+      )
+
       focusNewWordInput()
     }
 
@@ -196,7 +210,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
           margin: 0 -20px;
           padding: 0 20px;
           padding-left: 38px;
-          background: hsla(225, 0%, 95%, 1);
+          /* background: hsla(225, 0%, 95%, 1); */
         `}
       >
         <Checkbox
@@ -352,107 +366,147 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     )
 
     return (
-      <Box px="5" py="6" overflow="hidden" height="calc(100vh - 60px)">
+      <Box overflow="hidden" height="calc(100vh - 60px)">
         <>
-          {topToolbar}
+          <Box
+            px="5"
+            py="6"
+            pb="0"
+            zIndex={100}
+            position="relative"
+            css={
+              allWords.length > 0 &&
+              css`
+                box-shadow: 0 0 10px 0 #0003;
+              `
+            }
+          >
+            {topToolbar}
+            {allWords.length > 0 && toolbar}
+          </Box>
 
-          {allWords.length > 0 && toolbar}
+          <Box
+            px="5"
+            overflowY="hidden"
+            overflowX="hidden"
+            mx="-20px"
+            display="flex"
+            flexDirection="column"
+            height="calc(100vh - 188px)"
+          >
+            {allWords.length > 0 && (
+              <Box flex="1" width="100%" py="3">
+                <DragDropContext
+                  onBeforeDragStart={() => setIsDragging(true)}
+                  onDragEnd={(result) => {
+                    setIsDragging(false)
+                    if (!result.destination) {
+                      return
+                    }
 
-          <Box overflowY="hidden" overflowX="hidden" mx="-20px" px="20px">
-            <DragDropContext
-              onBeforeDragStart={() => setIsDragging(true)}
-              onDragEnd={(result) => {
-                setIsDragging(false)
-                if (!result.destination) {
-                  return
-                }
-
-                words.wordList = reorder(
-                  words.wordList,
-                  result.source.index,
-                  result.destination.index
-                )
-              }}
-            >
-              <Droppable droppableId="droppable">
-                {(provided, snapshot) => (
-                  <WordList
-                    mt="2"
-                    overflowY="auto"
-                    id="words-list"
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                  >
-                    {filteredWords.map((word, index) => {
-                      return (
-                        <Draggable
-                          key={word.id}
-                          draggableId={word.id}
-                          index={index}
-                        >
-                          {(provided, snapshot) => (
-                            <WordListRow
-                              provided={provided}
-                              snapshot={snapshot}
-                              word={word}
-                              showDragHandle={!state.textFilter}
-                              isSelected={state.selectedWords.has(word.id)}
-                              onSelectedChange={handleSelectionChange}
-                              focusNextField={focusNextField}
-                              focusPrevField={focusPrevField}
-                              onDelete={handleWordDelete}
-                              onSubmit={handleWordEditsSubmit}
-                            />
-                          )}
-                        </Draggable>
-                      )
-                    })}
-
-                    {/* NEW WORD INPUT */}
-                    {!state.textFilter && !isDragging && (
-                      <Observer>
-                        {() => (
-                          <NewWordInput
-                            onAddClick={() => handleNewWordInputSubmit()}
-                            inputRef={newWordInputRef}
-                            inputProps={{
-                              value: state.newWordText,
-                              onChange: (e: any) => {
-                                state.newWordText = e.target.value
-                              },
-                              onKeyDown: (e: React.KeyboardEvent) => {
-                                if (e.key === 'Enter') {
-                                  handleNewWordInputSubmit()
-                                } else if (e.key === 'Escape') {
-                                  ignoreBlur = true
-                                  state.newWordText = ''
-                                  newWordInputRef.current?.blur()
-                                  setTimeout(() => {
-                                    ignoreBlur = false
-                                  }, 100)
-                                } else if (e.key === 'ArrowUp') {
-                                  e.nativeEvent.preventDefault()
-                                  focusPrevField()
-                                } else if (e.key === 'ArrowDown') {
-                                  e.nativeEvent.preventDefault()
-                                  focusNextField()
-                                }
-                              },
-                            }}
-                          />
+                    words.wordList = reorder(
+                      words.wordList,
+                      result.source.index,
+                      result.destination.index
+                    )
+                  }}
+                >
+                  <Droppable
+                    droppableId="droppable"
+                    mode="virtual"
+                    renderClone={(provided, snapshot, rubric) => (
+                      <WordListRow
+                        style={provided.draggableProps.style}
+                        isSelected={state.selectedWords.has(
+                          filteredWords[rubric.source.index].id
                         )}
-                      </Observer>
+                        provided={provided}
+                        snapshot={snapshot}
+                        word={filteredWords[rubric.source.index]}
+                        showDragHandle={!state.textFilter}
+                      />
                     )}
+                  >
+                    {(provided, snapshot) => {
+                      const itemsCount = snapshot.isUsingPlaceholder
+                        ? filteredWords.length + 1
+                        : filteredWords.length
 
-                    {allWords.length === 0 && (
-                      <Box px="20px">
-                        <EmptyStateWordsUi target={target} />
-                      </Box>
-                    )}
-                  </WordList>
+                      return (
+                        <AutoSizer defaultWidth={300} defaultHeight={600}>
+                          {({ height, width }) => (
+                            <List
+                              overscanCount={3}
+                              height={height}
+                              itemCount={itemsCount}
+                              itemSize={40}
+                              width={width}
+                              ref={listRef}
+                              outerRef={provided.innerRef}
+                              itemData={{
+                                words: filteredWords,
+                                props: {
+                                  onSelectedChange: handleSelectionChange,
+                                  focusNextField,
+                                  focusPrevField,
+                                  onDelete: handleWordDelete,
+                                  onSubmit: handleWordEditsSubmit,
+                                },
+                              }}
+                            >
+                              {ListRow}
+                            </List>
+                          )}
+                        </AutoSizer>
+                      )
+                    }}
+                  </Droppable>
+                </DragDropContext>
+              </Box>
+            )}
+
+            {allWords.length === 0 && (
+              <Box px="20px" mt="1rem" mb="5">
+                <EmptyStateWordsUi target={target} />
+              </Box>
+            )}
+
+            {/* NEW WORD INPUT */}
+            {!state.textFilter && (
+              <Observer>
+                {() => (
+                  <NewWordInput
+                    isPinned={allWords.length > 0}
+                    onAddClick={() => handleNewWordInputSubmit()}
+                    inputRef={newWordInputRef}
+                    inputProps={{
+                      value: state.newWordText,
+                      onChange: (e: any) => {
+                        state.newWordText = e.target.value
+                      },
+                      onKeyDown: (e: React.KeyboardEvent) => {
+                        if (e.key === 'Enter') {
+                          handleNewWordInputSubmit()
+                        } else if (e.key === 'Escape') {
+                          ignoreBlur = true
+                          state.newWordText = ''
+                          newWordInputRef.current?.blur()
+                          setTimeout(() => {
+                            ignoreBlur = false
+                          }, 100)
+                        } else if (e.key === 'ArrowUp') {
+                          e.nativeEvent.preventDefault()
+                          focusPrevField()
+                        } else if (e.key === 'ArrowDown') {
+                          e.nativeEvent.preventDefault()
+                          focusNextField()
+                        }
+                      },
+                    }}
+                  />
                 )}
-              </Droppable>
-            </DragDropContext>
+              </Observer>
+            )}
           </Box>
         </>
 
@@ -484,36 +538,65 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
   }
 )
 
-const WordListRow: React.FC<{
-  isSelected: boolean
-  onSelectedChange: (word: WordListEntry, isSelected: boolean) => void
-  provided: DraggableProvided
-  snapshot: DraggableStateSnapshot
-  word: WordListEntry
-  showDragHandle?: boolean
-  onDelete: (word: WordListEntry) => void
-  onSubmit: (word: WordListEntry) => void
-  focusNextField: () => void
-  focusPrevField: () => void
-}> = observer(
+const ListRow = React.memo<ListChildComponentProps>(
+  ({ data, index, style }) => {
+    const word = data.words[index]
+    if (!word) {
+      return null
+    }
+    return (
+      <Draggable key={word.id} draggableId={word.id} index={index}>
+        {(provided, snapshot) => (
+          <WordListRow
+            provided={provided}
+            snapshot={snapshot}
+            word={word}
+            showDragHandle={!state.textFilter}
+            isSelected={state.selectedWords.has(word.id)}
+            style={{ ...provided.draggableProps.style, ...style }}
+            {...data.props}
+          />
+        )}
+      </Draggable>
+    )
+  },
+  areEqual
+)
+
+const WordListRow: React.FC<
+  {
+    style?: React.CSSProperties
+    isSelected: boolean
+    onSelectedChange?: (word: WordListEntry, isSelected: boolean) => void
+    provided: DraggableProvided
+    snapshot: DraggableStateSnapshot
+    word: WordListEntry
+    showDragHandle?: boolean
+    onDelete?: (word: WordListEntry) => void
+    onSubmit?: (word: WordListEntry) => void
+    focusNextField?: () => void
+    focusPrevField?: () => void
+  } & { [key: string]: any }
+> = observer(
   ({
     word,
     isSelected,
-    onSelectedChange,
+    onSelectedChange = noop,
     showDragHandle = true,
     provided,
     snapshot,
-    onSubmit,
-    onDelete,
-    focusNextField,
-    focusPrevField,
+    onSubmit = noop,
+    onDelete = noop,
+    focusNextField = noop,
+    focusPrevField = noop,
+    style = {},
+    ...otherProps
   }) => {
     return (
       <WordRow
+        {...otherProps}
         aria-label=""
         ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
         tabIndex={-1}
         css={css`
           ${snapshot.isDragging &&
@@ -536,8 +619,10 @@ const WordListRow: React.FC<{
             }
           `}
         `}
+        {...provided.draggableProps}
+        style={style}
       >
-        <Box color="gray.400">
+        <Box color="gray.400" {...provided.dragHandleProps}>
           <DragIndicator
             size="20px"
             css={css`
@@ -619,12 +704,22 @@ const WordListRow: React.FC<{
 )
 
 const NewWordInput: React.FC<{
+  isPinned?: boolean
   inputRef: any
   inputProps: InputProps
   onAddClick: () => void
-}> = ({ inputProps, inputRef, onAddClick }) => {
+}> = ({ inputProps, inputRef, onAddClick, isPinned }) => {
   return (
-    <WordRowNewInput>
+    <WordRowNewInput
+      css={css`
+        ${isPinned &&
+        `
+        box-shadow: 0 0 8px 0 #00000025;
+        // background-color: hsla(225, 0%, 95%, 1);
+        padding-bottom: 16px;
+        `}
+      `}
+    >
       <InputGroup flex={1}>
         <WordInput
           {...inputProps}
@@ -695,7 +790,11 @@ const WordRow = styled(Box)`
     transition: 0.2s opacity;
   }
 
+  position: relative;
+  z-index: 19;
+
   &:hover {
+    z-index: 20;
     /* background: hsla(200, 81%, 97%, 1); */
     ${WordDeleteButton}, ${WordMenuButton} {
       opacity: 1;
@@ -705,7 +804,10 @@ const WordRow = styled(Box)`
 
 const WordRowNewInput = styled(WordRow)`
   padding: 8px 16px;
+  padding-top: 16px;
   border: none;
+  position: relative;
+  z-index: 100;
 `
 
 const EmptyStateWordsUi: React.FC<{
@@ -713,7 +815,6 @@ const EmptyStateWordsUi: React.FC<{
   children?: React.ReactNode
 }> = ({ target, children }) => (
   <Box
-    mt="2rem"
     display="flex"
     alignItems="center"
     flexDirection="column"

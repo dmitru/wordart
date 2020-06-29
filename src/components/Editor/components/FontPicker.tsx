@@ -1,38 +1,32 @@
 import {
   Badge,
   Box,
-  Icon,
   IconButton,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  InputRightElement,
   Menu,
   MenuButton,
+  MenuDivider,
   MenuItem,
   MenuList,
   Text,
-  MenuDivider,
 } from '@chakra-ui/core'
+import css from '@emotion/css'
 import styled from '@emotion/styled'
-import { Button } from 'components/shared/Button'
 import { BaseBtn } from 'components/shared/BaseBtn'
+import { Button } from 'components/shared/Button'
+import { DeleteButton } from 'components/shared/DeleteButton'
+import { SearchInput } from 'components/shared/SearchInput'
 import {
   FontConfig,
+  fonts as allAvailableFonts,
   FontStyleConfig,
   popularFonts,
-  fonts as allAvailableFonts,
 } from 'data/fonts'
 import { capitalize, flatten, uniq } from 'lodash'
 import { observer, useLocalStore } from 'mobx-react'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList as List, ListProps } from 'react-window'
 import { useStore } from 'services/root-store'
-import { animateElement } from 'utils/animation'
-import css from '@emotion/css'
-import { DeleteButton } from 'components/shared/DeleteButton'
-import { SearchInput } from 'components/shared/SearchInput'
 
 export type FontPickerProps = {
   selectedFontId: string | null
