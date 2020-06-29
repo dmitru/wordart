@@ -115,6 +115,26 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
       )
     }
 
+    const focusNextField = () => {
+      const focusedEl = document.querySelector('.word-input:focus')
+      const wordInputs = [...document.getElementsByClassName('word-input')]
+      const currentInputIndex = wordInputs.findIndex((el) => focusedEl === el)
+      if (currentInputIndex > -1) {
+        wordInputs[currentInputIndex + 1]?.focus()
+        wordInputs[currentInputIndex + 1]?.select()
+      }
+    }
+
+    const focusPrevField = () => {
+      const focusedEl = document.querySelector('.word-input:focus')
+      const wordInputs = [...document.getElementsByClassName('word-input')]
+      const currentInputIndex = wordInputs.findIndex((el) => focusedEl === el)
+      if (currentInputIndex > -1) {
+        wordInputs[currentInputIndex - 1]?.focus()
+        wordInputs[currentInputIndex - 1]?.select()
+      }
+    }
+
     return (
       <Box px="5" py="6" overflow="hidden" height="calc(100vh - 60px)">
         <>
@@ -382,12 +402,16 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                       />
 
                                       <WordInput
+                                        className="word-input"
                                         autocomplete="off"
                                         spellcheck="false"
                                         autocorrect="off"
                                         pl="8px"
                                         flex="1"
                                         value={word.text}
+                                        onFocus={(e: any) => {
+                                          e.target?.select()
+                                        }}
                                         onChange={(e: any) => {
                                           store.updateWord(target, word.id, {
                                             text: e.target.value,
@@ -397,8 +421,17 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                           handleSubmit()
                                         }}
                                         onKeyDown={(e: React.KeyboardEvent) => {
+                                          console.log(e.key)
                                           if (e.key === 'Enter') {
                                             handleSubmit()
+                                            focusNextField()
+                                          } else if (e.key === 'Tab') {
+                                            handleSubmit()
+                                            focusNextField()
+                                          } else if (e.key === 'ArrowUp') {
+                                            focusPrevField()
+                                          } else if (e.key === 'ArrowDown') {
+                                            focusNextField()
                                           }
                                         }}
                                         placeholder="Type here..."
@@ -441,6 +474,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                           <WordRowNewInput>
                             <InputGroup flex={1}>
                               <WordInput
+                                className="word-input"
                                 autocomplete="off"
                                 spellcheck="false"
                                 autocorrect="off"
@@ -460,6 +494,10 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                     setTimeout(() => {
                                       ignoreBlur = false
                                     }, 100)
+                                  } else if (e.key === 'ArrowUp') {
+                                    focusPrevField()
+                                  } else if (e.key === 'ArrowDown') {
+                                    focusNextField()
                                   }
                                 }}
                                 hasBorder
