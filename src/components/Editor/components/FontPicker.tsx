@@ -17,7 +17,12 @@ import {
 import styled from '@emotion/styled'
 import { Button } from 'components/shared/Button'
 import { BaseBtn } from 'components/shared/BaseBtn'
-import { FontConfig, FontStyleConfig } from 'data/fonts'
+import {
+  FontConfig,
+  FontStyleConfig,
+  popularFonts,
+  fonts as allAvailableFonts,
+} from 'data/fonts'
 import { capitalize, flatten, uniq } from 'lodash'
 import { observer, useLocalStore } from 'mobx-react'
 import { useEffect, useMemo } from 'react'
@@ -44,7 +49,9 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
     language: 'any',
   }))
 
-  const allFonts = store.getAvailableFonts()
+  const allFonts = store.getAvailableFonts({
+    popular: state.style === 'popular',
+  })
 
   const styleOptions = uniq(
     flatten(allFonts.map((f) => f.font.categories || []))
@@ -61,7 +68,9 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
         (f.font.subsets || []).includes(state.language)) &&
       ((state.style === 'popular' && f.font.isPopular) ||
         (state.style !== 'popular' &&
-          (f.font.categories || [])[0] === state.style)) &&
+          state.style !== 'all' &&
+          (f.font.categories || [])[0] === state.style) ||
+        state.style === 'all') &&
       f.font.title
         .toLocaleLowerCase()
         .startsWith(state.query.toLocaleLowerCase())
@@ -124,7 +133,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
                 variantColor={state.style !== 'popular' ? 'accent' : undefined}
                 as={Button}
                 rightIcon="chevron-down"
-                size="xs"
+                size="sm"
                 mr="1"
               >
                 {state.style === 'popular'
@@ -150,7 +159,14 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
                     state.style = 'popular'
                   }}
                 >
-                  Popular
+                  Popular ({popularFonts.length})
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    state.style = 'all'
+                  }}
+                >
+                  All ({allAvailableFonts.length})
                 </MenuItem>
                 <MenuDivider />
                 {styleOptions.map((option, index) => (
@@ -188,7 +204,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
             <Menu>
               <MenuButton
                 mr="1"
-                size="xs"
+                size="sm"
                 as={Button}
                 // @ts-expect-error
                 variantColor={state.language === 'any' ? undefined : 'accent'}

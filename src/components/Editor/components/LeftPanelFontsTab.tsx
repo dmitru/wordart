@@ -82,7 +82,6 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
         <Box
           position="relative"
           overflow="hidden"
-          width="100%"
           height="calc(100vh - 50px)"
           px="5"
           py="6"
@@ -140,7 +139,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                     })}
                   </Box>
 
-                  <Box mt="3">
+                  <Box mt="3" display="flex" alignItems="center">
                     <Button
                       mr="3"
                       onClick={() => {
@@ -152,19 +151,10 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                       variantColor="primary"
                     >
                       Add more fonts
-                      <Tag
-                        ml="3"
-                        size="sm"
-                        rounded="full"
-                        variant="solid"
-                        variantColor="light"
-                      >
-                        <TagLabel>{(fonts || []).length} / 8</TagLabel>
-                      </Tag>
                     </Button>
 
                     <Menu>
-                      <MenuButton marginLeft="auto" as={MenuDotsButton} />
+                      <MenuButton as={MenuDotsButton} />
 
                       <MenuList>
                         <MenuItem
@@ -177,6 +167,16 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                         <MenuItem>Reset defaults</MenuItem>
                       </MenuList>
                     </Menu>
+
+                    <Tag
+                      ml="auto"
+                      size="sm"
+                      rounded="full"
+                      variant="outline"
+                      variantColor="gray"
+                    >
+                      <TagLabel>{(fonts || []).length} / 8</TagLabel>
+                    </Tag>
                   </Box>
                 </Box>
               </motion.div>
@@ -191,7 +191,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                 exit={{ x: 355, y: 0, opacity: 0 }}
               >
                 <Box
-                  height="calc(100vh - 120px)"
+                  height="calc(100vh - 100px)"
                   display="flex"
                   flexDirection="column"
                 >

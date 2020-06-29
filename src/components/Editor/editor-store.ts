@@ -51,6 +51,7 @@ import {
   fonts,
   FontStyleConfig,
   loadFontsConfig,
+  popularFonts,
 } from 'data/fonts'
 import { shapes } from 'data/shapes'
 import { loadFont } from 'lib/wordart/fonts'
@@ -154,10 +155,10 @@ export class EditorStore {
     }
 
     this.styleOptions.shape.items.words.fontIds = [
-      this.getAvailableFonts()[0].defaultStyle.fontId,
+      this.getAvailableFonts({ popular: true })[0].defaultStyle.fontId,
     ]
     this.styleOptions.bg.items.words.fontIds = [
-      this.getAvailableFonts()[0].defaultStyle.fontId,
+      this.getAvailableFonts({ popular: true })[1].defaultStyle.fontId,
     ]
 
     this.editor = new Editor({
@@ -1118,13 +1119,19 @@ export class EditorStore {
     return normalStyles[middleIndex]
   }
 
-  getAvailableFonts = (): {
+  getAvailableFonts = (
+    params: {
+      popular?: boolean
+    } = {}
+  ): {
     font: FontConfig
     defaultStyle: FontStyleConfig
   }[] => {
     const result: { font: FontConfig; defaultStyle: FontStyleConfig }[] = []
 
-    for (const font of [...this.customFonts, ...fonts]) {
+    const allFonts = params.popular ? popularFonts : fonts
+
+    for (const font of [...this.customFonts, ...allFonts]) {
       result.push({ font, defaultStyle: this.getDefaultStyleForFont(font) })
     }
     return result

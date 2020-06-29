@@ -1,3 +1,5 @@
+import { groupBy, sortBy } from 'lodash'
+
 export type FontId = string
 
 export type FontStyleConfig = {
@@ -21,15 +23,35 @@ export type FontConfig = {
 }
 
 export let fonts: FontConfig[] = []
+export let popularFonts: FontConfig[] = []
 
-const popularFonts: string[] = ['Lobster', 'Roboto']
+const getPopularFonts = (fonts: FontConfig[]): FontConfig[] => {
+  const result: FontConfig[] = []
+  const fontsByCategory = groupBy(fonts, (f) => (f.categories || [])[0])
+
+  const categoriesSorted = [
+    ['handwriting', 15],
+    ['display', 20],
+    ['monospace', 5],
+    ['serif', 10],
+    ['sans-serif', 10],
+  ] as [string, number][]
+
+  for (const [category, count] of categoriesSorted) {
+    const fontsInCategory = fontsByCategory[category] || []
+    const fontsInCategorySorted = sortBy(fontsInCategory, 'popularity')
+    if (fontsInCategorySorted.length > 0) {
+      result.push(...fontsInCategorySorted.slice(0, count))
+    }
+  }
+  return result
+}
 
 export const loadFontsConfig = async () => {
   const fontsData = await fetch('/fonts/config.json').then((res) => res.json())
   fonts.push(...fontsData)
-  for (const font of fonts) {
-    if (popularFonts.includes(font.title)) {
-      font.isPopular = true
-    }
+  popularFonts = getPopularFonts(fonts)
+  for (const font of popularFonts) {
+    font.isPopular = true
   }
 }
