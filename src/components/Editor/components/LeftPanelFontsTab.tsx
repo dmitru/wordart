@@ -191,7 +191,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
               >
                 <Box
                   width="100%"
-                  height="calc(100vh - 100px)"
+                  height="calc(100vh - 50px)"
                   px="5"
                   py="6"
                   position="absolute"
@@ -279,11 +279,7 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
   containerProps = {},
 }) => {
   return (
-    <FontButtonContainer
-      aria-label={`Font ${title}`}
-      selected={isSelected}
-      {...containerProps}
-    >
+    <FontButtonContainer aria-label={`Font ${title}`} {...containerProps}>
       <FontButton>
         <img src={thumbnail} />
         {isCustom && (
@@ -291,24 +287,24 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
             custom
           </Badge>
         )}
-      </FontButton>
 
-      <FontChangeButton
-        variantColor="secondary"
-        aria-label="Change font"
-        size="sm"
-        ml="2"
-        mr="2"
-        onClickCapture={(e: any) => {
-          e.preventDefault()
-          e.stopPropagation()
-          e.nativeEvent.stopImmediatePropagation()
-          e.nativeEvent.stopPropagation()
-          onChangeClick()
-        }}
-      >
-        Change
-      </FontChangeButton>
+        <FontChangeButton
+          variantColor="secondary"
+          aria-label="Change font"
+          size="sm"
+          ml="2"
+          mr="2"
+          onClickCapture={(e: any) => {
+            e.preventDefault()
+            e.stopPropagation()
+            e.nativeEvent.stopImmediatePropagation()
+            e.nativeEvent.stopPropagation()
+            onChangeClick()
+          }}
+        >
+          Change
+        </FontChangeButton>
+      </FontButton>
 
       {showDelete && (
         <FontDeleteButton
@@ -331,23 +327,27 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
 
 const FontChangeButton = styled(Button)`
   position: absolute;
-  right: 40px;
+  right: 8px;
 `
 
 const Toolbar = styled(Box)``
 
 const FontDeleteButton = styled(DeleteButton)`
   position: absolute;
-  right: 0;
+  right: -8px;
   width: 30px;
 `
 
 const FontButton = styled(BaseBtn)`
+  position: relative;
+  box-shadow: 0 0 4px 0 #0004;
+  padding: 0.25rem 0.75rem;
+  margin-right: 38px;
   border: none;
   flex: 1;
   display: inline-flex;
   align-items: center;
-  height: 48px;
+  height: 60px;
 
   img {
     max-width: 270px;
@@ -357,10 +357,8 @@ const FontButton = styled(BaseBtn)`
   }
 `
 
-const FontButtonContainer = styled(Box)<{ theme: any; selected?: boolean }>`
+const FontButtonContainer = styled(Box)<{ theme: any }>`
   position: relative;
-  box-shadow: 0 0 4px 0 #0004;
-  padding: 0.25rem 0.75rem;
   margin-bottom: 1rem;
 
   ${FontDeleteButton}, ${FontChangeButton} {
@@ -370,13 +368,13 @@ const FontButtonContainer = styled(Box)<{ theme: any; selected?: boolean }>`
 
   transition: 0.1s background;
 
-  ${(p) => (p.selected ? `background: ${p.theme.colors.blue['100']};` : '')}
-
   &:hover {
-    background: ${(p) =>
-      p.selected
-        ? `${p.theme.colors.blue['50']}`
-        : p.theme.colors.blackAlpha['50']};
+    ${FontButton} {
+      background: ${(p) =>
+        p.selected
+          ? `${p.theme.colors.blue['50']}`
+          : p.theme.colors.blackAlpha['50']};
+    }
 
     ${FontDeleteButton}, ${FontChangeButton} {
       opacity: 1;
