@@ -10,6 +10,10 @@ import {
   ProcessOrderDto,
   HdDownloadDto,
   HdDownloadResult,
+  CreateFolderDto,
+  Folder,
+  FolderId,
+  UpdateFolderDto,
 } from 'services/api/types'
 import { apiClient } from './api-client'
 
@@ -27,6 +31,24 @@ export const Api = {
     }): Promise<{ words: string[]; counts: number[] }> {
       const response = await apiClient.post('/extract/url', data)
       return response.data as { words: string[]; counts: number[] }
+    },
+  },
+
+  folders: {
+    async create(data: CreateFolderDto): Promise<Folder> {
+      const response = await apiClient.post('/folders', data)
+      return response.data as Folder
+    },
+    async delete(id: FolderId): Promise<void> {
+      await apiClient.delete(`/folders/${id}`)
+    },
+    async update(id: FolderId, data: UpdateFolderDto): Promise<Folder> {
+      const response = await apiClient.put(`/folders/${id}`, data)
+      return response.data as Folder
+    },
+    async fetchMy(): Promise<Folder[]> {
+      const response = await apiClient.get('/folders')
+      return response.data as Folder[]
     },
   },
 

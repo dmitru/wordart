@@ -29,7 +29,24 @@ export type Wordcloud = {
   updatedAt: string
 }
 
+export type FolderId = string
+export type Folder = {
+  id: FolderId
+  title: string
+  wordclouds: WordcloudId
+  createdAt: string
+  updatedAt: string
+}
+
 export type EditorPersistedData = EditorPersistedDataV1
+
+export type CreateFolderDto = {
+  title: string
+}
+
+export type UpdateFolderDto = Partial<{
+  title: string
+}>
 
 export type CreateWordcloudDto = {
   title: string

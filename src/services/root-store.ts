@@ -18,7 +18,8 @@ export class RootStore {
     this.wordcloudsStore = new WordcloudsStore(this)
 
     this.authStore.afterLogin = () => {
-      this.wordcloudsStore.fetchMyWordclouds()
+      this.wordcloudsStore.fetchWordclouds()
+      this.wordcloudsStore.fetchFolders()
     }
     this.authStore.initUsingSavedLocalAuthToken()
   }

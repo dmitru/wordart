@@ -7,46 +7,80 @@ import {
   CreateWordcloudDto,
   WordcloudId,
   SaveWordcloudDto,
+  Folder,
+  CreateFolderDto,
+  FolderId,
+  UpdateFolderDto,
 } from 'services/api/types'
 import { sortBy } from 'lodash'
 
 export class WordcloudsStore {
   rootStore: RootStore
 
-  @observable hasFetchedMy = false
-  @observable private _myWordclouds: Wordcloud[] = []
+  @observable hasFetchedWordclouds = false
+  @observable hasFetchedFolders = false
+  @observable private _wordclouds: Wordcloud[] = []
+  @observable private _folders: Folder[] = []
 
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
   }
 
   getById = (id: WordcloudId): Wordcloud | undefined => {
-    return this.myWordclouds.find((wc) => wc.id === id)
+    return this.wordclouds.find((wc) => wc.id === id)
   }
 
-  fetchMyWordclouds = async () => {
+  fetchWordclouds = async () => {
     const wordclouds = await Api.wordclouds.fetchMy()
-    this.hasFetchedMy = true
-    this._myWordclouds = wordclouds
+    this.hasFetchedWordclouds = true
+    this._wordclouds = wordclouds
+  }
+
+  fetchFolders = async () => {
+    const folders = await Api.folders.fetchMy()
+    this.hasFetchedFolders = true
+    this._folders = folders
   }
 
   create = async (data: CreateWordcloudDto): Promise<Wordcloud> => {
     const wordcloud = await Api.wordclouds.create(data)
-    this._myWordclouds.push(wordcloud)
+    this._wordclouds.push(wordcloud)
     return wordcloud
   }
 
   delete = async (id: WordcloudId): Promise<void> => {
-    this._myWordclouds = this._myWordclouds.filter((wc) => wc.id !== id)
+    this._wordclouds = this._wordclouds.filter((wc) => wc.id !== id)
     await Api.wordclouds.delete(id)
   }
 
   save = async (id: WordcloudId, data: SaveWordcloudDto): Promise<void> => {
-    const wordcloud = await Api.wordclouds.save(id, data)
-    return wordcloud
+    await Api.wordclouds.save(id, data)
   }
 
-  @computed get myWordclouds() {
-    return sortBy(this._myWordclouds, (wc) => -new Date(wc.updatedAt).getTime())
+  createFolder = async (data: CreateFolderDto): Promise<Folder> => {
+    const folder = await Api.folders.create(data)
+    this._folders.push(folder)
+    return folder
+  }
+
+  deleteFolder = async (id: FolderId): Promise<void> => {
+    this._folders = this._folders.filter((f) => f.id !== id)
+    await Api.folders.delete(id)
+  }
+
+  updateFolder = async (
+    id: FolderId,
+    data: UpdateFolderDto
+  ): Promise<Folder> => {
+    const folder = await Api.folders.update(id, data)
+    return folder
+  }
+
+  @computed get wordclouds() {
+    return sortBy(this._wordclouds, (wc) => -new Date(wc.updatedAt).getTime())
+  }
+
+  @computed get folders() {
+    return sortBy(this._folders, 'title')
   }
 }
