@@ -334,7 +334,12 @@ export const DesignsView = observer(() => {
   const isSelecting = selection.size > 0
 
   const rename = async (wc: Wordcloud, title: string) => {
+    title = title.trim()
+
     if (!title) {
+      return
+    }
+    if (title === wc.title) {
       return
     }
     await store.save(wc.id, { title })
