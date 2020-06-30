@@ -54,7 +54,12 @@ export class WordcloudsStore {
   }
 
   save = async (id: WordcloudId, data: SaveWordcloudDto): Promise<void> => {
+    const { title } = data
     await Api.wordclouds.save(id, data)
+    const wc = this._wordclouds.find((w) => w.id === id)
+    if (wc) {
+      wc.title = title
+    }
   }
 
   createFolder = async (data: CreateFolderDto): Promise<Folder> => {

@@ -55,11 +55,15 @@ export type CreateWordcloudDto = {
   editorData: EditorPersistedData
 }
 
-export type SaveWordcloudDto = {
-  title: string
-  thumbnail: string
-  editorData: EditorPersistedData
-}
+export type SaveWordcloudDto =
+  | {
+      title: string
+    }
+  | {
+      title: string
+      thumbnail: string
+      editorData: EditorPersistedData
+    }
 
 export type HdDownloadDto = {
   wordloudKey: string

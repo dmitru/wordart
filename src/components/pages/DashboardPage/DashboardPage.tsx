@@ -13,6 +13,7 @@ import {
   PopoverArrow,
   Text,
   Tag,
+  useToast,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
@@ -27,8 +28,24 @@ import React, { useState } from 'react'
 import { Wordcloud, Folder, FolderId } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
-import { FaFolder, FaFolderPlus, FaPlug, FaPlus } from 'react-icons/fa'
+import {
+  FaFolder,
+  FaFolderPlus,
+  FaPlug,
+  FaPlus,
+  FaCheckSquare,
+  FaRegCheckSquare,
+  FaRegFolder,
+  FaPencilAlt,
+  FaTimes,
+  FaCopy,
+  FaRegCopy,
+  FaChevronRight,
+} from 'react-icons/fa'
 import { observable } from 'mobx'
+import { PromptModal } from 'components/shared/PromptModal'
+import { useToasts } from 'use-toasts'
+import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 
 const state = observable({
   folder: null as Folder | null,
@@ -78,7 +95,10 @@ export type WordcloudThumbnailProps = {
   isSelected: boolean
   onSelectionChange: (isSelected: boolean) => void
   wordcloud: Wordcloud
-  onDelete: () => Promise<void>
+  onMoveToFolder: () => void
+  onDuplicate: () => void
+  onRename: () => void
+  onDelete: () => void
 }
 
 export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
@@ -88,6 +108,10 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
   onSelectionChange,
   wordcloud,
   onDelete,
+  onMoveToFolder,
+
+  onRename,
+  onDuplicate,
 }) => {
   const content = (
     <div>
@@ -197,7 +221,10 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
         <WordcloudThumbnailMenu
           wordcloud={wordcloud}
           onDelete={onDelete}
-          onMoveToFolder={() => console.log('todo')}
+          onMoveToFolder={onMoveToFolder}
+          onSelect={() => onSelectionChange(true)}
+          onRename={onRename}
+          onDuplicate={onDuplicate}
         />
       )}
 
@@ -209,6 +236,12 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
           rel={isSelecting ? '' : 'noopener noreferrer'}
           target={isSelecting ? '' : '_blank'}
           onClick={isSelecting ? onClick : undefined}
+          css={css`
+            ${isSelecting &&
+            `
+            &, &:hover, &:focus { text-decoration: none !important; }
+          `}
+          `}
         >
           {content}
         </Text>
@@ -219,18 +252,15 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
 
 type WordcloudThumbnailMenuProps = {
   wordcloud: Wordcloud
-  onMoveToFolder: (folder: Folder) => void
+  onMoveToFolder: () => void
+  onDuplicate: () => void
+  onSelect: () => void
+  onRename: () => void
   onDelete: () => void
 }
 
 const WordcloudThumbnailMenu: React.FC<WordcloudThumbnailMenuProps> = observer(
   (props: WordcloudThumbnailMenuProps) => {
-    const {
-      wordcloudsStore: { folders },
-    } = useStore()
-
-    const [isShowingFolders, setIsShowingFolders] = useState(false)
-
     return (
       <Menu>
         <MenuButton
@@ -238,48 +268,39 @@ const WordcloudThumbnailMenu: React.FC<WordcloudThumbnailMenuProps> = observer(
           noShadows={false}
           variant="solid"
         />
-        <MenuList
-          onClose={() => setIsShowingFolders(false)}
-          zIndex={10000}
-          hasArrow
-        >
+        <MenuList zIndex={10000} hasArrow>
           <PopoverArrow />
-          <div>
-            {isShowingFolders && (
-              <>
-                <MenuItem onClick={() => setIsShowingFolders(false)}>
-                  Back
-                </MenuItem>
-                {folders.map((f) => (
-                  <MenuItem onClick={() => props.onMoveToFolder(f)} key={f.id}>
-                    {f.title}
-                  </MenuItem>
-                ))}
-              </>
-            )}
-            {!isShowingFolders && (
-              <>
-                <MenuItem>Edit...</MenuItem>
-                <MenuDivider />
-                <MenuItem>Select</MenuItem>
-                <MenuItem onClick={() => setIsShowingFolders(true)}>
-                  Move to folder
-                </MenuItem>
-                <MenuItem>Duplicate</MenuItem>
-                <MenuItem>Rename</MenuItem>
-                <MenuDivider />
-                <MenuItem onClick={props.onDelete}>
-                  <Icon
-                    name="small-close"
-                    size="20px"
-                    color="gray.500"
-                    mr="2"
-                  />
-                  Delete
-                </MenuItem>
-              </>
-            )}
-          </div>
+
+          <MenuItemWithIcon icon={<FaChevronRight />} fontWeight="semibold">
+            Open in Editor...
+          </MenuItemWithIcon>
+
+          <MenuDivider />
+
+          <MenuItemWithIcon
+            onClick={props.onSelect}
+            icon={<FaRegCheckSquare />}
+          >
+            Select
+          </MenuItemWithIcon>
+          <MenuItemWithIcon
+            onClick={props.onMoveToFolder}
+            icon={<FaRegFolder />}
+          >
+            Move to folder
+          </MenuItemWithIcon>
+          <MenuItemWithIcon icon={<FaRegCopy />} onClick={props.onDuplicate}>
+            Duplicate
+          </MenuItemWithIcon>
+          <MenuItemWithIcon icon={<FaPencilAlt />} onClick={props.onRename}>
+            Rename
+          </MenuItemWithIcon>
+
+          <MenuDivider />
+
+          <MenuItemWithIcon icon={<FaTimes />} onClick={props.onDelete}>
+            Delete
+          </MenuItemWithIcon>
         </MenuList>
       </Menu>
     )
@@ -292,140 +313,192 @@ const ThumbnailMenuButton = styled(MenuDotsButton)`
 
 export const DesignsView = observer(() => {
   const { wordcloudsStore: store } = useStore()
+  const toasts = useToasts()
+  const [
+    duplicatingWordcloud,
+    setDuplicatingWordcloud,
+  ] = useState<Wordcloud | null>(null)
+  const [renamingWordcloud, setRenamingWordcloud] = useState<Wordcloud | null>(
+    null
+  )
+  const [deletingWordcloud, setDeletingWordcloud] = useState<Wordcloud | null>(
+    null
+  )
+  const [movingWordcloud, setMovindWordcloud] = useState<Wordcloud | null>(null)
+
   const [query, setQuery] = useState('')
+
   const { selection } = useLocalStore(() => ({
     selection: new Set<FolderId>(),
   }))
   const isSelecting = selection.size > 0
 
+  const rename = async (wc: Wordcloud, title: string) => {
+    if (!title) {
+      return
+    }
+    await store.save(wc.id, { title })
+    toasts.showSuccess({
+      title: 'Changes saved',
+    })
+  }
+
   return (
-    <Box flex="3">
-      <Box mt="4" mb="4" display="flex" alignItems="center">
-        <Link href={Urls.editor._next} as={Urls.editor.create} passHref>
-          <Button variantColor="accent" leftIcon="add" size="lg">
+    <>
+      <PromptModal
+        isOpen={renamingWordcloud != null}
+        initialValue={renamingWordcloud?.title}
+        onSubmit={async (title) => {
+          if (!renamingWordcloud) {
+            return
+          }
+          try {
+            await rename(renamingWordcloud, title)
+          } finally {
+            setRenamingWordcloud(null)
+          }
+        }}
+        onCancel={() => setRenamingWordcloud(null)}
+        title="Rename design"
+        inputProps={{
+          placeholder: 'Enter name...',
+        }}
+      />
+
+      <Box flex="3">
+        <Box mt="4" mb="4" display="flex" alignItems="center">
+          <Button
+            as="a"
+            css={css`
+              &,
+              &:hover,
+              &:focus {
+                text-decoration: none !important;
+              }
+            `}
+            href={Urls.editor.create}
+            target="_blank"
+            variantColor="accent"
+            leftIcon="add"
+            size="lg"
+          >
             Create New
           </Button>
-        </Link>
 
-        <Box ml="1rem" maxWidth="300px">
-          <SearchInput
-            noBorder={false}
-            onChange={setQuery}
-            value={query}
-            placeholder="Filter..."
-            size="md"
-          />
+          <Box ml="1rem" maxWidth="300px">
+            <SearchInput
+              noBorder={false}
+              onChange={setQuery}
+              value={query}
+              placeholder="Filter..."
+              size="md"
+            />
+          </Box>
         </Box>
-      </Box>
 
-      {!store.hasFetchedWordclouds && 'Loading...'}
-      {store.hasFetchedWordclouds && (
-        <Box>
-          {store.wordclouds.length === 0 && (
-            <>
-              <p>
-                Welcome! Click the button below to create your first wordcloud.
-              </p>
-              <Link href={Urls.editor._next} as={Urls.editor.create} passHref>
-                <Button variantColor="accent">Create</Button>
-              </Link>
-            </>
-          )}
-          <Flex
-            wrap="wrap"
-            alignItems="flex-start"
-            justifyItems="flex-start"
-            justifyContent="flex-start"
-            alignContent="flex-start"
-            css={css`
-              min-height: calc(100vh - 200px);
-              background: #f8f8f8;
-              padding: 2rem;
-              box-shadow: inset 0 0 6px 0 #0001;
-              margin-bottom: 3rem;
-            `}
-          >
-            {store.wordclouds.length > 0 &&
-              store.wordclouds
-                .filter(
-                  (wc) =>
-                    (query
-                      ? wc.title
-                          .toLocaleLowerCase()
-                          .includes(query.toLocaleLowerCase())
-                      : true) &&
-                    (state.folder == null || state.folder.id === wc.folder)
-                )
-                .map((wc) => (
-                  <WordcloudThumbnail
-                    key={wc.id}
-                    wordcloud={wc}
-                    isSelecting={isSelecting}
-                    onClick={
-                      isSelecting
-                        ? () => {
-                            console.log('onClick')
-                            if (isSelecting) {
-                              if (!selection.has(wc.id)) {
-                                selection.add(wc.id)
+        {!store.hasFetchedWordclouds && 'Loading...'}
+        {store.hasFetchedWordclouds && (
+          <Box>
+            {store.wordclouds.length === 0 && (
+              <>
+                <p>
+                  Welcome! Click the button below to create your first
+                  wordcloud.
+                </p>
+                <Link href={Urls.editor._next} as={Urls.editor.create} passHref>
+                  <Button variantColor="accent">Create</Button>
+                </Link>
+              </>
+            )}
+            <Flex
+              wrap="wrap"
+              alignItems="flex-start"
+              justifyItems="flex-start"
+              justifyContent="flex-start"
+              alignContent="flex-start"
+              css={css`
+                min-height: calc(100vh - 200px);
+                background: #f8f8f8;
+                padding: 2rem;
+                box-shadow: inset 0 0 6px 0 #0001;
+                margin-bottom: 3rem;
+              `}
+            >
+              {store.wordclouds.length > 0 &&
+                store.wordclouds
+                  .filter(
+                    (wc) =>
+                      (query
+                        ? wc.title
+                            .toLocaleLowerCase()
+                            .includes(query.toLocaleLowerCase())
+                        : true) &&
+                      (state.folder == null || state.folder.id === wc.folder)
+                  )
+                  .map((wc) => (
+                    <WordcloudThumbnail
+                      key={wc.id}
+                      wordcloud={wc}
+                      isSelecting={isSelecting}
+                      onClick={
+                        isSelecting
+                          ? () => {
+                              console.log('onClick')
+                              if (isSelecting) {
+                                if (!selection.has(wc.id)) {
+                                  selection.add(wc.id)
+                                } else {
+                                  selection.delete(wc.id)
+                                }
                               } else {
-                                selection.delete(wc.id)
+                                // Open the editor...
                               }
-                            } else {
-                              // Open the editor...
                             }
-                          }
-                        : () => null
-                    }
-                    isSelected={selection.has(wc.id)}
-                    onSelectionChange={(isSelected) => {
-                      if (isSelected) {
-                        selection.add(wc.id)
-                      } else {
-                        selection.delete(wc.id)
+                          : () => null
                       }
-                    }}
-                    onDelete={async () => {
-                      store.delete(wc.id)
-                    }}
-                  />
-                ))}
-          </Flex>
-        </Box>
-      )}
-    </Box>
+                      onMoveToFolder={() => setMovindWordcloud(wc)}
+                      onRename={() => setRenamingWordcloud(wc)}
+                      onDuplicate={() => setDuplicatingWordcloud(wc)}
+                      onDelete={() => setDeletingWordcloud(wc)}
+                      isSelected={selection.has(wc.id)}
+                      onSelectionChange={(isSelected) => {
+                        if (isSelected) {
+                          selection.add(wc.id)
+                        } else {
+                          selection.delete(wc.id)
+                        }
+                      }}
+                    />
+                  ))}
+            </Flex>
+          </Box>
+        )}
+      </Box>
+    </>
   )
 })
 
 export const FoldersView = observer(() => {
   const { wordcloudsStore: store } = useStore()
-
-  const handleCreateFolder = () => {
-    const title = window.prompt(
-      'Please enter name for the new folder:',
-      'New folder'
-    )
-    if (!title) {
-      return
-    }
-    store.createFolder({
-      title,
-    })
-  }
+  const toasts = useToasts()
+  const [renamingFolder, setRenamingFolder] = useState<Folder | null>(null)
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false)
 
   const deleteFolder = (folder: Folder) => {
     store.deleteFolder(folder.id)
+    toasts.showSuccess({
+      title: 'Folder deleted',
+    })
   }
 
-  const renameFolder = (folder: Folder) => {
-    const title = window.prompt(
-      'Please enter name for the new folder:',
-      folder.title
-    )
+  const renameFolder = async (folder: Folder, title: string) => {
     if (!title) {
       return
     }
-    return store.updateFolder(folder.id, { title })
+    await store.updateFolder(folder.id, { title })
+    toasts.showSuccess({
+      title: 'Folder renamed',
+    })
   }
 
   return (
@@ -451,7 +524,7 @@ export const FoldersView = observer(() => {
             state.folder = null
           }}
         >
-          All Designs
+          All your designs
         </FolderRow>
 
         <Text
@@ -479,7 +552,7 @@ export const FoldersView = observer(() => {
             }}
           >
             <Box mr="3" color="gray.400">
-              <FaFolder />
+              <FaRegFolder />
             </Box>
 
             {f.title}
@@ -490,7 +563,16 @@ export const FoldersView = observer(() => {
 
             <Box>
               <Menu>
-                <MenuButton as={FolderMenuButton} noShadows={false} size="sm" />
+                <MenuButton
+                  as={FolderMenuButton}
+                  noShadows={false}
+                  size="sm"
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation()
+                    e.nativeEvent.preventDefault()
+                    e.nativeEvent.stopPropagation()
+                  }}
+                />
                 <MenuList
                   fontWeight="normal"
                   zIndex={10000}
@@ -498,9 +580,24 @@ export const FoldersView = observer(() => {
                   css={css`
                     top: 50px;
                   `}
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation()
+                    e.nativeEvent.preventDefault()
+                    e.nativeEvent.stopPropagation()
+                  }}
                 >
-                  <MenuItem onClick={() => renameFolder(f)}>Rename</MenuItem>
-                  <MenuItem onClick={() => deleteFolder(f)}>Delete</MenuItem>
+                  <MenuItemWithIcon
+                    icon={<FaPencilAlt />}
+                    onClick={() => setRenamingFolder(f)}
+                  >
+                    Rename
+                  </MenuItemWithIcon>
+                  <MenuItemWithIcon
+                    icon={<FaTimes />}
+                    onClick={() => deleteFolder(f)}
+                  >
+                    Delete
+                  </MenuItemWithIcon>
                   <PopoverArrow />
                 </MenuList>
               </Menu>
@@ -508,12 +605,55 @@ export const FoldersView = observer(() => {
           </FolderRow>
         ))}
 
+        <PromptModal
+          isOpen={renamingFolder != null}
+          initialValue={renamingFolder?.title}
+          onSubmit={async (title) => {
+            if (!renamingFolder) {
+              return
+            }
+            try {
+              await renameFolder(renamingFolder, title)
+            } finally {
+              setRenamingFolder(null)
+            }
+          }}
+          onCancel={() => setRenamingFolder(null)}
+          title="Rename folder"
+          inputProps={{
+            placeholder: 'Enter folder name...',
+          }}
+        />
+
+        <PromptModal
+          isOpen={isCreatingFolder}
+          onSubmit={async (title) => {
+            try {
+              await store.createFolder({ title })
+              toasts.showSuccess({
+                title: 'New folder created',
+              })
+              setIsCreatingFolder(false)
+            } catch (error) {
+              toasts.showError({
+                title: 'Sorry, there was an error when creating new folder',
+              })
+            } finally {
+            }
+          }}
+          onCancel={() => setIsCreatingFolder(false)}
+          title="New folder"
+          inputProps={{
+            placeholder: 'Enter folder name...',
+          }}
+        />
+
         <Box mt="4">
           <Button
             color="gray.500"
             variant="outline"
             width="140px"
-            onClick={handleCreateFolder}
+            onClick={() => setIsCreatingFolder(true)}
           >
             <Box mr="2">
               <FaPlus />
