@@ -27,6 +27,7 @@ export type Wordcloud = {
   author: string
   createdAt: string
   updatedAt: string
+  folder: string
 }
 
 export type FolderId = string

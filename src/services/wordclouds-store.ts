@@ -73,6 +73,7 @@ export class WordcloudsStore {
     data: UpdateFolderDto
   ): Promise<Folder> => {
     const folder = await Api.folders.update(id, data)
+    this._folders = this._folders.map((f) => (f.id === id ? folder : f))
     return folder
   }
 
@@ -81,6 +82,6 @@ export class WordcloudsStore {
   }
 
   @computed get folders() {
-    return sortBy(this._folders, 'title')
+    return sortBy(this._folders, (f) => f.title.trim().toLocaleLowerCase())
   }
 }
