@@ -11,7 +11,7 @@ import { observer } from 'mobx-react'
 import Link from 'next/link'
 import pluralize from 'pluralize'
 import React, { useState } from 'react'
-import { FaFolder } from 'react-icons/fa'
+import { FaFolder, FaRegCheckSquare } from 'react-icons/fa'
 import { Wordcloud } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
@@ -35,6 +35,22 @@ export const DesignsView = observer(() => {
   )
 
   const [query, setQuery] = useState('')
+
+  const wordcloudsInFolder = store.wordclouds.filter((wc) => {
+    if (dashboardUiState.folder === 'all') {
+      return true
+    }
+    if (dashboardUiState.folder === 'no folder') {
+      return !wc.folder
+    }
+    return wc.folder === dashboardUiState.folder.id
+  })
+
+  const wordcloudsFiltered = wordcloudsInFolder.filter((wc) =>
+    query
+      ? wc.title.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+      : true
+  )
 
   const { selection } = dashboardUiState
   const isSelecting = selection.size > 0
@@ -124,6 +140,29 @@ export const DesignsView = observer(() => {
                 </Box>
                 Move to folder
               </Button>
+
+              <Button
+                mr="2"
+                variantColor="primary"
+                onClick={() => {
+                  const isAllSelected =
+                    selection.size === wordcloudsFiltered.length
+                  if (isAllSelected) {
+                    selection.clear()
+                  } else {
+                    dashboardUiState.selection = new Set(
+                      wordcloudsFiltered.map((w) => w.id)
+                    )
+                  }
+                }}
+              >
+                <Box mr="2">
+                  <FaRegCheckSquare />
+                </Box>
+                {selection.size === wordcloudsFiltered.length
+                  ? `Deselect ${wordcloudsFiltered.length}`
+                  : `Select all ${wordcloudsFiltered.length}`}
+              </Button>
             </Box>
           )}
         </Box>
@@ -158,53 +197,45 @@ export const DesignsView = observer(() => {
                 margin-bottom: 3rem;
               `}
             >
-              {store.wordclouds.length > 0 &&
-                store.wordclouds
-                  .filter(
-                    (wc) =>
-                      (query
-                        ? wc.title
-                            .toLocaleLowerCase()
-                            .includes(query.toLocaleLowerCase())
-                        : true) &&
-                      (dashboardUiState.folder == null ||
-                        dashboardUiState.folder.id === wc.folder)
-                  )
-                  .map((wc) => (
-                    <WordcloudThumbnail
-                      key={wc.id}
-                      wordcloud={wc}
-                      isSelecting={isSelecting}
-                      onClick={
-                        isSelecting
-                          ? () => {
-                              console.log('onClick')
-                              if (isSelecting) {
-                                if (!selection.has(wc.id)) {
-                                  selection.add(wc.id)
-                                } else {
-                                  selection.delete(wc.id)
-                                }
+              {/* TODO: empty UI */}
+
+              {wordcloudsInFolder.length > 0 &&
+                wordcloudsFiltered.length > 0 &&
+                wordcloudsFiltered.map((wc) => (
+                  <WordcloudThumbnail
+                    key={wc.id}
+                    wordcloud={wc}
+                    isSelecting={isSelecting}
+                    onClick={
+                      isSelecting
+                        ? () => {
+                            console.log('onClick')
+                            if (isSelecting) {
+                              if (!selection.has(wc.id)) {
+                                selection.add(wc.id)
                               } else {
-                                // Open the editor...
+                                selection.delete(wc.id)
                               }
+                            } else {
+                              // Open the editor...
                             }
-                          : () => null
+                          }
+                        : () => null
+                    }
+                    onMoveToFolder={() => setMovindWordclouds([wc])}
+                    onRename={() => setRenamingWordcloud(wc)}
+                    onDuplicate={() => setDuplicatingWordcloud(wc)}
+                    onDelete={() => setDeletingWordclouds([wc])}
+                    isSelected={selection.has(wc.id)}
+                    onSelectionChange={(isSelected) => {
+                      if (isSelected) {
+                        selection.add(wc.id)
+                      } else {
+                        selection.delete(wc.id)
                       }
-                      onMoveToFolder={() => setMovindWordclouds([wc])}
-                      onRename={() => setRenamingWordcloud(wc)}
-                      onDuplicate={() => setDuplicatingWordcloud(wc)}
-                      onDelete={() => setDeletingWordclouds([wc])}
-                      isSelected={selection.has(wc.id)}
-                      onSelectionChange={(isSelected) => {
-                        if (isSelected) {
-                          selection.add(wc.id)
-                        } else {
-                          selection.delete(wc.id)
-                        }
-                      }}
-                    />
-                  ))}
+                    }}
+                  />
+                ))}
             </Flex>
           </>
         )}
