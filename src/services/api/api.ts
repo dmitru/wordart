@@ -60,6 +60,10 @@ export const Api = {
     async delete(id: WordcloudId): Promise<void> {
       await apiClient.delete(`/wordclouds/${id}`)
     },
+    async deleteMany(ids: WordcloudId[]): Promise<void> {
+      // TODO: optimize it
+      await Promise.all(ids.map((id) => apiClient.delete(`/wordclouds/${id}`)))
+    },
     async save(id: WordcloudId, data: SaveWordcloudDto): Promise<void> {
       await apiClient.put(`/wordclouds/${id}`, data)
     },

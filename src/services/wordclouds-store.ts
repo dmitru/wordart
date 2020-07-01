@@ -48,9 +48,9 @@ export class WordcloudsStore {
     return wordcloud
   }
 
-  delete = async (id: WordcloudId): Promise<void> => {
-    this._wordclouds = this._wordclouds.filter((wc) => wc.id !== id)
-    await Api.wordclouds.delete(id)
+  delete = async (ids: WordcloudId[]): Promise<void> => {
+    await Api.wordclouds.deleteMany(ids)
+    this._wordclouds = this._wordclouds.filter((wc) => !ids.includes(wc.id))
   }
 
   save = async (id: WordcloudId, data: SaveWordcloudDto): Promise<void> => {
