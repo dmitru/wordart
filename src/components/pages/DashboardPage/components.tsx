@@ -296,7 +296,10 @@ export const FolderRowTag = styled(Tag)`
   color: ${(p) => p.theme.colors.gray['600']};
 `
 
-export const FolderRow = styled(Box)<{ isSelected?: boolean }>`
+export const FolderRow = styled(Box)<{
+  isSelected?: boolean
+  hideCountOnHover?: boolean
+}>`
   display: flex;
   cursor: pointer;
   align-items: center;
@@ -309,7 +312,7 @@ export const FolderRow = styled(Box)<{ isSelected?: boolean }>`
 
   &:hover {
     ${FolderRowTag} {
-      opacity: 0;
+      ${(p) => p.hideCountOnHover && 'opacity: 0;'}
     }
 
     ${(p) => !p.isSelected && `background: hsla(220, 71%, 98%, 1);`}

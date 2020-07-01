@@ -24,11 +24,13 @@ import { FaPencilAlt, FaPlus, FaRegFolder, FaTimes } from 'react-icons/fa'
 import { Folder } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { useToasts } from 'use-toasts'
+import { ConfirmModal } from 'components/shared/ConfirmModal'
 
 export const FoldersView = observer(() => {
   const { wordcloudsStore: store } = useStore()
   const toasts = useToasts()
   const [renamingFolder, setRenamingFolder] = useState<Folder | null>(null)
+  const [deletingFolder, setDeletingFolder] = useState<Folder | null>(null)
   const [isCreatingFolder, setIsCreatingFolder] = useState(false)
 
   const deleteFolder = (folder: Folder) => {
@@ -66,13 +68,35 @@ export const FoldersView = observer(() => {
           color="gray.600"
           py={2}
           px={3}
-          isSelected={dashboardUiState.folder == null}
+          isSelected={dashboardUiState.folder === 'all'}
           onClick={() => {
-            dashboardUiState.folder = null
+            dashboardUiState.folder = 'all'
           }}
         >
           All your designs
+          <FolderRowTag ml="auto" size="sm">
+            {store.wordclouds.length}
+          </FolderRowTag>
         </FolderRow>
+
+        {store.folders.length > 0 && (
+          <FolderRow
+            fontSize="lg"
+            fontWeight="semibold"
+            color="gray.600"
+            py={2}
+            px={3}
+            isSelected={dashboardUiState.folder === 'no folder'}
+            onClick={() => {
+              dashboardUiState.folder = 'no folder'
+            }}
+          >
+            Designs with no folder
+            <FolderRowTag ml="auto" size="sm">
+              {store.wordclouds.filter((wc) => !wc.folder).length}
+            </FolderRowTag>
+          </FolderRow>
+        )}
 
         <Text
           textTransform="uppercase"
@@ -87,6 +111,7 @@ export const FoldersView = observer(() => {
 
         {store.folders.map((f) => (
           <FolderRow
+            hideCountOnHover
             fontSize="lg"
             fontWeight="semibold"
             color="gray.600"
@@ -142,7 +167,7 @@ export const FoldersView = observer(() => {
                   </MenuItemWithIcon>
                   <MenuItemWithIcon
                     icon={<FaTimes />}
-                    onClick={() => deleteFolder(f)}
+                    onClick={() => setDeletingFolder(f)}
                   >
                     Delete
                   </MenuItemWithIcon>
@@ -153,6 +178,29 @@ export const FoldersView = observer(() => {
           </FolderRow>
         ))}
 
+        {/* Delete folder */}
+        <ConfirmModal
+          isOpen={deletingFolder != null}
+          title={`Delete folder "${deletingFolder?.title}"`}
+          onSubmit={async () => {
+            if (!deletingFolder) {
+              return
+            }
+            try {
+              await deleteFolder(deletingFolder)
+            } finally {
+              setDeletingFolder(null)
+            }
+          }}
+          onCancel={() => setDeletingFolder(null)}
+        >
+          <Text>Are you sure you want to delete this folder?</Text>
+          <Text>
+            Designs in this folder will <strong>not</strong> be deleted.
+          </Text>
+        </ConfirmModal>
+
+        {/* Rename folder */}
         <PromptModal
           isOpen={renamingFolder != null}
           initialValue={renamingFolder?.title}
@@ -173,6 +221,7 @@ export const FoldersView = observer(() => {
           }}
         />
 
+        {/* Create new folder */}
         <PromptModal
           isOpen={isCreatingFolder}
           onSubmit={async (title) => {
