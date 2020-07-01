@@ -97,7 +97,6 @@ export const DesignsView = observer(() => {
             target="_blank"
             variantColor="accent"
             leftIcon="add"
-            size="lg"
           >
             Create New
           </Button>
@@ -113,35 +112,9 @@ export const DesignsView = observer(() => {
           </Box>
 
           {isSelecting && (
-            <Box ml="3">
+            <Box ml="4">
               <Button
-                variant="outline"
-                mr="2"
-                onClick={() =>
-                  setDeletingWordclouds(
-                    store.wordclouds.filter((w) => selection.has(w.id))
-                  )
-                }
-              >
-                Delete
-              </Button>
-
-              <Button
-                mr="2"
-                variant="outline"
-                onClick={() =>
-                  setMovindWordclouds(
-                    store.wordclouds.filter((w) => selection.has(w.id))
-                  )
-                }
-              >
-                <Box mr="2">
-                  <FaFolder />
-                </Box>
-                Move to folder
-              </Button>
-
-              <Button
+                size="sm"
                 mr="2"
                 variantColor="primary"
                 onClick={() => {
@@ -160,8 +133,37 @@ export const DesignsView = observer(() => {
                   <FaRegCheckSquare />
                 </Box>
                 {selection.size === wordcloudsFiltered.length
-                  ? `Deselect ${wordcloudsFiltered.length}`
+                  ? `Deselect all`
                   : `Select all ${wordcloudsFiltered.length}`}
+              </Button>
+
+              <Button
+                size="sm"
+                mr="2"
+                variant="outline"
+                onClick={() =>
+                  setMovindWordclouds(
+                    store.wordclouds.filter((w) => selection.has(w.id))
+                  )
+                }
+              >
+                <Box mr="2">
+                  <FaFolder />
+                </Box>
+                Move to folder
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                mr="2"
+                onClick={() =>
+                  setDeletingWordclouds(
+                    store.wordclouds.filter((w) => selection.has(w.id))
+                  )
+                }
+              >
+                Delete
               </Button>
             </Box>
           )}
