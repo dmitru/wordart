@@ -35,6 +35,7 @@ import RandomImg from './img/random.svg'
 import styled from '@emotion/styled'
 import css from '@emotion/css'
 import { animateElement } from 'utils/animation'
+import { Tooltip } from 'components/shared/Tooltip'
 
 const anglePresets: {
   kind: WordAnglesPresetKind
@@ -77,28 +78,33 @@ const anglePresets: {
 
 const PresetBtns = styled(Box)`
   margin: 0 -2px;
+  display: flex;
+  flex-wrap: wrap;
 `
 
 const PresetBtn = styled(Box)<{ active: boolean; theme: any }>`
   cursor: pointer;
   user-select: none;
   display: inline-block;
-  width: 78px;
-  height: 78px;
-  margin: 2px;
+  width: 83px;
+  height: 83px;
+  margin: 0;
   border: 1px solid #dedede;
   padding: 6px;
-  box-shadow: 0 0 4px 0 #00000015;
 
   transition: transform 0.2s;
 
   &:hover {
-    transform: translateY(-2px);
+    background: #eaeaea;
   }
+
+  position: relative;
+  z-index: 8;
 
   ${(p) =>
     p.active &&
     `
+    z-index: 10;
   outline: 3px solid ${p.theme.colors.accent['500']};
   background: hsla(358, 80%, 65%, 0.14);
   `}
@@ -192,20 +198,23 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
               {style.items.words.anglesPreset === 'custom' && (
                 <>
                   <Box mt="3">
-                    <Button
-                      mr="1"
-                      variantColor="secondary"
-                      isDisabled={style.items.words.customAngles.length >= 8}
-                      size="sm"
-                      leftIcon="add"
-                      onClick={() => {
-                        style.items.words.customAngles.push(
-                          Math.round(-90 + Math.random() * 180)
-                        )
-                      }}
-                    >
-                      Add
-                    </Button>
+                    <Tooltip label="Add custom angle">
+                      <Button
+                        mr="1"
+                        variantColor="secondary"
+                        isDisabled={style.items.words.customAngles.length >= 8}
+                        size="sm"
+                        leftIcon="add"
+                        onClick={() => {
+                          style.items.words.customAngles.push(
+                            Math.round(-90 + Math.random() * 180)
+                          )
+                        }}
+                      >
+                        Add
+                      </Button>
+                    </Tooltip>
+
                     <Button
                       size="sm"
                       variant="ghost"
@@ -224,7 +233,6 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                           css={css`
                             flex: 1;
                           `}
-                          label={`Angle #${index + 1}`}
                           horizontal
                           value={angle}
                           onChange={(value) => {
