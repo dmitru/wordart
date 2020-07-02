@@ -29,27 +29,31 @@ export const WarningModal: React.FC<WarningModalProps> = observer(
         <ModalContent>
           {header && <ModalHeader>{header}</ModalHeader>}
           <ModalBody>
-            <Box
-              mb="1rem"
-              mx="auto"
-              bg="primary.50"
-              color="primary.300"
-              width="90px"
-              height="90px"
-              fontSize="60px"
-              borderRadius="100%"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              <FaExclamationCircle />
+            <Box display="flex" alignItems="flex-start">
+              <Box
+                mr="1rem"
+                bg="red.50"
+                color="red.300"
+                minWidth="60px"
+                height="60px"
+                fontSize="40px"
+                borderRadius="100%"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <FaExclamationCircle />
+              </Box>
+
+              <Box>
+                {content && <Text>{content}</Text>}
+                {children}
+              </Box>
             </Box>
-            {content && <Text>{content}</Text>}
-            {children}
           </ModalBody>
 
           <ModalFooter>
-            <Button width="100%" variantColor="primary" onClick={onClose}>
+            <Button variantColor="primary" onClick={onClose}>
               OK
             </Button>
           </ModalFooter>
