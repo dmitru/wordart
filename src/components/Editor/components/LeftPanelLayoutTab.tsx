@@ -197,7 +197,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
               </PresetBtns>
               {style.items.words.anglesPreset === 'custom' && (
                 <>
-                  <Box mt="3">
+                  <Box mt="4">
                     <Tooltip label="Add custom angle">
                       <Button
                         mr="1"
@@ -226,7 +226,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                     </Button>
                   </Box>
 
-                  <Box mt="4" pl="20px">
+                  <Box mt="2" pl="20px">
                     {style.items.words.customAngles.map((angle, index) => (
                       <Flex direction="row" key={index}>
                         <Slider
