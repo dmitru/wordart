@@ -421,8 +421,10 @@ export const DesignsView = observer(() => {
                   key={wc.id}
                   wordcloud={wc}
                   isSelecting={isSelecting}
-                  onClick={() => {
+                  onClick={(e) => {
                     if (isSelecting) {
+                      e.preventDefault()
+
                       if (!selection.has(wc.id)) {
                         selection.add(wc.id)
                       } else {
@@ -432,9 +434,10 @@ export const DesignsView = observer(() => {
                       // Open the editor...
                     }
                   }}
-                  onOpenInEditor={() =>
+                  onOpenInEditor={() => {
+                    console.log('onOpenInEditor', isSelecting)
                     openUrlInNewTab(Urls.editor.edit(wc.id))
-                  }
+                  }}
                   onMoveToFolder={() => setMovindWordclouds([wc])}
                   onRename={() => setRenamingWordcloud(wc)}
                   onDuplicate={() => setDuplicatingWordcloud(wc)}

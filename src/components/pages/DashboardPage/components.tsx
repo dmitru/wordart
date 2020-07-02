@@ -56,7 +56,7 @@ const ThumbnailCheckbox = styled(Checkbox)`
 
 export type WordcloudThumbnailProps = {
   isSelecting: boolean
-  onClick: () => void
+  onClick: (e: React.MouseEvent) => void
   isSelected: boolean
   onSelectionChange: (isSelected: boolean) => void
   wordcloud: Wordcloud
