@@ -325,6 +325,15 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     return (
       <PageLayoutWrapper>
         <TopNavWrapper alignItems="center" display="flex">
+          <img
+            src="/images/logo.svg"
+            css={css`
+              height: 40px;
+              margin: 0;
+              margin-left: 0.5rem;
+              margin-right: 0.5rem;
+            `}
+          />
           <Link href={Urls.dashboard} passHref>
             <TopNavButton mr="1" variant="secondary">
               <FiChevronLeft

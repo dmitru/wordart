@@ -18,6 +18,7 @@ export default class MyDocument extends Document {
     return (
       <html>
         <Head>
+          <link rel="shortcut icon" href="/favicon.svg" />
           <script src="https://cdn.paddle.com/paddle/paddle.js"></script>
           <style
           // @ts-ignore

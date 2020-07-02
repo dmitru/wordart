@@ -40,7 +40,7 @@ export const theme = {
   ...chakraTheme,
   colors: {
     header: {
-      bg: 'linear-gradient(90deg,hsl(200,45%,48%),hsla(219, 45%, 54%, 1))',
+      bg: 'linear-gradient(-90deg,hsl(200,45%,48%),hsla(219, 45%, 54%, 1))',
     },
     leftPanel: {
       bg: 'hsla(205,15%, 33%, 1)',

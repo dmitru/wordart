@@ -9,6 +9,7 @@ import { TopNavButton } from 'components/shared/TopNavButton'
 import { Button } from 'components/shared/Button'
 import { FaRegUserCircle } from 'react-icons/fa'
 import { useRouter } from 'next/dist/client/router'
+import css from '@emotion/css'
 
 export type HeaderProps = {
   fullWidth?: boolean
@@ -27,7 +28,14 @@ export const Header: React.FC<HeaderProps> = observer(
         <ContentContainer fullWidth={fullWidth}>
           <Box>
             <Link href="/" passHref>
-              <LogoLink>WordCloudy</LogoLink>
+              <LogoLink>
+                <img
+                  src="/images/logo-white-text.svg"
+                  css={css`
+                    height: 40px;
+                  `}
+                />
+              </LogoLink>
             </Link>
           </Box>
           <Box
