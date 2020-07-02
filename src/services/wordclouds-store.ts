@@ -55,6 +55,14 @@ export class WordcloudsStore {
   ): Promise<Wordcloud> => {
     const wordcloud = await Api.wordclouds.copy(id, data)
     this._wordclouds.push(wordcloud)
+
+    // Update folders
+    if (wordcloud.folderId != null) {
+      const folder = this._folders.find((f) => f.id === wordcloud.folderId)
+      if (folder) {
+        folder.wordclouds.push(wordcloud.id)
+      }
+    }
     return wordcloud
   }
 

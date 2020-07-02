@@ -55,39 +55,45 @@ export const MoveToFolderModal: React.FC<MoveToFolderModalProps> = observer(
                 </Box>
               )}
 
-              <Box maxHeight="400px" overflowY="auto" py="3" px="2">
-                <Box>
-                  <Button
-                    py="3"
-                    px="2"
-                    variant="link"
-                    css={css``}
-                    onClick={() => handleSubmit(null)}
-                  >
-                    No folder
-                  </Button>
+              {!isSubmitting && (
+                <Box maxHeight="400px" overflowY="auto" py="3" px="2">
+                  <Box>
+                    <Button
+                      width="100%"
+                      py="3"
+                      px="2"
+                      justifyContent="flex-start"
+                      variant="link"
+                      css={css``}
+                      onClick={() => handleSubmit(null)}
+                    >
+                      No folder
+                    </Button>
+                  </Box>
+
+                  <Divider />
+
+                  {!isSubmitting &&
+                    store.folders.map((f) => (
+                      <Box key={f.id}>
+                        <Button
+                          width="100%"
+                          justifyContent="flex-start"
+                          py="3"
+                          px="2"
+                          variant="link"
+                          css={css``}
+                          onClick={() => handleSubmit(f)}
+                        >
+                          <Box mr="2" fontSize="lg" color="gray.500">
+                            <FaRegFolder />
+                          </Box>
+                          {f.title}
+                        </Button>
+                      </Box>
+                    ))}
                 </Box>
-
-                <Divider />
-
-                {!isSubmitting &&
-                  store.folders.map((f) => (
-                    <Box key={f.id}>
-                      <Button
-                        py="3"
-                        px="2"
-                        variant="link"
-                        css={css``}
-                        onClick={() => handleSubmit(f)}
-                      >
-                        <Box mr="2" fontSize="lg" color="gray.500">
-                          <FaRegFolder />
-                        </Box>
-                        {f.title}
-                      </Button>
-                    </Box>
-                  ))}
-              </Box>
+              )}
             </Box>
           </ModalBody>
 
