@@ -27,7 +27,8 @@ export type Wordcloud = {
   author: string
   createdAt: string
   updatedAt: string
-  folder: string | null
+  lastUpdatedContentAt: string
+  folderId: string | null
 }
 
 export type FolderId = string
@@ -59,7 +60,14 @@ export type CloneWordcloudDto = {
   title: string
 }
 
-export type SaveWordcloudDto =
+export type UpdateManyWordcloudsDto = {
+  ids: WordcloudId[]
+  update: {
+    folderId?: string | null
+  }
+}
+
+export type UpdateWordcloudDto =
   | {
       title: string
     }

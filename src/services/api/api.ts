@@ -5,7 +5,7 @@ import {
   CreateWordcloudDto,
   EditorPersistedData,
   WordcloudId,
-  SaveWordcloudDto,
+  UpdateWordcloudDto,
   Order,
   ProcessOrderDto,
   HdDownloadDto,
@@ -15,6 +15,7 @@ import {
   FolderId,
   UpdateFolderDto,
   CloneWordcloudDto,
+  UpdateManyWordcloudsDto,
 } from 'services/api/types'
 import { apiClient } from './api-client'
 
@@ -68,8 +69,11 @@ export const Api = {
     async deleteMany(ids: WordcloudId[]): Promise<void> {
       await apiClient.delete(`/wordclouds/`, { data: { ids } })
     },
-    async save(id: WordcloudId, data: SaveWordcloudDto): Promise<void> {
+    async update(id: WordcloudId, data: UpdateWordcloudDto): Promise<void> {
       await apiClient.put(`/wordclouds/${id}`, data)
+    },
+    async updateMany(data: UpdateManyWordcloudsDto): Promise<void> {
+      await apiClient.put(`/wordclouds`, data)
     },
     async fetchMy(): Promise<Wordcloud[]> {
       const response = await apiClient.get('/wordclouds')

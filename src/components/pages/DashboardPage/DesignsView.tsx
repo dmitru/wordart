@@ -45,9 +45,9 @@ export const DesignsView = observer(() => {
       return true
     }
     if (dashboardUiState.folder === 'no folder') {
-      return !wc.folder
+      return !wc.folderId
     }
-    return wc.folder === dashboardUiState.folder.id
+    return wc.folderId === dashboardUiState.folder.id
   })
 
   const wordcloudsFiltered = wordcloudsInFolder.filter((wc) =>
@@ -74,12 +74,12 @@ export const DesignsView = observer(() => {
     })
   }
 
-  const moveToFolder = async (wcs: Wordcloud[], folder: Folder) => {
+  const moveToFolder = async (wcs: Wordcloud[], folder: Folder | null) => {
     await store.moveToFolder(wcs, folder)
     toasts.showSuccess({
-      title: `Moved ${wcs.length} ${pluralize('design', wcs.length)} to "${
-        folder.title
-      }"`,
+      title: `Moved ${wcs.length} ${pluralize('design', wcs.length)}${
+        folder ? ` to "${folder.title}"` : 'out of folder'
+      }`,
     })
     selection.clear()
   }
@@ -317,6 +317,17 @@ export const DesignsView = observer(() => {
                   {dashboardUiState.folder === 'no folder' &&
                     `All your designs are already in folders.`}
                 </Text>
+
+                {dashboardUiState.folder === 'no folder' && (
+                  <Button
+                    variantColor="secondary"
+                    onClick={() => {
+                      dashboardUiState.folder = 'all'
+                    }}
+                  >
+                    Show all designs
+                  </Button>
+                )}
               </Box>
             )}
 

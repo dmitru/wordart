@@ -93,7 +93,7 @@ export const FoldersView = observer(() => {
           >
             Designs with no folder
             <FolderRowTag ml="auto" size="sm">
-              {store.wordclouds.filter((wc) => !wc.folder).length}
+              {store.wordclouds.filter((wc) => !wc.folderId).length}
             </FolderRowTag>
           </FolderRow>
         )}
@@ -112,6 +112,7 @@ export const FoldersView = observer(() => {
         <Box
           overflow="auto"
           css={css`
+            min-height: 160px;
             max-height: 400px;
             max-height: calc(100vh - 420px);
 
@@ -160,6 +161,9 @@ export const FoldersView = observer(() => {
                     }}
                   />
                   <MenuList
+                    // usePortal
+
+                    // container={document.body}
                     fontWeight="normal"
                     placement="bottom-end"
                     zIndex={10000}
@@ -191,6 +195,20 @@ export const FoldersView = observer(() => {
               </Box>
             </FolderRow>
           ))}
+
+          <Box mt={store.folders.length > 0 ? '4' : '0'}>
+            <Button
+              color="gray.500"
+              variant="outline"
+              width="140px"
+              onClick={() => setIsCreatingFolder(true)}
+            >
+              <Box mr="2">
+                <FaPlus />
+              </Box>
+              New Folder
+            </Button>
+          </Box>
         </Box>
 
         {/* Delete folder */}
@@ -262,20 +280,6 @@ export const FoldersView = observer(() => {
             placeholder: 'Enter folder name...',
           }}
         />
-
-        <Box mt="4">
-          <Button
-            color="gray.500"
-            variant="outline"
-            width="140px"
-            onClick={() => setIsCreatingFolder(true)}
-          >
-            <Box mr="2">
-              <FaPlus />
-            </Box>
-            New Folder
-          </Button>
-        </Box>
       </FoldersList>
     </Box>
   )

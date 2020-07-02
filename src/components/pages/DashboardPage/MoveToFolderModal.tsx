@@ -7,6 +7,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Box,
+  Divider,
 } from '@chakra-ui/core'
 import { Button } from 'components/shared/Button'
 import { observer } from 'mobx-react'
@@ -22,7 +23,7 @@ export type MoveToFolderModalProps = {
   children?: React.ReactNode
   isOpen: boolean
   onCancel: () => void
-  onSubmit: (folder: Folder) => Promise<void>
+  onSubmit: (folder: Folder | null) => Promise<void>
 }
 
 export const MoveToFolderModal: React.FC<MoveToFolderModalProps> = observer(
@@ -30,7 +31,7 @@ export const MoveToFolderModal: React.FC<MoveToFolderModalProps> = observer(
     const [isSubmitting, setIsSubmitting] = useState(false)
     const { wordcloudsStore: store } = useStore()
 
-    const handleSubmit = async (folder: Folder) => {
+    const handleSubmit = async (folder: Folder | null) => {
       setIsSubmitting(true)
       try {
         await onSubmit(folder)
@@ -55,6 +56,20 @@ export const MoveToFolderModal: React.FC<MoveToFolderModalProps> = observer(
               )}
 
               <Box maxHeight="400px" overflowY="auto" py="3" px="2">
+                <Box>
+                  <Button
+                    py="3"
+                    px="2"
+                    variant="link"
+                    css={css``}
+                    onClick={() => handleSubmit(null)}
+                  >
+                    No folder
+                  </Button>
+                </Box>
+
+                <Divider />
+
                 {!isSubmitting &&
                   store.folders.map((f) => (
                     <Box key={f.id}>
