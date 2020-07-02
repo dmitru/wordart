@@ -6,7 +6,6 @@ export const useToasts = () => {
     position: 'bottom-right',
     duration: 3000,
     isClosable: true,
-    variant: 'subtle',
   }
   return {
     showWarning: (params: useToastOptions) =>

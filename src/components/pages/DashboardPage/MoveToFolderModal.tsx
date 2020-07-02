@@ -7,7 +7,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Box,
-  Divider,
 } from '@chakra-ui/core'
 import { Button } from 'components/shared/Button'
 import { observer } from 'mobx-react'
@@ -70,8 +69,6 @@ export const MoveToFolderModal: React.FC<MoveToFolderModalProps> = observer(
                       No folder
                     </Button>
                   </Box>
-
-                  <Divider />
 
                   {!isSubmitting &&
                     store.folders.map((f) => (

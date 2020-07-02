@@ -1,6 +1,19 @@
-import { Box, Flex, Text, Divider, Heading } from '@chakra-ui/core'
+import {
+  Box,
+  Flex,
+  Text,
+  Divider,
+  Heading,
+  Menu,
+  MenuButton,
+  MenuList,
+  PopoverArrow,
+} from '@chakra-ui/core'
 import css from '@emotion/css'
-import { WordcloudThumbnail } from 'components/pages/DashboardPage/components'
+import {
+  WordcloudThumbnail,
+  ThumbnailMenuButton,
+} from 'components/pages/DashboardPage/components'
 import { dashboardUiState } from 'components/pages/DashboardPage/state'
 import { Button } from 'components/shared/Button'
 import { ConfirmModal } from 'components/shared/ConfirmModal'
@@ -11,7 +24,13 @@ import { observer } from 'mobx-react'
 import Link from 'next/link'
 import pluralize from 'pluralize'
 import React, { useState } from 'react'
-import { FaRegCheckSquare, FaRegFolder, FaSearch } from 'react-icons/fa'
+import {
+  FaRegCheckSquare,
+  FaRegFolder,
+  FaSearch,
+  FaChevronRight,
+  FaTimes,
+} from 'react-icons/fa'
 import { Wordcloud, Folder } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
@@ -19,6 +38,7 @@ import { useToasts } from 'use-toasts'
 import { openUrlInNewTab } from 'utils/browser'
 import { Spinner } from 'components/Editor/components/Spinner'
 import { MoveToFolderModal } from 'components/pages/DashboardPage/MoveToFolderModal'
+import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 
 export const DesignsView = observer(() => {
   const { wordcloudsStore: store } = useStore()
@@ -78,7 +98,7 @@ export const DesignsView = observer(() => {
     await store.moveToFolder(wcs, folder)
     toasts.showSuccess({
       title: `Moved ${wcs.length} ${pluralize('design', wcs.length)}${
-        folder ? ` to "${folder.title}"` : 'out of folder'
+        folder ? ` to "${folder.title}"` : ' out of folder'
       }`,
     })
     selection.clear()
@@ -144,9 +164,43 @@ export const DesignsView = observer(() => {
 
           {isSelecting && (
             <Box ml="3">
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  variantColor="accent"
+                  rightIcon="chevron-down"
+                >
+                  {selection.size} selected
+                </MenuButton>
+                <MenuList zIndex={10000} hasArrow>
+                  <PopoverArrow />
+
+                  <MenuItemWithIcon
+                    icon={<FaRegFolder />}
+                    onClick={() =>
+                      setMovindWordclouds(
+                        store.wordclouds.filter((w) => selection.has(w.id))
+                      )
+                    }
+                  >
+                    Move to folder
+                  </MenuItemWithIcon>
+                  <MenuItemWithIcon
+                    icon={<FaTimes />}
+                    onClick={() =>
+                      setDeletingWordclouds(
+                        store.wordclouds.filter((w) => selection.has(w.id))
+                      )
+                    }
+                  >
+                    Delete
+                  </MenuItemWithIcon>
+                </MenuList>
+              </Menu>
+
               <Button
-                mr="2"
-                variantColor="primary"
+                ml="2"
+                variant="ghost"
                 onClick={() => {
                   const isAllSelected =
                     selection.size === wordcloudsFiltered.length
@@ -164,33 +218,7 @@ export const DesignsView = observer(() => {
                 </Box>
                 {selection.size === wordcloudsFiltered.length
                   ? `Deselect all`
-                  : `Select all ${wordcloudsFiltered.length}`}
-              </Button>
-
-              <Button
-                mr="2"
-                variant="outline"
-                onClick={() =>
-                  setMovindWordclouds(
-                    store.wordclouds.filter((w) => selection.has(w.id))
-                  )
-                }
-              >
-                <Box mr="2">
-                  <FaRegFolder />
-                </Box>
-                Move to folder
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={() =>
-                  setDeletingWordclouds(
-                    store.wordclouds.filter((w) => selection.has(w.id))
-                  )
-                }
-              >
-                Delete
+                  : `Select all`}
               </Button>
             </Box>
           )}
