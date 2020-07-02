@@ -27,14 +27,14 @@ export type Wordcloud = {
   author: string
   createdAt: string
   updatedAt: string
-  folder: string
+  folder: string | null
 }
 
 export type FolderId = string
 export type Folder = {
   id: FolderId
   title: string
-  wordclouds: WordcloudId
+  wordclouds: WordcloudId[]
   createdAt: string
   updatedAt: string
 }

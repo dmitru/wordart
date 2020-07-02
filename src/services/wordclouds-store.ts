@@ -1,7 +1,7 @@
 import 'mobx-react-lite/batchingForReactDom'
 import { RootStore } from 'services/root-store'
 import { Api } from 'services/api/api'
-import { observable, computed } from 'mobx'
+import { observable, computed, action } from 'mobx'
 import {
   Wordcloud,
   CreateWordcloudDto,
@@ -72,6 +72,23 @@ export class WordcloudsStore {
     }
   }
 
+  @action moveToFolder = async (
+    wcs: Wordcloud[],
+    folder: Folder
+  ): Promise<void> => {
+    for (const wc of wcs) {
+      const oldFolder = this._folders.find((f) => f.id === wc.folder)
+      if (oldFolder) {
+        oldFolder.wordclouds = oldFolder.wordclouds.filter(
+          (wId) => wId !== wc.id
+        )
+      }
+      wc.folder = folder.id
+      folder.wordclouds = [...new Set([...folder.wordclouds, wc.id])]
+    }
+    // TODO: API call
+  }
+
   createFolder = async (data: CreateFolderDto): Promise<Folder> => {
     const folder = await Api.folders.create(data)
     this._folders.push(folder)
@@ -79,6 +96,11 @@ export class WordcloudsStore {
   }
 
   deleteFolder = async (id: FolderId): Promise<void> => {
+    for (const wc of this._wordclouds) {
+      if (wc.folder === id) {
+        wc.folder = null
+      }
+    }
     this._folders = this._folders.filter((f) => f.id !== id)
     await Api.folders.delete(id)
   }

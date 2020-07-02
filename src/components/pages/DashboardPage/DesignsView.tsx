@@ -1,4 +1,4 @@
-import { Box, Flex, Text, Divider } from '@chakra-ui/core'
+import { Box, Flex, Text, Divider, Heading } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { WordcloudThumbnail } from 'components/pages/DashboardPage/components'
 import { dashboardUiState } from 'components/pages/DashboardPage/state'
@@ -12,12 +12,13 @@ import Link from 'next/link'
 import pluralize from 'pluralize'
 import React, { useState } from 'react'
 import { FaRegCheckSquare, FaRegFolder } from 'react-icons/fa'
-import { Wordcloud } from 'services/api/types'
+import { Wordcloud, Folder } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { useToasts } from 'use-toasts'
 import { openUrlInNewTab } from 'utils/browser'
 import { Spinner } from 'components/Editor/components/Spinner'
+import { MoveToFolderModal } from 'components/pages/DashboardPage/MoveToFolderModal'
 
 export const DesignsView = observer(() => {
   const { wordcloudsStore: store } = useStore()
@@ -70,6 +71,16 @@ export const DesignsView = observer(() => {
     toasts.showSuccess({
       title: 'Changes saved',
     })
+  }
+
+  const moveToFolder = async (wcs: Wordcloud[], folder: Folder) => {
+    await store.moveToFolder(wcs, folder)
+    toasts.showSuccess({
+      title: `Moved ${wcs.length} ${pluralize('design', wcs.length)} to "${
+        folder.title
+      }"`,
+    })
+    selection.clear()
   }
 
   const duplicate = async (wc: Wordcloud, title: string) => {
@@ -186,74 +197,181 @@ export const DesignsView = observer(() => {
 
         {!store.hasFetchedWordclouds && <Spinner />}
         {store.hasFetchedWordclouds && (
-          <>
-            {store.wordclouds.length === 0 && (
-              <>
-                <p>
-                  Welcome! Click the button below to create your first
-                  wordcloud.
-                </p>
-                <Link href={Urls.editor._next} as={Urls.editor.create} passHref>
-                  <Button variantColor="accent">Create</Button>
-                </Link>
-              </>
-            )}
-            <Flex
-              flex="1"
-              wrap="wrap"
-              alignItems="flex-start"
-              justifyItems="flex-start"
-              justifyContent="flex-start"
-              alignContent="flex-start"
-              css={css`
-                min-height: calc(100vh - 200px);
-                overflow-y: auto;
-                background: #f8f8f8;
-                padding: 2rem;
-                box-shadow: inset 0 0 6px 0 #0001;
-                margin-bottom: 1rem;
-              `}
-            >
-              {/* TODO: empty UI */}
+          <Flex
+            flex="1"
+            wrap="wrap"
+            alignItems="flex-start"
+            justifyItems="flex-start"
+            justifyContent="flex-start"
+            alignContent="flex-start"
+            css={css`
+              min-height: calc(100vh - 200px);
+              overflow-y: auto;
+              background: #f8f8f8;
+              padding: 2rem;
+              box-shadow: inset 0 0 6px 0 #0001;
+              margin-bottom: 1rem;
+            `}
+          >
+            {/* TODO: empty UI */}
 
-              {wordcloudsInFolder.length > 0 &&
-                wordcloudsFiltered.length > 0 &&
-                wordcloudsFiltered.map((wc) => (
-                  <WordcloudThumbnail
-                    key={wc.id}
-                    wordcloud={wc}
-                    isSelecting={isSelecting}
-                    onClick={() => {
-                      if (isSelecting) {
-                        if (!selection.has(wc.id)) {
-                          selection.add(wc.id)
-                        } else {
-                          selection.delete(wc.id)
-                        }
-                      } else {
-                        // Open the editor...
+            {store.wordclouds.length === 0 && (
+              <Box
+                mx="auto"
+                p="4"
+                fontSize="lg"
+                bg="white"
+                shadow="sm"
+                maxWidth="600px"
+                width="100%"
+              >
+                <Heading as="h1" size="lg">
+                  Welcome to WordCloudy!
+                </Heading>
+
+                <Box display="flex">
+                  <Button
+                    as="a"
+                    css={css`
+                      &,
+                      &:hover,
+                      &:focus {
+                        text-decoration: none !important;
                       }
-                    }}
-                    onOpenInEditor={() =>
-                      openUrlInNewTab(Urls.editor.edit(wc.id))
-                    }
-                    onMoveToFolder={() => setMovindWordclouds([wc])}
-                    onRename={() => setRenamingWordcloud(wc)}
-                    onDuplicate={() => setDuplicatingWordcloud(wc)}
-                    onDelete={() => setDeletingWordclouds([wc])}
-                    isSelected={selection.has(wc.id)}
-                    onSelectionChange={(isSelected) => {
-                      if (isSelected) {
+                    `}
+                    href={Urls.editor.create}
+                    target="_blank"
+                    variantColor="accent"
+                    leftIcon="add"
+                    mr="3"
+                    size="lg"
+                  >
+                    Create your First Design
+                  </Button>
+
+                  <Button variant="outline" size="lg">
+                    Check out tutorials
+                  </Button>
+                </Box>
+              </Box>
+            )}
+
+            {wordcloudsInFolder.length === 0 && (
+              <Box
+                display="flex"
+                maxWidth="600px"
+                width="100%"
+                mx="auto"
+                alignItems="center"
+                flexDirection="column"
+                boxShadow="sm"
+                borderColor="gray.100"
+                borderWidth="1px"
+                p="6"
+                bg="white"
+                shadow="sm"
+              >
+                <Box
+                  mb="1rem"
+                  bg="primary.50"
+                  color="primary.400"
+                  width="90px"
+                  height="90px"
+                  borderRadius="100%"
+                  borderWidth="2px"
+                  borderColor="primary.100"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <FaRegFolder size={48} />
+                </Box>
+
+                <Text
+                  fontSize="xl"
+                  flex={1}
+                  textAlign="center"
+                  color="gray.600"
+                  mb="0"
+                >
+                  This folder is empty
+                </Text>
+
+                <Text
+                  mt="4"
+                  fontSize="md"
+                  flex={1}
+                  textAlign="center"
+                  color="gray.500"
+                  maxWidth="300px"
+                >
+                  You can move some of you designs to this folder, or create a
+                  new design here.
+                </Text>
+              </Box>
+            )}
+
+            {wordcloudsInFolder.length > 0 &&
+              wordcloudsFiltered.length > 0 &&
+              wordcloudsFiltered.map((wc) => (
+                <WordcloudThumbnail
+                  key={wc.id}
+                  wordcloud={wc}
+                  isSelecting={isSelecting}
+                  onClick={() => {
+                    if (isSelecting) {
+                      if (!selection.has(wc.id)) {
                         selection.add(wc.id)
                       } else {
                         selection.delete(wc.id)
                       }
-                    }}
-                  />
-                ))}
-            </Flex>
-          </>
+                    } else {
+                      // Open the editor...
+                    }
+                  }}
+                  onOpenInEditor={() =>
+                    openUrlInNewTab(Urls.editor.edit(wc.id))
+                  }
+                  onMoveToFolder={() => setMovindWordclouds([wc])}
+                  onRename={() => setRenamingWordcloud(wc)}
+                  onDuplicate={() => setDuplicatingWordcloud(wc)}
+                  onDelete={() => setDeletingWordclouds([wc])}
+                  isSelected={selection.has(wc.id)}
+                  onSelectionChange={(isSelected) => {
+                    if (isSelected) {
+                      selection.add(wc.id)
+                    } else {
+                      selection.delete(wc.id)
+                    }
+                  }}
+                />
+              ))}
+          </Flex>
         )}
+
+        {/* Move to folder */}
+        <MoveToFolderModal
+          title={
+            movingWordclouds
+              ? `Move ${movingWordclouds.length} ${pluralize(
+                  'design',
+                  movingWordclouds.length
+                )} to folder`
+              : ''
+          }
+          isOpen={movingWordclouds != null}
+          onSubmit={async (folder) => {
+            if (!movingWordclouds) {
+              return
+            }
+            try {
+              await moveToFolder(movingWordclouds, folder)
+            } finally {
+              setMovindWordclouds(null)
+            }
+          }}
+          onCancel={() => setMovindWordclouds(null)}
+        ></MoveToFolderModal>
 
         {/* Rename */}
         <PromptModal
