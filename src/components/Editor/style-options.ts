@@ -76,6 +76,12 @@ export type BgFillTransparent = {
 }
 
 // Items coloring
+
+export type ItemsColoringConf =
+  | ItemsColoringColorConf
+  | ItemsColoringGradientConf
+  | ItemsColoringShapeConf
+
 export type ItemsColoringColorConf = {
   kind: 'color'
   colors: ColorString[]

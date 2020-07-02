@@ -2,12 +2,15 @@ import { Box, Collapse, Flex, Text } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { useThrottleCallback } from '@react-hook/throttle'
 import { BackgroundColorOptions } from 'components/Editor/components/BackgroundColorOptions'
-import { BgItemsColorPickerInline } from 'components/Editor/components/BgItemsColorPicker'
 import { ShapeColorOptions } from 'components/Editor/components/ShapeColorOptions'
 import {
   ShapeItemsColorPickerInline,
   ShapeItemsColorPickerKindDropdown,
 } from 'components/Editor/components/ShapeItemsColorPicker'
+import {
+  BgItemsColorPickerInline,
+  BgItemsColorPickerKindDropdown,
+} from 'components/Editor/components/BgItemsColorPicker'
 import { SectionLabel } from 'components/Editor/components/shared'
 import {
   ThemePresetThumbnail,
@@ -464,14 +467,20 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                         Background Items
                       </SectionLabel>
 
-                      <Box mt="0">
-                        <BgItemsColorPickerInline
-                          bgStyle={bgStyle}
-                          onUpdate={updateBgItemsColoring}
-                        />
+                      <Box mt="2" mb="4" display="flex" alignItems="center">
+                        <Box>
+                          <BgItemsColorPickerKindDropdown
+                            bgStyle={bgStyle}
+                            onUpdate={updateBgItemsColoring}
+                          />
+                        </Box>
 
                         <Button
                           ml="auto"
+                          css={css`
+                            width: 50px;
+                            box-shadow: none !important;
+                          `}
                           variant={
                             store.leftColorTab.showBgItemsAdvanced
                               ? 'solid'
@@ -480,7 +489,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                           variantColor={
                             store.leftColorTab.showBgItemsAdvanced
                               ? 'primary'
-                              : 'muted'
+                              : 'gray'
                           }
                           onClick={() => {
                             store.leftColorTab.showBgItemsAdvanced = !store
@@ -490,13 +499,38 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                           <FaCog
                             style={{
                               color: 'currentColor',
-                              marginRight: '5px',
                             }}
                           />
                         </Button>
                       </Box>
 
+                      <Box mt="2">
+                        <BgItemsColorPickerInline
+                          bgStyle={bgStyle}
+                          bgFill={bgStyle.fill}
+                          onUpdate={updateBgItemsColoring}
+                        />
+                      </Box>
+
                       <Collapse isOpen={store.leftColorTab.showBgItemsAdvanced}>
+                        <Box>
+                          <Slider
+                            afterLabel="%"
+                            horizontal
+                            label="Brightness"
+                            value={bgStyle.items.brightness}
+                            onChange={(value) => {
+                              const val = (value as any) as number
+                              bgStyle.items.brightness = val
+                            }}
+                            onAfterChange={updateBgItemsColoring}
+                            resetValue={0}
+                            min={-100}
+                            max={100}
+                            step={1}
+                          />
+                        </Box>
+
                         <Flex direction="row" mb="0">
                           <Slider
                             css={css`
@@ -511,6 +545,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                             }}
                             onAfterChange={updateBgItemsColoring}
                             min={0}
+                            resetValue={100}
                             max={100}
                             step={1}
                           />
@@ -553,6 +588,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                             }}
                             onAfterChange={updateBgItemsColoring}
                             min={0}
+                            resetValue={40}
                             max={100}
                             step={1}
                           />

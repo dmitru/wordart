@@ -1,5 +1,6 @@
 import { Text, Box, MenuItem, MenuItemProps } from '@chakra-ui/core'
 import React from 'react'
+import css from '@emotion/css'
 
 export const MenuItemWithDescription = React.forwardRef<
   MenuItemProps & {
@@ -9,7 +10,15 @@ export const MenuItemWithDescription = React.forwardRef<
   },
   any
 >(({ icon, title, description, children, ...props }, ref) => (
-  <MenuItem {...props} ref={ref}>
+  <MenuItem
+    {...props}
+    ref={ref}
+    css={css`
+      &:hover {
+        background: #edf2f7;
+      }
+    `}
+  >
     <Box mr="2" fontSize="lg" color="gray.500">
       {icon}
     </Box>

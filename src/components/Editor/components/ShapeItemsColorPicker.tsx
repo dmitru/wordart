@@ -1,27 +1,26 @@
 import {
   Box,
   Icon,
-  IconButton,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
+  PopoverArrow,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
-import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import chroma from 'chroma-js'
 import {
   BgStyleOptions,
   ShapeStyleOptions,
 } from 'components/Editor/style-options'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
-import { observer } from 'mobx-react'
-import React, { useState } from 'react'
-import { FiRefreshCw } from 'react-icons/fi'
 import { Button } from 'components/shared/Button'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { DeleteButton } from 'components/shared/DeleteButton'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
+import { observer } from 'mobx-react'
+import React, { useState } from 'react'
+import { FiRefreshCw } from 'react-icons/fi'
 
 export const ShapeItemsColorPickerKindDropdown: React.FC<{
   shapeStyle: ShapeStyleOptions
@@ -42,6 +41,7 @@ export const ShapeItemsColorPickerKindDropdown: React.FC<{
         {shapeStyle.items.coloring.kind === 'gradient' && 'Color: Scale'}
       </MenuButton>
       <MenuList
+        usePortal
         as="div"
         placement="bottom-start"
         css={css`
@@ -137,13 +137,8 @@ export const ShapeItemsColorPickerInline: React.FC<{
 
             <Menu>
               <MenuButton ml="2" as={MenuDotsButton} size="sm" />
-              <MenuList
-                placement="bottom-end"
-                zIndex={1000}
-                css={css`
-                  right: 30px;
-                `}
-              >
+              <MenuList placement="bottom-end" zIndex={1000}>
+                <PopoverArrow />
                 <MenuItem
                   onClick={() => {
                     shapeStyle.items.coloring.color.colors.length = 1

@@ -1,194 +1,141 @@
 import {
   Box,
-  Button,
-  ButtonProps,
+  Icon,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Text,
-  IconButton,
-  Icon,
+  PopoverArrow,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
 import { BgStyleOptions } from 'components/Editor/style-options'
+import { Button } from 'components/shared/Button'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
-import { ColorSwatchButton } from 'components/shared/ColorSwatchButton'
-import { observer, Observer } from 'mobx-react'
-import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
+import { DeleteButton } from 'components/shared/DeleteButton'
+import { MenuDotsButton } from 'components/shared/MenuDotsButton'
+import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
+import { observer } from 'mobx-react'
 import React, { useState } from 'react'
+import { FiRefreshCw } from 'react-icons/fi'
 
-export const BgItemsColorPickerSwatch = React.forwardRef<
-  HTMLElement,
-  {
-    bgStyle: BgStyleOptions
-  } & Partial<ButtonProps>
->(({ bgStyle, ...props }, ref) => {
+export const BgItemsColorPickerKindDropdown: React.FC<{
+  bgStyle: BgStyleOptions
+  onUpdate: () => void
+}> = observer(({ bgStyle, onUpdate }) => {
   return (
-    // @ts-ignore
-    <Observer>
-      {/* 
-      // @ts-ignore
-       */}
-      {() => {
-        let trigger: React.ReactNode = <span>open</span>
-        if (bgStyle.items.coloring.kind === 'color') {
-          trigger = (
-            <ColorSwatchButton
-              css={css`
-                width: 80px;
-              `}
-              borderRadius="none"
-              colors={bgStyle.items.coloring.color.colors}
-              kind="colors"
-              ref={ref}
-              {...props}
-            />
-          )
-        } else if (bgStyle.items.coloring.kind === 'gradient') {
-          trigger = (
-            <ColorSwatchButton
-              css={css`
-                width: 80px;
-              `}
-              borderRadius="none"
-              colors={[
-                bgStyle.items.coloring.gradient.gradient.from,
-                bgStyle.items.coloring.gradient.gradient.to,
-              ]}
-              kind="gradient"
-              ref={ref}
-              {...props}
-            />
-          )
-        } else if (bgStyle.items.coloring.kind === 'shape') {
-          trigger = (
-            <ColorSwatchButton
-              css={css`
-                width: 80px;
-              `}
-              borderRadius="none"
-              kind="spectrum"
-              ref={ref}
-              {...props}
-            />
-          )
-        }
+    <Menu>
+      <MenuButton
+        // @ts-ignore
+        variant="outline"
+        as={Button}
+        rightIcon="chevron-down"
+        py="2"
+        px="3"
+      >
+        {/* {bgStyle.items.coloring.kind === 'shape' && 'Color: Same as shape'} */}
+        {bgStyle.items.coloring.kind === 'color' && 'Color: Custom'}
+        {bgStyle.items.coloring.kind === 'gradient' && 'Color: Scale'}
+      </MenuButton>
+      <MenuList
+        usePortal
+        as="div"
+        placement="bottom-start"
+        css={css`
+          background: white;
+          position: absolute;
+          top: 0px !important;
+          margin-top: 0 !important;
+          z-index: 5000 !important;
+          max-height: 300px;
+          overflow: auto;
+        `}
+      >
+        {/* <MenuItemWithDescription
+          title="Same as shape"
+          description="Items will have color of the shape"
+          onClick={() => {
+            bgStyle.items.coloring.kind = 'shape'
+            onUpdate()
+          }}
+        /> */}
+        <MenuItemWithDescription
+          title="Custom"
+          description="Choose one or more custom colors"
+          onClick={() => {
+            bgStyle.items.coloring.kind = 'color'
+            onUpdate()
+          }}
+        />
 
-        return trigger
-      }}
-    </Observer>
+        <MenuItemWithDescription
+          title="Color scale"
+          description="Choose 2 colors to define a linear color scale"
+          onClick={() => {
+            bgStyle.items.coloring.kind = 'gradient'
+            onUpdate()
+          }}
+        />
+      </MenuList>
+    </Menu>
   )
 })
 
 export const BgItemsColorPickerInline: React.FC<{
   bgStyle: BgStyleOptions
-  label?: string
+  bgFill: BgStyleOptions['fill']
   onUpdate: () => void
   children?: React.ReactNode
-}> = observer(({ label, bgStyle, onUpdate, children }) => {
-  const [openShapeColors, setOpenShapeColors] = useState(false)
+}> = observer(({ bgFill, bgStyle, onUpdate, children }) => {
+  const [multicolorIndex, setMulticolorIndex] = useState(0)
+  const isDarkBg =
+    bgFill.kind === 'color' && chroma(bgFill.color.color).luminance() < 0.5
+
+  const getRandomColor = () =>
+    chroma
+      .random()
+      .luminance(isDarkBg ? 0.65 : 0.35)
+      .saturate(isDarkBg ? 0.3 : 0.4)
+      .hex()
 
   return (
     <Box>
       <Box display="flex" alignItems="center">
-        {label && (
-          <Text
-            mr="3"
-            my="0"
-            css={css`
-              font-weight: 600;
-            `}
-          >
-            {label}
-          </Text>
-        )}
-
-        <Menu>
-          <MenuButton
-            // @ts-ignore
-            variant="link"
-            variantColor="primary"
-            as={Button}
-            rightIcon="chevron-down"
-            py="2"
-            px="3"
-          >
-            {bgStyle.items.coloring.kind === 'shape' && 'Color: same as shape'}
-            {bgStyle.items.coloring.kind === 'color' && 'Color: custom'}
-            {bgStyle.items.coloring.kind === 'gradient' && 'Color: gradient'}
-          </MenuButton>
-          <MenuList
-            as="div"
-            placement="bottom-start"
-            css={css`
-              background: white;
-              position: absolute;
-              top: 0px !important;
-              margin-top: 0 !important;
-              z-index: 5000 !important;
-              max-height: 300px;
-              overflow: auto;
-            `}
-          >
-            <MenuItem
-              onClick={() => {
-                bgStyle.items.coloring.kind = 'shape'
-                onUpdate()
-              }}
-            >
-              Same as shape
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                bgStyle.items.coloring.kind = 'color'
-                onUpdate()
-              }}
-            >
-              Custom colors
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                bgStyle.items.coloring.kind = 'gradient'
-                onUpdate()
-              }}
-            >
-              Color gradient
-            </MenuItem>
-          </MenuList>
-        </Menu>
-
         {bgStyle.items.coloring.kind === 'color' && (
-          <>
+          <Box mt="3">
             <Button
               isDisabled={bgStyle.items.coloring.color.colors.length >= 8}
-              variantColor="green"
+              variantColor="secondary"
               leftIcon="add"
+              size="sm"
               onClick={() => {
-                const color = chroma.random().hex()
-                bgStyle.items.coloring.color.colors.push(color)
+                bgStyle.items.coloring.color.colors.push(getRandomColor())
                 onUpdate()
               }}
-              size="sm"
-              ml="auto"
             >
               Add
             </Button>
 
+            <Button
+              variant="ghost"
+              size="sm"
+              isDisabled={bgStyle.items.coloring.color.colors.length === 0}
+              onClick={() => {
+                bgStyle.items.coloring.color.colors = bgStyle.items.coloring.color.colors.map(
+                  () => getRandomColor()
+                )
+                onUpdate()
+              }}
+              ml="2"
+            >
+              <FiRefreshCw style={{ marginRight: '5px' }} />
+              Random
+            </Button>
+
             <Menu>
-              <MenuButton
-                marginLeft="2"
-                as={Button}
-                size="sm"
-                outline="none"
-                aria-label="menu"
-                color="black"
-                display="inline-flex"
-              >
-                <DotsThreeVertical size={18} />
-              </MenuButton>
-              <MenuList>
+              <MenuButton ml="2" as={MenuDotsButton} size="sm" />
+              <MenuList placement="bottom" zIndex={1000}>
+                <PopoverArrow />
                 <MenuItem
                   onClick={() => {
                     bgStyle.items.coloring.color.colors.length = 1
@@ -205,96 +152,59 @@ export const BgItemsColorPickerInline: React.FC<{
                 </MenuItem>
               </MenuList>
             </Menu>
-          </>
+          </Box>
         )}
       </Box>
 
-      <BgItemsColorPickerInlineImpl
-        bgStyle={bgStyle}
-        children={children}
-        onUpdate={onUpdate}
-      />
-    </Box>
-  )
-})
+      <Box mb="3" display="flex" flexDirection="row" alignItems="flex-start">
+        {bgStyle.items.coloring.kind === 'color' && (
+          <Box mt="3" display="flex" flexWrap="wrap">
+            {bgStyle.items.coloring.color.colors.map((color, index) => (
+              <Box mb="2" key={index} display="inline-flex" alignItems="center">
+                <ColorPickerPopover
+                  css={css`
+                    width: 44px;
+                  `}
+                  disableAlpha
+                  value={chroma(bgStyle.items.coloring.color.colors[index])
+                    .alpha(1)
+                    .hex()}
+                  onChange={(hex) => {
+                    const color = chroma(hex).hex()
+                    bgStyle.items.coloring.color.colors[index] = color
+                  }}
+                  onAfterChange={() => {
+                    onUpdate()
+                  }}
+                  color={bgStyle.items.coloring.color.colors[index]}
+                  onClick={() => setMulticolorIndex(index)}
+                />
 
-export const BgItemsColorPickerInlineImpl: React.FC<{
-  bgStyle: BgStyleOptions
-  onUpdate: () => void
-  children?: React.ReactNode
-}> = observer(({ bgStyle, onUpdate, children, ...props }) => {
-  const [multicolorIndex, setMulticolorIndex] = useState(0)
-
-  return (
-    <>
-      <Box
-        mb="2"
-        mt="2"
-        display="flex"
-        flexDirection="row"
-        alignItems="flex-start"
-      >
-        <Box display="flex" flexWrap="wrap">
-          {bgStyle.items.coloring.kind === 'color' && (
-            <>
-              {bgStyle.items.coloring.color.colors.map((color, index) => (
-                <Box
-                  mb="4"
-                  key={index}
-                  display="inline-flex"
-                  alignItems="center"
-                >
-                  <ColorPickerPopover
-                    css={css`
-                      width: 52px;
-                    `}
-                    disableAlpha
-                    value={chroma(bgStyle.items.coloring.color.colors[index])
-                      .alpha(1)
-                      .hex()}
-                    onChange={(hex) => {
-                      const color = chroma(hex).hex()
-                      bgStyle.items.coloring.color.colors[index] = color
-                    }}
-                    onAfterChange={() => {
+                {bgStyle.items.coloring.color.colors.length > 1 && (
+                  <DeleteButton
+                    size="xs"
+                    color="gray.400"
+                    ml="2px"
+                    mr="2"
+                    onClick={() => {
+                      bgStyle.items.coloring.color.colors.splice(index, 1)
                       onUpdate()
                     }}
-                    color={bgStyle.items.coloring.color.colors[index]}
-                    onClick={() => setMulticolorIndex(index)}
                   />
-
-                  {bgStyle.items.coloring.color.colors.length > 1 && (
-                    <IconButton
-                      isRound
-                      aria-label="Delete"
-                      ml="2px"
-                      mr="2"
-                      icon="close"
-                      size="xs"
-                      onClick={() => {
-                        bgStyle.items.coloring.color.colors.splice(index, 1)
-                        onUpdate()
-                      }}
-                    />
-                  )}
-                </Box>
-              ))}
-            </>
-          )}
-          {bgStyle.items.coloring.kind === 'gradient' && (
-            <>
-              <Box mt="0">
-                {[
-                  bgStyle.items.coloring.gradient.gradient.from,
-                  bgStyle.items.coloring.gradient.gradient.to,
-                ].map((color, index) => (
-                  <Box
-                    mr="3"
-                    key={index}
-                    display="inline-flex"
-                    alignItems="center"
-                  >
-                    <Box mr="2">{index === 1 ? 'To:' : 'From:'}</Box>
+                )}
+              </Box>
+            ))}
+          </Box>
+        )}
+        {bgStyle.items.coloring.kind === 'gradient' && (
+          <>
+            <Box mt="3" display="flex" alignItems="center">
+              {[
+                bgStyle.items.coloring.gradient.gradient.from,
+                bgStyle.items.coloring.gradient.gradient.to,
+              ].map((color, index) => (
+                <React.Fragment key={index}>
+                  <Box mr="3">
                     <ColorPickerPopover
                       disableAlpha
                       value={chroma(
@@ -323,13 +233,33 @@ export const BgItemsColorPickerInlineImpl: React.FC<{
                       onClick={() => setMulticolorIndex(index)}
                     />
                   </Box>
-                ))}
-              </Box>
-            </>
-          )}
-        </Box>
+                </React.Fragment>
+              ))}
+              {bgStyle.items.coloring.kind === 'gradient' && (
+                <Box>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      bgStyle.items.coloring.gradient.gradient = {
+                        from: getRandomColor(),
+                        to: getRandomColor(),
+                        assignBy: 'random',
+                      }
+                      onUpdate()
+                    }}
+                    ml="2"
+                  >
+                    <FiRefreshCw style={{ marginRight: '5px' }} />
+                    Random
+                  </Button>
+                </Box>
+              )}
+            </Box>
+          </>
+        )}
+        {children}
       </Box>
-      {children}
-    </>
+    </Box>
   )
 })

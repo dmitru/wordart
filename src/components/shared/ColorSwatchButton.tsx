@@ -117,6 +117,7 @@ const ColorSwatchButtonStyled = styled(Button)<{ theme: any }>`
   transition: 0.15s background, 0.1s box-shadow, 0.2s transition;
   position: relative;
   background: transparent;
+  box-shadow: none;
 
   &:hover {
     transform: scale(1.05);
