@@ -213,7 +213,8 @@ export const FoldersView = observer(() => {
             Are you sure you want to delete folder "{deletingFolder?.title}"?
           </Text>
           <Text>
-            Designs in this folder will <strong>not</strong> be deleted.
+            All designs in this folder will <strong>not</strong> be deleted and
+            will be moved outside of this folder.
           </Text>
         </ConfirmModal>
 

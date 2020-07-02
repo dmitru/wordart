@@ -11,7 +11,7 @@ import { observer } from 'mobx-react'
 import Link from 'next/link'
 import pluralize from 'pluralize'
 import React, { useState } from 'react'
-import { FaRegCheckSquare, FaRegFolder } from 'react-icons/fa'
+import { FaRegCheckSquare, FaRegFolder, FaSearch } from 'react-icons/fa'
 import { Wordcloud, Folder } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
@@ -39,7 +39,8 @@ export const DesignsView = observer(() => {
 
   const [query, setQuery] = useState('')
 
-  const wordcloudsInFolder = store.wordclouds.filter((wc) => {
+  const allWordclouds = store.wordclouds
+  const wordcloudsInFolder = allWordclouds.filter((wc) => {
     if (dashboardUiState.folder === 'all') {
       return true
     }
@@ -213,9 +214,7 @@ export const DesignsView = observer(() => {
               margin-bottom: 1rem;
             `}
           >
-            {/* TODO: empty UI */}
-
-            {store.wordclouds.length === 0 && (
+            {allWordclouds.length === 0 && (
               <Box
                 mx="auto"
                 p="4"
@@ -256,7 +255,7 @@ export const DesignsView = observer(() => {
               </Box>
             )}
 
-            {wordcloudsInFolder.length === 0 && (
+            {allWordclouds.length > 0 && wordcloudsInFolder.length === 0 && (
               <Box
                 display="flex"
                 maxWidth="600px"
@@ -284,7 +283,12 @@ export const DesignsView = observer(() => {
                   alignItems="center"
                   justifyContent="center"
                 >
-                  <FaRegFolder size={48} />
+                  {dashboardUiState.folder !== 'no folder' && (
+                    <FaRegFolder size={48} />
+                  )}
+                  {dashboardUiState.folder === 'no folder' && (
+                    <FaSearch size={40} />
+                  )}
                 </Box>
 
                 <Text
@@ -294,7 +298,10 @@ export const DesignsView = observer(() => {
                   color="gray.600"
                   mb="0"
                 >
-                  This folder is empty
+                  {dashboardUiState.folder === 'no folder' &&
+                    'Nothinig to show'}
+                  {dashboardUiState.folder !== 'no folder' &&
+                    'This folder is empty'}
                 </Text>
 
                 <Text
@@ -305,8 +312,65 @@ export const DesignsView = observer(() => {
                   color="gray.500"
                   maxWidth="300px"
                 >
-                  You can move some of you designs to this folder, or create a
-                  new design here.
+                  {dashboardUiState.folder !== 'no folder' &&
+                    `You can move some of you designs to this folder, or create a new design here.`}
+                  {dashboardUiState.folder === 'no folder' &&
+                    `All your designs are already in folders.`}
+                </Text>
+              </Box>
+            )}
+
+            {/* No search results */}
+            {wordcloudsInFolder.length > 0 && wordcloudsFiltered.length === 0 && (
+              <Box
+                display="flex"
+                maxWidth="600px"
+                width="100%"
+                mx="auto"
+                alignItems="center"
+                flexDirection="column"
+                boxShadow="sm"
+                borderColor="gray.100"
+                borderWidth="1px"
+                p="6"
+                bg="white"
+                shadow="sm"
+              >
+                <Box
+                  mb="1rem"
+                  bg="primary.50"
+                  color="primary.400"
+                  width="90px"
+                  height="90px"
+                  borderRadius="100%"
+                  borderWidth="2px"
+                  borderColor="primary.100"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <FaSearch size={40} />
+                </Box>
+
+                <Text
+                  fontSize="xl"
+                  flex={1}
+                  textAlign="center"
+                  color="gray.600"
+                  mb="0"
+                >
+                  No results to show
+                </Text>
+
+                <Text
+                  mt="4"
+                  fontSize="md"
+                  flex={1}
+                  textAlign="center"
+                  color="gray.500"
+                  maxWidth="400px"
+                >
+                  There are no designs matching the filter.
                 </Text>
               </Box>
             )}
