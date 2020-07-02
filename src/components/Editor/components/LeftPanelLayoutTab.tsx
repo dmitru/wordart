@@ -209,6 +209,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                           style.items.words.customAngles.push(
                             Math.round(-90 + Math.random() * 180)
                           )
+                          animateVisualize()
                         }}
                       >
                         Add
@@ -220,6 +221,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                       variant="ghost"
                       onClick={() => {
                         style.items.words.customAngles = [0]
+                        animateVisualize()
                       }}
                     >
                       Reset
@@ -250,6 +252,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                             <DeleteButton
                               onClick={() => {
                                 style.items.words.customAngles.splice(index, 1)
+                                animateVisualize()
                               }}
                             />
                           )}

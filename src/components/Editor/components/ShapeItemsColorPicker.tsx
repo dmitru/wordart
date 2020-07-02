@@ -21,6 +21,7 @@ import { FiRefreshCw } from 'react-icons/fi'
 import { Button } from 'components/shared/Button'
 import { DeleteButton } from 'components/shared/DeleteButton'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
+import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 
 export const ShapeItemsColorPickerKindDropdown: React.FC<{
   shapeStyle: ShapeStyleOptions
@@ -38,7 +39,7 @@ export const ShapeItemsColorPickerKindDropdown: React.FC<{
       >
         {shapeStyle.items.coloring.kind === 'shape' && 'Color: Same as shape'}
         {shapeStyle.items.coloring.kind === 'color' && 'Color: Custom'}
-        {shapeStyle.items.coloring.kind === 'gradient' && 'Color: Gradient'}
+        {shapeStyle.items.coloring.kind === 'gradient' && 'Color: Scale'}
       </MenuButton>
       <MenuList
         as="div"
@@ -53,30 +54,31 @@ export const ShapeItemsColorPickerKindDropdown: React.FC<{
           overflow: auto;
         `}
       >
-        <MenuItem
+        <MenuItemWithDescription
+          title="Same as shape"
+          description="Items will have color of the shape"
           onClick={() => {
             shapeStyle.items.coloring.kind = 'shape'
             onUpdate()
           }}
-        >
-          Same as shape
-        </MenuItem>
-        <MenuItem
+        />
+        <MenuItemWithDescription
+          title="Custom"
+          description="Choose one or more custom colors"
           onClick={() => {
             shapeStyle.items.coloring.kind = 'color'
             onUpdate()
           }}
-        >
-          Custom colors
-        </MenuItem>
-        <MenuItem
+        />
+
+        <MenuItemWithDescription
+          title="Color scale"
+          description="Choose 2 colors to define a linear color scale"
           onClick={() => {
             shapeStyle.items.coloring.kind = 'gradient'
             onUpdate()
           }}
-        >
-          Color gradient
-        </MenuItem>
+        />
       </MenuList>
     </Menu>
   )

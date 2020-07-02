@@ -84,6 +84,7 @@ import 'utils/canvas-to-blob'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { TopNavButton } from 'components/shared/TopNavButton'
 import { WarningModal } from 'components/Editor/components/WarningModal'
+import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -1038,37 +1039,21 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                             right: 200px;
                           `}
                         >
-                          <MenuItem
+                          <MenuItemWithDescription
+                            title="Shape"
+                            description="Use this layer to place words and icons on the shape."
                             onClick={() => {
                               store.targetTab = 'shape'
                             }}
-                          >
-                            <Box display="flex" flexDirection="column" py="2">
-                              <Text my="0" fontWeight="semibold">
-                                Shape
-                              </Text>
-                              <Text my="0" fontSize="xs" color="gray.500">
-                                Use this layer to place words and icons on the
-                                shape.
-                              </Text>
-                            </Box>
-                          </MenuItem>
+                          />
 
-                          <MenuItem
+                          <MenuItemWithDescription
+                            title="Background"
+                            description="Use this layer to place words and icons on the background."
                             onClick={() => {
                               store.targetTab = 'bg'
                             }}
-                          >
-                            <Box display="flex" flexDirection="column" py="2">
-                              <Text my="0" fontWeight="semibold">
-                                Background
-                              </Text>
-                              <Text my="0" fontSize="xs" color="gray.500">
-                                Use this layer to place words and icons on the
-                                background.
-                              </Text>
-                            </Box>
-                          </MenuItem>
+                          />
                         </MenuList>
                       </Menu>
                     </Box>

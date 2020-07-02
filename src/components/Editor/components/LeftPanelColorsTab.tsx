@@ -31,6 +31,7 @@ import { observer, useLocalStore } from 'mobx-react'
 import { FaCog, FaQuestionCircle } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
+import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -412,22 +413,11 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                             label={
                               <>
                                 <Box display="flex" alignItems="center">
-                                  Emphasize size{' '}
-                                  <Tooltip
+                                  Emphasize size
+                                  <HelpTooltipIcon
                                     label="Make larger words brighter and smaller words dimmer"
-                                    zIndex={100}
-                                    showDelay={200}
-                                  >
-                                    <Text
-                                      my="0"
-                                      cursor="help"
-                                      ml="2"
-                                      fontSize="lg"
-                                      color="gray.400"
-                                    >
-                                      <FaQuestionCircle />
-                                    </Text>
-                                  </Tooltip>
+                                    ml="2"
+                                  />
                                 </Box>
                               </>
                             }
