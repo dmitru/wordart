@@ -14,6 +14,7 @@ import {
   Folder,
   FolderId,
   UpdateFolderDto,
+  CloneWordcloudDto,
 } from 'services/api/types'
 import { apiClient } from './api-client'
 
@@ -57,12 +58,15 @@ export const Api = {
       const response = await apiClient.post('/wordclouds', data)
       return response.data as Wordcloud
     },
+    async copy(id: WordcloudId, data: CloneWordcloudDto): Promise<Wordcloud> {
+      const response = await apiClient.post(`/wordclouds/${id}/copy`, data)
+      return response.data as Wordcloud
+    },
     async delete(id: WordcloudId): Promise<void> {
       await apiClient.delete(`/wordclouds/${id}`)
     },
     async deleteMany(ids: WordcloudId[]): Promise<void> {
-      // TODO: optimize it
-      await Promise.all(ids.map((id) => apiClient.delete(`/wordclouds/${id}`)))
+      await apiClient.delete(`/wordclouds/`, { data: { ids } })
     },
     async save(id: WordcloudId, data: SaveWordcloudDto): Promise<void> {
       await apiClient.put(`/wordclouds/${id}`, data)

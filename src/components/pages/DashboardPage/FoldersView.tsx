@@ -109,79 +109,94 @@ export const FoldersView = observer(() => {
           Folders
         </Text>
 
-        {store.folders.map((f) => (
-          <FolderRow
-            hideCountOnHover
-            fontSize="lg"
-            fontWeight="semibold"
-            color="gray.600"
-            py={2}
-            px={3}
-            key={f.id}
-            isSelected={dashboardUiState.folder === f}
-            onClick={() => {
-              dashboardUiState.folder = f
-              dashboardUiState.selection.clear()
-            }}
-          >
-            <Box mr="3" color="gray.400">
-              <FaRegFolder />
-            </Box>
+        <Box
+          overflow="auto"
+          css={css`
+            max-height: 400px;
+            max-height: calc(100vh - 420px);
 
-            {f.title}
+            &::-webkit-scrollbar {
+              display: none; /* Chrome Safari */
+            }
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE 10+ */
+          `}
+        >
+          {store.folders.map((f) => (
+            <FolderRow
+              hideCountOnHover
+              fontSize="lg"
+              fontWeight="semibold"
+              color="gray.600"
+              py={2}
+              px={3}
+              key={f.id}
+              isSelected={dashboardUiState.folder === f}
+              onClick={() => {
+                dashboardUiState.folder = f
+                dashboardUiState.selection.clear()
+              }}
+            >
+              <Box mr="3" color="gray.400">
+                <FaRegFolder />
+              </Box>
 
-            <FolderRowTag ml="auto" size="sm">
-              {f.wordclouds.length}
-            </FolderRowTag>
+              {f.title}
 
-            <Box>
-              <Menu>
-                <MenuButton
-                  as={FolderMenuButton}
-                  noShadows={false}
-                  size="sm"
-                  onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation()
-                    e.nativeEvent.preventDefault()
-                    e.nativeEvent.stopPropagation()
-                  }}
-                />
-                <MenuList
-                  fontWeight="normal"
-                  zIndex={10000}
-                  hasArrow
-                  css={css`
-                    top: 50px;
-                  `}
-                  onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation()
-                    e.nativeEvent.preventDefault()
-                    e.nativeEvent.stopPropagation()
-                  }}
-                >
-                  <MenuItemWithIcon
-                    icon={<FaPencilAlt />}
-                    onClick={() => setRenamingFolder(f)}
+              <FolderRowTag ml="auto" size="sm">
+                {f.wordclouds.length}
+              </FolderRowTag>
+
+              <Box>
+                <Menu>
+                  <MenuButton
+                    as={FolderMenuButton}
+                    noShadows={false}
+                    size="sm"
+                    onClick={(e: React.MouseEvent) => {
+                      e.stopPropagation()
+                      e.nativeEvent.preventDefault()
+                      e.nativeEvent.stopPropagation()
+                    }}
+                  />
+                  <MenuList
+                    fontWeight="normal"
+                    placement="bottom-end"
+                    zIndex={10000}
+                    hasArrow
+                    css={css`
+                      top: 50px;
+                    `}
+                    onClick={(e: React.MouseEvent) => {
+                      e.stopPropagation()
+                      e.nativeEvent.preventDefault()
+                      e.nativeEvent.stopPropagation()
+                    }}
                   >
-                    Rename
-                  </MenuItemWithIcon>
-                  <MenuItemWithIcon
-                    icon={<FaTimes />}
-                    onClick={() => setDeletingFolder(f)}
-                  >
-                    Delete
-                  </MenuItemWithIcon>
-                  <PopoverArrow />
-                </MenuList>
-              </Menu>
-            </Box>
-          </FolderRow>
-        ))}
+                    <MenuItemWithIcon
+                      icon={<FaPencilAlt />}
+                      onClick={() => setRenamingFolder(f)}
+                    >
+                      Rename
+                    </MenuItemWithIcon>
+                    <MenuItemWithIcon
+                      icon={<FaTimes />}
+                      onClick={() => setDeletingFolder(f)}
+                    >
+                      Delete
+                    </MenuItemWithIcon>
+                    <PopoverArrow />
+                  </MenuList>
+                </Menu>
+              </Box>
+            </FolderRow>
+          ))}
+        </Box>
 
         {/* Delete folder */}
         <ConfirmModal
           isOpen={deletingFolder != null}
-          title={`Delete folder "${deletingFolder?.title}"`}
+          title={`Delete folder`}
           onSubmit={async () => {
             if (!deletingFolder) {
               return
@@ -194,7 +209,9 @@ export const FoldersView = observer(() => {
           }}
           onCancel={() => setDeletingFolder(null)}
         >
-          <Text>Are you sure you want to delete this folder?</Text>
+          <Text>
+            Are you sure you want to delete folder "{deletingFolder?.title}"?
+          </Text>
           <Text>
             Designs in this folder will <strong>not</strong> be deleted.
           </Text>

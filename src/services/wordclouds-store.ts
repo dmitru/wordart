@@ -11,6 +11,7 @@ import {
   CreateFolderDto,
   FolderId,
   UpdateFolderDto,
+  CloneWordcloudDto,
 } from 'services/api/types'
 import { sortBy } from 'lodash'
 
@@ -44,6 +45,15 @@ export class WordcloudsStore {
 
   create = async (data: CreateWordcloudDto): Promise<Wordcloud> => {
     const wordcloud = await Api.wordclouds.create(data)
+    this._wordclouds.push(wordcloud)
+    return wordcloud
+  }
+
+  copy = async (
+    id: WordcloudId,
+    data: CloneWordcloudDto
+  ): Promise<Wordcloud> => {
+    const wordcloud = await Api.wordclouds.copy(id, data)
     this._wordclouds.push(wordcloud)
     return wordcloud
   }

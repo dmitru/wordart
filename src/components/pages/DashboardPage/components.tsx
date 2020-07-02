@@ -63,6 +63,7 @@ export type WordcloudThumbnailProps = {
   onMoveToFolder: () => void
   onDuplicate: () => void
   onRename: () => void
+  onOpenInEditor: () => void
   onDelete: () => void
 }
 
@@ -74,7 +75,7 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
   wordcloud,
   onDelete,
   onMoveToFolder,
-
+  onOpenInEditor,
   onRename,
   onDuplicate,
 }) => {
@@ -200,6 +201,7 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
           onSelect={() => onSelectionChange(true)}
           onRename={onRename}
           onDuplicate={onDuplicate}
+          onOpenInEditor={onOpenInEditor}
         />
       )}
 
@@ -229,6 +231,7 @@ type WordcloudThumbnailMenuProps = {
   wordcloud: Wordcloud
   onMoveToFolder: () => void
   onDuplicate: () => void
+  onOpenInEditor: () => void
   onSelect: () => void
   onRename: () => void
   onDelete: () => void
@@ -246,7 +249,11 @@ const WordcloudThumbnailMenu: React.FC<WordcloudThumbnailMenuProps> = observer(
         <MenuList zIndex={10000} hasArrow>
           <PopoverArrow />
 
-          <MenuItemWithIcon icon={<FaChevronRight />} fontWeight="semibold">
+          <MenuItemWithIcon
+            icon={<FaChevronRight />}
+            fontWeight="semibold"
+            onClick={props.onOpenInEditor}
+          >
             Open in Editor...
           </MenuItemWithIcon>
 

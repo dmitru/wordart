@@ -1,4 +1,4 @@
-import { Box, Flex, Text } from '@chakra-ui/core'
+import { Box, Flex, Text, Divider } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { WordcloudThumbnail } from 'components/pages/DashboardPage/components'
 import { dashboardUiState } from 'components/pages/DashboardPage/state'
@@ -11,11 +11,13 @@ import { observer } from 'mobx-react'
 import Link from 'next/link'
 import pluralize from 'pluralize'
 import React, { useState } from 'react'
-import { FaFolder, FaRegCheckSquare } from 'react-icons/fa'
+import { FaRegCheckSquare, FaRegFolder } from 'react-icons/fa'
 import { Wordcloud } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { useToasts } from 'use-toasts'
+import { openUrlInNewTab } from 'utils/browser'
+import { Spinner } from 'components/Editor/components/Spinner'
 
 export const DesignsView = observer(() => {
   const { wordcloudsStore: store } = useStore()
@@ -70,6 +72,21 @@ export const DesignsView = observer(() => {
     })
   }
 
+  const duplicate = async (wc: Wordcloud, title: string) => {
+    title = title.trim()
+
+    if (!title) {
+      toasts.showWarning({
+        title: 'You need to enter a name to make a copy',
+      })
+      return
+    }
+    await store.copy(wc.id, { title })
+    toasts.showSuccess({
+      title: 'Copy created',
+    })
+  }
+
   const remove = async (wcs: Wordcloud[]) => {
     const ids = wcs.map((wc) => wc.id)
     await store.delete(ids)
@@ -111,10 +128,11 @@ export const DesignsView = observer(() => {
             />
           </Box>
 
+          <Divider orientation="vertical" />
+
           {isSelecting && (
-            <Box ml="4">
+            <Box ml="3">
               <Button
-                size="sm"
                 mr="2"
                 variantColor="primary"
                 onClick={() => {
@@ -138,7 +156,6 @@ export const DesignsView = observer(() => {
               </Button>
 
               <Button
-                size="sm"
                 mr="2"
                 variant="outline"
                 onClick={() =>
@@ -148,15 +165,13 @@ export const DesignsView = observer(() => {
                 }
               >
                 <Box mr="2">
-                  <FaFolder />
+                  <FaRegFolder />
                 </Box>
                 Move to folder
               </Button>
 
               <Button
-                size="sm"
                 variant="outline"
-                mr="2"
                 onClick={() =>
                   setDeletingWordclouds(
                     store.wordclouds.filter((w) => selection.has(w.id))
@@ -169,7 +184,7 @@ export const DesignsView = observer(() => {
           )}
         </Box>
 
-        {!store.hasFetchedWordclouds && 'Loading...'}
+        {!store.hasFetchedWordclouds && <Spinner />}
         {store.hasFetchedWordclouds && (
           <>
             {store.wordclouds.length === 0 && (
@@ -196,7 +211,7 @@ export const DesignsView = observer(() => {
                 background: #f8f8f8;
                 padding: 2rem;
                 box-shadow: inset 0 0 6px 0 #0001;
-                margin-bottom: 3rem;
+                margin-bottom: 1rem;
               `}
             >
               {/* TODO: empty UI */}
@@ -208,21 +223,19 @@ export const DesignsView = observer(() => {
                     key={wc.id}
                     wordcloud={wc}
                     isSelecting={isSelecting}
-                    onClick={
-                      isSelecting
-                        ? () => {
-                            console.log('onClick')
-                            if (isSelecting) {
-                              if (!selection.has(wc.id)) {
-                                selection.add(wc.id)
-                              } else {
-                                selection.delete(wc.id)
-                              }
-                            } else {
-                              // Open the editor...
-                            }
-                          }
-                        : () => null
+                    onClick={() => {
+                      if (isSelecting) {
+                        if (!selection.has(wc.id)) {
+                          selection.add(wc.id)
+                        } else {
+                          selection.delete(wc.id)
+                        }
+                      } else {
+                        // Open the editor...
+                      }
+                    }}
+                    onOpenInEditor={() =>
+                      openUrlInNewTab(Urls.editor.edit(wc.id))
                     }
                     onMoveToFolder={() => setMovindWordclouds([wc])}
                     onRename={() => setRenamingWordcloud(wc)}
@@ -260,6 +273,27 @@ export const DesignsView = observer(() => {
           title="Rename design"
           inputProps={{
             placeholder: 'Enter name...',
+          }}
+        />
+
+        {/* Duplicate */}
+        <PromptModal
+          isOpen={duplicatingWordcloud != null}
+          initialValue={duplicatingWordcloud?.title}
+          onSubmit={async (title) => {
+            if (!duplicatingWordcloud) {
+              return
+            }
+            try {
+              await duplicate(duplicatingWordcloud, title)
+            } finally {
+              setDuplicatingWordcloud(null)
+            }
+          }}
+          onCancel={() => setDuplicatingWordcloud(null)}
+          title="Save as a copy"
+          inputProps={{
+            placeholder: 'Enter name for the copy...',
           }}
         />
 

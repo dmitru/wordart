@@ -19,7 +19,7 @@ export const SiteLayout: React.FC<SiteLayoutProps> = ({
 }) => {
   return (
     <SiteLayoutWrapper>
-      <Header />
+      <Header fullWidth={fullWidth} />
       <ContentWrapper fullWidth={fullWidth}>{children}</ContentWrapper>
       {!noFooter && <Footer />}
     </SiteLayoutWrapper>

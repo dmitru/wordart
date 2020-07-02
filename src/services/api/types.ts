@@ -55,6 +55,10 @@ export type CreateWordcloudDto = {
   editorData: EditorPersistedData
 }
 
+export type CloneWordcloudDto = {
+  title: string
+}
+
 export type SaveWordcloudDto =
   | {
       title: string
