@@ -26,6 +26,7 @@ import { LeftPanelFontPicker } from 'components/Editor/components/LeftPanelFontP
 import { Button } from 'components/shared/Button'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { DeleteButton } from 'components/shared/DeleteButton'
+import { Tooltip } from 'components/shared/Tooltip'
 
 export type LeftPanelFontsTabProps = {
   target: TargetKind
@@ -167,15 +168,18 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                       </MenuList>
                     </Menu>
 
-                    <Tag
-                      ml="auto"
-                      size="sm"
-                      rounded="full"
-                      variant="outline"
-                      variantColor="gray"
-                    >
-                      <TagLabel>{(fonts || []).length} / 8</TagLabel>
-                    </Tag>
+                    <Tooltip label="You can use up to 8 different fonts in your designs">
+                      <Box ml="auto">
+                        <Tag
+                          size="sm"
+                          rounded="full"
+                          variant="outline"
+                          variantColor="gray"
+                        >
+                          <TagLabel>{(fonts || []).length} / 8</TagLabel>
+                        </Tag>
+                      </Box>
+                    </Tooltip>
                   </Box>
                 </Box>
               </motion.div>

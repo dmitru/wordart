@@ -88,12 +88,11 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
                       marginLeft="auto"
                       as={Button}
                       outline="none"
-                      // @ts-expect-error
-                      variant="outline"
                       aria-label="menu"
                       rightIcon="chevron-down"
-                      color="black"
+                      color="gray.600"
                       size="sm"
+                      variant="ghost"
                       display="inline-flex"
                     >
                       {'Style: '}

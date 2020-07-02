@@ -101,17 +101,14 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
 
   return (
     <>
-      <Box mt="2">
-        <Box display="flex" mb="1">
-          <SearchInput
-            placeholder="Find font..."
-            value={state.query}
-            onChange={(value) => {
-              state.query = value
-            }}
-          />
-        </Box>
-
+      <Box
+        mt="2"
+        css={css`
+          background: hsl(220, 36%, 95%);
+          margin: 0 -20px;
+          padding: 8px 20px 4px;
+        `}
+      >
         <Box display="flex" flexWrap="wrap" alignItems="flex-start">
           <Box
             css={css`
@@ -236,6 +233,16 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
               />
             )}
           </Box>
+        </Box>
+
+        <Box display="flex" mb="1">
+          <SearchInput
+            placeholder="Find font..."
+            value={state.query}
+            onChange={(value) => {
+              state.query = value
+            }}
+          />
         </Box>
       </Box>
 
