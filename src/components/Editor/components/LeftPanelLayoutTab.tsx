@@ -201,7 +201,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                     <Tooltip label="Add custom angle">
                       <Button
                         mr="1"
-                        variantColor="secondary"
+                        colorScheme="secondary"
                         isDisabled={style.items.words.customAngles.length >= 8}
                         size="sm"
                         leftIcon="add"

@@ -44,28 +44,29 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = observer(
 
     return (
       <Modal size="sm" isOpen={isOpen} onClose={onCancel}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>{title}</ModalHeader>
+        <ModalOverlay>
+          <ModalContent>
+            <ModalHeader>{title}</ModalHeader>
 
-          <ModalBody>{children}</ModalBody>
+            <ModalBody>{children}</ModalBody>
 
-          <ModalFooter>
-            <Button ml="3" variant="ghost" onClick={() => onCancel()}>
-              {cancelText}
-            </Button>
-            <Button
-              ml="3"
-              variantColor="primary"
-              onClick={handleSubmit}
-              isLoading={isSubmitting}
-            >
-              {submitText}
-            </Button>
-          </ModalFooter>
+            <ModalFooter>
+              <Button ml="3" variant="ghost" onClick={() => onCancel()}>
+                {cancelText}
+              </Button>
+              <Button
+                ml="3"
+                colorScheme="primary"
+                onClick={handleSubmit}
+                isLoading={isSubmitting}
+              >
+                {submitText}
+              </Button>
+            </ModalFooter>
 
-          <ModalCloseButton />
-        </ModalContent>
+            <ModalCloseButton />
+          </ModalContent>
+        </ModalOverlay>
       </Modal>
     )
   }

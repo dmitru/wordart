@@ -1,6 +1,6 @@
 import '@emotion/core'
 import 'emotion-theming'
-import { Theme as MyTheme } from 'styles/theme'
+import { Theme as MyTheme } from 'chakra'
 
 declare module '@emotion/core' {
   export interface Theme extends MyTheme {}

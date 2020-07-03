@@ -82,7 +82,7 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
                 )}
 
                 <Box mt="3">
-                  <Menu>
+                  <Menu placement="bottom-start">
                     <MenuButton
                       isDisabled={selectedFont.font.styles.length < 2}
                       marginLeft="auto"
@@ -102,7 +102,7 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
                       {selectedFontStyle && selectedFontStyle.fontWeight}
                     </MenuButton>
 
-                    <MenuList zIndex={100} placement="bottom-start">
+                    <MenuList>
                       {sortBy(
                         selectedFont.font.styles,
                         (fs) => fs.fontStyle,
@@ -148,7 +148,7 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
                 }
                 onSelected(selectedFont.font, selectedFontStyle)
               }}
-              variantColor="accent"
+              colorScheme="accent"
               id="font-picker-done"
             >
               {showCancel ? 'Add this font' : 'Done'}
@@ -214,7 +214,7 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
       <FontButton>
         <img src={thumbnail} />
         {isCustom && (
-          <Badge mr="2" ml="auto" variantColor="purple">
+          <Badge mr="2" ml="auto" colorScheme="purple">
             custom
           </Badge>
         )}

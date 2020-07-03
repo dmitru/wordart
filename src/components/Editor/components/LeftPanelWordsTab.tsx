@@ -168,7 +168,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     const topToolbar = (
       <Stack direction="row" mb="6" spacing="2">
         <Button
-          variantColor="primary"
+          colorScheme="primary"
           leftIcon="add"
           onClick={focusNewWordInput}
         >
@@ -177,7 +177,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
         <Button
           leftIcon="edit"
-          variantColor="secondary"
+          colorScheme="secondary"
           onClick={() => {
             state.isShowingEditor = true
           }}
@@ -244,7 +244,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             {selectedCount > 0 && (
               <MenuButton
                 as={Button}
-                variantColor="accent"
+                colorScheme="accent"
                 rightIcon="chevron-down"
                 size="sm"
               >
@@ -738,7 +738,7 @@ const NewWordInput: React.FC<{
             <Button
               px="3"
               width="100%"
-              variantColor="primary"
+              colorScheme="primary"
               onClick={onAddClick}
             >
               Add

@@ -189,7 +189,7 @@ export const FoldersView = observer(() => {
                     >
                       Delete
                     </MenuItemWithIcon>
-                    <PopoverArrow />
+                    {/* <PopoverArrow /> */}
                   </MenuList>
                 </Menu>
               </Box>

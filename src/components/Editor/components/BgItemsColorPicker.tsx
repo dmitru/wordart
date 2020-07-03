@@ -5,12 +5,14 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  PopoverArrow,
+  Portal,
+  Button,
+  MenuTransition,
 } from '@chakra-ui/core'
+import { AddIcon, ChevronDownIcon, CloseIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
 import { BgStyleOptions } from 'components/Editor/style-options'
-import { Button } from 'components/shared/Button'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { DeleteButton } from 'components/shared/DeleteButton'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
@@ -18,40 +20,32 @@ import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescripti
 import { observer } from 'mobx-react'
 import React, { useState } from 'react'
 import { FiRefreshCw } from 'react-icons/fi'
+import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 
 export const BgItemsColorPickerKindDropdown: React.FC<{
   bgStyle: BgStyleOptions
   onUpdate: () => void
 }> = observer(({ bgStyle, onUpdate }) => {
   return (
-    <Menu>
-      <MenuButton
-        // @ts-ignore
-        variant="outline"
-        as={Button}
-        rightIcon="chevron-down"
-        py="2"
-        px="3"
-      >
+    <Menu placement="bottom-start">
+      <MenuButton as={Button} rightIcon={<ChevronDownIcon />} py="2" px="3">
         {/* {bgStyle.items.coloring.kind === 'shape' && 'Color: Same as shape'} */}
         {bgStyle.items.coloring.kind === 'color' && 'Color: Custom'}
         {bgStyle.items.coloring.kind === 'gradient' && 'Color: Scale'}
       </MenuButton>
-      <MenuList
-        usePortal
-        as="div"
-        placement="bottom-start"
-        css={css`
-          background: white;
-          position: absolute;
-          top: 0px !important;
-          margin-top: 0 !important;
-          z-index: 5000 !important;
-          max-height: 300px;
-          overflow: auto;
-        `}
-      >
-        {/* <MenuItemWithDescription
+      <MenuTransition>
+        {(styles) => (
+          <Portal>
+            <MenuList
+              as="div"
+              css={css`
+                ${styles}
+                background: white;
+                max-height: 300px;
+                overflow: auto;
+              `}
+            >
+              {/* <MenuItemWithDescription
           title="Same as shape"
           description="Items will have color of the shape"
           onClick={() => {
@@ -59,24 +53,27 @@ export const BgItemsColorPickerKindDropdown: React.FC<{
             onUpdate()
           }}
         /> */}
-        <MenuItemWithDescription
-          title="Custom"
-          description="Choose one or more custom colors"
-          onClick={() => {
-            bgStyle.items.coloring.kind = 'color'
-            onUpdate()
-          }}
-        />
+              <MenuItemWithDescription
+                title="Custom"
+                description="Choose one or more custom colors"
+                onClick={() => {
+                  bgStyle.items.coloring.kind = 'color'
+                  onUpdate()
+                }}
+              />
 
-        <MenuItemWithDescription
-          title="Color scale"
-          description="Choose 2 colors to define a linear color scale"
-          onClick={() => {
-            bgStyle.items.coloring.kind = 'gradient'
-            onUpdate()
-          }}
-        />
-      </MenuList>
+              <MenuItemWithDescription
+                title="Color scale"
+                description="Choose 2 colors to define a linear color scale"
+                onClick={() => {
+                  bgStyle.items.coloring.kind = 'gradient'
+                  onUpdate()
+                }}
+              />
+            </MenuList>
+          </Portal>
+        )}
+      </MenuTransition>
     </Menu>
   )
 })
@@ -105,8 +102,8 @@ export const BgItemsColorPickerInline: React.FC<{
           <Box mt="3">
             <Button
               isDisabled={bgStyle.items.coloring.color.colors.length >= 8}
-              variantColor="secondary"
-              leftIcon="add"
+              colorScheme="secondary"
+              leftIcon={<AddIcon />}
               size="sm"
               onClick={() => {
                 bgStyle.items.coloring.color.colors.push(getRandomColor())
@@ -132,35 +129,40 @@ export const BgItemsColorPickerInline: React.FC<{
               Random
             </Button>
 
-            <Menu>
-              <MenuButton ml="2" as={MenuDotsButton} size="sm" />
-              <MenuList placement="bottom" zIndex={1000}>
-                <PopoverArrow />
-                <MenuItem
-                  onClick={() => {
-                    bgStyle.items.coloring.color.colors.length = 1
-                    onUpdate()
-                  }}
-                >
-                  <Icon
-                    name="small-close"
-                    size="20px"
-                    color="gray.500"
-                    mr="2"
-                  />
-                  Clear all
-                </MenuItem>
-              </MenuList>
+            <Menu placement="bottom">
+              <MenuButton
+                ml="2"
+                as={MenuDotsButton}
+                size="sm"
+                variant="ghost"
+              />
+              <Portal>
+                <MenuTransition>
+                  {(styles) => (
+                    <MenuList css={styles}>
+                      <MenuItemWithIcon
+                        icon={<CloseIcon />}
+                        onClick={() => {
+                          bgStyle.items.coloring.color.colors.length = 1
+                          onUpdate()
+                        }}
+                      >
+                        Clear all
+                      </MenuItemWithIcon>
+                    </MenuList>
+                  )}
+                </MenuTransition>
+              </Portal>
             </Menu>
           </Box>
         )}
       </Box>
 
-      <Box mb="3" display="flex" flexDirection="row" alignItems="flex-start">
+      <Box mb="2" display="flex" flexDirection="row" alignItems="flex-start">
         {bgStyle.items.coloring.kind === 'color' && (
-          <Box mt="3" display="flex" flexWrap="wrap">
+          <Box display="flex" flexWrap="wrap">
             {bgStyle.items.coloring.color.colors.map((color, index) => (
-              <Box mb="2" key={index} display="inline-flex" alignItems="center">
+              <Box mt="3" key={index} display="inline-flex" alignItems="center">
                 <ColorPickerPopover
                   css={css`
                     width: 44px;

@@ -120,8 +120,8 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
             <Menu>
               <MenuButton
                 // @ts-ignore
-                variant={state.style !== 'popular' ? 'solid' : 'ghost'}
-                variantColor={state.style !== 'popular' ? 'accent' : undefined}
+                colorScheme={state.style !== 'popular' ? 'solid' : 'ghost'}
+                colorScheme={state.style !== 'popular' ? 'accent' : undefined}
                 as={Button}
                 rightIcon="chevron-down"
                 size="sm"
@@ -198,8 +198,8 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
                 size="sm"
                 as={Button}
                 // @ts-expect-error
-                variantColor={state.language === 'any' ? undefined : 'accent'}
-                variant={state.language === 'any' ? 'ghost' : 'solid'}
+                colorScheme={state.language === 'any' ? undefined : 'accent'}
+                colorScheme={state.language === 'any' ? 'ghost' : 'solid'}
                 rightIcon="chevron-down"
               >
                 {state.language === 'any'
@@ -271,7 +271,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
             <Button
               mt="3"
               width="100%"
-              variantColor="secondary"
+              colorScheme="secondary"
               onClick={() => {
                 state.language = 'any'
                 state.style = 'popular'
@@ -311,7 +311,7 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
       <FontButton>
         <img src={thumbnail} />
         {isCustom && (
-          <Badge mr="2" ml="auto" variantColor="purple">
+          <Badge mr="2" ml="auto" colorScheme="purple">
             custom
           </Badge>
         )}

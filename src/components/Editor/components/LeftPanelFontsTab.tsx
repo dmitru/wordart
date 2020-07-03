@@ -148,7 +148,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                         state.view = 'choose-font'
                       }}
                       leftIcon="add"
-                      variantColor="primary"
+                      colorScheme="primary"
                     >
                       Add more fonts
                     </Button>
@@ -174,7 +174,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                           size="sm"
                           rounded="full"
                           variant="outline"
-                          variantColor="gray"
+                          colorScheme="gray"
                         >
                           <TagLabel>{(fonts || []).length} / 8</TagLabel>
                         </Tag>
@@ -287,13 +287,13 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
       <FontButton>
         <img src={thumbnail} />
         {isCustom && (
-          <Badge mr="2" ml="auto" variantColor="purple">
+          <Badge mr="2" ml="auto" colorScheme="purple">
             custom
           </Badge>
         )}
 
         <FontChangeButton
-          variantColor="secondary"
+          colorScheme="secondary"
           aria-label="Change font"
           size="sm"
           ml="2"

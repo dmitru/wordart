@@ -111,81 +111,86 @@ export const CustomizeRasterImageModal: React.FC<CustomizeRasterImageModalProps>
 
     return (
       <Modal isOpen={isOpen} onClose={close}>
-        <ModalOverlay />
-        <ModalContent maxWidth="350px">
-          <ModalHeader>Customize Image</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Box
-              mt="4"
-              css={
-                state.originalUrl
-                  ? undefined
-                  : css`
-                      display: none;
-                    `
-              }
-            >
-              <canvas ref={setProcessedImgCanvasRef} width="300" height="300" />
+        <ModalOverlay>
+          <ModalContent maxWidth="350px">
+            <ModalHeader>Customize Image</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Box
+                mt="4"
+                css={
+                  state.originalUrl
+                    ? undefined
+                    : css`
+                        display: none;
+                      `
+                }
+              >
+                <canvas
+                  ref={setProcessedImgCanvasRef}
+                  width="300"
+                  height="300"
+                />
 
-              <Box mt="3">
-                <Box>
-                  <Slider
-                    label="Remove light background"
-                    value={state.removeLightBackground * 100}
-                    onChange={(value) => {
-                      state.removeLightBackground = value / 100
-                      updateImgPreviewThrottled(state)
-                    }}
-                    onAfterChange={() => updateImgPreviewThrottled(state)}
-                    min={0}
-                    max={100}
-                    step={1}
-                  />
-                </Box>
-
-                <Box mb="3" height="30px">
-                  <Checkbox
-                    mr="5"
-                    isChecked={state.invert}
-                    onChange={(e) => {
-                      state.invert = e.target.checked
-                      updateImgPreviewThrottled(state)
-                    }}
-                  >
-                    Invert color
-                  </Checkbox>
-                  {state.invert && (
-                    <ColorPickerPopover
-                      value={state.invertColor}
-                      onChange={(color) => {
-                        state.invertColor = color
+                <Box mt="3">
+                  <Box>
+                    <Slider
+                      label="Remove light background"
+                      value={state.removeLightBackground * 100}
+                      onChange={(value) => {
+                        state.removeLightBackground = value / 100
                         updateImgPreviewThrottled(state)
                       }}
+                      onAfterChange={() => updateImgPreviewThrottled(state)}
+                      min={0}
+                      max={100}
+                      step={1}
                     />
-                  )}
+                  </Box>
+
+                  <Box mb="3" height="30px">
+                    <Checkbox
+                      mr="5"
+                      isChecked={state.invert}
+                      onChange={(e) => {
+                        state.invert = e.target.checked
+                        updateImgPreviewThrottled(state)
+                      }}
+                    >
+                      Invert color
+                    </Checkbox>
+                    {state.invert && (
+                      <ColorPickerPopover
+                        value={state.invertColor}
+                        onChange={(color) => {
+                          state.invertColor = color
+                          updateImgPreviewThrottled(state)
+                        }}
+                      />
+                    )}
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-          </ModalBody>
+            </ModalBody>
 
-          <ModalFooter>
-            {state.originalUrl && (
-              <Button
-                variantColor="accent"
-                onClick={() => {
-                  props.onSubmit(
-                    processedImgCanvasRef.current?.toDataURL()!,
-                    state
-                  )
-                  close()
-                }}
-              >
-                Done
-              </Button>
-            )}
-          </ModalFooter>
-        </ModalContent>
+            <ModalFooter>
+              {state.originalUrl && (
+                <Button
+                  colorScheme="accent"
+                  onClick={() => {
+                    props.onSubmit(
+                      processedImgCanvasRef.current?.toDataURL()!,
+                      state
+                    )
+                    close()
+                  }}
+                >
+                  Done
+                </Button>
+              )}
+            </ModalFooter>
+          </ModalContent>
+        </ModalOverlay>
       </Modal>
     )
   }

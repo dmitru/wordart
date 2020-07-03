@@ -26,12 +26,12 @@ export const StyleguidePage = observer(() => {
     <PageLayoutWrapper>
       {/* <Section>
         <h1>Buttons</h1>
-        <Button variantColor="primary">Primary</Button>
-        <Button variantColor="secondary">Secondary</Button>
-        <Button variantColor="primary" variant="outline">
+        <Button colorScheme="primary">Primary</Button>
+        <Button colorScheme="secondary">Secondary</Button>
+        <Button colorScheme="primary" variant="outline">
           Primary
         </Button>
-        <Button variantColor="secondary" variant="outline">
+        <Button colorScheme="secondary" variant="outline">
           Secondary
         </Button>
       </Section> */}

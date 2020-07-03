@@ -349,7 +349,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                   {state.mode === 'customize shape' && (
                     <Button
                       flex="1"
-                      variantColor="accent"
+                      colorScheme="accent"
                       onClick={() => {
                         state.mode = 'home'
                         if (store.leftTabIsTransformingShape) {
@@ -441,7 +441,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
                         <Button
                           flex="2"
-                          variantColor="accent"
+                          colorScheme="accent"
                           onClick={async () => {
                             const shapeId = store.addCustomShapeText({
                               kind: 'text',
@@ -543,7 +543,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
                           <Box>
                             <Button
-                              variantColor="accent"
+                              colorScheme="accent"
                               onClick={() => {
                                 state.isShowingCustomizeImage = true
                               }}
@@ -562,7 +562,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           <>
                             <Stack direction="row" mt="3" spacing="3">
                               <Button
-                                variantColor="primary"
+                                colorScheme="primary"
                                 onClick={() => {
                                   if (!store.editor) {
                                     return
@@ -597,7 +597,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                             </Text>
                             <Stack direction="row" mt="3" spacing="2">
                               <Button
-                                variantColor="accent"
+                                colorScheme="accent"
                                 onClick={() => {
                                   store.leftTabIsTransformingShape = false
                                   store.editor?.deselectShape()
@@ -635,7 +635,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                       <Flex mt="5">
                         <Tooltip label="Add custom image...">
                           <Button
-                            variantColor="primary"
+                            colorScheme="primary"
                             leftIcon="add"
                             size="sm"
                             mr="2"
@@ -649,7 +649,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
 
                         <Tooltip label="Use text as a shape...">
                           <Button
-                            variantColor="secondary"
+                            colorScheme="secondary"
                             leftIcon="add"
                             size="sm"
                             mr="2"
@@ -674,8 +674,10 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                           <Menu>
                             <MenuButton
                               // @ts-ignore
-                              variant={selectedCategory ? 'solid' : 'outline'}
-                              variantColor={
+                              colorScheme={
+                                selectedCategory ? 'solid' : 'outline'
+                              }
+                              colorScheme={
                                 selectedCategory ? 'accent' : undefined
                               }
                               as={Button}

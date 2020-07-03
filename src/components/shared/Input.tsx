@@ -2,11 +2,5 @@ import { Input as CInput, InputProps as CInputProps } from '@chakra-ui/core'
 import React from 'react'
 
 export const Input = React.forwardRef<CInputProps, any>(({ ...props }, ref) => (
-  <CInput
-    _placeholder={{
-      color: '#333',
-    }}
-    {...props}
-    ref={ref}
-  />
+  <CInput {...props} ref={ref} />
 ))

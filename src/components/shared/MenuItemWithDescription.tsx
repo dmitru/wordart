@@ -22,12 +22,12 @@ export const MenuItemWithDescription = React.forwardRef<
     <Box mr="2" fontSize="lg" color="gray.500">
       {icon}
     </Box>
-    <Box display="flex" flexDirection="column" py="2">
+    <Box display="flex" flexDirection="column">
       <Text my="0" fontWeight="semibold">
         {title}
       </Text>
       {description && (
-        <Text my="0" fontSize="xs" color="gray.500">
+        <Text my="0" fontSize="sm" color="gray.500">
           {description}
         </Text>
       )}

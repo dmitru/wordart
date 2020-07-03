@@ -81,7 +81,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
             <Button
               mr="3"
               flex="1"
-              variantColor="primary"
+              colorScheme="primary"
               onClick={() => {
                 state.isAdding = true
               }}
@@ -229,7 +229,7 @@ const EmptyStateShapesUi = () => (
       mt="6"
       // flex="1"
       size="lg"
-      variantColor="primary"
+      colorScheme="primary"
       onClick={() => {
         state.isAdding = true
       }}

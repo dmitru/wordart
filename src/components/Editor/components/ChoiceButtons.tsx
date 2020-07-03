@@ -20,8 +20,8 @@ export const ChoiceButtons: React.FC<
           px="2"
           py="1"
           mr="0"
-          // variant={choice.value === value ? 'solid' : 'outline'}
-          variantColor={choice.value === value ? 'secondary' : undefined}
+          // colorScheme={choice.value === value ? 'solid' : 'outline'}
+          colorScheme={choice.value === value ? 'secondary' : undefined}
           onClick={() => {
             onChange(choice.value)
           }}

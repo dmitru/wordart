@@ -5,6 +5,7 @@ import {
   EditablePreview,
   Heading,
   Icon,
+  Button,
   IconButton,
   Menu,
   MenuButton,
@@ -23,9 +24,12 @@ import {
   Stack,
   Text,
   useToast,
+  MenuTransition,
+  Portal,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
+import { ChevronDownIcon } from '@chakra-ui/icons'
 import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
 import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
@@ -50,7 +54,6 @@ import {
   mkShapeStyleConfFromOptions,
 } from 'components/Editor/style'
 import { BaseBtn } from 'components/shared/BaseBtn'
-import { Button } from 'components/shared/Button'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 import { Tooltip } from 'components/shared/Tooltip'
@@ -336,7 +339,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             `}
           />
           <Link href={Urls.dashboard} passHref>
-            <TopNavButton mr="1" variant="secondary">
+            <TopNavButton mr="1" colorScheme="secondary">
               <FiChevronLeft
                 css={css`
                   margin-right: 4px;
@@ -347,7 +350,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           </Link>
 
           <Menu>
-            <MenuButton mr="1" as={TopNavButton} variant="accent">
+            <MenuButton mr="1" as={TopNavButton} colorScheme="accent">
               <FiMenu
                 css={css`
                   margin-right: 4px;
@@ -440,7 +443,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           </Menu>
 
           <Button
-            variantColor="secondary"
+            colorScheme="secondary"
             onClick={handleSaveClick}
             isLoading={isSaving}
             mr="2"
@@ -496,7 +499,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             />
           </Editable>
 
-          <TopNavButton onClick={openExport} variant="secondary">
+          <TopNavButton onClick={openExport} colorScheme="secondary">
             <FiDownload
               css={css`
                 margin-right: 4px;
@@ -519,7 +522,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             Order Prints
           </TopNavButton> */}
 
-          <TopNavButton variant="secondary" mr="2" ml="auto">
+          <TopNavButton colorScheme="secondary" mr="2" ml="auto">
             <FiHelpCircle
               css={css`
                 margin-right: 4px;
@@ -528,7 +531,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             Help & Tutorials
           </TopNavButton>
 
-          <Button variantColor="accent">Upgrade</Button>
+          <Button colorScheme="accent">Upgrade</Button>
         </TopNavWrapper>
 
         <EditorLayout>
@@ -625,7 +628,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           </Heading>
                           {pageSizePresets.map((preset) => (
                             <Button
-                              variantColor={
+                              colorScheme={
                                 store.pageSize.kind === 'preset' &&
                                 store.pageSize.preset.id === preset.id
                                   ? 'primary'
@@ -643,7 +646,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                             </Button>
                           ))}
                           <Button
-                            variantColor={
+                            colorScheme={
                               store.pageSize.kind === 'custom'
                                 ? 'primary'
                                 : undefined
@@ -664,7 +667,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           <Box>
                             <Button
                               mt="4"
-                              variantColor="green"
+                              colorScheme="green"
                               onClick={() => {
                                 state.leftPanelContext = 'normal'
                               }}
@@ -721,102 +724,106 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 isOpen={state.isShowingExport}
                 onClose={closeExport}
               >
-                <ModalOverlay />
-                <ModalContent
-                  css={css`
-                    max-width: 530px;
-                  `}
-                >
-                  <ModalHeader>Choose Download Format</ModalHeader>
-                  <ModalBody pb={6}>
-                    {isExporting ? (
-                      <>
-                        <Spinner />
-                      </>
-                    ) : (
-                      <>
-                        <Text fontSize="lg">
-                          <strong>Standard Download,</strong> personal use only
-                        </Text>
-                        <Stack direction="row" spacing="3" flexWrap="wrap">
-                          <ExportButton
-                            variant="outline"
-                            onClick={() => handleDownloadClick(false, 'png')}
-                          >
-                            <Text mt="0" fontSize="lg" fontWeight="bold">
-                              PNG
-                            </Text>
-                            <Text mb="0" fontSize="sm" fontWeight="normal">
-                              1024 px
-                            </Text>
-                            <Text mb="0" fontSize="sm" fontWeight="normal">
-                              Higher quality
-                            </Text>
-                          </ExportButton>
-                          <ExportButton
-                            variant="outline"
-                            onClick={() => handleDownloadClick(false, 'jpeg')}
-                          >
-                            <Text mt="0" fontSize="lg" fontWeight="bold">
-                              JPEG
-                            </Text>
-                            <Text mb="0" fontSize="sm" fontWeight="normal">
-                              1024 px
-                            </Text>
-                            <Text mb="0" fontSize="sm" fontWeight="normal">
-                              Smaller file size
-                            </Text>
-                          </ExportButton>
-                        </Stack>
-
-                        <Box mt="6">
+                <ModalOverlay>
+                  <ModalContent
+                    css={css`
+                      max-width: 530px;
+                    `}
+                  >
+                    <ModalHeader>Choose Download Format</ModalHeader>
+                    <ModalBody pb={6}>
+                      {isExporting ? (
+                        <>
+                          <Spinner />
+                        </>
+                      ) : (
+                        <>
                           <Text fontSize="lg">
-                            <strong>HD Download,</strong> personal or commercial
-                            use
+                            <strong>Standard Download,</strong> personal use
+                            only
                           </Text>
                           <Stack direction="row" spacing="3" flexWrap="wrap">
                             <ExportButton
                               variant="outline"
-                              onClick={() => handleDownloadClick(true, 'png')}
+                              onClick={() => handleDownloadClick(false, 'png')}
                             >
-                              <Text mt="0" fontSize="lg">
-                                PNG (HD)
+                              <Text mt="0" fontSize="lg" fontWeight="bold">
+                                PNG
                               </Text>
-                              <Text mb="0" fontSize="sm">
-                                4096 px
+                              <Text mb="0" fontSize="sm" fontWeight="normal">
+                                1024 px
+                              </Text>
+                              <Text mb="0" fontSize="sm" fontWeight="normal">
+                                Higher quality
                               </Text>
                             </ExportButton>
-
                             <ExportButton
                               variant="outline"
-                              onClick={() => handleDownloadClick(true, 'jpeg')}
+                              onClick={() => handleDownloadClick(false, 'jpeg')}
                             >
-                              <Text mt="0" fontSize="lg">
-                                JPEG (HD)
+                              <Text mt="0" fontSize="lg" fontWeight="bold">
+                                JPEG
                               </Text>
-                              <Text mb="0" fontSize="sm">
-                                4096 px
+                              <Text mb="0" fontSize="sm" fontWeight="normal">
+                                1024 px
                               </Text>
-                            </ExportButton>
-
-                            <ExportButton
-                              variant="outline"
-                              onClick={() => handleDownloadClick(true, 'svg')}
-                            >
-                              <Text mt="0" fontSize="lg">
-                                SVG
-                              </Text>
-                              <Text mb="0" fontSize="sm">
-                                Vector format
+                              <Text mb="0" fontSize="sm" fontWeight="normal">
+                                Smaller file size
                               </Text>
                             </ExportButton>
                           </Stack>
-                        </Box>
-                      </>
-                    )}
-                  </ModalBody>
-                  <ModalCloseButton />
-                </ModalContent>
+
+                          <Box mt="6">
+                            <Text fontSize="lg">
+                              <strong>HD Download,</strong> personal or
+                              commercial use
+                            </Text>
+                            <Stack direction="row" spacing="3" flexWrap="wrap">
+                              <ExportButton
+                                variant="outline"
+                                onClick={() => handleDownloadClick(true, 'png')}
+                              >
+                                <Text mt="0" fontSize="lg">
+                                  PNG (HD)
+                                </Text>
+                                <Text mb="0" fontSize="sm">
+                                  4096 px
+                                </Text>
+                              </ExportButton>
+
+                              <ExportButton
+                                variant="outline"
+                                onClick={() =>
+                                  handleDownloadClick(true, 'jpeg')
+                                }
+                              >
+                                <Text mt="0" fontSize="lg">
+                                  JPEG (HD)
+                                </Text>
+                                <Text mb="0" fontSize="sm">
+                                  4096 px
+                                </Text>
+                              </ExportButton>
+
+                              <ExportButton
+                                variant="outline"
+                                onClick={() => handleDownloadClick(true, 'svg')}
+                              >
+                                <Text mt="0" fontSize="lg">
+                                  SVG
+                                </Text>
+                                <Text mb="0" fontSize="sm">
+                                  Vector format
+                                </Text>
+                              </ExportButton>
+                            </Stack>
+                          </Box>
+                        </>
+                      )}
+                    </ModalBody>
+                    <ModalCloseButton />
+                  </ModalContent>
+                </ModalOverlay>
               </Modal>
 
               <Modal
@@ -827,42 +834,43 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 closeOnOverlayClick={false}
                 closeOnEsc={false}
               >
-                <ModalOverlay />
-                <ModalContent>
-                  <ModalHeader>
-                    {store.visualizingStep === 'generating'
-                      ? 'Generating'
-                      : 'Visualizing'}
-                    : {Math.round(100 * (store.visualizingProgress || 0))}%
-                  </ModalHeader>
-                  <ModalBody pb={6}>
-                    <Stack>
-                      <Progress
-                        isAnimated
-                        hasStripe
-                        css={css`
-                          &,
-                          * {
-                            transition: all 0.2s !important;
-                          }
-                        `}
-                        color="accent"
-                        height="32px"
-                        value={(store.visualizingProgress || 0) * 100}
-                      />
-                      <Text fontSize="lg"></Text>
-                    </Stack>
-                  </ModalBody>
+                <ModalOverlay>
+                  <ModalContent>
+                    <ModalHeader>
+                      {store.visualizingStep === 'generating'
+                        ? 'Generating'
+                        : 'Visualizing'}
+                      : {Math.round(100 * (store.visualizingProgress || 0))}%
+                    </ModalHeader>
+                    <ModalBody pb={6}>
+                      <Stack>
+                        <Progress
+                          isAnimated
+                          hasStripe
+                          css={css`
+                            &,
+                            * {
+                              transition: all 0.2s !important;
+                            }
+                          `}
+                          color="accent"
+                          height="32px"
+                          value={(store.visualizingProgress || 0) * 100}
+                        />
+                        <Text fontSize="lg"></Text>
+                      </Stack>
+                    </ModalBody>
 
-                  <ModalFooter>
-                    <Button
-                      ref={cancelVisualizationBtnRef}
-                      onClick={cancelVisualization}
-                    >
-                      Cancel
-                    </Button>
-                  </ModalFooter>
-                </ModalContent>
+                    <ModalFooter>
+                      <Button
+                        ref={cancelVisualizationBtnRef}
+                        onClick={cancelVisualization}
+                      >
+                        Cancel
+                      </Button>
+                    </ModalFooter>
+                  </ModalContent>
+                </ModalOverlay>
               </Modal>
 
               {store.lifecycleState === 'initialized' && (
@@ -872,7 +880,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     css={css`
                       width: 128px;
                     `}
-                    variantColor="accent"
+                    colorScheme="accent"
                     isLoading={store.isVisualizing}
                     onClick={handleVisualizeClick}
                   >
@@ -957,7 +965,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         <Button
                           mr="2"
                           py="1"
-                          variantColor="green"
+                          colorScheme="green"
                           onClick={() => {
                             store.enterViewMode(store.targetTab)
                           }}
@@ -1018,43 +1026,47 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
                   {store.mode === 'view' && (
                     <Box mr="3" ml="auto" display="flex" alignItems="center">
-                      <Menu>
+                      <Menu placement="bottom-end">
                         <MenuButton
-                          // @ts-ignore
-                          variant="outline"
                           as={Button}
-                          rightIcon="chevron-down"
+                          // variant="outline"
+                          rightIcon={<ChevronDownIcon />}
                           py="2"
                           px="3"
                         >
                           {store.targetTab === 'shape' ? 'Shape layer' : ''}
                           {store.targetTab === 'bg' ? 'Background layer' : ''}
                         </MenuButton>
-                        <MenuList
-                          as="div"
-                          placement="bottom-end"
-                          css={css`
-                            max-height: 300px;
-                            max-width: 260px;
-                            right: 200px;
-                          `}
-                        >
-                          <MenuItemWithDescription
-                            title="Shape"
-                            description="Use this layer to place words and icons on the shape."
-                            onClick={() => {
-                              store.targetTab = 'shape'
-                            }}
-                          />
 
-                          <MenuItemWithDescription
-                            title="Background"
-                            description="Use this layer to place words and icons on the background."
-                            onClick={() => {
-                              store.targetTab = 'bg'
-                            }}
-                          />
-                        </MenuList>
+                        <Portal>
+                          <MenuTransition>
+                            {(styles) => (
+                              <MenuList
+                                css={css`
+                                  ${styles}
+                                  max-height: 300px;
+                                  max-width: 260px;
+                                `}
+                              >
+                                <MenuItemWithDescription
+                                  title="Shape"
+                                  description="Use this layer to place words and icons on the shape."
+                                  onClick={() => {
+                                    store.targetTab = 'shape'
+                                  }}
+                                />
+
+                                <MenuItemWithDescription
+                                  title="Background"
+                                  description="Use this layer to place words and icons on the background."
+                                  onClick={() => {
+                                    store.targetTab = 'bg'
+                                  }}
+                                />
+                              </MenuList>
+                            )}
+                          </MenuTransition>
+                        </Portal>
                       </Menu>
                     </Box>
                   )}
@@ -1153,7 +1165,7 @@ const TopToolbar = styled(Box)`
   height: 60px;
 `
 
-const TopNavWrapper = styled(Box)<{ theme: any }>`
+const TopNavWrapper = styled(Box)`
   height: 60px;
   padding: 10px 20px;
   /* padding-left: 90px; */
@@ -1270,7 +1282,7 @@ const LeftPanelContent = styled(Box)<{ theme: any; noScroll: boolean }>`
   flex: 1;
   height: ${(p) => (p.noScroll ? '100%' : 'calc(100vh - 50px)')};
   overflow: auto;
-  background: ${(p) => p.theme.colors.light};
+  background: white;
 
   &::-webkit-scrollbar {
     display: none; /* Chrome Safari */

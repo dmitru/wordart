@@ -30,7 +30,7 @@ export const AccountPage = observer(() => {
         {state.orders && state.orders.length === 0 && (
           <>
             <p>You haven't made any purchases yet.</p>
-            <Button variantColor="accent">Upgrade now</Button>
+            <Button colorScheme="accent">Upgrade now</Button>
           </>
         )}
         {state.orders && state.orders.length > 0 && (

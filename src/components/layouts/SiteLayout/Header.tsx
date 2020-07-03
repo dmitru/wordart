@@ -52,7 +52,7 @@ export const Header: React.FC<HeaderProps> = observer(
                     as={Urls.editor.create}
                     passHref
                   >
-                    <Button variantColor="accent" leftIcon="add" mr="3">
+                    <Button colorScheme="accent" leftIcon="add" mr="3">
                       Create
                     </Button>
                   </Link>
@@ -77,7 +77,7 @@ export const Header: React.FC<HeaderProps> = observer(
             {isNotLoggedIn && (
               <>
                 <Link href={Urls.login} passHref>
-                  <Button variantColor="accent">Sign up</Button>
+                  <Button colorScheme="accent">Sign up</Button>
                 </Link>
                 <Link href={Urls.login} passHref>
                   <Button variant="outline">Log in</Button>

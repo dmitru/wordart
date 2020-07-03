@@ -158,106 +158,109 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
 
     return (
       <Modal size="lg" isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Import Words</ModalHeader>
+        <ModalOverlay>
+          <ModalContent>
+            <ModalHeader>Import Words</ModalHeader>
 
-          <ModalBody>
-            <Tabs
-              size="md"
-              variant="line"
-              onChange={(index) => {
-                state.tabIndex = index
-              }}
-              index={state.tabIndex}
-            >
-              <TabList>
-                <Tab>From Text</Tab>
-                <Tab>From CSV / Excel</Tab>
-                <Tab>From Web</Tab>
-              </TabList>
-              <TabPanels>
-                {/* From Text */}
-                <TabPanel>
-                  <Textarea
-                    mt="4"
-                    autoFocus
-                    minHeight="200px"
-                    placeholder="Enter text..."
-                    value={state.textInput}
-                    onChange={(evt: any) => {
-                      state.textInput = evt.target.value
-                    }}
-                  />
-
-                  <Box mt="3">{parsingControls}</Box>
-                </TabPanel>
-
-                {/* From CSV */}
-                <TabPanel>
-                  <Box mt="4">
-                    <Text>
-                      <Link>Learn more</Link> about importing words from CSV,
-                      Excel or Google Sheets.
-                    </Text>
+            <ModalBody>
+              <Tabs
+                size="md"
+                colorScheme="line"
+                onChange={(index) => {
+                  state.tabIndex = index
+                }}
+                index={state.tabIndex}
+              >
+                <TabList>
+                  <Tab>From Text</Tab>
+                  <Tab>From CSV / Excel</Tab>
+                  <Tab>From Web</Tab>
+                </TabList>
+                <TabPanels>
+                  {/* From Text */}
+                  <TabPanel>
                     <Textarea
-                      mt="3"
-                      placeholder="Paste CSV..."
+                      mt="4"
+                      autoFocus
+                      minHeight="200px"
+                      placeholder="Enter text..."
                       value={state.textInput}
                       onChange={(evt: any) => {
                         state.textInput = evt.target.value
                       }}
                     />
-                    <Box mt="3">
-                      <Text>...or choose a CSV file: </Text>
-                      <Button variantColor="secondary">Open CSV file...</Button>
-                    </Box>
-                  </Box>
-                </TabPanel>
-
-                {/* From URL */}
-                <TabPanel>
-                  <Box mt="4">
-                    <Text>Paste a link to extract words from it:</Text>
-                    <Input
-                      mt="3"
-                      placeholder="Enter URL, e.g. https://news.google.com/"
-                      value={state.urlInput}
-                      onChange={(evt: any) => {
-                        state.urlInput = evt.target.value
-                      }}
-                    />
 
                     <Box mt="3">{parsingControls}</Box>
-                  </Box>
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
-          </ModalBody>
+                  </TabPanel>
 
-          <ModalFooter>
-            <Checkbox
-              marginRight="auto"
-              isChecked={state.clearExistingBeforeImporting}
-              onChange={(e) => {
-                state.clearExistingBeforeImporting = e.target.checked
-              }}
-            >
-              Clear the words list before importing
-            </Checkbox>
-            <Button
-              size="lg"
-              ml="3"
-              variantColor="accent"
-              isLoading={state.isImporting}
-              onClick={handleImport}
-            >
-              Import
-            </Button>
-          </ModalFooter>
+                  {/* From CSV */}
+                  <TabPanel>
+                    <Box mt="4">
+                      <Text>
+                        <Link>Learn more</Link> about importing words from CSV,
+                        Excel or Google Sheets.
+                      </Text>
+                      <Textarea
+                        mt="3"
+                        placeholder="Paste CSV..."
+                        value={state.textInput}
+                        onChange={(evt: any) => {
+                          state.textInput = evt.target.value
+                        }}
+                      />
+                      <Box mt="3">
+                        <Text>...or choose a CSV file: </Text>
+                        <Button colorScheme="secondary">
+                          Open CSV file...
+                        </Button>
+                      </Box>
+                    </Box>
+                  </TabPanel>
 
-          <ModalCloseButton />
-        </ModalContent>
+                  {/* From URL */}
+                  <TabPanel>
+                    <Box mt="4">
+                      <Text>Paste a link to extract words from it:</Text>
+                      <Input
+                        mt="3"
+                        placeholder="Enter URL, e.g. https://news.google.com/"
+                        value={state.urlInput}
+                        onChange={(evt: any) => {
+                          state.urlInput = evt.target.value
+                        }}
+                      />
+
+                      <Box mt="3">{parsingControls}</Box>
+                    </Box>
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
+            </ModalBody>
+
+            <ModalFooter>
+              <Checkbox
+                marginRight="auto"
+                isChecked={state.clearExistingBeforeImporting}
+                onChange={(e) => {
+                  state.clearExistingBeforeImporting = e.target.checked
+                }}
+              >
+                Clear the words list before importing
+              </Checkbox>
+              <Button
+                size="lg"
+                ml="3"
+                colorScheme="accent"
+                isLoading={state.isImporting}
+                onClick={handleImport}
+              >
+                Import
+              </Button>
+            </ModalFooter>
+
+            <ModalCloseButton />
+          </ModalContent>
+        </ModalOverlay>
       </Modal>
     )
   }

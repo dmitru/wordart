@@ -37,54 +37,55 @@ export const WordsEditorModal: React.FC<WordsEditorModalProps> = observer(
 
     return (
       <Modal size="md" isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit words list</ModalHeader>
+        <ModalOverlay>
+          <ModalContent>
+            <ModalHeader>Edit words list</ModalHeader>
 
-          <ModalBody>
-            {words.wordList.length > 0 && (
-              <WordList mt="2">
-                {words.wordList.map((word) => (
-                  <WordRow key={word.id} aria-label="">
-                    <Editable
-                      ml="2"
-                      flex={1}
-                      value={word.text}
-                      onChange={(text) => {
-                        store.updateWord(target, word.id, {
-                          text,
-                        })
-                        store.animateVisualize(false)
-                      }}
-                      selectAllOnFocus
-                      placeholder="Type new word here..."
-                    >
-                      <EditablePreview flex={1} width="100%" />
-                      <EditableInput placeholder="Type new word here..." />
-                    </Editable>
+            <ModalBody>
+              {words.wordList.length > 0 && (
+                <WordList mt="2">
+                  {words.wordList.map((word) => (
+                    <WordRow key={word.id} aria-label="">
+                      <Editable
+                        ml="2"
+                        flex={1}
+                        value={word.text}
+                        onChange={(text) => {
+                          store.updateWord(target, word.id, {
+                            text,
+                          })
+                          store.animateVisualize(false)
+                        }}
+                        selectAllOnFocus
+                        placeholder="Type new word here..."
+                      >
+                        <EditablePreview flex={1} width="100%" />
+                        <EditableInput placeholder="Type new word here..." />
+                      </Editable>
 
-                    <WordDeleteButton
-                      ml="2"
-                      mr="2"
-                      onClick={() => {
-                        store.deleteWord(target, word.id)
-                        store.animateVisualize(false)
-                      }}
-                    />
-                  </WordRow>
-                ))}
-              </WordList>
-            )}
-          </ModalBody>
+                      <WordDeleteButton
+                        ml="2"
+                        mr="2"
+                        onClick={() => {
+                          store.deleteWord(target, word.id)
+                          store.animateVisualize(false)
+                        }}
+                      />
+                    </WordRow>
+                  ))}
+                </WordList>
+              )}
+            </ModalBody>
 
-          <ModalFooter>
-            <Button ml="3" variantColor="accent" onClick={onClose}>
-              Done
-            </Button>
-          </ModalFooter>
+            <ModalFooter>
+              <Button ml="3" colorScheme="accent" onClick={onClose}>
+                Done
+              </Button>
+            </ModalFooter>
 
-          <ModalCloseButton />
-        </ModalContent>
+            <ModalCloseButton />
+          </ModalContent>
+        </ModalOverlay>
       </Modal>
     )
   }

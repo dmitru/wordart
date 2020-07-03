@@ -118,108 +118,109 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
 
     return (
       <Modal isOpen={isOpen} onClose={close}>
-        <ModalOverlay />
-        <ModalContent maxWidth="350px">
-          <ModalHeader>
-            {hasChosenImage ? 'Customize image' : 'Choose image to upload'}
-          </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Box
-              mt="4"
-              css={
-                state.originalUrl
-                  ? undefined
-                  : css`
-                      display: none;
-                    `
-              }
-            >
-              <canvas ref={processedImgCanvasRef} width="300" height="300" />
+        <ModalOverlay>
+          <ModalContent maxWidth="350px">
+            <ModalHeader>
+              {hasChosenImage ? 'Customize image' : 'Choose image to upload'}
+            </ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Box
+                mt="4"
+                css={
+                  state.originalUrl
+                    ? undefined
+                    : css`
+                        display: none;
+                      `
+                }
+              >
+                <canvas ref={processedImgCanvasRef} width="300" height="300" />
 
-              <Box mt="3">
-                <Box>
-                  <Slider
-                    label="Remove light background"
-                    value={state.removeLightBackground * 100}
-                    onChange={(value) => {
-                      state.removeLightBackground = value / 100
-                      updateImgPreviewThrottled(state)
-                    }}
-                    onAfterChange={() => updateImgPreviewThrottled(state)}
-                    min={0}
-                    max={100}
-                    step={1}
-                  />
-                </Box>
-
-                <Box mb="3" height="30px">
-                  <Checkbox
-                    mr="5"
-                    isChecked={state.invert}
-                    onChange={(e) => {
-                      state.invert = e.target.checked
-                      updateImgPreviewThrottled(state)
-                    }}
-                  >
-                    Invert color
-                  </Checkbox>
-                  {state.invert && (
-                    <ColorPickerPopover
-                      value={state.invertColor}
-                      onChange={(color) => {
-                        state.invertColor = color
+                <Box mt="3">
+                  <Box>
+                    <Slider
+                      label="Remove light background"
+                      value={state.removeLightBackground * 100}
+                      onChange={(value) => {
+                        state.removeLightBackground = value / 100
                         updateImgPreviewThrottled(state)
                       }}
+                      onAfterChange={() => updateImgPreviewThrottled(state)}
+                      min={0}
+                      max={100}
+                      step={1}
                     />
-                  )}
+                  </Box>
+
+                  <Box mb="3" height="30px">
+                    <Checkbox
+                      mr="5"
+                      isChecked={state.invert}
+                      onChange={(e) => {
+                        state.invert = e.target.checked
+                        updateImgPreviewThrottled(state)
+                      }}
+                    >
+                      Invert color
+                    </Checkbox>
+                    {state.invert && (
+                      <ColorPickerPopover
+                        value={state.invertColor}
+                        onChange={(color) => {
+                          state.invertColor = color
+                          updateImgPreviewThrottled(state)
+                        }}
+                      />
+                    )}
+                  </Box>
                 </Box>
               </Box>
-            </Box>
 
-            {!state.originalUrl && (
-              <Box {...getRootProps({ className: 'dropzone' })} py="4">
-                <input {...getInputProps({})} />
-                <p>
-                  Click or drag image files here - JPEG, PNG and SVG files are
-                  supported.
-                </p>
-                <Button mt="4" variantColor="accent" size="lg">
-                  Click to choose file...
+              {!state.originalUrl && (
+                <Box {...getRootProps({ className: 'dropzone' })} py="4">
+                  <input {...getInputProps({})} />
+                  <p>
+                    Click or drag image files here - JPEG, PNG and SVG files are
+                    supported.
+                  </p>
+                  <Button mt="4" colorScheme="accent" size="lg">
+                    Click to choose file...
+                  </Button>
+                </Box>
+              )}
+            </ModalBody>
+
+            <ModalFooter>
+              {state.originalUrl && (
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    state.originalUrl = null
+                  }}
+                >
+                  Choose another image
                 </Button>
-              </Box>
-            )}
-          </ModalBody>
-
-          <ModalFooter>
-            {state.originalUrl && (
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  state.originalUrl = null
-                }}
-              >
-                Choose another image
-              </Button>
-            )}
-            {state.originalUrl && (
-              <Button
-                variantColor="accent"
-                onClick={() => {
-                  props.onSubmit({
-                    state,
-                    thumbnailUrl: processedImgCanvasRef.current?.toDataURL(
-                      'image/png'
-                    )!,
-                  })
-                  close()
-                }}
-              >
-                Import
-              </Button>
-            )}
-          </ModalFooter>
-        </ModalContent>
+              )}
+              {state.originalUrl && (
+                <Button
+                  colorScheme="accent"
+                  onClick={() => {
+                    props.onSubmit({
+                      state,
+                      thumbnailUrl: processedImgCanvasRef.current?.toDataURL(
+                        'image/png'
+                      )!,
+                    })
+                    close()
+                  }}
+                >
+                  Import
+                </Button>
+              )}
+            </ModalFooter>
+          </ModalContent>
+        </ModalOverlay>
       </Modal>
     )
   }

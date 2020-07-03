@@ -49,41 +49,42 @@ export const PromptModal: React.FC<PromptModalProps> = observer(
 
     return (
       <Modal size="sm" isOpen={isOpen} onClose={onCancel}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>{title}</ModalHeader>
+        <ModalOverlay>
+          <ModalContent>
+            <ModalHeader>{title}</ModalHeader>
 
-          <ModalBody>
-            <Input
-              {...inputProps}
-              value={value}
-              onKeyDown={(e: React.KeyboardEvent) => {
-                if (e.key === 'Enter') {
-                  handleSubmit()
+            <ModalBody>
+              <Input
+                {...inputProps}
+                value={value}
+                onKeyDown={(e: React.KeyboardEvent) => {
+                  if (e.key === 'Enter') {
+                    handleSubmit()
+                  }
+                }}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setValue(e.target.value)
                 }
-              }}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setValue(e.target.value)
-              }
-            />
-          </ModalBody>
+              />
+            </ModalBody>
 
-          <ModalFooter>
-            <Button ml="3" variant="ghost" onClick={() => onCancel()}>
-              Cancel
-            </Button>
-            <Button
-              ml="3"
-              variantColor="primary"
-              onClick={handleSubmit}
-              isLoading={isSubmitting}
-            >
-              OK
-            </Button>
-          </ModalFooter>
+            <ModalFooter>
+              <Button ml="3" variant="ghost" onClick={() => onCancel()}>
+                Cancel
+              </Button>
+              <Button
+                ml="3"
+                colorScheme="primary"
+                onClick={handleSubmit}
+                isLoading={isSubmitting}
+              >
+                OK
+              </Button>
+            </ModalFooter>
 
-          <ModalCloseButton />
-        </ModalContent>
+            <ModalCloseButton />
+          </ModalContent>
+        </ModalOverlay>
       </Modal>
     )
   }

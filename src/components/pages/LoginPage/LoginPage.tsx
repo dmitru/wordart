@@ -94,7 +94,7 @@ export const LoginPage = observer(() => {
 
                 <Button
                   mt="4"
-                  variantColor="accent"
+                  colorScheme="accent"
                   isDisabled={isSubmitting}
                   type="submit"
                 >

@@ -1,44 +1,38 @@
 import {
   Box,
   Flex,
-  Text,
-  Divider,
   Heading,
   Menu,
   MenuButton,
   MenuList,
-  PopoverArrow,
+  Text,
 } from '@chakra-ui/core'
+import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
-import {
-  WordcloudThumbnail,
-  ThumbnailMenuButton,
-} from 'components/pages/DashboardPage/components'
+import { Spinner } from 'components/Editor/components/Spinner'
+import { WordcloudThumbnail } from 'components/pages/DashboardPage/components'
+import { MoveToFolderModal } from 'components/pages/DashboardPage/MoveToFolderModal'
 import { dashboardUiState } from 'components/pages/DashboardPage/state'
 import { Button } from 'components/shared/Button'
 import { ConfirmModal } from 'components/shared/ConfirmModal'
+import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 import { PromptModal } from 'components/shared/PromptModal'
 import { SearchInput } from 'components/shared/SearchInput'
 import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
-import Link from 'next/link'
 import pluralize from 'pluralize'
 import React, { useState } from 'react'
 import {
   FaRegCheckSquare,
   FaRegFolder,
   FaSearch,
-  FaChevronRight,
   FaTimes,
 } from 'react-icons/fa'
-import { Wordcloud, Folder } from 'services/api/types'
+import { Folder, Wordcloud } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { useToasts } from 'use-toasts'
 import { openUrlInNewTab } from 'utils/browser'
-import { Spinner } from 'components/Editor/components/Spinner'
-import { MoveToFolderModal } from 'components/pages/DashboardPage/MoveToFolderModal'
-import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 
 export const DesignsView = observer(() => {
   const { wordcloudsStore: store } = useStore()
@@ -144,8 +138,8 @@ export const DesignsView = observer(() => {
             `}
             href={Urls.editor.create}
             target="_blank"
-            variantColor="accent"
-            leftIcon="add"
+            colorScheme="accent"
+            leftIcon={<AddIcon />}
           >
             Create New
           </Button>
@@ -160,20 +154,18 @@ export const DesignsView = observer(() => {
             />
           </Box>
 
-          <Divider orientation="vertical" />
-
           {isSelecting && (
             <Box ml="3">
               <Menu>
                 <MenuButton
                   as={Button}
-                  variantColor="accent"
-                  rightIcon="chevron-down"
+                  colorScheme="accent"
+                  rightIcon={<ChevronDownIcon />}
                 >
                   {selection.size} selected
                 </MenuButton>
-                <MenuList zIndex={10000} hasArrow>
-                  <PopoverArrow />
+                <MenuList zIndex={10000}>
+                  {/* <PopoverArrow /> */}
 
                   <MenuItemWithIcon
                     icon={<FaRegFolder />}
@@ -248,7 +240,7 @@ export const DesignsView = observer(() => {
                 p="4"
                 fontSize="lg"
                 bg="white"
-                shadow="sm"
+                boxShadow="sm"
                 maxWidth="600px"
                 width="100%"
               >
@@ -268,7 +260,7 @@ export const DesignsView = observer(() => {
                     `}
                     href={Urls.editor.create}
                     target="_blank"
-                    variantColor="accent"
+                    colorScheme="accent"
                     leftIcon="add"
                     mr="3"
                     size="lg"
@@ -296,7 +288,6 @@ export const DesignsView = observer(() => {
                 borderWidth="1px"
                 p="6"
                 bg="white"
-                shadow="sm"
               >
                 <Box
                   mb="1rem"
@@ -348,7 +339,7 @@ export const DesignsView = observer(() => {
 
                 {dashboardUiState.folder === 'no folder' && (
                   <Button
-                    variantColor="secondary"
+                    colorScheme="secondary"
                     onClick={() => {
                       dashboardUiState.folder = 'all'
                     }}
@@ -373,7 +364,6 @@ export const DesignsView = observer(() => {
                 borderWidth="1px"
                 p="6"
                 bg="white"
-                shadow="sm"
               >
                 <Box
                   mb="1rem"

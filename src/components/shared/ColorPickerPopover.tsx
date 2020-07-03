@@ -40,7 +40,6 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
         placement="bottom"
         closeOnBlur
         closeOnEsc
-        usePortal
       >
         <PopoverTrigger>
           <ColorSwatchButton
@@ -58,7 +57,6 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
             width: 250px;
           `}
         >
-          <PopoverArrow />
           <PopoverBody p={2}>
             <SketchPicker
               css={css`

@@ -35,6 +35,7 @@ import { FaCog, FaQuestionCircle } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -149,7 +150,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                         min-width: 120px;
                       `}
                       variant="outline"
-                      leftIcon="chevron-left"
+                      leftIcon={<ChevronLeftIcon />}
                       onClick={() => {
                         state.view = 'normal'
                         if (state.savedStyle && state.selectedThemeTitle) {
@@ -176,7 +177,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                             ml="3"
                             flex="1"
                             // width="100%"
-                            variantColor="accent"
+                            colorScheme="accent"
                             variant="solid"
                             isDisabled={!state.selectedThemeTitle}
                             onClick={() => {
@@ -249,8 +250,8 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                 >
                   <Box mb="5" display="flex">
                     <Button
-                      variantColor="primary"
-                      rightIcon="chevron-right"
+                      colorScheme="primary"
+                      rightIcon={<ChevronRightIcon />}
                       onClick={() => {
                         state.view = 'themes'
                         state.selectedThemeTitle = ''
@@ -333,12 +334,12 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                           width: 50px;
                           box-shadow: none !important;
                         `}
-                        variant={
+                        colorScheme={
                           store.leftColorTab.showShapeItemsAdvanced
                             ? 'solid'
                             : 'ghost'
                         }
-                        variantColor={
+                        colorScheme={
                           store.leftColorTab.showShapeItemsAdvanced
                             ? 'primary'
                             : 'gray'
@@ -462,139 +463,10 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   </Box>
 
                   {store?.editor && store.editor.items.bg.items.length > 0 && (
-                    <Box mb="2rem">
-                      <SectionLabel display="flex" alignItems="center">
-                        Background Items
-                      </SectionLabel>
-
-                      <Box mt="2" mb="4" display="flex" alignItems="center">
-                        <Box>
-                          <BgItemsColorPickerKindDropdown
-                            bgStyle={bgStyle}
-                            onUpdate={updateBgItemsColoring}
-                          />
-                        </Box>
-
-                        <Button
-                          ml="auto"
-                          css={css`
-                            width: 50px;
-                            box-shadow: none !important;
-                          `}
-                          variant={
-                            store.leftColorTab.showBgItemsAdvanced
-                              ? 'solid'
-                              : 'ghost'
-                          }
-                          variantColor={
-                            store.leftColorTab.showBgItemsAdvanced
-                              ? 'primary'
-                              : 'gray'
-                          }
-                          onClick={() => {
-                            store.leftColorTab.showBgItemsAdvanced = !store
-                              .leftColorTab.showBgItemsAdvanced
-                          }}
-                        >
-                          <FaCog
-                            style={{
-                              color: 'currentColor',
-                            }}
-                          />
-                        </Button>
-                      </Box>
-
-                      <Box mt="2">
-                        <BgItemsColorPickerInline
-                          bgStyle={bgStyle}
-                          bgFill={bgStyle.fill}
-                          onUpdate={updateBgItemsColoring}
-                        />
-                      </Box>
-
-                      <Collapse isOpen={store.leftColorTab.showBgItemsAdvanced}>
-                        <Box>
-                          <Slider
-                            afterLabel="%"
-                            horizontal
-                            label="Brightness"
-                            value={bgStyle.items.brightness}
-                            onChange={(value) => {
-                              const val = (value as any) as number
-                              bgStyle.items.brightness = val
-                            }}
-                            onAfterChange={updateBgItemsColoring}
-                            resetValue={0}
-                            min={-100}
-                            max={100}
-                            step={1}
-                          />
-                        </Box>
-
-                        <Flex direction="row" mb="0">
-                          <Slider
-                            css={css`
-                              flex: 1;
-                            `}
-                            horizontal
-                            afterLabel="%"
-                            label="Opacity"
-                            value={bgStyle.items.opacity}
-                            onChange={(value) => {
-                              bgStyle.items.opacity = value
-                            }}
-                            onAfterChange={updateBgItemsColoring}
-                            min={0}
-                            resetValue={100}
-                            max={100}
-                            step={1}
-                          />
-                        </Flex>
-
-                        <Box mb="4">
-                          <Slider
-                            css={css`
-                              flex: 1;
-                            `}
-                            horizontal
-                            label={
-                              <>
-                                <Box display="flex" alignItems="center">
-                                  Emphasize size{' '}
-                                  <Tooltip
-                                    label="Make larger words brighter and smaller words dimmer"
-                                    zIndex={100}
-                                    showDelay={200}
-                                  >
-                                    <Text
-                                      my="0"
-                                      color="blue"
-                                      cursor="help"
-                                      ml="2"
-                                    >
-                                      <FaQuestionCircle
-                                        style={{ color: '#999' }}
-                                      />
-                                    </Text>
-                                  </Tooltip>
-                                </Box>
-                              </>
-                            }
-                            afterLabel="%"
-                            value={bgStyle.items.dimSmallerItems}
-                            onChange={(value) => {
-                              const val = (value as any) as number
-                              bgStyle.items.dimSmallerItems = val
-                            }}
-                            onAfterChange={updateBgItemsColoring}
-                            min={0}
-                            resetValue={40}
-                            max={100}
-                            step={1}
-                          />
-                        </Box>
-                      </Collapse>
-                    </Box>
+                    <BgItemsStyleOptions
+                      target={target}
+                      updateBgItemsColoring={updateBgItemsColoring}
+                    />
                   )}
                   {/* </background> */}
                 </Box>
@@ -606,3 +478,144 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
     )
   }
 )
+
+export const BgItemsStyleOptions: React.FC<{
+  target: TargetKind
+  updateBgItemsColoring: () => void
+}> = observer(({ updateBgItemsColoring, target }) => {
+  const { editorPageStore: store } = useStore()
+  const {
+    // @ts-ignore
+    renderKey, // eslint-disable-line
+  } = store
+  const shape = store.getShape()
+  const shapeStyle = store.styleOptions.shape
+  const bgStyle = store.styleOptions.bg
+
+  return (
+    <Box mb="2rem">
+      <SectionLabel display="flex" alignItems="center">
+        Background Items
+      </SectionLabel>
+
+      <Box mt="2" mb="2" display="flex" alignItems="center">
+        <Box>
+          <BgItemsColorPickerKindDropdown
+            bgStyle={bgStyle}
+            onUpdate={updateBgItemsColoring}
+          />
+        </Box>
+
+        <Button
+          ml="auto"
+          css={css`
+            width: 50px;
+            box-shadow: none !important;
+          `}
+          colorScheme={
+            store.leftColorTab.showBgItemsAdvanced ? 'solid' : 'ghost'
+          }
+          colorScheme={
+            store.leftColorTab.showBgItemsAdvanced ? 'primary' : 'gray'
+          }
+          onClick={() => {
+            store.leftColorTab.showBgItemsAdvanced = !store.leftColorTab
+              .showBgItemsAdvanced
+          }}
+        >
+          <FaCog
+            style={{
+              color: 'currentColor',
+            }}
+          />
+        </Button>
+      </Box>
+
+      <Box mt="2">
+        <BgItemsColorPickerInline
+          bgStyle={bgStyle}
+          bgFill={bgStyle.fill}
+          onUpdate={updateBgItemsColoring}
+        />
+      </Box>
+
+      <Collapse isOpen={store.leftColorTab.showBgItemsAdvanced}>
+        <Box pb="3" mt="4">
+          <Box>
+            <Slider
+              afterLabel="%"
+              horizontal
+              label="Brightness"
+              value={bgStyle.items.brightness}
+              onChange={(value) => {
+                const val = (value as any) as number
+                bgStyle.items.brightness = val
+              }}
+              onAfterChange={updateBgItemsColoring}
+              resetValue={0}
+              min={-100}
+              max={100}
+              step={1}
+            />
+          </Box>
+
+          <Flex direction="row" mb="0">
+            <Slider
+              css={css`
+                flex: 1;
+              `}
+              horizontal
+              afterLabel="%"
+              label="Opacity"
+              value={bgStyle.items.opacity}
+              onChange={(value) => {
+                bgStyle.items.opacity = value
+              }}
+              onAfterChange={updateBgItemsColoring}
+              min={0}
+              resetValue={100}
+              max={100}
+              step={1}
+            />
+          </Flex>
+
+          <Box mb="4">
+            <Slider
+              css={css`
+                flex: 1;
+              `}
+              horizontal
+              label={
+                <>
+                  <Box display="flex" alignItems="center">
+                    Emphasize size{' '}
+                    <Tooltip
+                      label="Make larger words brighter and smaller words dimmer"
+                      zIndex={100}
+                      showDelay={200}
+                    >
+                      <Text my="0" color="blue" cursor="help" ml="2">
+                        <FaQuestionCircle style={{ color: '#999' }} />
+                      </Text>
+                    </Tooltip>
+                  </Box>
+                </>
+              }
+              afterLabel="%"
+              value={bgStyle.items.dimSmallerItems}
+              onChange={(value) => {
+                const val = (value as any) as number
+                bgStyle.items.dimSmallerItems = val
+              }}
+              onAfterChange={updateBgItemsColoring}
+              min={0}
+              resetValue={40}
+              max={100}
+              step={1}
+            />
+          </Box>
+        </Box>
+      </Collapse>
+    </Box>
+  )
+})

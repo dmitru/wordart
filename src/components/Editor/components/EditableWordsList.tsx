@@ -31,7 +31,6 @@ import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { WordsEditorModal } from 'components/Editor/components/WordsEditorModal'
 import { useRef } from 'react'
-import { fireEventForEl } from 'utils/dom'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -88,8 +87,8 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             <Stack direction="row" mb="3" spacing="1">
               <Button
                 size="sm"
-                variantColor="secondary"
-                leftIcon="add"
+                colorScheme="secondary"
+                leftIcon={<AddIcon />}
                 onClick={() => handleAddWord()}
               >
                 Add
@@ -97,8 +96,8 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
               <Button
                 size="sm"
-                leftIcon="edit"
-                variantColor="primary"
+                leftIcon={<EditIcon />}
+                colorScheme="primary"
                 onClick={() => {
                   state.isShowingEditor = true
                 }}
@@ -109,7 +108,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               <Button
                 size="sm"
                 variant="outline"
-                leftIcon="arrow-up"
+                leftIcon={<ArrowUpIcon />}
                 onClick={() => {
                   state.isShowingImport = true
                 }}
@@ -118,9 +117,9 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               </Button>
 
               <Box marginLeft="auto">
-                <Menu>
+                <Menu placement="bottom-end">
                   <MenuButton as={MenuDotsButton} size="sm" />
-                  <MenuList zIndex={1000} placement="bottom-end">
+                  <MenuList zIndex={1000}>
                     <MenuGroup title="Formatting">
                       <MenuItem
                         onClick={() => {
@@ -288,8 +287,8 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               mt="6"
               // flex="1"
               size="lg"
-              variantColor="primary"
-              leftIcon="add"
+              colorScheme="primary"
+              leftIcon={<AddIcon />}
               onClick={() => {
                 state.isForcedHideEmptyUi = true
               }}

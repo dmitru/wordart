@@ -89,71 +89,72 @@ export const AddCustomFontModal: React.FC<AddCustomFontModalProps> = observer(
 
     return (
       <Modal isOpen={isOpen} onClose={close}>
-        <ModalOverlay />
-        <ModalContent maxWidth="350px">
-          <ModalHeader>Choose a font to upload</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Box
-              mt="4"
-              css={
-                state.url
-                  ? undefined
-                  : css`
-                      display: none;
-                    `
-              }
-            >
-              {state.thumbnailUrl && (
-                <img src={state.thumbnailUrl} width="500" height="auto" />
-              )}
-            </Box>
-
-            {!state.url && (
-              <Box {...getRootProps({ className: 'dropzone' })} py="4">
-                <input {...getInputProps({})} />
-                <p>
-                  Click or drag font file here. Supported formats: *.TTF, *.OTF
-                  and *.WOFF font files.
-                </p>
-                <Button mt="4" variantColor="accent" size="lg">
-                  Click to choose file...
-                </Button>
+        <ModalOverlay>
+          <ModalContent maxWidth="350px">
+            <ModalHeader>Choose a font to upload</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Box
+                mt="4"
+                css={
+                  state.url
+                    ? undefined
+                    : css`
+                        display: none;
+                      `
+                }
+              >
+                {state.thumbnailUrl && (
+                  <img src={state.thumbnailUrl} width="500" height="auto" />
+                )}
               </Box>
-            )}
-          </ModalBody>
 
-          <ModalFooter>
-            {state.url && (
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  state.url = null
-                }}
-              >
-                Choose another file
-              </Button>
-            )}
-            {state.url && (
-              <Button
-                variantColor="accent"
-                onClick={() => {
-                  if (!state.url || !state.thumbnailUrl || !state.title) {
-                    return
-                  }
-                  props.onSubmit({
-                    title: state.title,
-                    url: state.url,
-                    thumbnailUrl: state.thumbnailUrl,
-                  })
-                  close()
-                }}
-              >
-                Import font
-              </Button>
-            )}
-          </ModalFooter>
-        </ModalContent>
+              {!state.url && (
+                <Box {...getRootProps({ className: 'dropzone' })} py="4">
+                  <input {...getInputProps({})} />
+                  <p>
+                    Click or drag font file here. Supported formats: *.TTF,
+                    *.OTF and *.WOFF font files.
+                  </p>
+                  <Button mt="4" colorScheme="accent" size="lg">
+                    Click to choose file...
+                  </Button>
+                </Box>
+              )}
+            </ModalBody>
+
+            <ModalFooter>
+              {state.url && (
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    state.url = null
+                  }}
+                >
+                  Choose another file
+                </Button>
+              )}
+              {state.url && (
+                <Button
+                  colorScheme="accent"
+                  onClick={() => {
+                    if (!state.url || !state.thumbnailUrl || !state.title) {
+                      return
+                    }
+                    props.onSubmit({
+                      title: state.title,
+                      url: state.url,
+                      thumbnailUrl: state.thumbnailUrl,
+                    })
+                    close()
+                  }}
+                >
+                  Import font
+                </Button>
+              )}
+            </ModalFooter>
+          </ModalContent>
+        </ModalOverlay>
       </Modal>
     )
   }

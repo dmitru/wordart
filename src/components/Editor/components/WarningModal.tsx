@@ -25,41 +25,42 @@ export const WarningModal: React.FC<WarningModalProps> = observer(
   ({ isOpen, onClose, header, content, children }) => {
     return (
       <Modal size="md" isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          {header && <ModalHeader>{header}</ModalHeader>}
-          <ModalBody>
-            <Box display="flex" alignItems="flex-start">
-              <Box
-                mr="1rem"
-                bg="red.50"
-                color="red.300"
-                minWidth="60px"
-                height="60px"
-                fontSize="40px"
-                borderRadius="100%"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <FaExclamationCircle />
+        <ModalOverlay>
+          <ModalContent>
+            {header && <ModalHeader>{header}</ModalHeader>}
+            <ModalBody>
+              <Box display="flex" alignItems="flex-start">
+                <Box
+                  mr="1rem"
+                  bg="red.50"
+                  color="red.300"
+                  minWidth="60px"
+                  height="60px"
+                  fontSize="40px"
+                  borderRadius="100%"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <FaExclamationCircle />
+                </Box>
+
+                <Box>
+                  {content && <Text>{content}</Text>}
+                  {children}
+                </Box>
               </Box>
+            </ModalBody>
 
-              <Box>
-                {content && <Text>{content}</Text>}
-                {children}
-              </Box>
-            </Box>
-          </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="primary" onClick={onClose}>
+                OK
+              </Button>
+            </ModalFooter>
 
-          <ModalFooter>
-            <Button variantColor="primary" onClick={onClose}>
-              OK
-            </Button>
-          </ModalFooter>
-
-          <ModalCloseButton />
-        </ModalContent>
+            <ModalCloseButton />
+          </ModalContent>
+        </ModalOverlay>
       </Modal>
     )
   }

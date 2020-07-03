@@ -41,7 +41,6 @@ export const ShapeItemsColorPickerKindDropdown: React.FC<{
         {shapeStyle.items.coloring.kind === 'gradient' && 'Color: Scale'}
       </MenuButton>
       <MenuList
-        usePortal
         as="div"
         placement="bottom-start"
         css={css`
@@ -108,7 +107,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
           <Box mt="3">
             <Button
               isDisabled={shapeStyle.items.coloring.color.colors.length >= 8}
-              variantColor="secondary"
+              colorScheme="secondary"
               leftIcon="add"
               size="sm"
               onClick={() => {
@@ -138,7 +137,6 @@ export const ShapeItemsColorPickerInline: React.FC<{
             <Menu>
               <MenuButton ml="2" as={MenuDotsButton} size="sm" />
               <MenuList placement="bottom-end" zIndex={1000}>
-                <PopoverArrow />
                 <MenuItem
                   onClick={() => {
                     shapeStyle.items.coloring.color.colors.length = 1
