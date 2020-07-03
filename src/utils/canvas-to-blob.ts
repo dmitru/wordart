@@ -13,6 +13,7 @@
 
 /*! @source http://purl.eligrey.com/github/canvas-toBlob.js/blob/master/canvas-toBlob.js */
 
+// @ts-ignore
 ;(function (view) {
   'use strict'
   var Uint8Array = view.Uint8Array,
@@ -20,7 +21,9 @@
     canvas_proto = HTMLCanvasElement && HTMLCanvasElement.prototype,
     is_base64_regex = /\s*;\s*base64\s*(?:;|$)/i,
     to_data_url = 'toDataURL',
+    // @ts-ignore
     base64_ranks,
+    // @ts-ignore
     decode_base64 = function (base64) {
       var len = base64.length,
         buffer = new Uint8Array(((len / 4) * 3) | 0),
@@ -34,6 +37,7 @@
         undef
       while (len--) {
         code = base64.charCodeAt(i++)
+        // @ts-ignore
         rank = base64_ranks[code - 43]
         if (rank !== 255 && rank !== undef) {
           last[1] = last[0]
@@ -143,6 +147,7 @@
   }
   if (HTMLCanvasElement && (!canvas_proto.toBlob || !canvas_proto.toBlobHD)) {
     if (!canvas_proto.toBlob)
+      // @ts-ignore
       canvas_proto.toBlob = function (callback, type /*, ...args*/) {
         if (!type) {
           type = 'image/png'
@@ -162,15 +167,21 @@
           data = dataURI.substring(header_end + 1),
           is_base64 = is_base64_regex.test(dataURI.substring(0, header_end)),
           blob
+        // @ts-ignore
         if (Blob.fake) {
           // no reason to decode a data: URI that's just going to become a data URI again
           blob = new Blob()
+          // @ts-ignore
           if (is_base64) {
+            // @ts-ignore
             blob.encoding = 'base64'
           } else {
+            // @ts-ignore
             blob.encoding = 'URI'
           }
+          // @ts-ignore
           blob.data = data
+          // @ts-ignore
           blob.size = data.length
         } else if (Uint8Array) {
           if (is_base64) {
@@ -196,6 +207,7 @@
 })(
   (typeof self !== 'undefined' && self) ||
     (typeof window !== 'undefined' && window) ||
+    // @ts-ignore
     this.content ||
     this
 )

@@ -184,7 +184,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
             mr="3"
             mb="2"
           >
-            <Menu>
+            <Menu placement="bottom-start">
               <MenuButton
                 mr="1"
                 size="sm"
@@ -197,11 +197,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
                   ? 'Any language'
                   : `${capitalize(state.language)}`}
               </MenuButton>
-              <MenuList
-                placement="bottom-start"
-                maxHeight="200px"
-                overflowY="auto"
-              >
+              <MenuList maxHeight="200px" overflowY="auto">
                 {langOptions.map((option) => (
                   <MenuItem
                     key={option}

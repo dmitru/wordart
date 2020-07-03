@@ -10,7 +10,7 @@ const getMenuListStyle = (props: Props): SystemProps => {
     outline: 0,
     minWidth: '3xs',
     paddingY: '2',
-    zIndex: '10',
+    zIndex: 1000,
     borderRadius: 'md',
     border: '1px solid',
     borderColor: 'inherit',

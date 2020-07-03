@@ -370,10 +370,7 @@ const FontButtonContainer = styled(Box)<{ theme: any }>`
 
   &:hover {
     ${FontButton} {
-      background: ${(p) =>
-        p.selected
-          ? `${p.theme.colors.blue['50']}`
-          : p.theme.colors.blackAlpha['50']};
+      background: ${(p) => p.theme.colors.blackAlpha['50']};
     }
 
     ${FontDeleteButton}, ${FontChangeButton} {

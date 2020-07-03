@@ -37,6 +37,7 @@ export const BgItemsColorPickerKindDropdown: React.FC<{
         {(styles) => (
           <Portal>
             <MenuList
+              // @ts-ignore
               css={css`
                 ${styles}
                 background: white;
@@ -138,6 +139,7 @@ export const BgItemsColorPickerInline: React.FC<{
               <Portal>
                 <MenuTransition>
                   {(styles) => (
+                    // @ts-ignore
                     <MenuList css={styles}>
                       <MenuItemWithIcon
                         icon={<CloseIcon />}

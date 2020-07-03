@@ -2,7 +2,7 @@ import { Button, ButtonProps } from 'components/shared/Button'
 import { CloseIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 
-export const DeleteButton: React.FC<Omit<ButtonProps, 'children'>> = (
+export const DeleteButton: React.FC<Omit<ButtonProps, 'children' | 'ref'>> = (
   props
 ) => (
   <Button

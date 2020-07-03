@@ -6,10 +6,10 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Button,
+  Input,
   InputProps,
 } from '@chakra-ui/core'
-import { Button } from 'components/shared/Button'
-import { Input } from 'components/shared/Input'
 import { observer } from 'mobx-react'
 import { useState, useEffect, ChangeEvent } from 'react'
 
@@ -19,7 +19,7 @@ export type PromptModalProps = {
   isOpen: boolean
   onCancel: () => void
   onSubmit: (value: string) => Promise<void>
-  inputProps?: InputProps
+  inputProps?: Partial<InputProps>
 }
 
 export const PromptModal: React.FC<PromptModalProps> = observer(

@@ -29,7 +29,11 @@ import {
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
-import { ChevronDownIcon } from '@chakra-ui/icons'
+import {
+  ChevronDownIcon,
+  ArrowForwardIcon,
+  ArrowBackIcon,
+} from '@chakra-ui/icons'
 import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
 import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
@@ -907,7 +911,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   >
                     <IconButton
                       ml="3"
-                      icon="arrow-back"
+                      icon={<ArrowBackIcon />}
                       aria-label="Undo"
                       variant="outline"
                       isDisabled={!store.editor?.canUndo()}
@@ -923,7 +927,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   >
                     <IconButton
                       ml="1"
-                      icon="arrow-forward"
+                      icon={<ArrowForwardIcon />}
                       aria-label="Redo"
                       variant="outline"
                       isDisabled={!store.editor?.canRedo()}
@@ -1047,6 +1051,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           <MenuTransition>
                             {(styles) => (
                               <MenuList
+                                // @ts-ignore
                                 css={css`
                                   ${styles}
                                   max-height: 300px;
@@ -1170,10 +1175,9 @@ const TopToolbar = styled(Box)`
   height: 60px;
 `
 
-const TopNavWrapper = styled(Box)`
+const TopNavWrapper = styled(Box)<{ theme: any }>`
   height: 60px;
   padding: 10px 20px;
-  /* padding-left: 90px; */
   background: ${(p) => p.theme.colors.header.bg};
 `
 

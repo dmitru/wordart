@@ -1,6 +1,7 @@
 import { Box } from '@chakra-ui/core'
 import styled from '@emotion/styled'
 import { ThemePreset } from 'components/Editor/style'
+import { Theme } from 'chakra'
 
 export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
   theme,
@@ -189,7 +190,10 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
   )
 }
 
-export const ThemePresetThumbnailContainer = styled(Box)<{ isActive: boolean }>`
+export const ThemePresetThumbnailContainer = styled(Box)<{
+  isActive: boolean
+  theme: Theme
+}>`
   display: flex;
   flex-direction: column;
   align-items: center;

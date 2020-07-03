@@ -1,26 +1,26 @@
-import { useToast, useToastOptions } from '@chakra-ui/core'
+import { useToast, UseToastOptions } from '@chakra-ui/core'
 
 export const useToasts = () => {
   const toasts = useToast()
-  const commonParams: useToastOptions = {
+  const commonParams: UseToastOptions = {
     position: 'bottom-right',
     duration: 3000,
     isClosable: true,
   }
   return {
-    showWarning: (params: useToastOptions) =>
+    showWarning: (params: UseToastOptions) =>
       toasts({
         ...commonParams,
         status: 'warning',
         ...params,
       }),
-    showSuccess: (params: useToastOptions) =>
+    showSuccess: (params: UseToastOptions) =>
       toasts({
         ...commonParams,
         status: 'success',
         ...params,
       }),
-    showError: (params: useToastOptions) =>
+    showError: (params: UseToastOptions) =>
       toasts({
         ...commonParams,
         status: 'error',

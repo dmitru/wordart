@@ -4,6 +4,7 @@ import {
   Checkbox,
   Image,
   Menu,
+  MenuProps,
   MenuButton,
   MenuDivider,
   MenuList,
@@ -20,6 +21,7 @@ import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
+import { Theme } from 'chakra'
 import React, { useCallback, useState } from 'react'
 import {
   FaChevronRight,
@@ -38,12 +40,6 @@ const ThumbnailCheckbox = styled(Checkbox)`
   padding-right: 16px;
   padding-bottom: 16px;
   box-sizing: content-box;
-
-  &:hover {
-    > div {
-      background: hsla(225, 0%, 95%, 1);
-    }
-  }
 
   > div {
     width: 30px;
@@ -82,8 +78,6 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
   onRename,
   onDuplicate,
 }) => {
-  const [isHovered, setIsHovered] = useState(false)
-
   const content = (
     <div>
       <AspectRatio
@@ -95,7 +89,7 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
         overflow="hidden"
         border="none"
       >
-        <Image src={wordcloud.thumbnail} objectFit="contain" css={css`&,`} />
+        <Image src={wordcloud.thumbnail} objectFit="contain" />
       </AspectRatio>
       <Text
         p="3"
@@ -115,8 +109,6 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
 
   return (
     <Box
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       p={0}
       maxWidth="180px"
       minWidth="180px"
@@ -204,7 +196,7 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
         }}
       />
 
-      {!isSelecting && isHovered && (
+      {!isSelecting && (
         <WordcloudThumbnailMenu
           wordcloud={wordcloud}
           onDelete={onDelete}
@@ -248,55 +240,54 @@ type WordcloudThumbnailMenuProps = {
   onDelete: () => void
 }
 
-const WordcloudThumbnailMenu: React.FC<WordcloudThumbnailMenuProps> = (
-  props: WordcloudThumbnailMenuProps
-) => (
+const WordcloudThumbnailMenu: React.FC<WordcloudThumbnailMenuProps> = React.memo<
+  WordcloudThumbnailMenuProps
+>((props) => (
   <Menu>
     <MenuButton as={ThumbnailMenuButton} noShadows={false} variant="solid" />
-    <Portal>
-      <MenuTransition>
-        {(styles) => (
-          <MenuList css={styles}>
-            <MenuItemWithIcon
-              icon={<FaChevronRight />}
-              fontWeight="semibold"
-              onClick={props.onOpenInEditor}
-            >
-              Open in Editor...
-            </MenuItemWithIcon>
+    <MenuTransition>
+      {(styles) => (
+        // @ts-ignore
+        <MenuList css={styles}>
+          <MenuItemWithIcon
+            icon={<FaChevronRight />}
+            fontWeight="semibold"
+            onClick={props.onOpenInEditor}
+          >
+            Open in Editor...
+          </MenuItemWithIcon>
 
-            <MenuDivider />
+          <MenuDivider />
 
-            <MenuItemWithIcon
-              onClick={props.onSelect}
-              icon={<FaRegCheckSquare />}
-            >
-              Select
-            </MenuItemWithIcon>
-            <MenuItemWithIcon
-              onClick={props.onMoveToFolder}
-              icon={<FaRegFolder />}
-            >
-              Move to folder
-            </MenuItemWithIcon>
-            <MenuItemWithIcon icon={<FaRegCopy />} onClick={props.onDuplicate}>
-              Duplicate
-            </MenuItemWithIcon>
-            <MenuItemWithIcon icon={<FaPencilAlt />} onClick={props.onRename}>
-              Rename
-            </MenuItemWithIcon>
+          <MenuItemWithIcon
+            onClick={props.onSelect}
+            icon={<FaRegCheckSquare />}
+          >
+            Select
+          </MenuItemWithIcon>
+          <MenuItemWithIcon
+            onClick={props.onMoveToFolder}
+            icon={<FaRegFolder />}
+          >
+            Move to folder
+          </MenuItemWithIcon>
+          <MenuItemWithIcon icon={<FaRegCopy />} onClick={props.onDuplicate}>
+            Duplicate
+          </MenuItemWithIcon>
+          <MenuItemWithIcon icon={<FaPencilAlt />} onClick={props.onRename}>
+            Rename
+          </MenuItemWithIcon>
 
-            <MenuDivider />
+          <MenuDivider />
 
-            <MenuItemWithIcon icon={<FaTimes />} onClick={props.onDelete}>
-              Delete
-            </MenuItemWithIcon>
-          </MenuList>
-        )}
-      </MenuTransition>
-    </Portal>
+          <MenuItemWithIcon icon={<FaTimes />} onClick={props.onDelete}>
+            Delete
+          </MenuItemWithIcon>
+        </MenuList>
+      )}
+    </MenuTransition>
   </Menu>
-)
+))
 
 export const ThumbnailMenuButton = styled(MenuDotsButton)`
   /* background: #fff; */
@@ -306,7 +297,7 @@ export const FoldersList = styled(Box)``
 
 export const FolderMenuButton = styled(MenuDotsButton)``
 
-export const FolderRowTag = styled(Tag)`
+export const FolderRowTag = styled(Tag)<{ theme: Theme }>`
   transition: all 0;
   background: ${(p) => p.theme.colors.primary['50']};
   color: ${(p) => p.theme.colors.gray['600']};

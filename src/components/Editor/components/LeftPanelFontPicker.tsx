@@ -144,7 +144,7 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
             <Button
               flex="2"
               onClick={() => {
-                if (!selectedFont) {
+                if (!selectedFont || !selectedFontStyle) {
                   return
                 }
                 onSelected(selectedFont.font, selectedFontStyle)

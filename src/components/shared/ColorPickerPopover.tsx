@@ -57,6 +57,7 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
             width: 250px;
           `}
         >
+          <PopoverArrow />
           <PopoverBody p={2}>
             <SketchPicker
               css={css`

@@ -31,6 +31,7 @@ import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { WordsEditorModal } from 'components/Editor/components/WordsEditorModal'
 import { useRef } from 'react'
+import { AddIcon, EditIcon, ArrowUpIcon } from '@chakra-ui/icons'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -285,7 +286,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             <Button
               mr="3"
               mt="6"
-              // flex="1"
               size="lg"
               colorScheme="primary"
               leftIcon={<AddIcon />}
@@ -303,7 +303,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
           onClose={() => {
             state.isShowingImport = false
           }}
-          onImported={(words) => {
+          onImported={({ clearExistingBeforeImporting, words }) => {
             for (const word of words) {
               store.addWord(target, word)
             }
