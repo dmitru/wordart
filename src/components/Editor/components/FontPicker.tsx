@@ -9,6 +9,7 @@ import {
   MenuList,
   Text,
 } from '@chakra-ui/core'
+import { ChevronDownIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
 import { BaseBtn } from 'components/shared/BaseBtn'
@@ -117,13 +118,12 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
             mr="3"
             mb="2"
           >
-            <Menu>
+            <Menu placement="bottom-start">
               <MenuButton
-                // @ts-ignore
-                colorScheme={state.style !== 'popular' ? 'solid' : 'ghost'}
+                variant={state.style !== 'popular' ? 'solid' : 'ghost'}
                 colorScheme={state.style !== 'popular' ? 'accent' : undefined}
                 as={Button}
-                rightIcon="chevron-down"
+                rightIcon={<ChevronDownIcon />}
                 size="sm"
                 mr="1"
               >
@@ -132,15 +132,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
                   : capitalize(state.style)}
               </MenuButton>
               <MenuList
-                as="div"
-                placement="bottom-start"
                 css={css`
-                  background: white;
-                  position: absolute;
-                  top: 0px !important;
-                  left: 10px;
-                  margin-top: 0 !important;
-                  z-index: 5000 !important;
                   max-height: 300px;
                   overflow: auto;
                 `}
@@ -197,10 +189,9 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
                 mr="1"
                 size="sm"
                 as={Button}
-                // @ts-expect-error
                 colorScheme={state.language === 'any' ? undefined : 'accent'}
-                colorScheme={state.language === 'any' ? 'ghost' : 'solid'}
-                rightIcon="chevron-down"
+                variant={state.language === 'any' ? 'ghost' : 'solid'}
+                rightIcon={<ChevronDownIcon />}
               >
                 {state.language === 'any'
                   ? 'Any language'
@@ -210,7 +201,6 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
                 placement="bottom-start"
                 maxHeight="200px"
                 overflowY="auto"
-                zIndex={100000}
               >
                 {langOptions.map((option) => (
                   <MenuItem

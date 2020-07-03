@@ -21,18 +21,18 @@ import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescripti
 import { observer } from 'mobx-react'
 import React, { useState } from 'react'
 import { FiRefreshCw } from 'react-icons/fi'
+import { ChevronDownIcon, AddIcon, SmallCloseIcon } from '@chakra-ui/icons'
 
 export const ShapeItemsColorPickerKindDropdown: React.FC<{
   shapeStyle: ShapeStyleOptions
   onUpdate: () => void
 }> = observer(({ shapeStyle, onUpdate }) => {
   return (
-    <Menu>
+    <Menu placement="bottom-start">
       <MenuButton
-        // @ts-ignore
         variant="outline"
         as={Button}
-        rightIcon="chevron-down"
+        rightIcon={<ChevronDownIcon />}
         py="2"
         px="3"
       >
@@ -41,14 +41,7 @@ export const ShapeItemsColorPickerKindDropdown: React.FC<{
         {shapeStyle.items.coloring.kind === 'gradient' && 'Color: Scale'}
       </MenuButton>
       <MenuList
-        as="div"
-        placement="bottom-start"
         css={css`
-          background: white;
-          position: absolute;
-          top: 0px !important;
-          margin-top: 0 !important;
-          z-index: 5000 !important;
           max-height: 300px;
           overflow: auto;
         `}
@@ -108,7 +101,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
             <Button
               isDisabled={shapeStyle.items.coloring.color.colors.length >= 8}
               colorScheme="secondary"
-              leftIcon="add"
+              leftIcon={<AddIcon />}
               size="sm"
               onClick={() => {
                 shapeStyle.items.coloring.color.colors.push(getRandomColor())
@@ -134,21 +127,16 @@ export const ShapeItemsColorPickerInline: React.FC<{
               Random
             </Button>
 
-            <Menu>
+            <Menu placement="bottom-end">
               <MenuButton ml="2" as={MenuDotsButton} size="sm" />
-              <MenuList placement="bottom-end" zIndex={1000}>
+              <MenuList>
                 <MenuItem
                   onClick={() => {
                     shapeStyle.items.coloring.color.colors.length = 1
                     onUpdate()
                   }}
                 >
-                  <Icon
-                    name="small-close"
-                    size="20px"
-                    color="gray.500"
-                    mr="2"
-                  />
+                  <SmallCloseIcon size="20px" color="gray.500" mr="2" />
                   Clear all
                 </MenuItem>
               </MenuList>

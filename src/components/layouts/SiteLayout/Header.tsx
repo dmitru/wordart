@@ -10,6 +10,7 @@ import { Button } from 'components/shared/Button'
 import { FaRegUserCircle } from 'react-icons/fa'
 import { useRouter } from 'next/dist/client/router'
 import css from '@emotion/css'
+import { AddIcon } from '@chakra-ui/icons'
 
 export type HeaderProps = {
   fullWidth?: boolean
@@ -52,14 +53,14 @@ export const Header: React.FC<HeaderProps> = observer(
                     as={Urls.editor.create}
                     passHref
                   >
-                    <Button colorScheme="accent" leftIcon="add" mr="3">
+                    <Button colorScheme="accent" leftIcon={<AddIcon />} mr="3">
                       Create
                     </Button>
                   </Link>
                 )}
 
                 <Link href={Urls.dashboard} passHref>
-                  <TopNavButton variant>Your Designs</TopNavButton>
+                  <TopNavButton>Your Designs</TopNavButton>
                 </Link>
                 <Link href={Urls.pricing} passHref>
                   <TopNavButton>Pricing</TopNavButton>

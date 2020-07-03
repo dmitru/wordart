@@ -27,6 +27,7 @@ import { Button } from 'components/shared/Button'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { DeleteButton } from 'components/shared/DeleteButton'
 import { Tooltip } from 'components/shared/Tooltip'
+import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 
 export type LeftPanelFontsTabProps = {
   target: TargetKind
@@ -147,14 +148,14 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
                         state.isAddingFont = true
                         state.view = 'choose-font'
                       }}
-                      leftIcon="add"
+                      leftIcon={<AddIcon />}
                       colorScheme="primary"
                     >
                       Add more fonts
                     </Button>
 
                     <Menu>
-                      <MenuButton as={MenuDotsButton} />
+                      <MenuButton as={MenuDotsButton} variant="ghost" />
 
                       <MenuList>
                         <MenuItem
@@ -170,12 +171,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
 
                     <Tooltip label="You can use up to 8 different fonts in your designs">
                       <Box ml="auto">
-                        <Tag
-                          size="sm"
-                          rounded="full"
-                          variant="outline"
-                          colorScheme="gray"
-                        >
+                        <Tag rounded="full" colorScheme="gray">
                           <TagLabel>{(fonts || []).length} / 8</TagLabel>
                         </Tag>
                       </Box>

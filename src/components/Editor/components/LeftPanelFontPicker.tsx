@@ -20,6 +20,7 @@ import { observer, useLocalStore } from 'mobx-react'
 import { useEffect, useMemo } from 'react'
 import { useStore } from 'services/root-store'
 import { animateElement } from 'utils/animation'
+import { ChevronDownIcon } from '@chakra-ui/icons'
 
 export type LeftPanelFontPickerProps = {
   selectedFontId: string
@@ -89,7 +90,7 @@ export const LeftPanelFontPicker: React.FC<LeftPanelFontPickerProps> = observer(
                       as={Button}
                       outline="none"
                       aria-label="menu"
-                      rightIcon="chevron-down"
+                      rightIcon={<ChevronDownIcon />}
                       color="gray.600"
                       size="sm"
                       variant="ghost"

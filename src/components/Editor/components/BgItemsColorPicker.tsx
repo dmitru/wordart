@@ -37,7 +37,6 @@ export const BgItemsColorPickerKindDropdown: React.FC<{
         {(styles) => (
           <Portal>
             <MenuList
-              as="div"
               css={css`
                 ${styles}
                 background: white;

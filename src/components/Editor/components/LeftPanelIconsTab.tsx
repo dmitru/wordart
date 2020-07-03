@@ -17,6 +17,7 @@ import { Button } from 'components/shared/Button'
 import { Tooltip } from 'components/shared/Tooltip'
 import { SmileBeam } from '@styled-icons/fa-solid/SmileBeam'
 import { FaQuestionCircle } from 'react-icons/fa'
+import { ChevronLeftIcon } from '@chakra-ui/icons'
 
 export type LeftPanelIconsTabProps = {
   target: TargetKind
@@ -51,7 +52,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
 
             <Button
               width="50%"
-              leftIcon="chevron-left"
+              leftIcon={<ChevronLeftIcon />}
               variant="outline"
               onClick={() => {
                 state.isAdding = false

@@ -149,7 +149,7 @@ export const FoldersView = observer(() => {
               </FolderRowTag>
 
               <Box>
-                <Menu>
+                <Menu placement="bottom-end">
                   <MenuButton
                     as={FolderMenuButton}
                     noShadows={false}
@@ -161,16 +161,7 @@ export const FoldersView = observer(() => {
                     }}
                   />
                   <MenuList
-                    // usePortal
-
-                    // container={document.body}
                     fontWeight="normal"
-                    placement="bottom-end"
-                    zIndex={10000}
-                    hasArrow
-                    css={css`
-                      top: 50px;
-                    `}
                     onClick={(e: React.MouseEvent) => {
                       e.stopPropagation()
                       e.nativeEvent.preventDefault()

@@ -119,7 +119,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               <Box marginLeft="auto">
                 <Menu placement="bottom-end">
                   <MenuButton as={MenuDotsButton} size="sm" />
-                  <MenuList zIndex={1000}>
+                  <MenuList>
                     <MenuGroup title="Formatting">
                       <MenuItem
                         onClick={() => {

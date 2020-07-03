@@ -339,7 +339,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             `}
           />
           <Link href={Urls.dashboard} passHref>
-            <TopNavButton mr="1" colorScheme="secondary">
+            <TopNavButton mr="1" variant="secondary" colorScheme="secondary">
               <FiChevronLeft
                 css={css`
                   margin-right: 4px;
@@ -350,7 +350,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           </Link>
 
           <Menu>
-            <MenuButton mr="1" as={TopNavButton} colorScheme="accent">
+            <MenuButton mr="2" as={TopNavButton} variant="primary">
               <FiMenu
                 css={css`
                   margin-right: 4px;
@@ -462,7 +462,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           <Editable
             css={css`
               background: #fff3;
-              padding: 2px 8px;
+              padding: 5px 8px;
+              overflow: hidden;
               border-radius: 4px;
               display: flex;
               height: 40px;
@@ -499,7 +500,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             />
           </Editable>
 
-          <TopNavButton onClick={openExport} colorScheme="secondary">
+          <TopNavButton
+            variant="secondary"
+            onClick={openExport}
+            colorScheme="secondary"
+          >
             <FiDownload
               css={css`
                 margin-right: 4px;

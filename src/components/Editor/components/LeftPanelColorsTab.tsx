@@ -334,7 +334,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                           width: 50px;
                           box-shadow: none !important;
                         `}
-                        colorScheme={
+                        variant={
                           store.leftColorTab.showShapeItemsAdvanced
                             ? 'solid'
                             : 'ghost'
@@ -512,9 +512,7 @@ export const BgItemsStyleOptions: React.FC<{
             width: 50px;
             box-shadow: none !important;
           `}
-          colorScheme={
-            store.leftColorTab.showBgItemsAdvanced ? 'solid' : 'ghost'
-          }
+          variant={store.leftColorTab.showBgItemsAdvanced ? 'solid' : 'ghost'}
           colorScheme={
             store.leftColorTab.showBgItemsAdvanced ? 'primary' : 'gray'
           }

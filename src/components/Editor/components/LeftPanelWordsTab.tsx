@@ -47,6 +47,7 @@ import {
   DraggableProvided,
 } from 'react-beautiful-dnd'
 import { useStore } from 'services/root-store'
+import { ChevronDownIcon, AddIcon, EditIcon } from '@chakra-ui/icons'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -169,14 +170,14 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
       <Stack direction="row" mb="6" spacing="2">
         <Button
           colorScheme="primary"
-          leftIcon="add"
+          leftIcon={<AddIcon />}
           onClick={focusNewWordInput}
         >
           Add
         </Button>
 
         <Button
-          leftIcon="edit"
+          leftIcon={<EditIcon />}
           colorScheme="secondary"
           onClick={() => {
             state.isShowingEditor = true
@@ -239,19 +240,21 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         </Box>
 
         <Box flex="1" ml="auto" display="flex" justifyContent="flex-end">
-          <Menu>
-            {selectedCount === 0 && <MenuButton as={MenuDotsButton} />}
+          <Menu placement="bottom-end">
+            {selectedCount === 0 && (
+              <MenuButton as={MenuDotsButton} size="sm" variant="ghost" />
+            )}
             {selectedCount > 0 && (
               <MenuButton
                 as={Button}
                 colorScheme="accent"
-                rightIcon="chevron-down"
+                rightIcon={<ChevronDownIcon />}
                 size="sm"
               >
                 {selectedCount} {pluralize('words', selectedCount)}
               </MenuButton>
             )}
-            <MenuList zIndex={1000} placement="bottom-end">
+            <MenuList>
               <MenuItem
                 onClick={() => {
                   for (const w of wordsToProcess) {

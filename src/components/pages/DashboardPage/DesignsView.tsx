@@ -164,9 +164,7 @@ export const DesignsView = observer(() => {
                 >
                   {selection.size} selected
                 </MenuButton>
-                <MenuList zIndex={10000}>
-                  {/* <PopoverArrow /> */}
-
+                <MenuList>
                   <MenuItemWithIcon
                     icon={<FaRegFolder />}
                     onClick={() =>
@@ -261,7 +259,7 @@ export const DesignsView = observer(() => {
                     href={Urls.editor.create}
                     target="_blank"
                     colorScheme="accent"
-                    leftIcon="add"
+                    leftIcon={<AddIcon />}
                     mr="3"
                     size="lg"
                   >

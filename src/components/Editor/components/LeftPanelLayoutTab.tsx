@@ -36,6 +36,7 @@ import styled from '@emotion/styled'
 import css from '@emotion/css'
 import { animateElement } from 'utils/animation'
 import { Tooltip } from 'components/shared/Tooltip'
+import { AddIcon } from '@chakra-ui/icons'
 
 const anglePresets: {
   kind: WordAnglesPresetKind
@@ -204,7 +205,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                         colorScheme="secondary"
                         isDisabled={style.items.words.customAngles.length >= 8}
                         size="sm"
-                        leftIcon="add"
+                        leftIcon={<AddIcon />}
                         onClick={() => {
                           style.items.words.customAngles.push(
                             Math.round(-90 + Math.random() * 180)

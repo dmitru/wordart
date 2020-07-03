@@ -13,6 +13,7 @@ import { observer } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
 import { Button } from 'components/shared/Button'
+import { ChevronDownIcon } from '@chakra-ui/icons'
 
 export const SvgShapeColorKindDropdown: React.FC<{
   onUpdate: () => void
@@ -24,12 +25,11 @@ export const SvgShapeColorKindDropdown: React.FC<{
     return <></>
   }
   return (
-    <Menu>
+    <Menu placement="bottom-start">
       <MenuButton
-        // @ts-ignore
         variant="outline"
         as={Button}
-        rightIcon="chevron-down"
+        rightIcon={<ChevronDownIcon />}
         py="2"
         px="3"
       >
@@ -39,14 +39,7 @@ export const SvgShapeColorKindDropdown: React.FC<{
           'Custom color'}
       </MenuButton>
       <MenuList
-        as="div"
-        placement="bottom-start"
         css={css`
-          background: white;
-          position: absolute;
-          top: 0px !important;
-          margin-top: 0 !important;
-          z-index: 5000 !important;
           max-height: 300px;
           overflow: auto;
         `}

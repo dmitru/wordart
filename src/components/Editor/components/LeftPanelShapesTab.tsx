@@ -17,6 +17,7 @@ import {
   Text,
   Textarea,
 } from '@chakra-ui/core'
+import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import { Button } from 'components/shared/Button'
 import { css } from '@emotion/core'
 import { AddCustomImageModal } from 'components/Editor/components/AddCustomImageModal'
@@ -636,7 +637,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         <Tooltip label="Add custom image...">
                           <Button
                             colorScheme="primary"
-                            leftIcon="add"
+                            leftIcon={<AddIcon />}
                             size="sm"
                             mr="2"
                             onClick={() => {
@@ -650,7 +651,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         <Tooltip label="Use text as a shape...">
                           <Button
                             colorScheme="secondary"
-                            leftIcon="add"
+                            leftIcon={<AddIcon />}
                             size="sm"
                             mr="2"
                             onClick={() => {
@@ -673,15 +674,12 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                         <Box>
                           <Menu>
                             <MenuButton
-                              // @ts-ignore
-                              colorScheme={
-                                selectedCategory ? 'solid' : 'outline'
-                              }
+                              variant={selectedCategory ? 'solid' : 'outline'}
                               colorScheme={
                                 selectedCategory ? 'accent' : undefined
                               }
                               as={Button}
-                              rightIcon="chevron-down"
+                              rightIcon={<ChevronDownIcon />}
                               size="sm"
                               py="2"
                               px="3"
@@ -691,15 +689,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                                 : 'All categories'}
                             </MenuButton>
                             <MenuList
-                              as="div"
-                              placement="bottom-start"
                               css={css`
-                                background: white;
-                                position: absolute;
-                                top: 0px !important;
-                                left: 10px;
-                                margin-top: 0 !important;
-                                z-index: 5000 !important;
                                 max-height: 300px;
                                 overflow: auto;
                               `}
