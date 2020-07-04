@@ -28,6 +28,8 @@ import {
   ShapeId,
   ShapeRasterConf,
   ShapeTextConf,
+  ShapeImageConf,
+  ShapeSvgConf,
 } from 'components/Editor/shape-config'
 import {
   getAnglesForPreset,
@@ -53,7 +55,7 @@ import {
   loadFontsConfig,
   popularFonts,
 } from 'data/fonts'
-import { shapes } from 'data/shapes'
+import { imageShapes, iconShapes } from 'data/shapes'
 import { loadFont } from 'lib/wordart/fonts'
 import { cloneDeep, isEqual, sortBy, uniq, uniqBy } from 'lodash'
 import { action, observable, set, toJS } from 'mobx'
@@ -126,8 +128,10 @@ export class EditorStore {
   @observable leftTabIsTransformingShape = false
   @observable targetTab = 'shape' as TargetTab
   @observable hasItemChanges = false
-  @observable availableShapes: ShapeConf[] = shapes
-  @observable selectedShapeId: ShapeId = shapes[4].id
+  @observable availableImageShapes: ShapeImageConf[] = imageShapes
+  @observable availableIconShapes: ShapeSvgConf[] = iconShapes
+  // @TODO: refactor it to simply store reference to a ShapeConf
+  @observable selectedShapeId: ShapeId = imageShapes[4].id
 
   wordIdGen = new UniqIdGenerator(3)
   customImgIdGen = new UniqIdGenerator(3)
@@ -244,7 +248,7 @@ export class EditorStore {
       await this.loadSerialized(params.serialized)
     } else {
       await this.applyColorTheme(themePresets[0])
-      await this.selectShape(shapes[5].id)
+      await this.selectShape(imageShapes[5].id)
     }
 
     this.enterViewMode('shape')
@@ -390,7 +394,9 @@ export class EditorStore {
       serialized.data.sceneSize.w / serialized.data.sceneSize.h,
       false
     )
-    this.availableShapes = this.availableShapes.filter((s) => !s.isCustom)
+    this.availableImageShapes = this.availableImageShapes.filter(
+      (s) => !s.isCustom
+    )
 
     for (const font of serialized.data.customFonts) {
       await this.addCustomFont(font)
@@ -1004,7 +1010,9 @@ export class EditorStore {
     this.logger.debug('destroyEditor')
     this.editor?.destroy()
     this.lifecycleState = 'destroyed'
-    this.availableShapes = this.availableShapes.filter((s) => !s.isCustom)
+    this.availableImageShapes = this.availableImageShapes.filter(
+      (s) => !s.isCustom
+    )
     this.styleOptions.shape = cloneDeep(defaultShapeStyleOptions)
     this.styleOptions.bg = cloneDeep(defaultBgStyleOptions)
   }
@@ -1043,44 +1051,56 @@ export class EditorStore {
     })
   }
 
+  // @TODO
   addCustomShapeImg = (shape: Omit<ShapeRasterConf, 'id'>) => {
-    const matchedShape = this.availableShapes.find(
-      (s) => s.kind === shape.kind && s.url === shape.url
-    )
-    if (matchedShape) {
-      return matchedShape.id
-    }
-    const id = this.customImgIdGen.get()
+    // const matchedShape = this.availableImageShapes.find(
+    //   (s) => s.kind === shape.kind && s.url === shape.url
+    // )
+    // if (matchedShape) {
+    //   return matchedShape.id
+    // }
+    // const id = this.customImgIdGen.get()
 
-    this.availableShapes.push({
-      ...shape,
-      id,
-    } as ShapeConf)
+    // this.availableImageShapes.push({
+    //   ...shape,
+    //   id,
+    // } as ShapeConf)
 
-    return id
+    // return id
+    return 'custom-img'
   }
 
+  // @TODO
   addCustomShapeText = (shape: Omit<ShapeTextConf, 'id'>) => {
-    const matchedShape = this.availableShapes.find(
-      (s) =>
-        s.kind === shape.kind &&
-        s.text === shape.text &&
-        isEqual(s.textStyle, shape.textStyle)
-    )
-    if (matchedShape) {
-      return matchedShape.id
-    }
-    const id = this.customImgIdGen.get()
-    this.availableShapes.push({
-      ...shape,
-      id,
-    } as ShapeConf)
-    return id
+    // const matchedShape = this.availableImageShapes.find(
+    //   (s) =>
+    //     s.kind === shape.kind &&
+    //     s.text === shape.text &&
+    //     isEqual(s.textStyle, shape.textStyle)
+    // )
+    // if (matchedShape) {
+    //   return matchedShape.id
+    // }
+    // const id = this.customImgIdGen.get()
+    // this.availableImageShapes.push({
+    //   ...shape,
+    //   id,
+    // } as ShapeConf)
+    // return id
+    return 'custom-text'
   }
 
-  getAvailableShapes = (): ShapeConf[] =>
+  getAvailableImageShapes = (): ShapeImageConf[] =>
     sortBy(
-      this.availableShapes,
+      this.availableImageShapes,
+      (s) => (s.categories ? this.getCategoryOrder(s.categories[0]) : 999999),
+      (s) => (s.isCustom ? -1 : 1),
+      (s) => s.title
+    )
+
+  getAvailableIconShapes = (): ShapeSvgConf[] =>
+    sortBy(
+      this.availableIconShapes,
       (s) => (s.categories ? this.getCategoryOrder(s.categories[0]) : 999999),
       (s) => (s.isCustom ? -1 : 1),
       (s) => s.title
@@ -1096,7 +1116,7 @@ export class EditorStore {
   }
 
   getShapeConfById = (shapeId: ShapeId): ShapeConf | undefined =>
-    this.availableShapes.find((s) => s.id === shapeId)
+    this.availableImageShapes.find((s) => s.id === shapeId)
   getShape = (): Shape | undefined => {
     const { selectedShapeId } = this
     return this.editor?.shape || undefined
@@ -1166,7 +1186,7 @@ export class EditorStore {
       : Promise.resolve(null)
 
   getSelectedShapeConf = () =>
-    this.availableShapes.find((s) => s.id === this.selectedShapeId)!
+    this.availableImageShapes.find((s) => s.id === this.selectedShapeId)!
 
   selectShapeAndSaveUndo = async (
     shapeId: ShapeId,

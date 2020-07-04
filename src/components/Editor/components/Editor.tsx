@@ -35,7 +35,6 @@ import {
   ArrowBackIcon,
 } from '@chakra-ui/icons'
 import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
-import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
 import { Shapes } from '@styled-icons/fa-solid/Shapes'
 import { Font } from '@styled-icons/icomoon/Font'
@@ -46,7 +45,7 @@ import { LeftPanelColorsTab } from 'components/Editor/components/LeftPanelColors
 import { LeftPanelFontsTab } from 'components/Editor/components/LeftPanelFontsTab'
 import { LeftPanelIconsTab } from 'components/Editor/components/LeftPanelIconsTab'
 import { LeftPanelLayoutTab } from 'components/Editor/components/LeftPanelLayoutTab'
-import { LeftPanelShapesTab } from 'components/Editor/components/LeftPanelShapesTab'
+import { LeftPanelShapesTab } from 'components/Editor/components/ShapesTab/LeftPanelShapesTab'
 import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTab'
 import { Spinner } from 'components/Editor/components/Spinner'
 import {

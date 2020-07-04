@@ -1,6 +1,10 @@
 import { iconsFaRegular } from 'data/icons-fa-regular'
 import { iconsFaSolid } from 'data/icons-fa-solid'
-import { ShapeConf } from 'components/Editor/shape-config'
+import {
+  ShapeConf,
+  ShapeSvgConf,
+  ShapeImageConf,
+} from 'components/Editor/shape-config'
 import animalsShapes from './shapes-animals'
 import geoShapes from './shapes-geo'
 import geometryShapes from './shapes-geometry'
@@ -9,7 +13,7 @@ const defaultEdgesProcessing = {
   amount: 80,
 }
 
-export const svgIcons: ShapeConf[] = [...iconsFaSolid.slice(0, 10000)]
+export const svgIcons: ShapeSvgConf[] = [...iconsFaSolid.slice(0, 10000)]
   .filter((i) => i != null)
   .map((icon, index) =>
     icon
@@ -24,13 +28,15 @@ export const svgIcons: ShapeConf[] = [...iconsFaSolid.slice(0, 10000)]
             colors: { kind: 'original' },
             edges: defaultEdgesProcessing,
           },
-          categories: ['icon'],
-        } as ShapeConf)
+          categories: ['icon', 'solid'],
+        } as ShapeSvgConf)
       : null
   )
-  .filter((x) => x != null) as ShapeConf[]
+  .filter((x) => x != null) as ShapeSvgConf[]
 
-export const svgIconsOutline: ShapeConf[] = [...iconsFaRegular.slice(0, 10000)]
+export const svgIconsOutline: ShapeSvgConf[] = [
+  ...iconsFaRegular.slice(0, 10000),
+]
   .filter((i) => i != null)
   .map((icon, index) =>
     icon
@@ -45,14 +51,14 @@ export const svgIconsOutline: ShapeConf[] = [...iconsFaRegular.slice(0, 10000)]
             colors: { kind: 'original' },
             edges: defaultEdgesProcessing,
           },
-          categories: ['icon'],
-        } as ShapeConf)
+          categories: ['icon', 'outline'],
+        } as ShapeSvgConf)
       : null
   )
-  .filter((x) => x != null) as ShapeConf[]
+  .filter((x) => x != null) as ShapeSvgConf[]
 
 // @ts-ignore
-export const shapes: ShapeConf[] = [
+export const imageShapes: ShapeImageConf[] = [
   ...[
     ...geometryShapes.map((s) => ({ ...s, categories: ['geometry'] })),
     ...geoShapes.map((s) => ({ ...s, categories: ['geo'] })),
@@ -169,17 +175,20 @@ export const shapes: ShapeConf[] = [
       url: '/images/yin-yang.svg',
       fill: 'green',
     },
-  ].map((c, index) => ({
-    categories: ['other'],
-    ...c,
-    id: `${index + 1}`,
-    thumbnailUrl: c.url,
-    processedThumbnailUrl: c.url,
-    processing: {
-      colors: { kind: 'original' },
-      edges: defaultEdgesProcessing,
-    },
-  })),
-  ...svgIcons,
-  ...svgIconsOutline,
+  ].map(
+    (c, index) =>
+      ({
+        categories: ['other'],
+        ...c,
+        id: `${c.title.toLocaleLowerCase().replace(' ', '-')}`,
+        thumbnailUrl: c.url,
+        processedThumbnailUrl: c.url,
+        processing: {
+          colors: { kind: 'original' },
+          edges: defaultEdgesProcessing,
+        },
+      } as ShapeImageConf)
+  ),
 ]
+
+export const iconShapes = [...svgIcons, ...svgIconsOutline]

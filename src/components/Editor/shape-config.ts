@@ -2,8 +2,29 @@ import { FontId } from 'data/fonts'
 import { ColorString } from 'components/Editor/style-options'
 
 /** Representation of an shape option available for selection */
-export type ShapeConf = ShapeSvgConf | ShapeRasterConf | ShapeTextConf
+export type ShapeConf =
+  | ShapeSvgConf
+  | ShapeRasterConf
+  | ShapeTextConf
+  | ShapeRandomBlobConf
+  | ShapeFullCanvasConf
+export type ShapeImageConf = ShapeSvgConf | ShapeRasterConf
 export type ShapeKind = ShapeConf['kind']
+
+export type ShapeFullCanvasConf = {
+  kind: 'full canvas'
+  id: 's:full canvas'
+  thumbnailUrl: string
+  color: string
+}
+
+export type ShapeRandomBlobConf = {
+  kind: 'random blob'
+  id: 's:random blob'
+  url: string
+  thumbnailUrl: string
+  color: string
+}
 
 export type ShapeSvgConf = {
   isCustom?: boolean
@@ -31,8 +52,6 @@ export type ShapeRasterConf = {
 }
 export type ShapeTextConf = {
   isCustom?: boolean
-  categories?: string[]
-  keywords?: string[]
   id: ShapeId
   title: string
   thumbnailUrl: string

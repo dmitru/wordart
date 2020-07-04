@@ -9,6 +9,7 @@ import { FixedSizeList as List, ListProps } from 'react-window'
 import css from '@emotion/css'
 
 export type ShapeSelectorProps = {
+  columns?: number
   shapes: ShapeConf[]
   showProcessedThumbnails?: boolean
   selectedShapeId?: ShapeId
@@ -17,24 +18,25 @@ export type ShapeSelectorProps = {
 
 export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
   ({
+    columns = 3,
     shapes,
     selectedShapeId,
     showProcessedThumbnails = false,
     onSelected = noop,
     ...rest
   }) => {
-    const cols = 3
+    const cols = columns
     const rows = Math.ceil(shapes.length / cols)
 
-    const itemWidth = 106
-    const itemHeight = 106
+    const width = 106 * 3
+    const itemWidth = width / cols
+    const itemHeight = width / cols
 
     const ThumbnailsRow: ListProps['children'] = ({ index, style }) => {
-      const rowShapes = [
-        shapes[cols * index],
-        shapes[cols * index + 1],
-        shapes[cols * index + 2],
-      ].filter((s) => s != null)
+      const rowShapes = new Array(cols)
+        .fill(null)
+        .map((v, colIndex) => shapes[cols * index + colIndex])
+        .filter((s) => s != null)
 
       return (
         <Box
@@ -55,6 +57,8 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
               onClick={() => {
                 onSelected(shape)
               }}
+              size={itemWidth}
+              padding={8}
               backgroundColor="white"
               active={shape.id === selectedShapeId}
               url={
@@ -92,27 +96,41 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
 
 export const ShapeThumbnailBtn: React.FC<
   {
+    size?: number
+    padding?: number
     backgroundColor: string
     url: string
     active?: boolean
   } & Omit<React.HTMLProps<HTMLButtonElement>, 'shape' | 'type'>
-> = observer(({ url, backgroundColor, active = false, onClick, ...rest }) => {
-  return (
-    <ShapeThumbnailBtnInner
-      {...rest}
-      active={active}
-      onClick={onClick}
-      backgroundColor={backgroundColor}
-    >
-      <ShapeThumbnailBtnInnerImg src={url} />
-    </ShapeThumbnailBtnInner>
-  )
-  return null
-})
+> = observer(
+  ({
+    size = 106,
+    padding = 8,
+    url,
+    backgroundColor,
+    active = false,
+    onClick,
+    ...rest
+  }) => {
+    return (
+      <ShapeThumbnailBtnInner
+        {...rest}
+        padding={padding}
+        size={size}
+        active={active}
+        onClick={onClick}
+        backgroundColor={backgroundColor}
+      >
+        <ShapeThumbnailBtnInnerImg src={url} size={size - 2 * padding} />
+      </ShapeThumbnailBtnInner>
+    )
+    return null
+  }
+)
 
-const ShapeThumbnailBtnInnerImg = styled.img`
-  width: 90px;
-  height: 90px;
+const ShapeThumbnailBtnInnerImg = styled.img<{ size: number }>`
+  width: ${(p) => p.size}px;
+  height: ${(p) => p.size}px;
   margin: 0;
   object-fit: contain;
 `
@@ -120,13 +138,15 @@ const ShapeThumbnailBtnInnerImg = styled.img`
 export const ShapeThumbnails = styled(Box)``
 
 const ShapeThumbnailBtnInner = styled.button<{
+  size: number
+  padding: number
   theme: any
   backgroundColor: string
   fill?: string
   active: boolean
 }>`
-  width: 106px;
-  height: 106px;
+  width: ${(p) => p.size}px;
+  height: ${(p) => p.size}px;
   border: 1px solid #efefef;
   outline: none;
   background: white;
@@ -147,8 +167,8 @@ const ShapeThumbnailBtnInner = styled.button<{
   }
 
   svg {
-    width: 90px;
-    height: 90px;
+    width: ${(p) => p.size - 2 * p.padding}px;
+    height: ${(p) => p.size - 2 * p.padding}px;
     // filter: drop-shadow(0px 0px 4px #0003);
 
     * {

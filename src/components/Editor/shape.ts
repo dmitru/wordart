@@ -9,7 +9,6 @@ import { MatrixSerialized } from 'services/api/persisted/v1'
 
 /** Representation of the currently selected shape */
 export type Shape = ShapeSvg | ShapeRaster | ShapeText
-export type ShapeKind = Shape['kind']
 
 // SVG
 

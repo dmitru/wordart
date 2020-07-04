@@ -16,6 +16,8 @@ import {
   Stack,
   Text,
   Textarea,
+  Portal,
+  MenuTransition,
 } from '@chakra-ui/core'
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import { Button } from 'components/shared/Button'
@@ -50,11 +52,11 @@ import { FontPicker } from 'components/Editor/components/FontPicker'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { DeleteButton } from 'components/shared/DeleteButton'
 import { SearchInput } from 'components/shared/SearchInput'
-
-export type LeftPanelShapesTabProps = {}
+import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
+import { leftPanelShapesState } from 'components/Editor/components/ShapesTab/state'
+import { ShapeTypeSelector } from 'components/Editor/components/ShapesTab/ShapeTypeSelector'
 
 type TabMode = 'home' | 'customize shape' | 'add text shape'
-
 const initialState = {
   mode: 'home' as TabMode,
   isShowingAddCustomImage: false,
@@ -79,7 +81,10 @@ const initialState = {
         },
   },
 }
+
 const state = observable<typeof initialState>({ ...initialState })
+
+export type LeftPanelShapesTabProps = {}
 
 const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
   <Slider
@@ -134,7 +139,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
     const shapesPerCategoryCounts = allCategoryOptions.map(
       ({ value }) =>
         store
-          .getAvailableShapes()
+          .getAvailableImageShapes()
           .filter((s) => (s.categories || []).includes(value)).length
     )
 
@@ -149,7 +154,7 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
     )
     const [query, setQuery] = useState('')
     const matchingShapes = store
-      .getAvailableShapes()
+      .getAvailableImageShapes()
       .filter(
         (s) =>
           (!query ||
@@ -261,6 +266,12 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
     return (
       <>
         <Box px="5" py="6">
+          <Box mb="3">
+            <ShapeTypeSelector />
+          </Box>
+
+          {leftPanelShapesState.shapeVariety === 'image' && <ClipArtPicker />}
+
           <>
             <Box display="flex" alignItems="flex-start" mb="3">
               {shape && (
@@ -697,7 +708,8 @@ export const LeftPanelShapesTab: React.FC<LeftPanelShapesTabProps> = observer(
                               <MenuItem
                                 onClick={() => setSelectedCategory(null)}
                               >
-                                Show all ({store.getAvailableShapes().length})
+                                Show all (
+                                {store.getAvailableImageShapes().length})
                               </MenuItem>
                               <MenuDivider />
                               {allCategoryOptions.map((item, index) => (
