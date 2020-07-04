@@ -120,7 +120,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                       store.animateVisualize(false)
                     }}
                     backgroundColor="white"
-                    url={store.getShapeConfById(icon.shapeId)!.thumbnailUrl}
+                    url={store.getIconShapeConfById(icon.shapeId)!.thumbnailUrl}
                   />
                 ))}
               </ShapeThumbnails>

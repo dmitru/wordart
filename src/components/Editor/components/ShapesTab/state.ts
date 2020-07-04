@@ -85,6 +85,7 @@ export type FullCanvasShapeOptions = {
   padding: number
 }
 
+// TODO: move it to editor page store
 export const leftPanelShapesState = observable<LeftPanelShapesState>(
   leftPanelShapesInitialState
 )

@@ -34,6 +34,7 @@ import { FaCog } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
+import { SectionLabel } from 'components/Editor/components/shared'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -273,98 +274,6 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
 
           <Box position="relative" width="100%" height="calc(100vh - 295px)">
             <AnimatePresence initial={false}>
-              {shape && state.mode === 'customize shape' && (
-                <motion.div
-                  key="customize"
-                  initial={{ x: 355, y: 0, opacity: 0 }}
-                  transition={{ ease: 'easeInOut', duration: 0.2 }}
-                  animate={{ x: 0, y: 0, opacity: 1 }}
-                  exit={{ x: 355, y: 0, opacity: 0 }}
-                >
-                  <Stack mb="4" p="2" position="absolute" width="100%">
-                    <ShapeColorOptions onUpdate={updateShapeColoring} />
-
-                    {shape.kind === 'raster' && (
-                      <>
-                        <Heading size="md" m="0" mb="3" display="flex">
-                          Image
-                        </Heading>
-
-                        <Box>
-                          <Button
-                            colorScheme="accent"
-                            onClick={() => {
-                              state.isShowingCustomizeImage = true
-                            }}
-                          >
-                            Customize Image
-                          </Button>
-                        </Box>
-                      </>
-                    )}
-
-                    <Box mt="6">
-                      <Heading size="md" m="0" display="flex">
-                        Resize, rotate, transform
-                      </Heading>
-                      {!store.leftTabIsTransformingShape && (
-                        <>
-                          <Stack direction="row" mt="3" spacing="3">
-                            <Button
-                              colorScheme="primary"
-                              onClick={() => {
-                                if (!store.editor) {
-                                  return
-                                }
-                                const totalItemsCount =
-                                  (store.editor.items.shape.items.length || 0) +
-                                  (store.editor.items.bg.items.length || 0)
-                                if (
-                                  totalItemsCount > 0 &&
-                                  !window.confirm(
-                                    'All unlocked words will be removed. Do you want to continue?'
-                                  )
-                                ) {
-                                  return
-                                }
-                                store.leftTabIsTransformingShape = true
-                                store.editor.selectShape()
-                              }}
-                            >
-                              Transform shape
-                            </Button>
-                            {resetTransformBtn}
-                          </Stack>
-                        </>
-                      )}
-
-                      {store.leftTabIsTransformingShape && (
-                        <Box>
-                          <Text mt="2">
-                            Drag the shape to move or rotate it.
-                          </Text>
-                          <Stack direction="row" mt="3" spacing="2">
-                            <Button
-                              colorScheme="accent"
-                              onClick={() => {
-                                store.leftTabIsTransformingShape = false
-                                store.editor?.deselectShape()
-                                store.editor?.clearItems('shape')
-                                store.editor?.clearItems('bg')
-                                store.animateVisualize(false)
-                              }}
-                            >
-                              Apply
-                            </Button>
-                            {resetTransformBtn}
-                          </Stack>
-                        </Box>
-                      )}
-                    </Box>
-                  </Stack>
-                </motion.div>
-              )}
-
               {state.mode === 'home' && (
                 <motion.div
                   key="main"
@@ -432,14 +341,111 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                       showProcessedThumbnails
                       shapes={matchingShapes}
                       onSelected={async (shapeConfig) => {
-                        if (store.selectedShapeId !== shapeConfig.id) {
-                          await store.selectShapeAndSaveUndo(shapeConfig.id)
+                        if (
+                          store.getSelectedShapeConf().id !== shapeConfig.id
+                        ) {
+                          await store.selectShapeAndSaveUndo(shapeConfig)
                         }
                         store.animateVisualize(false)
                       }}
                       selectedShapeId={store.getSelectedShapeConf().id}
                     />
                   </Box>
+                </motion.div>
+              )}
+
+              {shape && state.mode === 'customize shape' && (
+                <motion.div
+                  key="customize"
+                  initial={{ x: 355, y: 0, opacity: 0 }}
+                  transition={{ ease: 'easeInOut', duration: 0.2 }}
+                  animate={{ x: 0, y: 0, opacity: 1 }}
+                  exit={{ x: 355, y: 0, opacity: 0 }}
+                >
+                  <Stack mb="4" p="2" position="absolute" width="100%">
+                    <SectionLabel>Colors</SectionLabel>
+                    <ShapeColorOptions onUpdate={updateShapeColoring} />
+
+                    {shape.kind === 'raster' && (
+                      <>
+                        <Heading size="md" m="0" mb="3" display="flex">
+                          Image
+                        </Heading>
+
+                        <Box>
+                          <Button
+                            colorScheme="accent"
+                            onClick={() => {
+                              state.isShowingCustomizeImage = true
+                            }}
+                          >
+                            Customize Image
+                          </Button>
+                        </Box>
+                      </>
+                    )}
+
+                    <Box mt="6">
+                      <SectionLabel>
+                        {/* <Heading size="md" m="0" display="flex"> */}
+                        Resize, rotate, transform
+                        {/* </Heading> */}
+                      </SectionLabel>
+                      {!store.leftTabIsTransformingShape && (
+                        <>
+                          <Stack direction="row" mt="3" spacing="3">
+                            <Button
+                              colorScheme="primary"
+                              onClick={() => {
+                                if (!store.editor) {
+                                  return
+                                }
+                                const totalItemsCount =
+                                  (store.editor.items.shape.items.length || 0) +
+                                  (store.editor.items.bg.items.length || 0)
+                                if (
+                                  totalItemsCount > 0 &&
+                                  !window.confirm(
+                                    'All unlocked words will be removed. Do you want to continue?'
+                                  )
+                                ) {
+                                  return
+                                }
+                                store.leftTabIsTransformingShape = true
+                                store.editor.selectShape()
+                              }}
+                            >
+                              Transform shape
+                            </Button>
+                            {resetTransformBtn}
+                          </Stack>
+                        </>
+                      )}
+
+                      {store.leftTabIsTransformingShape && (
+                        <Box>
+                          <Text mt="2">
+                            Drag the shape to move or rotate it.
+                          </Text>
+                          <Stack direction="row" mt="3" spacing="2">
+                            <Button
+                              colorScheme="accent"
+                              onClick={() => {
+                                store.leftTabIsTransformingShape = false
+                                store.editor?.deselectShape()
+                                store.editor?.clearItems('shape')
+                                store.editor?.clearItems('bg')
+                                store.animateVisualize(false)
+                              }}
+                            >
+                              Apply
+                            </Button>
+                            {resetTransformBtn}
+                          </Stack>
+                        </Box>
+                      )}
+                    </Box>
+                  </Stack>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -475,7 +481,7 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                   }
                 : undefined,
             }
-            await store.updateShape()
+            await store.updateShapeFromSelectedShapeConf()
             store.updateShapeThumbnail()
           }}
         />

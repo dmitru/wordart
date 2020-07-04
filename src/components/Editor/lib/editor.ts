@@ -1279,7 +1279,7 @@ export class Editor {
           })),
         // Icons
         icons: style.items.icons.iconList.map((shape) => ({
-          shape: this.store.getShapeConfById(shape.shapeId)!,
+          shape: this.store.getIconShapeConfById(shape.shapeId)!,
         })),
         iconsMaxSize: style.items.placement.iconsMaxSize,
         iconProbability: style.items.placement.iconsProportion / 100,
@@ -1491,7 +1491,7 @@ export class Editor {
           })),
         // Icons
         icons: style.items.icons.iconList.map((shape) => ({
-          shape: this.store.getShapeConfById(shape.shapeId)!,
+          shape: this.store.getIconShapeConfById(shape.shapeId)!,
         })),
         iconsMaxSize: style.items.placement.iconsMaxSize,
         iconProbability: style.items.placement.iconsProportion / 100,
@@ -1849,7 +1849,7 @@ export class Editor {
       if (shapesById.has(shapeId)) {
         continue
       }
-      const shapeConf = this.store.getShapeConfById(itemConfig.shapeId)
+      const shapeConf = this.store.getIconShapeConfById(itemConfig.shapeId)
       if (shapeConf?.kind === 'svg') {
         const shapeObj = await loadObjFromSvg(shapeConf.url)
         shapeObj.scale(100 / shapeObj.getBoundingRect().height)
@@ -1870,7 +1870,7 @@ export class Editor {
       }
 
       let shapeObj: fabric.Object | undefined
-      const shapeConf = this.store.getShapeConfById(itemConfig.shapeId)
+      const shapeConf = this.store.getIconShapeConfById(itemConfig.shapeId)
       if (shapeConf?.kind === 'svg') {
         shapeObj = shapesById.get(itemConfig.shapeId)!.shapeObj
       }

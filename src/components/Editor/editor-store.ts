@@ -131,7 +131,8 @@ export class EditorStore {
   @observable availableImageShapes: ShapeImageConf[] = imageShapes
   @observable availableIconShapes: ShapeSvgConf[] = iconShapes
   // @TODO: refactor it to simply store reference to a ShapeConf
-  @observable selectedShapeId: ShapeId = imageShapes[4].id
+  // @observable selectedShapeId: ShapeId = imageShapes[4].id
+  @observable selectedShapeConf: ShapeConf = imageShapes[4]
 
   wordIdGen = new UniqIdGenerator(3)
   customImgIdGen = new UniqIdGenerator(3)
@@ -248,7 +249,7 @@ export class EditorStore {
       await this.loadSerialized(params.serialized)
     } else {
       await this.applyColorTheme(themePresets[0])
-      await this.selectShape(imageShapes[5].id)
+      await this.selectShape(imageShapes[5])
     }
 
     this.enterViewMode('shape')
@@ -403,32 +404,41 @@ export class EditorStore {
     }
 
     if (data.shape.kind === 'custom-raster') {
-      const customImgId = this.addCustomShapeImg({
+      const customShapeConf: ShapeConf = {
         kind: 'raster',
+        id: 'custom:raster',
         title: 'Custom',
         url: data.shape.url,
         isCustom: true,
         thumbnailUrl: data.shape.url,
         processedThumbnailUrl: data.shape.url,
         processing: data.shape.processing,
-      })
-      await this.selectShape(customImgId, false, false)
+      }
+      await this.selectShape(customShapeConf, false, false)
     } else if (data.shape.kind === 'custom-text') {
-      const customImgId = this.addCustomShapeText({
+      const customShapeConf: ShapeConf = {
         kind: 'text',
+        id: 'custom:text',
         title: 'Custom',
         isCustom: true,
         thumbnailUrl: '',
         processedThumbnailUrl: '', // TODO
         text: data.shape.text,
         textStyle: data.shape.textStyle,
-      })
-      await this.selectShape(customImgId, false, false)
+      }
+      await this.selectShape(customShapeConf, false, false)
     } else if (
       (data.shape.kind === 'raster' || data.shape.kind === 'svg') &&
       data.shape.shapeId != null
     ) {
-      await this.selectShape(data.shape.shapeId, false, false)
+      const shapeId = data.shape.shapeId
+      const shapeConf =
+        this.availableIconShapes.find((s) => s.id === shapeId) ||
+        this.availableImageShapes.find((s) => s.id === shapeId)
+      if (!shapeConf) {
+        throw new Error(`shape config not found for shape id ${shapeId}`)
+      }
+      await this.selectShape(shapeConf, false, false)
     }
 
     const shape = this.editor.shape
@@ -620,7 +630,7 @@ export class EditorStore {
       mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
       false
     )
-    const shapeConf = this.getShapeConfById(this.selectedShapeId)!
+    const shapeConf = this.selectedShapeConf
     await this.editor.updateShapeColors(shapeConf, false)
 
     await this.editor.setShapeItemsStyle(
@@ -680,7 +690,7 @@ export class EditorStore {
 
     return {
       mode: this.editor.mode,
-      shapeId: this.selectedShapeId,
+      shapeConf: cloneDeep(this.selectedShapeConf),
       activeLayer: this.targetTab,
       selection,
       leftTabIsTransformingShape: this.leftTabIsTransformingShape,
@@ -728,7 +738,7 @@ export class EditorStore {
     }
 
     // Shape
-    this.selectedShapeId = state.shapeId
+    this.selectedShapeConf = state.shapeConf
     this.updateShapeThumbnail()
 
     // Active layer
@@ -1115,10 +1125,13 @@ export class EditorStore {
     return map[category] || 999999
   }
 
-  getShapeConfById = (shapeId: ShapeId): ShapeConf | undefined =>
+  getIconShapeConfById = (shapeId: ShapeId): ShapeSvgConf | undefined =>
+    this.availableIconShapes.find((s) => s.id === shapeId)
+
+  getImageShapeConfById = (shapeId: ShapeId): ShapeImageConf | undefined =>
     this.availableImageShapes.find((s) => s.id === shapeId)
+
   getShape = (): Shape | undefined => {
-    const { selectedShapeId } = this
     return this.editor?.shape || undefined
   }
   getShapeConf = (): ShapeConf | undefined => this.getShape()?.config
@@ -1185,11 +1198,10 @@ export class EditorStore {
       ? loadFont(this.getFontById(fontId)!.style.url!)
       : Promise.resolve(null)
 
-  getSelectedShapeConf = () =>
-    this.availableImageShapes.find((s) => s.id === this.selectedShapeId)!
+  getSelectedShapeConf = () => this.selectedShapeConf
 
   selectShapeAndSaveUndo = async (
-    shapeId: ShapeId,
+    shapeConfig: ShapeConf,
     updateShapeColors = true,
     render = true
   ) => {
@@ -1200,7 +1212,7 @@ export class EditorStore {
     const stateBefore = this.getStateSnapshot()
 
     const persistedDataBefore = await this.serialize()
-    await this.selectShape(shapeId, updateShapeColors, render)
+    await this.selectShape(shapeConfig, updateShapeColors, render)
     const persistedDataAfter = await this.serialize()
     this.editor.pushUndoFrame({
       kind: 'visualize',
@@ -1215,15 +1227,13 @@ export class EditorStore {
   }
 
   @action selectShape = async (
-    shapeId: ShapeId,
+    shapeConfig: ShapeConf,
     updateShapeColors = true,
     render = true
   ) => {
     if (!this.editor) {
       return
     }
-
-    const shapeConfig = this.getShapeConfById(shapeId)!
 
     await this.editor.setShape({
       shapeConfig,
@@ -1243,18 +1253,19 @@ export class EditorStore {
       }
     }
 
-    this.selectedShapeId = shapeId
+    this.selectedShapeConf = shapeConfig
     this.editor.version++
 
     this.updateShapeThumbnail()
   }
 
-  updateShape = async () => {
+  /** Update shape based on the selected shape config (e.g. after shape config changes) */
+  updateShapeFromSelectedShapeConf = async () => {
     if (!this.editor) {
       return
     }
 
-    const shape = this.getShapeConfById(this.selectedShapeId)!
+    const shape = this.selectedShapeConf
     await this.editor.setShape({
       shapeConfig: shape,
       bgFillStyle: mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
@@ -1446,7 +1457,7 @@ export const pageSizePresets: PageSizePreset[] = [
 
 export type EditorStateSnapshot = {
   mode: EditorMode
-  shapeId: ShapeId
+  shapeConf: ShapeConf
   activeLayer: TargetTab
   leftTabIsTransformingShape: boolean
   selection:

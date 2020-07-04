@@ -1,5 +1,6 @@
 import {
   Box,
+  Flex,
   Menu,
   MenuButton,
   MenuItem,
@@ -14,6 +15,8 @@ import React from 'react'
 import { useStore } from 'services/root-store'
 import { Button } from 'components/shared/Button'
 import { ChevronDownIcon } from '@chakra-ui/icons'
+import { Tooltip } from 'components/shared/Tooltip'
+import { DeleteButton } from 'components/shared/DeleteButton'
 
 export const SvgShapeColorKindDropdown: React.FC<{
   onUpdate: () => void
@@ -108,55 +111,102 @@ export const SvgShapeColorOptions: React.FC<{
   return (
     <>
       <Box mt="2" mb="4" display="flex" alignItems="center">
-        <SvgShapeColorKindDropdown onUpdate={onUpdate} />
-
-        {shape.config.processing.colors.kind === 'single-color' && (
-          <Box ml="3">
+        {/* Show the only option - Single color */}
+        {shape.colorMap.length === 1 && (
+          <Flex alignItems="center">
             <ColorPickerPopover
               disableAlpha
-              value={chroma(shape.config.processing.colors.color)
+              value={chroma(
+                shape.config.processing.colors.kind === 'original'
+                  ? shapeStyle.colors.color
+                  : shape.config.processing.colors.kind === 'single-color'
+                  ? shape.config.processing.colors.color
+                  : 'black'
+              )
                 .alpha(1)
                 .hex()}
               onChange={(hex) => {
-                if (shape.config.processing.colors.kind === 'single-color') {
-                  shape.config.processing.colors.color = chroma(hex).hex()
-                  shapeStyle.colors.color = chroma(hex).hex()
-                }
+                shape.config.processing.colors.kind = 'single-color'
+                shape.config.processing.colors.color = chroma(hex).hex()
+                shapeStyle.colors.color = chroma(hex).hex()
               }}
               onAfterChange={() => {
                 onUpdate()
               }}
             />
-          </Box>
+            {shape.config.processing.colors.kind === 'single-color' && (
+              <Tooltip label="Reset default color">
+                <DeleteButton
+                  ml="2"
+                  onClick={() => {
+                    shape.config.processing.colors.kind = 'original'
+                    onUpdate()
+                  }}
+                />
+              </Tooltip>
+            )}
+          </Flex>
         )}
-      </Box>
 
-      {shape.config.processing.colors.kind === 'color-map' && (
-        <Box>
-          {shape.config.processing.colors.colors.map((color, index) => (
-            <Box mr="1" key={index} display="inline-block">
-              {shape.config.processing.colors.kind === 'color-map' && (
+        {shape.colorMap.length > 1 && (
+          <>
+            <SvgShapeColorKindDropdown onUpdate={onUpdate} />
+
+            {shape.config.processing.colors.kind === 'single-color' && (
+              <Box ml="3">
                 <ColorPickerPopover
                   disableAlpha
-                  value={chroma(shape.config.processing.colors.colors[index])
+                  value={chroma(shape.config.processing.colors.color)
                     .alpha(1)
                     .hex()}
                   onChange={(hex) => {
-                    if (shape.config.processing.colors.kind === 'color-map') {
-                      shape.config.processing.colors.colors[index] = chroma(
-                        hex
-                      ).hex()
+                    if (
+                      shape.config.processing.colors.kind === 'single-color'
+                    ) {
+                      shape.config.processing.colors.color = chroma(hex).hex()
+                      shapeStyle.colors.color = chroma(hex).hex()
                     }
                   }}
                   onAfterChange={() => {
                     onUpdate()
                   }}
                 />
-              )}
-            </Box>
-          ))}
-        </Box>
-      )}
+              </Box>
+            )}
+
+            {shape.config.processing.colors.kind === 'color-map' && (
+              <Box>
+                {shape.config.processing.colors.colors.map((color, index) => (
+                  <Box mr="1" key={index} display="inline-block">
+                    {shape.config.processing.colors.kind === 'color-map' && (
+                      <ColorPickerPopover
+                        disableAlpha
+                        value={chroma(
+                          shape.config.processing.colors.colors[index]
+                        )
+                          .alpha(1)
+                          .hex()}
+                        onChange={(hex) => {
+                          if (
+                            shape.config.processing.colors.kind === 'color-map'
+                          ) {
+                            shape.config.processing.colors.colors[
+                              index
+                            ] = chroma(hex).hex()
+                          }
+                        }}
+                        onAfterChange={() => {
+                          onUpdate()
+                        }}
+                      />
+                    )}
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </>
+        )}
+      </Box>
     </>
   )
 })

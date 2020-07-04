@@ -15,6 +15,7 @@ export type ShapeFullCanvasConf = {
   kind: 'full canvas'
   id: 's:full canvas'
   thumbnailUrl: string
+  processedThumbnailUrl: string
   color: string
 }
 
@@ -23,6 +24,7 @@ export type ShapeRandomBlobConf = {
   id: 's:random blob'
   url: string
   thumbnailUrl: string
+  processedThumbnailUrl: string
   color: string
 }
 

@@ -64,7 +64,7 @@ export const BgItemsColorPickerKindDropdown: React.FC<{
 
               <MenuItemWithDescription
                 title="Color scale"
-                description="Choose 2 colors to define a linear color scale"
+                description="Choose 2 colors to use all colors in between"
                 onClick={() => {
                   bgStyle.items.coloring.kind = 'gradient'
                   onUpdate()

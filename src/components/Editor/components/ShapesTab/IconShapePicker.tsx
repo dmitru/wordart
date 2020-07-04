@@ -432,8 +432,10 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                       showProcessedThumbnails
                       shapes={matchingShapes}
                       onSelected={async (shapeConfig) => {
-                        if (store.selectedShapeId !== shapeConfig.id) {
-                          await store.selectShapeAndSaveUndo(shapeConfig.id)
+                        if (
+                          store.getSelectedShapeConf().id !== shapeConfig.id
+                        ) {
+                          await store.selectShapeAndSaveUndo(shapeConfig)
                         }
                         store.animateVisualize(false)
                       }}
@@ -475,7 +477,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                   }
                 : undefined,
             }
-            await store.updateShape()
+            await store.updateShapeFromSelectedShapeConf()
             store.updateShapeThumbnail()
           }}
         />
