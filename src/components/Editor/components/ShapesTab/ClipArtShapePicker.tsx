@@ -19,7 +19,7 @@ import {
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
 import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
-import { ShapeImageConf } from 'components/Editor/shape-config'
+import { ShapeClipartConf } from 'components/Editor/shape-config'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
 import { SearchInput } from 'components/shared/SearchInput'
@@ -342,13 +342,15 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                       shapes={matchingShapes}
                       onSelected={async (shapeConfig) => {
                         if (
-                          store.getSelectedShapeConf().id !== shapeConfig.id
+                          store.shapesPanel.image.selected !==
+                          (shapeConfig as ShapeClipartConf).id
                         ) {
+                          store.shapesPanel.image.selected = (shapeConfig as ShapeClipartConf).id
                           await store.selectShapeAndSaveUndo(shapeConfig)
                         }
                         store.animateVisualize(false)
                       }}
-                      selectedShapeId={store.getSelectedShapeConf().id}
+                      selectedShapeId={store.shapesPanel.image.selected}
                     />
                   </Box>
                 </motion.div>
@@ -366,7 +368,7 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                     <SectionLabel>Colors</SectionLabel>
                     <ShapeColorOptions onUpdate={updateShapeColoring} />
 
-                    {shape.kind === 'raster' && (
+                    {/* {shape.kind === 'raster' && (
                       <>
                         <Heading size="md" m="0" mb="3" display="flex">
                           Image
@@ -383,7 +385,7 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                           </Button>
                         </Box>
                       </>
-                    )}
+                    )} */}
 
                     <Box mt="6">
                       <SectionLabel>
@@ -453,7 +455,7 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
         </>
       </Box>
 
-      {shape && shape.kind === 'raster' && (
+      {/* {shape && shape.kind === 'raster' && (
         <CustomizeRasterImageModal
           isOpen={state.isShowingCustomizeImage}
           key={shape.id}
@@ -485,7 +487,7 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
             store.updateShapeThumbnail()
           }}
         />
-      )}
+      )} */}
     </>
   )
 })

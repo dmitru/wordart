@@ -1,22 +1,31 @@
 import {
-  ShapeId,
-  ShapeRasterConf,
-  ShapeSvgConf,
+  ShapeFullCanvasConf,
+  ShapeRandomBlobConf,
   ShapeTextConf,
+  ShapeClipartSvgConf,
+  ShapeClipartRasterConf,
+  ShapeCustomImageSvgConf,
+  ShapeCustomImageRasterConf,
+  ShapeIconConf,
 } from 'components/Editor/shape-config'
 import { ColorString } from 'components/Editor/style-options'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 
 /** Representation of the currently selected shape */
-export type Shape = ShapeSvg | ShapeRaster | ShapeText
+export type Shape =
+  | ShapeIcon
+  | ShapeClipart
+  | ShapeCustomImage
+  | ShapeRandomBlob
+  | ShapeFullCanvas
+  | ShapeText
 
-// SVG
+export type ShapeClipart = ShapeClipartSvg | ShapeClipartRaster
+export type ShapeCustomImage = ShapeCustomImageSvg | ShapeCustomImageRaster
 
-export type ShapeSvg = {
-  id: ShapeId
-  kind: 'svg'
+// Clipart
+type ShapeSvgBase = {
   url: string
-  isCustom: boolean
   transform: MatrixSerialized
   originalTransform: MatrixSerialized
   /** Original colors, correspond to colorMap indices */
@@ -24,10 +33,23 @@ export type ShapeSvg = {
   /** Mapping of color slots to fabric items */
   colorMap: SvgShapeColorsMapEntry[]
 
-  config: ShapeSvgConf
-
   obj: fabric.Object
   objOriginalColors: fabric.Object
+}
+
+export type ShapeClipartSvg = ShapeSvgBase & {
+  kind: 'clipart:svg'
+  config: ShapeClipartSvgConf
+}
+
+export type ShapeCustomImageSvg = ShapeSvgBase & {
+  kind: 'custom:svg'
+  config: ShapeCustomImageSvgConf
+}
+
+export type ShapeIcon = ShapeSvgBase & {
+  kind: 'icon'
+  config: ShapeIconConf
 }
 
 export type SvgShapeColorsMapEntry = {
@@ -37,17 +59,10 @@ export type SvgShapeColorsMapEntry = {
   stroke: boolean
 }
 
-// Raster
-
-export type ShapeRaster = {
-  id: ShapeId
-  kind: 'raster'
-  isCustom: boolean
+type ShapeRasterBase = {
   url: string
   transform: MatrixSerialized
   originalTransform: MatrixSerialized
-
-  config: ShapeRasterConf
 
   // Canvases
   originalCanvas: HTMLCanvasElement
@@ -56,14 +71,43 @@ export type ShapeRaster = {
   obj: fabric.Object
 }
 
-// Text
+export type ShapeCustomImageRaster = ShapeRasterBase & {
+  kind: 'custom:raster'
+  config: ShapeCustomImageRasterConf
+}
 
+export type ShapeClipartRaster = ShapeRasterBase & {
+  kind: 'clipart:raster'
+  config: ShapeClipartRasterConf
+}
+
+// Text
 export type ShapeText = {
-  id: ShapeId
   kind: 'text'
-  isCustom: boolean
 
   config: ShapeTextConf
+
+  transform: MatrixSerialized
+  originalTransform: MatrixSerialized
+  obj: fabric.Object
+}
+
+// Full canvas
+export type ShapeFullCanvas = {
+  kind: 'full-canvas'
+
+  config: ShapeFullCanvasConf
+
+  transform: MatrixSerialized
+  originalTransform: MatrixSerialized
+  obj: fabric.Object
+}
+
+// Blob
+export type ShapeRandomBlob = {
+  kind: 'random-blob'
+
+  config: ShapeRandomBlobConf
 
   transform: MatrixSerialized
   originalTransform: MatrixSerialized

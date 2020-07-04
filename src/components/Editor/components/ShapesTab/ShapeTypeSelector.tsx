@@ -7,7 +7,6 @@ import {
 } from '@chakra-ui/core'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
-import { leftPanelShapesState } from 'components/Editor/components/ShapesTab/state'
 import { Button } from 'components/shared/Button'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { observer } from 'mobx-react'
@@ -16,6 +15,7 @@ import { useStore } from 'services/root-store'
 
 export const ShapeTypeSelector: React.FC<{}> = observer(() => {
   const { editorPageStore: store } = useStore()
+  const { shapesPanel: leftPanelShapesState } = store
 
   return (
     <Menu placement="bottom-end">
@@ -27,12 +27,12 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
         px="3"
       >
         {'Shape type: '}
-        {leftPanelShapesState.shapeVariety === 'blob' && 'Blob'}
-        {leftPanelShapesState.shapeVariety === 'image' && 'Clip art'}
-        {leftPanelShapesState.shapeVariety === 'icon' && 'Icon'}
-        {leftPanelShapesState.shapeVariety === 'custom image' && 'Custom image'}
-        {leftPanelShapesState.shapeVariety === 'text' && 'Text'}
-        {leftPanelShapesState.shapeVariety === 'full canvas' && 'Full canvas'}
+        {leftPanelShapesState.shapeKind === 'random blob' && 'Blob'}
+        {leftPanelShapesState.shapeKind === 'image' && 'Clip art'}
+        {leftPanelShapesState.shapeKind === 'icon' && 'Icon'}
+        {leftPanelShapesState.shapeKind === 'custom image' && 'Custom image'}
+        {leftPanelShapesState.shapeKind === 'text' && 'Text'}
+        {leftPanelShapesState.shapeKind === 'full canvas' && 'Full canvas'}
       </MenuButton>
 
       <Portal>
@@ -49,7 +49,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 title="Blob shape"
                 description="A random blob shape for quick and unique designs"
                 onClick={() => {
-                  leftPanelShapesState.shapeVariety = 'blob'
+                  leftPanelShapesState.shapeKind = 'random blob'
                 }}
               />
 
@@ -57,7 +57,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 title="Clip Art"
                 description="Choose one of hundreds images"
                 onClick={() => {
-                  leftPanelShapesState.shapeVariety = 'image'
+                  leftPanelShapesState.shapeKind = 'image'
                   const shapeConf = store.getImageShapeConfById(
                     leftPanelShapesState.image.selected
                   )
@@ -71,7 +71,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 title="Icon"
                 description="Choose one of thousands icons and emoticons"
                 onClick={() => {
-                  leftPanelShapesState.shapeVariety = 'icon'
+                  leftPanelShapesState.shapeKind = 'icon'
                   const shapeConf = store.getIconShapeConfById(
                     leftPanelShapesState.icon.selected
                   )
@@ -85,7 +85,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 title="Text"
                 description="Use custom text as shape"
                 onClick={() => {
-                  leftPanelShapesState.shapeVariety = 'text'
+                  leftPanelShapesState.shapeKind = 'text'
                 }}
               />
 
@@ -93,7 +93,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 title="Custom image"
                 description="Upload your own image!"
                 onClick={() => {
-                  leftPanelShapesState.shapeVariety = 'custom image'
+                  leftPanelShapesState.shapeKind = 'custom image'
                 }}
               />
 
@@ -101,7 +101,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 title="Full canvas"
                 description="Fill the entire canvas"
                 onClick={() => {
-                  leftPanelShapesState.shapeVariety = 'full canvas'
+                  leftPanelShapesState.shapeKind = 'full canvas'
                 }}
               />
             </MenuList>

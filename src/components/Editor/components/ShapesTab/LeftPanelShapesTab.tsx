@@ -1,12 +1,15 @@
 import { Box } from '@chakra-ui/core'
 import { ClipArtShapePicker } from 'components/Editor/components/ShapesTab/ClipArtShapePicker'
+import { IconShapePicker } from 'components/Editor/components/ShapesTab/IconShapePicker'
 import { ShapeTypeSelector } from 'components/Editor/components/ShapesTab/ShapeTypeSelector'
-import { leftPanelShapesState } from 'components/Editor/components/ShapesTab/state'
 import { observer } from 'mobx-react'
 import React from 'react'
-import { IconShapePicker } from 'components/Editor/components/ShapesTab/IconShapePicker'
+import { useStore } from 'services/root-store'
 
 export const LeftPanelShapesTab: React.FC<{}> = observer(() => {
+  const {
+    editorPageStore: { shapesPanel: leftPanelShapesState },
+  } = useStore()
   return (
     <>
       <Box px="5" py="6">
@@ -14,10 +17,8 @@ export const LeftPanelShapesTab: React.FC<{}> = observer(() => {
           <ShapeTypeSelector />
         </Box>
 
-        {leftPanelShapesState.shapeVariety === 'image' && (
-          <ClipArtShapePicker />
-        )}
-        {leftPanelShapesState.shapeVariety === 'icon' && <IconShapePicker />}
+        {leftPanelShapesState.shapeKind === 'image' && <ClipArtShapePicker />}
+        {leftPanelShapesState.shapeKind === 'icon' && <IconShapePicker />}
       </Box>
     </>
   )

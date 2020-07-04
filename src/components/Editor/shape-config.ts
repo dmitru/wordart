@@ -1,15 +1,48 @@
 import { FontId } from 'data/fonts'
 import { ColorString } from 'components/Editor/style-options'
+import {
+  ShapeClipartSvg,
+  ShapeCustomImageSvg,
+  ShapeIcon,
+  ShapeClipartRaster,
+  ShapeCustomImageRaster,
+} from 'components/Editor/shape'
+
+export type ShapeId = string
 
 /** Representation of an shape option available for selection */
 export type ShapeConf =
-  | ShapeSvgConf
-  | ShapeRasterConf
+  | ShapeClipartConf
+  | ShapeCustomImageConf
+  | ShapeIconConf
   | ShapeTextConf
   | ShapeRandomBlobConf
   | ShapeFullCanvasConf
-export type ShapeImageConf = ShapeSvgConf | ShapeRasterConf
+
+export type ShapeClipartConf = ShapeClipartSvgConf | ShapeClipartRasterConf
+export type ShapeCustomImageConf =
+  | ShapeCustomImageSvgConf
+  | ShapeCustomImageRasterConf
+
+export type ShapeRasterConf =
+  | ShapeClipartRasterConf
+  | ShapeCustomImageRasterConf
+
 export type ShapeKind = ShapeConf['kind']
+
+export type ShapeTextConf = {
+  title: string
+  thumbnailUrl: string
+  processedThumbnailUrl: string
+  kind: 'text'
+  text: string
+  textStyle: ShapeTextStyle
+}
+
+export type ShapeTextStyle = {
+  color: string
+  fontId: FontId
+}
 
 export type ShapeFullCanvasConf = {
   kind: 'full canvas'
@@ -28,47 +61,45 @@ export type ShapeRandomBlobConf = {
   color: string
 }
 
-export type ShapeSvgConf = {
-  isCustom?: boolean
-  id: ShapeId
+type ShapeSvgConfBase = {
   categories?: string[]
   keywords?: string[]
-  kind: 'svg'
   url: string
   thumbnailUrl: string
   processedThumbnailUrl: string
   title: string
   processing: SvgProcessingConf
 }
-export type ShapeRasterConf = {
-  isCustom?: boolean
+
+export type ShapeClipartSvgConf = ShapeSvgConfBase & {
+  kind: ShapeClipartSvg['kind']
+  id: ShapeId
+}
+export type ShapeCustomImageSvgConf = ShapeSvgConfBase & {
+  kind: ShapeCustomImageSvg['kind']
+}
+export type ShapeIconConf = ShapeSvgConfBase & {
+  kind: ShapeIcon['kind']
+  id: ShapeId
+}
+
+type ShapeRasterConfBase = {
   categories?: string[]
   keywords?: string[]
-  id: ShapeId
-  kind: 'raster'
   url: string
   thumbnailUrl: string
   processedThumbnailUrl: string
   title: string
-  processing?: RasterProcessingConf
+  processing: RasterProcessingConf
 }
-export type ShapeTextConf = {
-  isCustom?: boolean
+
+export type ShapeClipartRasterConf = ShapeRasterConfBase & {
+  kind: ShapeClipartRaster['kind']
   id: ShapeId
-  title: string
-  thumbnailUrl: string
-  processedThumbnailUrl: string
-  kind: 'text'
-  text: string
-  textStyle: ShapeTextStyle
 }
-
-export type ShapeTextStyle = {
-  color: string
-  fontId: FontId
+export type ShapeCustomImageRasterConf = ShapeRasterConfBase & {
+  kind: ShapeCustomImageRaster['kind']
 }
-
-export type ShapeId = string
 
 export type SvgProcessingConf = {
   colors:

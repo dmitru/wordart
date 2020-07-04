@@ -19,7 +19,7 @@ import {
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
 import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
-import { ShapeImageConf } from 'components/Editor/shape-config'
+import { ShapeClipartConf } from 'components/Editor/shape-config'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
 import { SearchInput } from 'components/shared/SearchInput'
@@ -27,13 +27,16 @@ import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'
 import { AnimatePresence, motion } from 'framer-motion'
 import { isEqual } from 'lodash'
-import { observable } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import { observer } from 'mobx-react'
 import React, { useEffect, useState } from 'react'
 import { FaCog } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
+import chroma from 'chroma-js'
+import { DeleteButton } from 'components/shared/DeleteButton'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -168,6 +171,11 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
       </Tooltip>
     ) : null
 
+  const shapeConfig = store.getSelectedShapeConf()
+  if (!shape || shapeConfig.kind !== 'icon') {
+    return <></>
+  }
+
   return (
     <>
       <Box>
@@ -235,7 +243,9 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                 />
               </Box>
 
-              <Flex marginTop="70px" width="100%">
+              <IconColorPicker updateShapeColoring={updateShapeColoring} />
+
+              <Flex width="100%">
                 {state.mode === 'home' && (
                   <Button
                     mr="2"
@@ -281,27 +291,6 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                   exit={{ x: 355, y: 0, opacity: 0 }}
                 >
                   <Stack mb="4" p="2" position="absolute" width="100%">
-                    <ShapeColorOptions onUpdate={updateShapeColoring} />
-
-                    {shape.kind === 'raster' && (
-                      <>
-                        <Heading size="md" m="0" mb="3" display="flex">
-                          Image
-                        </Heading>
-
-                        <Box>
-                          <Button
-                            colorScheme="accent"
-                            onClick={() => {
-                              state.isShowingCustomizeImage = true
-                            }}
-                          >
-                            Customize Image
-                          </Button>
-                        </Box>
-                      </>
-                    )}
-
                     <Box mt="6">
                       <Heading size="md" m="0" display="flex">
                         Resize, rotate, transform
@@ -429,17 +418,25 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
 
                     <ShapeSelector
                       columns={6}
-                      showProcessedThumbnails
                       shapes={matchingShapes}
                       onSelected={async (shapeConfig) => {
+                        if (shapeConfig.kind !== 'icon') {
+                          return
+                        }
+                        shapeConfig.processing.colors = {
+                          kind: 'single-color',
+                          color: store.shapesPanel.icon.color,
+                        }
+
                         if (
-                          store.getSelectedShapeConf().id !== shapeConfig.id
+                          store.shapesPanel.icon.selected !== shapeConfig.id
                         ) {
+                          store.shapesPanel.icon.selected = shapeConfig.id
                           await store.selectShapeAndSaveUndo(shapeConfig)
                         }
                         store.animateVisualize(false)
                       }}
-                      selectedShapeId={store.getSelectedShapeConf().id}
+                      selectedShapeId={store.shapesPanel.icon.selected}
                     />
                   </Box>
                 </motion.div>
@@ -448,40 +445,41 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
           </Box>
         </>
       </Box>
-
-      {shape && shape.kind === 'raster' && (
-        <CustomizeRasterImageModal
-          isOpen={state.isShowingCustomizeImage}
-          key={shape.id}
-          value={{
-            invert: shape.config.processing?.invert != null,
-            invertColor: shape.config.processing?.invert?.color || 'black',
-            removeLightBackground:
-              shape.config.processing?.removeLightBackground?.threshold || 0,
-            originalUrl: shape.url,
-          }}
-          onClose={() => {
-            state.isShowingCustomizeImage = false
-          }}
-          onSubmit={async (thumbnailUrl, value) => {
-            shape.config.processedThumbnailUrl = thumbnailUrl
-            shape.config.processing = {
-              invert: value.invert
-                ? {
-                    color: value.invertColor,
-                  }
-                : undefined,
-              removeLightBackground: value.removeLightBackground
-                ? {
-                    threshold: value.removeLightBackground,
-                  }
-                : undefined,
-            }
-            await store.updateShapeFromSelectedShapeConf()
-            store.updateShapeThumbnail()
-          }}
-        />
-      )}
     </>
   )
 })
+
+const IconColorPicker = observer(
+  ({ updateShapeColoring }: { updateShapeColoring: () => void }) => {
+    const { editorPageStore: store } = useStore()
+    const shapeStyle = store.styleOptions.shape
+    const shape = store.getShape()
+    const shapeConfig = store.getSelectedShapeConf()
+
+    if (!shape || shapeConfig.kind !== 'icon') {
+      return <></>
+    }
+
+    return (
+      <Flex alignItems="center">
+        <ColorPickerPopover
+          disableAlpha
+          value={chroma(store.shapesPanel.icon.color).alpha(1).hex()}
+          onChange={(color) => {
+            runInAction(() => {
+              shapeConfig.processing.colors = {
+                kind: 'single-color',
+                color,
+              }
+              store.shapesPanel.icon.color = color
+            })
+          }}
+          onAfterChange={() => {
+            console.log('onAfterChange')
+            updateShapeColoring()
+          }}
+        />
+      </Flex>
+    )
+  }
+)

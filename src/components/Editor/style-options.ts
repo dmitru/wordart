@@ -34,10 +34,6 @@ export type BgStyleOptions = {
 /** UI state for shape style options */
 export type ShapeStyleOptions = {
   opacity: number
-  colors: {
-    color: ColorString
-    colorMaps: Map<ShapeId, ColorString[]>
-  }
   items: {
     words: WordItemsOptions
     icons: IconItemsOptions

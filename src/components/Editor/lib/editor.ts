@@ -32,9 +32,10 @@ import { Shape, SvgShapeColorsMapEntry } from 'components/Editor/shape'
 import {
   ShapeConf,
   ShapeId,
-  ShapeRasterConf,
-  ShapeSvgConf,
   ShapeTextConf,
+  ShapeTextStyle,
+  SvgProcessingConf,
+  RasterProcessingConf,
 } from 'components/Editor/shape-config'
 import { BgStyleConf, ShapeStyleConf } from 'components/Editor/style'
 import {
@@ -237,19 +238,22 @@ export class Editor {
 
     this.canvas.on('object:modified', (evt) => {
       const target = evt.target
+      const { shape } = this
       console.log('obj:modified')
       if (!target) {
         return
       }
 
       if (
-        target === this.shape?.obj &&
-        this.shape.kind === 'svg' &&
-        this.shape.objOriginalColors
+        target === shape?.obj &&
+        (shape.kind === 'custom:svg' ||
+          shape.kind === 'clipart:svg' ||
+          shape.kind === 'icon') &&
+        shape.objOriginalColors
       ) {
-        const transform = getObjTransformMatrix(this.shape.obj)
-        this.shape.transform = transform
-        applyTransformToObj(this.shape.objOriginalColors, transform)
+        const transform = getObjTransformMatrix(shape.obj)
+        shape.transform = transform
+        applyTransformToObj(shape.objOriginalColors, transform)
         this.store.renderKey++
 
         this.canvas.requestRenderAll()
@@ -583,19 +587,15 @@ export class Editor {
     }
   }
 
-  updateRasterShapeColors = (config: ShapeRasterConf) => {
-    if (this.shape?.kind !== 'raster') {
-      console.error(
-        `Unexpected shape type: expected raster, got ${this.shape?.kind}, shape id: ${this.shape?.id}`
-      )
-      return
-    }
+  updateRasterShapeColors = (config: RasterProcessingConf) => {
+    // @TODO
+    throw new Error('not implemented')
   }
 
-  updateTextShapeColors = async (config: ShapeTextConf) => {
+  updateTextShapeColors = async (textStyle: ShapeTextStyle) => {
     if (this.shape?.kind !== 'text') {
       console.error(
-        `Unexpected shape type: expected text, got ${this.shape?.kind}, shape id: ${this.shape?.id}`
+        `Unexpected shape type: expected text, got ${this.shape?.kind}`
       )
       return
     }
@@ -605,13 +605,17 @@ export class Editor {
     }
 
     const shapeObj = this.shape.obj
-    setFillColor(shapeObj, config.textStyle.color)
+    setFillColor(shapeObj, textStyle.color)
   }
 
-  updateSvgShapeColors = async (config: ShapeSvgConf) => {
-    if (this.shape?.kind !== 'svg') {
+  updateSvgShapeColors = async (config: SvgProcessingConf) => {
+    if (
+      this.shape?.kind !== 'clipart:svg' &&
+      this.shape?.kind !== 'custom:svg' &&
+      this.shape?.kind !== 'icon'
+    ) {
       console.error(
-        `Unexpected shape type: expected svg, got ${this.shape?.kind}, shape id: ${this.shape?.id}`
+        `Unexpected shape type: expected svg, got ${this.shape?.kind}, shape id: ${this.shape}`
       )
       return
     }
@@ -623,7 +627,7 @@ export class Editor {
     let shapeObj = await cloneObj(this.shape.objOriginalColors)
     shapeObj.selectable = false
     shapeObj.opacity = this.shape.obj.opacity || 1
-    const { colors } = config.processing
+    const { colors } = config
 
     if (colors.kind === 'original') {
       // do nothing
@@ -666,14 +670,18 @@ export class Editor {
       this.logger.debug('>  No current shape, early exit')
       return
     }
-    if (config.kind === 'raster' && this.shape.kind === 'raster') {
-      this.updateRasterShapeColors(config)
+    if (config.kind === 'clipart:raster' || config.kind === 'custom:raster') {
+      this.updateRasterShapeColors(config.processing)
     }
-    if (config.kind === 'svg' && this.shape.kind === 'svg') {
-      this.updateSvgShapeColors(config)
+    if (
+      config.kind === 'clipart:svg' ||
+      config.kind === 'custom:svg' ||
+      config.kind === 'icon'
+    ) {
+      this.updateSvgShapeColors(config.processing)
     }
     if (config.kind === 'text' && this.shape.kind === 'text') {
-      this.updateTextShapeColors(config)
+      this.updateTextShapeColors(config.textStyle)
     }
     if (render) {
       this.canvas.requestRenderAll()
@@ -791,7 +799,11 @@ export class Editor {
         color = chroma(colors[colorIndex])
         colorIndex = (colorIndex + 1) % colors.length
       } else if (coloring.kind === 'shape') {
-        if (shape.kind === 'svg') {
+        if (
+          shape.kind === 'custom:svg' ||
+          shape.kind === 'clipart:svg' ||
+          shape.kind === 'icon'
+        ) {
           if (shape.config.processing.colors.kind === 'single-color') {
             const shapeColor = new paper.Color(
               shape.config.processing.colors.color
@@ -826,7 +838,10 @@ export class Editor {
               255 * shapeColor.blue
             )
           }
-        } else if (shape.kind === 'raster') {
+        } else if (
+          shape.kind === 'custom:raster' ||
+          shape.kind === 'clipart:raster'
+        ) {
           let colorString = item.shapeColor
           if (shape.config.processing?.invert) {
             colorString = shape.config.processing.invert.color
@@ -889,16 +904,20 @@ export class Editor {
     let shape: Shape | undefined
 
     // Process the shape...
-    if (shapeConfig.kind === 'svg') {
+    if (
+      shapeConfig.kind === 'clipart:svg' ||
+      shapeConfig.kind === 'custom:svg' ||
+      shapeConfig.kind === 'icon'
+    ) {
       shapeObj = await loadObjFromSvg(shapeConfig.url)
 
       colorMap = computeColorsMap(shapeObj as fabric.Group)
 
       shape = {
+        // @ts-ignore
         config: shapeConfig,
-        kind: 'svg',
-        id: shapeConfig.id,
-        isCustom: shapeConfig.isCustom || false,
+        // @ts-ignore
+        kind: shapeConfig.kind,
         obj: shapeObj,
         objOriginalColors: shapeObj,
         originalColors: colorMap.map((c) => c.color),
@@ -907,7 +926,10 @@ export class Editor {
         url: shapeConfig.url,
         colorMap,
       }
-    } else if (shapeConfig.kind === 'raster') {
+    } else if (
+      shapeConfig.kind === 'custom:raster' ||
+      shapeConfig.kind === 'clipart:raster'
+    ) {
       shapeObj = await loadObjFromImg(shapeConfig.url)
       const originalCanvas = objAsCanvasElement(shapeObj)
       const processedCanvas = objAsCanvasElement(shapeObj)
@@ -918,10 +940,10 @@ export class Editor {
       shapeObj = new fabric.Image(canvasToImgElement(processedCanvas))
 
       shape = {
+        // @ts-ignore
         config: shapeConfig,
-        kind: 'raster',
-        id: shapeConfig.id,
-        isCustom: shapeConfig.isCustom || false,
+        // @ts-ignore
+        kind: shapeConfig.kind,
         obj: shapeObj,
         transform: new paper.Matrix().values as MatrixSerialized,
         originalTransform: new paper.Matrix().values as MatrixSerialized,
@@ -950,8 +972,6 @@ export class Editor {
       shape = {
         config: shapeConfig,
         kind: 'text',
-        id: shapeConfig.id,
-        isCustom: shapeConfig.isCustom || false,
         transform: new paper.Matrix().values as MatrixSerialized,
         originalTransform: new paper.Matrix().values as MatrixSerialized,
         obj: shapeObj,
@@ -1004,7 +1024,11 @@ export class Editor {
     }
     this.canvas.add(shapeObj)
 
-    if (shape?.kind === 'svg') {
+    if (
+      shape?.kind === 'clipart:svg' ||
+      shape?.kind === 'custom:svg' ||
+      shape?.kind === 'icon'
+    ) {
       const shapeCopyObj = await cloneObj(shapeObj)
       shapeCopyObj.set({ selectable: false })
       shape.objOriginalColors = shapeCopyObj
@@ -1144,7 +1168,6 @@ export class Editor {
 
   generateBgItems = async (params: { style: BgStyleConf }) => {
     const { style } = params
-    const { coloring } = style.items
     this.store.visualizeAnimatedLastTime = new Date()
     this.logger.debug('generateBgItems')
     if (!this.shape?.obj) {
@@ -1157,7 +1180,12 @@ export class Editor {
 
     const shapeObj = this.shape.obj
     const shapeOriginalColorsObj =
-      this.shape.kind === 'svg' ? this.shape.objOriginalColors : this.shape.obj
+      this.shape.kind === 'clipart:svg' ||
+      this.shape.kind === 'custom:svg' ||
+      this.shape.kind === 'icon'
+        ? this.shape.objOriginalColors
+        : this.shape.obj
+
     if (!shapeOriginalColorsObj) {
       console.error('No shapeOriginalColorsObj')
       return
@@ -1224,7 +1252,22 @@ export class Editor {
     const shapeConfig = this.store.getSelectedShapeConf()
     const wordConfigsById = keyBy(style.items.words.wordList, 'id')
 
-    let addedFirstBatch = false
+    const enableRemoveWhiteBg =
+      shapeConfig.kind === 'custom:raster' ||
+      shapeConfig.kind === 'clipart:raster'
+    const enableEdges =
+      (shapeConfig.kind === 'custom:raster' ||
+        shapeConfig.kind === 'clipart:raster' ||
+        shapeConfig.kind === 'custom:svg' ||
+        shapeConfig.kind === 'clipart:svg') &&
+      shapeConfig.processing?.edges != null
+    const edgesAmount =
+      shapeConfig.kind === 'custom:raster' ||
+      shapeConfig.kind === 'clipart:raster' ||
+      shapeConfig.kind === 'custom:svg' ||
+      shapeConfig.kind === 'clipart:svg'
+        ? shapeConfig.processing?.edges?.amount
+        : 0
 
     const result = await this.generator.fillShape(
       {
@@ -1235,7 +1278,7 @@ export class Editor {
           bounds: sceneBounds,
           processing: {
             removeWhiteBg: {
-              enabled: shapeConfig.kind === 'raster',
+              enabled: enableRemoveWhiteBg,
               lightnessThreshold: 98,
             },
             shrink: {
@@ -1243,19 +1286,12 @@ export class Editor {
               amount: style.items.placement.shapePadding,
             },
             edges: {
-              enabled:
-                this.shape.kind === 'raster' || this.shape.kind === 'svg'
-                  ? this.shape.config.processing?.edges != null
-                  : false,
+              enabled: enableEdges,
               blur:
-                17 *
-                (1 -
-                  ((this.shape.kind === 'raster' ||
-                    this.shape.kind === 'svg') &&
-                  this.shape.config.processing?.edges
-                    ? this.shape.config.processing?.edges.amount
-                    : 0) /
-                    100),
+                (17 *
+                  (1 -
+                    (enableEdges && edgesAmount != null ? edgesAmount : 0))) /
+                100,
               lowThreshold: 30,
               highThreshold: 100,
             },
@@ -1376,7 +1412,12 @@ export class Editor {
 
     const shapeObj = this.shape.obj
     const shapeOriginalColorsObj =
-      this.shape.kind === 'svg' ? this.shape.objOriginalColors : this.shape.obj
+      this.shape.kind === 'clipart:svg' ||
+      this.shape.kind === 'custom:svg' ||
+      this.shape.kind === 'icon'
+        ? this.shape.objOriginalColors
+        : this.shape.obj
+
     if (!shapeOriginalColorsObj) {
       console.error('No shapeOriginalColorsObj')
       return
@@ -1425,21 +1466,29 @@ export class Editor {
       shapeCanvas.width,
       shapeCanvas.height
     )
-    // shapeRaster = undefined
+
     const wordFonts: Font[] = await this.fetchFonts(style.items.words.fontIds)
 
     const shapeConfig = this.store.getSelectedShapeConf()
     const wordConfigsById = keyBy(style.items.words.wordList, 'id')
 
-    let addedFirstBatch = false
-
-    let shouldRemoveEdges = false
-    if (
-      this.shape.kind === 'raster' ||
-      (this.shape.kind === 'svg' && this.shape.colorMap.length > 1)
-    ) {
-      shouldRemoveEdges = this.shape.config.processing?.edges != null
-    }
+    // @TODO: don't remove edges for single-color SVG shapes
+    const enableRemoveWhiteBg =
+      shapeConfig.kind === 'custom:raster' ||
+      shapeConfig.kind === 'clipart:raster'
+    const enableEdges =
+      (shapeConfig.kind === 'custom:raster' ||
+        shapeConfig.kind === 'clipart:raster' ||
+        shapeConfig.kind === 'custom:svg' ||
+        shapeConfig.kind === 'clipart:svg') &&
+      shapeConfig.processing?.edges != null
+    const edgesAmount =
+      shapeConfig.kind === 'custom:raster' ||
+      shapeConfig.kind === 'clipart:raster' ||
+      shapeConfig.kind === 'custom:svg' ||
+      shapeConfig.kind === 'clipart:svg'
+        ? shapeConfig.processing?.edges?.amount
+        : 0
 
     const result = await this.generator.fillShape(
       {
@@ -1450,7 +1499,7 @@ export class Editor {
           bounds: shapeRasterBounds,
           processing: {
             removeWhiteBg: {
-              enabled: shapeConfig.kind === 'raster',
+              enabled: enableRemoveWhiteBg,
               lightnessThreshold: 98,
             },
             shrink: {
@@ -1458,16 +1507,12 @@ export class Editor {
               amount: style.items.placement.shapePadding,
             },
             edges: {
-              enabled: shouldRemoveEdges,
+              enabled: enableEdges,
               blur:
-                17 *
-                (1 -
-                  ((this.shape.kind === 'raster' ||
-                    this.shape.kind === 'svg') &&
-                  this.shape.config.processing?.edges
-                    ? this.shape.config.processing?.edges.amount
-                    : 0) /
-                    100),
+                (17 *
+                  (1 -
+                    (enableEdges && edgesAmount != null ? edgesAmount : 0))) /
+                100,
               lowThreshold: 30,
               highThreshold: 100,
             },
@@ -1497,31 +1542,7 @@ export class Editor {
         iconProbability: style.items.placement.iconsProportion / 100,
       },
       async (batch, progressPercent) => {
-        // if (!addedFirstBatch) {
-        //   await this.deleteNonLockedShapeItems()
-        //   addedFirstBatch = true
-        // }
-        // const items: EditorItemConfig[] = []
-
-        // for (const genItem of batch) {
-        //   if (genItem.kind === 'word') {
-        //     const wordConfig = wordConfigsById[genItem.wordConfigId]
-        //     items.push({
-        //       ...genItem,
-        //       color: 'black',
-        //       locked: false,
-        //       text: wordConfig.text,
-        //       customColor: wordConfig.color,
-        //     })
-        //   }
-        // }
-        // await this.addShapeItems(items)
-        // console.log(
-        //   'this.store.visualizingProgress=',
-        //   this.store.visualizingProgress
-        // )
         this.store.visualizingProgress = progressPercent
-        // await this.setShapeItemsStyle(style.items)
         for (let i = 0; i < PROGRESS_REPORT_RAF_WAIT_COUNT; ++i) {
           await waitAnimationFrame()
         }
@@ -1837,7 +1858,7 @@ export class Editor {
       fabricObjToItem.set(item.fabricObj, item)
     }
 
-    // Process shape items...
+    // Process icon items...
     const shapesById = new Map<
       ShapeId,
       {
@@ -1850,7 +1871,7 @@ export class Editor {
         continue
       }
       const shapeConf = this.store.getIconShapeConfById(itemConfig.shapeId)
-      if (shapeConf?.kind === 'svg') {
+      if (shapeConf?.kind === 'icon' || shapeConf?.kind === 'clipart:svg') {
         const shapeObj = await loadObjFromSvg(shapeConf.url)
         shapeObj.scale(100 / shapeObj.getBoundingRect().height)
         shapeObj.setCoords()
@@ -1871,7 +1892,7 @@ export class Editor {
 
       let shapeObj: fabric.Object | undefined
       const shapeConf = this.store.getIconShapeConfById(itemConfig.shapeId)
-      if (shapeConf?.kind === 'svg') {
+      if (shapeConf?.kind === 'icon' || shapeConf?.kind === 'clipart:svg') {
         shapeObj = shapesById.get(itemConfig.shapeId)!.shapeObj
       }
 

@@ -26,10 +26,10 @@ import { Shape } from 'components/Editor/shape'
 import {
   ShapeConf,
   ShapeId,
-  ShapeRasterConf,
   ShapeTextConf,
-  ShapeImageConf,
-  ShapeSvgConf,
+  ShapeClipartConf,
+  ShapeKind,
+  ShapeIconConf,
 } from 'components/Editor/shape-config'
 import {
   getAnglesForPreset,
@@ -57,7 +57,7 @@ import {
 } from 'data/fonts'
 import { imageShapes, iconShapes } from 'data/shapes'
 import { loadFont } from 'lib/wordart/fonts'
-import { cloneDeep, isEqual, sortBy, uniq, uniqBy } from 'lodash'
+import { cloneDeep, sortBy, uniq, uniqBy } from 'lodash'
 import { action, observable, set, toJS } from 'mobx'
 import paper from 'paper'
 import {
@@ -114,6 +114,7 @@ export class EditorStore {
 
   @observable customFonts: FontConfig[] = []
 
+  @observable shapesPanel = leftPanelShapesInitialState
   /** Ui state of the various settings of the editor */
   @observable styleOptions = {
     bg: defaultBgStyleOptions,
@@ -128,8 +129,8 @@ export class EditorStore {
   @observable leftTabIsTransformingShape = false
   @observable targetTab = 'shape' as TargetTab
   @observable hasItemChanges = false
-  @observable availableImageShapes: ShapeImageConf[] = imageShapes
-  @observable availableIconShapes: ShapeSvgConf[] = iconShapes
+  @observable availableImageShapes: ShapeClipartConf[] = imageShapes
+  @observable availableIconShapes: ShapeIconConf[] = iconShapes
   // @TODO: refactor it to simply store reference to a ShapeConf
   // @observable selectedShapeId: ShapeId = imageShapes[4].id
   @observable selectedShapeConf: ShapeConf = imageShapes[4]
@@ -375,286 +376,255 @@ export class EditorStore {
   }
 
   @action loadSerialized = async (serialized: EditorPersistedData) => {
-    const shouldShowModal =
-      serialized.data.bgItems.items.length > 0 ||
-      serialized.data.shapeItems.items.length > 0
-
-    if (shouldShowModal) {
-      this.isVisualizing = true
-      this.visualizingStep = 'drawing'
-      this.visualizingProgress = 0
-    }
-
-    this.logger.debug('loadSerialized', serialized)
-    if (!this.editor) {
-      throw new Error('editor is not initialized')
-    }
-
-    const { data } = serialized
-    this.editor.setAspectRatio(
-      serialized.data.sceneSize.w / serialized.data.sceneSize.h,
-      false
-    )
-    this.availableImageShapes = this.availableImageShapes.filter(
-      (s) => !s.isCustom
-    )
-
-    for (const font of serialized.data.customFonts) {
-      await this.addCustomFont(font)
-    }
-
-    if (data.shape.kind === 'custom-raster') {
-      const customShapeConf: ShapeConf = {
-        kind: 'raster',
-        id: 'custom:raster',
-        title: 'Custom',
-        url: data.shape.url,
-        isCustom: true,
-        thumbnailUrl: data.shape.url,
-        processedThumbnailUrl: data.shape.url,
-        processing: data.shape.processing,
-      }
-      await this.selectShape(customShapeConf, false, false)
-    } else if (data.shape.kind === 'custom-text') {
-      const customShapeConf: ShapeConf = {
-        kind: 'text',
-        id: 'custom:text',
-        title: 'Custom',
-        isCustom: true,
-        thumbnailUrl: '',
-        processedThumbnailUrl: '', // TODO
-        text: data.shape.text,
-        textStyle: data.shape.textStyle,
-      }
-      await this.selectShape(customShapeConf, false, false)
-    } else if (
-      (data.shape.kind === 'raster' || data.shape.kind === 'svg') &&
-      data.shape.shapeId != null
-    ) {
-      const shapeId = data.shape.shapeId
-      const shapeConf =
-        this.availableIconShapes.find((s) => s.id === shapeId) ||
-        this.availableImageShapes.find((s) => s.id === shapeId)
-      if (!shapeConf) {
-        throw new Error(`shape config not found for shape id ${shapeId}`)
-      }
-      await this.selectShape(shapeConf, false, false)
-    }
-
-    const shape = this.editor.shape
-    if (data.shape.transform && shape) {
-      applyTransformToObj(shape.obj, data.shape.transform)
-      if (shape.kind === 'svg') {
-        applyTransformToObj(shape.objOriginalColors, data.shape.transform)
-      }
-    }
-
-    if (
-      shape?.kind === 'svg' &&
-      data.shape.kind === 'svg' &&
-      data.shape.processing
-    ) {
-      shape.config.processing = data.shape.processing
-    } else if (
-      shape?.kind === 'raster' &&
-      data.shape.kind === 'raster' &&
-      data.shape.processing
-    ) {
-      shape.config.processing = data.shape.processing
-    }
-
-    const sceneSize = this.editor.getSceneBounds(0)
-    const scale = sceneSize.width / serialized.data.sceneSize.w
-
-    const bgStyle = this.styleOptions.bg
-    const shapeStyle = this.styleOptions.shape
-
-    // // Restore BG style options
-    if (data.bgStyle.fill.kind === 'color') {
-      this.styleOptions.bg.fill.color = data.bgStyle.fill
-    } else if (data.bgStyle.fill.kind === 'transparent') {
-      this.styleOptions.bg.fill.kind = 'transparent'
-    }
-
-    bgStyle.items.dimSmallerItems = data.bgStyle.items.dimSmallerItems
-    bgStyle.items.brightness = data.bgStyle.items.brightness
-    bgStyle.items.opacity = data.bgStyle.items.opacity
-    bgStyle.items.placement = data.bgStyle.items.placement
-    bgStyle.items.icons.iconList = data.bgStyle.items.icons.iconList
-    bgStyle.items.words.customAngles = data.bgStyle.items.words.angles
-    bgStyle.items.words.wordList = data.bgStyle.items.words.wordList
-    bgStyle.items.words.fontIds = data.bgStyle.items.words.fontIds
-
-    if (data.bgStyle.items.coloring.kind === 'color') {
-      bgStyle.items.coloring.kind = 'color'
-      bgStyle.items.coloring.color = {
-        ...bgStyle.items.coloring.color,
-        ...data.bgStyle.items.coloring,
-      }
-    } else if (data.bgStyle.items.coloring.kind === 'gradient') {
-      bgStyle.items.coloring.kind = 'gradient'
-      bgStyle.items.coloring.gradient = data.bgStyle.items.coloring
-    }
-
-    // Restore Shape style options
-
-    shapeStyle.items.dimSmallerItems = data.shapeStyle.items.dimSmallerItems
-    shapeStyle.items.brightness = data.shapeStyle.items.brightness
-    shapeStyle.items.opacity = data.shapeStyle.items.opacity
-    shapeStyle.items.placement = data.shapeStyle.items.placement
-    shapeStyle.items.icons.iconList = data.shapeStyle.items.icons.iconList
-    shapeStyle.items.words.customAngles = data.shapeStyle.items.words.angles
-    shapeStyle.items.words.wordList = data.shapeStyle.items.words.wordList
-    shapeStyle.items.words.fontIds = data.shapeStyle.items.words.fontIds
-    shapeStyle.opacity = data.shapeStyle.opacity
-
-    if (data.shapeStyle.items.coloring.kind === 'color') {
-      shapeStyle.items.coloring.kind = 'color'
-      shapeStyle.items.coloring.color = {
-        ...shapeStyle.items.coloring.color,
-        ...data.shapeStyle.items.coloring,
-      }
-    } else if (data.shapeStyle.items.coloring.kind === 'gradient') {
-      shapeStyle.items.coloring.kind = 'gradient'
-      shapeStyle.items.coloring.gradient = data.shapeStyle.items.coloring
-    } else if (data.shapeStyle.items.coloring.kind === 'shape') {
-      shapeStyle.items.coloring.kind = 'shape'
-      shapeStyle.items.coloring.shape = data.shapeStyle.items.coloring
-    }
-
-    const deserializeItems = async ({
-      items,
-      words,
-      fontIds,
-    }: {
-      items: PersistedItemV1[]
-      words: PersistedWordV1[]
-      fontIds: FontId[]
-    }): Promise<EditorItemConfig[]> => {
-      console.log('deserializeItems: ', { words, items, fontIds })
-
-      // Fetch all required Fonts
-      const fontsById = new Map<FontId, Font>()
-      for (const fontId of fontIds) {
-        const font = await this.fetchFontById(fontId)
-        if (!font) {
-          throw new Error(`no font ${fontId}`)
-        }
-        fontsById.set(fontId, { otFont: font, id: fontId, isCustom: false })
-      }
-
-      const wordsInfoMap = new Map<
-        string,
-        { fontId: FontId; text: string; wordConfigId?: WordConfigId }
-      >()
-
-      const result: EditorItemConfig[] = []
-      for (const [index, item] of items.entries()) {
-        if (item.k === 'w') {
-          const word = words[item.wi]
-          const fontId = fontIds[word.fontIndex]
-          const fontEntry = fontsById.get(fontId)
-          if (!fontEntry) {
-            console.error(`No font entry for fontId ${fontId}`)
-            continue
-          }
-          const wordInfoId = `${fontId}-${word.text}`
-          if (!wordsInfoMap.has(wordInfoId)) {
-            wordsInfoMap.set(wordInfoId, {
-              text: word.text,
-              fontId,
-              wordConfigId: undefined,
-            })
-          }
-
-          const { text, wordConfigId } = wordsInfoMap.get(wordInfoId)!
-          const wordItem: EditorItemConfigWord = {
-            index: index,
-            color: item.c,
-            customColor: item.cc,
-            locked: item.l || false,
-            shapeColor: item.sc,
-            kind: 'word',
-            transform: new paper.Matrix(item.t).prepend(
-              new paper.Matrix().scale(scale, new paper.Point(0, 0))
-            ),
-            fontId,
-            text,
-            wordConfigId,
-          }
-
-          result.push(wordItem)
-        }
-
-        if (item.k === 's') {
-          const shapeItem: EditorItemConfigShape = {
-            index: index,
-            color: item.c,
-            customColor: item.cc,
-            locked: item.l || false,
-            shapeColor: item.sc,
-            kind: 'shape',
-            transform: new paper.Matrix(item.t).prepend(
-              new paper.Matrix().scale(scale, new paper.Point(0, 0))
-            ),
-            shapeId: item.sId,
-          }
-
-          result.push(shapeItem)
-        }
-      }
-
-      return result
-    }
-
-    const [shapeItems, bgItems] = await Promise.all([
-      deserializeItems({
-        items: data.shapeItems.items,
-        fontIds: data.shapeItems.fontIds,
-        words: data.shapeItems.words,
-      }),
-      deserializeItems({
-        items: data.bgItems.items,
-        fontIds: data.bgItems.fontIds,
-        words: data.bgItems.words,
-      }),
-    ])
-    this.editor.setShapeOpacity(shapeStyle.opacity / 100, false)
-    await this.editor.setShapeItems(shapeItems, false)
-    await this.editor.setBgItems(bgItems, false)
-
-    this.editor.setBgOpacity(
-      bgStyle.fill.kind === 'transparent' ? 0 : bgStyle.fill.color.opacity / 100
-    )
-    this.editor.setBgColor(
-      mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
-      false
-    )
-    const shapeConf = this.selectedShapeConf
-    await this.editor.updateShapeColors(shapeConf, false)
-
-    await this.editor.setShapeItemsStyle(
-      mkShapeStyleConfFromOptions(this.styleOptions.shape).items,
-      false
-    )
-    await this.editor.setBgItemsStyle(
-      mkBgStyleConfFromOptions(this.styleOptions.bg).items,
-      false
-    )
-
-    await this.updateShapeThumbnail()
-
-    this.editor.bgCanvas.requestRenderAll()
-    this.editor.canvas.requestRenderAll()
-
-    this.editor.key = data.key
-    this.editor.version = data.version
-
-    if (shouldShowModal) {
-      this.visualizingProgress = 1
-      this.isVisualizing = false
-      this.visualizingStep = null
-    }
+    // const shouldShowModal =
+    //   serialized.data.bgItems.items.length > 0 ||
+    //   serialized.data.shapeItems.items.length > 0
+    // if (shouldShowModal) {
+    //   this.isVisualizing = true
+    //   this.visualizingStep = 'drawing'
+    //   this.visualizingProgress = 0
+    // }
+    // this.logger.debug('loadSerialized', serialized)
+    // if (!this.editor) {
+    //   throw new Error('editor is not initialized')
+    // }
+    // const { data } = serialized
+    // this.editor.setAspectRatio(
+    //   serialized.data.sceneSize.w / serialized.data.sceneSize.h,
+    //   false
+    // )
+    // this.availableImageShapes = this.availableImageShapes.filter(
+    //   (s) => !s.isCustom
+    // )
+    // for (const font of serialized.data.customFonts) {
+    //   await this.addCustomFont(font)
+    // }
+    // if (data.shape.kind === 'custom-raster') {
+    //   const customShapeConf: ShapeConf = {
+    //     kind: 'raster',
+    //     id: 'custom:raster',
+    //     title: 'Custom',
+    //     url: data.shape.url,
+    //     isCustom: true,
+    //     thumbnailUrl: data.shape.url,
+    //     processedThumbnailUrl: data.shape.url,
+    //     processing: data.shape.processing,
+    //   }
+    //   await this.selectShape(customShapeConf, false, false)
+    // } else if (data.shape.kind === 'custom-text') {
+    //   const customShapeConf: ShapeConf = {
+    //     kind: 'text',
+    //     id: 'custom:text',
+    //     title: 'Custom',
+    //     isCustom: true,
+    //     thumbnailUrl: '',
+    //     processedThumbnailUrl: '', // TODO
+    //     text: data.shape.text,
+    //     textStyle: data.shape.textStyle,
+    //   }
+    //   await this.selectShape(customShapeConf, false, false)
+    // } else if (
+    //   (data.shape.kind === 'raster' || data.shape.kind === 'svg') &&
+    //   data.shape.shapeId != null
+    // ) {
+    //   const shapeId = data.shape.shapeId
+    //   const shapeConf =
+    //     this.availableIconShapes.find((s) => s.id === shapeId) ||
+    //     this.availableImageShapes.find((s) => s.id === shapeId)
+    //   if (!shapeConf) {
+    //     throw new Error(`shape config not found for shape id ${shapeId}`)
+    //   }
+    //   await this.selectShape(shapeConf, false, false)
+    // }
+    // const shape = this.editor.shape
+    // if (data.shape.transform && shape) {
+    //   applyTransformToObj(shape.obj, data.shape.transform)
+    //   if (shape.kind === 'svg') {
+    //     applyTransformToObj(shape.objOriginalColors, data.shape.transform)
+    //   }
+    // }
+    // if (
+    //   shape?.kind === 'svg' &&
+    //   data.shape.kind === 'svg' &&
+    //   data.shape.processing
+    // ) {
+    //   shape.config.processing = data.shape.processing
+    // } else if (
+    //   shape?.kind === 'raster' &&
+    //   data.shape.kind === 'raster' &&
+    //   data.shape.processing
+    // ) {
+    //   shape.config.processing = data.shape.processing
+    // }
+    // const sceneSize = this.editor.getSceneBounds(0)
+    // const scale = sceneSize.width / serialized.data.sceneSize.w
+    // const bgStyle = this.styleOptions.bg
+    // const shapeStyle = this.styleOptions.shape
+    // // // Restore BG style options
+    // if (data.bgStyle.fill.kind === 'color') {
+    //   this.styleOptions.bg.fill.color = data.bgStyle.fill
+    // } else if (data.bgStyle.fill.kind === 'transparent') {
+    //   this.styleOptions.bg.fill.kind = 'transparent'
+    // }
+    // bgStyle.items.dimSmallerItems = data.bgStyle.items.dimSmallerItems
+    // bgStyle.items.brightness = data.bgStyle.items.brightness
+    // bgStyle.items.opacity = data.bgStyle.items.opacity
+    // bgStyle.items.placement = data.bgStyle.items.placement
+    // bgStyle.items.icons.iconList = data.bgStyle.items.icons.iconList
+    // bgStyle.items.words.customAngles = data.bgStyle.items.words.angles
+    // bgStyle.items.words.wordList = data.bgStyle.items.words.wordList
+    // bgStyle.items.words.fontIds = data.bgStyle.items.words.fontIds
+    // if (data.bgStyle.items.coloring.kind === 'color') {
+    //   bgStyle.items.coloring.kind = 'color'
+    //   bgStyle.items.coloring.color = {
+    //     ...bgStyle.items.coloring.color,
+    //     ...data.bgStyle.items.coloring,
+    //   }
+    // } else if (data.bgStyle.items.coloring.kind === 'gradient') {
+    //   bgStyle.items.coloring.kind = 'gradient'
+    //   bgStyle.items.coloring.gradient = data.bgStyle.items.coloring
+    // }
+    // // Restore Shape style options
+    // shapeStyle.items.dimSmallerItems = data.shapeStyle.items.dimSmallerItems
+    // shapeStyle.items.brightness = data.shapeStyle.items.brightness
+    // shapeStyle.items.opacity = data.shapeStyle.items.opacity
+    // shapeStyle.items.placement = data.shapeStyle.items.placement
+    // shapeStyle.items.icons.iconList = data.shapeStyle.items.icons.iconList
+    // shapeStyle.items.words.customAngles = data.shapeStyle.items.words.angles
+    // shapeStyle.items.words.wordList = data.shapeStyle.items.words.wordList
+    // shapeStyle.items.words.fontIds = data.shapeStyle.items.words.fontIds
+    // shapeStyle.opacity = data.shapeStyle.opacity
+    // if (data.shapeStyle.items.coloring.kind === 'color') {
+    //   shapeStyle.items.coloring.kind = 'color'
+    //   shapeStyle.items.coloring.color = {
+    //     ...shapeStyle.items.coloring.color,
+    //     ...data.shapeStyle.items.coloring,
+    //   }
+    // } else if (data.shapeStyle.items.coloring.kind === 'gradient') {
+    //   shapeStyle.items.coloring.kind = 'gradient'
+    //   shapeStyle.items.coloring.gradient = data.shapeStyle.items.coloring
+    // } else if (data.shapeStyle.items.coloring.kind === 'shape') {
+    //   shapeStyle.items.coloring.kind = 'shape'
+    //   shapeStyle.items.coloring.shape = data.shapeStyle.items.coloring
+    // }
+    // const deserializeItems = async ({
+    //   items,
+    //   words,
+    //   fontIds,
+    // }: {
+    //   items: PersistedItemV1[]
+    //   words: PersistedWordV1[]
+    //   fontIds: FontId[]
+    // }): Promise<EditorItemConfig[]> => {
+    //   console.log('deserializeItems: ', { words, items, fontIds })
+    //   // Fetch all required Fonts
+    //   const fontsById = new Map<FontId, Font>()
+    //   for (const fontId of fontIds) {
+    //     const font = await this.fetchFontById(fontId)
+    //     if (!font) {
+    //       throw new Error(`no font ${fontId}`)
+    //     }
+    //     fontsById.set(fontId, { otFont: font, id: fontId, isCustom: false })
+    //   }
+    //   const wordsInfoMap = new Map<
+    //     string,
+    //     { fontId: FontId; text: string; wordConfigId?: WordConfigId }
+    //   >()
+    //   const result: EditorItemConfig[] = []
+    //   for (const [index, item] of items.entries()) {
+    //     if (item.k === 'w') {
+    //       const word = words[item.wi]
+    //       const fontId = fontIds[word.fontIndex]
+    //       const fontEntry = fontsById.get(fontId)
+    //       if (!fontEntry) {
+    //         console.error(`No font entry for fontId ${fontId}`)
+    //         continue
+    //       }
+    //       const wordInfoId = `${fontId}-${word.text}`
+    //       if (!wordsInfoMap.has(wordInfoId)) {
+    //         wordsInfoMap.set(wordInfoId, {
+    //           text: word.text,
+    //           fontId,
+    //           wordConfigId: undefined,
+    //         })
+    //       }
+    //       const { text, wordConfigId } = wordsInfoMap.get(wordInfoId)!
+    //       const wordItem: EditorItemConfigWord = {
+    //         index: index,
+    //         color: item.c,
+    //         customColor: item.cc,
+    //         locked: item.l || false,
+    //         shapeColor: item.sc,
+    //         kind: 'word',
+    //         transform: new paper.Matrix(item.t).prepend(
+    //           new paper.Matrix().scale(scale, new paper.Point(0, 0))
+    //         ),
+    //         fontId,
+    //         text,
+    //         wordConfigId,
+    //       }
+    //       result.push(wordItem)
+    //     }
+    //     if (item.k === 's') {
+    //       const shapeItem: EditorItemConfigShape = {
+    //         index: index,
+    //         color: item.c,
+    //         customColor: item.cc,
+    //         locked: item.l || false,
+    //         shapeColor: item.sc,
+    //         kind: 'shape',
+    //         transform: new paper.Matrix(item.t).prepend(
+    //           new paper.Matrix().scale(scale, new paper.Point(0, 0))
+    //         ),
+    //         shapeId: item.sId,
+    //       }
+    //       result.push(shapeItem)
+    //     }
+    //   }
+    //   return result
+    // }
+    // const [shapeItems, bgItems] = await Promise.all([
+    //   deserializeItems({
+    //     items: data.shapeItems.items,
+    //     fontIds: data.shapeItems.fontIds,
+    //     words: data.shapeItems.words,
+    //   }),
+    //   deserializeItems({
+    //     items: data.bgItems.items,
+    //     fontIds: data.bgItems.fontIds,
+    //     words: data.bgItems.words,
+    //   }),
+    // ])
+    // this.editor.setShapeOpacity(shapeStyle.opacity / 100, false)
+    // await this.editor.setShapeItems(shapeItems, false)
+    // await this.editor.setBgItems(bgItems, false)
+    // this.editor.setBgOpacity(
+    //   bgStyle.fill.kind === 'transparent' ? 0 : bgStyle.fill.color.opacity / 100
+    // )
+    // this.editor.setBgColor(
+    //   mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
+    //   false
+    // )
+    // const shapeConf = this.selectedShapeConf
+    // await this.editor.updateShapeColors(shapeConf, false)
+    // await this.editor.setShapeItemsStyle(
+    //   mkShapeStyleConfFromOptions(this.styleOptions.shape).items,
+    //   false
+    // )
+    // await this.editor.setBgItemsStyle(
+    //   mkBgStyleConfFromOptions(this.styleOptions.bg).items,
+    //   false
+    // )
+    // await this.updateShapeThumbnail()
+    // this.editor.bgCanvas.requestRenderAll()
+    // this.editor.canvas.requestRenderAll()
+    // this.editor.key = data.key
+    // this.editor.version = data.version
+    // if (shouldShowModal) {
+    //   this.visualizingProgress = 1
+    //   this.isVisualizing = false
+    //   this.visualizingStep = null
+    // }
   }
 
   updateShapeThumbnail = async () => {
@@ -856,37 +826,33 @@ export class EditorStore {
     const serializeShape = (shape: Shape): PersistedShapeConfV1 => {
       const transform = getObjTransformMatrix(this.getShape()!.obj)
 
-      if (shape.kind === 'raster') {
-        if (shape.isCustom) {
-          return {
-            kind: 'custom-raster',
-            transform,
-            url: shape.url,
-            processing: shape.config.processing || {},
-          }
-        } else {
-          return {
-            kind: 'raster',
-            transform,
-            shapeId: shape.id,
-            processing: shape.config.processing || {},
-          }
+      if (shape.kind === 'custom:raster') {
+        return {
+          kind: 'custom-raster',
+          transform,
+          url: shape.url,
+          processing: shape.config.processing || {},
         }
-      } else if (shape.kind === 'svg') {
-        if (shape.isCustom) {
-          return {
-            kind: 'custom-svg',
-            transform,
-            url: shape.url,
-            processing: shape.config.processing || {},
-          }
-        } else {
-          return {
-            kind: 'svg',
-            transform,
-            shapeId: shape.id,
-            processing: shape.config.processing || {},
-          }
+      } else if (shape.kind === 'clipart:raster') {
+        return {
+          kind: 'raster',
+          transform,
+          shapeId: shape.config.id,
+          processing: shape.config.processing || {},
+        }
+      } else if (shape.kind === 'custom:svg') {
+        return {
+          kind: 'custom-svg',
+          transform,
+          url: shape.url,
+          processing: shape.config.processing || {},
+        }
+      } else if (shape.kind === 'clipart:svg') {
+        return {
+          kind: 'svg',
+          transform,
+          shapeId: shape.config.id,
+          processing: shape.config.processing || {},
         }
       } else if (shape.kind === 'text') {
         return {
@@ -895,6 +861,13 @@ export class EditorStore {
           textStyle: shape.config.textStyle,
           transform,
         }
+      } else if (
+        shape.kind === 'icon' ||
+        shape.kind === 'full-canvas' ||
+        shape.kind === 'random-blob'
+      ) {
+        // TODO
+        throw new Error('not supported')
       } else {
         exhaustiveCheck(shape)
       }
@@ -1020,9 +993,6 @@ export class EditorStore {
     this.logger.debug('destroyEditor')
     this.editor?.destroy()
     this.lifecycleState = 'destroyed'
-    this.availableImageShapes = this.availableImageShapes.filter(
-      (s) => !s.isCustom
-    )
     this.styleOptions.shape = cloneDeep(defaultShapeStyleOptions)
     this.styleOptions.bg = cloneDeep(defaultBgStyleOptions)
   }
@@ -1061,58 +1031,17 @@ export class EditorStore {
     })
   }
 
-  // @TODO
-  addCustomShapeImg = (shape: Omit<ShapeRasterConf, 'id'>) => {
-    // const matchedShape = this.availableImageShapes.find(
-    //   (s) => s.kind === shape.kind && s.url === shape.url
-    // )
-    // if (matchedShape) {
-    //   return matchedShape.id
-    // }
-    // const id = this.customImgIdGen.get()
-
-    // this.availableImageShapes.push({
-    //   ...shape,
-    //   id,
-    // } as ShapeConf)
-
-    // return id
-    return 'custom-img'
-  }
-
-  // @TODO
-  addCustomShapeText = (shape: Omit<ShapeTextConf, 'id'>) => {
-    // const matchedShape = this.availableImageShapes.find(
-    //   (s) =>
-    //     s.kind === shape.kind &&
-    //     s.text === shape.text &&
-    //     isEqual(s.textStyle, shape.textStyle)
-    // )
-    // if (matchedShape) {
-    //   return matchedShape.id
-    // }
-    // const id = this.customImgIdGen.get()
-    // this.availableImageShapes.push({
-    //   ...shape,
-    //   id,
-    // } as ShapeConf)
-    // return id
-    return 'custom-text'
-  }
-
-  getAvailableImageShapes = (): ShapeImageConf[] =>
+  getAvailableImageShapes = (): ShapeClipartConf[] =>
     sortBy(
       this.availableImageShapes,
       (s) => (s.categories ? this.getCategoryOrder(s.categories[0]) : 999999),
-      (s) => (s.isCustom ? -1 : 1),
       (s) => s.title
     )
 
-  getAvailableIconShapes = (): ShapeSvgConf[] =>
+  getAvailableIconShapes = (): ShapeIconConf[] =>
     sortBy(
       this.availableIconShapes,
       (s) => (s.categories ? this.getCategoryOrder(s.categories[0]) : 999999),
-      (s) => (s.isCustom ? -1 : 1),
       (s) => s.title
     )
 
@@ -1125,10 +1054,10 @@ export class EditorStore {
     return map[category] || 999999
   }
 
-  getIconShapeConfById = (shapeId: ShapeId): ShapeSvgConf | undefined =>
+  getIconShapeConfById = (shapeId: ShapeId): ShapeIconConf | undefined =>
     this.availableIconShapes.find((s) => s.id === shapeId)
 
-  getImageShapeConfById = (shapeId: ShapeId): ShapeImageConf | undefined =>
+  getImageShapeConfById = (shapeId: ShapeId): ShapeClipartConf | undefined =>
     this.availableImageShapes.find((s) => s.id === shapeId)
 
   getShape = (): Shape | undefined => {
@@ -1244,13 +1173,9 @@ export class EditorStore {
       render,
     })
 
-    if (this.editor.shape?.kind === 'svg') {
-      if (!this.styleOptions.shape.colors.colorMaps.get(this.editor.shape.id)) {
-        this.styleOptions.shape.colors.colorMaps.set(
-          this.editor.shape.id,
-          this.editor.shape.originalColors
-        )
-      }
+    const { shape } = this.editor
+    if (!shape) {
+      return
     }
 
     this.selectedShapeConf = shapeConfig
@@ -1355,6 +1280,10 @@ export class EditorStore {
     const shape = this.getShape()
     const { shape: shapeStyle, bg: bgStyle } = this.styleOptions
 
+    if (!shape) {
+      return
+    }
+
     // Shape
     console.log('applyTheme', theme)
     shapeStyle.opacity = theme.shapeOpacity
@@ -1370,13 +1299,16 @@ export class EditorStore {
     }
 
     // Shape fill
-    if (shape?.kind === 'svg') {
+    if (
+      shape.kind === 'clipart:svg' ||
+      shape.kind === 'custom:svg' ||
+      shape.kind === 'icon'
+    ) {
       shape.config.processing.colors = {
         kind: 'single-color',
         color: theme.shapeFill,
       }
-      shapeStyle.colors.color = theme.shapeFill
-    } else if (shape?.kind === 'text') {
+    } else if (shape.kind === 'text') {
       shape.config.textStyle.color = theme.shapeFill
     }
 
@@ -1469,4 +1401,80 @@ export type EditorStateSnapshot = {
         kind: 'shape'
       }
     | null
+}
+
+export type TabMode = 'home' | 'customize shape' | 'add text shape'
+
+export type ShapeKindOption =
+  | 'icon'
+  | 'image'
+  | 'full canvas'
+  | 'random blob'
+  | 'custom image'
+  | 'text'
+
+export type LeftPanelShapesState = {
+  shapeKind: ShapeKindOption
+  blob: BlobShapeOptions
+  fullCanvas: FullCanvasShapeOptions
+  image: ImageShapeOptions
+  icon: IconShapeOptions
+  text: TextShapeOptions
+  customImage: CustomImageShapeOptions
+}
+
+export const leftPanelShapesInitialState: LeftPanelShapesState = {
+  shapeKind: 'icon',
+  blob: {
+    color: 'red',
+    complexity: 10,
+  },
+  customImage: {},
+  fullCanvas: {
+    color: 'pink',
+    padding: 0,
+  },
+  icon: {
+    category: null,
+    selected: iconShapes[0].id,
+    color: 'black',
+  },
+  image: {
+    category: null,
+    selected: imageShapes[0].id,
+  },
+  text: {
+    fontId: 'Pacifico:regular',
+    color: 'blue',
+    text: 'Hi',
+  },
+}
+
+export type CustomImageShapeOptions = {}
+
+export type ImageShapeOptions = {
+  category: string | null
+  selected: ShapeId
+}
+
+export type IconShapeOptions = {
+  category: string | null
+  selected: ShapeId
+  color: string
+}
+
+export type TextShapeOptions = {
+  text: string
+  fontId: FontId
+  color: string
+}
+
+export type BlobShapeOptions = {
+  color: string
+  complexity: number
+}
+
+export type FullCanvasShapeOptions = {
+  color: string
+  padding: number
 }
