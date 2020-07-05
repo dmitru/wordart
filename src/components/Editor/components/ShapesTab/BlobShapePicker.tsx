@@ -46,6 +46,7 @@ import { SectionLabel } from 'components/Editor/components/shared'
 import { FontPicker } from 'components/Editor/components/FontPicker'
 import { ShapeRandomBlobConf } from 'components/Editor/shape-config'
 import { generateBlobShapePathData } from 'components/Editor/lib/blob-shape-gen'
+import { BlobShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -288,17 +289,10 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
               </Box>
 
               <Box display="flex" alignItems="center" mb="5">
-                <Text my="0" mr="3" fontWeight="semibold">
-                  Color
-                </Text>
-                <ColorPickerPopover
-                  value={store.shapesPanel.blob.color}
-                  onChange={(color) => {
-                    store.shapesPanel.blob.color = color
-                    shape.config.color = color
-                    updateThumbnailDebounced()
-                  }}
-                  onAfterChange={() => updateShapeColoringDebounced()}
+                <BlobShapeColorPicker
+                  shapeConf={shape.config}
+                  onAfterChange={updateShapeColoringDebounced}
+                  onChange={updateThumbnailDebounced}
                 />
               </Box>
 
@@ -417,7 +411,7 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
                   animate={{ x: 0, y: 0, opacity: 1 }}
                   exit={{ x: -400, y: 0, opacity: 0 }}
                 >
-                  <Stack mb="4" p="2" position="absolute" width="100%">
+                  <Stack mb="4" p="2" mt="6" position="absolute" width="100%">
                     <Box>
                       <Slider
                         label="Complexity"

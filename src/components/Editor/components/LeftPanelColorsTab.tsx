@@ -2,7 +2,7 @@ import { Box, Collapse, Flex, Text } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { useThrottleCallback } from '@react-hook/throttle'
 import { BackgroundColorOptions } from 'components/Editor/components/BackgroundColorOptions'
-import { ShapeColorOptions } from 'components/Editor/components/ShapeColorOptions'
+import { ShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
 import {
   ShapeItemsColorPickerInline,
   ShapeItemsColorPickerKindDropdown,
@@ -303,7 +303,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                       />
                     </Box>
 
-                    <ShapeColorOptions onUpdate={onUpdate} />
+                    <ShapeColorPicker onUpdate={onUpdate} />
                     {/* </svg-shape> */}
                   </Box>
                   {/* </shape-color> */}

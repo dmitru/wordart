@@ -8,7 +8,7 @@ import {
 } from 'components/Editor/lib/fabric-utils'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
+import { TextShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
 import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'
 import { fabric } from 'fabric'
@@ -375,21 +375,10 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
                     />
 
                     <Box display="flex" alignItems="center" mb="5">
-                      <Text my="0" mr="3" fontWeight="semibold">
-                        Color
-                      </Text>
-                      <ColorPickerPopover
-                        value={store.shapesPanel.text.color}
-                        onChange={(color) => {
-                          const shape = store.getShape()
-                          store.shapesPanel.text.color = color
-                          if (!shape || shape.kind !== 'text') {
-                            return
-                          }
-                          shape.config.textStyle.color = color
-                          updateThumbnailDebounced()
-                        }}
-                        onAfterChange={() => updateShapeColoringDebounced()}
+                      <TextShapeColorPicker
+                        shapeConf={shape.config}
+                        onAfterChange={updateShapeColoringDebounced}
+                        onChange={updateThumbnailDebounced}
                       />
                     </Box>
 

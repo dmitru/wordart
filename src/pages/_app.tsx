@@ -4,6 +4,7 @@ import { CacheProvider } from '@emotion/core'
 import App from 'next/app'
 import React from 'react'
 import { globalStyles } from 'styles/globalStyles'
+
 import theme from 'chakra'
 
 const emotionCache = createCache({

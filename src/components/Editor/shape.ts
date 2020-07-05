@@ -30,6 +30,8 @@ type ShapeSvgBase = {
   originalTransform: MatrixSerialized
   /** Original colors, correspond to colorMap indices */
   originalColors: ColorString[]
+  /** Customized colors, correspond to colorMap indices */
+  customColors: ColorString[]
   /** Mapping of color slots to fabric items */
   colorMap: SvgShapeColorsMapEntry[]
 

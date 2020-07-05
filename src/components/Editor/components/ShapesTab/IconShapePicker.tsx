@@ -35,6 +35,8 @@ import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { iconsCategories } from 'data/icon-categories'
 import { useDebounce } from 'use-debounce'
+import { IconShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
+import { SectionLabel } from 'components/Editor/components/shared'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -93,7 +95,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
     )
   }, [debouncedQuery, selectedCategory])
 
-  const [updateShapeColoring] = useDebouncedCallback(
+  const [updateShapeColoringDebounced] = useDebouncedCallback(
     async () => {
       if (!shape) {
         return
@@ -128,7 +130,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
         kind: 'single-color',
         color: store.shapesPanel.icon.color,
       }
-      updateShapeColoring()
+      updateShapeColoringDebounced()
     }
   }, [])
 
@@ -228,10 +230,10 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
               </Box>
 
               <Box display="flex" alignItems="center" mb="5">
-                <Text my="0" mr="3" fontWeight="semibold">
-                  Color
-                </Text>
-                <IconColorPicker updateShapeColoring={updateShapeColoring} />
+                <IconShapeColorPicker
+                  shapeConf={shape.config}
+                  onAfterChange={updateShapeColoringDebounced}
+                />
               </Box>
 
               <Flex width="100%">
@@ -278,11 +280,9 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                   animate={{ x: 0, y: 0, opacity: 1 }}
                   exit={{ x: 355, y: 0, opacity: 0 }}
                 >
-                  <Stack mb="4" p="2" position="absolute" width="100%">
-                    <Box mt="6">
-                      <Heading size="md" m="0" display="flex">
-                        Resize, rotate, transform
-                      </Heading>
+                  <Stack mb="4" mt="5" position="absolute" width="100%">
+                    <Box>
+                      <SectionLabel>Resize, rotate, transform</SectionLabel>
                       {!store.leftTabIsTransformingShape && (
                         <>
                           <Stack direction="row" mt="3" spacing="3">
@@ -356,7 +356,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                     display="flex"
                     flexDirection="column"
                   >
-                    <Flex align="center" mt="2" mb="4">
+                    <Flex align="center" mt="5" mb="4">
                       <Box mr="3">
                         <Menu>
                           <MenuButton
@@ -435,38 +435,3 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
     </>
   )
 })
-
-const IconColorPicker = observer(
-  ({ updateShapeColoring }: { updateShapeColoring: () => void }) => {
-    const { editorPageStore: store } = useStore()
-    const shapeStyle = store.styleOptions.shape
-    const shape = store.getShape()
-    const shapeConfig = store.getSelectedShapeConf()
-
-    if (!shape || shapeConfig.kind !== 'icon') {
-      return <></>
-    }
-
-    return (
-      <Flex alignItems="center">
-        <ColorPickerPopover
-          disableAlpha
-          value={chroma(store.shapesPanel.icon.color).alpha(1).hex()}
-          onChange={(color) => {
-            runInAction(() => {
-              shapeConfig.processing.colors = {
-                kind: 'single-color',
-                color,
-              }
-              store.shapesPanel.icon.color = color
-            })
-          }}
-          onAfterChange={() => {
-            console.log('onAfterChange')
-            updateShapeColoring()
-          }}
-        />
-      </Flex>
-    )
-  }
-)

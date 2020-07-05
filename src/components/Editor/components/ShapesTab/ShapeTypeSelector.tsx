@@ -61,7 +61,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
               />
 
               <MenuItemWithDescription
-                title="Clip Art"
+                title="Clip art"
                 description="Pick one of hundreds images"
                 onClick={() => {
                   shapesPanel.shapeKind = 'image'

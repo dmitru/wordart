@@ -17,6 +17,7 @@ import React, { useEffect } from 'react'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
+import { FullCanvasShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
 
 const initialState = {
   thumbnailPreview: '',
@@ -229,17 +230,10 @@ export const FullCanvasShapePicker: React.FC<{}> = observer(() => {
               </Box>
 
               <Box display="flex" alignItems="center" mb="5">
-                <Text my="0" mr="3" fontWeight="semibold">
-                  Color
-                </Text>
-                <ColorPickerPopover
-                  value={store.shapesPanel.fullCanvas.color}
-                  onChange={(color) => {
-                    store.shapesPanel.fullCanvas.color = color
-                    shape.config.color = color
-                    updateThumbnailDebounced()
-                  }}
-                  onAfterChange={() => updateShapeColoringDebounced()}
+                <FullCanvasShapeColorPicker
+                  shapeConf={shape.config}
+                  onAfterChange={updateShapeColoringDebounced}
+                  onChange={updateThumbnailDebounced}
                 />
               </Box>
             </Box>

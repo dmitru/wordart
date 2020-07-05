@@ -973,6 +973,7 @@ export class Editor {
         kind: shapeConfig.kind,
         obj: shapeObj,
         objOriginalColors: shapeObj,
+        customColors: colorMap.map((c) => c.color),
         originalColors: colorMap.map((c) => c.color),
         transform: new paper.Matrix().values as MatrixSerialized,
         originalTransform: new paper.Matrix().values as MatrixSerialized,

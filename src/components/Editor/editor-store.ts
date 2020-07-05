@@ -1298,10 +1298,7 @@ export class EditorStore {
     }
 
     // Shape fill
-    this.shapesPanel.icon.color = theme.shapeFill
-    this.shapesPanel.text.color = theme.shapeFill
-    this.shapesPanel.blob.color = theme.shapeFill
-    this.shapesPanel.fullCanvas.color = theme.shapeFill
+    this.updateColorForAllShapeTypes(theme.shapeFill)
 
     if (
       shape.kind === 'clipart:svg' ||
@@ -1357,6 +1354,15 @@ export class EditorStore {
       this.editor?.setBgOpacity(0)
     }
     this.updateShapeThumbnail()
+  }
+
+  @action updateColorForAllShapeTypes = (color: string) => {
+    this.shapesPanel.blob.color = color
+    this.shapesPanel.text.color = color
+    this.shapesPanel.icon.color = color
+    this.shapesPanel.fullCanvas.color = color
+    this.shapesPanel.image.singleColor = color
+    this.shapesPanel.customImage.invertColor = color
   }
 }
 
@@ -1440,10 +1446,11 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
     complexity: 40,
     points: 5,
   },
-  customImage: {},
+  customImage: {
+    invertColor: '#4A90E2',
+  },
   fullCanvas: {
     color: '#4A90E2',
-    padding: 0,
   },
   icon: {
     category: null,
@@ -1453,6 +1460,7 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
   image: {
     category: null,
     selected: imageShapes[0].id,
+    singleColor: '#4A90E2',
   },
   text: {
     fontId: 'Pacifico:regular',
@@ -1461,11 +1469,14 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
   },
 }
 
-export type CustomImageShapeOptions = {}
+export type CustomImageShapeOptions = {
+  invertColor: string
+}
 
 export type ImageShapeOptions = {
   category: string | null
   selected: ShapeId
+  singleColor: string
 }
 
 export type IconShapeOptions = {

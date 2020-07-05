@@ -6,6 +6,7 @@ import Document, {
 } from 'next/document'
 import { extractCritical } from 'emotion-server'
 import 'lib/wordart/console-extensions'
+import { getTabTitle } from 'utils/tab-title'
 
 export default class MyDocument extends Document {
   // static async getInitialProps(ctx: DocumentContext) {

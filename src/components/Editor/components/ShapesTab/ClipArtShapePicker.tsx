@@ -13,7 +13,7 @@ import {
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
 import { CustomizeRasterImageModal } from 'components/Editor/components/CustomizeRasterImageModal'
-import { ShapeColorOptions } from 'components/Editor/components/ShapeColorOptions'
+import { ShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
 import {
   ShapeSelector,
   ShapeThumbnailBtn,
@@ -336,7 +336,6 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                     </Flex>
 
                     <ShapeSelector
-                      showProcessedThumbnails
                       shapes={matchingShapes}
                       onSelected={async (shapeConfig) => {
                         if (
@@ -362,9 +361,9 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                   animate={{ x: 0, y: 0, opacity: 1 }}
                   exit={{ x: 355, y: 0, opacity: 0 }}
                 >
-                  <Stack mb="4" p="2" position="absolute" width="100%">
+                  <Stack mb="4" mt="5" position="absolute" width="100%">
                     <SectionLabel>Colors</SectionLabel>
-                    <ShapeColorOptions onUpdate={updateShapeColoring} />
+                    <ShapeColorPicker onUpdate={updateShapeColoring} />
 
                     {/* {shape.kind === 'raster' && (
                       <>
@@ -386,11 +385,7 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                     )} */}
 
                     <Box mt="6">
-                      <SectionLabel>
-                        {/* <Heading size="md" m="0" display="flex"> */}
-                        Resize, rotate, transform
-                        {/* </Heading> */}
-                      </SectionLabel>
+                      <SectionLabel>Resize, rotate, transform</SectionLabel>
                       {!store.leftTabIsTransformingShape && (
                         <>
                           <Stack direction="row" mt="3" spacing="3">

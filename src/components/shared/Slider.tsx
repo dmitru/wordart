@@ -56,13 +56,10 @@ export const Slider: React.FC<SliderProps> = (props) => {
     >
       {label && (
         <Text
+          color="gray.500"
+          fontWeight="semibold"
+          my="0"
           css={css`
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
-              Helvetica, Arial, sans-serif, 'Apple Color Emoji',
-              'Segoe UI Emoji', 'Segoe UI Symbol';
-            font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 0;
             ${horizontal
               ? `
               margin-right: 16px;
