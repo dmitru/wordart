@@ -74,71 +74,74 @@ export const Slider: React.FC<SliderProps> = (props) => {
           {label}
         </Text>
       )}
-      <SliderImpl
-        domain={[min, max]}
-        values={[value]}
-        step={step}
-        onUpdate={(value) => onChange(value[0])}
-        onSlideEnd={(value) => onAfterChange(value[0])}
-        css={css`
-          position: relative;
-          height: 30px;
-          flex: 1;
-        `}
-      >
-        <Rail>
-          {({ getRailProps }) => <SliderRail getRailProps={getRailProps} />}
-        </Rail>
-        <Handles>
-          {({ handles, getHandleProps }) => (
-            <Box
-              css={css`
-                width: calc(100% - 36px);
-                left: 18px;
-                position: relative;
-              `}
-            >
-              {handles.map((handle) => (
-                <KeyboardHandle
-                  key={handle.id}
-                  handle={handle}
-                  domain={[min, max]}
-                  getHandleProps={getHandleProps}
-                  afterLabel={afterLabel}
-                />
-              ))}
-            </Box>
-          )}
-        </Handles>
-        <Tracks left={false} right={false}>
-          {({ tracks, getTrackProps }) => (
-            <Box>
-              {tracks.map(({ id, source, target }) => (
-                <Track
-                  key={id}
-                  source={source}
-                  target={target}
-                  getTrackProps={getTrackProps}
-                />
-              ))}
-            </Box>
-          )}
-        </Tracks>
-      </SliderImpl>
 
-      {resetValue != null && (
-        <DeleteButton
-          color="gray.400"
-          ml="2"
+      <Box display="flex" alignItems="center">
+        <SliderImpl
+          domain={[min, max]}
+          values={[value]}
+          step={step}
+          onUpdate={(value) => onChange(value[0])}
+          onSlideEnd={(value) => onAfterChange(value[0])}
           css={css`
-            visibility: ${value === resetValue ? 'hidden' : 'visible'};
+            position: relative;
+            height: 30px;
+            flex: 1;
           `}
-          onClick={() => {
-            onChange(resetValue)
-            onAfterChange(resetValue)
-          }}
-        />
-      )}
+        >
+          <Rail>
+            {({ getRailProps }) => <SliderRail getRailProps={getRailProps} />}
+          </Rail>
+          <Handles>
+            {({ handles, getHandleProps }) => (
+              <Box
+                css={css`
+                  width: calc(100% - 36px);
+                  left: 18px;
+                  position: relative;
+                `}
+              >
+                {handles.map((handle) => (
+                  <KeyboardHandle
+                    key={handle.id}
+                    handle={handle}
+                    domain={[min, max]}
+                    getHandleProps={getHandleProps}
+                    afterLabel={afterLabel}
+                  />
+                ))}
+              </Box>
+            )}
+          </Handles>
+          <Tracks left={false} right={false}>
+            {({ tracks, getTrackProps }) => (
+              <Box>
+                {tracks.map(({ id, source, target }) => (
+                  <Track
+                    key={id}
+                    source={source}
+                    target={target}
+                    getTrackProps={getTrackProps}
+                  />
+                ))}
+              </Box>
+            )}
+          </Tracks>
+        </SliderImpl>
+
+        {resetValue != null && (
+          <DeleteButton
+            color="gray.400"
+            ml="2"
+            css={css`
+              visibility: ${value === resetValue ? 'hidden' : 'visible'};
+            `}
+            onClick={() => {
+              onChange(resetValue)
+              onAfterChange(resetValue)
+            }}
+          />
+        )}
+      </Box>
 
       {labelRight && (
         <Text

@@ -44,19 +44,14 @@ export type ShapeTextStyle = {
 
 export type ShapeFullCanvasConf = {
   kind: 'full canvas'
-  id: 's:full canvas'
-  thumbnailUrl: string
-  processedThumbnailUrl: string
   color: string
 }
 
 export type ShapeRandomBlobConf = {
-  kind: 'random blob'
-  id: 's:random blob'
-  url: string
-  thumbnailUrl: string
-  processedThumbnailUrl: string
+  kind: 'blob'
   color: string
+  complexity: number
+  // @TODO: add svg field, encoding the blob svg
 }
 
 type ShapeSvgConfBase = {

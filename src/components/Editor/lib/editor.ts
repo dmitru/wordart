@@ -592,6 +592,22 @@ export class Editor {
     throw new Error('not implemented')
   }
 
+  updateBlobShapeColors = async (color: string) => {
+    if (this.shape?.kind !== 'blob') {
+      console.error(
+        `Unexpected shape type: expected blob, got ${this.shape?.kind}`
+      )
+      return
+    }
+
+    if (!this.shape.obj) {
+      return
+    }
+
+    const shapeObj = this.shape.obj
+    setFillColor(shapeObj, color)
+  }
+
   updateTextShapeColors = async (textStyle: ShapeTextStyle) => {
     if (this.shape?.kind !== 'text') {
       console.error(
@@ -680,8 +696,11 @@ export class Editor {
     ) {
       this.updateSvgShapeColors(config.processing)
     }
-    if (config.kind === 'text' && this.shape.kind === 'text') {
+    if (config.kind === 'text') {
       this.updateTextShapeColors(config.textStyle)
+    }
+    if (config.kind === 'blob') {
+      this.updateBlobShapeColors(config.color)
     }
     if (render) {
       this.canvas.requestRenderAll()
@@ -972,6 +991,21 @@ export class Editor {
       shape = {
         config: shapeConfig,
         kind: 'text',
+        transform: new paper.Matrix().values as MatrixSerialized,
+        originalTransform: new paper.Matrix().values as MatrixSerialized,
+        obj: shapeObj,
+      }
+    } else if (shapeConfig.kind === 'blob') {
+      const circle = new fabric.Circle({
+        top: 0,
+        left: 0,
+        radius: 100,
+        fill: shapeConfig.color,
+      })
+      shapeObj = circle
+      shape = {
+        kind: 'blob',
+        config: shapeConfig,
         transform: new paper.Matrix().values as MatrixSerialized,
         originalTransform: new paper.Matrix().values as MatrixSerialized,
         obj: shapeObj,

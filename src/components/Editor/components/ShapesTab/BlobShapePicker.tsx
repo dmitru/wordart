@@ -1,7 +1,24 @@
-import { Box, Flex, Heading, Stack, Text, Textarea } from '@chakra-ui/core'
+import {
+  Box,
+  Flex,
+  Heading,
+  Menu,
+  MenuButton,
+  MenuDivider,
+  MenuItem,
+  MenuList,
+  Stack,
+  Text,
+  Textarea,
+} from '@chakra-ui/core'
+import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
-import { FontPicker } from 'components/Editor/components/FontPicker'
-import { ShapeThumbnailBtn } from 'components/Editor/components/ShapeSelector'
+import chroma from 'chroma-js'
+import { fabric } from 'fabric'
+import {
+  ShapeSelector,
+  ShapeThumbnailBtn,
+} from 'components/Editor/components/ShapeSelector'
 import {
   applyTransformToObj,
   createMultilineFabricTextGroup,
@@ -9,19 +26,23 @@ import {
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
+import { SearchInput } from 'components/shared/SearchInput'
 import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'
-import { fabric } from 'fabric'
 import { AnimatePresence, motion } from 'framer-motion'
-import { createCanvas } from 'lib/wordart/canvas-utils'
 import { isEqual } from 'lodash'
-import { observable } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import { observer } from 'mobx-react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { FaCog } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
+import { iconsCategories } from 'data/icon-categories'
+import { useDebounce } from 'use-debounce'
+import { createCanvas } from 'lib/wordart/canvas-utils'
+import { SectionLabel } from 'components/Editor/components/shared'
+import { FontPicker } from 'components/Editor/components/FontPicker'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -48,7 +69,7 @@ const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
   />
 ))
 
-export const TextShapePicker: React.FC<{}> = observer(() => {
+export const BlobShapePicker: React.FC<{}> = observer(() => {
   const { editorPageStore: store } = useStore()
   const shapeStyle = store.styleOptions.shape
   const shape = store.getShape()
@@ -120,44 +141,22 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
       </Tooltip>
     ) : null
 
-  const updateTextThumbnailPreview = async () => {
-    if (!shape || shape.kind !== 'text') {
+  const updateBlobThumbnailPreview = async () => {
+    if (!shape || shape.kind !== 'blob') {
       return
     }
-    const fontInfo = store.getFontById(store.shapesPanel.text.fontId)
-    if (!fontInfo) {
-      return
-    }
-    const font = await store.fetchFontById(fontInfo.style.fontId)
-    if (!font) {
-      return
-    }
-
     const canvasSize = 400
-    const pad = 10
-    const fontSize = 100
 
     const canvas = createCanvas({ w: canvasSize, h: canvasSize })
     const c = new fabric.StaticCanvas(canvas)
 
-    const text = store.shapesPanel.text.text
-    const group = createMultilineFabricTextGroup(
-      text,
-      font,
-      fontSize,
-      store.shapesPanel.text.color
-    )
-    if (group.height! > group.width!) {
-      group.scaleToHeight(canvasSize - 2 * pad)
-    } else {
-      group.scaleToWidth(canvasSize - 2 * pad)
-    }
-    group.setPositionByOrigin(
-      new fabric.Point(canvasSize / 2, canvasSize / 2),
-      'center',
-      'center'
-    )
-    c.add(group)
+    const circle = new fabric.Circle({
+      radius: canvasSize / 3,
+      left: 0,
+      top: 0,
+      fill: store.shapesPanel.blob.color,
+    })
+    c.add(circle)
 
     c.renderAll()
     state.thumbnailPreview = c.toDataURL()
@@ -165,18 +164,21 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
   }
 
   useEffect(() => {
-    if (shape && shape.kind === 'text') {
-      updateTextThumbnailPreview()
+    if (shape && shape.kind === 'blob') {
+      updateBlobThumbnailPreview()
     }
   }, [shape])
 
-  const [updateThumbnail] = useDebouncedCallback(
-    updateTextThumbnailPreview,
+  const [updateThumbnailDebounced] = useDebouncedCallback(
+    updateBlobThumbnailPreview,
     300,
-    { leading: false, trailing: true }
+    {
+      leading: false,
+      trailing: true,
+    }
   )
 
-  if (!shape || shape.kind !== 'text') {
+  if (!shape || shape.kind !== 'blob') {
     return <></>
   }
 
@@ -363,53 +365,55 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
                   exit={{ x: -400, y: 0, opacity: 0 }}
                 >
                   <Stack mb="4" p="2" position="absolute" width="100%">
-                    <Textarea
-                      mb="3"
-                      autoFocus
-                      value={store.shapesPanel.text.text}
-                      onChange={async (e: any) => {
-                        const text = e.target.value
-                        store.shapesPanel.text.text = text
-                        shape.config.text = text
-                        updateShapeDebounced()
-                        updateThumbnail()
-                      }}
-                      placeholder="Type text here..."
-                    />
+                    <Box>
+                      <Slider
+                        label="Complexity"
+                        afterLabel="%"
+                        value={store.shapesPanel.blob.complexity}
+                        onChange={(value) => {
+                          store.shapesPanel.blob.complexity = value
+                          updateThumbnailDebounced()
+                        }}
+                        resetValue={20}
+                        onAfterChange={updateShapeDebounced}
+                        min={0}
+                        max={100}
+                        step={1}
+                      />
+                    </Box>
+
+                    <Box>
+                      <Slider
+                        label="Points"
+                        value={store.shapesPanel.blob.points}
+                        onChange={(value) => {
+                          store.shapesPanel.blob.points = value
+                          updateThumbnailDebounced()
+                        }}
+                        resetValue={5}
+                        onAfterChange={updateShapeDebounced}
+                        min={3}
+                        max={16}
+                        step={1}
+                      />
+                    </Box>
 
                     <Box display="flex" alignItems="center" mb="5">
                       <Text my="0" mr="3" fontWeight="semibold">
                         Color
                       </Text>
                       <ColorPickerPopover
-                        value={store.shapesPanel.text.color}
+                        value={store.shapesPanel.blob.color}
                         onChange={(color) => {
-                          store.shapesPanel.text.color = color
-                          shape.config.textStyle.color = color
-                          updateThumbnail()
+                          store.shapesPanel.blob.color = color
+                          shape.config.color = color
+                          updateThumbnailDebounced()
                         }}
                         onAfterChange={() => updateShapeColoringDebounced()}
                       />
                     </Box>
 
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      css={css`
-                        min-height: 300px;
-                        height: calc(100vh - 520px);
-                      `}
-                    >
-                      <FontPicker
-                        selectedFontId={store.shapesPanel.text.fontId}
-                        onHighlighted={async (font, style) => {
-                          store.shapesPanel.text.fontId = style.fontId
-                          shape.config.textStyle.fontId = style.fontId
-                          updateThumbnail()
-                          updateShapeDebounced()
-                        }}
-                      />
-                    </Box>
+                    <Button colorScheme="secondary">Randomize</Button>
                   </Stack>
                 </motion.div>
               )}

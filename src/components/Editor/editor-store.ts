@@ -653,12 +653,10 @@ export class EditorStore {
 
     shape.set({ opacity: 1 })
     const canvas = objAsCanvasElement(shape)
-    if (!currentShapeConf.thumbnailUrl) {
+    if ('thumbnailUrl' in currentShapeConf) {
       currentShapeConf.thumbnailUrl = canvas.toDataURL()
     }
-    if (currentShapeConf.kind === 'text') {
-      currentShapeConf.thumbnailUrl = canvas.toDataURL()
-    } else {
+    if ('processedThumbnailUrl' in currentShapeConf) {
       currentShapeConf.processedThumbnailUrl = canvas.toDataURL()
     }
     this.renderKey++
@@ -889,7 +887,7 @@ export class EditorStore {
           textStyle: shape.config.textStyle,
           transform,
         }
-      } else if (shape.kind === 'full-canvas' || shape.kind === 'random-blob') {
+      } else if (shape.kind === 'full-canvas' || shape.kind === 'blob') {
         // TODO
         throw new Error('not supported')
       } else {
@@ -1317,7 +1315,7 @@ export class EditorStore {
       this.shapesPanel.text.color = theme.shapeFill
     } else if (shape.kind === 'full-canvas') {
       this.shapesPanel.fullCanvas.color = theme.shapeFill
-    } else if (shape.kind === 'random-blob') {
+    } else if (shape.kind === 'blob') {
       this.shapesPanel.blob.color = theme.shapeFill
     }
 
@@ -1420,7 +1418,7 @@ export type ShapeKindOption =
   | 'icon'
   | 'image'
   | 'full canvas'
-  | 'random blob'
+  | 'blob'
   | 'custom image'
   | 'text'
 
@@ -1439,6 +1437,7 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
   blob: {
     color: 'red',
     complexity: 10,
+    points: 5,
   },
   customImage: {},
   fullCanvas: {
@@ -1482,6 +1481,7 @@ export type TextShapeOptions = {
 
 export type BlobShapeOptions = {
   color: string
+  points: number
   complexity: number
 }
 

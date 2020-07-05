@@ -105,7 +105,7 @@ export type ShapeFullCanvas = {
 
 // Blob
 export type ShapeRandomBlob = {
-  kind: 'random-blob'
+  kind: 'blob'
 
   config: ShapeRandomBlobConf
 

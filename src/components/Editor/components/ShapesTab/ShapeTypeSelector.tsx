@@ -12,7 +12,10 @@ import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescripti
 import { observer } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
-import { ShapeTextConf } from 'components/Editor/shape-config'
+import {
+  ShapeTextConf,
+  ShapeRandomBlobConf,
+} from 'components/Editor/shape-config'
 
 export const ShapeTypeSelector: React.FC<{}> = observer(() => {
   const { editorPageStore: store } = useStore()
@@ -28,7 +31,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
         px="3"
       >
         {'Shape type: '}
-        {shapesPanel.shapeKind === 'random blob' && 'Blob'}
+        {shapesPanel.shapeKind === 'blob' && 'Blob'}
         {shapesPanel.shapeKind === 'image' && 'Clip art'}
         {shapesPanel.shapeKind === 'icon' && 'Icon'}
         {shapesPanel.shapeKind === 'custom image' && 'Custom image'}
@@ -48,9 +51,16 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
             >
               <MenuItemWithDescription
                 title="Blob shape"
-                description="A random blob shape for quick and unique designs"
+                description="A blob shape for quick and unique designs"
                 onClick={() => {
-                  shapesPanel.shapeKind = 'random blob'
+                  const shape: ShapeRandomBlobConf = {
+                    kind: 'blob',
+                    color: shapesPanel.blob.color,
+                    points: shapesPanel.blob.points,
+                    complexity: shapesPanel.blob.complexity,
+                  }
+                  store.selectShape(shape)
+                  shapesPanel.shapeKind = 'blob'
                 }}
               />
 
