@@ -567,6 +567,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         <FindAndReplaceModal
           onSubmit={({ find, replace }) => {
             state.isShowingFindAndReplace = false
+
             let count = 0
             for (const w of wordsToProcess) {
               if (w.text.includes(find)) {
@@ -574,6 +575,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               }
               w.text = w.text.replace(find, replace)
             }
+
             toasts.showSuccess({
               title: `Replaced ${count} ${pluralize('occurance', count)}`,
             })
