@@ -162,7 +162,7 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
                 state.stemming = e.target.checked
               }}
             >
-              Word stemming (e.g. treat “love” and “loves” as one word)
+              Word stemming (e.g. treat “love” and “loves” as the same word)
             </Checkbox>
           </Stack>
         </Collapse>

@@ -7,15 +7,19 @@ import {
   Menu,
   MenuButton,
   MenuDivider,
-  MenuItem,
   MenuList,
+  MenuTransition,
+  Portal,
   Stack,
   Text,
 } from '@chakra-ui/core'
+import { AddIcon, ChevronDownIcon, CloseIcon, EditIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
 import { TextFields } from '@styled-icons/material-twotone/TextFields'
 import { DragIndicator } from '@styled-icons/material/DragIndicator'
+import { FormatTextSize } from '@styled-icons/zondicons/FormatTextSize'
+import { FindAndReplaceModal } from 'components/Editor/components/FindAndReplaceModal'
 import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
 import { WordsEditorModal } from 'components/Editor/components/WordsEditorModal'
 import { WordConfigId } from 'components/Editor/editor-store'
@@ -25,29 +29,29 @@ import { Button } from 'components/shared/Button'
 import { DeleteButton } from 'components/shared/DeleteButton'
 import { Input } from 'components/shared/Input'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
+import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 import { SearchInput } from 'components/shared/SearchInput'
 import { capitalize, noop } from 'lodash'
 import { observable } from 'mobx'
 import { observer, Observer } from 'mobx-react'
 import pluralize from 'pluralize'
-import AutoSizer from 'react-virtualized-auto-sizer'
-import {
-  FixedSizeList as List,
-  ListProps,
-  ListChildComponentProps,
-  areEqual,
-} from 'react-window'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   DragDropContext,
   Draggable,
+  DraggableProvided,
   DraggableStateSnapshot,
   Droppable,
-  DraggableProvidedDraggableProps,
-  DraggableProvided,
 } from 'react-beautiful-dnd'
+import { FaDownload, FaSearch } from 'react-icons/fa'
+import AutoSizer from 'react-virtualized-auto-sizer'
+import {
+  areEqual,
+  FixedSizeList as List,
+  ListChildComponentProps,
+} from 'react-window'
 import { useStore } from 'services/root-store'
-import { ChevronDownIcon, AddIcon, EditIcon } from '@chakra-ui/icons'
+import { useToasts } from 'use-toasts'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -63,6 +67,7 @@ const reorder = (list: any[], startIndex: number, endIndex: number) => {
 
 const state = observable({
   isShowingImport: false,
+  isShowingFindAndReplace: false,
   isShowingEditor: false,
   textFilter: '',
   newWordText: '',
@@ -76,6 +81,8 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     const { editorPageStore: store } = useStore()
     const style = store.styleOptions[target]
     const words = style.items.words
+
+    const toasts = useToasts()
 
     useEffect(() => {
       state.selectedWords.clear()
@@ -199,6 +206,13 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
       </Stack>
     )
 
+    const handleExportCSVClick = () => {
+      alert('TODO')
+    }
+    const handleFindAndReplaceClick = () => {
+      state.isShowingFindAndReplace = true
+    }
+
     const toolbar = (
       <Stack
         direction="row"
@@ -239,6 +253,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
           />
         </Box>
 
+        {/* Words / selection actions */}
         <Box flex="1" ml="auto" display="flex" justifyContent="flex-end">
           <Menu placement="bottom-end">
             {selectedCount === 0 && (
@@ -254,75 +269,95 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                 {selectedCount} {pluralize('words', selectedCount)}
               </MenuButton>
             )}
-            <MenuList>
-              <MenuItem
-                onClick={() => {
-                  for (const w of wordsToProcess) {
-                    w.text = capitalize(w.text)
-                  }
-                  store.animateVisualize(false)
-                }}
-              >
-                Capitalize
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  for (const w of wordsToProcess) {
-                    w.text = w.text.toLocaleUpperCase()
-                  }
-                  store.animateVisualize(false)
-                }}
-              >
-                UPPERCASE
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  for (const w of wordsToProcess) {
-                    w.text = w.text.toLocaleLowerCase()
-                  }
-                  store.animateVisualize(false)
-                }}
-              >
-                lowercase
-              </MenuItem>
+            <Portal>
+              <MenuTransition>
+                {(styles) => (
+                  <MenuList css={styles}>
+                    <MenuItemWithIcon
+                      icon={<FormatTextSize />}
+                      onClick={() => {
+                        for (const w of wordsToProcess) {
+                          w.text = capitalize(w.text)
+                        }
+                        store.animateVisualize(false)
+                      }}
+                    >
+                      Capitalize
+                    </MenuItemWithIcon>
+                    <MenuItemWithIcon
+                      icon={<FormatTextSize />}
+                      onClick={() => {
+                        for (const w of wordsToProcess) {
+                          w.text = w.text.toLocaleUpperCase()
+                        }
+                        store.animateVisualize(false)
+                      }}
+                    >
+                      UPPERCASE
+                    </MenuItemWithIcon>
+                    <MenuItemWithIcon
+                      icon={<FormatTextSize />}
+                      onClick={() => {
+                        for (const w of wordsToProcess) {
+                          w.text = w.text.toLocaleLowerCase()
+                        }
+                        store.animateVisualize(false)
+                      }}
+                    >
+                      lowercase
+                    </MenuItemWithIcon>
 
-              {selectedCount === 0 && (
-                <>
-                  <MenuDivider />
-                  <MenuItem>Import CSV...</MenuItem>
-                  <MenuItem>Export CSV...</MenuItem>
+                    {selectedCount === 0 && (
+                      <>
+                        <MenuDivider />
+                        <MenuItemWithIcon
+                          onClick={handleExportCSVClick}
+                          icon={<FaDownload />}
+                        >
+                          Export as CSV
+                        </MenuItemWithIcon>
 
-                  <MenuDivider />
-                  <MenuItem>Find and replace...</MenuItem>
-                </>
-              )}
+                        <MenuDivider />
 
-              <MenuDivider />
+                        <MenuItemWithIcon
+                          onClick={handleFindAndReplaceClick}
+                          icon={<FaSearch />}
+                        >
+                          Find and replace...
+                        </MenuItemWithIcon>
+                      </>
+                    )}
 
-              <MenuItem
-                onClick={() => {
-                  if (selectedCount > 0) {
-                    for (const w of wordsToProcess) {
-                      store.deleteWord(target, w.id)
-                    }
-                  } else {
-                    if (
-                      window.confirm(
-                        'Are you sure you want to remove all words?'
-                      )
-                    ) {
-                      store.clearWords(target)
-                    }
-                  }
-                  updateSelectedWords()
-                  if (words.wordList.length === 0) {
-                    focusNewWordInput()
-                  }
-                }}
-              >
-                {selectedCount > 0 ? 'Delete' : 'Delete all'}
-              </MenuItem>
-            </MenuList>
+                    <MenuDivider />
+
+                    <MenuItemWithIcon
+                      icon={<CloseIcon />}
+                      onClick={() => {
+                        if (selectedCount > 0) {
+                          for (const w of wordsToProcess) {
+                            store.deleteWord(target, w.id)
+                          }
+                        } else {
+                          if (
+                            window.confirm(
+                              'Are you sure you want to remove all words?'
+                            )
+                          ) {
+                            store.clearWords(target)
+                          }
+                        }
+                        updateSelectedWords()
+                        if (words.wordList.length === 0) {
+                          focusNewWordInput()
+                        }
+                      }}
+                    >
+                      {selectedCount > 0 ? 'Delete selected' : 'Clear the list'}
+                    </MenuItemWithIcon>
+                  </MenuList>
+                )}
+              </MenuTransition>
+            </Portal>
           </Menu>
         </Box>
       </Stack>
@@ -526,6 +561,26 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
             store.animateVisualize(false)
             state.isShowingImport = false
+          }}
+        />
+
+        <FindAndReplaceModal
+          onSubmit={({ find, replace }) => {
+            state.isShowingFindAndReplace = false
+            let count = 0
+            for (const w of wordsToProcess) {
+              if (w.text.includes(find)) {
+                count++
+              }
+              w.text = w.text.replace(find, replace)
+            }
+            toasts.showSuccess({
+              title: `Replaced ${count} ${pluralize('occurance', count)}`,
+            })
+          }}
+          isOpen={state.isShowingFindAndReplace}
+          onClose={() => {
+            state.isShowingFindAndReplace = false
           }}
         />
 
@@ -846,7 +901,7 @@ const EmptyStateWordsUi: React.FC<{
     </Text>
 
     <Text mt="4" fontSize="md" flex={1} textAlign="center" color="gray.500">
-      After adding words, hit Visualize
+      After you add words, hit Visualize
       <br /> to see the result!
     </Text>
 
