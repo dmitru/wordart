@@ -113,14 +113,22 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
   )
 
   useEffect(() => {
-    // updateShapeColoring()
-
     return () => {
       if (store.leftTabIsTransformingShape) {
         store.editor?.deselectShape()
       }
       Object.assign(state, initialState)
       store.leftTabIsTransformingShape = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (shapeConfig && shapeConfig.kind === 'icon') {
+      shapeConfig.processing.colors = {
+        kind: 'single-color',
+        color: store.shapesPanel.icon.color,
+      }
+      updateShapeColoring()
     }
   }, [])
 

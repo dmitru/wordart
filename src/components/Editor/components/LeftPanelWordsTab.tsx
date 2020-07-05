@@ -736,6 +736,7 @@ const NewWordInput: React.FC<{
           placeholder="Type new word here..."
         />
         <InputRightElement
+          px="0"
           width="80px"
           children={
             <Button
