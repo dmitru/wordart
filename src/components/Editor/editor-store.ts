@@ -1363,6 +1363,7 @@ export class EditorStore {
     bgStyle.items.dimSmallerItems = theme.bgDimSmallerItems
     // </update-styles>
 
+    await this.editor?.updateShapeColors(shape.config)
     this.editor?.setShapeOpacity(shapeStyle.opacity / 100)
     await this.editor?.setShapeItemsStyle(
       mkShapeStyleConfFromOptions(shapeStyle).items
@@ -1374,6 +1375,7 @@ export class EditorStore {
     } else {
       this.editor?.setBgOpacity(0)
     }
+    this.updateShapeThumbnail()
   }
 }
 
