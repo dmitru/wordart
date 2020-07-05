@@ -1285,7 +1285,6 @@ export class EditorStore {
     }
 
     // Shape
-    console.log('applyTheme', theme)
     shapeStyle.opacity = theme.shapeOpacity
     shapeStyle.items.brightness = 0
 
