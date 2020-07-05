@@ -12,16 +12,15 @@ import {
 } from '@chakra-ui/core'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
-import { CustomizeRasterImageModal } from 'components/Editor/components/CustomizeRasterImageModal'
-import { ShapeColorOptions } from 'components/Editor/components/ShapeColorOptions'
+import chroma from 'chroma-js'
 import {
   ShapeSelector,
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
 import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
-import { ShapeClipartConf } from 'components/Editor/shape-config'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { SearchInput } from 'components/shared/SearchInput'
 import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'
@@ -29,14 +28,13 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { isEqual } from 'lodash'
 import { observable, runInAction } from 'mobx'
 import { observer } from 'mobx-react'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { FaCog } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
-import chroma from 'chroma-js'
-import { DeleteButton } from 'components/shared/DeleteButton'
+import { iconsCategories } from 'data/icon-categories'
+import { useDebounce } from 'use-debounce'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -73,51 +71,27 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
     renderKey, // eslint-disable-line
   } = store
 
-  const allCategoryOptions = [
-    ['geometry', 'Geometric Shapes'],
-    ['animals', 'Animals & Pets'],
-    ['geo', 'Countries & Earth'],
-    ['other', 'Others'],
-    // 'Baby',
-    // 'Birthday',
-    // 'Christmas',
-    // 'Clouds',
-    // 'Geometric Shapes',
-    // 'Emoji',
-    // 'Icons',
-    // 'Love & Wedding',
-    // 'Nature',
-    // 'Music',
-    // 'Money & Business',
-    // 'People',
-    // 'Education & School',
-    // 'Sports',
-    // 'Transport',
-    // 'Other',
-  ].map(([value, label]) => ({ value, label }))
+  const allCategoryOptions = iconsCategories
 
-  const allIconShapes = store.getAvailableIconShapes()
+  const allItems = store.getAvailableIconShapes()
 
-  const shapesPerCategoryCounts = allCategoryOptions.map(
-    ({ value }) =>
-      allIconShapes.filter((s) => (s.categories || []).includes(value)).length
-  )
-
-  const [selectedCategory, setSelectedCategory] = useState<{
-    value: string
-    label: string
-  } | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
   const [query, setQuery] = useState('')
 
-  const matchingShapes = allIconShapes.filter(
-    (s) =>
-      (!query ||
-        (query && s.title.toLowerCase().includes(query.toLowerCase()))) &&
-      (!selectedCategory ||
-        (selectedCategory &&
-          (s.categories || []).includes(selectedCategory.value)))
-  )
+  const [debouncedQuery] = useDebounce(query, 300)
+
+  const matchingItems = useMemo(() => {
+    const query = debouncedQuery.trim().toLowerCase()
+    return allItems.filter(
+      (s) =>
+        (!query ||
+          (query && s.title.toLowerCase().includes(query)) ||
+          (s.keywords || []).includes(query)) &&
+        (!selectedCategory ||
+          (selectedCategory && (s.categories || []).includes(selectedCategory)))
+    )
+  }, [debouncedQuery, selectedCategory])
 
   const [updateShapeColoring] = useDebouncedCallback(
     async () => {
@@ -243,12 +217,13 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                 />
               </Box>
 
-              <IconColorPicker updateShapeColoring={updateShapeColoring} />
+              <Box mb="3">
+                <IconColorPicker updateShapeColoring={updateShapeColoring} />
+              </Box>
 
               <Flex width="100%">
                 {state.mode === 'home' && (
                   <Button
-                    mr="2"
                     variant="outline"
                     display="flex"
                     flex="1"
@@ -382,9 +357,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                             py="2"
                             px="3"
                           >
-                            {selectedCategory
-                              ? selectedCategory.label
-                              : 'All categories'}
+                            {selectedCategory || 'All categories'}
                           </MenuButton>
                           <MenuList
                             css={css`
@@ -393,16 +366,15 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                             `}
                           >
                             <MenuItem onClick={() => setSelectedCategory(null)}>
-                              Show all ({store.getAvailableImageShapes().length}
-                              )
+                              Show all ({allItems.length})
                             </MenuItem>
                             <MenuDivider />
                             {allCategoryOptions.map((item, index) => (
                               <MenuItem
-                                key={item.value}
-                                onClick={() => setSelectedCategory(item)}
+                                key={item.label}
+                                onClick={() => setSelectedCategory(item.label)}
                               >
-                                {item.label} ({shapesPerCategoryCounts[index]})
+                                {item.label} ({item.count})
                               </MenuItem>
                             ))}
                           </MenuList>
@@ -418,7 +390,8 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
 
                     <ShapeSelector
                       columns={6}
-                      shapes={matchingShapes}
+                      overscanCount={3}
+                      shapes={matchingItems}
                       onSelected={async (shapeConfig) => {
                         if (shapeConfig.kind !== 'icon') {
                           return

@@ -10,6 +10,7 @@ import css from '@emotion/css'
 
 export type ShapeSelectorProps = {
   columns?: number
+  overscanCount?: number
   shapes: ShapeConf[]
   showProcessedThumbnails?: boolean
   selectedShapeId?: ShapeId
@@ -19,6 +20,7 @@ export type ShapeSelectorProps = {
 export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
   ({
     columns = 3,
+    overscanCount = 4,
     shapes,
     selectedShapeId,
     showProcessedThumbnails = false,
@@ -78,7 +80,7 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
           <AutoSizer defaultWidth={346} defaultHeight={600}>
             {({ height }) => (
               <List
-                overscanCount={5}
+                overscanCount={overscanCount}
                 height={height}
                 itemCount={rows}
                 itemSize={itemHeight}

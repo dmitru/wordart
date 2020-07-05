@@ -1,5 +1,6 @@
-import { iconsFaRegular } from 'data/icons-fa-regular'
-import { iconsFaSolid } from 'data/icons-fa-solid'
+import { icons as iconsFaRegular } from 'data/icons-fa-regular'
+import { icons as iconsFaSolid } from 'data/icons-fa-solid'
+import { icons as iconsFaBrands } from 'data/icons-fa-brands'
 import { ShapeClipartConf, ShapeIconConf } from 'components/Editor/shape-config'
 import animalsShapes from './shapes-animals'
 import geoShapes from './shapes-geo'
@@ -9,35 +10,16 @@ const defaultEdgesProcessing = {
   amount: 80,
 }
 
-export const svgIcons: ShapeIconConf[] = [...iconsFaSolid.slice(0, 10000)]
-  .filter((i) => i != null)
-  .map((icon, index) =>
-    icon
-      ? ({
-          id: `fa-${index}`,
-          kind: 'icon',
-          title: icon.title,
-          url: icon.url,
-          thumbnailUrl: icon.url,
-          processedThumbnailUrl: icon.url,
-          processing: {
-            colors: { kind: 'original' },
-            edges: defaultEdgesProcessing,
-          },
-          categories: ['solid'],
-        } as ShapeIconConf)
-      : null
-  )
-  .filter((x) => x != null) as ShapeIconConf[]
-
-export const svgIconsOutline: ShapeIconConf[] = [
-  ...iconsFaRegular.slice(0, 10000),
+export const svgIcons: ShapeIconConf[] = [
+  ...iconsFaSolid,
+  ...iconsFaRegular,
+  ...iconsFaBrands,
 ]
   .filter((i) => i != null)
-  .map((icon, index) =>
+  .map((icon) =>
     icon
       ? ({
-          id: `fa-outline-${index}`,
+          id: `fa-${icon.name}`,
           kind: 'icon',
           title: icon.title,
           url: icon.url,
@@ -47,7 +29,8 @@ export const svgIconsOutline: ShapeIconConf[] = [
             colors: { kind: 'original' },
             edges: defaultEdgesProcessing,
           },
-          categories: ['outline'],
+          keywords: icon.keywords,
+          categories: icon.categories,
         } as ShapeIconConf)
       : null
   )
@@ -187,4 +170,4 @@ export const imageShapes: ShapeClipartConf[] = [
   ),
 ]
 
-export const iconShapes = [...svgIcons, ...svgIconsOutline]
+export const iconShapes = svgIcons
