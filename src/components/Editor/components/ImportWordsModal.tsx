@@ -17,7 +17,9 @@ import {
   Tabs,
   Text,
   Textarea,
+  Collapse,
 } from '@chakra-ui/core'
+import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
 import { Button } from 'components/shared/Button'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
@@ -44,6 +46,7 @@ const state = observable({
   stemming: true,
   removeCommon: true,
   clearExistingBeforeImporting: true,
+  isShowingOptions: false,
 })
 
 export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
@@ -121,38 +124,48 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
 
     const parsingControls = (
       <>
-        <Text fontWeight="semibold" mb="1" mt="5" color="gray.500">
-          Options
-        </Text>
+        <Button
+          variant="outline"
+          onClick={() => {
+            state.isShowingOptions = !state.isShowingOptions
+          }}
+          rightIcon={
+            state.isShowingOptions ? <ChevronUpIcon /> : <ChevronDownIcon />
+          }
+        >
+          {state.isShowingOptions ? 'Hide ' : 'Show '} options
+        </Button>
 
-        <Stack spacing="3" mb="4">
-          <Checkbox
-            isChecked={state.removeCommon}
-            onChange={(e) => {
-              state.removeCommon = e.target.checked
-            }}
-          >
-            Remove common words (e.g. "and", "a", "the", etc)
-          </Checkbox>
+        <Collapse isOpen={state.isShowingOptions}>
+          <Stack mt="4" spacing="3" mb="4">
+            <Checkbox
+              isChecked={state.removeCommon}
+              onChange={(e) => {
+                state.removeCommon = e.target.checked
+              }}
+            >
+              Remove common words (e.g. "and", "a", "the", etc)
+            </Checkbox>
 
-          <Checkbox
-            isChecked={state.removeNumbers}
-            onChange={(e) => {
-              state.removeNumbers = e.target.checked
-            }}
-          >
-            Remove numbers
-          </Checkbox>
+            <Checkbox
+              isChecked={state.removeNumbers}
+              onChange={(e) => {
+                state.removeNumbers = e.target.checked
+              }}
+            >
+              Remove numbers
+            </Checkbox>
 
-          <Checkbox
-            isChecked={state.stemming}
-            onChange={(e) => {
-              state.stemming = e.target.checked
-            }}
-          >
-            Word stemming (e.g. treat “love” and “loves” as one word)
-          </Checkbox>
-        </Stack>
+            <Checkbox
+              isChecked={state.stemming}
+              onChange={(e) => {
+                state.stemming = e.target.checked
+              }}
+            >
+              Word stemming (e.g. treat “love” and “loves” as one word)
+            </Checkbox>
+          </Stack>
+        </Collapse>
       </>
     )
 
