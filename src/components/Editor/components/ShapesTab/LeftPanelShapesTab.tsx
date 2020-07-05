@@ -7,6 +7,7 @@ import { TextShapePicker } from 'components/Editor/components/ShapesTab/TextShap
 import { observer } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
+import { FullCanvasShapePicker } from 'components/Editor/components/ShapesTab/FullCanvasShapePicker'
 
 export const LeftPanelShapesTab: React.FC<{}> = observer(() => {
   const {
@@ -23,6 +24,9 @@ export const LeftPanelShapesTab: React.FC<{}> = observer(() => {
         {leftPanelShapesState.shapeKind === 'icon' && <IconShapePicker />}
         {leftPanelShapesState.shapeKind === 'text' && <TextShapePicker />}
         {leftPanelShapesState.shapeKind === 'blob' && <BlobShapePicker />}
+        {leftPanelShapesState.shapeKind === 'full-canvas' && (
+          <FullCanvasShapePicker />
+        )}
       </Box>
     </>
   )

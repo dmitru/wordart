@@ -16,6 +16,7 @@ import {
   ShapeTextConf,
   ShapeRandomBlobConf,
   ShapeIconConf,
+  ShapeFullCanvasConf,
 } from 'components/Editor/shape-config'
 
 export const ShapeTypeSelector: React.FC<{}> = observer(() => {
@@ -31,13 +32,13 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
         py="2"
         px="3"
       >
-        {'Shape type: '}
+        {'Shape: '}
         {shapesPanel.shapeKind === 'blob' && 'Blob'}
         {shapesPanel.shapeKind === 'image' && 'Clip art'}
         {shapesPanel.shapeKind === 'icon' && 'Icon'}
         {shapesPanel.shapeKind === 'custom image' && 'Custom image'}
         {shapesPanel.shapeKind === 'text' && 'Text'}
-        {shapesPanel.shapeKind === 'full canvas' && 'Full canvas'}
+        {shapesPanel.shapeKind === 'full-canvas' && 'Fill entire canvas'}
       </MenuButton>
 
       <Portal>
@@ -119,9 +120,14 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
 
               <MenuItemWithDescription
                 title="Full canvas"
-                description="Fill the entire canvas"
+                description="Use the entire canvas as a shape"
                 onClick={() => {
-                  shapesPanel.shapeKind = 'full canvas'
+                  shapesPanel.shapeKind = 'full-canvas'
+                  const textShape: ShapeFullCanvasConf = {
+                    kind: 'full-canvas',
+                    color: shapesPanel.fullCanvas.color,
+                  }
+                  store.selectShape(textShape)
                   store.animateVisualize(false)
                 }}
               />

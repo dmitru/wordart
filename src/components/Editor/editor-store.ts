@@ -893,8 +893,10 @@ export class EditorStore {
           points: shape.config.points,
         }
       } else if (shape.kind === 'full-canvas') {
-        // TODO
-        throw new Error('not supported')
+        return {
+          kind: shape.kind,
+          color: shape.config.color,
+        }
       } else {
         exhaustiveCheck(shape)
       }
@@ -1297,6 +1299,11 @@ export class EditorStore {
     }
 
     // Shape fill
+    this.shapesPanel.icon.color = theme.shapeFill
+    this.shapesPanel.text.color = theme.shapeFill
+    this.shapesPanel.blob.color = theme.shapeFill
+    this.shapesPanel.fullCanvas.color = theme.shapeFill
+
     if (
       shape.kind === 'clipart:svg' ||
       shape.kind === 'custom:svg' ||
@@ -1306,18 +1313,12 @@ export class EditorStore {
         kind: 'single-color',
         color: theme.shapeFill,
       }
-      if (shape.kind === 'icon') {
-        this.shapesPanel.icon.color = theme.shapeFill
-      }
     } else if (shape.kind === 'text') {
       shape.config.textStyle.color = theme.shapeFill
-      this.shapesPanel.text.color = theme.shapeFill
     } else if (shape.kind === 'full-canvas') {
       shape.config.color = theme.shapeFill
-      this.shapesPanel.fullCanvas.color = theme.shapeFill
     } else if (shape.kind === 'blob') {
       shape.config.color = theme.shapeFill
-      this.shapesPanel.blob.color = theme.shapeFill
     }
 
     // Shape items coloring
@@ -1418,7 +1419,7 @@ export type TabMode = 'home' | 'customize shape' | 'add text shape'
 export type ShapeKindOption =
   | 'icon'
   | 'image'
-  | 'full canvas'
+  | 'full-canvas'
   | 'blob'
   | 'custom image'
   | 'text'
@@ -1488,5 +1489,4 @@ export type BlobShapeOptions = {
 
 export type FullCanvasShapeOptions = {
   color: string
-  padding: number
 }

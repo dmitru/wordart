@@ -1069,6 +1069,15 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                                   title="Background"
                                   description="Use this layer to place words and icons on the background."
                                   onClick={() => {
+                                    if (
+                                      store.getShapeConf()?.kind ===
+                                      'full-canvas'
+                                    ) {
+                                      alert(
+                                        'Background layer is not available when "Entire canvas" is selected in the Shapes panel'
+                                      )
+                                      return
+                                    }
                                     store.targetTab = 'bg'
                                   }}
                                 />

@@ -43,7 +43,7 @@ export type ShapeTextStyle = {
 }
 
 export type ShapeFullCanvasConf = {
-  kind: 'full canvas'
+  kind: 'full-canvas'
   color: string
 }
 

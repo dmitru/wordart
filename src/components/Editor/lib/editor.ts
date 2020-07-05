@@ -609,6 +609,22 @@ export class Editor {
     setFillColor(shapeObj, color)
   }
 
+  updateFullCanvasShapeColors = async (color: string) => {
+    if (this.shape?.kind !== 'full-canvas') {
+      console.error(
+        `Unexpected shape type: expected full-canvas, got ${this.shape?.kind}`
+      )
+      return
+    }
+
+    if (!this.shape.obj) {
+      return
+    }
+
+    const shapeObj = this.shape.obj
+    setFillColor(shapeObj, color)
+  }
+
   updateTextShapeColors = async (textStyle: ShapeTextStyle) => {
     if (this.shape?.kind !== 'text') {
       console.error(
@@ -702,6 +718,9 @@ export class Editor {
     }
     if (config.kind === 'blob') {
       this.updateBlobShapeColors(config.color)
+    }
+    if (config.kind === 'full-canvas') {
+      this.updateFullCanvasShapeColors(config.color)
     }
     if (render) {
       this.canvas.requestRenderAll()
@@ -881,6 +900,13 @@ export class Editor {
             255 * shapeColor.green,
             255 * shapeColor.blue
           )
+        } else if (shape.kind === 'full-canvas') {
+          const shapeColor = new paper.Color(shape.config.color)
+          color = chroma.rgb(
+            255 * shapeColor.red,
+            255 * shapeColor.green,
+            255 * shapeColor.blue
+          )
         }
       } else {
         exhaustiveCheck(coloring)
@@ -1014,40 +1040,61 @@ export class Editor {
         originalTransform: new paper.Matrix().values as MatrixSerialized,
         obj: shapeObj,
       }
+    } else if (shapeConfig.kind === 'full-canvas') {
+      const pathObj = new fabric.Rect({
+        left: this.projectBounds.left,
+        top: this.projectBounds.top,
+        width: this.projectBounds.width,
+        height: this.projectBounds.height,
+        fill: shapeConfig.color,
+      })
+      shapeObj = new fabric.Group([pathObj])
+
+      shape = {
+        kind: 'full-canvas',
+        config: shapeConfig,
+        transform: new paper.Matrix().values as MatrixSerialized,
+        originalTransform: new paper.Matrix().values as MatrixSerialized,
+        obj: shapeObj,
+      }
     }
 
     if (!shapeObj) {
       throw new Error('no shape obj')
     }
 
-    const w = shapeObj.width!
-    const h = shapeObj.height!
-    const defaultPadding = 50
+    const shouldAutoScale = shapeConfig.kind !== 'full-canvas'
 
-    const sceneBounds = this.getSceneBounds(defaultPadding)
-    if (Math.max(w, h) !== Math.max(sceneBounds.width, sceneBounds.height)) {
-      const scale =
-        w / h > sceneBounds.width / sceneBounds.height
-          ? sceneBounds.width / w
-          : sceneBounds.height / h
-      shapeObj.set({ scaleX: scale, scaleY: scale })
-    }
+    if (shouldAutoScale) {
+      const w = shapeObj.width!
+      const h = shapeObj.height!
+      const defaultPadding = 50
 
-    if (params.clear) {
-      this.clear(params.render)
+      const sceneBounds = this.getSceneBounds(defaultPadding)
+      if (Math.max(w, h) !== Math.max(sceneBounds.width, sceneBounds.height)) {
+        const scale =
+          w / h > sceneBounds.width / sceneBounds.height
+            ? sceneBounds.width / w
+            : sceneBounds.height / h
+        shapeObj.set({ scaleX: scale, scaleY: scale })
+      }
+
+      shapeObj.setPositionByOrigin(
+        new fabric.Point(
+          sceneBounds.left + sceneBounds.width / 2,
+          sceneBounds.top + sceneBounds.height / 2
+        ),
+        'center',
+        'center'
+      )
     }
 
     const { shapeStyle, bgFillStyle } = params
 
+    if (params.clear) {
+      this.clear(params.render)
+    }
     this.setBgColor(bgFillStyle, render)
-    shapeObj.setPositionByOrigin(
-      new fabric.Point(
-        sceneBounds.left + sceneBounds.width / 2,
-        sceneBounds.top + sceneBounds.height / 2
-      ),
-      'center',
-      'center'
-    )
 
     shapeObj.set({
       opacity: shapeStyle.opacity,

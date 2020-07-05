@@ -47,6 +47,7 @@ export type PersistedShapeConfV1 =
   | PersistedShapeConfClipartSvgV1
   | PersistedShapeConfIconV1
   | PersistedShapeConfBlobV1
+  | PersistedShapeConfFullCanvasV1
   | PersistedShapeConfCustomSvgV1
   | PersistedShapeConfCustomTextV1
 
@@ -81,6 +82,10 @@ export type PersistedShapeConfBlobV1 = {
   color: string
   points: number
   complexity: number
+}
+export type PersistedShapeConfFullCanvasV1 = {
+  kind: 'full-canvas'
+  color: string
 }
 export type PersistedShapeConfCustomSvgV1 = {
   kind: 'custom:svg'
