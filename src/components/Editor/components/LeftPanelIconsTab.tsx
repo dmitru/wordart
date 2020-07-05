@@ -35,7 +35,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
     const style = store.styleOptions[target]
     const icons = style.items.icons.iconList
 
-    const shapes = store.getAvailableIconShapes()
+    const shapes = store.availableIconShapes
 
     return (
       <Box

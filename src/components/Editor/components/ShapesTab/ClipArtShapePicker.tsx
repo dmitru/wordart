@@ -94,7 +94,7 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
     // 'Other',
   ].map(([value, label]) => ({ value, label }))
 
-  const allClipArtShapes = store.getAvailableImageShapes()
+  const allClipArtShapes = store.availableImageShapes
 
   const shapesPerCategoryCounts = allCategoryOptions.map(
     ({ value }) =>
@@ -314,8 +314,7 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                             `}
                           >
                             <MenuItem onClick={() => setSelectedCategory(null)}>
-                              Show all ({store.getAvailableImageShapes().length}
-                              )
+                              Show all ({store.availableImageShapes.length})
                             </MenuItem>
                             <MenuDivider />
                             {allCategoryOptions.map((item, index) => (

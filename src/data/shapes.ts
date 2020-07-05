@@ -5,6 +5,8 @@ import { ShapeClipartConf, ShapeIconConf } from 'components/Editor/shape-config'
 import animalsShapes from './shapes-animals'
 import geoShapes from './shapes-geo'
 import geometryShapes from './shapes-geometry'
+import { iconsCategories } from 'data/icon-categories'
+import { sortBy } from 'lodash'
 
 const defaultEdgesProcessing = {
   amount: 80,
@@ -37,7 +39,7 @@ export const svgIcons: ShapeIconConf[] = [
   .filter((x) => x != null) as ShapeIconConf[]
 
 // @ts-ignore
-export const imageShapes: ShapeClipartConf[] = [
+const unsortedImageShapes: ShapeClipartConf[] = [
   ...[
     ...geometryShapes.map((s) => ({ ...s, categories: ['geometry'] })),
     ...geoShapes.map((s) => ({ ...s, categories: ['geo'] })),
@@ -170,4 +172,31 @@ export const imageShapes: ShapeClipartConf[] = [
   ),
 ]
 
-export const iconShapes = svgIcons
+const getSortedIconsShapes = (): ShapeIconConf[] => {
+  const categoryOrderMap: { [category: string]: number } = {}
+  for (const [index, category] of iconsCategories.entries()) {
+    categoryOrderMap[category.label] = index
+  }
+
+  return sortBy(
+    svgIcons,
+    (s) => (s.categories ? categoryOrderMap[s.categories[0]] : 999999),
+    (s) => s.title
+  )
+}
+
+const getSortedImageShapes = (): ShapeClipartConf[] => {
+  const map: { [category: string]: number } = {
+    geometry: 10,
+    geo: 200,
+  }
+  return sortBy(
+    unsortedImageShapes,
+    (s) => (s.categories ? map[s.categories[0]] || 999999 : 999999),
+    (s) => s.title
+  )
+}
+
+export const imageShapes = getSortedImageShapes()
+
+export const iconShapes = getSortedIconsShapes()

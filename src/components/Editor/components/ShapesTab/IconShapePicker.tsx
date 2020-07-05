@@ -73,7 +73,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
 
   const allCategoryOptions = iconsCategories
 
-  const allItems = store.getAvailableIconShapes()
+  const allItems = store.availableIconShapes
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 

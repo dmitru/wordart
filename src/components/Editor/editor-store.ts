@@ -58,7 +58,7 @@ import {
 import { imageShapes, iconShapes } from 'data/shapes'
 import { loadFont } from 'lib/wordart/fonts'
 import { cloneDeep, sortBy, uniq, uniqBy } from 'lodash'
-import { action, observable, set, toJS } from 'mobx'
+import { action, observable, set, toJS, computed } from 'mobx'
 import paper from 'paper'
 import {
   MatrixSerialized,
@@ -79,6 +79,7 @@ import { exhaustiveCheck } from 'utils/type-utils'
 import { createCanvas } from 'lib/wordart/canvas-utils'
 import { animateElement } from 'utils/animation'
 import { themePresets } from 'components/Editor/theme-presets'
+import { iconsCategories } from 'data/icon-categories'
 
 export type EditorMode = 'view' | 'edit'
 
@@ -1048,29 +1049,6 @@ export class EditorStore {
       popularity: 1,
       subsets: ['custom'],
     })
-  }
-
-  getAvailableImageShapes = (): ShapeClipartConf[] =>
-    sortBy(
-      this.availableImageShapes,
-      (s) => (s.categories ? this.getCategoryOrder(s.categories[0]) : 999999),
-      (s) => s.title
-    )
-
-  getAvailableIconShapes = (): ShapeIconConf[] =>
-    sortBy(
-      this.availableIconShapes,
-      (s) => (s.categories ? this.getCategoryOrder(s.categories[0]) : 999999),
-      (s) => s.title
-    )
-
-  getCategoryOrder = (category: string): number => {
-    const map: { [category: string]: number } = {
-      geometry: 10,
-      geo: 200,
-      icon: 99999999,
-    }
-    return map[category] || 999999
   }
 
   getIconShapeConfById = (shapeId: ShapeId): ShapeIconConf | undefined =>
