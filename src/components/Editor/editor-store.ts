@@ -844,28 +844,28 @@ export class EditorStore {
 
       if (shape.kind === 'custom:raster') {
         return {
-          kind: 'custom-raster',
+          kind: shape.kind,
           transform,
           url: shape.url,
           processing: shape.config.processing || {},
         }
       } else if (shape.kind === 'clipart:raster') {
         return {
-          kind: 'raster',
+          kind: shape.kind,
           transform,
           shapeId: shape.config.id,
           processing: shape.config.processing || {},
         }
       } else if (shape.kind === 'custom:svg') {
         return {
-          kind: 'custom-svg',
+          kind: shape.kind,
           transform,
           url: shape.url,
           processing: shape.config.processing || {},
         }
       } else if (shape.kind === 'clipart:svg') {
         return {
-          kind: 'svg',
+          kind: shape.kind,
           transform,
           shapeId: shape.config.id,
           processing: shape.config.processing || {},
@@ -879,7 +879,7 @@ export class EditorStore {
         }
       } else if (shape.kind === 'text') {
         return {
-          kind: 'custom-text',
+          kind: shape.kind,
           text: shape.config.text,
           textStyle: shape.config.textStyle,
           transform,

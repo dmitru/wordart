@@ -50,19 +50,19 @@ export type PersistedShapeConfV1 =
   | PersistedShapeConfCustomTextV1
 
 export type PersistedShapeConfClipartRasterV1 = {
-  kind: 'raster'
+  kind: 'clipart:raster'
   transform: MatrixSerialized
   shapeId: ShapeId
   processing?: RasterProcessingConf
 }
 export type PersistedShapeConfCustomRasterV1 = {
-  kind: 'custom-raster'
+  kind: 'custom:raster'
   transform: MatrixSerialized
   url: string
   processing?: RasterProcessingConf
 }
 export type PersistedShapeConfClipartSvgV1 = {
-  kind: 'svg'
+  kind: 'clipart:svg'
   transform: MatrixSerialized
   shapeId: ShapeId
   processing?: SvgProcessingConf
@@ -74,13 +74,13 @@ export type PersistedShapeConfIconV1 = {
   processing?: SvgProcessingConf
 }
 export type PersistedShapeConfCustomSvgV1 = {
-  kind: 'custom-svg'
+  kind: 'custom:svg'
   transform: MatrixSerialized
   url: string
   processing?: SvgProcessingConf
 }
 export type PersistedShapeConfCustomTextV1 = {
-  kind: 'custom-text'
+  kind: 'text'
   transform: MatrixSerialized
   text: string
   textStyle: ShapeTextStyle
