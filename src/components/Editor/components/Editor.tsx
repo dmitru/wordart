@@ -28,6 +28,7 @@ import {
   Portal,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
+import { getTabTitle } from 'utils/tab-title'
 import styled from '@emotion/styled'
 import {
   ChevronDownIcon,
@@ -91,6 +92,7 @@ import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { TopNavButton } from 'components/shared/TopNavButton'
 import { WarningModal } from 'components/Editor/components/WarningModal'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
+import { Helmet } from 'react-helmet'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -290,7 +292,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const {
       // @ts-ignore
-      renderKey, // eslint-disable-line
+      Key, // eslint-disable-line
     } = store
     const hasItems = store.editor
       ? store.targetTab === 'bg'
@@ -331,6 +333,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     return (
       <PageLayoutWrapper>
+        <Helmet>
+          <title>{getTabTitle(state.title)}</title>
+        </Helmet>
+
         <TopNavWrapper alignItems="center" display="flex">
           <img
             src="/images/logo.svg"
