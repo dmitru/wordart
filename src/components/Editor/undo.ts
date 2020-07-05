@@ -3,6 +3,7 @@ import { EditorStateSnapshot } from 'components/Editor/editor-store'
 import { EditorItemId, EditorItem } from 'components/Editor/lib/editor-item'
 import { ColorString } from 'components/Editor/style-options'
 import { MatrixSerialized } from 'services/api/persisted/v1'
+import { observable, computed } from 'mobx'
 
 export type UndoFrameKind = UndoFrame['kind']
 
@@ -43,8 +44,8 @@ export type ItemUpdateUndoData = {
 }
 
 export class UndoStack {
-  frames: UndoFrame[] = []
-  nextFrame = 0
+  @observable frames: UndoFrame[] = []
+  @observable nextFrame = 0
   maxSize: number
 
   constructor(maxSize = 100) {
@@ -68,20 +69,24 @@ export class UndoStack {
     }
   }
 
-  canUndo = () => this.nextFrame >= 1
+  @computed get canUndo() {
+    return this.nextFrame >= 1
+  }
 
   undo = (): UndoFrame => {
-    if (!this.canUndo()) {
+    if (!this.canUndo) {
       throw new Error('undo stack is empty')
     }
     this.nextFrame--
     return this.frames[this.nextFrame]
   }
 
-  canRedo = () => this.nextFrame < this.frames.length
+  @computed get canRedo() {
+    return this.nextFrame < this.frames.length
+  }
 
   redo = (): UndoFrame => {
-    if (!this.canRedo()) {
+    if (!this.canRedo) {
       throw new Error('redo stack is empty')
     }
     const frame = this.frames[this.nextFrame]

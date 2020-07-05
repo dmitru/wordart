@@ -912,14 +912,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     aria-label="Undo"
                     hasArrow
                     zIndex={5}
-                    isDisabled={!store.editor?.canUndo()}
+                    isDisabled={!store.editor?.canUndo}
                   >
                     <IconButton
                       ml="3"
                       icon={<ArrowBackIcon />}
                       aria-label="Undo"
                       variant="outline"
-                      isDisabled={!store.editor?.canUndo()}
+                      isDisabled={!store.editor?.canUndo}
                       onClick={store.editor?.undo}
                     />
                   </Tooltip>
@@ -928,14 +928,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     aria-label="Redo"
                     hasArrow
                     zIndex={5}
-                    isDisabled={!store.editor?.canRedo()}
+                    isDisabled={!store.editor?.canRedo}
                   >
                     <IconButton
                       ml="1"
                       icon={<ArrowForwardIcon />}
                       aria-label="Redo"
                       variant="outline"
-                      isDisabled={!store.editor?.canRedo()}
+                      isDisabled={!store.editor?.canRedo}
                       onClick={store.editor?.redo}
                     />
                   </Tooltip>

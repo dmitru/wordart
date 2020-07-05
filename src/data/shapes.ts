@@ -130,17 +130,17 @@ const unsortedImageShapes: ShapeClipartConf[] = [
       url: '/images/bear-belly.svg',
     },
     {
-      kind: 'raster',
+      kind: 'clipart:raster',
       title: 'Beatles',
       url: '/images/beatles.jpg',
     },
     {
-      kind: 'raster',
+      kind: 'clipart:raster',
       title: 'Number Six',
       url: '/images/number_six.png',
     },
     {
-      kind: 'raster',
+      kind: 'clipart:raster',
       title: 'Darth Vader',
       url: '/images/darth_vader.jpg',
     },

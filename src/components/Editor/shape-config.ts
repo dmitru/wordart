@@ -83,7 +83,6 @@ type ShapeRasterConfBase = {
   url: string
   thumbnailUrl: string
   processedThumbnailUrl: string
-  title: string
   processing: RasterProcessingConf
 }
 

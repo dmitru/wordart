@@ -31,7 +31,6 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
   ...props
 }) => {
   const initialFocusRef = useRef(null)
-  const ref = useRef(null)
 
   return (
     <>
@@ -45,7 +44,6 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
           <ColorSwatchButton
             kind="color"
             color={value}
-            ref={ref}
             {...props}
             opacity={colorSwatchOpacity}
           />

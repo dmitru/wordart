@@ -56,7 +56,7 @@ import {
 } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { flatten, groupBy, keyBy, max, min, sortBy } from 'lodash'
-import { toJS } from 'mobx'
+import { toJS, action, observable, computed } from 'mobx'
 import { nanoid } from 'nanoid/non-secure'
 import { BoundingBox, Glyph } from 'opentype.js'
 import paper from 'paper'
@@ -110,7 +110,7 @@ export class Editor {
   shape: null | Shape = null
 
   undoStack = new UndoStack()
-  isUndoing = false
+  @observable isUndoing = false
 
   items: {
     shape: {
@@ -1680,7 +1680,7 @@ export class Editor {
     this.store.renderKey++
   }
 
-  pushUndoFrame = (frame: UndoFrame) => {
+  @action pushUndoFrame = (frame: UndoFrame) => {
     this.undoStack.push(frame)
     this.store.renderKey++
   }
@@ -1707,9 +1707,9 @@ export class Editor {
     this.canvas.requestRenderAll()
   }
 
-  undo = async () => {
+  @action undo = async () => {
     this.isUndoing = true
-    this.store.renderKey++
+
     const frame = this.undoStack.undo()
     console.log('undo', frame)
     if (frame.kind === 'visualize') {
@@ -1727,10 +1727,10 @@ export class Editor {
     this.store.renderKey++
   }
 
-  redo = async () => {
+  @action redo = async () => {
     const frame = this.undoStack.redo()
     this.isUndoing = true
-    this.store.renderKey++
+
     console.log('redo', frame)
     if (frame.kind === 'visualize') {
       await this.store.loadSerialized(frame.dataAfter)
@@ -1747,8 +1747,12 @@ export class Editor {
     this.store.renderKey++
   }
 
-  canUndo = (): boolean => !this.isUndoing && this.undoStack.canUndo()
-  canRedo = (): boolean => !this.isUndoing && this.undoStack.canRedo()
+  @computed get canUndo() {
+    return !this.isUndoing && this.undoStack.canUndo
+  }
+  @computed get canRedo() {
+    return !this.isUndoing && this.undoStack.canRedo
+  }
 
   clear = async (clearCanvas = true) => {
     this.logger.debug('Editor: clear')

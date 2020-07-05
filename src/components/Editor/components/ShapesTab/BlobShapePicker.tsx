@@ -1,52 +1,25 @@
-import {
-  Box,
-  Flex,
-  Heading,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Stack,
-  Text,
-  Textarea,
-} from '@chakra-ui/core'
-import { ChevronDownIcon } from '@chakra-ui/icons'
+import { Box, Flex, Heading, Stack, Text } from '@chakra-ui/core'
 import { css } from '@emotion/core'
-import chroma from 'chroma-js'
-import { fabric } from 'fabric'
-import {
-  ShapeSelector,
-  ShapeThumbnailBtn,
-} from 'components/Editor/components/ShapeSelector'
-import {
-  applyTransformToObj,
-  createMultilineFabricTextGroup,
-  loadObjFromSvgString,
-} from 'components/Editor/lib/fabric-utils'
+import { BlobShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
+import { ShapeThumbnailBtn } from 'components/Editor/components/ShapeSelector'
+import { generateBlobShapePathData } from 'components/Editor/lib/blob-shape-gen'
+import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
+import { ShapeRandomBlobConf } from 'components/Editor/shape-config'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
-import { SearchInput } from 'components/shared/SearchInput'
 import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'
+import { fabric } from 'fabric'
 import { AnimatePresence, motion } from 'framer-motion'
+import { createCanvas } from 'lib/wordart/canvas-utils'
 import { isEqual } from 'lodash'
-import { observable, runInAction } from 'mobx'
+import { observable } from 'mobx'
 import { observer } from 'mobx-react'
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect } from 'react'
 import { FaCog } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
-import { iconsCategories } from 'data/icon-categories'
-import { useDebounce } from 'use-debounce'
-import { createCanvas } from 'lib/wordart/canvas-utils'
-import { SectionLabel } from 'components/Editor/components/shared'
-import { FontPicker } from 'components/Editor/components/FontPicker'
-import { ShapeRandomBlobConf } from 'components/Editor/shape-config'
-import { generateBlobShapePathData } from 'components/Editor/lib/blob-shape-gen'
-import { BlobShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -192,7 +165,7 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
       pathData: blobShapeSvg,
     }
 
-    await store.selectShape(shapeConfig)
+    await store.selectShapeAndSaveUndo(shapeConfig)
     updateBlobThumbnailPreview()
 
     store.animateVisualize(false)

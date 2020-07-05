@@ -248,21 +248,6 @@ export class EditorStore {
 
     if (params.serialized) {
       await this.loadSerialized(params.serialized)
-
-      if (
-        this.selectedShapeConf.kind === 'clipart:raster' ||
-        this.selectedShapeConf.kind === 'clipart:svg'
-      ) {
-        this.shapesPanel.shapeKind = 'image'
-        this.shapesPanel.image.selected = this.selectedShapeConf.id
-      } else if (
-        this.selectedShapeConf.kind === 'custom:raster' ||
-        this.selectedShapeConf.kind === 'custom:svg'
-      ) {
-        this.shapesPanel.shapeKind = 'custom image'
-      } else {
-        this.shapesPanel.shapeKind = this.selectedShapeConf.kind
-      }
     } else {
       await this.applyColorTheme(themePresets[0])
       await this.selectShape(imageShapes[5])
@@ -391,255 +376,330 @@ export class EditorStore {
   }
 
   @action loadSerialized = async (serialized: EditorPersistedData) => {
-    // const shouldShowModal =
-    //   serialized.data.bgItems.items.length > 0 ||
-    //   serialized.data.shapeItems.items.length > 0
-    // if (shouldShowModal) {
-    //   this.isVisualizing = true
-    //   this.visualizingStep = 'drawing'
-    //   this.visualizingProgress = 0
-    // }
-    // this.logger.debug('loadSerialized', serialized)
-    // if (!this.editor) {
-    //   throw new Error('editor is not initialized')
-    // }
-    // const { data } = serialized
-    // this.editor.setAspectRatio(
-    //   serialized.data.sceneSize.w / serialized.data.sceneSize.h,
-    //   false
-    // )
-    // this.availableImageShapes = this.availableImageShapes.filter(
-    //   (s) => !s.isCustom
-    // )
-    // for (const font of serialized.data.customFonts) {
-    //   await this.addCustomFont(font)
-    // }
-    // if (data.shape.kind === 'custom-raster') {
-    //   const customShapeConf: ShapeConf = {
-    //     kind: 'raster',
-    //     id: 'custom:raster',
-    //     title: 'Custom',
-    //     url: data.shape.url,
-    //     isCustom: true,
-    //     thumbnailUrl: data.shape.url,
-    //     processedThumbnailUrl: data.shape.url,
-    //     processing: data.shape.processing,
-    //   }
-    //   await this.selectShape(customShapeConf, false, false)
-    // } else if (data.shape.kind === 'custom-text') {
-    //   const customShapeConf: ShapeConf = {
-    //     kind: 'text',
-    //     id: 'custom:text',
-    //     title: 'Custom',
-    //     isCustom: true,
-    //     thumbnailUrl: '',
-    //     processedThumbnailUrl: '', // TODO
-    //     text: data.shape.text,
-    //     textStyle: data.shape.textStyle,
-    //   }
-    //   await this.selectShape(customShapeConf, false, false)
-    // } else if (
-    //   (data.shape.kind === 'raster' || data.shape.kind === 'svg') &&
-    //   data.shape.shapeId != null
-    // ) {
-    //   const shapeId = data.shape.shapeId
-    //   const shapeConf =
-    //     this.availableIconShapes.find((s) => s.id === shapeId) ||
-    //     this.availableImageShapes.find((s) => s.id === shapeId)
-    //   if (!shapeConf) {
-    //     throw new Error(`shape config not found for shape id ${shapeId}`)
-    //   }
-    //   await this.selectShape(shapeConf, false, false)
-    // }
-    // const shape = this.editor.shape
-    // if (data.shape.transform && shape) {
-    //   applyTransformToObj(shape.obj, data.shape.transform)
-    //   if (shape.kind === 'svg') {
-    //     applyTransformToObj(shape.objOriginalColors, data.shape.transform)
-    //   }
-    // }
-    // if (
-    //   shape?.kind === 'svg' &&
-    //   data.shape.kind === 'svg' &&
-    //   data.shape.processing
-    // ) {
-    //   shape.config.processing = data.shape.processing
-    // } else if (
-    //   shape?.kind === 'raster' &&
-    //   data.shape.kind === 'raster' &&
-    //   data.shape.processing
-    // ) {
-    //   shape.config.processing = data.shape.processing
-    // }
-    // const sceneSize = this.editor.getSceneBounds(0)
-    // const scale = sceneSize.width / serialized.data.sceneSize.w
-    // const bgStyle = this.styleOptions.bg
-    // const shapeStyle = this.styleOptions.shape
-    // // // Restore BG style options
-    // if (data.bgStyle.fill.kind === 'color') {
-    //   this.styleOptions.bg.fill.color = data.bgStyle.fill
-    // } else if (data.bgStyle.fill.kind === 'transparent') {
-    //   this.styleOptions.bg.fill.kind = 'transparent'
-    // }
-    // bgStyle.items.dimSmallerItems = data.bgStyle.items.dimSmallerItems
-    // bgStyle.items.brightness = data.bgStyle.items.brightness
-    // bgStyle.items.opacity = data.bgStyle.items.opacity
-    // bgStyle.items.placement = data.bgStyle.items.placement
-    // bgStyle.items.icons.iconList = data.bgStyle.items.icons.iconList
-    // bgStyle.items.words.customAngles = data.bgStyle.items.words.angles
-    // bgStyle.items.words.wordList = data.bgStyle.items.words.wordList
-    // bgStyle.items.words.fontIds = data.bgStyle.items.words.fontIds
-    // if (data.bgStyle.items.coloring.kind === 'color') {
-    //   bgStyle.items.coloring.kind = 'color'
-    //   bgStyle.items.coloring.color = {
-    //     ...bgStyle.items.coloring.color,
-    //     ...data.bgStyle.items.coloring,
-    //   }
-    // } else if (data.bgStyle.items.coloring.kind === 'gradient') {
-    //   bgStyle.items.coloring.kind = 'gradient'
-    //   bgStyle.items.coloring.gradient = data.bgStyle.items.coloring
-    // }
-    // // Restore Shape style options
-    // shapeStyle.items.dimSmallerItems = data.shapeStyle.items.dimSmallerItems
-    // shapeStyle.items.brightness = data.shapeStyle.items.brightness
-    // shapeStyle.items.opacity = data.shapeStyle.items.opacity
-    // shapeStyle.items.placement = data.shapeStyle.items.placement
-    // shapeStyle.items.icons.iconList = data.shapeStyle.items.icons.iconList
-    // shapeStyle.items.words.customAngles = data.shapeStyle.items.words.angles
-    // shapeStyle.items.words.wordList = data.shapeStyle.items.words.wordList
-    // shapeStyle.items.words.fontIds = data.shapeStyle.items.words.fontIds
-    // shapeStyle.opacity = data.shapeStyle.opacity
-    // if (data.shapeStyle.items.coloring.kind === 'color') {
-    //   shapeStyle.items.coloring.kind = 'color'
-    //   shapeStyle.items.coloring.color = {
-    //     ...shapeStyle.items.coloring.color,
-    //     ...data.shapeStyle.items.coloring,
-    //   }
-    // } else if (data.shapeStyle.items.coloring.kind === 'gradient') {
-    //   shapeStyle.items.coloring.kind = 'gradient'
-    //   shapeStyle.items.coloring.gradient = data.shapeStyle.items.coloring
-    // } else if (data.shapeStyle.items.coloring.kind === 'shape') {
-    //   shapeStyle.items.coloring.kind = 'shape'
-    //   shapeStyle.items.coloring.shape = data.shapeStyle.items.coloring
-    // }
-    // const deserializeItems = async ({
-    //   items,
-    //   words,
-    //   fontIds,
-    // }: {
-    //   items: PersistedItemV1[]
-    //   words: PersistedWordV1[]
-    //   fontIds: FontId[]
-    // }): Promise<EditorItemConfig[]> => {
-    //   console.log('deserializeItems: ', { words, items, fontIds })
-    //   // Fetch all required Fonts
-    //   const fontsById = new Map<FontId, Font>()
-    //   for (const fontId of fontIds) {
-    //     const font = await this.fetchFontById(fontId)
-    //     if (!font) {
-    //       throw new Error(`no font ${fontId}`)
-    //     }
-    //     fontsById.set(fontId, { otFont: font, id: fontId, isCustom: false })
-    //   }
-    //   const wordsInfoMap = new Map<
-    //     string,
-    //     { fontId: FontId; text: string; wordConfigId?: WordConfigId }
-    //   >()
-    //   const result: EditorItemConfig[] = []
-    //   for (const [index, item] of items.entries()) {
-    //     if (item.k === 'w') {
-    //       const word = words[item.wi]
-    //       const fontId = fontIds[word.fontIndex]
-    //       const fontEntry = fontsById.get(fontId)
-    //       if (!fontEntry) {
-    //         console.error(`No font entry for fontId ${fontId}`)
-    //         continue
-    //       }
-    //       const wordInfoId = `${fontId}-${word.text}`
-    //       if (!wordsInfoMap.has(wordInfoId)) {
-    //         wordsInfoMap.set(wordInfoId, {
-    //           text: word.text,
-    //           fontId,
-    //           wordConfigId: undefined,
-    //         })
-    //       }
-    //       const { text, wordConfigId } = wordsInfoMap.get(wordInfoId)!
-    //       const wordItem: EditorItemConfigWord = {
-    //         index: index,
-    //         color: item.c,
-    //         customColor: item.cc,
-    //         locked: item.l || false,
-    //         shapeColor: item.sc,
-    //         kind: 'word',
-    //         transform: new paper.Matrix(item.t).prepend(
-    //           new paper.Matrix().scale(scale, new paper.Point(0, 0))
-    //         ),
-    //         fontId,
-    //         text,
-    //         wordConfigId,
-    //       }
-    //       result.push(wordItem)
-    //     }
-    //     if (item.k === 's') {
-    //       const shapeItem: EditorItemConfigShape = {
-    //         index: index,
-    //         color: item.c,
-    //         customColor: item.cc,
-    //         locked: item.l || false,
-    //         shapeColor: item.sc,
-    //         kind: 'shape',
-    //         transform: new paper.Matrix(item.t).prepend(
-    //           new paper.Matrix().scale(scale, new paper.Point(0, 0))
-    //         ),
-    //         shapeId: item.sId,
-    //       }
-    //       result.push(shapeItem)
-    //     }
-    //   }
-    //   return result
-    // }
-    // const [shapeItems, bgItems] = await Promise.all([
-    //   deserializeItems({
-    //     items: data.shapeItems.items,
-    //     fontIds: data.shapeItems.fontIds,
-    //     words: data.shapeItems.words,
-    //   }),
-    //   deserializeItems({
-    //     items: data.bgItems.items,
-    //     fontIds: data.bgItems.fontIds,
-    //     words: data.bgItems.words,
-    //   }),
-    // ])
-    // this.editor.setShapeOpacity(shapeStyle.opacity / 100, false)
-    // await this.editor.setShapeItems(shapeItems, false)
-    // await this.editor.setBgItems(bgItems, false)
-    // this.editor.setBgOpacity(
-    //   bgStyle.fill.kind === 'transparent' ? 0 : bgStyle.fill.color.opacity / 100
-    // )
-    // this.editor.setBgColor(
-    //   mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
-    //   false
-    // )
-    // const shapeConf = this.selectedShapeConf
-    // await this.editor.updateShapeColors(shapeConf, false)
-    // await this.editor.setShapeItemsStyle(
-    //   mkShapeStyleConfFromOptions(this.styleOptions.shape).items,
-    //   false
-    // )
-    // await this.editor.setBgItemsStyle(
-    //   mkBgStyleConfFromOptions(this.styleOptions.bg).items,
-    //   false
-    // )
-    // await this.updateShapeThumbnail()
-    // this.editor.bgCanvas.requestRenderAll()
-    // this.editor.canvas.requestRenderAll()
-    // this.editor.key = data.key
-    // this.editor.version = data.version
-    // if (shouldShowModal) {
-    //   this.visualizingProgress = 1
-    //   this.isVisualizing = false
-    //   this.visualizingStep = null
-    // }
+    const shouldShowModal =
+      serialized.data.bgItems.items.length > 0 ||
+      serialized.data.shapeItems.items.length > 0
+    if (shouldShowModal) {
+      this.isVisualizing = true
+      this.visualizingStep = 'drawing'
+      this.visualizingProgress = 0
+    }
+    this.logger.debug('loadSerialized', serialized)
+    if (!this.editor) {
+      throw new Error('editor is not initialized')
+    }
+    const { data } = serialized
+    this.editor.setAspectRatio(
+      serialized.data.sceneSize.w / serialized.data.sceneSize.h,
+      false
+    )
+
+    for (const font of serialized.data.customFonts) {
+      await this.addCustomFont(font)
+    }
+
+    if (data.shape.kind === 'custom:raster') {
+      const customShapeConf: ShapeConf = {
+        kind: 'custom:raster',
+        url: data.shape.url,
+        thumbnailUrl: data.shape.url,
+        processedThumbnailUrl: data.shape.url,
+        processing: data.shape.processing || {},
+      }
+      await this.selectShape(customShapeConf, false, false)
+    } else if (data.shape.kind === 'text') {
+      const customShapeConf: ShapeConf = {
+        kind: 'text',
+        thumbnailUrl: '',
+        text: data.shape.text,
+        textStyle: data.shape.textStyle,
+      }
+      await this.selectShape(customShapeConf, false, false)
+    } else if (data.shape.kind === 'blob') {
+      const customShapeConf: ShapeConf = {
+        kind: 'blob',
+        color: data.shape.color,
+        complexity: data.shape.complexity,
+        points: data.shape.points,
+        pathData: data.shape.pathData,
+      }
+      await this.selectShape(customShapeConf, false, false)
+    } else if (data.shape.kind === 'full-canvas') {
+      const customShapeConf: ShapeConf = {
+        kind: 'full-canvas',
+        color: data.shape.color,
+      }
+      await this.selectShape(customShapeConf, false, false)
+    } else if (
+      (data.shape.kind === 'clipart:raster' ||
+        data.shape.kind === 'clipart:svg' ||
+        data.shape.kind === 'icon') &&
+      data.shape.shapeId != null
+    ) {
+      const shapeId = data.shape.shapeId
+      const shapeConf =
+        this.availableIconShapes.find((s) => s.id === shapeId) ||
+        this.availableImageShapes.find((s) => s.id === shapeId)
+      if (!shapeConf) {
+        throw new Error(`shape config not found for shape id ${shapeId}`)
+      }
+      await this.selectShape(shapeConf, false, false)
+    }
+
+    const shape = this.editor.shape
+    if ('transform' in data.shape && shape) {
+      applyTransformToObj(shape.obj, data.shape.transform)
+      if (
+        shape.kind === 'clipart:svg' ||
+        shape.kind === 'custom:svg' ||
+        shape.kind === 'icon'
+      ) {
+        applyTransformToObj(shape.objOriginalColors, data.shape.transform)
+      }
+    }
+
+    if (
+      shape &&
+      (shape.kind === 'clipart:svg' ||
+        shape.kind === 'custom:svg' ||
+        shape.kind === 'icon') &&
+      (data.shape.kind === 'clipart:svg' ||
+        data.shape.kind === 'custom:svg' ||
+        data.shape.kind === 'icon') &&
+      data.shape.processing
+    ) {
+      shape.config.processing = data.shape.processing
+    } else if (
+      shape &&
+      (shape.kind === 'clipart:raster' || shape.kind === 'custom:raster') &&
+      (data.shape.kind === 'clipart:raster' ||
+        data.shape.kind === 'custom:raster') &&
+      data.shape.processing
+    ) {
+      shape.config.processing = data.shape.processing
+    }
+
+    const sceneSize = this.editor.getSceneBounds(0)
+    const scale = sceneSize.width / serialized.data.sceneSize.w
+    const bgStyle = this.styleOptions.bg
+    const shapeStyle = this.styleOptions.shape
+
+    // // Restore BG style options
+    if (data.bgStyle.fill.kind === 'color') {
+      this.styleOptions.bg.fill.color = data.bgStyle.fill
+    } else if (data.bgStyle.fill.kind === 'transparent') {
+      this.styleOptions.bg.fill.kind = 'transparent'
+    }
+
+    bgStyle.items.dimSmallerItems = data.bgStyle.items.dimSmallerItems
+    bgStyle.items.brightness = data.bgStyle.items.brightness
+    bgStyle.items.opacity = data.bgStyle.items.opacity
+    bgStyle.items.placement = data.bgStyle.items.placement
+    bgStyle.items.icons.iconList = data.bgStyle.items.icons.iconList
+    bgStyle.items.words.customAngles = data.bgStyle.items.words.angles
+    bgStyle.items.words.wordList = data.bgStyle.items.words.wordList
+    bgStyle.items.words.fontIds = data.bgStyle.items.words.fontIds
+    if (data.bgStyle.items.coloring.kind === 'color') {
+      bgStyle.items.coloring.kind = 'color'
+      bgStyle.items.coloring.color = {
+        ...bgStyle.items.coloring.color,
+        ...data.bgStyle.items.coloring,
+      }
+    } else if (data.bgStyle.items.coloring.kind === 'gradient') {
+      bgStyle.items.coloring.kind = 'gradient'
+      bgStyle.items.coloring.gradient = data.bgStyle.items.coloring
+    }
+
+    // Restore Shape style options
+    shapeStyle.items.dimSmallerItems = data.shapeStyle.items.dimSmallerItems
+    shapeStyle.items.brightness = data.shapeStyle.items.brightness
+    shapeStyle.items.opacity = data.shapeStyle.items.opacity
+    shapeStyle.items.placement = data.shapeStyle.items.placement
+    shapeStyle.items.icons.iconList = data.shapeStyle.items.icons.iconList
+    shapeStyle.items.words.customAngles = data.shapeStyle.items.words.angles
+    shapeStyle.items.words.wordList = data.shapeStyle.items.words.wordList
+    shapeStyle.items.words.fontIds = data.shapeStyle.items.words.fontIds
+    shapeStyle.opacity = data.shapeStyle.opacity
+
+    if (data.shapeStyle.items.coloring.kind === 'color') {
+      shapeStyle.items.coloring.kind = 'color'
+      shapeStyle.items.coloring.color = {
+        ...shapeStyle.items.coloring.color,
+        ...data.shapeStyle.items.coloring,
+      }
+    } else if (data.shapeStyle.items.coloring.kind === 'gradient') {
+      shapeStyle.items.coloring.kind = 'gradient'
+      shapeStyle.items.coloring.gradient = data.shapeStyle.items.coloring
+    } else if (data.shapeStyle.items.coloring.kind === 'shape') {
+      shapeStyle.items.coloring.kind = 'shape'
+      shapeStyle.items.coloring.shape = data.shapeStyle.items.coloring
+    }
+
+    // RESTORE SHAPE PANEL STATE
+    if (
+      this.selectedShapeConf.kind === 'clipart:raster' ||
+      this.selectedShapeConf.kind === 'clipart:svg'
+    ) {
+      this.shapesPanel.shapeKind = 'image'
+      this.shapesPanel.image.selected = this.selectedShapeConf.id
+      if (
+        this.selectedShapeConf.kind === 'clipart:svg' &&
+        this.selectedShapeConf.processing.colors.kind === 'single-color'
+      ) {
+        this.shapesPanel.image.singleColor = this.selectedShapeConf.processing.colors.color
+      }
+    } else if (
+      this.selectedShapeConf.kind === 'custom:raster' ||
+      this.selectedShapeConf.kind === 'custom:svg'
+    ) {
+      this.shapesPanel.shapeKind = 'custom image'
+    } else {
+      this.shapesPanel.shapeKind = this.selectedShapeConf.kind
+
+      if (this.selectedShapeConf.kind === 'text') {
+        this.shapesPanel.text.text = this.selectedShapeConf.text
+        this.shapesPanel.text.color = this.selectedShapeConf.textStyle.color
+        this.shapesPanel.text.fontId = this.selectedShapeConf.textStyle.fontId
+      } else if (this.selectedShapeConf.kind === 'blob') {
+        this.shapesPanel.blob.color = this.selectedShapeConf.color
+        this.shapesPanel.blob.complexity = this.selectedShapeConf.complexity
+        this.shapesPanel.blob.points = this.selectedShapeConf.points
+      } else if (this.selectedShapeConf.kind === 'full-canvas') {
+        this.shapesPanel.fullCanvas.color = this.selectedShapeConf.color
+      } else if (
+        this.selectedShapeConf.kind === 'icon' &&
+        this.selectedShapeConf.processing.colors.kind === 'single-color'
+      ) {
+        this.shapesPanel.icon.color = this.selectedShapeConf.processing.colors.color
+      }
+    }
+
+    const deserializeItems = async ({
+      items,
+      words,
+      fontIds,
+    }: {
+      items: PersistedItemV1[]
+      words: PersistedWordV1[]
+      fontIds: FontId[]
+    }): Promise<EditorItemConfig[]> => {
+      console.log('deserializeItems: ', { words, items, fontIds })
+      // Fetch all required Fonts
+      const fontsById = new Map<FontId, Font>()
+      for (const fontId of fontIds) {
+        const font = await this.fetchFontById(fontId)
+        if (!font) {
+          throw new Error(`no font ${fontId}`)
+        }
+        fontsById.set(fontId, { otFont: font, id: fontId, isCustom: false })
+      }
+      const wordsInfoMap = new Map<
+        string,
+        { fontId: FontId; text: string; wordConfigId?: WordConfigId }
+      >()
+      const result: EditorItemConfig[] = []
+      for (const [index, item] of items.entries()) {
+        if (item.k === 'w') {
+          const word = words[item.wi]
+          const fontId = fontIds[word.fontIndex]
+          const fontEntry = fontsById.get(fontId)
+          if (!fontEntry) {
+            console.error(`No font entry for fontId ${fontId}`)
+            continue
+          }
+          const wordInfoId = `${fontId}-${word.text}`
+          if (!wordsInfoMap.has(wordInfoId)) {
+            wordsInfoMap.set(wordInfoId, {
+              text: word.text,
+              fontId,
+              wordConfigId: undefined,
+            })
+          }
+          const { text, wordConfigId } = wordsInfoMap.get(wordInfoId)!
+          const wordItem: EditorItemConfigWord = {
+            index: index,
+            color: item.c,
+            customColor: item.cc,
+            locked: item.l || false,
+            shapeColor: item.sc,
+            kind: 'word',
+            transform: new paper.Matrix(item.t).prepend(
+              new paper.Matrix().scale(scale, new paper.Point(0, 0))
+            ),
+            fontId,
+            text,
+            wordConfigId,
+          }
+          result.push(wordItem)
+        }
+        if (item.k === 's') {
+          const shapeItem: EditorItemConfigShape = {
+            index: index,
+            color: item.c,
+            customColor: item.cc,
+            locked: item.l || false,
+            shapeColor: item.sc,
+            kind: 'shape',
+            transform: new paper.Matrix(item.t).prepend(
+              new paper.Matrix().scale(scale, new paper.Point(0, 0))
+            ),
+            shapeId: item.sId,
+          }
+          result.push(shapeItem)
+        }
+      }
+      return result
+    }
+
+    const [shapeItems, bgItems] = await Promise.all([
+      deserializeItems({
+        items: data.shapeItems.items,
+        fontIds: data.shapeItems.fontIds,
+        words: data.shapeItems.words,
+      }),
+      deserializeItems({
+        items: data.bgItems.items,
+        fontIds: data.bgItems.fontIds,
+        words: data.bgItems.words,
+      }),
+    ])
+
+    this.editor.setShapeOpacity(shapeStyle.opacity / 100, false)
+
+    await this.editor.setShapeItems(shapeItems, false)
+    await this.editor.setBgItems(bgItems, false)
+
+    this.editor.setBgOpacity(
+      bgStyle.fill.kind === 'transparent' ? 0 : bgStyle.fill.color.opacity / 100
+    )
+    this.editor.setBgColor(
+      mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
+      false
+    )
+    const shapeConf = this.selectedShapeConf
+
+    await this.editor.updateShapeColors(shapeConf, false)
+    await this.editor.setShapeItemsStyle(
+      mkShapeStyleConfFromOptions(this.styleOptions.shape).items,
+      false
+    )
+    await this.editor.setBgItemsStyle(
+      mkBgStyleConfFromOptions(this.styleOptions.bg).items,
+      false
+    )
+    await this.updateShapeThumbnail()
+
+    this.editor.bgCanvas.requestRenderAll()
+    this.editor.canvas.requestRenderAll()
+
+    this.editor.key = data.key
+    this.editor.version = data.version
+
+    if (shouldShowModal) {
+      this.visualizingProgress = 1
+      this.isVisualizing = false
+      this.visualizingStep = null
+    }
   }
 
   updateShapeThumbnail = async () => {
