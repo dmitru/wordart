@@ -255,7 +255,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
             </Box>
           </Box>
 
-          <Box position="relative" width="100%" height="calc(100vh - 295px)">
+          <Box position="relative" width="100%" height="calc(100vh - 350px)">
             <AnimatePresence initial={false}>
               {shape && state.mode === 'customize shape' && (
                 <motion.div

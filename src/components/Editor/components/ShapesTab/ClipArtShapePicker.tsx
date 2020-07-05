@@ -240,7 +240,6 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
               <Flex marginTop="70px" width="100%">
                 {state.mode === 'home' && (
                   <Button
-                    mr="2"
                     variant="outline"
                     display="flex"
                     flex="1"
@@ -272,7 +271,7 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
             </Box>
           </Box>
 
-          <Box position="relative" width="100%" height="calc(100vh - 295px)">
+          <Box position="relative" width="100%" height="calc(100vh - 350px)">
             <AnimatePresence initial={false}>
               {state.mode === 'home' && (
                 <motion.div
