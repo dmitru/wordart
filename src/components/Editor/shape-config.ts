@@ -50,8 +50,9 @@ export type ShapeFullCanvasConf = {
 export type ShapeRandomBlobConf = {
   kind: 'blob'
   color: string
+  points: number
   complexity: number
-  // @TODO: add svg field, encoding the blob svg
+  svg: string
 }
 
 type ShapeSvgConfBase = {

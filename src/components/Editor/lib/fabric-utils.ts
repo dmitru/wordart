@@ -54,9 +54,17 @@ export const loadObjFromImg = (url: string) =>
     })
   )
 
-export const loadObjFromSvg = (url: string) =>
+export const loadObjFromSvgUrl = (url: string) =>
   new Promise<fabric.Object>((resolve) =>
     fabric.loadSVGFromURL(url, (objects, options) => {
+      var obj = fabric.util.groupSVGElements(objects, options)
+      resolve(obj)
+    })
+  )
+
+export const loadObjFromSvgString = (svg: string) =>
+  new Promise<fabric.Object>((resolve) =>
+    fabric.loadSVGFromString(svg, (objects, options) => {
       var obj = fabric.util.groupSVGElements(objects, options)
       resolve(obj)
     })

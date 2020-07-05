@@ -3,7 +3,7 @@ import { WordConfigId } from 'components/Editor/editor-store'
 import {
   ShapeConf,
   ShapeId,
-  ShapeSvgConf,
+  ShapeIconConf,
 } from 'components/Editor/shape-config'
 import { FontId } from 'data/fonts'
 import {
@@ -26,7 +26,7 @@ import { Path } from 'opentype.js'
 import paper from 'paper'
 import { consoleLoggers } from 'utils/console-logger'
 import {
-  loadObjFromSvg,
+  loadObjFromSvgUrl,
   objAsCanvasElement,
   setFillColor,
 } from 'components/Editor/lib/fabric-utils'
@@ -199,8 +199,8 @@ export class Generator {
     const iconsBounds: Rect[] = []
 
     for (let icon of icons) {
-      const shapeItemGroup = await loadObjFromSvg(
-        (icon.shape as ShapeSvgConf).url
+      const shapeItemGroup = await loadObjFromSvgUrl(
+        (icon.shape as ShapeIconConf).url
       )
       setFillColor(shapeItemGroup, 'black')
       // Scale the shape so that it's 100 in height (similar to word items having fontSize = 100

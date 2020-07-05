@@ -884,7 +884,16 @@ export class EditorStore {
           textStyle: shape.config.textStyle,
           transform,
         }
-      } else if (shape.kind === 'full-canvas' || shape.kind === 'blob') {
+      } else if (shape.kind === 'blob') {
+        return {
+          kind: shape.kind,
+          transform,
+          svg: shape.config.svg,
+          color: shape.config.color,
+          complexity: shape.config.complexity,
+          points: shape.config.points,
+        }
+      } else if (shape.kind === 'full-canvas') {
         // TODO
         throw new Error('not supported')
       } else {

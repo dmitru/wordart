@@ -23,9 +23,10 @@ import {
   createMultilineFabricTextGroup,
   getObjTransformMatrix,
   loadObjFromImg,
-  loadObjFromSvg,
+  loadObjFromSvgUrl,
   objAsCanvasElement,
   setFillColor,
+  loadObjFromSvgString,
 } from 'components/Editor/lib/fabric-utils'
 import { Font, Generator } from 'components/Editor/lib/generator'
 import { Shape, SvgShapeColorsMapEntry } from 'components/Editor/shape'
@@ -873,6 +874,13 @@ export class Editor {
             255 * shapeColor.green,
             255 * shapeColor.blue
           )
+        } else if (shape.kind === 'blob') {
+          const shapeColor = new paper.Color(shape.config.color)
+          color = chroma.rgb(
+            255 * shapeColor.red,
+            255 * shapeColor.green,
+            255 * shapeColor.blue
+          )
         }
       } else {
         exhaustiveCheck(coloring)
@@ -928,7 +936,7 @@ export class Editor {
       shapeConfig.kind === 'custom:svg' ||
       shapeConfig.kind === 'icon'
     ) {
-      shapeObj = await loadObjFromSvg(shapeConfig.url)
+      shapeObj = await loadObjFromSvgUrl(shapeConfig.url)
 
       colorMap = computeColorsMap(shapeObj as fabric.Group)
 
@@ -996,13 +1004,8 @@ export class Editor {
         obj: shapeObj,
       }
     } else if (shapeConfig.kind === 'blob') {
-      const circle = new fabric.Circle({
-        top: 0,
-        left: 0,
-        radius: 100,
-        fill: shapeConfig.color,
-      })
-      shapeObj = circle
+      shapeObj = await loadObjFromSvgString(shapeConfig.svg)
+
       shape = {
         kind: 'blob',
         config: shapeConfig,
@@ -1906,7 +1909,7 @@ export class Editor {
       }
       const shapeConf = this.store.getIconShapeConfById(itemConfig.shapeId)
       if (shapeConf?.kind === 'icon' || shapeConf?.kind === 'clipart:svg') {
-        const shapeObj = await loadObjFromSvg(shapeConf.url)
+        const shapeObj = await loadObjFromSvgUrl(shapeConf.url)
         shapeObj.scale(100 / shapeObj.getBoundingRect().height)
         shapeObj.setCoords()
         shapesById.set(shapeId, {

@@ -53,13 +53,6 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 title="Blob shape"
                 description="A blob shape for quick and unique designs"
                 onClick={() => {
-                  const shape: ShapeRandomBlobConf = {
-                    kind: 'blob',
-                    color: shapesPanel.blob.color,
-                    points: shapesPanel.blob.points,
-                    complexity: shapesPanel.blob.complexity,
-                  }
-                  store.selectShape(shape)
                   shapesPanel.shapeKind = 'blob'
                 }}
               />

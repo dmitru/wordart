@@ -46,6 +46,7 @@ export type PersistedShapeConfV1 =
   | PersistedShapeConfCustomRasterV1
   | PersistedShapeConfClipartSvgV1
   | PersistedShapeConfIconV1
+  | PersistedShapeConfBlobV1
   | PersistedShapeConfCustomSvgV1
   | PersistedShapeConfCustomTextV1
 
@@ -72,6 +73,14 @@ export type PersistedShapeConfIconV1 = {
   transform: MatrixSerialized
   shapeId: ShapeId
   processing?: SvgProcessingConf
+}
+export type PersistedShapeConfBlobV1 = {
+  kind: 'blob'
+  transform: MatrixSerialized
+  svg: string
+  color: string
+  points: number
+  complexity: number
 }
 export type PersistedShapeConfCustomSvgV1 = {
   kind: 'custom:svg'

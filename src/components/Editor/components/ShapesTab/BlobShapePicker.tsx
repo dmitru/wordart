@@ -22,6 +22,7 @@ import {
 import {
   applyTransformToObj,
   createMultilineFabricTextGroup,
+  loadObjFromSvgString,
 } from 'components/Editor/lib/fabric-utils'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
@@ -43,6 +44,8 @@ import { useDebounce } from 'use-debounce'
 import { createCanvas } from 'lib/wordart/canvas-utils'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { FontPicker } from 'components/Editor/components/FontPicker'
+import { ShapeRandomBlobConf } from 'components/Editor/shape-config'
+import { generateBlobShape } from 'components/Editor/lib/blob-shape-gen'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -142,30 +145,62 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
     ) : null
 
   const updateBlobThumbnailPreview = async () => {
+    const shape = store.getShape()
     if (!shape || shape.kind !== 'blob') {
       return
     }
     const canvasSize = 400
+    const pad = 10
 
     const canvas = createCanvas({ w: canvasSize, h: canvasSize })
     const c = new fabric.StaticCanvas(canvas)
 
-    const circle = new fabric.Circle({
-      radius: canvasSize / 3,
-      left: 0,
-      top: 0,
-      fill: store.shapesPanel.blob.color,
-    })
-    c.add(circle)
+    const shapeObj = await loadObjFromSvgString(shape.config.svg)
+    c.add(shapeObj)
+    shapeObj.set({ fill: store.shapesPanel.blob.color })
+
+    if (shapeObj.height! > shapeObj.width!) {
+      shapeObj.scaleToHeight(canvasSize - 2 * pad)
+    } else {
+      shapeObj.scaleToWidth(canvasSize - 2 * pad)
+    }
+    shapeObj.setPositionByOrigin(
+      new fabric.Point(canvasSize / 2, canvasSize / 2),
+      'center',
+      'center'
+    )
 
     c.renderAll()
     state.thumbnailPreview = c.toDataURL()
     c.dispose()
   }
 
+  const updateBlobShape = async () => {
+    const blobShapeObj = generateBlobShape({
+      color: store.shapesPanel.blob.color,
+      points: store.shapesPanel.blob.points,
+      complexity: store.shapesPanel.blob.complexity,
+    })
+
+    const shapeConfig: ShapeRandomBlobConf = {
+      kind: 'blob',
+      color: store.shapesPanel.blob.color,
+      points: store.shapesPanel.blob.points,
+      complexity: store.shapesPanel.blob.complexity,
+      svg: blobShapeObj.toSVG(),
+    }
+
+    await store.selectShape(shapeConfig)
+    updateBlobThumbnailPreview()
+  }
+
   useEffect(() => {
     if (shape && shape.kind === 'blob') {
       updateBlobThumbnailPreview()
+    }
+
+    if (!shape || shape.kind !== 'blob') {
+      updateBlobShape()
     }
   }, [shape])
 
@@ -413,7 +448,9 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
                       />
                     </Box>
 
-                    <Button colorScheme="secondary">Randomize</Button>
+                    <Button colorScheme="secondary" onClick={updateBlobShape}>
+                      Randomize
+                    </Button>
                   </Stack>
                 </motion.div>
               )}
