@@ -1,5 +1,6 @@
 
   export type IconConfig = {
+    type: string
     title: string
     name: string
     url: string
@@ -9,6 +10,7 @@
   
   export const icons = [{
   "name": "columns",
+  "type": "solid",
   "title": "Columns",
   "keywords": [
     "browser",
@@ -26,6 +28,7 @@
 },
 {
   "name": "comment-dots",
+  "type": "solid",
   "title": "Comment Dots",
   "keywords": [
     "bubble",
@@ -50,6 +53,7 @@
 },
 {
   "name": "passport",
+  "type": "solid",
   "title": "Passport",
   "keywords": [
     "document",
@@ -67,6 +71,7 @@
 },
 {
   "name": "socks",
+  "type": "solid",
   "title": "Socks",
   "keywords": [
     "business socks",
@@ -85,6 +90,7 @@
 },
 {
   "name": "underline",
+  "type": "solid",
   "title": "Underline",
   "keywords": [
     "edit",
@@ -101,6 +107,7 @@
 },
 {
   "name": "tint-slash",
+  "type": "solid",
   "title": "Tint Slash",
   "keywords": [
     "color",
@@ -118,6 +125,7 @@
 },
 {
   "name": "undo-alt",
+  "type": "solid",
   "title": "Alternate Undo",
   "keywords": [
     "back",
@@ -138,6 +146,7 @@
 },
 {
   "name": "cloud-meatball",
+  "type": "solid",
   "title": "Cloud with (a chance of) Meatball",
   "keywords": [
     "FLDSMDFR",
@@ -154,6 +163,7 @@
 },
 {
   "name": "caret-down",
+  "type": "solid",
   "title": "Caret Down",
   "keywords": [
     "arrow",
@@ -171,6 +181,7 @@
 },
 {
   "name": "laptop-house",
+  "type": "solid",
   "title": "Laptop House",
   "keywords": [
     "computer",
@@ -190,6 +201,7 @@
 },
 {
   "name": "dice-three",
+  "type": "solid",
   "title": "Dice Three",
   "keywords": [
     "chance",
@@ -206,6 +218,7 @@
 },
 {
   "name": "toggle-on",
+  "type": "solid",
   "title": "Toggle On",
   "keywords": [
     "switch"
@@ -220,6 +233,7 @@
 },
 {
   "name": "clone",
+  "type": "solid",
   "title": "Clone",
   "keywords": [
     "arrange",
@@ -239,6 +253,7 @@
 },
 {
   "name": "search",
+  "type": "solid",
   "title": "Search",
   "keywords": [
     "bigger",
@@ -258,6 +273,7 @@
 },
 {
   "name": "grimace",
+  "type": "solid",
   "title": "Grimacing Face",
   "keywords": [
     "cringe",
@@ -273,6 +289,7 @@
 },
 {
   "name": "angle-double-left",
+  "type": "solid",
   "title": "Angle Double Left",
   "keywords": [
     "arrows",
@@ -290,6 +307,7 @@
 },
 {
   "name": "crow",
+  "type": "solid",
   "title": "Crow",
   "keywords": [
     "bird",
@@ -308,6 +326,7 @@
 },
 {
   "name": "pallet",
+  "type": "solid",
   "title": "Pallet",
   "keywords": [
     "archive",
@@ -324,6 +343,7 @@
 },
 {
   "name": "eraser",
+  "type": "solid",
   "title": "eraser",
   "keywords": [
     "art",
@@ -344,6 +364,7 @@
 },
 {
   "name": "list-ul",
+  "type": "solid",
   "title": "list-ul",
   "keywords": [
     "checklist",
@@ -362,6 +383,7 @@
 },
 {
   "name": "chart-line",
+  "type": "solid",
   "title": "Line Chart",
   "keywords": [
     "activity",
@@ -383,6 +405,7 @@
 },
 {
   "name": "receipt",
+  "type": "solid",
   "title": "Receipt",
   "keywords": [
     "check",
@@ -402,6 +425,7 @@
 },
 {
   "name": "briefcase-medical",
+  "type": "solid",
   "title": "Medical Briefcase",
   "keywords": [
     "doctor",
@@ -417,6 +441,7 @@
 },
 {
   "name": "pause-circle",
+  "type": "solid",
   "title": "Pause Circle",
   "keywords": [
     "hold",
@@ -430,6 +455,7 @@
 },
 {
   "name": "check-square",
+  "type": "solid",
   "title": "Check Square",
   "keywords": [
     "accept",
@@ -453,6 +479,7 @@
 },
 {
   "name": "hand-holding-usd",
+  "type": "solid",
   "title": "Hand Holding US Dollar",
   "keywords": [
     "$",
@@ -474,6 +501,7 @@
 },
 {
   "name": "cash-register",
+  "type": "solid",
   "title": "Cash Register",
   "keywords": [
     "buy",
@@ -497,6 +525,7 @@
 },
 {
   "name": "arrow-down",
+  "type": "solid",
   "title": "arrow-down",
   "keywords": [
     "download"
@@ -509,6 +538,7 @@
 },
 {
   "name": "grin-squint",
+  "type": "solid",
   "title": "Grinning Squinting Face",
   "keywords": [
     "emoticon",
@@ -524,6 +554,7 @@
 },
 {
   "name": "campground",
+  "type": "solid",
   "title": "Campground",
   "keywords": [
     "camping",
@@ -543,6 +574,7 @@
 },
 {
   "name": "american-sign-language-interpreting",
+  "type": "solid",
   "title": "American Sign Language Interpreting",
   "keywords": [
     "asl",
@@ -561,6 +593,7 @@
 },
 {
   "name": "poo",
+  "type": "solid",
   "title": "Poo",
   "keywords": [
     "crap",
@@ -579,6 +612,7 @@
 },
 {
   "name": "search-minus",
+  "type": "solid",
   "title": "Search Minus",
   "keywords": [
     "minify",
@@ -596,6 +630,7 @@
 },
 {
   "name": "ghost",
+  "type": "solid",
   "title": "Ghost",
   "keywords": [
     "apparition",
@@ -617,6 +652,7 @@
 },
 {
   "name": "business-time",
+  "type": "solid",
   "title": "Business Time",
   "keywords": [
     "alarm",
@@ -635,6 +671,7 @@
 },
 {
   "name": "list",
+  "type": "solid",
   "title": "List",
   "keywords": [
     "checklist",
@@ -653,6 +690,7 @@
 },
 {
   "name": "broadcast-tower",
+  "type": "solid",
   "title": "Broadcast Tower",
   "keywords": [
     "airwaves",
@@ -672,6 +710,7 @@
 },
 {
   "name": "sign",
+  "type": "solid",
   "title": "Sign",
   "keywords": [
     "directions",
@@ -687,6 +726,7 @@
 },
 {
   "name": "long-arrow-alt-right",
+  "type": "solid",
   "title": "Alternate Long Arrow Right",
   "keywords": [
     "forward",
@@ -701,6 +741,7 @@
 },
 {
   "name": "volume-off",
+  "type": "solid",
   "title": "Volume Off",
   "keywords": [
     "audio",
@@ -722,6 +763,7 @@
 },
 {
   "name": "stream",
+  "type": "solid",
   "title": "Stream",
   "keywords": [
     "flow",
@@ -739,6 +781,7 @@
 },
 {
   "name": "pen-alt",
+  "type": "solid",
   "title": "Alternate Pen",
   "keywords": [
     "design",
@@ -759,6 +802,7 @@
 },
 {
   "name": "neuter",
+  "type": "solid",
   "title": "Neuter",
   "keywords": [],
   "categories": [
@@ -769,6 +813,7 @@
 },
 {
   "name": "fist-raised",
+  "type": "solid",
   "title": "Raised Fist",
   "keywords": [
     "Dungeons & Dragons",
@@ -792,6 +837,7 @@
 },
 {
   "name": "file-excel",
+  "type": "solid",
   "title": "Excel File",
   "keywords": [
     "csv",
@@ -808,6 +854,7 @@
 },
 {
   "name": "virus",
+  "type": "solid",
   "title": "Virus",
   "keywords": [
     "bug",
@@ -825,6 +872,7 @@
 },
 {
   "name": "prescription",
+  "type": "solid",
   "title": "Prescription",
   "keywords": [
     "drugs",
@@ -843,6 +891,7 @@
 },
 {
   "name": "bed",
+  "type": "solid",
   "title": "Bed",
   "keywords": [
     "lodging",
@@ -864,6 +913,7 @@
 },
 {
   "name": "sort-numeric-up",
+  "type": "solid",
   "title": "Sort Numeric Up",
   "keywords": [
     "arrange",
@@ -881,6 +931,7 @@
 },
 {
   "name": "stopwatch-20",
+  "type": "solid",
   "title": "Stopwatch 20",
   "keywords": [
     "ABCs",
@@ -899,6 +950,7 @@
 },
 {
   "name": "dumpster",
+  "type": "solid",
   "title": "Dumpster",
   "keywords": [
     "alley",
@@ -915,6 +967,7 @@
 },
 {
   "name": "font-awesome-logo-full",
+  "type": "solid",
   "title": "Font Awesome Full Logo",
   "keywords": [],
   "categories": [],
@@ -923,6 +976,7 @@
 },
 {
   "name": "wind",
+  "type": "solid",
   "title": "Wind",
   "keywords": [
     "air",
@@ -943,6 +997,7 @@
 },
 {
   "name": "skiing-nordic",
+  "type": "solid",
   "title": "Skiing Nordic",
   "keywords": [
     "activity",
@@ -963,6 +1018,7 @@
 },
 {
   "name": "subscript",
+  "type": "solid",
   "title": "subscript",
   "keywords": [
     "edit",
@@ -980,6 +1036,7 @@
 },
 {
   "name": "viruses",
+  "type": "solid",
   "title": "Viruses",
   "keywords": [
     "bugs",
@@ -999,6 +1056,7 @@
 },
 {
   "name": "drum-steelpan",
+  "type": "solid",
   "title": "Drum Steelpan",
   "keywords": [
     "calypso",
@@ -1020,6 +1078,7 @@
 },
 {
   "name": "handshake-slash",
+  "type": "solid",
   "title": "Handshake Slash",
   "keywords": [
     "broken",
@@ -1034,6 +1093,7 @@
 },
 {
   "name": "user-cog",
+  "type": "solid",
   "title": "User Cog",
   "keywords": [
     "admin",
@@ -1049,6 +1109,7 @@
 },
 {
   "name": "cog",
+  "type": "solid",
   "title": "cog",
   "keywords": [
     "gear",
@@ -1067,6 +1128,7 @@
 },
 {
   "name": "play-circle",
+  "type": "solid",
   "title": "Play Circle",
   "keywords": [
     "audio",
@@ -1084,6 +1146,7 @@
 },
 {
   "name": "list-alt",
+  "type": "solid",
   "title": "Alternate List",
   "keywords": [
     "checklist",
@@ -1102,6 +1165,7 @@
 },
 {
   "name": "mobile-alt",
+  "type": "solid",
   "title": "Alternate Mobile",
   "keywords": [
     "apple",
@@ -1124,6 +1188,7 @@
 },
 {
   "name": "prescription-bottle-alt",
+  "type": "solid",
   "title": "Alternate Prescription Bottle",
   "keywords": [
     "drugs",
@@ -1141,6 +1206,7 @@
 },
 {
   "name": "poll-h",
+  "type": "solid",
   "title": "Poll H",
   "keywords": [
     "results",
@@ -1158,6 +1224,7 @@
 },
 {
   "name": "luggage-cart",
+  "type": "solid",
   "title": "Luggage Cart",
   "keywords": [
     "bag",
@@ -1174,6 +1241,7 @@
 },
 {
   "name": "clinic-medical",
+  "type": "solid",
   "title": "Medical Clinic",
   "keywords": [
     "covid-19",
@@ -1195,6 +1263,7 @@
 },
 {
   "name": "tools",
+  "type": "solid",
   "title": "Tools",
   "keywords": [
     "admin",
@@ -1216,6 +1285,7 @@
 },
 {
   "name": "hryvnia",
+  "type": "solid",
   "title": "Hryvnia",
   "keywords": [
     "currency",
@@ -1231,6 +1301,7 @@
 },
 {
   "name": "long-arrow-alt-left",
+  "type": "solid",
   "title": "Alternate Long Arrow Left",
   "keywords": [
     "back",
@@ -1245,6 +1316,7 @@
 },
 {
   "name": "mitten",
+  "type": "solid",
   "title": "Mitten",
   "keywords": [
     "clothing",
@@ -1266,6 +1338,7 @@
 },
 {
   "name": "pen-nib",
+  "type": "solid",
   "title": "Pen Nib",
   "keywords": [
     "design",
@@ -1285,6 +1358,7 @@
 },
 {
   "name": "hourglass",
+  "type": "solid",
   "title": "Hourglass",
   "keywords": [
     "hour",
@@ -1302,6 +1376,7 @@
 },
 {
   "name": "arrow-alt-circle-left",
+  "type": "solid",
   "title": "Alternate Arrow Circle Left",
   "keywords": [
     "arrow-circle-o-left",
@@ -1316,6 +1391,7 @@
 },
 {
   "name": "grin-hearts",
+  "type": "solid",
   "title": "Smiling Face With Heart-Eyes",
   "keywords": [
     "emoticon",
@@ -1331,6 +1407,7 @@
 },
 {
   "name": "boxes",
+  "type": "solid",
   "title": "Boxes",
   "keywords": [
     "archives",
@@ -1346,6 +1423,7 @@
 },
 {
   "name": "dot-circle",
+  "type": "solid",
   "title": "Dot Circle",
   "keywords": [
     "bullseye",
@@ -1361,6 +1439,7 @@
 },
 {
   "name": "sort-alpha-up-alt",
+  "type": "solid",
   "title": "Alternate Sort Alphabetical Up",
   "keywords": [
     "alphabetical",
@@ -1378,6 +1457,7 @@
 },
 {
   "name": "chess-rook",
+  "type": "solid",
   "title": "Chess Rook",
   "keywords": [
     "board",
@@ -1395,6 +1475,7 @@
 },
 {
   "name": "dice-one",
+  "type": "solid",
   "title": "Dice One",
   "keywords": [
     "chance",
@@ -1411,6 +1492,7 @@
 },
 {
   "name": "reply",
+  "type": "solid",
   "title": "Reply",
   "keywords": [
     "mail",
@@ -1427,6 +1509,7 @@
 },
 {
   "name": "hamburger",
+  "type": "solid",
   "title": "Hamburger",
   "keywords": [
     "bacon",
@@ -1448,6 +1531,7 @@
 },
 {
   "name": "grip-lines",
+  "type": "solid",
   "title": "Grip Lines",
   "keywords": [
     "affordance",
@@ -1464,6 +1548,7 @@
 },
 {
   "name": "camera-retro",
+  "type": "solid",
   "title": "Retro Camera",
   "keywords": [
     "image",
@@ -1484,6 +1569,7 @@
 },
 {
   "name": "toolbox",
+  "type": "solid",
   "title": "Toolbox",
   "keywords": [
     "admin",
@@ -1502,6 +1588,7 @@
 },
 {
   "name": "envelope-open-text",
+  "type": "solid",
   "title": "Envelope Open-text",
   "keywords": [
     "e-mail",
@@ -1520,6 +1607,7 @@
 },
 {
   "name": "quran",
+  "type": "solid",
   "title": "Quran",
   "keywords": [
     "book",
@@ -1535,6 +1623,7 @@
 },
 {
   "name": "thermometer-quarter",
+  "type": "solid",
   "title": "Thermometer 1/4 Full",
   "keywords": [
     "mercury",
@@ -1549,6 +1638,7 @@
 },
 {
   "name": "beer",
+  "type": "solid",
   "title": "beer",
   "keywords": [
     "alcohol",
@@ -1573,6 +1663,7 @@
 },
 {
   "name": "ankh",
+  "type": "solid",
   "title": "Ankh",
   "keywords": [
     "amulet",
@@ -1591,6 +1682,7 @@
 },
 {
   "name": "chess-knight",
+  "type": "solid",
   "title": "Chess Knight",
   "keywords": [
     "board",
@@ -1608,6 +1700,7 @@
 },
 {
   "name": "id-card-alt",
+  "type": "solid",
   "title": "Alternate Identification Card",
   "keywords": [
     "contact",
@@ -1627,6 +1720,7 @@
 },
 {
   "name": "comments-dollar",
+  "type": "solid",
   "title": "Comments Dollar",
   "keywords": [
     "bubble",
@@ -1654,6 +1748,7 @@
 },
 {
   "name": "spray-can",
+  "type": "solid",
   "title": "Spray Can",
   "keywords": [
     "Paint",
@@ -1670,6 +1765,7 @@
 },
 {
   "name": "user-secret",
+  "type": "solid",
   "title": "User Secret",
   "keywords": [
     "clothing",
@@ -1691,6 +1787,7 @@
 },
 {
   "name": "utensil-spoon",
+  "type": "solid",
   "title": "Utensil Spoon",
   "keywords": [
     "cutlery",
@@ -1708,6 +1805,7 @@
 },
 {
   "name": "star-half-alt",
+  "type": "solid",
   "title": "Alternate Star Half",
   "keywords": [
     "achievement",
@@ -1726,6 +1824,7 @@
 },
 {
   "name": "basketball-ball",
+  "type": "solid",
   "title": "Basketball Ball",
   "keywords": [
     "dribble",
@@ -1741,6 +1840,7 @@
 },
 {
   "name": "head-side-cough",
+  "type": "solid",
   "title": "Head Side Cough",
   "keywords": [
     "cough",
@@ -1758,6 +1858,7 @@
 },
 {
   "name": "umbrella",
+  "type": "solid",
   "title": "Umbrella",
   "keywords": [
     "protection",
@@ -1776,6 +1877,7 @@
 },
 {
   "name": "user",
+  "type": "solid",
   "title": "User",
   "keywords": [
     "account",
@@ -1797,6 +1899,7 @@
 },
 {
   "name": "blind",
+  "type": "solid",
   "title": "Blind",
   "keywords": [
     "cane",
@@ -1814,6 +1917,7 @@
 },
 {
   "name": "volume-down",
+  "type": "solid",
   "title": "Volume Down",
   "keywords": [
     "audio",
@@ -1834,6 +1938,7 @@
 },
 {
   "name": "cart-plus",
+  "type": "solid",
   "title": "Add to Shopping Cart",
   "keywords": [
     "add",
@@ -1852,6 +1957,7 @@
 },
 {
   "name": "id-badge",
+  "type": "solid",
   "title": "Identification Badge",
   "keywords": [
     "address",
@@ -1870,6 +1976,7 @@
 },
 {
   "name": "smile-wink",
+  "type": "solid",
   "title": "Winking Face",
   "keywords": [
     "emoticon",
@@ -1886,6 +1993,7 @@
 },
 {
   "name": "network-wired",
+  "type": "solid",
   "title": "Wired Network",
   "keywords": [
     "computer",
@@ -1900,6 +2008,7 @@
 },
 {
   "name": "cannabis",
+  "type": "solid",
   "title": "Cannabis",
   "keywords": [
     "bud",
@@ -1926,6 +2035,7 @@
 },
 {
   "name": "tape",
+  "type": "solid",
   "title": "Tape",
   "keywords": [
     "design",
@@ -1940,6 +2050,7 @@
 },
 {
   "name": "photo-video",
+  "type": "solid",
   "title": "Photo Video",
   "keywords": [
     "av",
@@ -1959,6 +2070,7 @@
 },
 {
   "name": "hand-holding",
+  "type": "solid",
   "title": "Hand Holding",
   "keywords": [
     "carry",
@@ -1972,6 +2084,7 @@
 },
 {
   "name": "laptop-code",
+  "type": "solid",
   "title": "Laptop Code",
   "keywords": [
     "computer",
@@ -1994,6 +2107,7 @@
 },
 {
   "name": "circle",
+  "type": "solid",
   "title": "Circle",
   "keywords": [
     "circle-thin",
@@ -2014,6 +2128,7 @@
 },
 {
   "name": "temperature-high",
+  "type": "solid",
   "title": "High Temperature",
   "keywords": [
     "cook",
@@ -2032,6 +2147,7 @@
 },
 {
   "name": "box-tissue",
+  "type": "solid",
   "title": "Tissue Box",
   "keywords": [
     "cough",
@@ -2050,6 +2166,7 @@
 },
 {
   "name": "football-ball",
+  "type": "solid",
   "title": "Football Ball",
   "keywords": [
     "ball",
@@ -2067,6 +2184,7 @@
 },
 {
   "name": "hippo",
+  "type": "solid",
   "title": "Hippo",
   "keywords": [
     "animal",
@@ -2083,6 +2201,7 @@
 },
 {
   "name": "grin-tongue-wink",
+  "type": "solid",
   "title": "Winking Face With Tongue",
   "keywords": [
     "LOL",
@@ -2097,6 +2216,7 @@
 },
 {
   "name": "envelope-square",
+  "type": "solid",
   "title": "Envelope Square",
   "keywords": [
     "e-mail",
@@ -2116,6 +2236,7 @@
 },
 {
   "name": "home",
+  "type": "solid",
   "title": "home",
   "keywords": [
     "abode",
@@ -2134,6 +2255,7 @@
 },
 {
   "name": "copyright",
+  "type": "solid",
   "title": "Copyright",
   "keywords": [
     "brand",
@@ -2149,6 +2271,7 @@
 },
 {
   "name": "battery-half",
+  "type": "solid",
   "title": "Battery 1/2 Full",
   "keywords": [
     "charge",
@@ -2164,6 +2287,7 @@
 },
 {
   "name": "music",
+  "type": "solid",
   "title": "Music",
   "keywords": [
     "lyrics",
@@ -2183,6 +2307,7 @@
 },
 {
   "name": "wave-square",
+  "type": "solid",
   "title": "Square Wave",
   "keywords": [
     "frequency",
@@ -2197,6 +2322,7 @@
 },
 {
   "name": "th-list",
+  "type": "solid",
   "title": "th-list",
   "keywords": [
     "checklist",
@@ -2215,6 +2341,7 @@
 },
 {
   "name": "car-crash",
+  "type": "solid",
   "title": "Car Crash",
   "keywords": [
     "accident",
@@ -2235,6 +2362,7 @@
 },
 {
   "name": "quote-right",
+  "type": "solid",
   "title": "quote-right",
   "keywords": [
     "mention",
@@ -2254,6 +2382,7 @@
 },
 {
   "name": "low-vision",
+  "type": "solid",
   "title": "Low Vision",
   "keywords": [
     "blind",
@@ -2269,6 +2398,7 @@
 },
 {
   "name": "map-marked-alt",
+  "type": "solid",
   "title": "Alternate Map Marked",
   "keywords": [
     "address",
@@ -2296,6 +2426,7 @@
 },
 {
   "name": "users-cog",
+  "type": "solid",
   "title": "Users Cog",
   "keywords": [
     "admin",
@@ -2313,6 +2444,7 @@
 },
 {
   "name": "tasks",
+  "type": "solid",
   "title": "Tasks",
   "keywords": [
     "checklist",
@@ -2333,6 +2465,7 @@
 },
 {
   "name": "igloo",
+  "type": "solid",
   "title": "Igloo",
   "keywords": [
     "dome",
@@ -2353,6 +2486,7 @@
 },
 {
   "name": "recycle",
+  "type": "solid",
   "title": "Recycle",
   "keywords": [
     "Waste",
@@ -2370,6 +2504,7 @@
 },
 {
   "name": "eject",
+  "type": "solid",
   "title": "eject",
   "keywords": [
     "abort",
@@ -2385,6 +2520,7 @@
 },
 {
   "name": "laugh-wink",
+  "type": "solid",
   "title": "Laughing Winking Face",
   "keywords": [
     "LOL",
@@ -2401,6 +2537,7 @@
 },
 {
   "name": "hand-point-right",
+  "type": "solid",
   "title": "Hand Pointing Right",
   "keywords": [
     "finger",
@@ -2419,6 +2556,7 @@
 },
 {
   "name": "archway",
+  "type": "solid",
   "title": "Archway",
   "keywords": [
     "arc",
@@ -2436,6 +2574,7 @@
 },
 {
   "name": "chevron-down",
+  "type": "solid",
   "title": "chevron-down",
   "keywords": [
     "arrow",
@@ -2450,6 +2589,7 @@
 },
 {
   "name": "heading",
+  "type": "solid",
   "title": "heading",
   "keywords": [
     "format",
@@ -2465,6 +2605,7 @@
 },
 {
   "name": "strikethrough",
+  "type": "solid",
   "title": "Strikethrough",
   "keywords": [
     "cancel",
@@ -2482,6 +2623,7 @@
 },
 {
   "name": "sort-numeric-up-alt",
+  "type": "solid",
   "title": "Alternate Sort Numeric Up",
   "keywords": [
     "arrange",
@@ -2499,6 +2641,7 @@
 },
 {
   "name": "file-word",
+  "type": "solid",
   "title": "Word File",
   "keywords": [
     "document",
@@ -2515,6 +2658,7 @@
 },
 {
   "name": "i-cursor",
+  "type": "solid",
   "title": "I Beam Cursor",
   "keywords": [
     "editing",
@@ -2531,6 +2675,7 @@
 },
 {
   "name": "hospital-alt",
+  "type": "solid",
   "title": "Alternate Hospital",
   "keywords": [
     "building",
@@ -2547,6 +2692,7 @@
 },
 {
   "name": "money-check",
+  "type": "solid",
   "title": "Money Check",
   "keywords": [
     "bank check",
@@ -2569,6 +2715,7 @@
 },
 {
   "name": "door-closed",
+  "type": "solid",
   "title": "Door Closed",
   "keywords": [
     "enter",
@@ -2587,6 +2734,7 @@
 },
 {
   "name": "sort-alpha-up",
+  "type": "solid",
   "title": "Sort Alphabetical Up",
   "keywords": [
     "alphabetical",
@@ -2604,6 +2752,7 @@
 },
 {
   "name": "compact-disc",
+  "type": "solid",
   "title": "Compact Disc",
   "keywords": [
     "album",
@@ -2626,6 +2775,7 @@
 },
 {
   "name": "hard-hat",
+  "type": "solid",
   "title": "Hard Hat",
   "keywords": [
     "construction",
@@ -2642,6 +2792,7 @@
 },
 {
   "name": "user-alt-slash",
+  "type": "solid",
   "title": "Alternate User Slash",
   "keywords": [
     "account",
@@ -2661,6 +2812,7 @@
 },
 {
   "name": "gas-pump",
+  "type": "solid",
   "title": "Gas Pump",
   "keywords": [
     "car",
@@ -2678,6 +2830,7 @@
 },
 {
   "name": "sign-in-alt",
+  "type": "solid",
   "title": "Alternate Sign In",
   "keywords": [
     "arrow",
@@ -2701,6 +2854,7 @@
 },
 {
   "name": "expand-arrows-alt",
+  "type": "solid",
   "title": "Alternate Expand Arrows",
   "keywords": [
     "bigger",
@@ -2718,6 +2872,7 @@
 },
 {
   "name": "thermometer-three-quarters",
+  "type": "solid",
   "title": "Thermometer 3/4 Full",
   "keywords": [
     "mercury",
@@ -2732,6 +2887,7 @@
 },
 {
   "name": "weight-hanging",
+  "type": "solid",
   "title": "Hanging Weight",
   "keywords": [
     "anvil",
@@ -2744,6 +2900,7 @@
 },
 {
   "name": "couch",
+  "type": "solid",
   "title": "Couch",
   "keywords": [
     "chair",
@@ -2761,6 +2918,7 @@
 },
 {
   "name": "church",
+  "type": "solid",
   "title": "Church",
   "keywords": [
     "building",
@@ -2779,6 +2937,7 @@
 },
 {
   "name": "crop",
+  "type": "solid",
   "title": "crop",
   "keywords": [
     "design",
@@ -2795,6 +2954,7 @@
 },
 {
   "name": "restroom",
+  "type": "solid",
   "title": "Restroom",
   "keywords": [
     "bathroom",
@@ -2814,6 +2974,7 @@
 },
 {
   "name": "object-group",
+  "type": "solid",
   "title": "Object Group",
   "keywords": [
     "combine",
@@ -2830,6 +2991,7 @@
 },
 {
   "name": "pen-fancy",
+  "type": "solid",
   "title": "Pen Fancy",
   "keywords": [
     "design",
@@ -2850,6 +3012,7 @@
 },
 {
   "name": "cookie",
+  "type": "solid",
   "title": "Cookie",
   "keywords": [
     "baked good",
@@ -2870,6 +3033,7 @@
 },
 {
   "name": "tag",
+  "type": "solid",
   "title": "tag",
   "keywords": [
     "discount",
@@ -2888,6 +3052,7 @@
 },
 {
   "name": "user-tag",
+  "type": "solid",
   "title": "User Tag",
   "keywords": [
     "avatar",
@@ -2905,6 +3070,7 @@
 },
 {
   "name": "skiing",
+  "type": "solid",
   "title": "Skiing",
   "keywords": [
     "activity",
@@ -2928,6 +3094,7 @@
 },
 {
   "name": "file-export",
+  "type": "solid",
   "title": "File Export",
   "keywords": [
     "download",
@@ -2941,6 +3108,7 @@
 },
 {
   "name": "file-medical-alt",
+  "type": "solid",
   "title": "Alternate Medical File",
   "keywords": [
     "document",
@@ -2957,6 +3125,7 @@
 },
 {
   "name": "briefcase",
+  "type": "solid",
   "title": "Briefcase",
   "keywords": [
     "bag",
@@ -2976,6 +3145,7 @@
 },
 {
   "name": "dragon",
+  "type": "solid",
   "title": "Dragon",
   "keywords": [
     "Dungeons & Dragons",
@@ -2995,6 +3165,7 @@
 },
 {
   "name": "file-audio",
+  "type": "solid",
   "title": "Audio File",
   "keywords": [
     "document",
@@ -3014,6 +3185,7 @@
 },
 {
   "name": "pen-square",
+  "type": "solid",
   "title": "Pen Square",
   "keywords": [
     "edit",
@@ -3030,6 +3202,7 @@
 },
 {
   "name": "grin-wink",
+  "type": "solid",
   "title": "Grinning Winking Face",
   "keywords": [
     "emoticon",
@@ -3046,6 +3219,7 @@
 },
 {
   "name": "arrow-circle-up",
+  "type": "solid",
   "title": "Arrow Circle Up",
   "keywords": [
     "upload"
@@ -3058,6 +3232,7 @@
 },
 {
   "name": "splotch",
+  "type": "solid",
   "title": "Splotch",
   "keywords": [
     "Ink",
@@ -3074,6 +3249,7 @@
 },
 {
   "name": "shower",
+  "type": "solid",
   "title": "Shower",
   "keywords": [
     "bath",
@@ -3092,6 +3268,7 @@
 },
 {
   "name": "teeth-open",
+  "type": "solid",
   "title": "Teeth Open",
   "keywords": [
     "dental",
@@ -3109,6 +3286,7 @@
 },
 {
   "name": "phone-volume",
+  "type": "solid",
   "title": "Phone Volume",
   "keywords": [
     "call",
@@ -3132,6 +3310,7 @@
 },
 {
   "name": "exchange-alt",
+  "type": "solid",
   "title": "Alternate Exchange",
   "keywords": [
     "arrow",
@@ -3150,6 +3329,7 @@
 },
 {
   "name": "thermometer-half",
+  "type": "solid",
   "title": "Thermometer 1/2 Full",
   "keywords": [
     "mercury",
@@ -3164,6 +3344,7 @@
 },
 {
   "name": "pound-sign",
+  "type": "solid",
   "title": "Pound Sign",
   "keywords": [
     "currency",
@@ -3178,6 +3359,7 @@
 },
 {
   "name": "headset",
+  "type": "solid",
   "title": "Headset",
   "keywords": [
     "audio",
@@ -3200,6 +3382,7 @@
 },
 {
   "name": "carrot",
+  "type": "solid",
   "title": "Carrot",
   "keywords": [
     "bugs bunny",
@@ -3218,6 +3401,7 @@
 },
 {
   "name": "prescription-bottle",
+  "type": "solid",
   "title": "Prescription Bottle",
   "keywords": [
     "drugs",
@@ -3236,6 +3420,7 @@
 },
 {
   "name": "map",
+  "type": "solid",
   "title": "Map",
   "keywords": [
     "address",
@@ -3265,6 +3450,7 @@
 },
 {
   "name": "inbox",
+  "type": "solid",
   "title": "inbox",
   "keywords": [
     "archive",
@@ -3281,6 +3467,7 @@
 },
 {
   "name": "balance-scale-right",
+  "type": "solid",
   "title": "Balance Scale (Right-Weighted)",
   "keywords": [
     "justice",
@@ -3301,6 +3488,7 @@
 },
 {
   "name": "comments",
+  "type": "solid",
   "title": "comments",
   "keywords": [
     "bubble",
@@ -3324,6 +3512,7 @@
 },
 {
   "name": "align-justify",
+  "type": "solid",
   "title": "align-justify",
   "keywords": [
     "format",
@@ -3338,6 +3527,7 @@
 },
 {
   "name": "plus-square",
+  "type": "solid",
   "title": "Plus Square",
   "keywords": [
     "add",
@@ -3358,6 +3548,7 @@
 },
 {
   "name": "microphone",
+  "type": "solid",
   "title": "microphone",
   "keywords": [
     "audio",
@@ -3381,6 +3572,7 @@
 },
 {
   "name": "database",
+  "type": "solid",
   "title": "Database",
   "keywords": [
     "computer",
@@ -3398,6 +3590,7 @@
 },
 {
   "name": "calendar-day",
+  "type": "solid",
   "title": "Calendar with Day Focus",
   "keywords": [
     "date",
@@ -3418,6 +3611,7 @@
 },
 {
   "name": "angle-down",
+  "type": "solid",
   "title": "angle-down",
   "keywords": [
     "arrow",
@@ -3433,6 +3627,7 @@
 },
 {
   "name": "pump-soap",
+  "type": "solid",
   "title": "Pump Soap",
   "keywords": [
     "anti-bacterial",
@@ -3451,6 +3646,7 @@
 },
 {
   "name": "hands-helping",
+  "type": "solid",
   "title": "Helping Hands",
   "keywords": [
     "aid",
@@ -3468,6 +3664,7 @@
 },
 {
   "name": "rss-square",
+  "type": "solid",
   "title": "RSS Square",
   "keywords": [
     "blog",
@@ -3486,6 +3683,7 @@
 },
 {
   "name": "dice-five",
+  "type": "solid",
   "title": "Dice Five",
   "keywords": [
     "chance",
@@ -3503,6 +3701,7 @@
 },
 {
   "name": "swimmer",
+  "type": "solid",
   "title": "Swimmer",
   "keywords": [
     "athlete",
@@ -3527,6 +3726,7 @@
 },
 {
   "name": "truck-moving",
+  "type": "solid",
   "title": "Truck Moving",
   "keywords": [
     "cargo",
@@ -3542,6 +3742,7 @@
 },
 {
   "name": "trash-restore",
+  "type": "solid",
   "title": "Trash Restore",
   "keywords": [
     "back",
@@ -3558,6 +3759,7 @@
 },
 {
   "name": "satellite-dish",
+  "type": "solid",
   "title": "Satellite Dish",
   "keywords": [
     "SETI",
@@ -3578,6 +3780,7 @@
 },
 {
   "name": "text-width",
+  "type": "solid",
   "title": "Text Width",
   "keywords": [
     "edit",
@@ -3595,6 +3798,7 @@
 },
 {
   "name": "globe-asia",
+  "type": "solid",
   "title": "Globe with Asia shown",
   "keywords": [
     "all",
@@ -3621,6 +3825,7 @@
 },
 {
   "name": "user-astronaut",
+  "type": "solid",
   "title": "User Astronaut",
   "keywords": [
     "avatar",
@@ -3639,6 +3844,7 @@
 },
 {
   "name": "file-invoice-dollar",
+  "type": "solid",
   "title": "File Invoice with US Dollar",
   "keywords": [
     "$",
@@ -3660,6 +3866,7 @@
 },
 {
   "name": "file",
+  "type": "solid",
   "title": "File",
   "keywords": [
     "document",
@@ -3684,6 +3891,7 @@
 },
 {
   "name": "meh-blank",
+  "type": "solid",
   "title": "Face Without Mouth",
   "keywords": [
     "emoticon",
@@ -3699,6 +3907,7 @@
 },
 {
   "name": "cloud-upload-alt",
+  "type": "solid",
   "title": "Alternate Cloud Upload",
   "keywords": [
     "cloud-upload",
@@ -3715,6 +3924,7 @@
 },
 {
   "name": "signal",
+  "type": "solid",
   "title": "signal",
   "keywords": [
     "bars",
@@ -3732,6 +3942,7 @@
 },
 {
   "name": "book-dead",
+  "type": "solid",
   "title": "Book of the Dead",
   "keywords": [
     "Dungeons & Dragons",
@@ -3760,6 +3971,7 @@
 },
 {
   "name": "brain",
+  "type": "solid",
   "title": "Brain",
   "keywords": [
     "cerebellum",
@@ -3779,6 +3991,7 @@
 },
 {
   "name": "male",
+  "type": "solid",
   "title": "Male",
   "keywords": [
     "human",
@@ -3796,6 +4009,7 @@
 },
 {
   "name": "paint-brush",
+  "type": "solid",
   "title": "Paint Brush",
   "keywords": [
     "acrylic",
@@ -3816,6 +4030,7 @@
 },
 {
   "name": "helicopter",
+  "type": "solid",
   "title": "Helicopter",
   "keywords": [
     "airwolf",
@@ -3835,6 +4050,7 @@
 },
 {
   "name": "ruler-horizontal",
+  "type": "solid",
   "title": "Ruler Horizontal",
   "keywords": [
     "design",
@@ -3853,6 +4069,7 @@
 },
 {
   "name": "paw",
+  "type": "solid",
   "title": "Paw",
   "keywords": [
     "animal",
@@ -3871,6 +4088,7 @@
 },
 {
   "name": "chess",
+  "type": "solid",
   "title": "Chess",
   "keywords": [
     "board",
@@ -3891,6 +4109,7 @@
 },
 {
   "name": "wine-glass-alt",
+  "type": "solid",
   "title": "Alternate Wine Glas",
   "keywords": [
     "alcohol",
@@ -3910,6 +4129,7 @@
 },
 {
   "name": "voicemail",
+  "type": "solid",
   "title": "Voicemail",
   "keywords": [
     "answer",
@@ -3925,6 +4145,7 @@
 },
 {
   "name": "golf-ball",
+  "type": "solid",
   "title": "Golf Ball",
   "keywords": [
     "caddy",
@@ -3940,6 +4161,7 @@
 },
 {
   "name": "road",
+  "type": "solid",
   "title": "road",
   "keywords": [
     "highway",
@@ -3958,6 +4180,7 @@
 },
 {
   "name": "text-height",
+  "type": "solid",
   "title": "text-height",
   "keywords": [
     "edit",
@@ -3975,6 +4198,7 @@
 },
 {
   "name": "kiss-wink-heart",
+  "type": "solid",
   "title": "Face Blowing a Kiss",
   "keywords": [
     "beso",
@@ -3991,6 +4215,7 @@
 },
 {
   "name": "frown-open",
+  "type": "solid",
   "title": "Frowning Face With Open Mouth",
   "keywords": [
     "disapprove",
@@ -4007,6 +4232,7 @@
 },
 {
   "name": "box-open",
+  "type": "solid",
   "title": "Box Open",
   "keywords": [
     "archive",
@@ -4023,6 +4249,7 @@
 },
 {
   "name": "terminal",
+  "type": "solid",
   "title": "Terminal",
   "keywords": [
     "code",
@@ -4039,6 +4266,7 @@
 },
 {
   "name": "square-root-alt",
+  "type": "solid",
   "title": "Alternate Square Root",
   "keywords": [
     "arithmetic",
@@ -4054,6 +4282,7 @@
 },
 {
   "name": "city",
+  "type": "solid",
   "title": "City",
   "keywords": [
     "buildings",
@@ -4071,6 +4300,7 @@
 },
 {
   "name": "comment-dollar",
+  "type": "solid",
   "title": "Comment Dollar",
   "keywords": [
     "bubble",
@@ -4098,6 +4328,7 @@
 },
 {
   "name": "chevron-up",
+  "type": "solid",
   "title": "chevron-up",
   "keywords": [
     "arrow",
@@ -4112,6 +4343,7 @@
 },
 {
   "name": "lira-sign",
+  "type": "solid",
   "title": "Turkish Lira Sign",
   "keywords": [
     "currency",
@@ -4127,6 +4359,7 @@
 },
 {
   "name": "square-full",
+  "type": "solid",
   "title": "Square Full",
   "keywords": [
     "block",
@@ -4141,6 +4374,7 @@
 },
 {
   "name": "ticket-alt",
+  "type": "solid",
   "title": "Alternate Ticket",
   "keywords": [
     "movie",
@@ -4157,6 +4391,7 @@
 },
 {
   "name": "laugh",
+  "type": "solid",
   "title": "Grinning Face With Big Eyes",
   "keywords": [
     "LOL",
@@ -4173,6 +4408,7 @@
 },
 {
   "name": "unlock-alt",
+  "type": "solid",
   "title": "Alternate Unlock",
   "keywords": [
     "admin",
@@ -4191,6 +4427,7 @@
 },
 {
   "name": "sad-tear",
+  "type": "solid",
   "title": "Loudly Crying Face",
   "keywords": [
     "emoticon",
@@ -4206,6 +4443,7 @@
 },
 {
   "name": "file-video",
+  "type": "solid",
   "title": "Video File",
   "keywords": [
     "document",
@@ -4223,6 +4461,7 @@
 },
 {
   "name": "house-damage",
+  "type": "solid",
   "title": "Damaged House",
   "keywords": [
     "building",
@@ -4239,6 +4478,7 @@
 },
 {
   "name": "mortar-pestle",
+  "type": "solid",
   "title": "Mortar Pestle",
   "keywords": [
     "crush",
@@ -4260,6 +4500,7 @@
 },
 {
   "name": "folder-open",
+  "type": "solid",
   "title": "Folder Open",
   "keywords": [
     "archive",
@@ -4282,6 +4523,7 @@
 },
 {
   "name": "plane-departure",
+  "type": "solid",
   "title": "Plane Departure",
   "keywords": [
     "airplane",
@@ -4303,6 +4545,7 @@
 },
 {
   "name": "paint-roller",
+  "type": "solid",
   "title": "Paint Roller",
   "keywords": [
     "acrylic",
@@ -4323,6 +4566,7 @@
 },
 {
   "name": "keyboard",
+  "type": "solid",
   "title": "Keyboard",
   "keywords": [
     "accessory",
@@ -4343,6 +4587,7 @@
 },
 {
   "name": "less-than",
+  "type": "solid",
   "title": "Less Than",
   "keywords": [
     "arithmetic",
@@ -4357,6 +4602,7 @@
 },
 {
   "name": "angle-up",
+  "type": "solid",
   "title": "angle-up",
   "keywords": [
     "arrow",
@@ -4372,6 +4618,7 @@
 },
 {
   "name": "bath",
+  "type": "solid",
   "title": "Bath",
   "keywords": [
     "clean",
@@ -4392,6 +4639,7 @@
 },
 {
   "name": "record-vinyl",
+  "type": "solid",
   "title": "Record Vinyl",
   "keywords": [
     "LP",
@@ -4409,6 +4657,7 @@
 },
 {
   "name": "grin-alt",
+  "type": "solid",
   "title": "Alternate Grinning Face",
   "keywords": [
     "emoticon",
@@ -4424,6 +4673,7 @@
 },
 {
   "name": "exclamation-triangle",
+  "type": "solid",
   "title": "Exclamation Triangle",
   "keywords": [
     "alert",
@@ -4446,6 +4696,7 @@
 },
 {
   "name": "question-circle",
+  "type": "solid",
   "title": "Question Circle",
   "keywords": [
     "help",
@@ -4463,6 +4714,7 @@
 },
 {
   "name": "map-signs",
+  "type": "solid",
   "title": "Map Signs",
   "keywords": [
     "directions",
@@ -4481,6 +4733,7 @@
 },
 {
   "name": "poo-storm",
+  "type": "solid",
   "title": "Poo Storm",
   "keywords": [
     "bolt",
@@ -4500,6 +4753,7 @@
 },
 {
   "name": "map-marker",
+  "type": "solid",
   "title": "map-marker",
   "keywords": [
     "address",
@@ -4530,6 +4784,7 @@
 },
 {
   "name": "question",
+  "type": "solid",
   "title": "Question",
   "keywords": [
     "help",
@@ -4546,6 +4801,7 @@
 },
 {
   "name": "lock",
+  "type": "solid",
   "title": "lock",
   "keywords": [
     "admin",
@@ -4566,6 +4822,7 @@
 },
 {
   "name": "x-ray",
+  "type": "solid",
   "title": "X-Ray",
   "keywords": [
     "health",
@@ -4582,6 +4839,7 @@
 },
 {
   "name": "fire",
+  "type": "solid",
   "title": "fire",
   "keywords": [
     "burn",
@@ -4603,6 +4861,7 @@
 },
 {
   "name": "ban",
+  "type": "solid",
   "title": "ban",
   "keywords": [
     "abort",
@@ -4626,6 +4885,7 @@
 },
 {
   "name": "portrait",
+  "type": "solid",
   "title": "Portrait",
   "keywords": [
     "id",
@@ -4643,6 +4903,7 @@
 },
 {
   "name": "shopping-bag",
+  "type": "solid",
   "title": "Shopping Bag",
   "keywords": [
     "buy",
@@ -4662,6 +4923,7 @@
 },
 {
   "name": "divide",
+  "type": "solid",
   "title": "Divide",
   "keywords": [
     "arithmetic",
@@ -4677,6 +4939,7 @@
 },
 {
   "name": "piggy-bank",
+  "type": "solid",
   "title": "Piggy Bank",
   "keywords": [
     "bank",
@@ -4693,6 +4956,7 @@
 },
 {
   "name": "file-contract",
+  "type": "solid",
   "title": "File Contract",
   "keywords": [
     "agreement",
@@ -4709,6 +4973,7 @@
 },
 {
   "name": "sd-card",
+  "type": "solid",
   "title": "Sd Card",
   "keywords": [
     "image",
@@ -4725,6 +4990,7 @@
 },
 {
   "name": "redo-alt",
+  "type": "solid",
   "title": "Alternate Redo",
   "keywords": [
     "forward",
@@ -4743,6 +5009,7 @@
 },
 {
   "name": "pen",
+  "type": "solid",
   "title": "Pen",
   "keywords": [
     "design",
@@ -4763,6 +5030,7 @@
 },
 {
   "name": "drumstick-bite",
+  "type": "solid",
   "title": "Drumstick with Bite Taken Out",
   "keywords": [
     "bone",
@@ -4781,6 +5049,7 @@
 },
 {
   "name": "plane",
+  "type": "solid",
   "title": "plane",
   "keywords": [
     "airplane",
@@ -4802,6 +5071,7 @@
 },
 {
   "name": "chevron-right",
+  "type": "solid",
   "title": "chevron-right",
   "keywords": [
     "arrow",
@@ -4817,6 +5087,7 @@
 },
 {
   "name": "republican",
+  "type": "solid",
   "title": "Republican",
   "keywords": [
     "american",
@@ -4837,6 +5108,7 @@
 },
 {
   "name": "clipboard",
+  "type": "solid",
   "title": "Clipboard",
   "keywords": [
     "copy",
@@ -4855,6 +5127,7 @@
 },
 {
   "name": "mars",
+  "type": "solid",
   "title": "Mars",
   "keywords": [
     "male"
@@ -4867,6 +5140,7 @@
 },
 {
   "name": "venus-mars",
+  "type": "solid",
   "title": "Venus Mars",
   "keywords": [
     "Gender"
@@ -4879,6 +5153,7 @@
 },
 {
   "name": "truck-pickup",
+  "type": "solid",
   "title": "Truck Side",
   "keywords": [
     "cargo",
@@ -4894,6 +5169,7 @@
 },
 {
   "name": "life-ring",
+  "type": "solid",
   "title": "Life Ring",
   "keywords": [
     "coast guard",
@@ -4912,6 +5188,7 @@
 },
 {
   "name": "link",
+  "type": "solid",
   "title": "Link",
   "keywords": [
     "attach",
@@ -4927,6 +5204,7 @@
 },
 {
   "name": "compress-arrows-alt",
+  "type": "solid",
   "title": "Alternate Compress Arrows",
   "keywords": [
     "collapse",
@@ -4947,6 +5225,7 @@
 },
 {
   "name": "certificate",
+  "type": "solid",
   "title": "certificate",
   "keywords": [
     "badge",
@@ -4965,6 +5244,7 @@
 },
 {
   "name": "toggle-off",
+  "type": "solid",
   "title": "Toggle Off",
   "keywords": [
     "switch"
@@ -4979,6 +5259,7 @@
 },
 {
   "name": "ellipsis-h",
+  "type": "solid",
   "title": "Horizontal Ellipsis",
   "keywords": [
     "dots",
@@ -5001,6 +5282,7 @@
 },
 {
   "name": "hot-tub",
+  "type": "solid",
   "title": "Hot Tub",
   "keywords": [
     "bath",
@@ -5018,6 +5300,7 @@
 },
 {
   "name": "key",
+  "type": "solid",
   "title": "key",
   "keywords": [
     "lock",
@@ -5038,6 +5321,7 @@
 },
 {
   "name": "birthday-cake",
+  "type": "solid",
   "title": "Birthday Cake",
   "keywords": [
     "anniversary",
@@ -5062,6 +5346,7 @@
 },
 {
   "name": "map-marked",
+  "type": "solid",
   "title": "Map Marked",
   "keywords": [
     "address",
@@ -5089,6 +5374,7 @@
 },
 {
   "name": "gifts",
+  "type": "solid",
   "title": "Gifts",
   "keywords": [
     "christmas",
@@ -5110,6 +5396,7 @@
 },
 {
   "name": "level-down-alt",
+  "type": "solid",
   "title": "Alternate Level Down",
   "keywords": [
     "arrow",
@@ -5123,6 +5410,7 @@
 },
 {
   "name": "meh",
+  "type": "solid",
   "title": "Neutral Face",
   "keywords": [
     "emoticon",
@@ -5141,6 +5429,7 @@
 },
 {
   "name": "caret-square-left",
+  "type": "solid",
   "title": "Caret Square Left",
   "keywords": [
     "arrow",
@@ -5157,6 +5446,7 @@
 },
 {
   "name": "medkit",
+  "type": "solid",
   "title": "medkit",
   "keywords": [
     "first aid",
@@ -5175,6 +5465,7 @@
 },
 {
   "name": "door-open",
+  "type": "solid",
   "title": "Door Open",
   "keywords": [
     "enter",
@@ -5193,6 +5484,7 @@
 },
 {
   "name": "cloud-sun",
+  "type": "solid",
   "title": "Cloud with Sun",
   "keywords": [
     "clear",
@@ -5213,6 +5505,7 @@
 },
 {
   "name": "arrow-right",
+  "type": "solid",
   "title": "arrow-right",
   "keywords": [
     "forward",
@@ -5226,6 +5519,7 @@
 },
 {
   "name": "store",
+  "type": "solid",
   "title": "Store",
   "keywords": [
     "building",
@@ -5242,6 +5536,7 @@
 },
 {
   "name": "greater-than-equal",
+  "type": "solid",
   "title": "Greater Than Equal To",
   "keywords": [
     "arithmetic",
@@ -5256,6 +5551,7 @@
 },
 {
   "name": "hamsa",
+  "type": "solid",
   "title": "Hamsa",
   "keywords": [
     "amulet",
@@ -5274,6 +5570,7 @@
 },
 {
   "name": "calendar-plus",
+  "type": "solid",
   "title": "Calendar Plus",
   "keywords": [
     "add",
@@ -5297,6 +5594,7 @@
 },
 {
   "name": "brush",
+  "type": "solid",
   "title": "Brush",
   "keywords": [
     "art",
@@ -5314,6 +5612,7 @@
 },
 {
   "name": "at",
+  "type": "solid",
   "title": "At",
   "keywords": [
     "address",
@@ -5330,6 +5629,7 @@
 },
 {
   "name": "percentage",
+  "type": "solid",
   "title": "Percentage",
   "keywords": [
     "discount",
@@ -5347,6 +5647,7 @@
 },
 {
   "name": "stop-circle",
+  "type": "solid",
   "title": "Stop Circle",
   "keywords": [
     "block",
@@ -5362,6 +5663,7 @@
 },
 {
   "name": "concierge-bell",
+  "type": "solid",
   "title": "Concierge Bell",
   "keywords": [
     "attention",
@@ -5379,6 +5681,7 @@
 },
 {
   "name": "phone-slash",
+  "type": "solid",
   "title": "Phone Slash",
   "keywords": [
     "call",
@@ -5401,6 +5704,7 @@
 },
 {
   "name": "cubes",
+  "type": "solid",
   "title": "Cubes",
   "keywords": [
     "3d",
@@ -5420,6 +5724,7 @@
 },
 {
   "name": "user-ninja",
+  "type": "solid",
   "title": "User Ninja",
   "keywords": [
     "assassin",
@@ -5436,6 +5741,7 @@
 },
 {
   "name": "ship",
+  "type": "solid",
   "title": "Ship",
   "keywords": [
     "boat",
@@ -5452,6 +5758,7 @@
 },
 {
   "name": "qrcode",
+  "type": "solid",
   "title": "qrcode",
   "keywords": [
     "barcode",
@@ -5468,6 +5775,7 @@
 },
 {
   "name": "notes-medical",
+  "type": "solid",
   "title": "Medical Notes",
   "keywords": [
     "clipboard",
@@ -5486,6 +5794,7 @@
 },
 {
   "name": "ambulance",
+  "type": "solid",
   "title": "ambulance",
   "keywords": [
     "covid-19",
@@ -5510,6 +5819,7 @@
 },
 {
   "name": "user-clock",
+  "type": "solid",
   "title": "User Clock",
   "keywords": [
     "alert",
@@ -5525,6 +5835,7 @@
 },
 {
   "name": "calendar-check",
+  "type": "solid",
   "title": "Calendar Check",
   "keywords": [
     "accept",
@@ -5554,6 +5865,7 @@
 },
 {
   "name": "skating",
+  "type": "solid",
   "title": "Skating",
   "keywords": [
     "activity",
@@ -5574,6 +5886,7 @@
 },
 {
   "name": "store-alt-slash",
+  "type": "solid",
   "title": "Alternate Store Slash",
   "keywords": [
     "building",
@@ -5591,6 +5904,7 @@
 },
 {
   "name": "stopwatch",
+  "type": "solid",
   "title": "Stopwatch",
   "keywords": [
     "clock",
@@ -5606,6 +5920,7 @@
 },
 {
   "name": "border-all",
+  "type": "solid",
   "title": "Border All",
   "keywords": [
     "cell",
@@ -5622,6 +5937,7 @@
 },
 {
   "name": "minus-square",
+  "type": "solid",
   "title": "Minus Square",
   "keywords": [
     "collapse",
@@ -5642,6 +5958,7 @@
 },
 {
   "name": "yen-sign",
+  "type": "solid",
   "title": "Yen Sign",
   "keywords": [
     "currency",
@@ -5656,6 +5973,7 @@
 },
 {
   "name": "calendar-week",
+  "type": "solid",
   "title": "Calendar with Week Focus",
   "keywords": [
     "date",
@@ -5676,6 +5994,7 @@
 },
 {
   "name": "pizza-slice",
+  "type": "solid",
   "title": "Pizza Slice",
   "keywords": [
     "cheese",
@@ -5697,6 +6016,7 @@
 },
 {
   "name": "thumbs-down",
+  "type": "solid",
   "title": "thumbs-down",
   "keywords": [
     "disagree",
@@ -5718,6 +6038,7 @@
 },
 {
   "name": "comment-medical",
+  "type": "solid",
   "title": "Alternate Medical Chat",
   "keywords": [
     "advice",
@@ -5744,6 +6065,7 @@
 },
 {
   "name": "compress",
+  "type": "solid",
   "title": "Compress",
   "keywords": [
     "collapse",
@@ -5763,6 +6085,7 @@
 },
 {
   "name": "envelope",
+  "type": "solid",
   "title": "Envelope",
   "keywords": [
     "e-mail",
@@ -5786,6 +6109,7 @@
 },
 {
   "name": "user-md",
+  "type": "solid",
   "title": "Doctor",
   "keywords": [
     "covid-19",
@@ -5807,6 +6131,7 @@
 },
 {
   "name": "utensils",
+  "type": "solid",
   "title": "Utensils",
   "keywords": [
     "cutlery",
@@ -5828,6 +6153,7 @@
 },
 {
   "name": "person-booth",
+  "type": "solid",
   "title": "Person Entering Booth",
   "keywords": [
     "changing",
@@ -5848,6 +6174,7 @@
 },
 {
   "name": "archive",
+  "type": "solid",
   "title": "Archive",
   "keywords": [
     "box",
@@ -5868,6 +6195,7 @@
 },
 {
   "name": "caret-up",
+  "type": "solid",
   "title": "Caret Up",
   "keywords": [
     "arrow",
@@ -5882,6 +6210,7 @@
 },
 {
   "name": "hand-point-left",
+  "type": "solid",
   "title": "Hand Pointing Left",
   "keywords": [
     "back",
@@ -5900,6 +6229,7 @@
 },
 {
   "name": "location-arrow",
+  "type": "solid",
   "title": "location-arrow",
   "keywords": [
     "address",
@@ -5920,6 +6250,7 @@
 },
 {
   "name": "magnet",
+  "type": "solid",
   "title": "magnet",
   "keywords": [
     "Attract",
@@ -5936,6 +6267,7 @@
 },
 {
   "name": "school",
+  "type": "solid",
   "title": "School",
   "keywords": [
     "building",
@@ -5955,6 +6287,7 @@
 },
 {
   "name": "diagnoses",
+  "type": "solid",
   "title": "Diagnoses",
   "keywords": [
     "analyze",
@@ -5971,6 +6304,7 @@
 },
 {
   "name": "ruler-vertical",
+  "type": "solid",
   "title": "Ruler Vertical",
   "keywords": [
     "design",
@@ -5989,6 +6323,7 @@
 },
 {
   "name": "desktop",
+  "type": "solid",
   "title": "Desktop",
   "keywords": [
     "computer",
@@ -6010,6 +6345,7 @@
 },
 {
   "name": "download",
+  "type": "solid",
   "title": "Download",
   "keywords": [
     "export",
@@ -6027,6 +6363,7 @@
 },
 {
   "name": "hand-lizard",
+  "type": "solid",
   "title": "Lizard (Hand)",
   "keywords": [
     "game",
@@ -6040,6 +6377,7 @@
 },
 {
   "name": "baseball-ball",
+  "type": "solid",
   "title": "Baseball Ball",
   "keywords": [
     "foul",
@@ -6058,6 +6396,7 @@
 },
 {
   "name": "expand",
+  "type": "solid",
   "title": "Expand",
   "keywords": [
     "bigger",
@@ -6074,6 +6413,7 @@
 },
 {
   "name": "people-carry",
+  "type": "solid",
   "title": "People Carry",
   "keywords": [
     "box",
@@ -6092,6 +6432,7 @@
 },
 {
   "name": "khanda",
+  "type": "solid",
   "title": "Khanda",
   "keywords": [
     "chakkar",
@@ -6107,6 +6448,7 @@
 },
 {
   "name": "teeth",
+  "type": "solid",
   "title": "Teeth",
   "keywords": [
     "bite",
@@ -6125,6 +6467,7 @@
 },
 {
   "name": "phone-alt",
+  "type": "solid",
   "title": "Alternate Phone",
   "keywords": [
     "call",
@@ -6147,6 +6490,7 @@
 },
 {
   "name": "fighter-jet",
+  "type": "solid",
   "title": "fighter-jet",
   "keywords": [
     "airplane",
@@ -6170,6 +6514,7 @@
 },
 {
   "name": "hand-scissors",
+  "type": "solid",
   "title": "Scissors (Hand)",
   "keywords": [
     "cut",
@@ -6184,6 +6529,7 @@
 },
 {
   "name": "vihara",
+  "type": "solid",
   "title": "Vihara",
   "keywords": [
     "buddhism",
@@ -6200,6 +6546,7 @@
 },
 {
   "name": "battery-three-quarters",
+  "type": "solid",
   "title": "Battery 3/4 Full",
   "keywords": [
     "charge",
@@ -6215,6 +6562,7 @@
 },
 {
   "name": "book-open",
+  "type": "solid",
   "title": "Book Open",
   "keywords": [
     "flyer",
@@ -6232,6 +6580,7 @@
 },
 {
   "name": "hourglass-start",
+  "type": "solid",
   "title": "Hourglass Start",
   "keywords": [
     "hour",
@@ -6248,6 +6597,7 @@
 },
 {
   "name": "comment-slash",
+  "type": "solid",
   "title": "Comment Slash",
   "keywords": [
     "bubble",
@@ -6274,6 +6624,7 @@
 },
 {
   "name": "sign-out-alt",
+  "type": "solid",
   "title": "Alternate Sign Out",
   "keywords": [
     "arrow",
@@ -6293,6 +6644,7 @@
 },
 {
   "name": "glass-cheers",
+  "type": "solid",
   "title": "Glass Cheers",
   "keywords": [
     "alcohol",
@@ -6317,6 +6669,7 @@
 },
 {
   "name": "file-import",
+  "type": "solid",
   "title": "File Import",
   "keywords": [
     "copy",
@@ -6332,6 +6685,7 @@
 },
 {
   "name": "transgender-alt",
+  "type": "solid",
   "title": "Alternate Transgender",
   "keywords": [
     "intersex"
@@ -6344,6 +6698,7 @@
 },
 {
   "name": "disease",
+  "type": "solid",
   "title": "Disease",
   "keywords": [
     "bacteria",
@@ -6364,6 +6719,7 @@
 },
 {
   "name": "hand-point-up",
+  "type": "solid",
   "title": "Hand Pointing Up",
   "keywords": [
     "finger",
@@ -6379,6 +6735,7 @@
 },
 {
   "name": "server",
+  "type": "solid",
   "title": "Server",
   "keywords": [
     "computer",
@@ -6395,6 +6752,7 @@
 },
 {
   "name": "bolt",
+  "type": "solid",
   "title": "Lightning Bolt",
   "keywords": [
     "electricity",
@@ -6411,6 +6769,7 @@
 },
 {
   "name": "tv",
+  "type": "solid",
   "title": "Television",
   "keywords": [
     "computer",
@@ -6431,6 +6790,7 @@
 },
 {
   "name": "sms",
+  "type": "solid",
   "title": "SMS",
   "keywords": [
     "chat",
@@ -6450,6 +6810,7 @@
 },
 {
   "name": "democrat",
+  "type": "solid",
   "title": "Democrat",
   "keywords": [
     "american",
@@ -6470,6 +6831,7 @@
 },
 {
   "name": "hand-holding-medical",
+  "type": "solid",
   "title": "Hand Holding Medical Cross",
   "keywords": [
     "care",
@@ -6486,6 +6848,7 @@
 },
 {
   "name": "user-plus",
+  "type": "solid",
   "title": "User Plus",
   "keywords": [
     "add",
@@ -6504,6 +6867,7 @@
 },
 {
   "name": "tablet-alt",
+  "type": "solid",
   "title": "Alternate Tablet",
   "keywords": [
     "apple",
@@ -6521,6 +6885,7 @@
 },
 {
   "name": "money-bill-alt",
+  "type": "solid",
   "title": "Alternate Money Bill",
   "keywords": [
     "buy",
@@ -6542,6 +6907,7 @@
 },
 {
   "name": "cocktail",
+  "type": "solid",
   "title": "Cocktail",
   "keywords": [
     "alcohol",
@@ -6563,6 +6929,7 @@
 },
 {
   "name": "chevron-circle-right",
+  "type": "solid",
   "title": "Chevron Circle Right",
   "keywords": [
     "arrow",
@@ -6577,6 +6944,7 @@
 },
 {
   "name": "star-and-crescent",
+  "type": "solid",
   "title": "Star and Crescent",
   "keywords": [
     "islam",
@@ -6591,6 +6959,7 @@
 },
 {
   "name": "angle-double-right",
+  "type": "solid",
   "title": "Angle Double Right",
   "keywords": [
     "arrows",
@@ -6609,6 +6978,7 @@
 },
 {
   "name": "shapes",
+  "type": "solid",
   "title": "Shapes",
   "keywords": [
     "blocks",
@@ -6627,6 +6997,7 @@
 },
 {
   "name": "solar-panel",
+  "type": "solid",
   "title": "Solar Panel",
   "keywords": [
     "clean",
@@ -6643,6 +7014,7 @@
 },
 {
   "name": "mosque",
+  "type": "solid",
   "title": "Mosque",
   "keywords": [
     "building",
@@ -6659,6 +7031,7 @@
 },
 {
   "name": "satellite",
+  "type": "solid",
   "title": "Satellite",
   "keywords": [
     "communications",
@@ -6676,6 +7049,7 @@
 },
 {
   "name": "indent",
+  "type": "solid",
   "title": "Indent",
   "keywords": [
     "align",
@@ -6691,6 +7065,7 @@
 },
 {
   "name": "sort-amount-down",
+  "type": "solid",
   "title": "Sort Amount Down",
   "keywords": [
     "arrange",
@@ -6708,6 +7083,7 @@
 },
 {
   "name": "chevron-circle-left",
+  "type": "solid",
   "title": "Chevron Circle Left",
   "keywords": [
     "arrow",
@@ -6722,6 +7098,7 @@
 },
 {
   "name": "ad",
+  "type": "solid",
   "title": "Ad",
   "keywords": [
     "advertisement",
@@ -6738,6 +7115,7 @@
 },
 {
   "name": "dna",
+  "type": "solid",
   "title": "DNA",
   "keywords": [
     "double helix",
@@ -6755,6 +7133,7 @@
 },
 {
   "name": "slash",
+  "type": "solid",
   "title": "Slash",
   "keywords": [
     "cancel",
@@ -6772,6 +7151,7 @@
 },
 {
   "name": "taxi",
+  "type": "solid",
   "title": "Taxi",
   "keywords": [
     "cab",
@@ -6797,6 +7177,7 @@
 },
 {
   "name": "book",
+  "type": "solid",
   "title": "book",
   "keywords": [
     "diary",
@@ -6817,6 +7198,7 @@
 },
 {
   "name": "hotdog",
+  "type": "solid",
   "title": "Hot Dog",
   "keywords": [
     "bun",
@@ -6839,6 +7221,7 @@
 },
 {
   "name": "remove-format",
+  "type": "solid",
   "title": "Remove Format",
   "keywords": [
     "cancel",
@@ -6856,6 +7239,7 @@
 },
 {
   "name": "hotel",
+  "type": "solid",
   "title": "Hotel",
   "keywords": [
     "building",
@@ -6875,6 +7259,7 @@
 },
 {
   "name": "plane-slash",
+  "type": "solid",
   "title": "Plane Slash",
   "keywords": [
     "airplane mode",
@@ -6890,6 +7275,7 @@
 },
 {
   "name": "object-ungroup",
+  "type": "solid",
   "title": "Object Ungroup",
   "keywords": [
     "copy",
@@ -6906,6 +7292,7 @@
 },
 {
   "name": "skull",
+  "type": "solid",
   "title": "Skull",
   "keywords": [
     "bones",
@@ -6919,6 +7306,7 @@
 },
 {
   "name": "thermometer-full",
+  "type": "solid",
   "title": "Thermometer Full",
   "keywords": [
     "fever",
@@ -6935,6 +7323,7 @@
 },
 {
   "name": "paragraph",
+  "type": "solid",
   "title": "paragraph",
   "keywords": [
     "edit",
@@ -6951,6 +7340,7 @@
 },
 {
   "name": "plug",
+  "type": "solid",
   "title": "Plug",
   "keywords": [
     "connect",
@@ -6970,6 +7360,7 @@
 },
 {
   "name": "thermometer-empty",
+  "type": "solid",
   "title": "Thermometer Empty",
   "keywords": [
     "cold",
@@ -6985,6 +7376,7 @@
 },
 {
   "name": "train",
+  "type": "solid",
   "title": "Train",
   "keywords": [
     "bullet",
@@ -7003,6 +7395,7 @@
 },
 {
   "name": "h-square",
+  "type": "solid",
   "title": "H Square",
   "keywords": [
     "directions",
@@ -7020,6 +7413,7 @@
 },
 {
   "name": "chess-board",
+  "type": "solid",
   "title": "Chess Board",
   "keywords": [
     "board",
@@ -7036,6 +7430,7 @@
 },
 {
   "name": "user-minus",
+  "type": "solid",
   "title": "User Minus",
   "keywords": [
     "delete",
@@ -7050,6 +7445,7 @@
 },
 {
   "name": "dizzy",
+  "type": "solid",
   "title": "Dizzy Face",
   "keywords": [
     "dazed",
@@ -7066,6 +7462,7 @@
 },
 {
   "name": "wallet",
+  "type": "solid",
   "title": "Wallet",
   "keywords": [
     "billfold",
@@ -7083,6 +7480,7 @@
 },
 {
   "name": "file-image",
+  "type": "solid",
   "title": "Image File",
   "keywords": [
     "document",
@@ -7100,6 +7498,7 @@
 },
 {
   "name": "bell",
+  "type": "solid",
   "title": "bell",
   "keywords": [
     "alarm",
@@ -7126,6 +7525,7 @@
 },
 {
   "name": "coffee",
+  "type": "solid",
   "title": "Coffee",
   "keywords": [
     "beverage",
@@ -7153,6 +7553,7 @@
 },
 {
   "name": "code",
+  "type": "solid",
   "title": "Code",
   "keywords": [
     "brackets",
@@ -7168,6 +7569,7 @@
 },
 {
   "name": "dolly",
+  "type": "solid",
   "title": "Dolly",
   "keywords": [
     "carry",
@@ -7183,6 +7585,7 @@
 },
 {
   "name": "user-lock",
+  "type": "solid",
   "title": "User Lock",
   "keywords": [
     "admin",
@@ -7200,6 +7603,7 @@
 },
 {
   "name": "volleyball-ball",
+  "type": "solid",
   "title": "Volleyball Ball",
   "keywords": [
     "beach",
@@ -7215,6 +7619,7 @@
 },
 {
   "name": "shield-alt",
+  "type": "solid",
   "title": "Alternate Shield",
   "keywords": [
     "achievement",
@@ -7236,6 +7641,7 @@
 },
 {
   "name": "long-arrow-alt-up",
+  "type": "solid",
   "title": "Alternate Long Arrow Up",
   "keywords": [
     "long-arrow-up",
@@ -7249,6 +7655,7 @@
 },
 {
   "name": "cloud-moon-rain",
+  "type": "solid",
   "title": "Cloud with Moon and Rain",
   "keywords": [
     "crescent",
@@ -7269,6 +7676,7 @@
 },
 {
   "name": "project-diagram",
+  "type": "solid",
   "title": "Project Diagram",
   "keywords": [
     "chart",
@@ -7285,6 +7693,7 @@
 },
 {
   "name": "thermometer",
+  "type": "solid",
   "title": "Thermometer",
   "keywords": [
     "covid-19",
@@ -7301,6 +7710,7 @@
 },
 {
   "name": "air-freshener",
+  "type": "solid",
   "title": "Air Freshener",
   "keywords": [
     "car",
@@ -7317,6 +7727,7 @@
 },
 {
   "name": "spider",
+  "type": "solid",
   "title": "Spider",
   "keywords": [
     "arachnid",
@@ -7335,6 +7746,7 @@
 },
 {
   "name": "hand-sparkles",
+  "type": "solid",
   "title": "Hand Sparkles",
   "keywords": [
     "clean",
@@ -7352,6 +7764,7 @@
 },
 {
   "name": "flag",
+  "type": "solid",
   "title": "flag",
   "keywords": [
     "country",
@@ -7372,6 +7785,7 @@
 },
 {
   "name": "podcast",
+  "type": "solid",
   "title": "Podcast",
   "keywords": [
     "audio",
@@ -7387,6 +7801,7 @@
 },
 {
   "name": "user-times",
+  "type": "solid",
   "title": "Remove User",
   "keywords": [
     "archive",
@@ -7402,6 +7817,7 @@
 },
 {
   "name": "glass-martini-alt",
+  "type": "solid",
   "title": "Alternate Glass Martini",
   "keywords": [
     "alcohol",
@@ -7420,6 +7836,7 @@
 },
 {
   "name": "hand-peace",
+  "type": "solid",
   "title": "Peace (Hand)",
   "keywords": [
     "rest",
@@ -7433,6 +7850,7 @@
 },
 {
   "name": "level-up-alt",
+  "type": "solid",
   "title": "Alternate Level Up",
   "keywords": [
     "arrow",
@@ -7446,6 +7864,7 @@
 },
 {
   "name": "truck-loading",
+  "type": "solid",
   "title": "Truck Loading",
   "keywords": [
     "box",
@@ -7464,6 +7883,7 @@
 },
 {
   "name": "chess-king",
+  "type": "solid",
   "title": "Chess King",
   "keywords": [
     "board",
@@ -7480,6 +7900,7 @@
 },
 {
   "name": "stop",
+  "type": "solid",
   "title": "stop",
   "keywords": [
     "block",
@@ -7494,6 +7915,7 @@
 },
 {
   "name": "arrow-circle-left",
+  "type": "solid",
   "title": "Arrow Circle Left",
   "keywords": [
     "back",
@@ -7507,6 +7929,7 @@
 },
 {
   "name": "newspaper",
+  "type": "solid",
   "title": "Newspaper",
   "keywords": [
     "article",
@@ -7527,6 +7950,7 @@
 },
 {
   "name": "snowflake",
+  "type": "solid",
   "title": "Snowflake",
   "keywords": [
     "precipitation",
@@ -7545,6 +7969,7 @@
 },
 {
   "name": "step-forward",
+  "type": "solid",
   "title": "step-forward",
   "keywords": [
     "end",
@@ -7559,6 +7984,7 @@
 },
 {
   "name": "cube",
+  "type": "solid",
   "title": "Cube",
   "keywords": [
     "3d",
@@ -7576,6 +8002,7 @@
 },
 {
   "name": "bomb",
+  "type": "solid",
   "title": "Bomb",
   "keywords": [
     "error",
@@ -7593,6 +8020,7 @@
 },
 {
   "name": "arrows-alt-h",
+  "type": "solid",
   "title": "Alternate Arrows Horizontal",
   "keywords": [
     "arrows-h",
@@ -7610,6 +8038,7 @@
 },
 {
   "name": "file-medical",
+  "type": "solid",
   "title": "Medical File",
   "keywords": [
     "document",
@@ -7627,6 +8056,7 @@
 },
 {
   "name": "shuttle-van",
+  "type": "solid",
   "title": "Shuttle Van",
   "keywords": [
     "airport",
@@ -7647,6 +8077,7 @@
 },
 {
   "name": "star-half",
+  "type": "solid",
   "title": "star-half",
   "keywords": [
     "achievement",
@@ -7666,6 +8097,7 @@
 },
 {
   "name": "pencil-ruler",
+  "type": "solid",
   "title": "Pencil Ruler",
   "keywords": [
     "design",
@@ -7682,6 +8114,7 @@
 },
 {
   "name": "ruler",
+  "type": "solid",
   "title": "Ruler",
   "keywords": [
     "design",
@@ -7698,6 +8131,7 @@
 },
 {
   "name": "frown",
+  "type": "solid",
   "title": "Frowning Face",
   "keywords": [
     "disapprove",
@@ -7717,6 +8151,7 @@
 },
 {
   "name": "truck-monster",
+  "type": "solid",
   "title": "Truck Monster",
   "keywords": [
     "offroad",
@@ -7732,6 +8167,7 @@
 },
 {
   "name": "grin-tongue-squint",
+  "type": "solid",
   "title": "Squinting Face With Tongue",
   "keywords": [
     "LOL",
@@ -7746,6 +8182,7 @@
 },
 {
   "name": "outdent",
+  "type": "solid",
   "title": "Outdent",
   "keywords": [
     "align",
@@ -7761,6 +8198,7 @@
 },
 {
   "name": "clipboard-list",
+  "type": "solid",
   "title": "Clipboard List",
   "keywords": [
     "checklist",
@@ -7782,6 +8220,7 @@
 },
 {
   "name": "fax",
+  "type": "solid",
   "title": "Fax",
   "keywords": [
     "business",
@@ -7800,6 +8239,7 @@
 },
 {
   "name": "biohazard",
+  "type": "solid",
   "title": "Biohazard",
   "keywords": [
     "covid-19",
@@ -7821,6 +8261,7 @@
 },
 {
   "name": "caret-right",
+  "type": "solid",
   "title": "Caret Right",
   "keywords": [
     "arrow",
@@ -7836,6 +8277,7 @@
 },
 {
   "name": "user-graduate",
+  "type": "solid",
   "title": "User Graduate",
   "keywords": [
     "cap",
@@ -7855,6 +8297,7 @@
 },
 {
   "name": "map-marker-alt",
+  "type": "solid",
   "title": "Alternate Map Marker",
   "keywords": [
     "address",
@@ -7884,6 +8327,7 @@
 },
 {
   "name": "smog",
+  "type": "solid",
   "title": "Smog",
   "keywords": [
     "dragon",
@@ -7901,6 +8345,7 @@
 },
 {
   "name": "bold",
+  "type": "solid",
   "title": "bold",
   "keywords": [
     "emphasis",
@@ -7915,6 +8360,7 @@
 },
 {
   "name": "tablets",
+  "type": "solid",
   "title": "Tablets",
   "keywords": [
     "drugs",
@@ -7932,6 +8378,7 @@
 },
 {
   "name": "envelope-open",
+  "type": "solid",
   "title": "Envelope Open",
   "keywords": [
     "e-mail",
@@ -7954,6 +8401,7 @@
 },
 {
   "name": "trophy",
+  "type": "solid",
   "title": "trophy",
   "keywords": [
     "achievement",
@@ -7973,6 +8421,7 @@
 },
 {
   "name": "share-alt",
+  "type": "solid",
   "title": "Alternate Share",
   "keywords": [
     "forward",
@@ -7989,6 +8438,7 @@
 },
 {
   "name": "battery-full",
+  "type": "solid",
   "title": "Battery Full",
   "keywords": [
     "charge",
@@ -8004,6 +8454,7 @@
 },
 {
   "name": "equals",
+  "type": "solid",
   "title": "Equals",
   "keywords": [
     "arithmetic",
@@ -8019,6 +8470,7 @@
 },
 {
   "name": "plus",
+  "type": "solid",
   "title": "plus",
   "keywords": [
     "add",
@@ -8040,6 +8492,7 @@
 },
 {
   "name": "check",
+  "type": "solid",
   "title": "Check",
   "keywords": [
     "accept",
@@ -8066,6 +8519,7 @@
 },
 {
   "name": "seedling",
+  "type": "solid",
   "title": "Seedling",
   "keywords": [
     "flora",
@@ -8086,6 +8540,7 @@
 },
 {
   "name": "star-of-david",
+  "type": "solid",
   "title": "Star of David",
   "keywords": [
     "jewish",
@@ -8100,6 +8555,7 @@
 },
 {
   "name": "share-square",
+  "type": "solid",
   "title": "Share Square",
   "keywords": [
     "forward",
@@ -8117,6 +8573,7 @@
 },
 {
   "name": "ruler-combined",
+  "type": "solid",
   "title": "Ruler Combined",
   "keywords": [
     "design",
@@ -8135,6 +8592,7 @@
 },
 {
   "name": "tenge",
+  "type": "solid",
   "title": "Tenge",
   "keywords": [
     "currency",
@@ -8150,6 +8608,7 @@
 },
 {
   "name": "trademark",
+  "type": "solid",
   "title": "Trademark",
   "keywords": [
     "copyright",
@@ -8164,6 +8623,7 @@
 },
 {
   "name": "kaaba",
+  "type": "solid",
   "title": "Kaaba",
   "keywords": [
     "building",
@@ -8180,6 +8640,7 @@
 },
 {
   "name": "smoking",
+  "type": "solid",
   "title": "Smoking",
   "keywords": [
     "cancer",
@@ -8197,6 +8658,7 @@
 },
 {
   "name": "hospital",
+  "type": "solid",
   "title": "hospital",
   "keywords": [
     "building",
@@ -8216,6 +8678,7 @@
 },
 {
   "name": "flask",
+  "type": "solid",
   "title": "Flask",
   "keywords": [
     "beaker",
@@ -8235,6 +8698,7 @@
 },
 {
   "name": "mars-stroke-v",
+  "type": "solid",
   "title": "Mars Stroke Vertical",
   "keywords": [],
   "categories": [
@@ -8245,6 +8709,7 @@
 },
 {
   "name": "headphones",
+  "type": "solid",
   "title": "headphones",
   "keywords": [
     "audio",
@@ -8264,6 +8729,7 @@
 },
 {
   "name": "horse-head",
+  "type": "solid",
   "title": "Horse Head",
   "keywords": [
     "equus",
@@ -8281,6 +8747,7 @@
 },
 {
   "name": "rss",
+  "type": "solid",
   "title": "rss",
   "keywords": [
     "blog",
@@ -8299,6 +8766,7 @@
 },
 {
   "name": "horse",
+  "type": "solid",
   "title": "Horse",
   "keywords": [
     "equus",
@@ -8317,6 +8785,7 @@
 },
 {
   "name": "landmark",
+  "type": "solid",
   "title": "Landmark",
   "keywords": [
     "building",
@@ -8336,6 +8805,7 @@
 },
 {
   "name": "money-check-alt",
+  "type": "solid",
   "title": "Alternate Money Check",
   "keywords": [
     "bank check",
@@ -8358,6 +8828,7 @@
 },
 {
   "name": "wifi",
+  "type": "solid",
   "title": "WiFi",
   "keywords": [
     "connection",
@@ -8379,6 +8850,7 @@
 },
 {
   "name": "radiation-alt",
+  "type": "solid",
   "title": "Alternate Radiation",
   "keywords": [
     "danger",
@@ -8400,6 +8872,7 @@
 },
 {
   "name": "file-archive",
+  "type": "solid",
   "title": "Archive File",
   "keywords": [
     ".zip",
@@ -8417,6 +8890,7 @@
 },
 {
   "name": "chalkboard-teacher",
+  "type": "solid",
   "title": "Chalkboard Teacher",
   "keywords": [
     "blackboard",
@@ -8436,6 +8910,7 @@
 },
 {
   "name": "angle-right",
+  "type": "solid",
   "title": "angle-right",
   "keywords": [
     "arrow",
@@ -8452,6 +8927,7 @@
 },
 {
   "name": "arrow-circle-right",
+  "type": "solid",
   "title": "Arrow Circle Right",
   "keywords": [
     "forward",
@@ -8465,6 +8941,7 @@
 },
 {
   "name": "venus",
+  "type": "solid",
   "title": "Venus",
   "keywords": [
     "female"
@@ -8477,6 +8954,7 @@
 },
 {
   "name": "mug-hot",
+  "type": "solid",
   "title": "Mug Hot",
   "keywords": [
     "caliente",
@@ -8500,6 +8978,7 @@
 },
 {
   "name": "info",
+  "type": "solid",
   "title": "Info",
   "keywords": [
     "details",
@@ -8518,6 +8997,7 @@
 },
 {
   "name": "bullhorn",
+  "type": "solid",
   "title": "bullhorn",
   "keywords": [
     "announcement",
@@ -8540,6 +9020,7 @@
 },
 {
   "name": "bread-slice",
+  "type": "solid",
   "title": "Bread Slice",
   "keywords": [
     "bake",
@@ -8563,6 +9044,7 @@
 },
 {
   "name": "microphone-alt-slash",
+  "type": "solid",
   "title": "Alternate Microphone Slash",
   "keywords": [
     "audio",
@@ -8585,6 +9067,7 @@
 },
 {
   "name": "dog",
+  "type": "solid",
   "title": "Dog",
   "keywords": [
     "animal",
@@ -8604,6 +9087,7 @@
 },
 {
   "name": "user-nurse",
+  "type": "solid",
   "title": "Nurse",
   "keywords": [
     "covid-19",
@@ -8621,6 +9105,7 @@
 },
 {
   "name": "fan",
+  "type": "solid",
   "title": "Fan",
   "keywords": [
     "ac",
@@ -8640,6 +9125,7 @@
 },
 {
   "name": "palette",
+  "type": "solid",
   "title": "Palette",
   "keywords": [
     "acrylic",
@@ -8660,6 +9146,7 @@
 },
 {
   "name": "share-alt-square",
+  "type": "solid",
   "title": "Alternate Share Square",
   "keywords": [
     "forward",
@@ -8675,6 +9162,7 @@
 },
 {
   "name": "cart-arrow-down",
+  "type": "solid",
   "title": "Shopping Cart Arrow Down",
   "keywords": [
     "download",
@@ -8692,6 +9180,7 @@
 },
 {
   "name": "directions",
+  "type": "solid",
   "title": "Directions",
   "keywords": [
     "map",
@@ -8707,6 +9196,7 @@
 },
 {
   "name": "om",
+  "type": "solid",
   "title": "Om",
   "keywords": [
     "buddhism",
@@ -8722,6 +9212,7 @@
 },
 {
   "name": "hourglass-half",
+  "type": "solid",
   "title": "Hourglass Half",
   "keywords": [
     "hour",
@@ -8738,6 +9229,7 @@
 },
 {
   "name": "lungs-virus",
+  "type": "solid",
   "title": "Lungs Virus",
   "keywords": [
     "breath",
@@ -8753,6 +9245,7 @@
 },
 {
   "name": "holly-berry",
+  "type": "solid",
   "title": "Holly Berry",
   "keywords": [
     "catwoman",
@@ -8775,6 +9268,7 @@
 },
 {
   "name": "flag-usa",
+  "type": "solid",
   "title": "United States of America Flag",
   "keywords": [
     "betsy ross",
@@ -8792,6 +9286,7 @@
 },
 {
   "name": "info-circle",
+  "type": "solid",
   "title": "Info Circle",
   "keywords": [
     "details",
@@ -8810,6 +9305,7 @@
 },
 {
   "name": "smoking-ban",
+  "type": "solid",
   "title": "Smoking Ban",
   "keywords": [
     "ban",
@@ -8827,6 +9323,7 @@
 },
 {
   "name": "folder-plus",
+  "type": "solid",
   "title": "Folder Plus",
   "keywords": [
     "add",
@@ -8846,6 +9343,7 @@
 },
 {
   "name": "grip-horizontal",
+  "type": "solid",
   "title": "Grip Horizontal",
   "keywords": [
     "affordance",
@@ -8862,6 +9360,7 @@
 },
 {
   "name": "hat-cowboy",
+  "type": "solid",
   "title": "Cowboy Hat",
   "keywords": [
     "buckaroo",
@@ -8884,6 +9383,7 @@
 },
 {
   "name": "space-shuttle",
+  "type": "solid",
   "title": "Space Shuttle",
   "keywords": [
     "astronaut",
@@ -8903,6 +9403,7 @@
 },
 {
   "name": "grin-beam",
+  "type": "solid",
   "title": "Grinning Face With Smiling Eyes",
   "keywords": [
     "emoticon",
@@ -8918,6 +9419,7 @@
 },
 {
   "name": "biking",
+  "type": "solid",
   "title": "Biking",
   "keywords": [
     "bicycle",
@@ -8939,6 +9441,7 @@
 },
 {
   "name": "feather-alt",
+  "type": "solid",
   "title": "Alternate Feather",
   "keywords": [
     "bird",
@@ -8956,6 +9459,7 @@
 },
 {
   "name": "virus-slash",
+  "type": "solid",
   "title": "Virus Slash",
   "keywords": [
     "bug",
@@ -8975,6 +9479,7 @@
 },
 {
   "name": "hat-cowboy-side",
+  "type": "solid",
   "title": "Cowboy Hat Side",
   "keywords": [
     "buckaroo",
@@ -8997,6 +9502,7 @@
 },
 {
   "name": "rainbow",
+  "type": "solid",
   "title": "Rainbow",
   "keywords": [
     "gold",
@@ -9014,6 +9520,7 @@
 },
 {
   "name": "cookie-bite",
+  "type": "solid",
   "title": "Cookie Bite",
   "keywords": [
     "baked good",
@@ -9035,6 +9542,7 @@
 },
 {
   "name": "copy",
+  "type": "solid",
   "title": "Copy",
   "keywords": [
     "clone",
@@ -9057,6 +9565,7 @@
 },
 {
   "name": "funnel-dollar",
+  "type": "solid",
   "title": "Funnel Dollar",
   "keywords": [
     "filter",
@@ -9073,6 +9582,7 @@
 },
 {
   "name": "tram",
+  "type": "solid",
   "title": "Tram",
   "keywords": [
     "crossing",
@@ -9093,6 +9603,7 @@
 },
 {
   "name": "fish",
+  "type": "solid",
   "title": "Fish",
   "keywords": [
     "fauna",
@@ -9110,6 +9621,7 @@
 },
 {
   "name": "sort-numeric-down-alt",
+  "type": "solid",
   "title": "Alternate Sort Numeric Down",
   "keywords": [
     "arrange",
@@ -9127,6 +9639,7 @@
 },
 {
   "name": "signature",
+  "type": "solid",
   "title": "Signature",
   "keywords": [
     "John Hancock",
@@ -9140,6 +9653,7 @@
 },
 {
   "name": "not-equal",
+  "type": "solid",
   "title": "Not Equal",
   "keywords": [
     "arithmetic",
@@ -9154,6 +9668,7 @@
 },
 {
   "name": "kiss-beam",
+  "type": "solid",
   "title": "Kissing Face With Smiling Eyes",
   "keywords": [
     "beso",
@@ -9170,6 +9685,7 @@
 },
 {
   "name": "burn",
+  "type": "solid",
   "title": "Burn",
   "keywords": [
     "caliente",
@@ -9191,6 +9707,7 @@
 },
 {
   "name": "glasses",
+  "type": "solid",
   "title": "Glasses",
   "keywords": [
     "hipster",
@@ -9211,6 +9728,7 @@
 },
 {
   "name": "coins",
+  "type": "solid",
   "title": "Coins",
   "keywords": [
     "currency",
@@ -9228,6 +9746,7 @@
 },
 {
   "name": "closed-captioning",
+  "type": "solid",
   "title": "Closed Captioning",
   "keywords": [
     "cc",
@@ -9247,6 +9766,7 @@
 },
 {
   "name": "monument",
+  "type": "solid",
   "title": "Monument",
   "keywords": [
     "building",
@@ -9263,6 +9783,7 @@
 },
 {
   "name": "hat-wizard",
+  "type": "solid",
   "title": "Wizard's Hat",
   "keywords": [
     "Dungeons & Dragons",
@@ -9291,6 +9812,7 @@
 },
 {
   "name": "arrow-alt-circle-right",
+  "type": "solid",
   "title": "Alternate Arrow Circle Right",
   "keywords": [
     "arrow-circle-o-right",
@@ -9305,6 +9827,7 @@
 },
 {
   "name": "less-than-equal",
+  "type": "solid",
   "title": "Less Than Equal To",
   "keywords": [
     "arithmetic",
@@ -9319,6 +9842,7 @@
 },
 {
   "name": "balance-scale-left",
+  "type": "solid",
   "title": "Balance Scale (Left-Weighted)",
   "keywords": [
     "justice",
@@ -9339,6 +9863,7 @@
 },
 {
   "name": "file-download",
+  "type": "solid",
   "title": "File Download",
   "keywords": [
     "document",
@@ -9353,6 +9878,7 @@
 },
 {
   "name": "tint",
+  "type": "solid",
   "title": "tint",
   "keywords": [
     "color",
@@ -9372,6 +9898,7 @@
 },
 {
   "name": "fast-backward",
+  "type": "solid",
   "title": "fast-backward",
   "keywords": [
     "beginning",
@@ -9388,6 +9915,7 @@
 },
 {
   "name": "caravan",
+  "type": "solid",
   "title": "Caravan",
   "keywords": [
     "camper",
@@ -9407,6 +9935,7 @@
 },
 {
   "name": "industry",
+  "type": "solid",
   "title": "Industry",
   "keywords": [
     "building",
@@ -9428,6 +9957,7 @@
 },
 {
   "name": "child",
+  "type": "solid",
   "title": "Child",
   "keywords": [
     "boy",
@@ -9444,6 +9974,7 @@
 },
 {
   "name": "sort-alpha-down-alt",
+  "type": "solid",
   "title": "Alternate Sort Alphabetical Down",
   "keywords": [
     "alphabetical",
@@ -9461,6 +9992,7 @@
 },
 {
   "name": "fire-extinguisher",
+  "type": "solid",
   "title": "fire-extinguisher",
   "keywords": [
     "burn",
@@ -9481,6 +10013,7 @@
 },
 {
   "name": "marker",
+  "type": "solid",
   "title": "Marker",
   "keywords": [
     "design",
@@ -9501,6 +10034,7 @@
 },
 {
   "name": "align-right",
+  "type": "solid",
   "title": "align-right",
   "keywords": [
     "format",
@@ -9515,6 +10049,7 @@
 },
 {
   "name": "image",
+  "type": "solid",
   "title": "Image",
   "keywords": [
     "album",
@@ -9533,6 +10068,7 @@
 },
 {
   "name": "hand-point-down",
+  "type": "solid",
   "title": "Hand Pointing Down",
   "keywords": [
     "finger",
@@ -9548,6 +10084,7 @@
 },
 {
   "name": "vector-square",
+  "type": "solid",
   "title": "Vector Square",
   "keywords": [
     "anchors",
@@ -9564,6 +10101,7 @@
 },
 {
   "name": "lightbulb",
+  "type": "solid",
   "title": "Lightbulb",
   "keywords": [
     "energy",
@@ -9584,6 +10122,7 @@
 },
 {
   "name": "ellipsis-v",
+  "type": "solid",
   "title": "Vertical Ellipsis",
   "keywords": [
     "dots",
@@ -9606,6 +10145,7 @@
 },
 {
   "name": "check-circle",
+  "type": "solid",
   "title": "Check Circle",
   "keywords": [
     "accept",
@@ -9629,6 +10169,7 @@
 },
 {
   "name": "save",
+  "type": "solid",
   "title": "Save",
   "keywords": [
     "disk",
@@ -9649,6 +10190,7 @@
 },
 {
   "name": "smile",
+  "type": "solid",
   "title": "Smiling Face",
   "keywords": [
     "approve",
@@ -9669,6 +10211,7 @@
 },
 {
   "name": "images",
+  "type": "solid",
   "title": "Images",
   "keywords": [
     "album",
@@ -9687,6 +10230,7 @@
 },
 {
   "name": "tshirt",
+  "type": "solid",
   "title": "T-Shirt",
   "keywords": [
     "clothing",
@@ -9703,6 +10247,7 @@
 },
 {
   "name": "pager",
+  "type": "solid",
   "title": "Pager",
   "keywords": [
     "beeper",
@@ -9717,6 +10262,7 @@
 },
 {
   "name": "shield-virus",
+  "type": "solid",
   "title": "Shield Virus",
   "keywords": [
     "antibodies",
@@ -9733,6 +10279,7 @@
 },
 {
   "name": "grin-tears",
+  "type": "solid",
   "title": "Face With Tears of Joy",
   "keywords": [
     "LOL",
@@ -9747,6 +10294,7 @@
 },
 {
   "name": "donate",
+  "type": "solid",
   "title": "Donate",
   "keywords": [
     "contribute",
@@ -9764,6 +10312,7 @@
 },
 {
   "name": "calendar-alt",
+  "type": "solid",
   "title": "Alternate Calendar",
   "keywords": [
     "calendar",
@@ -9785,6 +10334,7 @@
 },
 {
   "name": "th-large",
+  "type": "solid",
   "title": "th-large",
   "keywords": [
     "blocks",
@@ -9800,6 +10350,7 @@
 },
 {
   "name": "laugh-beam",
+  "type": "solid",
   "title": "Laugh Face with Beaming Eyes",
   "keywords": [
     "LOL",
@@ -9816,6 +10367,7 @@
 },
 {
   "name": "code-branch",
+  "type": "solid",
   "title": "Code Branch",
   "keywords": [
     "branch",
@@ -9836,6 +10388,7 @@
 },
 {
   "name": "vr-cardboard",
+  "type": "solid",
   "title": "Cardboard VR",
   "keywords": [
     "3d",
@@ -9850,6 +10403,7 @@
 },
 {
   "name": "eye-dropper",
+  "type": "solid",
   "title": "Eye Dropper",
   "keywords": [
     "beaker",
@@ -9871,6 +10425,7 @@
 },
 {
   "name": "hand-paper",
+  "type": "solid",
   "title": "Paper (Hand)",
   "keywords": [
     "game",
@@ -9886,6 +10441,7 @@
 },
 {
   "name": "caret-square-down",
+  "type": "solid",
   "title": "Caret Square Down",
   "keywords": [
     "arrow",
@@ -9904,6 +10460,7 @@
 },
 {
   "name": "dice-d6",
+  "type": "solid",
   "title": "Dice D6",
   "keywords": [
     "Dungeons & Dragons",
@@ -9925,6 +10482,7 @@
 },
 {
   "name": "volume-mute",
+  "type": "solid",
   "title": "Volume Mute",
   "keywords": [
     "audio",
@@ -9944,6 +10502,7 @@
 },
 {
   "name": "search-plus",
+  "type": "solid",
   "title": "Search Plus",
   "keywords": [
     "bigger",
@@ -9962,6 +10521,7 @@
 },
 {
   "name": "paperclip",
+  "type": "solid",
   "title": "Paperclip",
   "keywords": [
     "attach",
@@ -9980,6 +10540,7 @@
 },
 {
   "name": "file-alt",
+  "type": "solid",
   "title": "Alternate File",
   "keywords": [
     "document",
@@ -10004,6 +10565,7 @@
 },
 {
   "name": "street-view",
+  "type": "solid",
   "title": "Street View",
   "keywords": [
     "directions",
@@ -10020,6 +10582,7 @@
 },
 {
   "name": "fast-forward",
+  "type": "solid",
   "title": "fast-forward",
   "keywords": [
     "end",
@@ -10034,6 +10597,7 @@
 },
 {
   "name": "hand-holding-water",
+  "type": "solid",
   "title": "Hand Holding Water",
   "keywords": [
     "carry",
@@ -10051,6 +10615,7 @@
 },
 {
   "name": "trailer",
+  "type": "solid",
   "title": "Trailer",
   "keywords": [
     "carry",
@@ -10068,6 +10633,7 @@
 },
 {
   "name": "syringe",
+  "type": "solid",
   "title": "Syringe",
   "keywords": [
     "covid-19",
@@ -10086,6 +10652,7 @@
 },
 {
   "name": "car-battery",
+  "type": "solid",
   "title": "Car Battery",
   "keywords": [
     "auto",
@@ -10101,6 +10668,7 @@
 },
 {
   "name": "award",
+  "type": "solid",
   "title": "Award",
   "keywords": [
     "honor",
@@ -10121,6 +10689,7 @@
 },
 {
   "name": "baby-carriage",
+  "type": "solid",
   "title": "Baby Carriage",
   "keywords": [
     "buggy",
@@ -10143,6 +10712,7 @@
 },
 {
   "name": "box",
+  "type": "solid",
   "title": "Box",
   "keywords": [
     "archive",
@@ -10158,6 +10728,7 @@
 },
 {
   "name": "thumbs-up",
+  "type": "solid",
   "title": "thumbs-up",
   "keywords": [
     "agree",
@@ -10185,6 +10756,7 @@
 },
 {
   "name": "superscript",
+  "type": "solid",
   "title": "superscript",
   "keywords": [
     "edit",
@@ -10203,6 +10775,7 @@
 },
 {
   "name": "glass-martini",
+  "type": "solid",
   "title": "Martini Glass",
   "keywords": [
     "alcohol",
@@ -10223,6 +10796,7 @@
 },
 {
   "name": "hiking",
+  "type": "solid",
   "title": "Hiking",
   "keywords": [
     "activity",
@@ -10245,6 +10819,7 @@
 },
 {
   "name": "mask",
+  "type": "solid",
   "title": "Mask",
   "keywords": [
     "carnivale",
@@ -10263,6 +10838,7 @@
 },
 {
   "name": "peace",
+  "type": "solid",
   "title": "Peace",
   "keywords": [
     "serenity",
@@ -10278,6 +10854,7 @@
 },
 {
   "name": "percent",
+  "type": "solid",
   "title": "Percent",
   "keywords": [
     "discount",
@@ -10294,6 +10871,7 @@
 },
 {
   "name": "square",
+  "type": "solid",
   "title": "Square",
   "keywords": [
     "block",
@@ -10308,6 +10886,7 @@
 },
 {
   "name": "crown",
+  "type": "solid",
   "title": "Crown",
   "keywords": [
     "award",
@@ -10323,6 +10902,7 @@
 },
 {
   "name": "broom",
+  "type": "solid",
   "title": "Broom",
   "keywords": [
     "clean",
@@ -10343,6 +10923,7 @@
 },
 {
   "name": "stethoscope",
+  "type": "solid",
   "title": "Stethoscope",
   "keywords": [
     "covid-19",
@@ -10364,6 +10945,7 @@
 },
 {
   "name": "eye-slash",
+  "type": "solid",
   "title": "Eye Slash",
   "keywords": [
     "blind",
@@ -10388,6 +10970,7 @@
 },
 {
   "name": "candy-cane",
+  "type": "solid",
   "title": "Candy Cane",
   "keywords": [
     "candy",
@@ -10408,6 +10991,7 @@
 },
 {
   "name": "play",
+  "type": "solid",
   "title": "play",
   "keywords": [
     "audio",
@@ -10428,6 +11012,7 @@
 },
 {
   "name": "backward",
+  "type": "solid",
   "title": "backward",
   "keywords": [
     "previous",
@@ -10441,6 +11026,7 @@
 },
 {
   "name": "paper-plane",
+  "type": "solid",
   "title": "Paper Plane",
   "keywords": [
     "air",
@@ -10462,6 +11048,7 @@
 },
 {
   "name": "cogs",
+  "type": "solid",
   "title": "cogs",
   "keywords": [
     "gears",
@@ -10479,6 +11066,7 @@
 },
 {
   "name": "pencil-alt",
+  "type": "solid",
   "title": "Alternate Pencil",
   "keywords": [
     "design",
@@ -10501,6 +11089,7 @@
 },
 {
   "name": "greater-than",
+  "type": "solid",
   "title": "Greater Than",
   "keywords": [
     "arithmetic",
@@ -10515,6 +11104,7 @@
 },
 {
   "name": "arrow-alt-circle-up",
+  "type": "solid",
   "title": "Alternate Arrow Circle Up",
   "keywords": [
     "arrow-circle-o-up"
@@ -10527,6 +11117,7 @@
 },
 {
   "name": "dungeon",
+  "type": "solid",
   "title": "Dungeon",
   "keywords": [
     "Dungeons & Dragons",
@@ -10549,6 +11140,7 @@
 },
 {
   "name": "user-edit",
+  "type": "solid",
   "title": "User Edit",
   "keywords": [
     "edit",
@@ -10566,6 +11158,7 @@
 },
 {
   "name": "table",
+  "type": "solid",
   "title": "table",
   "keywords": [
     "data",
@@ -10581,6 +11174,7 @@
 },
 {
   "name": "barcode",
+  "type": "solid",
   "title": "barcode",
   "keywords": [
     "info",
@@ -10599,6 +11193,7 @@
 },
 {
   "name": "thumbtack",
+  "type": "solid",
   "title": "Thumbtack",
   "keywords": [
     "coordinates",
@@ -10619,6 +11214,7 @@
 },
 {
   "name": "hourglass-end",
+  "type": "solid",
   "title": "Hourglass End",
   "keywords": [
     "hour",
@@ -10635,6 +11231,7 @@
 },
 {
   "name": "scroll",
+  "type": "solid",
   "title": "Scroll",
   "keywords": [
     "Dungeons & Dragons",
@@ -10654,6 +11251,7 @@
 },
 {
   "name": "flag-checkered",
+  "type": "solid",
   "title": "flag-checkered",
   "keywords": [
     "notice",
@@ -10674,6 +11272,7 @@
 },
 {
   "name": "chalkboard",
+  "type": "solid",
   "title": "Chalkboard",
   "keywords": [
     "blackboard",
@@ -10693,6 +11292,7 @@
 },
 {
   "name": "radiation",
+  "type": "solid",
   "title": "Radiation",
   "keywords": [
     "danger",
@@ -10714,6 +11314,7 @@
 },
 {
   "name": "th",
+  "type": "solid",
   "title": "th",
   "keywords": [
     "blocks",
@@ -10729,6 +11330,7 @@
 },
 {
   "name": "baby",
+  "type": "solid",
   "title": "Baby",
   "keywords": [
     "child",
@@ -10750,6 +11352,7 @@
 },
 {
   "name": "shekel-sign",
+  "type": "solid",
   "title": "Shekel Sign",
   "keywords": [
     "currency",
@@ -10764,6 +11367,7 @@
 },
 {
   "name": "grin-squint-tears",
+  "type": "solid",
   "title": "Rolling on the Floor Laughing",
   "keywords": [
     "emoticon",
@@ -10779,6 +11383,7 @@
 },
 {
   "name": "battery-empty",
+  "type": "solid",
   "title": "Battery Empty",
   "keywords": [
     "charge",
@@ -10795,6 +11400,7 @@
 },
 {
   "name": "star-of-life",
+  "type": "solid",
   "title": "Star of Life",
   "keywords": [
     "doctor",
@@ -10811,6 +11417,7 @@
 },
 {
   "name": "camera",
+  "type": "solid",
   "title": "camera",
   "keywords": [
     "image",
@@ -10832,6 +11439,7 @@
 },
 {
   "name": "magic",
+  "type": "solid",
   "title": "magic",
   "keywords": [
     "autocomplete",
@@ -10853,6 +11461,7 @@
 },
 {
   "name": "border-style",
+  "type": "solid",
   "title": "Border Style",
   "keywords": [],
   "categories": [
@@ -10863,6 +11472,7 @@
 },
 {
   "name": "redo",
+  "type": "solid",
   "title": "Redo",
   "keywords": [
     "forward",
@@ -10881,6 +11491,7 @@
 },
 {
   "name": "file-powerpoint",
+  "type": "solid",
   "title": "Powerpoint File",
   "keywords": [
     "display",
@@ -10896,6 +11507,7 @@
 },
 {
   "name": "folder-minus",
+  "type": "solid",
   "title": "Folder Minus",
   "keywords": [
     "archive",
@@ -10914,6 +11526,7 @@
 },
 {
   "name": "otter",
+  "type": "solid",
   "title": "Otter",
   "keywords": [
     "animal",
@@ -10931,6 +11544,7 @@
 },
 {
   "name": "sync-alt",
+  "type": "solid",
   "title": "Alternate Sync",
   "keywords": [
     "exchange",
@@ -10951,6 +11565,7 @@
 },
 {
   "name": "sim-card",
+  "type": "solid",
   "title": "SIM Card",
   "keywords": [
     "hard drive",
@@ -10969,6 +11584,7 @@
 },
 {
   "name": "truck",
+  "type": "solid",
   "title": "truck",
   "keywords": [
     "cargo",
@@ -10989,6 +11605,7 @@
 },
 {
   "name": "grin-tongue",
+  "type": "solid",
   "title": "Face With Tongue",
   "keywords": [
     "LOL",
@@ -11003,6 +11620,7 @@
 },
 {
   "name": "apple-alt",
+  "type": "solid",
   "title": "Fruit Apple",
   "keywords": [
     "fall",
@@ -11025,6 +11643,7 @@
 },
 {
   "name": "grin-beam-sweat",
+  "type": "solid",
   "title": "Grinning Face With Sweat",
   "keywords": [
     "embarass",
@@ -11040,6 +11659,7 @@
 },
 {
   "name": "glass-whiskey",
+  "type": "solid",
   "title": "Glass Whiskey",
   "keywords": [
     "alcohol",
@@ -11063,6 +11683,7 @@
 },
 {
   "name": "oil-can",
+  "type": "solid",
   "title": "Oil Can",
   "keywords": [
     "auto",
@@ -11080,6 +11701,7 @@
 },
 {
   "name": "blender",
+  "type": "solid",
   "title": "Blender",
   "keywords": [
     "cocktail",
@@ -11098,6 +11720,7 @@
 },
 {
   "name": "wine-glass",
+  "type": "solid",
   "title": "Wine Glass",
   "keywords": [
     "alcohol",
@@ -11120,6 +11743,7 @@
 },
 {
   "name": "hand-spock",
+  "type": "solid",
   "title": "Spock (Hand)",
   "keywords": [
     "live long",
@@ -11137,6 +11761,7 @@
 },
 {
   "name": "bible",
+  "type": "solid",
   "title": "Bible",
   "keywords": [
     "book",
@@ -11153,6 +11778,7 @@
 },
 {
   "name": "toilet-paper",
+  "type": "solid",
   "title": "Toilet Paper",
   "keywords": [
     "bathroom",
@@ -11174,6 +11800,7 @@
 },
 {
   "name": "head-side-virus",
+  "type": "solid",
   "title": "Head Side Virus",
   "keywords": [
     "cold",
@@ -11189,6 +11816,7 @@
 },
 {
   "name": "egg",
+  "type": "solid",
   "title": "Egg",
   "keywords": [
     "breakfast",
@@ -11205,6 +11833,7 @@
 },
 {
   "name": "user-friends",
+  "type": "solid",
   "title": "User Friends",
   "keywords": [
     "group",
@@ -11222,6 +11851,7 @@
 },
 {
   "name": "hands-wash",
+  "type": "solid",
   "title": "Hands Wash",
   "keywords": [
     "covid-19",
@@ -11237,6 +11867,7 @@
 },
 {
   "name": "bullseye",
+  "type": "solid",
   "title": "Bullseye",
   "keywords": [
     "archery",
@@ -11256,6 +11887,7 @@
 },
 {
   "name": "exclamation-circle",
+  "type": "solid",
   "title": "Exclamation Circle",
   "keywords": [
     "alert",
@@ -11278,6 +11910,7 @@
 },
 {
   "name": "bus",
+  "type": "solid",
   "title": "Bus",
   "keywords": [
     "public transportation",
@@ -11296,6 +11929,7 @@
 },
 {
   "name": "book-reader",
+  "type": "solid",
   "title": "Book Reader",
   "keywords": [
     "flyer",
@@ -11313,6 +11947,7 @@
 },
 {
   "name": "dolly-flatbed",
+  "type": "solid",
   "title": "Dolly Flatbed",
   "keywords": [
     "carry",
@@ -11328,6 +11963,7 @@
 },
 {
   "name": "mercury",
+  "type": "solid",
   "title": "Mercury",
   "keywords": [
     "transgender"
@@ -11340,6 +11976,7 @@
 },
 {
   "name": "infinity",
+  "type": "solid",
   "title": "Infinity",
   "keywords": [
     "eternity",
@@ -11355,6 +11992,7 @@
 },
 {
   "name": "cloud-download-alt",
+  "type": "solid",
   "title": "Alternate Cloud Download",
   "keywords": [
     "download",
@@ -11370,6 +12008,7 @@
 },
 {
   "name": "gem",
+  "type": "solid",
   "title": "Gem",
   "keywords": [
     "diamond",
@@ -11387,6 +12026,7 @@
 },
 {
   "name": "audio-description",
+  "type": "solid",
   "title": "Audio Description",
   "keywords": [
     "blind",
@@ -11403,6 +12043,7 @@
 },
 {
   "name": "skull-crossbones",
+  "type": "solid",
   "title": "Skull & Crossbones",
   "keywords": [
     "Dungeons & Dragons",
@@ -11437,6 +12078,7 @@
 },
 {
   "name": "feather",
+  "type": "solid",
   "title": "Feather",
   "keywords": [
     "bird",
@@ -11454,6 +12096,7 @@
 },
 {
   "name": "trash",
+  "type": "solid",
   "title": "Trash",
   "keywords": [
     "delete",
@@ -11471,6 +12114,7 @@
 },
 {
   "name": "chart-bar",
+  "type": "solid",
   "title": "Bar Chart",
   "keywords": [
     "analytics",
@@ -11486,6 +12130,7 @@
 },
 {
   "name": "fire-alt",
+  "type": "solid",
   "title": "Alternate Fire",
   "keywords": [
     "burn",
@@ -11508,6 +12153,7 @@
 },
 {
   "name": "transgender",
+  "type": "solid",
   "title": "Transgender",
   "keywords": [
     "intersex"
@@ -11520,6 +12166,7 @@
 },
 {
   "name": "dumpster-fire",
+  "type": "solid",
   "title": "Dumpster Fire",
   "keywords": [
     "alley",
@@ -11540,6 +12187,7 @@
 },
 {
   "name": "toilet",
+  "type": "solid",
   "title": "Toilet",
   "keywords": [
     "bathroom",
@@ -11565,6 +12213,7 @@
 },
 {
   "name": "step-backward",
+  "type": "solid",
   "title": "step-backward",
   "keywords": [
     "beginning",
@@ -11581,6 +12230,7 @@
 },
 {
   "name": "leaf",
+  "type": "solid",
   "title": "leaf",
   "keywords": [
     "eco",
@@ -11601,6 +12251,7 @@
 },
 {
   "name": "paste",
+  "type": "solid",
   "title": "Paste",
   "keywords": [
     "clipboard",
@@ -11621,6 +12272,7 @@
 },
 {
   "name": "window-maximize",
+  "type": "solid",
   "title": "Window Maximize",
   "keywords": [
     "browser",
@@ -11636,6 +12288,7 @@
 },
 {
   "name": "gopuram",
+  "type": "solid",
   "title": "Gopuram",
   "keywords": [
     "building",
@@ -11653,6 +12306,7 @@
 },
 {
   "name": "address-book",
+  "type": "solid",
   "title": "Address Book",
   "keywords": [
     "contact",
@@ -11671,6 +12325,7 @@
 },
 {
   "name": "memory",
+  "type": "solid",
   "title": "Memory",
   "keywords": [
     "DIMM",
@@ -11688,6 +12343,7 @@
 },
 {
   "name": "dollar-sign",
+  "type": "solid",
   "title": "Dollar Sign",
   "keywords": [
     "$",
@@ -11707,6 +12363,7 @@
 },
 {
   "name": "journal-whills",
+  "type": "solid",
   "title": "Journal of the Whills",
   "keywords": [
     "book",
@@ -11725,6 +12382,7 @@
 },
 {
   "name": "meh-rolling-eyes",
+  "type": "solid",
   "title": "Face With Rolling Eyes",
   "keywords": [
     "emoticon",
@@ -11740,6 +12398,7 @@
 },
 {
   "name": "graduation-cap",
+  "type": "solid",
   "title": "Graduation Cap",
   "keywords": [
     "ceremony",
@@ -11760,6 +12419,7 @@
 },
 {
   "name": "kiwi-bird",
+  "type": "solid",
   "title": "Kiwi Bird",
   "keywords": [
     "bird",
@@ -11774,6 +12434,7 @@
 },
 {
   "name": "volume-up",
+  "type": "solid",
   "title": "Volume Up",
   "keywords": [
     "audio",
@@ -11794,6 +12455,7 @@
 },
 {
   "name": "fill-drip",
+  "type": "solid",
   "title": "Fill Drip",
   "keywords": [
     "bucket",
@@ -11811,6 +12473,7 @@
 },
 {
   "name": "sliders-h",
+  "type": "solid",
   "title": "Horizontal Sliders",
   "keywords": [
     "adjust",
@@ -11828,6 +12491,7 @@
 },
 {
   "name": "running",
+  "type": "solid",
   "title": "Running",
   "keywords": [
     "exercise",
@@ -11848,6 +12512,7 @@
 },
 {
   "name": "hashtag",
+  "type": "solid",
   "title": "Hashtag",
   "keywords": [
     "Twitter",
@@ -11865,6 +12530,7 @@
 },
 {
   "name": "guitar",
+  "type": "solid",
   "title": "Guitar",
   "keywords": [
     "acoustic",
@@ -11884,6 +12550,7 @@
 },
 {
   "name": "bong",
+  "type": "solid",
   "title": "Bong",
   "keywords": [
     "aparatus",
@@ -11901,6 +12568,7 @@
 },
 {
   "name": "star",
+  "type": "solid",
   "title": "Star",
   "keywords": [
     "achievement",
@@ -11925,6 +12593,7 @@
 },
 {
   "name": "phone-square-alt",
+  "type": "solid",
   "title": "Alternate Phone Square",
   "keywords": [
     "call",
@@ -11944,6 +12613,7 @@
 },
 {
   "name": "arrows-alt-v",
+  "type": "solid",
   "title": "Alternate Arrows Vertical",
   "keywords": [
     "arrows-v",
@@ -11961,6 +12631,7 @@
 },
 {
   "name": "euro-sign",
+  "type": "solid",
   "title": "Euro Sign",
   "keywords": [
     "currency",
@@ -11976,6 +12647,7 @@
 },
 {
   "name": "sun",
+  "type": "solid",
   "title": "Sun",
   "keywords": [
     "brighten",
@@ -11999,6 +12671,7 @@
 },
 {
   "name": "wrench",
+  "type": "solid",
   "title": "Wrench",
   "keywords": [
     "construction",
@@ -12022,6 +12695,7 @@
 },
 {
   "name": "arrow-circle-down",
+  "type": "solid",
   "title": "Arrow Circle Down",
   "keywords": [
     "download"
@@ -12034,6 +12708,7 @@
 },
 {
   "name": "circle-notch",
+  "type": "solid",
   "title": "Circle Notched",
   "keywords": [
     "circle-o-notch",
@@ -12051,6 +12726,7 @@
 },
 {
   "name": "shoe-prints",
+  "type": "solid",
   "title": "Shoe Prints",
   "keywords": [
     "feet",
@@ -12068,6 +12744,7 @@
 },
 {
   "name": "edit",
+  "type": "solid",
   "title": "Edit",
   "keywords": [
     "edit",
@@ -12088,6 +12765,7 @@
 },
 {
   "name": "soap",
+  "type": "solid",
   "title": "Soap",
   "keywords": [
     "bubbles",
@@ -12104,6 +12782,7 @@
 },
 {
   "name": "bacon",
+  "type": "solid",
   "title": "Bacon",
   "keywords": [
     "blt",
@@ -12123,6 +12802,7 @@
 },
 {
   "name": "unlink",
+  "type": "solid",
   "title": "unlink",
   "keywords": [
     "attachment",
@@ -12138,6 +12818,7 @@
 },
 {
   "name": "plane-arrival",
+  "type": "solid",
   "title": "Plane Arrival",
   "keywords": [
     "airplane",
@@ -12159,6 +12840,7 @@
 },
 {
   "name": "bone",
+  "type": "solid",
   "title": "Bone",
   "keywords": [
     "calcium",
@@ -12176,6 +12858,7 @@
 },
 {
   "name": "bus-alt",
+  "type": "solid",
   "title": "Bus Alt",
   "keywords": [
     "mta",
@@ -12194,6 +12877,7 @@
 },
 {
   "name": "crutch",
+  "type": "solid",
   "title": "Crutch",
   "keywords": [
     "cane",
@@ -12209,6 +12893,7 @@
 },
 {
   "name": "anchor",
+  "type": "solid",
   "title": "Anchor",
   "keywords": [
     "berth",
@@ -12231,6 +12916,7 @@
 },
 {
   "name": "jedi",
+  "type": "solid",
   "title": "Jedi",
   "keywords": [
     "crest",
@@ -12249,6 +12935,7 @@
 },
 {
   "name": "head-side-cough-slash",
+  "type": "solid",
   "title": "Head Side-cough-slash",
   "keywords": [
     "cough",
@@ -12266,6 +12953,7 @@
 },
 {
   "name": "hammer",
+  "type": "solid",
   "title": "Hammer",
   "keywords": [
     "admin",
@@ -12282,6 +12970,7 @@
 },
 {
   "name": "search-location",
+  "type": "solid",
   "title": "Search Location",
   "keywords": [
     "bigger",
@@ -12299,6 +12988,7 @@
 },
 {
   "name": "highlighter",
+  "type": "solid",
   "title": "Highlighter",
   "keywords": [
     "edit",
@@ -12318,6 +13008,7 @@
 },
 {
   "name": "head-side-mask",
+  "type": "solid",
   "title": "Head Side Mask",
   "keywords": [
     "breath",
@@ -12334,6 +13025,7 @@
 },
 {
   "name": "address-card",
+  "type": "solid",
   "title": "Address Card",
   "keywords": [
     "about",
@@ -12353,6 +13045,7 @@
 },
 {
   "name": "caret-square-right",
+  "type": "solid",
   "title": "Caret Square Right",
   "keywords": [
     "arrow",
@@ -12369,6 +13062,7 @@
 },
 {
   "name": "wheelchair",
+  "type": "solid",
   "title": "Wheelchair",
   "keywords": [
     "accessible",
@@ -12389,6 +13083,7 @@
 },
 {
   "name": "chart-pie",
+  "type": "solid",
   "title": "Pie Chart",
   "keywords": [
     "analytics",
@@ -12406,6 +13101,7 @@
 },
 {
   "name": "lemon",
+  "type": "solid",
   "title": "Lemon",
   "keywords": [
     "citrus",
@@ -12425,6 +13121,7 @@
 },
 {
   "name": "place-of-worship",
+  "type": "solid",
   "title": "Place of Worship",
   "keywords": [
     "building",
@@ -12442,6 +13139,7 @@
 },
 {
   "name": "bug",
+  "type": "solid",
   "title": "Bug",
   "keywords": [
     "beetle",
@@ -12460,6 +13158,7 @@
 },
 {
   "name": "smile-beam",
+  "type": "solid",
   "title": "Beaming Face With Smiling Eyes",
   "keywords": [
     "emoticon",
@@ -12475,6 +13174,7 @@
 },
 {
   "name": "handshake-alt-slash",
+  "type": "solid",
   "title": "Handshake Alternate Slash",
   "keywords": [
     "broken",
@@ -12489,6 +13189,7 @@
 },
 {
   "name": "praying-hands",
+  "type": "solid",
   "title": "Praying Hands",
   "keywords": [
     "kneel",
@@ -12505,6 +13206,7 @@
 },
 {
   "name": "mars-stroke-h",
+  "type": "solid",
   "title": "Mars Stroke Horizontal",
   "keywords": [],
   "categories": [
@@ -12515,6 +13217,7 @@
 },
 {
   "name": "spinner",
+  "type": "solid",
   "title": "Spinner",
   "keywords": [
     "circle",
@@ -12529,6 +13232,7 @@
 },
 {
   "name": "unlock",
+  "type": "solid",
   "title": "unlock",
   "keywords": [
     "admin",
@@ -12547,6 +13251,7 @@
 },
 {
   "name": "adjust",
+  "type": "solid",
   "title": "adjust",
   "keywords": [
     "contrast",
@@ -12563,6 +13268,7 @@
 },
 {
   "name": "hand-holding-heart",
+  "type": "solid",
   "title": "Hand Holding Heart",
   "keywords": [
     "carry",
@@ -12580,6 +13286,7 @@
 },
 {
   "name": "compass",
+  "type": "solid",
   "title": "Compass",
   "keywords": [
     "directions",
@@ -12603,6 +13310,7 @@
 },
 {
   "name": "meteor",
+  "type": "solid",
   "title": "Meteor",
   "keywords": [
     "armageddon",
@@ -12620,6 +13328,7 @@
 },
 {
   "name": "plus-circle",
+  "type": "solid",
   "title": "Plus Circle",
   "keywords": [
     "add",
@@ -12638,6 +13347,7 @@
 },
 {
   "name": "sort-amount-down-alt",
+  "type": "solid",
   "title": "Alternate Sort Amount Down",
   "keywords": [
     "arrange",
@@ -12654,6 +13364,7 @@
 },
 {
   "name": "faucet",
+  "type": "solid",
   "title": "Faucet",
   "keywords": [
     "covid-19",
@@ -12673,6 +13384,7 @@
 },
 {
   "name": "search-dollar",
+  "type": "solid",
   "title": "Search Dollar",
   "keywords": [
     "bigger",
@@ -12691,6 +13403,7 @@
 },
 {
   "name": "external-link-square-alt",
+  "type": "solid",
   "title": "Alternate External Link Square",
   "keywords": [
     "external-link-square",
@@ -12707,6 +13420,7 @@
 },
 {
   "name": "traffic-light",
+  "type": "solid",
   "title": "Traffic Light",
   "keywords": [
     "direction",
@@ -12722,6 +13436,7 @@
 },
 {
   "name": "bicycle",
+  "type": "solid",
   "title": "Bicycle",
   "keywords": [
     "bike",
@@ -12741,6 +13456,7 @@
 },
 {
   "name": "menorah",
+  "type": "solid",
   "title": "Menorah",
   "keywords": [
     "candle",
@@ -12757,6 +13473,7 @@
 },
 {
   "name": "hospital-user",
+  "type": "solid",
   "title": "Hospital with User",
   "keywords": [
     "covid-19",
@@ -12774,6 +13491,7 @@
 },
 {
   "name": "cloud-moon",
+  "type": "solid",
   "title": "Cloud with Moon",
   "keywords": [
     "crescent",
@@ -12792,6 +13510,7 @@
 },
 {
   "name": "warehouse",
+  "type": "solid",
   "title": "Warehouse",
   "keywords": [
     "building",
@@ -12809,6 +13528,7 @@
 },
 {
   "name": "chevron-circle-down",
+  "type": "solid",
   "title": "Chevron Circle Down",
   "keywords": [
     "arrow",
@@ -12825,6 +13545,7 @@
 },
 {
   "name": "credit-card",
+  "type": "solid",
   "title": "Credit Card",
   "keywords": [
     "buy",
@@ -12844,6 +13565,7 @@
 },
 {
   "name": "user-circle",
+  "type": "solid",
   "title": "User Circle",
   "keywords": [
     "account",
@@ -12864,6 +13586,7 @@
 },
 {
   "name": "joint",
+  "type": "solid",
   "title": "Joint",
   "keywords": [
     "blunt",
@@ -12885,6 +13608,7 @@
 },
 {
   "name": "user-tie",
+  "type": "solid",
   "title": "User Tie",
   "keywords": [
     "avatar",
@@ -12903,6 +13627,7 @@
 },
 {
   "name": "snowman",
+  "type": "solid",
   "title": "Snowman",
   "keywords": [
     "decoration",
@@ -12919,6 +13644,7 @@
 },
 {
   "name": "chevron-circle-up",
+  "type": "solid",
   "title": "Chevron Circle Up",
   "keywords": [
     "arrow",
@@ -12933,6 +13659,7 @@
 },
 {
   "name": "tachometer-alt",
+  "type": "solid",
   "title": "Alternate Tachometer",
   "keywords": [
     "dashboard",
@@ -12950,6 +13677,7 @@
 },
 {
   "name": "vial",
+  "type": "solid",
   "title": "Vial",
   "keywords": [
     "experiment",
@@ -12969,6 +13697,7 @@
 },
 {
   "name": "reply-all",
+  "type": "solid",
   "title": "reply-all",
   "keywords": [
     "mail",
@@ -12985,6 +13714,7 @@
 },
 {
   "name": "sort-alpha-down",
+  "type": "solid",
   "title": "Sort Alphabetical Down",
   "keywords": [
     "alphabetical",
@@ -13002,6 +13732,7 @@
 },
 {
   "name": "language",
+  "type": "solid",
   "title": "Language",
   "keywords": [
     "dialect",
@@ -13020,6 +13751,7 @@
 },
 {
   "name": "cloud-rain",
+  "type": "solid",
   "title": "Cloud with Rain",
   "keywords": [
     "precipitation",
@@ -13035,6 +13767,7 @@
 },
 {
   "name": "mars-stroke",
+  "type": "solid",
   "title": "Mars Stroke",
   "keywords": [],
   "categories": [
@@ -13045,6 +13778,7 @@
 },
 {
   "name": "venus-double",
+  "type": "solid",
   "title": "Venus Double",
   "keywords": [
     "female"
@@ -13057,6 +13791,7 @@
 },
 {
   "name": "trash-alt",
+  "type": "solid",
   "title": "Alternate Trash",
   "keywords": [
     "delete",
@@ -13075,6 +13810,7 @@
 },
 {
   "name": "window-close",
+  "type": "solid",
   "title": "Window Close",
   "keywords": [
     "browser",
@@ -13090,6 +13826,7 @@
 },
 {
   "name": "tired",
+  "type": "solid",
   "title": "Tired Face",
   "keywords": [
     "angry",
@@ -13106,6 +13843,7 @@
 },
 {
   "name": "sitemap",
+  "type": "solid",
   "title": "Sitemap",
   "keywords": [
     "directory",
@@ -13124,6 +13862,7 @@
 },
 {
   "name": "deaf",
+  "type": "solid",
   "title": "Deaf",
   "keywords": [
     "ear",
@@ -13138,6 +13877,7 @@
 },
 {
   "name": "crosshairs",
+  "type": "solid",
   "title": "Crosshairs",
   "keywords": [
     "aim",
@@ -13156,6 +13896,7 @@
 },
 {
   "name": "poop",
+  "type": "solid",
   "title": "Poop",
   "keywords": [
     "crap",
@@ -13173,6 +13914,7 @@
 },
 {
   "name": "clock",
+  "type": "solid",
   "title": "Clock",
   "keywords": [
     "date",
@@ -13191,6 +13933,7 @@
 },
 {
   "name": "window-minimize",
+  "type": "solid",
   "title": "Window Minimize",
   "keywords": [
     "browser",
@@ -13206,6 +13949,7 @@
 },
 {
   "name": "retweet",
+  "type": "solid",
   "title": "Retweet",
   "keywords": [
     "refresh",
@@ -13222,6 +13966,7 @@
 },
 {
   "name": "phone",
+  "type": "solid",
   "title": "Phone",
   "keywords": [
     "call",
@@ -13244,6 +13989,7 @@
 },
 {
   "name": "toilet-paper-slash",
+  "type": "solid",
   "title": "Toilet Paper Slash",
   "keywords": [
     "bathroom",
@@ -13266,6 +14012,7 @@
 },
 {
   "name": "sad-cry",
+  "type": "solid",
   "title": "Crying Face",
   "keywords": [
     "emoticon",
@@ -13281,6 +14028,7 @@
 },
 {
   "name": "crop-alt",
+  "type": "solid",
   "title": "Alternate Crop",
   "keywords": [
     "design",
@@ -13297,6 +14045,7 @@
 },
 {
   "name": "lungs",
+  "type": "solid",
   "title": "Lungs",
   "keywords": [
     "air",
@@ -13313,6 +14062,7 @@
 },
 {
   "name": "house-user",
+  "type": "solid",
   "title": "House User",
   "keywords": [
     "covid-19",
@@ -13328,6 +14078,7 @@
 },
 {
   "name": "mail-bulk",
+  "type": "solid",
   "title": "Mail Bulk",
   "keywords": [
     "archive",
@@ -13348,6 +14099,7 @@
 },
 {
   "name": "dumbbell",
+  "type": "solid",
   "title": "Dumbbell",
   "keywords": [
     "exercise",
@@ -13366,6 +14118,7 @@
 },
 {
   "name": "sync",
+  "type": "solid",
   "title": "Sync",
   "keywords": [
     "exchange",
@@ -13386,6 +14139,7 @@
 },
 {
   "name": "sort-amount-up-alt",
+  "type": "solid",
   "title": "Alternate Sort Amount Up",
   "keywords": [
     "arrange",
@@ -13402,6 +14156,7 @@
 },
 {
   "name": "wine-bottle",
+  "type": "solid",
   "title": "Wine Bottle",
   "keywords": [
     "alcohol",
@@ -13422,6 +14177,7 @@
 },
 {
   "name": "tractor",
+  "type": "solid",
   "title": "Tractor",
   "keywords": [
     "agriculture",
@@ -13437,6 +14193,7 @@
 },
 {
   "name": "eye",
+  "type": "solid",
   "title": "Eye",
   "keywords": [
     "look",
@@ -13462,6 +14219,7 @@
 },
 {
   "name": "mobile",
+  "type": "solid",
   "title": "Mobile Phone",
   "keywords": [
     "apple",
@@ -13484,6 +14242,7 @@
 },
 {
   "name": "universal-access",
+  "type": "solid",
   "title": "Universal Access",
   "keywords": [
     "accessibility",
@@ -13500,6 +14259,7 @@
 },
 {
   "name": "user-injured",
+  "type": "solid",
   "title": "User Injured",
   "keywords": [
     "cast",
@@ -13517,6 +14277,7 @@
 },
 {
   "name": "angle-double-up",
+  "type": "solid",
   "title": "Angle Double Up",
   "keywords": [
     "arrows",
@@ -13532,6 +14293,7 @@
 },
 {
   "name": "book-medical",
+  "type": "solid",
   "title": "Medical Book",
   "keywords": [
     "diary",
@@ -13552,6 +14314,7 @@
 },
 {
   "name": "dove",
+  "type": "solid",
   "title": "Dove",
   "keywords": [
     "bird",
@@ -13571,6 +14334,7 @@
 },
 {
   "name": "car-side",
+  "type": "solid",
   "title": "Car Side",
   "keywords": [
     "auto",
@@ -13589,6 +14353,7 @@
 },
 {
   "name": "bahai",
+  "type": "solid",
   "title": "Bahá'í",
   "keywords": [
     "bahai",
@@ -13604,6 +14369,7 @@
 },
 {
   "name": "gift",
+  "type": "solid",
   "title": "gift",
   "keywords": [
     "christmas",
@@ -13628,6 +14394,7 @@
 },
 {
   "name": "compress-alt",
+  "type": "solid",
   "title": "Alternate Compress",
   "keywords": [
     "collapse",
@@ -13647,6 +14414,7 @@
 },
 {
   "name": "car",
+  "type": "solid",
   "title": "Car",
   "keywords": [
     "auto",
@@ -13668,6 +14436,7 @@
 },
 {
   "name": "registered",
+  "type": "solid",
   "title": "Registered Trademark",
   "keywords": [
     "copyright",
@@ -13682,6 +14451,7 @@
 },
 {
   "name": "file-invoice",
+  "type": "solid",
   "title": "File Invoice",
   "keywords": [
     "account",
@@ -13699,6 +14469,7 @@
 },
 {
   "name": "long-arrow-alt-down",
+  "type": "solid",
   "title": "Alternate Long Arrow Down",
   "keywords": [
     "download",
@@ -13712,6 +14483,7 @@
 },
 {
   "name": "draw-polygon",
+  "type": "solid",
   "title": "Draw Polygon",
   "keywords": [
     "anchors",
@@ -13729,6 +14501,7 @@
 },
 {
   "name": "battery-quarter",
+  "type": "solid",
   "title": "Battery 1/4 Full",
   "keywords": [
     "charge",
@@ -13745,6 +14518,7 @@
 },
 {
   "name": "atlas",
+  "type": "solid",
   "title": "Atlas",
   "keywords": [
     "book",
@@ -13763,6 +14537,7 @@
 },
 {
   "name": "table-tennis",
+  "type": "solid",
   "title": "Table Tennis",
   "keywords": [
     "ball",
@@ -13777,6 +14552,7 @@
 },
 {
   "name": "layer-group",
+  "type": "solid",
   "title": "Layer Group",
   "keywords": [
     "arrange",
@@ -13794,6 +14570,7 @@
 },
 {
   "name": "arrow-alt-circle-down",
+  "type": "solid",
   "title": "Alternate Arrow Circle Down",
   "keywords": [
     "arrow-circle-o-down",
@@ -13807,6 +14584,7 @@
 },
 {
   "name": "share",
+  "type": "solid",
   "title": "Share",
   "keywords": [
     "forward",
@@ -13825,6 +14603,7 @@
 },
 {
   "name": "tags",
+  "type": "solid",
   "title": "tags",
   "keywords": [
     "discount",
@@ -13843,6 +14622,7 @@
 },
 {
   "name": "people-arrows",
+  "type": "solid",
   "title": "People Arrows",
   "keywords": [
     "covid-19",
@@ -13860,6 +14640,7 @@
 },
 {
   "name": "vials",
+  "type": "solid",
   "title": "Vials",
   "keywords": [
     "experiment",
@@ -13879,6 +14660,7 @@
 },
 {
   "name": "globe-europe",
+  "type": "solid",
   "title": "Globe with Europe shown",
   "keywords": [
     "all",
@@ -13905,6 +14687,7 @@
 },
 {
   "name": "arrow-up",
+  "type": "solid",
   "title": "arrow-up",
   "keywords": [
     "forward",
@@ -13918,6 +14701,7 @@
 },
 {
   "name": "balance-scale",
+  "type": "solid",
   "title": "Balance Scale",
   "keywords": [
     "balanced",
@@ -13938,6 +14722,7 @@
 },
 {
   "name": "grin",
+  "type": "solid",
   "title": "Grinning Face",
   "keywords": [
     "emoticon",
@@ -13953,6 +14738,7 @@
 },
 {
   "name": "microscope",
+  "type": "solid",
   "title": "Microscope",
   "keywords": [
     "covid-19",
@@ -13972,6 +14758,7 @@
 },
 {
   "name": "subway",
+  "type": "solid",
   "title": "Subway",
   "keywords": [
     "machine",
@@ -13990,6 +14777,7 @@
 },
 {
   "name": "microphone-alt",
+  "type": "solid",
   "title": "Alternate Microphone",
   "keywords": [
     "audio",
@@ -14012,6 +14800,7 @@
 },
 {
   "name": "first-aid",
+  "type": "solid",
   "title": "First Aid",
   "keywords": [
     "emergency",
@@ -14030,6 +14819,7 @@
 },
 {
   "name": "drum",
+  "type": "solid",
   "title": "Drum",
   "keywords": [
     "instrument",
@@ -14047,6 +14837,7 @@
 },
 {
   "name": "sort",
+  "type": "solid",
   "title": "Sort",
   "keywords": [
     "filter",
@@ -14061,6 +14852,7 @@
 },
 {
   "name": "procedures",
+  "type": "solid",
   "title": "Procedures",
   "keywords": [
     "EKG",
@@ -14080,6 +14872,7 @@
 },
 {
   "name": "calendar-minus",
+  "type": "solid",
   "title": "Calendar Minus",
   "keywords": [
     "calendar",
@@ -14102,6 +14895,7 @@
 },
 {
   "name": "ethernet",
+  "type": "solid",
   "title": "Ethernet",
   "keywords": [
     "cable",
@@ -14121,6 +14915,7 @@
 },
 {
   "name": "undo",
+  "type": "solid",
   "title": "Undo",
   "keywords": [
     "back",
@@ -14142,6 +14937,7 @@
 },
 {
   "name": "video",
+  "type": "solid",
   "title": "Video",
   "keywords": [
     "camera",
@@ -14161,6 +14957,7 @@
 },
 {
   "name": "robot",
+  "type": "solid",
   "title": "Robot",
   "keywords": [
     "android",
@@ -14177,6 +14974,7 @@
 },
 {
   "name": "pepper-hot",
+  "type": "solid",
   "title": "Hot Pepper",
   "keywords": [
     "buffalo wings",
@@ -14199,6 +14997,7 @@
 },
 {
   "name": "tree",
+  "type": "solid",
   "title": "Tree",
   "keywords": [
     "bark",
@@ -14220,6 +15019,7 @@
 },
 {
   "name": "id-card",
+  "type": "solid",
   "title": "Identification Card",
   "keywords": [
     "contact",
@@ -14239,6 +15039,7 @@
 },
 {
   "name": "pills",
+  "type": "solid",
   "title": "Pills",
   "keywords": [
     "drugs",
@@ -14256,6 +15057,7 @@
 },
 {
   "name": "puzzle-piece",
+  "type": "solid",
   "title": "Puzzle Piece",
   "keywords": [
     "add-on",
@@ -14272,6 +15074,7 @@
 },
 {
   "name": "map-pin",
+  "type": "solid",
   "title": "Map Pin",
   "keywords": [
     "address",
@@ -14298,6 +15101,7 @@
 },
 {
   "name": "filter",
+  "type": "solid",
   "title": "Filter",
   "keywords": [
     "funnel",
@@ -14315,6 +15119,7 @@
 },
 {
   "name": "allergies",
+  "type": "solid",
   "title": "Allergies",
   "keywords": [
     "allergy",
@@ -14335,6 +15140,7 @@
 },
 {
   "name": "suitcase-rolling",
+  "type": "solid",
   "title": "Suitcase Rolling",
   "keywords": [
     "baggage",
@@ -14353,6 +15159,7 @@
 },
 {
   "name": "water",
+  "type": "solid",
   "title": "Water",
   "keywords": [
     "lake",
@@ -14373,6 +15180,7 @@
 },
 {
   "name": "cloud-showers-heavy",
+  "type": "solid",
   "title": "Cloud with Heavy Showers",
   "keywords": [
     "precipitation",
@@ -14388,6 +15196,7 @@
 },
 {
   "name": "chess-pawn",
+  "type": "solid",
   "title": "Chess Pawn",
   "keywords": [
     "board",
@@ -14404,6 +15213,7 @@
 },
 {
   "name": "umbrella-beach",
+  "type": "solid",
   "title": "Umbrella Beach",
   "keywords": [
     "protection",
@@ -14423,6 +15233,7 @@
 },
 {
   "name": "check-double",
+  "type": "solid",
   "title": "Double Check",
   "keywords": [
     "accept",
@@ -14449,6 +15260,7 @@
 },
 {
   "name": "file-signature",
+  "type": "solid",
   "title": "File Signature",
   "keywords": [
     "John Hancock",
@@ -14464,6 +15276,7 @@
 },
 {
   "name": "italic",
+  "type": "solid",
   "title": "italic",
   "keywords": [
     "edit",
@@ -14481,6 +15294,7 @@
 },
 {
   "name": "globe-americas",
+  "type": "solid",
   "title": "Globe with Americas shown",
   "keywords": [
     "all",
@@ -14507,6 +15321,7 @@
 },
 {
   "name": "bell-slash",
+  "type": "solid",
   "title": "Bell Slash",
   "keywords": [
     "alert",
@@ -14530,6 +15345,7 @@
 },
 {
   "name": "handshake",
+  "type": "solid",
   "title": "Handshake",
   "keywords": [
     "agreement",
@@ -14548,6 +15364,7 @@
 },
 {
   "name": "money-bill",
+  "type": "solid",
   "title": "Money Bill",
   "keywords": [
     "buy",
@@ -14569,6 +15386,7 @@
 },
 {
   "name": "medal",
+  "type": "solid",
   "title": "Medal",
   "keywords": [
     "award",
@@ -14585,6 +15403,7 @@
 },
 {
   "name": "mars-double",
+  "type": "solid",
   "title": "Mars Double",
   "keywords": [],
   "categories": [
@@ -14595,6 +15414,7 @@
 },
 {
   "name": "won-sign",
+  "type": "solid",
   "title": "Won Sign",
   "keywords": [
     "currency",
@@ -14609,6 +15429,7 @@
 },
 {
   "name": "comment",
+  "type": "solid",
   "title": "comment",
   "keywords": [
     "bubble",
@@ -14635,6 +15456,7 @@
 },
 {
   "name": "torii-gate",
+  "type": "solid",
   "title": "Torii Gate",
   "keywords": [
     "building",
@@ -14649,6 +15471,7 @@
 },
 {
   "name": "video-slash",
+  "type": "solid",
   "title": "Video Slash",
   "keywords": [
     "add",
@@ -14668,6 +15491,7 @@
 },
 {
   "name": "calendar",
+  "type": "solid",
   "title": "Calendar",
   "keywords": [
     "calendar-o",
@@ -14690,6 +15514,7 @@
 },
 {
   "name": "globe",
+  "type": "solid",
   "title": "Globe",
   "keywords": [
     "all",
@@ -14721,6 +15546,7 @@
 },
 {
   "name": "arrow-left",
+  "type": "solid",
   "title": "arrow-left",
   "keywords": [
     "back",
@@ -14734,6 +15560,7 @@
 },
 {
   "name": "align-center",
+  "type": "solid",
   "title": "align-center",
   "keywords": [
     "format",
@@ -14749,6 +15576,7 @@
 },
 {
   "name": "hospital-symbol",
+  "type": "solid",
   "title": "Hospital Symbol",
   "keywords": [
     "clinic",
@@ -14764,6 +15592,7 @@
 },
 {
   "name": "cross",
+  "type": "solid",
   "title": "Cross",
   "keywords": [
     "catholicism",
@@ -14779,6 +15608,7 @@
 },
 {
   "name": "blog",
+  "type": "solid",
   "title": "Blog",
   "keywords": [
     "journal",
@@ -14799,6 +15629,7 @@
 },
 {
   "name": "university",
+  "type": "solid",
   "title": "University",
   "keywords": [
     "bank",
@@ -14817,6 +15648,7 @@
 },
 {
   "name": "route",
+  "type": "solid",
   "title": "Route",
   "keywords": [
     "directions",
@@ -14833,6 +15665,7 @@
 },
 {
   "name": "bowling-ball",
+  "type": "solid",
   "title": "Bowling Ball",
   "keywords": [
     "alley",
@@ -14850,6 +15683,7 @@
 },
 {
   "name": "money-bill-wave-alt",
+  "type": "solid",
   "title": "Alternate Wavy Money Bill",
   "keywords": [
     "buy",
@@ -14869,6 +15703,7 @@
 },
 {
   "name": "minus-circle",
+  "type": "solid",
   "title": "Minus Circle",
   "keywords": [
     "delete",
@@ -14887,6 +15722,7 @@
 },
 {
   "name": "grip-lines-vertical",
+  "type": "solid",
   "title": "Grip Lines Vertical",
   "keywords": [
     "affordance",
@@ -14903,6 +15739,7 @@
 },
 {
   "name": "microchip",
+  "type": "solid",
   "title": "Microchip",
   "keywords": [
     "cpu",
@@ -14920,6 +15757,7 @@
 },
 {
   "name": "frog",
+  "type": "solid",
   "title": "Frog",
   "keywords": [
     "amphibian",
@@ -14945,6 +15783,7 @@
 },
 {
   "name": "laptop",
+  "type": "solid",
   "title": "Laptop",
   "keywords": [
     "computer",
@@ -14966,6 +15805,7 @@
 },
 {
   "name": "power-off",
+  "type": "solid",
   "title": "Power Off",
   "keywords": [
     "cancel",
@@ -14984,6 +15824,7 @@
 },
 {
   "name": "theater-masks",
+  "type": "solid",
   "title": "Theater Masks",
   "keywords": [
     "comedy",
@@ -14999,6 +15840,7 @@
 },
 {
   "name": "heartbeat",
+  "type": "solid",
   "title": "Heartbeat",
   "keywords": [
     "ekg",
@@ -15018,6 +15860,7 @@
 },
 {
   "name": "chart-area",
+  "type": "solid",
   "title": "Area Chart",
   "keywords": [
     "analytics",
@@ -15033,6 +15876,7 @@
 },
 {
   "name": "sign-language",
+  "type": "solid",
   "title": "Sign Language",
   "keywords": [
     "Translate",
@@ -15048,6 +15892,7 @@
 },
 {
   "name": "quote-left",
+  "type": "solid",
   "title": "quote-left",
   "keywords": [
     "mention",
@@ -15067,6 +15912,7 @@
 },
 {
   "name": "file-prescription",
+  "type": "solid",
   "title": "File Prescription",
   "keywords": [
     "document",
@@ -15085,6 +15931,7 @@
 },
 {
   "name": "mountain",
+  "type": "solid",
   "title": "Mountain",
   "keywords": [
     "glacier",
@@ -15103,6 +15950,7 @@
 },
 {
   "name": "microphone-slash",
+  "type": "solid",
   "title": "Microphone Slash",
   "keywords": [
     "audio",
@@ -15127,6 +15975,7 @@
 },
 {
   "name": "times-circle",
+  "type": "solid",
   "title": "Times Circle",
   "keywords": [
     "close",
@@ -15148,6 +15997,7 @@
 },
 {
   "name": "caret-left",
+  "type": "solid",
   "title": "Caret Left",
   "keywords": [
     "arrow",
@@ -15163,6 +16013,7 @@
 },
 {
   "name": "dice-two",
+  "type": "solid",
   "title": "Dice Two",
   "keywords": [
     "chance",
@@ -15179,6 +16030,7 @@
 },
 {
   "name": "tooth",
+  "type": "solid",
   "title": "Tooth",
   "keywords": [
     "bicuspid",
@@ -15196,6 +16048,7 @@
 },
 {
   "name": "chess-queen",
+  "type": "solid",
   "title": "Chess Queen",
   "keywords": [
     "board",
@@ -15212,6 +16065,7 @@
 },
 {
   "name": "calendar-times",
+  "type": "solid",
   "title": "Calendar Times",
   "keywords": [
     "archive",
@@ -15235,6 +16089,7 @@
 },
 {
   "name": "headphones-alt",
+  "type": "solid",
   "title": "Alternate Headphones",
   "keywords": [
     "audio",
@@ -15252,6 +16107,7 @@
 },
 {
   "name": "digital-tachograph",
+  "type": "solid",
   "title": "Digital Tachograph",
   "keywords": [
     "data",
@@ -15267,6 +16123,7 @@
 },
 {
   "name": "file-code",
+  "type": "solid",
   "title": "Code File",
   "keywords": [
     "css",
@@ -15283,6 +16140,7 @@
 },
 {
   "name": "file-csv",
+  "type": "solid",
   "title": "File CSV",
   "keywords": [
     "document",
@@ -15297,6 +16155,7 @@
 },
 {
   "name": "external-link-alt",
+  "type": "solid",
   "title": "Alternate External Link",
   "keywords": [
     "external-link",
@@ -15313,6 +16172,7 @@
 },
 {
   "name": "heart-broken",
+  "type": "solid",
   "title": "Heart Broken",
   "keywords": [
     "breakup",
@@ -15334,6 +16194,7 @@
 },
 {
   "name": "angle-double-down",
+  "type": "solid",
   "title": "Angle Double Down",
   "keywords": [
     "arrows",
@@ -15349,6 +16210,7 @@
 },
 {
   "name": "dice-six",
+  "type": "solid",
   "title": "Dice Six",
   "keywords": [
     "chance",
@@ -15365,6 +16227,7 @@
 },
 {
   "name": "cut",
+  "type": "solid",
   "title": "Cut",
   "keywords": [
     "clip",
@@ -15384,6 +16247,7 @@
 },
 {
   "name": "user-alt",
+  "type": "solid",
   "title": "Alternate User",
   "keywords": [
     "account",
@@ -15404,6 +16268,7 @@
 },
 {
   "name": "cloud",
+  "type": "solid",
   "title": "Cloud",
   "keywords": [
     "atmosphere",
@@ -15424,6 +16289,7 @@
 },
 {
   "name": "hockey-puck",
+  "type": "solid",
   "title": "Hockey Puck",
   "keywords": [
     "ice",
@@ -15438,6 +16304,7 @@
 },
 {
   "name": "tty",
+  "type": "solid",
   "title": "TTY",
   "keywords": [
     "communication",
@@ -15456,6 +16323,7 @@
 },
 {
   "name": "grip-vertical",
+  "type": "solid",
   "title": "Grip Vertical",
   "keywords": [
     "affordance",
@@ -15472,6 +16340,7 @@
 },
 {
   "name": "futbol",
+  "type": "solid",
   "title": "Futbol",
   "keywords": [
     "ball",
@@ -15488,6 +16357,7 @@
 },
 {
   "name": "snowboarding",
+  "type": "solid",
   "title": "Snowboarding",
   "keywords": [
     "activity",
@@ -15507,6 +16377,7 @@
 },
 {
   "name": "cheese",
+  "type": "solid",
   "title": "Cheese",
   "keywords": [
     "cheddar",
@@ -15526,6 +16397,7 @@
 },
 {
   "name": "comment-alt",
+  "type": "solid",
   "title": "Alternate Comment",
   "keywords": [
     "bubble",
@@ -15551,6 +16423,7 @@
 },
 {
   "name": "dice",
+  "type": "solid",
   "title": "Dice",
   "keywords": [
     "chance",
@@ -15568,6 +16441,7 @@
 },
 {
   "name": "bars",
+  "type": "solid",
   "title": "Bars",
   "keywords": [
     "checklist",
@@ -15591,6 +16465,7 @@
 },
 {
   "name": "bezier-curve",
+  "type": "solid",
   "title": "Bezier Curve",
   "keywords": [
     "curves",
@@ -15607,6 +16482,7 @@
 },
 {
   "name": "chair",
+  "type": "solid",
   "title": "Chair",
   "keywords": [
     "furniture",
@@ -15621,6 +16497,7 @@
 },
 {
   "name": "dice-d20",
+  "type": "solid",
   "title": "Dice D20",
   "keywords": [
     "Dungeons & Dragons",
@@ -15642,6 +16519,7 @@
 },
 {
   "name": "suitcase",
+  "type": "solid",
   "title": "Suitcase",
   "keywords": [
     "baggage",
@@ -15663,6 +16541,7 @@
 },
 {
   "name": "laugh-squint",
+  "type": "solid",
   "title": "Laughing Squinting Face",
   "keywords": [
     "LOL",
@@ -15679,6 +16558,7 @@
 },
 {
   "name": "sort-numeric-down",
+  "type": "solid",
   "title": "Sort Numeric Down",
   "keywords": [
     "arrange",
@@ -15696,6 +16576,7 @@
 },
 {
   "name": "motorcycle",
+  "type": "solid",
   "title": "Motorcycle",
   "keywords": [
     "bike",
@@ -15714,6 +16595,7 @@
 },
 {
   "name": "upload",
+  "type": "solid",
   "title": "Upload",
   "keywords": [
     "hard drive",
@@ -15730,6 +16612,7 @@
 },
 {
   "name": "store-slash",
+  "type": "solid",
   "title": "Store Slash",
   "keywords": [
     "building",
@@ -15747,6 +16630,7 @@
 },
 {
   "name": "pause",
+  "type": "solid",
   "title": "pause",
   "keywords": [
     "hold",
@@ -15760,6 +16644,7 @@
 },
 {
   "name": "forward",
+  "type": "solid",
   "title": "forward",
   "keywords": [
     "forward",
@@ -15774,6 +16659,7 @@
 },
 {
   "name": "icons",
+  "type": "solid",
   "title": "Icons",
   "keywords": [
     "bolt",
@@ -15795,6 +16681,7 @@
 },
 {
   "name": "dice-four",
+  "type": "solid",
   "title": "Dice Four",
   "keywords": [
     "chance",
@@ -15811,6 +16698,7 @@
 },
 {
   "name": "bookmark",
+  "type": "solid",
   "title": "bookmark",
   "keywords": [
     "favorite",
@@ -15831,6 +16719,7 @@
 },
 {
   "name": "braille",
+  "type": "solid",
   "title": "Braille",
   "keywords": [
     "alphabet",
@@ -15847,6 +16736,7 @@
 },
 {
   "name": "file-upload",
+  "type": "solid",
   "title": "File Upload",
   "keywords": [
     "document",
@@ -15862,6 +16752,7 @@
 },
 {
   "name": "rocket",
+  "type": "solid",
   "title": "rocket",
   "keywords": [
     "aircraft",
@@ -15882,6 +16773,7 @@
 },
 {
   "name": "icicles",
+  "type": "solid",
   "title": "Icicles",
   "keywords": [
     "cold",
@@ -15899,6 +16791,7 @@
 },
 {
   "name": "caret-square-up",
+  "type": "solid",
   "title": "Caret Square Up",
   "keywords": [
     "arrow",
@@ -15915,6 +16808,7 @@
 },
 {
   "name": "blender-phone",
+  "type": "solid",
   "title": "Blender Phone",
   "keywords": [
     "appliance",
@@ -15933,6 +16827,7 @@
 },
 {
   "name": "asterisk",
+  "type": "solid",
   "title": "asterisk",
   "keywords": [
     "annotation",
@@ -15948,6 +16843,7 @@
 },
 {
   "name": "user-check",
+  "type": "solid",
   "title": "User Check",
   "keywords": [
     "accept",
@@ -15963,6 +16859,7 @@
 },
 {
   "name": "hand-pointer",
+  "type": "solid",
   "title": "Pointer (Hand)",
   "keywords": [
     "arrow",
@@ -15978,6 +16875,7 @@
 },
 {
   "name": "cloud-sun-rain",
+  "type": "solid",
   "title": "Cloud with Sun and Rain",
   "keywords": [
     "day",
@@ -15996,6 +16894,7 @@
 },
 {
   "name": "rupee-sign",
+  "type": "solid",
   "title": "Indian Rupee Sign",
   "keywords": [
     "currency",
@@ -16011,6 +16910,7 @@
 },
 {
   "name": "sleigh",
+  "type": "solid",
   "title": "Sleigh",
   "keywords": [
     "christmas",
@@ -16032,6 +16932,7 @@
 },
 {
   "name": "tablet",
+  "type": "solid",
   "title": "tablet",
   "keywords": [
     "apple",
@@ -16049,6 +16950,7 @@
 },
 {
   "name": "kiss",
+  "type": "solid",
   "title": "Kissing Face",
   "keywords": [
     "beso",
@@ -16065,6 +16967,7 @@
 },
 {
   "name": "list-ol",
+  "type": "solid",
   "title": "list-ol",
   "keywords": [
     "checklist",
@@ -16084,6 +16987,7 @@
 },
 {
   "name": "spell-check",
+  "type": "solid",
   "title": "Spell Check",
   "keywords": [
     "dictionary",
@@ -16100,6 +17004,7 @@
 },
 {
   "name": "random",
+  "type": "solid",
   "title": "random",
   "keywords": [
     "arrows",
@@ -16118,6 +17023,7 @@
 },
 {
   "name": "car-alt",
+  "type": "solid",
   "title": "Alternate Car",
   "keywords": [
     "auto",
@@ -16136,6 +17042,7 @@
 },
 {
   "name": "laptop-medical",
+  "type": "solid",
   "title": "Laptop Medical",
   "keywords": [
     "computer",
@@ -16153,6 +17060,7 @@
 },
 {
   "name": "ruble-sign",
+  "type": "solid",
   "title": "Ruble Sign",
   "keywords": [
     "currency",
@@ -16167,6 +17075,7 @@
 },
 {
   "name": "store-alt",
+  "type": "solid",
   "title": "Alternate Store",
   "keywords": [
     "building",
@@ -16183,6 +17092,7 @@
 },
 {
   "name": "hand-rock",
+  "type": "solid",
   "title": "Rock (Hand)",
   "keywords": [
     "fist",
@@ -16197,6 +17107,7 @@
 },
 {
   "name": "lock-open",
+  "type": "solid",
   "title": "Lock Open",
   "keywords": [
     "admin",
@@ -16217,6 +17128,7 @@
 },
 {
   "name": "atom",
+  "type": "solid",
   "title": "Atom",
   "keywords": [
     "atheism",
@@ -16242,6 +17154,7 @@
 },
 {
   "name": "cat",
+  "type": "solid",
   "title": "Cat",
   "keywords": [
     "feline",
@@ -16261,6 +17174,7 @@
 },
 {
   "name": "yin-yang",
+  "type": "solid",
   "title": "Yin Yang",
   "keywords": [
     "daoism",
@@ -16276,6 +17190,7 @@
 },
 {
   "name": "grin-stars",
+  "type": "solid",
   "title": "Star-Struck",
   "keywords": [
     "emoticon",
@@ -16290,6 +17205,7 @@
 },
 {
   "name": "ice-cream",
+  "type": "solid",
   "title": "Ice Cream",
   "keywords": [
     "chocolate",
@@ -16311,6 +17227,7 @@
 },
 {
   "name": "ring",
+  "type": "solid",
   "title": "Ring",
   "keywords": [
     "Dungeons & Dragons",
@@ -16336,6 +17253,7 @@
 },
 {
   "name": "poll",
+  "type": "solid",
   "title": "Poll",
   "keywords": [
     "results",
@@ -16353,6 +17271,7 @@
 },
 {
   "name": "globe-africa",
+  "type": "solid",
   "title": "Globe with Africa shown",
   "keywords": [
     "all",
@@ -16379,6 +17298,7 @@
 },
 {
   "name": "parking",
+  "type": "solid",
   "title": "Parking",
   "keywords": [
     "auto",
@@ -16395,6 +17315,7 @@
 },
 {
   "name": "snowplow",
+  "type": "solid",
   "title": "Snowplow",
   "keywords": [
     "clean up",
@@ -16414,6 +17335,7 @@
 },
 {
   "name": "backspace",
+  "type": "solid",
   "title": "Backspace",
   "keywords": [
     "command",
@@ -16428,6 +17350,7 @@
 },
 {
   "name": "angle-left",
+  "type": "solid",
   "title": "angle-left",
   "keywords": [
     "arrow",
@@ -16444,6 +17367,7 @@
 },
 {
   "name": "hdd",
+  "type": "solid",
   "title": "HDD",
   "keywords": [
     "cpu",
@@ -16462,6 +17386,7 @@
 },
 {
   "name": "sticky-note",
+  "type": "solid",
   "title": "Sticky Note",
   "keywords": [
     "message",
@@ -16481,6 +17406,7 @@
 },
 {
   "name": "shopping-cart",
+  "type": "solid",
   "title": "shopping-cart",
   "keywords": [
     "buy",
@@ -16502,6 +17428,7 @@
 },
 {
   "name": "parachute-box",
+  "type": "solid",
   "title": "Parachute Box",
   "keywords": [
     "aid",
@@ -16517,6 +17444,7 @@
 },
 {
   "name": "spa",
+  "type": "solid",
   "title": "Spa",
   "keywords": [
     "flora",
@@ -16535,6 +17463,7 @@
 },
 {
   "name": "sort-down",
+  "type": "solid",
   "title": "Sort Down (Descending)",
   "keywords": [
     "arrow",
@@ -16552,6 +17481,7 @@
 },
 {
   "name": "calculator",
+  "type": "solid",
   "title": "Calculator",
   "keywords": [
     "abacus",
@@ -16573,6 +17503,7 @@
 },
 {
   "name": "window-restore",
+  "type": "solid",
   "title": "Window Restore",
   "keywords": [
     "browser",
@@ -16587,6 +17518,7 @@
 },
 {
   "name": "user-slash",
+  "type": "solid",
   "title": "User Slash",
   "keywords": [
     "ban",
@@ -16602,6 +17534,7 @@
 },
 {
   "name": "vote-yea",
+  "type": "solid",
   "title": "Vote Yea",
   "keywords": [
     "accept",
@@ -16619,6 +17552,7 @@
 },
 {
   "name": "shipping-fast",
+  "type": "solid",
   "title": "Shipping Fast",
   "keywords": [
     "express",
@@ -16637,6 +17571,7 @@
 },
 {
   "name": "mouse",
+  "type": "solid",
   "title": "Mouse",
   "keywords": [
     "click",
@@ -16653,6 +17588,7 @@
 },
 {
   "name": "screwdriver",
+  "type": "solid",
   "title": "Screwdriver",
   "keywords": [
     "admin",
@@ -16673,6 +17609,7 @@
 },
 {
   "name": "female",
+  "type": "solid",
   "title": "Female",
   "keywords": [
     "human",
@@ -16689,6 +17626,7 @@
 },
 {
   "name": "money-bill-wave",
+  "type": "solid",
   "title": "Wavy Money Bill",
   "keywords": [
     "buy",
@@ -16708,6 +17646,7 @@
 },
 {
   "name": "hand-middle-finger",
+  "type": "solid",
   "title": "Hand with Middle Finger Raised",
   "keywords": [
     "flip the bird",
@@ -16723,6 +17662,7 @@
 },
 {
   "name": "chess-bishop",
+  "type": "solid",
   "title": "Chess Bishop",
   "keywords": [
     "board",
@@ -16739,6 +17679,7 @@
 },
 {
   "name": "shopping-basket",
+  "type": "solid",
   "title": "Shopping Basket",
   "keywords": [
     "buy",
@@ -16758,6 +17699,7 @@
 },
 {
   "name": "dharmachakra",
+  "type": "solid",
   "title": "Dharmachakra",
   "keywords": [
     "buddhism",
@@ -16774,6 +17716,7 @@
 },
 {
   "name": "charging-station",
+  "type": "solid",
   "title": "Charging Station",
   "keywords": [
     "electric",
@@ -16790,6 +17733,7 @@
 },
 {
   "name": "building",
+  "type": "solid",
   "title": "Building",
   "keywords": [
     "apartment",
@@ -16810,6 +17754,7 @@
 },
 {
   "name": "binoculars",
+  "type": "solid",
   "title": "Binoculars",
   "keywords": [
     "glasses",
@@ -16829,6 +17774,7 @@
 },
 {
   "name": "angry",
+  "type": "solid",
   "title": "Angry Face",
   "keywords": [
     "disapprove",
@@ -16845,6 +17791,7 @@
 },
 {
   "name": "genderless",
+  "type": "solid",
   "title": "Genderless",
   "keywords": [
     "androgynous",
@@ -16859,6 +17806,7 @@
 },
 {
   "name": "quidditch",
+  "type": "solid",
   "title": "Quidditch",
   "keywords": [
     "ball",
@@ -16879,6 +17827,7 @@
 },
 {
   "name": "history",
+  "type": "solid",
   "title": "History",
   "keywords": [
     "Rewind",
@@ -16897,6 +17846,7 @@
 },
 {
   "name": "gavel",
+  "type": "solid",
   "title": "Gavel",
   "keywords": [
     "hammer",
@@ -16914,6 +17864,7 @@
 },
 {
   "name": "torah",
+  "type": "solid",
   "title": "Torah",
   "keywords": [
     "book",
@@ -16930,6 +17881,7 @@
 },
 {
   "name": "folder",
+  "type": "solid",
   "title": "Folder",
   "keywords": [
     "archive",
@@ -16951,6 +17903,7 @@
 },
 {
   "name": "arrows-alt",
+  "type": "solid",
   "title": "Alternate Arrows",
   "keywords": [
     "arrow",
@@ -16972,6 +17925,7 @@
 },
 {
   "name": "drafting-compass",
+  "type": "solid",
   "title": "Drafting Compass",
   "keywords": [
     "design",
@@ -16989,6 +17943,7 @@
 },
 {
   "name": "assistive-listening-systems",
+  "type": "solid",
   "title": "Assistive Listening Systems",
   "keywords": [
     "amplify",
@@ -17008,6 +17963,7 @@
 },
 {
   "name": "pump-medical",
+  "type": "solid",
   "title": "Pump Medical",
   "keywords": [
     "anti-bacterial",
@@ -17027,6 +17983,7 @@
 },
 {
   "name": "users",
+  "type": "solid",
   "title": "Users",
   "keywords": [
     "friends",
@@ -17045,6 +18002,7 @@
 },
 {
   "name": "hands",
+  "type": "solid",
   "title": "Hands",
   "keywords": [
     "carry",
@@ -17059,6 +18017,7 @@
 },
 {
   "name": "fingerprint",
+  "type": "solid",
   "title": "Fingerprint",
   "keywords": [
     "human",
@@ -17079,6 +18038,7 @@
 },
 {
   "name": "fill",
+  "type": "solid",
   "title": "Fill",
   "keywords": [
     "bucket",
@@ -17094,6 +18054,7 @@
 },
 {
   "name": "hanukiah",
+  "type": "solid",
   "title": "Hanukiah",
   "keywords": [
     "candle",
@@ -17110,6 +18071,7 @@
 },
 {
   "name": "synagogue",
+  "type": "solid",
   "title": "Synagogue",
   "keywords": [
     "building",
@@ -17128,6 +18090,7 @@
 },
 {
   "name": "file-pdf",
+  "type": "solid",
   "title": "PDF File",
   "keywords": [
     "acrobat",
@@ -17143,6 +18106,7 @@
 },
 {
   "name": "flushed",
+  "type": "solid",
   "title": "Flushed Face",
   "keywords": [
     "embarrassed",
@@ -17157,6 +18121,7 @@
 },
 {
   "name": "gamepad",
+  "type": "solid",
   "title": "Gamepad",
   "keywords": [
     "arcade",
@@ -17177,6 +18142,7 @@
 },
 {
   "name": "walking",
+  "type": "solid",
   "title": "Walking",
   "keywords": [
     "exercise",
@@ -17194,6 +18160,7 @@
 },
 {
   "name": "clipboard-check",
+  "type": "solid",
   "title": "Clipboard with Check",
   "keywords": [
     "accept",
@@ -17216,6 +18183,7 @@
 },
 {
   "name": "minus",
+  "type": "solid",
   "title": "minus",
   "keywords": [
     "collapse",
@@ -17236,6 +18204,7 @@
 },
 {
   "name": "phone-square",
+  "type": "solid",
   "title": "Phone Square",
   "keywords": [
     "call",
@@ -17255,6 +18224,7 @@
 },
 {
   "name": "times",
+  "type": "solid",
   "title": "Times",
   "keywords": [
     "close",
@@ -17278,6 +18248,7 @@
 },
 {
   "name": "chevron-left",
+  "type": "solid",
   "title": "chevron-left",
   "keywords": [
     "arrow",
@@ -17293,6 +18264,7 @@
 },
 {
   "name": "film",
+  "type": "solid",
   "title": "Film",
   "keywords": [
     "cinema",
@@ -17310,6 +18282,7 @@
 },
 {
   "name": "print",
+  "type": "solid",
   "title": "print",
   "keywords": [
     "business",
@@ -17331,6 +18304,7 @@
 },
 {
   "name": "moon",
+  "type": "solid",
   "title": "Moon",
   "keywords": [
     "contrast",
@@ -17349,6 +18323,7 @@
 },
 {
   "name": "stroopwafel",
+  "type": "solid",
   "title": "Stroopwafel",
   "keywords": [
     "caramel",
@@ -17367,6 +18342,7 @@
 },
 {
   "name": "pray",
+  "type": "solid",
   "title": "Pray",
   "keywords": [
     "kneel",
@@ -17383,6 +18359,7 @@
 },
 {
   "name": "exclamation",
+  "type": "solid",
   "title": "exclamation",
   "keywords": [
     "alert",
@@ -17405,6 +18382,7 @@
 },
 {
   "name": "weight",
+  "type": "solid",
   "title": "Weight",
   "keywords": [
     "health",
@@ -17421,6 +18399,7 @@
 },
 {
   "name": "band-aid",
+  "type": "solid",
   "title": "Band-Aid",
   "keywords": [
     "bandage",
@@ -17437,6 +18416,7 @@
 },
 {
   "name": "sort-amount-up",
+  "type": "solid",
   "title": "Sort Amount Up",
   "keywords": [
     "arrange",
@@ -17453,6 +18433,7 @@
 },
 {
   "name": "capsules",
+  "type": "solid",
   "title": "Capsules",
   "keywords": [
     "drugs",
@@ -17470,6 +18451,7 @@
 },
 {
   "name": "surprise",
+  "type": "solid",
   "title": "Hushed Face",
   "keywords": [
     "emoticon",
@@ -17484,6 +18466,7 @@
 },
 {
   "name": "trash-restore-alt",
+  "type": "solid",
   "title": "Alternative Trash Restore",
   "keywords": [
     "back",
@@ -17500,6 +18483,7 @@
 },
 {
   "name": "expand-alt",
+  "type": "solid",
   "title": "Alternate Expand",
   "keywords": [
     "arrows",
@@ -17517,6 +18501,7 @@
 },
 {
   "name": "border-none",
+  "type": "solid",
   "title": "Border None",
   "keywords": [
     "cell",
@@ -17533,6 +18518,7 @@
 },
 {
   "name": "user-shield",
+  "type": "solid",
   "title": "User Shield",
   "keywords": [
     "admin",
@@ -17550,6 +18536,7 @@
 },
 {
   "name": "mouse-pointer",
+  "type": "solid",
   "title": "Mouse Pointer",
   "keywords": [
     "arrow",
@@ -17564,6 +18551,7 @@
 },
 {
   "name": "ribbon",
+  "type": "solid",
   "title": "Ribbon",
   "keywords": [
     "badge",
@@ -17579,6 +18567,7 @@
 },
 {
   "name": "swatchbook",
+  "type": "solid",
   "title": "Swatchbook",
   "keywords": [
     "Pantone",
@@ -17595,6 +18584,7 @@
 },
 {
   "name": "swimming-pool",
+  "type": "solid",
   "title": "Swimming Pool",
   "keywords": [
     "ladder",
@@ -17612,6 +18602,7 @@
 },
 {
   "name": "stamp",
+  "type": "solid",
   "title": "Stamp",
   "keywords": [
     "art",
@@ -17629,6 +18620,7 @@
 },
 {
   "name": "sort-up",
+  "type": "solid",
   "title": "Sort Up (Ascending)",
   "keywords": [
     "arrow",
@@ -17646,6 +18638,7 @@
 },
 {
   "name": "align-left",
+  "type": "solid",
   "title": "align-left",
   "keywords": [
     "format",
@@ -17660,6 +18653,7 @@
 },
 {
   "name": "temperature-low",
+  "type": "solid",
   "title": "Low Temperature",
   "keywords": [
     "cold",
@@ -17678,6 +18672,7 @@
 },
 {
   "name": "pastafarianism",
+  "type": "solid",
   "title": "Pastafarianism",
   "keywords": [
     "agnosticism",
@@ -17693,6 +18688,7 @@
 },
 {
   "name": "heart",
+  "type": "solid",
   "title": "Heart",
   "keywords": [
     "favorite",
@@ -17719,6 +18715,7 @@
 },
 {
   "name": "font",
+  "type": "solid",
   "title": "font",
   "keywords": [
     "alphabet",

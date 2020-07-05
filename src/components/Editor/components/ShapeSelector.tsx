@@ -3,7 +3,11 @@ import styled from '@emotion/styled'
 import { noop } from 'lodash'
 import { darken } from 'polished'
 import { Box, BoxProps } from '@chakra-ui/core'
-import { ShapeConf, ShapeId } from 'components/Editor/shape-config'
+import {
+  ShapeConf,
+  ShapeId,
+  ShapeClipartConf,
+} from 'components/Editor/shape-config'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList as List, ListProps } from 'react-window'
 import css from '@emotion/css'
@@ -11,7 +15,7 @@ import css from '@emotion/css'
 export type ShapeSelectorProps = {
   columns?: number
   overscanCount?: number
-  shapes: ShapeConf[]
+  shapes: (ShapeClipartConf | ShapeIconConf)[]
   showProcessedThumbnails?: boolean
   selectedShapeId?: ShapeId
   onSelected?: (shape: ShapeConf) => void

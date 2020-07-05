@@ -21,12 +21,12 @@ export const svgIcons: ShapeIconConf[] = [
   .map((icon) =>
     icon
       ? ({
-          id: `fa-${icon.name}`,
+          id: `fa-${icon.type}-${icon.name}`,
           kind: 'icon',
           title: icon.title,
           url: icon.url,
-          thumbnailUrl: icon.url,
           processedThumbnailUrl: icon.url,
+          thumbnailUrl: icon.url,
           processing: {
             colors: { kind: 'original' },
             edges: defaultEdgesProcessing,

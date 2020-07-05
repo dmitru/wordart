@@ -653,9 +653,6 @@ export class EditorStore {
 
     shape.set({ opacity: 1 })
     const canvas = objAsCanvasElement(shape)
-    if ('thumbnailUrl' in currentShapeConf) {
-      currentShapeConf.thumbnailUrl = canvas.toDataURL()
-    }
     if ('processedThumbnailUrl' in currentShapeConf) {
       currentShapeConf.processedThumbnailUrl = canvas.toDataURL()
     }

@@ -1,5 +1,6 @@
 
   export type IconConfig = {
+    type: string
     title: string
     name: string
     url: string
@@ -9,6 +10,7 @@
   
   export const icons = [{
   "name": "comment-dots",
+  "type": "regular",
   "title": "Comment Dots",
   "keywords": [
     "bubble",
@@ -33,6 +35,7 @@
 },
 {
   "name": "clone",
+  "type": "regular",
   "title": "Clone",
   "keywords": [
     "arrange",
@@ -52,6 +55,7 @@
 },
 {
   "name": "grimace",
+  "type": "regular",
   "title": "Grimacing Face",
   "keywords": [
     "cringe",
@@ -67,6 +71,7 @@
 },
 {
   "name": "pause-circle",
+  "type": "regular",
   "title": "Pause Circle",
   "keywords": [
     "hold",
@@ -80,6 +85,7 @@
 },
 {
   "name": "check-square",
+  "type": "regular",
   "title": "Check Square",
   "keywords": [
     "accept",
@@ -103,6 +109,7 @@
 },
 {
   "name": "grin-squint",
+  "type": "regular",
   "title": "Grinning Squinting Face",
   "keywords": [
     "emoticon",
@@ -118,6 +125,7 @@
 },
 {
   "name": "file-excel",
+  "type": "regular",
   "title": "Excel File",
   "keywords": [
     "csv",
@@ -134,6 +142,7 @@
 },
 {
   "name": "font-awesome-logo-full",
+  "type": "regular",
   "title": "Font Awesome Full Logo",
   "keywords": [],
   "categories": [],
@@ -142,6 +151,7 @@
 },
 {
   "name": "play-circle",
+  "type": "regular",
   "title": "Play Circle",
   "keywords": [
     "audio",
@@ -159,6 +169,7 @@
 },
 {
   "name": "list-alt",
+  "type": "regular",
   "title": "Alternate List",
   "keywords": [
     "checklist",
@@ -177,6 +188,7 @@
 },
 {
   "name": "hourglass",
+  "type": "regular",
   "title": "Hourglass",
   "keywords": [
     "hour",
@@ -194,6 +206,7 @@
 },
 {
   "name": "arrow-alt-circle-left",
+  "type": "regular",
   "title": "Alternate Arrow Circle Left",
   "keywords": [
     "arrow-circle-o-left",
@@ -208,6 +221,7 @@
 },
 {
   "name": "grin-hearts",
+  "type": "regular",
   "title": "Smiling Face With Heart-Eyes",
   "keywords": [
     "emoticon",
@@ -223,6 +237,7 @@
 },
 {
   "name": "dot-circle",
+  "type": "regular",
   "title": "Dot Circle",
   "keywords": [
     "bullseye",
@@ -238,6 +253,7 @@
 },
 {
   "name": "user",
+  "type": "regular",
   "title": "User",
   "keywords": [
     "account",
@@ -259,6 +275,7 @@
 },
 {
   "name": "id-badge",
+  "type": "regular",
   "title": "Identification Badge",
   "keywords": [
     "address",
@@ -277,6 +294,7 @@
 },
 {
   "name": "smile-wink",
+  "type": "regular",
   "title": "Winking Face",
   "keywords": [
     "emoticon",
@@ -293,6 +311,7 @@
 },
 {
   "name": "circle",
+  "type": "regular",
   "title": "Circle",
   "keywords": [
     "circle-thin",
@@ -313,6 +332,7 @@
 },
 {
   "name": "grin-tongue-wink",
+  "type": "regular",
   "title": "Winking Face With Tongue",
   "keywords": [
     "LOL",
@@ -327,6 +347,7 @@
 },
 {
   "name": "copyright",
+  "type": "regular",
   "title": "Copyright",
   "keywords": [
     "brand",
@@ -342,6 +363,7 @@
 },
 {
   "name": "laugh-wink",
+  "type": "regular",
   "title": "Laughing Winking Face",
   "keywords": [
     "LOL",
@@ -358,6 +380,7 @@
 },
 {
   "name": "hand-point-right",
+  "type": "regular",
   "title": "Hand Pointing Right",
   "keywords": [
     "finger",
@@ -376,6 +399,7 @@
 },
 {
   "name": "file-word",
+  "type": "regular",
   "title": "Word File",
   "keywords": [
     "document",
@@ -392,6 +416,7 @@
 },
 {
   "name": "object-group",
+  "type": "regular",
   "title": "Object Group",
   "keywords": [
     "combine",
@@ -408,6 +433,7 @@
 },
 {
   "name": "file-audio",
+  "type": "regular",
   "title": "Audio File",
   "keywords": [
     "document",
@@ -427,6 +453,7 @@
 },
 {
   "name": "grin-wink",
+  "type": "regular",
   "title": "Grinning Winking Face",
   "keywords": [
     "emoticon",
@@ -443,6 +470,7 @@
 },
 {
   "name": "map",
+  "type": "regular",
   "title": "Map",
   "keywords": [
     "address",
@@ -472,6 +500,7 @@
 },
 {
   "name": "comments",
+  "type": "regular",
   "title": "comments",
   "keywords": [
     "bubble",
@@ -495,6 +524,7 @@
 },
 {
   "name": "plus-square",
+  "type": "regular",
   "title": "Plus Square",
   "keywords": [
     "add",
@@ -515,6 +545,7 @@
 },
 {
   "name": "file",
+  "type": "regular",
   "title": "File",
   "keywords": [
     "document",
@@ -539,6 +570,7 @@
 },
 {
   "name": "meh-blank",
+  "type": "regular",
   "title": "Face Without Mouth",
   "keywords": [
     "emoticon",
@@ -554,6 +586,7 @@
 },
 {
   "name": "kiss-wink-heart",
+  "type": "regular",
   "title": "Face Blowing a Kiss",
   "keywords": [
     "beso",
@@ -570,6 +603,7 @@
 },
 {
   "name": "frown-open",
+  "type": "regular",
   "title": "Frowning Face With Open Mouth",
   "keywords": [
     "disapprove",
@@ -586,6 +620,7 @@
 },
 {
   "name": "laugh",
+  "type": "regular",
   "title": "Grinning Face With Big Eyes",
   "keywords": [
     "LOL",
@@ -602,6 +637,7 @@
 },
 {
   "name": "sad-tear",
+  "type": "regular",
   "title": "Loudly Crying Face",
   "keywords": [
     "emoticon",
@@ -617,6 +653,7 @@
 },
 {
   "name": "file-video",
+  "type": "regular",
   "title": "Video File",
   "keywords": [
     "document",
@@ -634,6 +671,7 @@
 },
 {
   "name": "folder-open",
+  "type": "regular",
   "title": "Folder Open",
   "keywords": [
     "archive",
@@ -656,6 +694,7 @@
 },
 {
   "name": "keyboard",
+  "type": "regular",
   "title": "Keyboard",
   "keywords": [
     "accessory",
@@ -676,6 +715,7 @@
 },
 {
   "name": "grin-alt",
+  "type": "regular",
   "title": "Alternate Grinning Face",
   "keywords": [
     "emoticon",
@@ -691,6 +731,7 @@
 },
 {
   "name": "question-circle",
+  "type": "regular",
   "title": "Question Circle",
   "keywords": [
     "help",
@@ -708,6 +749,7 @@
 },
 {
   "name": "clipboard",
+  "type": "regular",
   "title": "Clipboard",
   "keywords": [
     "copy",
@@ -726,6 +768,7 @@
 },
 {
   "name": "life-ring",
+  "type": "regular",
   "title": "Life Ring",
   "keywords": [
     "coast guard",
@@ -744,6 +787,7 @@
 },
 {
   "name": "meh",
+  "type": "regular",
   "title": "Neutral Face",
   "keywords": [
     "emoticon",
@@ -762,6 +806,7 @@
 },
 {
   "name": "caret-square-left",
+  "type": "regular",
   "title": "Caret Square Left",
   "keywords": [
     "arrow",
@@ -778,6 +823,7 @@
 },
 {
   "name": "calendar-plus",
+  "type": "regular",
   "title": "Calendar Plus",
   "keywords": [
     "add",
@@ -801,6 +847,7 @@
 },
 {
   "name": "stop-circle",
+  "type": "regular",
   "title": "Stop Circle",
   "keywords": [
     "block",
@@ -816,6 +863,7 @@
 },
 {
   "name": "calendar-check",
+  "type": "regular",
   "title": "Calendar Check",
   "keywords": [
     "accept",
@@ -845,6 +893,7 @@
 },
 {
   "name": "minus-square",
+  "type": "regular",
   "title": "Minus Square",
   "keywords": [
     "collapse",
@@ -865,6 +914,7 @@
 },
 {
   "name": "thumbs-down",
+  "type": "regular",
   "title": "thumbs-down",
   "keywords": [
     "disagree",
@@ -886,6 +936,7 @@
 },
 {
   "name": "envelope",
+  "type": "regular",
   "title": "Envelope",
   "keywords": [
     "e-mail",
@@ -909,6 +960,7 @@
 },
 {
   "name": "hand-point-left",
+  "type": "regular",
   "title": "Hand Pointing Left",
   "keywords": [
     "back",
@@ -927,6 +979,7 @@
 },
 {
   "name": "hand-lizard",
+  "type": "regular",
   "title": "Lizard (Hand)",
   "keywords": [
     "game",
@@ -940,6 +993,7 @@
 },
 {
   "name": "hand-scissors",
+  "type": "regular",
   "title": "Scissors (Hand)",
   "keywords": [
     "cut",
@@ -954,6 +1008,7 @@
 },
 {
   "name": "hand-point-up",
+  "type": "regular",
   "title": "Hand Pointing Up",
   "keywords": [
     "finger",
@@ -969,6 +1024,7 @@
 },
 {
   "name": "money-bill-alt",
+  "type": "regular",
   "title": "Alternate Money Bill",
   "keywords": [
     "buy",
@@ -990,6 +1046,7 @@
 },
 {
   "name": "object-ungroup",
+  "type": "regular",
   "title": "Object Ungroup",
   "keywords": [
     "copy",
@@ -1006,6 +1063,7 @@
 },
 {
   "name": "dizzy",
+  "type": "regular",
   "title": "Dizzy Face",
   "keywords": [
     "dazed",
@@ -1022,6 +1080,7 @@
 },
 {
   "name": "file-image",
+  "type": "regular",
   "title": "Image File",
   "keywords": [
     "document",
@@ -1039,6 +1098,7 @@
 },
 {
   "name": "bell",
+  "type": "regular",
   "title": "bell",
   "keywords": [
     "alarm",
@@ -1065,6 +1125,7 @@
 },
 {
   "name": "flag",
+  "type": "regular",
   "title": "flag",
   "keywords": [
     "country",
@@ -1085,6 +1146,7 @@
 },
 {
   "name": "hand-peace",
+  "type": "regular",
   "title": "Peace (Hand)",
   "keywords": [
     "rest",
@@ -1098,6 +1160,7 @@
 },
 {
   "name": "newspaper",
+  "type": "regular",
   "title": "Newspaper",
   "keywords": [
     "article",
@@ -1118,6 +1181,7 @@
 },
 {
   "name": "snowflake",
+  "type": "regular",
   "title": "Snowflake",
   "keywords": [
     "precipitation",
@@ -1136,6 +1200,7 @@
 },
 {
   "name": "star-half",
+  "type": "regular",
   "title": "star-half",
   "keywords": [
     "achievement",
@@ -1155,6 +1220,7 @@
 },
 {
   "name": "frown",
+  "type": "regular",
   "title": "Frowning Face",
   "keywords": [
     "disapprove",
@@ -1174,6 +1240,7 @@
 },
 {
   "name": "grin-tongue-squint",
+  "type": "regular",
   "title": "Squinting Face With Tongue",
   "keywords": [
     "LOL",
@@ -1188,6 +1255,7 @@
 },
 {
   "name": "envelope-open",
+  "type": "regular",
   "title": "Envelope Open",
   "keywords": [
     "e-mail",
@@ -1210,6 +1278,7 @@
 },
 {
   "name": "share-square",
+  "type": "regular",
   "title": "Share Square",
   "keywords": [
     "forward",
@@ -1227,6 +1296,7 @@
 },
 {
   "name": "hospital",
+  "type": "regular",
   "title": "hospital",
   "keywords": [
     "building",
@@ -1246,6 +1316,7 @@
 },
 {
   "name": "file-archive",
+  "type": "regular",
   "title": "Archive File",
   "keywords": [
     ".zip",
@@ -1263,6 +1334,7 @@
 },
 {
   "name": "grin-beam",
+  "type": "regular",
   "title": "Grinning Face With Smiling Eyes",
   "keywords": [
     "emoticon",
@@ -1278,6 +1350,7 @@
 },
 {
   "name": "copy",
+  "type": "regular",
   "title": "Copy",
   "keywords": [
     "clone",
@@ -1300,6 +1373,7 @@
 },
 {
   "name": "kiss-beam",
+  "type": "regular",
   "title": "Kissing Face With Smiling Eyes",
   "keywords": [
     "beso",
@@ -1316,6 +1390,7 @@
 },
 {
   "name": "closed-captioning",
+  "type": "regular",
   "title": "Closed Captioning",
   "keywords": [
     "cc",
@@ -1335,6 +1410,7 @@
 },
 {
   "name": "arrow-alt-circle-right",
+  "type": "regular",
   "title": "Alternate Arrow Circle Right",
   "keywords": [
     "arrow-circle-o-right",
@@ -1349,6 +1425,7 @@
 },
 {
   "name": "image",
+  "type": "regular",
   "title": "Image",
   "keywords": [
     "album",
@@ -1367,6 +1444,7 @@
 },
 {
   "name": "hand-point-down",
+  "type": "regular",
   "title": "Hand Pointing Down",
   "keywords": [
     "finger",
@@ -1382,6 +1460,7 @@
 },
 {
   "name": "lightbulb",
+  "type": "regular",
   "title": "Lightbulb",
   "keywords": [
     "energy",
@@ -1402,6 +1481,7 @@
 },
 {
   "name": "check-circle",
+  "type": "regular",
   "title": "Check Circle",
   "keywords": [
     "accept",
@@ -1425,6 +1505,7 @@
 },
 {
   "name": "save",
+  "type": "regular",
   "title": "Save",
   "keywords": [
     "disk",
@@ -1445,6 +1526,7 @@
 },
 {
   "name": "smile",
+  "type": "regular",
   "title": "Smiling Face",
   "keywords": [
     "approve",
@@ -1465,6 +1547,7 @@
 },
 {
   "name": "images",
+  "type": "regular",
   "title": "Images",
   "keywords": [
     "album",
@@ -1483,6 +1566,7 @@
 },
 {
   "name": "grin-tears",
+  "type": "regular",
   "title": "Face With Tears of Joy",
   "keywords": [
     "LOL",
@@ -1497,6 +1581,7 @@
 },
 {
   "name": "calendar-alt",
+  "type": "regular",
   "title": "Alternate Calendar",
   "keywords": [
     "calendar",
@@ -1518,6 +1603,7 @@
 },
 {
   "name": "laugh-beam",
+  "type": "regular",
   "title": "Laugh Face with Beaming Eyes",
   "keywords": [
     "LOL",
@@ -1534,6 +1620,7 @@
 },
 {
   "name": "hand-paper",
+  "type": "regular",
   "title": "Paper (Hand)",
   "keywords": [
     "game",
@@ -1549,6 +1636,7 @@
 },
 {
   "name": "caret-square-down",
+  "type": "regular",
   "title": "Caret Square Down",
   "keywords": [
     "arrow",
@@ -1567,6 +1655,7 @@
 },
 {
   "name": "file-alt",
+  "type": "regular",
   "title": "Alternate File",
   "keywords": [
     "document",
@@ -1591,6 +1680,7 @@
 },
 {
   "name": "thumbs-up",
+  "type": "regular",
   "title": "thumbs-up",
   "keywords": [
     "agree",
@@ -1618,6 +1708,7 @@
 },
 {
   "name": "square",
+  "type": "regular",
   "title": "Square",
   "keywords": [
     "block",
@@ -1632,6 +1723,7 @@
 },
 {
   "name": "eye-slash",
+  "type": "regular",
   "title": "Eye Slash",
   "keywords": [
     "blind",
@@ -1656,6 +1748,7 @@
 },
 {
   "name": "paper-plane",
+  "type": "regular",
   "title": "Paper Plane",
   "keywords": [
     "air",
@@ -1677,6 +1770,7 @@
 },
 {
   "name": "arrow-alt-circle-up",
+  "type": "regular",
   "title": "Alternate Arrow Circle Up",
   "keywords": [
     "arrow-circle-o-up"
@@ -1689,6 +1783,7 @@
 },
 {
   "name": "grin-squint-tears",
+  "type": "regular",
   "title": "Rolling on the Floor Laughing",
   "keywords": [
     "emoticon",
@@ -1704,6 +1799,7 @@
 },
 {
   "name": "file-powerpoint",
+  "type": "regular",
   "title": "Powerpoint File",
   "keywords": [
     "display",
@@ -1719,6 +1815,7 @@
 },
 {
   "name": "grin-tongue",
+  "type": "regular",
   "title": "Face With Tongue",
   "keywords": [
     "LOL",
@@ -1733,6 +1830,7 @@
 },
 {
   "name": "grin-beam-sweat",
+  "type": "regular",
   "title": "Grinning Face With Sweat",
   "keywords": [
     "embarass",
@@ -1748,6 +1846,7 @@
 },
 {
   "name": "hand-spock",
+  "type": "regular",
   "title": "Spock (Hand)",
   "keywords": [
     "live long",
@@ -1765,6 +1864,7 @@
 },
 {
   "name": "gem",
+  "type": "regular",
   "title": "Gem",
   "keywords": [
     "diamond",
@@ -1782,6 +1882,7 @@
 },
 {
   "name": "chart-bar",
+  "type": "regular",
   "title": "Bar Chart",
   "keywords": [
     "analytics",
@@ -1797,6 +1898,7 @@
 },
 {
   "name": "window-maximize",
+  "type": "regular",
   "title": "Window Maximize",
   "keywords": [
     "browser",
@@ -1812,6 +1914,7 @@
 },
 {
   "name": "address-book",
+  "type": "regular",
   "title": "Address Book",
   "keywords": [
     "contact",
@@ -1830,6 +1933,7 @@
 },
 {
   "name": "meh-rolling-eyes",
+  "type": "regular",
   "title": "Face With Rolling Eyes",
   "keywords": [
     "emoticon",
@@ -1845,6 +1949,7 @@
 },
 {
   "name": "star",
+  "type": "regular",
   "title": "Star",
   "keywords": [
     "achievement",
@@ -1869,6 +1974,7 @@
 },
 {
   "name": "sun",
+  "type": "regular",
   "title": "Sun",
   "keywords": [
     "brighten",
@@ -1892,6 +1998,7 @@
 },
 {
   "name": "edit",
+  "type": "regular",
   "title": "Edit",
   "keywords": [
     "edit",
@@ -1912,6 +2019,7 @@
 },
 {
   "name": "address-card",
+  "type": "regular",
   "title": "Address Card",
   "keywords": [
     "about",
@@ -1931,6 +2039,7 @@
 },
 {
   "name": "caret-square-right",
+  "type": "regular",
   "title": "Caret Square Right",
   "keywords": [
     "arrow",
@@ -1947,6 +2056,7 @@
 },
 {
   "name": "lemon",
+  "type": "regular",
   "title": "Lemon",
   "keywords": [
     "citrus",
@@ -1966,6 +2076,7 @@
 },
 {
   "name": "smile-beam",
+  "type": "regular",
   "title": "Beaming Face With Smiling Eyes",
   "keywords": [
     "emoticon",
@@ -1981,6 +2092,7 @@
 },
 {
   "name": "compass",
+  "type": "regular",
   "title": "Compass",
   "keywords": [
     "directions",
@@ -2004,6 +2116,7 @@
 },
 {
   "name": "credit-card",
+  "type": "regular",
   "title": "Credit Card",
   "keywords": [
     "buy",
@@ -2023,6 +2136,7 @@
 },
 {
   "name": "user-circle",
+  "type": "regular",
   "title": "User Circle",
   "keywords": [
     "account",
@@ -2043,6 +2157,7 @@
 },
 {
   "name": "trash-alt",
+  "type": "regular",
   "title": "Alternate Trash",
   "keywords": [
     "delete",
@@ -2061,6 +2176,7 @@
 },
 {
   "name": "window-close",
+  "type": "regular",
   "title": "Window Close",
   "keywords": [
     "browser",
@@ -2076,6 +2192,7 @@
 },
 {
   "name": "tired",
+  "type": "regular",
   "title": "Tired Face",
   "keywords": [
     "angry",
@@ -2092,6 +2209,7 @@
 },
 {
   "name": "clock",
+  "type": "regular",
   "title": "Clock",
   "keywords": [
     "date",
@@ -2110,6 +2228,7 @@
 },
 {
   "name": "window-minimize",
+  "type": "regular",
   "title": "Window Minimize",
   "keywords": [
     "browser",
@@ -2125,6 +2244,7 @@
 },
 {
   "name": "sad-cry",
+  "type": "regular",
   "title": "Crying Face",
   "keywords": [
     "emoticon",
@@ -2140,6 +2260,7 @@
 },
 {
   "name": "eye",
+  "type": "regular",
   "title": "Eye",
   "keywords": [
     "look",
@@ -2165,6 +2286,7 @@
 },
 {
   "name": "registered",
+  "type": "regular",
   "title": "Registered Trademark",
   "keywords": [
     "copyright",
@@ -2179,6 +2301,7 @@
 },
 {
   "name": "arrow-alt-circle-down",
+  "type": "regular",
   "title": "Alternate Arrow Circle Down",
   "keywords": [
     "arrow-circle-o-down",
@@ -2192,6 +2315,7 @@
 },
 {
   "name": "grin",
+  "type": "regular",
   "title": "Grinning Face",
   "keywords": [
     "emoticon",
@@ -2207,6 +2331,7 @@
 },
 {
   "name": "calendar-minus",
+  "type": "regular",
   "title": "Calendar Minus",
   "keywords": [
     "calendar",
@@ -2229,6 +2354,7 @@
 },
 {
   "name": "id-card",
+  "type": "regular",
   "title": "Identification Card",
   "keywords": [
     "contact",
@@ -2248,6 +2374,7 @@
 },
 {
   "name": "bell-slash",
+  "type": "regular",
   "title": "Bell Slash",
   "keywords": [
     "alert",
@@ -2271,6 +2398,7 @@
 },
 {
   "name": "handshake",
+  "type": "regular",
   "title": "Handshake",
   "keywords": [
     "agreement",
@@ -2289,6 +2417,7 @@
 },
 {
   "name": "comment",
+  "type": "regular",
   "title": "comment",
   "keywords": [
     "bubble",
@@ -2315,6 +2444,7 @@
 },
 {
   "name": "calendar",
+  "type": "regular",
   "title": "Calendar",
   "keywords": [
     "calendar-o",
@@ -2337,6 +2467,7 @@
 },
 {
   "name": "times-circle",
+  "type": "regular",
   "title": "Times Circle",
   "keywords": [
     "close",
@@ -2358,6 +2489,7 @@
 },
 {
   "name": "calendar-times",
+  "type": "regular",
   "title": "Calendar Times",
   "keywords": [
     "archive",
@@ -2381,6 +2513,7 @@
 },
 {
   "name": "file-code",
+  "type": "regular",
   "title": "Code File",
   "keywords": [
     "css",
@@ -2397,6 +2530,7 @@
 },
 {
   "name": "futbol",
+  "type": "regular",
   "title": "Futbol",
   "keywords": [
     "ball",
@@ -2413,6 +2547,7 @@
 },
 {
   "name": "comment-alt",
+  "type": "regular",
   "title": "Alternate Comment",
   "keywords": [
     "bubble",
@@ -2438,6 +2573,7 @@
 },
 {
   "name": "laugh-squint",
+  "type": "regular",
   "title": "Laughing Squinting Face",
   "keywords": [
     "LOL",
@@ -2454,6 +2590,7 @@
 },
 {
   "name": "bookmark",
+  "type": "regular",
   "title": "bookmark",
   "keywords": [
     "favorite",
@@ -2474,6 +2611,7 @@
 },
 {
   "name": "caret-square-up",
+  "type": "regular",
   "title": "Caret Square Up",
   "keywords": [
     "arrow",
@@ -2490,6 +2628,7 @@
 },
 {
   "name": "hand-pointer",
+  "type": "regular",
   "title": "Pointer (Hand)",
   "keywords": [
     "arrow",
@@ -2505,6 +2644,7 @@
 },
 {
   "name": "kiss",
+  "type": "regular",
   "title": "Kissing Face",
   "keywords": [
     "beso",
@@ -2521,6 +2661,7 @@
 },
 {
   "name": "hand-rock",
+  "type": "regular",
   "title": "Rock (Hand)",
   "keywords": [
     "fist",
@@ -2535,6 +2676,7 @@
 },
 {
   "name": "grin-stars",
+  "type": "regular",
   "title": "Star-Struck",
   "keywords": [
     "emoticon",
@@ -2549,6 +2691,7 @@
 },
 {
   "name": "hdd",
+  "type": "regular",
   "title": "HDD",
   "keywords": [
     "cpu",
@@ -2567,6 +2710,7 @@
 },
 {
   "name": "sticky-note",
+  "type": "regular",
   "title": "Sticky Note",
   "keywords": [
     "message",
@@ -2586,6 +2730,7 @@
 },
 {
   "name": "window-restore",
+  "type": "regular",
   "title": "Window Restore",
   "keywords": [
     "browser",
@@ -2600,6 +2745,7 @@
 },
 {
   "name": "building",
+  "type": "regular",
   "title": "Building",
   "keywords": [
     "apartment",
@@ -2620,6 +2766,7 @@
 },
 {
   "name": "angry",
+  "type": "regular",
   "title": "Angry Face",
   "keywords": [
     "disapprove",
@@ -2636,6 +2783,7 @@
 },
 {
   "name": "folder",
+  "type": "regular",
   "title": "Folder",
   "keywords": [
     "archive",
@@ -2657,6 +2805,7 @@
 },
 {
   "name": "file-pdf",
+  "type": "regular",
   "title": "PDF File",
   "keywords": [
     "acrobat",
@@ -2672,6 +2821,7 @@
 },
 {
   "name": "flushed",
+  "type": "regular",
   "title": "Flushed Face",
   "keywords": [
     "embarrassed",
@@ -2686,6 +2836,7 @@
 },
 {
   "name": "moon",
+  "type": "regular",
   "title": "Moon",
   "keywords": [
     "contrast",
@@ -2704,6 +2855,7 @@
 },
 {
   "name": "surprise",
+  "type": "regular",
   "title": "Hushed Face",
   "keywords": [
     "emoticon",
@@ -2718,6 +2870,7 @@
 },
 {
   "name": "heart",
+  "type": "regular",
   "title": "Heart",
   "keywords": [
     "favorite",

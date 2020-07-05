@@ -23,7 +23,7 @@ for (const { icons, label } of Object.values(categoriesMeta)) {
 
 console.log('iconToCategories', iconToCategories)
 
-async function processIcons(dirPath) {
+async function processIcons(dirPath, type) {
   console.log(path.join(__dirname, '..', `./public/${dirPath}`))
   const dir = await fs.promises.opendir(
     path.join(__dirname, '..', `./public/${dirPath}`)
@@ -45,6 +45,7 @@ async function processIcons(dirPath) {
 
     icons.push({
       name: iconName,
+      type,
       title: iconInfo.label,
       keywords: iconInfo.search.terms,
       categories: iconToCategories[iconName] || [],
@@ -57,12 +58,13 @@ async function processIcons(dirPath) {
 }
 
 async function process(kind) {
-  const solidIcons = await processIcons(`shapes/svg/fontawesome/${kind}`)
+  const solidIcons = await processIcons(`shapes/svg/fontawesome/${kind}`, kind)
 
   const allIcons = [...solidIcons]
 
   const exportString = `
   export type IconConfig = {
+    type: string
     title: string
     name: string
     url: string

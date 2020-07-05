@@ -196,7 +196,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                   }
                 `}
                 backgroundColor="white"
-                url={shape.config.processedThumbnailUrl!}
+                url={shape.config.thumbnailUrl!}
               />
             )}
             <Box
@@ -390,6 +390,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
 
                     <ShapeSelector
                       columns={6}
+                      showProcessedThumbnails={false}
                       overscanCount={3}
                       shapes={matchingItems}
                       onSelected={async (shapeConfig) => {

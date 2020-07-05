@@ -1,5 +1,6 @@
 
   export type IconConfig = {
+    type: string
     title: string
     name: string
     url: string
@@ -9,6 +10,7 @@
   
   export const icons = [{
   "name": "viadeo-square",
+  "type": "brands",
   "title": "Video Square",
   "keywords": [],
   "categories": [],
@@ -17,6 +19,7 @@
 },
 {
   "name": "supple",
+  "type": "brands",
   "title": "Supple",
   "keywords": [],
   "categories": [],
@@ -25,6 +28,7 @@
 },
 {
   "name": "bootstrap",
+  "type": "brands",
   "title": "Bootstrap",
   "keywords": [],
   "categories": [],
@@ -33,6 +37,7 @@
 },
 {
   "name": "weixin",
+  "type": "brands",
   "title": "Weixin (WeChat)",
   "keywords": [],
   "categories": [],
@@ -41,6 +46,7 @@
 },
 {
   "name": "connectdevelop",
+  "type": "brands",
   "title": "Connect Develop",
   "keywords": [],
   "categories": [],
@@ -49,6 +55,7 @@
 },
 {
   "name": "medium",
+  "type": "brands",
   "title": "Medium",
   "keywords": [],
   "categories": [],
@@ -57,6 +64,7 @@
 },
 {
   "name": "ioxhost",
+  "type": "brands",
   "title": "ioxhost",
   "keywords": [],
   "categories": [],
@@ -65,6 +73,7 @@
 },
 {
   "name": "snapchat-ghost",
+  "type": "brands",
   "title": "Snapchat Ghost",
   "keywords": [],
   "categories": [],
@@ -73,6 +82,7 @@
 },
 {
   "name": "fonticons",
+  "type": "brands",
   "title": "Fonticons",
   "keywords": [],
   "categories": [],
@@ -81,6 +91,7 @@
 },
 {
   "name": "figma",
+  "type": "brands",
   "title": "Figma",
   "keywords": [
     "app",
@@ -93,6 +104,7 @@
 },
 {
   "name": "reddit-alien",
+  "type": "brands",
   "title": "reddit Alien",
   "keywords": [],
   "categories": [],
@@ -101,6 +113,7 @@
 },
 {
   "name": "angrycreative",
+  "type": "brands",
   "title": "Angry Creative",
   "keywords": [],
   "categories": [],
@@ -109,6 +122,7 @@
 },
 {
   "name": "imdb",
+  "type": "brands",
   "title": "IMDB",
   "keywords": [],
   "categories": [],
@@ -117,6 +131,7 @@
 },
 {
   "name": "steam",
+  "type": "brands",
   "title": "Steam",
   "keywords": [],
   "categories": [
@@ -127,6 +142,7 @@
 },
 {
   "name": "d-and-d-beyond",
+  "type": "brands",
   "title": "D&D Beyond",
   "keywords": [
     "Dungeons & Dragons",
@@ -144,6 +160,7 @@
 },
 {
   "name": "font-awesome-logo-full",
+  "type": "brands",
   "title": "Font Awesome Full Logo",
   "keywords": [],
   "categories": [],
@@ -152,6 +169,7 @@
 },
 {
   "name": "tumblr",
+  "type": "brands",
   "title": "Tumblr",
   "keywords": [],
   "categories": [],
@@ -160,6 +178,7 @@
 },
 {
   "name": "pied-piper-square",
+  "type": "brands",
   "title": "Pied Piper Square Logo (Old)",
   "keywords": [],
   "categories": [],
@@ -168,6 +187,7 @@
 },
 {
   "name": "tripadvisor",
+  "type": "brands",
   "title": "TripAdvisor",
   "keywords": [],
   "categories": [],
@@ -176,6 +196,7 @@
 },
 {
   "name": "penny-arcade",
+  "type": "brands",
   "title": "Penny Arcade",
   "keywords": [
     "Dungeons & Dragons",
@@ -195,6 +216,7 @@
 },
 {
   "name": "bandcamp",
+  "type": "brands",
   "title": "Bandcamp",
   "keywords": [],
   "categories": [],
@@ -203,6 +225,7 @@
 },
 {
   "name": "red-river",
+  "type": "brands",
   "title": "red river",
   "keywords": [],
   "categories": [],
@@ -211,6 +234,7 @@
 },
 {
   "name": "stackpath",
+  "type": "brands",
   "title": "Stackpath",
   "keywords": [],
   "categories": [],
@@ -219,6 +243,7 @@
 },
 {
   "name": "strava",
+  "type": "brands",
   "title": "Strava",
   "keywords": [],
   "categories": [],
@@ -227,6 +252,7 @@
 },
 {
   "name": "dropbox",
+  "type": "brands",
   "title": "Dropbox",
   "keywords": [],
   "categories": [],
@@ -235,6 +261,7 @@
 },
 {
   "name": "microsoft",
+  "type": "brands",
   "title": "Microsoft",
   "keywords": [],
   "categories": [],
@@ -243,6 +270,7 @@
 },
 {
   "name": "creative-commons-nd",
+  "type": "brands",
   "title": "Creative Commons No Derivative Works",
   "keywords": [],
   "categories": [],
@@ -251,6 +279,7 @@
 },
 {
   "name": "dyalog",
+  "type": "brands",
   "title": "Dyalog",
   "keywords": [],
   "categories": [],
@@ -259,6 +288,7 @@
 },
 {
   "name": "squarespace",
+  "type": "brands",
   "title": "Squarespace",
   "keywords": [],
   "categories": [],
@@ -267,6 +297,7 @@
 },
 {
   "name": "google-plus-square",
+  "type": "brands",
   "title": "Google Plus Square",
   "keywords": [
     "social network"
@@ -277,6 +308,7 @@
 },
 {
   "name": "whatsapp-square",
+  "type": "brands",
   "title": "What's App Square",
   "keywords": [],
   "categories": [],
@@ -285,6 +317,7 @@
 },
 {
   "name": "accusoft",
+  "type": "brands",
   "title": "Accusoft",
   "keywords": [],
   "categories": [],
@@ -293,6 +326,7 @@
 },
 {
   "name": "lastfm",
+  "type": "brands",
   "title": "last.fm",
   "keywords": [],
   "categories": [],
@@ -301,6 +335,7 @@
 },
 {
   "name": "phoenix-squadron",
+  "type": "brands",
   "title": "Phoenix Squadron",
   "keywords": [],
   "categories": [],
@@ -309,6 +344,7 @@
 },
 {
   "name": "yelp",
+  "type": "brands",
   "title": "Yelp",
   "keywords": [],
   "categories": [],
@@ -317,6 +353,7 @@
 },
 {
   "name": "deviantart",
+  "type": "brands",
   "title": "deviantART",
   "keywords": [],
   "categories": [],
@@ -325,6 +362,7 @@
 },
 {
   "name": "airbnb",
+  "type": "brands",
   "title": "Airbnb",
   "keywords": [],
   "categories": [],
@@ -333,6 +371,7 @@
 },
 {
   "name": "usps",
+  "type": "brands",
   "title": "United States Postal Service",
   "keywords": [
     "american",
@@ -346,6 +385,7 @@
 },
 {
   "name": "envira",
+  "type": "brands",
   "title": "Envira Gallery",
   "keywords": [
     "leaf"
@@ -356,6 +396,7 @@
 },
 {
   "name": "fulcrum",
+  "type": "brands",
   "title": "Fulcrum",
   "keywords": [],
   "categories": [],
@@ -364,6 +405,7 @@
 },
 {
   "name": "linux",
+  "type": "brands",
   "title": "Linux",
   "keywords": [
     "tux"
@@ -374,6 +416,7 @@
 },
 {
   "name": "foursquare",
+  "type": "brands",
   "title": "Foursquare",
   "keywords": [],
   "categories": [],
@@ -382,6 +425,7 @@
 },
 {
   "name": "drupal",
+  "type": "brands",
   "title": "Drupal Logo",
   "keywords": [],
   "categories": [],
@@ -390,6 +434,7 @@
 },
 {
   "name": "cc-stripe",
+  "type": "brands",
   "title": "Stripe Credit Card",
   "keywords": [],
   "categories": [
@@ -400,6 +445,7 @@
 },
 {
   "name": "dev",
+  "type": "brands",
   "title": "DEV",
   "keywords": [],
   "categories": [],
@@ -408,6 +454,7 @@
 },
 {
   "name": "speakap",
+  "type": "brands",
   "title": "Speakap",
   "keywords": [],
   "categories": [],
@@ -416,6 +463,7 @@
 },
 {
   "name": "android",
+  "type": "brands",
   "title": "Android",
   "keywords": [
     "robot"
@@ -426,6 +474,7 @@
 },
 {
   "name": "adobe",
+  "type": "brands",
   "title": "Adobe",
   "keywords": [
     "acrobat",
@@ -441,6 +490,7 @@
 },
 {
   "name": "git-square",
+  "type": "brands",
   "title": "Git Square",
   "keywords": [],
   "categories": [],
@@ -449,6 +499,7 @@
 },
 {
   "name": "ethereum",
+  "type": "brands",
   "title": "Ethereum",
   "keywords": [],
   "categories": [
@@ -460,6 +511,7 @@
 },
 {
   "name": "shirtsinbulk",
+  "type": "brands",
   "title": "Shirts in Bulk",
   "keywords": [],
   "categories": [],
@@ -468,6 +520,7 @@
 },
 {
   "name": "black-tie",
+  "type": "brands",
   "title": "Font Awesome Black Tie",
   "keywords": [],
   "categories": [],
@@ -476,6 +529,7 @@
 },
 {
   "name": "odnoklassniki",
+  "type": "brands",
   "title": "Odnoklassniki",
   "keywords": [],
   "categories": [],
@@ -484,6 +538,7 @@
 },
 {
   "name": "fonticons-fi",
+  "type": "brands",
   "title": "Fonticons Fi",
   "keywords": [],
   "categories": [],
@@ -492,6 +547,7 @@
 },
 {
   "name": "cc-amex",
+  "type": "brands",
   "title": "American Express Credit Card",
   "keywords": [
     "amex"
@@ -504,6 +560,7 @@
 },
 {
   "name": "js",
+  "type": "brands",
   "title": "JavaScript (JS)",
   "keywords": [],
   "categories": [],
@@ -512,6 +569,7 @@
 },
 {
   "name": "galactic-senate",
+  "type": "brands",
   "title": "Galactic Senate",
   "keywords": [
     "star wars"
@@ -524,6 +582,7 @@
 },
 {
   "name": "reacteurope",
+  "type": "brands",
   "title": "ReactEurope",
   "keywords": [],
   "categories": [],
@@ -532,6 +591,7 @@
 },
 {
   "name": "openid",
+  "type": "brands",
   "title": "OpenID",
   "keywords": [],
   "categories": [],
@@ -540,6 +600,7 @@
 },
 {
   "name": "gitlab",
+  "type": "brands",
   "title": "GitLab",
   "keywords": [
     "Axosoft"
@@ -550,6 +611,7 @@
 },
 {
   "name": "sourcetree",
+  "type": "brands",
   "title": "Sourcetree",
   "keywords": [],
   "categories": [],
@@ -558,6 +620,7 @@
 },
 {
   "name": "gg",
+  "type": "brands",
   "title": "GG Currency",
   "keywords": [],
   "categories": [
@@ -568,6 +631,7 @@
 },
 {
   "name": "joget",
+  "type": "brands",
   "title": "Joget",
   "keywords": [],
   "categories": [],
@@ -576,6 +640,7 @@
 },
 {
   "name": "weibo",
+  "type": "brands",
   "title": "Weibo",
   "keywords": [],
   "categories": [],
@@ -584,6 +649,7 @@
 },
 {
   "name": "aws",
+  "type": "brands",
   "title": "Amazon Web Services (AWS)",
   "keywords": [],
   "categories": [],
@@ -592,6 +658,7 @@
 },
 {
   "name": "sass",
+  "type": "brands",
   "title": "Sass",
   "keywords": [],
   "categories": [],
@@ -600,6 +667,7 @@
 },
 {
   "name": "cc-paypal",
+  "type": "brands",
   "title": "Paypal Credit Card",
   "keywords": [],
   "categories": [
@@ -610,6 +678,7 @@
 },
 {
   "name": "superpowers",
+  "type": "brands",
   "title": "Superpowers",
   "keywords": [],
   "categories": [],
@@ -618,6 +687,7 @@
 },
 {
   "name": "sellcast",
+  "type": "brands",
   "title": "Sellcast",
   "keywords": [
     "eercast"
@@ -628,6 +698,7 @@
 },
 {
   "name": "java",
+  "type": "brands",
   "title": "Java",
   "keywords": [],
   "categories": [],
@@ -636,6 +707,7 @@
 },
 {
   "name": "orcid",
+  "type": "brands",
   "title": "ORCID",
   "keywords": [],
   "categories": [],
@@ -644,6 +716,7 @@
 },
 {
   "name": "tencent-weibo",
+  "type": "brands",
   "title": "Tencent Weibo",
   "keywords": [],
   "categories": [],
@@ -652,6 +725,7 @@
 },
 {
   "name": "trade-federation",
+  "type": "brands",
   "title": "Trade Federation",
   "keywords": [],
   "categories": [],
@@ -660,6 +734,7 @@
 },
 {
   "name": "viber",
+  "type": "brands",
   "title": "Viber",
   "keywords": [],
   "categories": [],
@@ -668,6 +743,7 @@
 },
 {
   "name": "ello",
+  "type": "brands",
   "title": "Ello",
   "keywords": [],
   "categories": [],
@@ -676,6 +752,7 @@
 },
 {
   "name": "wix",
+  "type": "brands",
   "title": "Wix",
   "keywords": [],
   "categories": [],
@@ -684,6 +761,7 @@
 },
 {
   "name": "mizuni",
+  "type": "brands",
   "title": "Mizuni",
   "keywords": [],
   "categories": [],
@@ -692,6 +770,7 @@
 },
 {
   "name": "leanpub",
+  "type": "brands",
   "title": "Leanpub",
   "keywords": [],
   "categories": [],
@@ -700,6 +779,7 @@
 },
 {
   "name": "bitbucket",
+  "type": "brands",
   "title": "Bitbucket",
   "keywords": [
     "atlassian",
@@ -712,6 +792,7 @@
 },
 {
   "name": "pagelines",
+  "type": "brands",
   "title": "Pagelines",
   "keywords": [
     "eco",
@@ -728,6 +809,7 @@
 },
 {
   "name": "creative-commons",
+  "type": "brands",
   "title": "Creative Commons",
   "keywords": [],
   "categories": [],
@@ -736,6 +818,7 @@
 },
 {
   "name": "github",
+  "type": "brands",
   "title": "GitHub",
   "keywords": [
     "octocat"
@@ -746,6 +829,7 @@
 },
 {
   "name": "viacoin",
+  "type": "brands",
   "title": "Viacoin",
   "keywords": [],
   "categories": [],
@@ -754,6 +838,7 @@
 },
 {
   "name": "freebsd",
+  "type": "brands",
   "title": "FreeBSD",
   "keywords": [],
   "categories": [],
@@ -762,6 +847,7 @@
 },
 {
   "name": "rebel",
+  "type": "brands",
   "title": "Rebel Alliance",
   "keywords": [],
   "categories": [],
@@ -770,6 +856,7 @@
 },
 {
   "name": "fedex",
+  "type": "brands",
   "title": "FedEx",
   "keywords": [
     "Federal Express",
@@ -782,6 +869,7 @@
 },
 {
   "name": "usb",
+  "type": "brands",
   "title": "USB",
   "keywords": [],
   "categories": [],
@@ -790,6 +878,7 @@
 },
 {
   "name": "empire",
+  "type": "brands",
   "title": "Galactic Empire",
   "keywords": [],
   "categories": [],
@@ -798,6 +887,7 @@
 },
 {
   "name": "simplybuilt",
+  "type": "brands",
   "title": "SimplyBuilt",
   "keywords": [],
   "categories": [],
@@ -806,6 +896,7 @@
 },
 {
   "name": "google-drive",
+  "type": "brands",
   "title": "Google Drive",
   "keywords": [],
   "categories": [],
@@ -814,6 +905,7 @@
 },
 {
   "name": "microblog",
+  "type": "brands",
   "title": "Micro.blog",
   "keywords": [],
   "categories": [],
@@ -822,6 +914,7 @@
 },
 {
   "name": "etsy",
+  "type": "brands",
   "title": "Etsy",
   "keywords": [],
   "categories": [],
@@ -830,6 +923,7 @@
 },
 {
   "name": "bimobject",
+  "type": "brands",
   "title": "BIMobject",
   "keywords": [],
   "categories": [],
@@ -838,6 +932,7 @@
 },
 {
   "name": "app-store-ios",
+  "type": "brands",
   "title": "iOS App Store",
   "keywords": [],
   "categories": [],
@@ -846,6 +941,7 @@
 },
 {
   "name": "gripfire",
+  "type": "brands",
   "title": "Gripfire, Inc.",
   "keywords": [],
   "categories": [],
@@ -854,6 +950,7 @@
 },
 {
   "name": "500px",
+  "type": "brands",
   "title": "500px",
   "keywords": [],
   "categories": [],
@@ -862,6 +959,7 @@
 },
 {
   "name": "speaker-deck",
+  "type": "brands",
   "title": "Speaker Deck",
   "keywords": [],
   "categories": [],
@@ -870,6 +968,7 @@
 },
 {
   "name": "deskpro",
+  "type": "brands",
   "title": "Deskpro",
   "keywords": [],
   "categories": [],
@@ -878,6 +977,7 @@
 },
 {
   "name": "critical-role",
+  "type": "brands",
   "title": "Critical Role",
   "keywords": [
     "Dungeons & Dragons",
@@ -896,6 +996,7 @@
 },
 {
   "name": "vimeo-v",
+  "type": "brands",
   "title": "Vimeo",
   "keywords": [
     "vimeo"
@@ -906,6 +1007,7 @@
 },
 {
   "name": "stripe-s",
+  "type": "brands",
   "title": "Stripe S",
   "keywords": [],
   "categories": [
@@ -916,6 +1018,7 @@
 },
 {
   "name": "keybase",
+  "type": "brands",
   "title": "Keybase",
   "keywords": [],
   "categories": [],
@@ -924,6 +1027,7 @@
 },
 {
   "name": "yandex-international",
+  "type": "brands",
   "title": "Yandex International",
   "keywords": [],
   "categories": [],
@@ -932,6 +1036,7 @@
 },
 {
   "name": "umbraco",
+  "type": "brands",
   "title": "Umbraco",
   "keywords": [],
   "categories": [],
@@ -940,6 +1045,7 @@
 },
 {
   "name": "joomla",
+  "type": "brands",
   "title": "Joomla Logo",
   "keywords": [],
   "categories": [],
@@ -948,6 +1054,7 @@
 },
 {
   "name": "google-play",
+  "type": "brands",
   "title": "Google Play",
   "keywords": [],
   "categories": [],
@@ -956,6 +1063,7 @@
 },
 {
   "name": "uniregistry",
+  "type": "brands",
   "title": "Uniregistry",
   "keywords": [],
   "categories": [],
@@ -964,6 +1072,7 @@
 },
 {
   "name": "d-and-d",
+  "type": "brands",
   "title": "Dungeons & Dragons",
   "keywords": [],
   "categories": [
@@ -974,6 +1083,7 @@
 },
 {
   "name": "kaggle",
+  "type": "brands",
   "title": "Kaggle",
   "keywords": [],
   "categories": [],
@@ -982,6 +1092,7 @@
 },
 {
   "name": "hubspot",
+  "type": "brands",
   "title": "HubSpot",
   "keywords": [],
   "categories": [],
@@ -990,6 +1101,7 @@
 },
 {
   "name": "confluence",
+  "type": "brands",
   "title": "Confluence",
   "keywords": [
     "atlassian"
@@ -1000,6 +1112,7 @@
 },
 {
   "name": "youtube-square",
+  "type": "brands",
   "title": "YouTube Square",
   "keywords": [],
   "categories": [],
@@ -1008,6 +1121,7 @@
 },
 {
   "name": "servicestack",
+  "type": "brands",
   "title": "Servicestack",
   "keywords": [],
   "categories": [],
@@ -1016,6 +1130,7 @@
 },
 {
   "name": "reddit-square",
+  "type": "brands",
   "title": "reddit Square",
   "keywords": [],
   "categories": [],
@@ -1024,6 +1139,7 @@
 },
 {
   "name": "npm",
+  "type": "brands",
   "title": "npm",
   "keywords": [],
   "categories": [],
@@ -1032,6 +1148,7 @@
 },
 {
   "name": "creative-commons-nc",
+  "type": "brands",
   "title": "Creative Commons Noncommercial",
   "keywords": [],
   "categories": [],
@@ -1040,6 +1157,7 @@
 },
 {
   "name": "galactic-republic",
+  "type": "brands",
   "title": "Galactic Republic",
   "keywords": [
     "politics",
@@ -1053,6 +1171,7 @@
 },
 {
   "name": "raspberry-pi",
+  "type": "brands",
   "title": "Raspberry Pi",
   "keywords": [],
   "categories": [],
@@ -1061,6 +1180,7 @@
 },
 {
   "name": "instagram-square",
+  "type": "brands",
   "title": "Instagram Square",
   "keywords": [],
   "categories": [],
@@ -1069,6 +1189,7 @@
 },
 {
   "name": "tumblr-square",
+  "type": "brands",
   "title": "Tumblr Square",
   "keywords": [],
   "categories": [],
@@ -1077,6 +1198,7 @@
 },
 {
   "name": "mastodon",
+  "type": "brands",
   "title": "Mastodon",
   "keywords": [],
   "categories": [],
@@ -1085,6 +1207,7 @@
 },
 {
   "name": "angular",
+  "type": "brands",
   "title": "Angular",
   "keywords": [],
   "categories": [],
@@ -1093,6 +1216,7 @@
 },
 {
   "name": "untappd",
+  "type": "brands",
   "title": "Untappd",
   "keywords": [],
   "categories": [],
@@ -1101,6 +1225,7 @@
 },
 {
   "name": "apper",
+  "type": "brands",
   "title": "Apper Systems AB",
   "keywords": [],
   "categories": [],
@@ -1109,6 +1234,7 @@
 },
 {
   "name": "git-alt",
+  "type": "brands",
   "title": "Git Alt",
   "keywords": [],
   "categories": [],
@@ -1117,6 +1243,7 @@
 },
 {
   "name": "behance-square",
+  "type": "brands",
   "title": "Behance Square",
   "keywords": [],
   "categories": [],
@@ -1125,6 +1252,7 @@
 },
 {
   "name": "vk",
+  "type": "brands",
   "title": "VK",
   "keywords": [],
   "categories": [],
@@ -1133,6 +1261,7 @@
 },
 {
   "name": "vimeo",
+  "type": "brands",
   "title": "Vimeo",
   "keywords": [],
   "categories": [],
@@ -1141,6 +1270,7 @@
 },
 {
   "name": "discourse",
+  "type": "brands",
   "title": "Discourse",
   "keywords": [],
   "categories": [],
@@ -1149,6 +1279,7 @@
 },
 {
   "name": "hotjar",
+  "type": "brands",
   "title": "Hotjar",
   "keywords": [],
   "categories": [],
@@ -1157,6 +1288,7 @@
 },
 {
   "name": "symfony",
+  "type": "brands",
   "title": "Symfony",
   "keywords": [],
   "categories": [],
@@ -1165,6 +1297,7 @@
 },
 {
   "name": "slack-hash",
+  "type": "brands",
   "title": "Slack Hashtag",
   "keywords": [
     "anchor",
@@ -1177,6 +1310,7 @@
 },
 {
   "name": "skyatlas",
+  "type": "brands",
   "title": "skyatlas",
   "keywords": [],
   "categories": [],
@@ -1185,6 +1319,7 @@
 },
 {
   "name": "hacker-news",
+  "type": "brands",
   "title": "Hacker News",
   "keywords": [],
   "categories": [],
@@ -1193,6 +1328,7 @@
 },
 {
   "name": "instagram",
+  "type": "brands",
   "title": "Instagram",
   "keywords": [],
   "categories": [],
@@ -1201,6 +1337,7 @@
 },
 {
   "name": "y-combinator",
+  "type": "brands",
   "title": "Y Combinator",
   "keywords": [],
   "categories": [],
@@ -1209,6 +1346,7 @@
 },
 {
   "name": "shopify",
+  "type": "brands",
   "title": "Shopify",
   "keywords": [],
   "categories": [],
@@ -1217,6 +1355,7 @@
 },
 {
   "name": "mendeley",
+  "type": "brands",
   "title": "Mendeley",
   "keywords": [],
   "categories": [],
@@ -1225,6 +1364,7 @@
 },
 {
   "name": "fort-awesome-alt",
+  "type": "brands",
   "title": "Alternate Fort Awesome",
   "keywords": [
     "castle"
@@ -1235,6 +1375,7 @@
 },
 {
   "name": "r-project",
+  "type": "brands",
   "title": "R Project",
   "keywords": [],
   "categories": [],
@@ -1243,6 +1384,7 @@
 },
 {
   "name": "edge",
+  "type": "brands",
   "title": "Edge Browser",
   "keywords": [
     "browser",
@@ -1254,6 +1396,7 @@
 },
 {
   "name": "yammer",
+  "type": "brands",
   "title": "Yammer",
   "keywords": [],
   "categories": [],
@@ -1262,6 +1405,7 @@
 },
 {
   "name": "fly",
+  "type": "brands",
   "title": "Fly",
   "keywords": [],
   "categories": [],
@@ -1270,6 +1414,7 @@
 },
 {
   "name": "safari",
+  "type": "brands",
   "title": "Safari",
   "keywords": [
     "browser"
@@ -1280,6 +1425,7 @@
 },
 {
   "name": "pied-piper-hat",
+  "type": "brands",
   "title": "Pied Piper Hat (Old)",
   "keywords": [
     "clothing"
@@ -1290,6 +1436,7 @@
 },
 {
   "name": "audible",
+  "type": "brands",
   "title": "Audible",
   "keywords": [],
   "categories": [],
@@ -1298,6 +1445,7 @@
 },
 {
   "name": "yoast",
+  "type": "brands",
   "title": "Yoast",
   "keywords": [],
   "categories": [],
@@ -1306,6 +1454,7 @@
 },
 {
   "name": "fort-awesome",
+  "type": "brands",
   "title": "Fort Awesome",
   "keywords": [
     "castle"
@@ -1316,6 +1465,7 @@
 },
 {
   "name": "python",
+  "type": "brands",
   "title": "Python",
   "keywords": [],
   "categories": [],
@@ -1324,6 +1474,7 @@
 },
 {
   "name": "cc-apple-pay",
+  "type": "brands",
   "title": "Apple Pay Credit Card",
   "keywords": [],
   "categories": [
@@ -1334,6 +1485,7 @@
 },
 {
   "name": "docker",
+  "type": "brands",
   "title": "Docker",
   "keywords": [],
   "categories": [],
@@ -1342,6 +1494,7 @@
 },
 {
   "name": "git",
+  "type": "brands",
   "title": "Git",
   "keywords": [],
   "categories": [],
@@ -1350,6 +1503,7 @@
 },
 {
   "name": "blogger",
+  "type": "brands",
   "title": "Blogger",
   "keywords": [],
   "categories": [],
@@ -1358,6 +1512,7 @@
 },
 {
   "name": "itch-io",
+  "type": "brands",
   "title": "itch.io",
   "keywords": [],
   "categories": [],
@@ -1366,6 +1521,7 @@
 },
 {
   "name": "creative-commons-nc-eu",
+  "type": "brands",
   "title": "Creative Commons Noncommercial (Euro Sign)",
   "keywords": [],
   "categories": [],
@@ -1374,6 +1530,7 @@
 },
 {
   "name": "schlix",
+  "type": "brands",
   "title": "SCHLIX",
   "keywords": [],
   "categories": [],
@@ -1382,6 +1539,7 @@
 },
 {
   "name": "mailchimp",
+  "type": "brands",
   "title": "Mailchimp",
   "keywords": [],
   "categories": [],
@@ -1390,6 +1548,7 @@
 },
 {
   "name": "neos",
+  "type": "brands",
   "title": "Neos",
   "keywords": [],
   "categories": [],
@@ -1398,6 +1557,7 @@
 },
 {
   "name": "creative-commons-pd",
+  "type": "brands",
   "title": "Creative Commons Public Domain",
   "keywords": [],
   "categories": [],
@@ -1406,6 +1566,7 @@
 },
 {
   "name": "pinterest-p",
+  "type": "brands",
   "title": "Pinterest P",
   "keywords": [],
   "categories": [],
@@ -1414,6 +1575,7 @@
 },
 {
   "name": "digg",
+  "type": "brands",
   "title": "Digg Logo",
   "keywords": [],
   "categories": [],
@@ -1422,6 +1584,7 @@
 },
 {
   "name": "acquisitions-incorporated",
+  "type": "brands",
   "title": "Acquisitions Incorporated",
   "keywords": [
     "Dungeons & Dragons",
@@ -1440,6 +1603,7 @@
 },
 {
   "name": "bitcoin",
+  "type": "brands",
   "title": "Bitcoin",
   "keywords": [],
   "categories": [
@@ -1451,6 +1615,7 @@
 },
 {
   "name": "whmcs",
+  "type": "brands",
   "title": "WHMCS",
   "keywords": [],
   "categories": [],
@@ -1459,6 +1624,7 @@
 },
 {
   "name": "delicious",
+  "type": "brands",
   "title": "Delicious",
   "keywords": [],
   "categories": [],
@@ -1467,6 +1633,7 @@
 },
 {
   "name": "hackerrank",
+  "type": "brands",
   "title": "Hackerrank",
   "keywords": [],
   "categories": [],
@@ -1475,6 +1642,7 @@
 },
 {
   "name": "vimeo-square",
+  "type": "brands",
   "title": "Vimeo Square",
   "keywords": [],
   "categories": [],
@@ -1483,6 +1651,7 @@
 },
 {
   "name": "telegram",
+  "type": "brands",
   "title": "Telegram",
   "keywords": [],
   "categories": [],
@@ -1491,6 +1660,7 @@
 },
 {
   "name": "cc-discover",
+  "type": "brands",
   "title": "Discover Credit Card",
   "keywords": [],
   "categories": [
@@ -1501,6 +1671,7 @@
 },
 {
   "name": "centercode",
+  "type": "brands",
   "title": "Centercode",
   "keywords": [],
   "categories": [],
@@ -1509,6 +1680,7 @@
 },
 {
   "name": "erlang",
+  "type": "brands",
   "title": "Erlang",
   "keywords": [],
   "categories": [],
@@ -1517,6 +1689,7 @@
 },
 {
   "name": "medrt",
+  "type": "brands",
   "title": "MRT",
   "keywords": [],
   "categories": [],
@@ -1525,6 +1698,7 @@
 },
 {
   "name": "salesforce",
+  "type": "brands",
   "title": "Salesforce",
   "keywords": [],
   "categories": [],
@@ -1533,6 +1707,7 @@
 },
 {
   "name": "meetup",
+  "type": "brands",
   "title": "Meetup",
   "keywords": [],
   "categories": [],
@@ -1541,6 +1716,7 @@
 },
 {
   "name": "wizards-of-the-coast",
+  "type": "brands",
   "title": "Wizards of the Coast",
   "keywords": [
     "Dungeons & Dragons",
@@ -1559,6 +1735,7 @@
 },
 {
   "name": "markdown",
+  "type": "brands",
   "title": "Markdown",
   "keywords": [],
   "categories": [],
@@ -1567,6 +1744,7 @@
 },
 {
   "name": "goodreads",
+  "type": "brands",
   "title": "Goodreads",
   "keywords": [],
   "categories": [],
@@ -1575,6 +1753,7 @@
 },
 {
   "name": "dribbble-square",
+  "type": "brands",
   "title": "Dribbble Square",
   "keywords": [],
   "categories": [],
@@ -1583,6 +1762,7 @@
 },
 {
   "name": "unity",
+  "type": "brands",
   "title": "Unity 3D",
   "keywords": [],
   "categories": [],
@@ -1591,6 +1771,7 @@
 },
 {
   "name": "creative-commons-sampling-plus",
+  "type": "brands",
   "title": "Creative Commons Sampling +",
   "keywords": [],
   "categories": [],
@@ -1599,6 +1780,7 @@
 },
 {
   "name": "invision",
+  "type": "brands",
   "title": "InVision",
   "keywords": [
     "app",
@@ -1611,6 +1793,7 @@
 },
 {
   "name": "mix",
+  "type": "brands",
   "title": "Mix",
   "keywords": [],
   "categories": [],
@@ -1619,6 +1802,7 @@
 },
 {
   "name": "gratipay",
+  "type": "brands",
   "title": "Gratipay (Gittip)",
   "keywords": [
     "favorite",
@@ -1632,6 +1816,7 @@
 },
 {
   "name": "magento",
+  "type": "brands",
   "title": "Magento",
   "keywords": [],
   "categories": [],
@@ -1640,6 +1825,7 @@
 },
 {
   "name": "bluetooth",
+  "type": "brands",
   "title": "Bluetooth",
   "keywords": [],
   "categories": [
@@ -1650,6 +1836,7 @@
 },
 {
   "name": "houzz",
+  "type": "brands",
   "title": "Houzz",
   "keywords": [],
   "categories": [],
@@ -1658,6 +1845,7 @@
 },
 {
   "name": "expeditedssl",
+  "type": "brands",
   "title": "ExpeditedSSL",
   "keywords": [],
   "categories": [],
@@ -1666,6 +1854,7 @@
 },
 {
   "name": "the-red-yeti",
+  "type": "brands",
   "title": "The Red Yeti",
   "keywords": [],
   "categories": [],
@@ -1674,6 +1863,7 @@
 },
 {
   "name": "canadian-maple-leaf",
+  "type": "brands",
   "title": "Canadian Maple Leaf",
   "keywords": [
     "canada",
@@ -1688,6 +1878,7 @@
 },
 {
   "name": "sith",
+  "type": "brands",
   "title": "Sith",
   "keywords": [],
   "categories": [],
@@ -1696,6 +1887,7 @@
 },
 {
   "name": "algolia",
+  "type": "brands",
   "title": "Algolia",
   "keywords": [],
   "categories": [],
@@ -1704,6 +1896,7 @@
 },
 {
   "name": "ussunnah",
+  "type": "brands",
   "title": "us-Sunnah Foundation",
   "keywords": [],
   "categories": [],
@@ -1712,6 +1905,7 @@
 },
 {
   "name": "sellsy",
+  "type": "brands",
   "title": "Sellsy",
   "keywords": [],
   "categories": [],
@@ -1720,6 +1914,7 @@
 },
 {
   "name": "jira",
+  "type": "brands",
   "title": "Jira",
   "keywords": [
     "atlassian"
@@ -1730,6 +1925,7 @@
 },
 {
   "name": "spotify",
+  "type": "brands",
   "title": "Spotify",
   "keywords": [],
   "categories": [
@@ -1740,6 +1936,7 @@
 },
 {
   "name": "intercom",
+  "type": "brands",
   "title": "Intercom",
   "keywords": [
     "app",
@@ -1752,6 +1949,7 @@
 },
 {
   "name": "wolf-pack-battalion",
+  "type": "brands",
   "title": "Wolf Pack Battalion",
   "keywords": [],
   "categories": [],
@@ -1760,6 +1958,7 @@
 },
 {
   "name": "flipboard",
+  "type": "brands",
   "title": "Flipboard",
   "keywords": [],
   "categories": [],
@@ -1768,6 +1967,7 @@
 },
 {
   "name": "google-wallet",
+  "type": "brands",
   "title": "Google Wallet",
   "keywords": [],
   "categories": [
@@ -1778,6 +1978,7 @@
 },
 {
   "name": "shopware",
+  "type": "brands",
   "title": "Shopware",
   "keywords": [],
   "categories": [],
@@ -1786,6 +1987,7 @@
 },
 {
   "name": "phoenix-framework",
+  "type": "brands",
   "title": "Phoenix Framework",
   "keywords": [],
   "categories": [],
@@ -1794,6 +1996,7 @@
 },
 {
   "name": "kickstarter-k",
+  "type": "brands",
   "title": "Kickstarter K",
   "keywords": [],
   "categories": [],
@@ -1802,6 +2005,7 @@
 },
 {
   "name": "cc-jcb",
+  "type": "brands",
   "title": "JCB Credit Card",
   "keywords": [],
   "categories": [
@@ -1812,6 +2016,7 @@
 },
 {
   "name": "researchgate",
+  "type": "brands",
   "title": "Researchgate",
   "keywords": [],
   "categories": [],
@@ -1820,6 +2025,7 @@
 },
 {
   "name": "lyft",
+  "type": "brands",
   "title": "lyft",
   "keywords": [],
   "categories": [],
@@ -1828,6 +2034,7 @@
 },
 {
   "name": "wpressr",
+  "type": "brands",
   "title": "wpressr",
   "keywords": [
     "rendact"
@@ -1838,6 +2045,7 @@
 },
 {
   "name": "lastfm-square",
+  "type": "brands",
   "title": "last.fm Square",
   "keywords": [],
   "categories": [],
@@ -1846,6 +2054,7 @@
 },
 {
   "name": "periscope",
+  "type": "brands",
   "title": "Periscope",
   "keywords": [],
   "categories": [],
@@ -1854,6 +2063,7 @@
 },
 {
   "name": "modx",
+  "type": "brands",
   "title": "MODX",
   "keywords": [],
   "categories": [],
@@ -1862,6 +2072,7 @@
 },
 {
   "name": "kickstarter",
+  "type": "brands",
   "title": "Kickstarter",
   "keywords": [],
   "categories": [],
@@ -1870,6 +2081,7 @@
 },
 {
   "name": "slideshare",
+  "type": "brands",
   "title": "Slideshare",
   "keywords": [],
   "categories": [],
@@ -1878,6 +2090,7 @@
 },
 {
   "name": "snapchat",
+  "type": "brands",
   "title": "Snapchat",
   "keywords": [],
   "categories": [],
@@ -1886,6 +2099,7 @@
 },
 {
   "name": "font-awesome",
+  "type": "brands",
   "title": "Font Awesome",
   "keywords": [
     "meanpath"
@@ -1896,6 +2110,7 @@
 },
 {
   "name": "buy-n-large",
+  "type": "brands",
   "title": "Buy n Large",
   "keywords": [],
   "categories": [],
@@ -1904,6 +2119,7 @@
 },
 {
   "name": "readme",
+  "type": "brands",
   "title": "ReadMe",
   "keywords": [],
   "categories": [],
@@ -1912,6 +2128,7 @@
 },
 {
   "name": "creative-commons-nc-jp",
+  "type": "brands",
   "title": "Creative Commons Noncommercial (Yen Sign)",
   "keywords": [],
   "categories": [],
@@ -1920,6 +2137,7 @@
 },
 {
   "name": "themeisle",
+  "type": "brands",
   "title": "ThemeIsle",
   "keywords": [],
   "categories": [],
@@ -1928,6 +2146,7 @@
 },
 {
   "name": "html5",
+  "type": "brands",
   "title": "HTML 5 Logo",
   "keywords": [],
   "categories": [],
@@ -1936,6 +2155,7 @@
 },
 {
   "name": "replyd",
+  "type": "brands",
   "title": "replyd",
   "keywords": [],
   "categories": [],
@@ -1944,6 +2164,7 @@
 },
 {
   "name": "cuttlefish",
+  "type": "brands",
   "title": "Cuttlefish",
   "keywords": [],
   "categories": [],
@@ -1952,6 +2173,7 @@
 },
 {
   "name": "rockrms",
+  "type": "brands",
   "title": "Rockrms",
   "keywords": [],
   "categories": [],
@@ -1960,6 +2182,7 @@
 },
 {
   "name": "ravelry",
+  "type": "brands",
   "title": "Ravelry",
   "keywords": [],
   "categories": [],
@@ -1968,6 +2191,7 @@
 },
 {
   "name": "quora",
+  "type": "brands",
   "title": "Quora",
   "keywords": [],
   "categories": [],
@@ -1976,6 +2200,7 @@
 },
 {
   "name": "font-awesome-alt",
+  "type": "brands",
   "title": "Alternate Font Awesome",
   "keywords": [],
   "categories": [],
@@ -1984,6 +2209,7 @@
 },
 {
   "name": "monero",
+  "type": "brands",
   "title": "Monero",
   "keywords": [],
   "categories": [],
@@ -1992,6 +2218,7 @@
 },
 {
   "name": "hire-a-helper",
+  "type": "brands",
   "title": "HireAHelper",
   "keywords": [],
   "categories": [],
@@ -2000,6 +2227,7 @@
 },
 {
   "name": "github-alt",
+  "type": "brands",
   "title": "Alternate GitHub",
   "keywords": [
     "octocat"
@@ -2010,6 +2238,7 @@
 },
 {
   "name": "creative-commons-share",
+  "type": "brands",
   "title": "Creative Commons Share",
   "keywords": [],
   "categories": [],
@@ -2018,6 +2247,7 @@
 },
 {
   "name": "yarn",
+  "type": "brands",
   "title": "Yarn",
   "keywords": [],
   "categories": [],
@@ -2026,6 +2256,7 @@
 },
 {
   "name": "cc-visa",
+  "type": "brands",
   "title": "Visa Credit Card",
   "keywords": [],
   "categories": [
@@ -2036,6 +2267,7 @@
 },
 {
   "name": "dochub",
+  "type": "brands",
   "title": "DocHub",
   "keywords": [],
   "categories": [],
@@ -2044,6 +2276,7 @@
 },
 {
   "name": "github-square",
+  "type": "brands",
   "title": "GitHub Square",
   "keywords": [
     "octocat"
@@ -2054,6 +2287,7 @@
 },
 {
   "name": "laravel",
+  "type": "brands",
   "title": "Laravel",
   "keywords": [],
   "categories": [],
@@ -2062,6 +2296,7 @@
 },
 {
   "name": "digital-ocean",
+  "type": "brands",
   "title": "Digital Ocean",
   "keywords": [],
   "categories": [],
@@ -2070,6 +2305,7 @@
 },
 {
   "name": "xing-square",
+  "type": "brands",
   "title": "Xing Square",
   "keywords": [],
   "categories": [],
@@ -2078,6 +2314,7 @@
 },
 {
   "name": "earlybirds",
+  "type": "brands",
   "title": "Earlybirds",
   "keywords": [],
   "categories": [],
@@ -2086,6 +2323,7 @@
 },
 {
   "name": "centos",
+  "type": "brands",
   "title": "Centos",
   "keywords": [
     "linux",
@@ -2098,6 +2336,7 @@
 },
 {
   "name": "bluetooth-b",
+  "type": "brands",
   "title": "Bluetooth",
   "keywords": [],
   "categories": [
@@ -2108,6 +2347,7 @@
 },
 {
   "name": "teamspeak",
+  "type": "brands",
   "title": "TeamSpeak",
   "keywords": [],
   "categories": [],
@@ -2116,6 +2356,7 @@
 },
 {
   "name": "wpexplorer",
+  "type": "brands",
   "title": "WPExplorer",
   "keywords": [],
   "categories": [],
@@ -2124,6 +2365,7 @@
 },
 {
   "name": "first-order-alt",
+  "type": "brands",
   "title": "Alternate First Order",
   "keywords": [],
   "categories": [],
@@ -2132,6 +2374,7 @@
 },
 {
   "name": "ubuntu",
+  "type": "brands",
   "title": "Ubuntu",
   "keywords": [
     "linux",
@@ -2144,6 +2387,7 @@
 },
 {
   "name": "opencart",
+  "type": "brands",
   "title": "OpenCart",
   "keywords": [],
   "categories": [],
@@ -2152,6 +2396,7 @@
 },
 {
   "name": "pied-piper",
+  "type": "brands",
   "title": "Pied Piper Logo",
   "keywords": [],
   "categories": [],
@@ -2160,6 +2405,7 @@
 },
 {
   "name": "paypal",
+  "type": "brands",
   "title": "Paypal",
   "keywords": [],
   "categories": [
@@ -2170,6 +2416,7 @@
 },
 {
   "name": "suse",
+  "type": "brands",
   "title": "Suse",
   "keywords": [
     "linux",
@@ -2182,6 +2429,7 @@
 },
 {
   "name": "wpbeginner",
+  "type": "brands",
   "title": "WPBeginner",
   "keywords": [],
   "categories": [],
@@ -2190,6 +2438,7 @@
 },
 {
   "name": "blogger-b",
+  "type": "brands",
   "title": "Blogger B",
   "keywords": [],
   "categories": [],
@@ -2198,6 +2447,7 @@
 },
 {
   "name": "rocketchat",
+  "type": "brands",
   "title": "Rocket.Chat",
   "keywords": [],
   "categories": [],
@@ -2206,6 +2456,7 @@
 },
 {
   "name": "draft2digital",
+  "type": "brands",
   "title": "Draft2digital",
   "keywords": [],
   "categories": [],
@@ -2214,6 +2465,7 @@
 },
 {
   "name": "playstation",
+  "type": "brands",
   "title": "PlayStation",
   "keywords": [],
   "categories": [
@@ -2224,6 +2476,7 @@
 },
 {
   "name": "facebook",
+  "type": "brands",
   "title": "Facebook",
   "keywords": [
     "facebook-official",
@@ -2235,6 +2488,7 @@
 },
 {
   "name": "amazon-pay",
+  "type": "brands",
   "title": "Amazon Pay",
   "keywords": [],
   "categories": [
@@ -2245,6 +2499,7 @@
 },
 {
   "name": "amazon",
+  "type": "brands",
   "title": "Amazon",
   "keywords": [],
   "categories": [],
@@ -2253,6 +2508,7 @@
 },
 {
   "name": "quinscape",
+  "type": "brands",
   "title": "QuinScape",
   "keywords": [],
   "categories": [],
@@ -2261,6 +2517,7 @@
 },
 {
   "name": "free-code-camp",
+  "type": "brands",
   "title": "freeCodeCamp",
   "keywords": [],
   "categories": [],
@@ -2269,6 +2526,7 @@
 },
 {
   "name": "vine",
+  "type": "brands",
   "title": "Vine",
   "keywords": [],
   "categories": [],
@@ -2277,6 +2535,7 @@
 },
 {
   "name": "pinterest",
+  "type": "brands",
   "title": "Pinterest",
   "keywords": [],
   "categories": [],
@@ -2285,6 +2544,7 @@
 },
 {
   "name": "creative-commons-sa",
+  "type": "brands",
   "title": "Creative Commons Share Alike",
   "keywords": [],
   "categories": [],
@@ -2293,6 +2553,7 @@
 },
 {
   "name": "creative-commons-pd-alt",
+  "type": "brands",
   "title": "Alternate Creative Commons Public Domain",
   "keywords": [],
   "categories": [],
@@ -2301,6 +2562,7 @@
 },
 {
   "name": "stack-overflow",
+  "type": "brands",
   "title": "Stack Overflow",
   "keywords": [],
   "categories": [],
@@ -2309,6 +2571,7 @@
 },
 {
   "name": "page4",
+  "type": "brands",
   "title": "page4 Corporation",
   "keywords": [],
   "categories": [],
@@ -2317,6 +2580,7 @@
 },
 {
   "name": "mdb",
+  "type": "brands",
   "title": "Material Design for Bootstrap",
   "keywords": [],
   "categories": [],
@@ -2325,6 +2589,7 @@
 },
 {
   "name": "osi",
+  "type": "brands",
   "title": "Open Source Initiative",
   "keywords": [],
   "categories": [],
@@ -2333,6 +2598,7 @@
 },
 {
   "name": "yandex",
+  "type": "brands",
   "title": "Yandex",
   "keywords": [],
   "categories": [],
@@ -2341,6 +2607,7 @@
 },
 {
   "name": "whatsapp",
+  "type": "brands",
   "title": "What's App",
   "keywords": [],
   "categories": [],
@@ -2349,6 +2616,7 @@
 },
 {
   "name": "google",
+  "type": "brands",
   "title": "Google Logo",
   "keywords": [],
   "categories": [],
@@ -2357,6 +2625,7 @@
 },
 {
   "name": "chromecast",
+  "type": "brands",
   "title": "Chromecast",
   "keywords": [],
   "categories": [],
@@ -2365,6 +2634,7 @@
 },
 {
   "name": "line",
+  "type": "brands",
   "title": "Line",
   "keywords": [],
   "categories": [],
@@ -2373,6 +2643,7 @@
 },
 {
   "name": "battle-net",
+  "type": "brands",
   "title": "Battle.net",
   "keywords": [],
   "categories": [],
@@ -2381,6 +2652,7 @@
 },
 {
   "name": "affiliatetheme",
+  "type": "brands",
   "title": "affiliatetheme",
   "keywords": [],
   "categories": [],
@@ -2389,6 +2661,7 @@
 },
 {
   "name": "atlassian",
+  "type": "brands",
   "title": "Atlassian",
   "keywords": [],
   "categories": [],
@@ -2397,6 +2670,7 @@
 },
 {
   "name": "aviato",
+  "type": "brands",
   "title": "Aviato",
   "keywords": [],
   "categories": [],
@@ -2405,6 +2679,7 @@
 },
 {
   "name": "bity",
+  "type": "brands",
   "title": "Bity",
   "keywords": [],
   "categories": [],
@@ -2413,6 +2688,7 @@
 },
 {
   "name": "php",
+  "type": "brands",
   "title": "PHP",
   "keywords": [],
   "categories": [],
@@ -2421,6 +2697,7 @@
 },
 {
   "name": "stumbleupon-circle",
+  "type": "brands",
   "title": "StumbleUpon Circle",
   "keywords": [],
   "categories": [],
@@ -2429,6 +2706,7 @@
 },
 {
   "name": "stripe",
+  "type": "brands",
   "title": "Stripe",
   "keywords": [],
   "categories": [
@@ -2439,6 +2717,7 @@
 },
 {
   "name": "jedi-order",
+  "type": "brands",
   "title": "Jedi Order",
   "keywords": [
     "star wars"
@@ -2451,6 +2730,7 @@
 },
 {
   "name": "think-peaks",
+  "type": "brands",
   "title": "Think Peaks",
   "keywords": [],
   "categories": [],
@@ -2459,6 +2739,7 @@
 },
 {
   "name": "buromobelexperte",
+  "type": "brands",
   "title": "Büromöbel-Experte GmbH & Co. KG.",
   "keywords": [],
   "categories": [],
@@ -2467,6 +2748,7 @@
 },
 {
   "name": "phabricator",
+  "type": "brands",
   "title": "Phabricator",
   "keywords": [],
   "categories": [],
@@ -2475,6 +2757,7 @@
 },
 {
   "name": "apple-pay",
+  "type": "brands",
   "title": "Apple Pay",
   "keywords": [],
   "categories": [
@@ -2485,6 +2768,7 @@
 },
 {
   "name": "artstation",
+  "type": "brands",
   "title": "Artstation",
   "keywords": [],
   "categories": [],
@@ -2493,6 +2777,7 @@
 },
 {
   "name": "font-awesome-flag",
+  "type": "brands",
   "title": "Font Awesome Flag",
   "keywords": [],
   "categories": [],
@@ -2501,6 +2786,7 @@
 },
 {
   "name": "scribd",
+  "type": "brands",
   "title": "Scribd",
   "keywords": [],
   "categories": [],
@@ -2509,6 +2795,7 @@
 },
 {
   "name": "stack-exchange",
+  "type": "brands",
   "title": "Stack Exchange",
   "keywords": [],
   "categories": [],
@@ -2517,6 +2804,7 @@
 },
 {
   "name": "fedora",
+  "type": "brands",
   "title": "Fedora",
   "keywords": [
     "linux",
@@ -2529,6 +2817,7 @@
 },
 {
   "name": "jenkins",
+  "type": "brands",
   "title": "Jenkis",
   "keywords": [],
   "categories": [],
@@ -2537,6 +2826,7 @@
 },
 {
   "name": "studiovinari",
+  "type": "brands",
   "title": "Studio Vinari",
   "keywords": [],
   "categories": [],
@@ -2545,6 +2835,7 @@
 },
 {
   "name": "glide",
+  "type": "brands",
   "title": "Glide",
   "keywords": [],
   "categories": [],
@@ -2553,6 +2844,7 @@
 },
 {
   "name": "adn",
+  "type": "brands",
   "title": "App.net",
   "keywords": [],
   "categories": [],
@@ -2561,6 +2853,7 @@
 },
 {
   "name": "css3-alt",
+  "type": "brands",
   "title": "Alternate CSS3 Logo",
   "keywords": [],
   "categories": [],
@@ -2569,6 +2862,7 @@
 },
 {
   "name": "xing",
+  "type": "brands",
   "title": "Xing",
   "keywords": [],
   "categories": [],
@@ -2577,6 +2871,7 @@
 },
 {
   "name": "medapps",
+  "type": "brands",
   "title": "MedApps",
   "keywords": [],
   "categories": [],
@@ -2585,6 +2880,7 @@
 },
 {
   "name": "redhat",
+  "type": "brands",
   "title": "Redhat",
   "keywords": [
     "linux",
@@ -2597,6 +2893,7 @@
 },
 {
   "name": "fantasy-flight-games",
+  "type": "brands",
   "title": "Fantasy Flight-games",
   "keywords": [
     "Dungeons & Dragons",
@@ -2615,6 +2912,7 @@
 },
 {
   "name": "facebook-f",
+  "type": "brands",
   "title": "Facebook F",
   "keywords": [
     "facebook"
@@ -2625,6 +2923,7 @@
 },
 {
   "name": "hips",
+  "type": "brands",
   "title": "Hips",
   "keywords": [],
   "categories": [],
@@ -2633,6 +2932,7 @@
 },
 {
   "name": "twitch",
+  "type": "brands",
   "title": "Twitch",
   "keywords": [],
   "categories": [
@@ -2643,6 +2943,7 @@
 },
 {
   "name": "cc-diners-club",
+  "type": "brands",
   "title": "Diner's Club Credit Card",
   "keywords": [],
   "categories": [
@@ -2653,6 +2954,7 @@
 },
 {
   "name": "windows",
+  "type": "brands",
   "title": "Windows",
   "keywords": [
     "microsoft",
@@ -2665,6 +2967,7 @@
 },
 {
   "name": "rev",
+  "type": "brands",
   "title": "Rev.io",
   "keywords": [],
   "categories": [],
@@ -2673,6 +2976,7 @@
 },
 {
   "name": "btc",
+  "type": "brands",
   "title": "BTC",
   "keywords": [],
   "categories": [
@@ -2684,6 +2988,7 @@
 },
 {
   "name": "creative-commons-zero",
+  "type": "brands",
   "title": "Creative Commons CC0",
   "keywords": [],
   "categories": [],
@@ -2692,6 +2997,7 @@
 },
 {
   "name": "elementor",
+  "type": "brands",
   "title": "Elementor",
   "keywords": [],
   "categories": [],
@@ -2700,6 +3006,7 @@
 },
 {
   "name": "youtube",
+  "type": "brands",
   "title": "YouTube",
   "keywords": [
     "film",
@@ -2715,6 +3022,7 @@
 },
 {
   "name": "accessible-icon",
+  "type": "brands",
   "title": "Accessible Icon",
   "keywords": [
     "accessibility",
@@ -2734,6 +3042,7 @@
 },
 {
   "name": "gg-circle",
+  "type": "brands",
   "title": "GG Currency Circle",
   "keywords": [],
   "categories": [
@@ -2744,6 +3053,7 @@
 },
 {
   "name": "app-store",
+  "type": "brands",
   "title": "App Store",
   "keywords": [],
   "categories": [],
@@ -2752,6 +3062,7 @@
 },
 {
   "name": "codiepie",
+  "type": "brands",
   "title": "Codie Pie",
   "keywords": [],
   "categories": [],
@@ -2760,6 +3071,7 @@
 },
 {
   "name": "stumbleupon",
+  "type": "brands",
   "title": "StumbleUpon Logo",
   "keywords": [],
   "categories": [],
@@ -2768,6 +3080,7 @@
 },
 {
   "name": "nutritionix",
+  "type": "brands",
   "title": "Nutritionix",
   "keywords": [],
   "categories": [],
@@ -2776,6 +3089,7 @@
 },
 {
   "name": "linkedin-in",
+  "type": "brands",
   "title": "LinkedIn In",
   "keywords": [
     "linkedin"
@@ -2786,6 +3100,7 @@
 },
 {
   "name": "jsfiddle",
+  "type": "brands",
   "title": "jsFiddle",
   "keywords": [],
   "categories": [],
@@ -2794,6 +3109,7 @@
 },
 {
   "name": "yahoo",
+  "type": "brands",
   "title": "Yahoo Logo",
   "keywords": [],
   "categories": [],
@@ -2802,6 +3118,7 @@
 },
 {
   "name": "grav",
+  "type": "brands",
   "title": "Grav",
   "keywords": [],
   "categories": [],
@@ -2810,6 +3127,7 @@
 },
 {
   "name": "firefox-browser",
+  "type": "brands",
   "title": "Firefox Browser",
   "keywords": [
     "browser"
@@ -2820,6 +3138,7 @@
 },
 {
   "name": "sticker-mule",
+  "type": "brands",
   "title": "Sticker Mule",
   "keywords": [],
   "categories": [],
@@ -2828,6 +3147,7 @@
 },
 {
   "name": "goodreads-g",
+  "type": "brands",
   "title": "Goodreads G",
   "keywords": [],
   "categories": [],
@@ -2836,6 +3156,7 @@
 },
 {
   "name": "uber",
+  "type": "brands",
   "title": "Uber",
   "keywords": [],
   "categories": [],
@@ -2844,6 +3165,7 @@
 },
 {
   "name": "sketch",
+  "type": "brands",
   "title": "Sketch",
   "keywords": [
     "app",
@@ -2856,6 +3178,7 @@
 },
 {
   "name": "creative-commons-remix",
+  "type": "brands",
   "title": "Creative Commons Remix",
   "keywords": [],
   "categories": [],
@@ -2864,6 +3187,7 @@
 },
 {
   "name": "itunes-note",
+  "type": "brands",
   "title": "Itunes Note",
   "keywords": [],
   "categories": [],
@@ -2872,6 +3196,7 @@
 },
 {
   "name": "gulp",
+  "type": "brands",
   "title": "Gulp",
   "keywords": [],
   "categories": [],
@@ -2880,6 +3205,7 @@
 },
 {
   "name": "keycdn",
+  "type": "brands",
   "title": "KeyCDN",
   "keywords": [],
   "categories": [],
@@ -2888,6 +3214,7 @@
 },
 {
   "name": "diaspora",
+  "type": "brands",
   "title": "Diaspora",
   "keywords": [],
   "categories": [],
@@ -2896,6 +3223,7 @@
 },
 {
   "name": "cotton-bureau",
+  "type": "brands",
   "title": "Cotton Bureau",
   "keywords": [
     "clothing",
@@ -2908,6 +3236,7 @@
 },
 {
   "name": "reddit",
+  "type": "brands",
   "title": "reddit Logo",
   "keywords": [],
   "categories": [],
@@ -2916,6 +3245,7 @@
 },
 {
   "name": "alipay",
+  "type": "brands",
   "title": "Alipay",
   "keywords": [],
   "categories": [
@@ -2926,6 +3256,7 @@
 },
 {
   "name": "cloudscale",
+  "type": "brands",
   "title": "cloudscale.ch",
   "keywords": [],
   "categories": [],
@@ -2934,6 +3265,7 @@
 },
 {
   "name": "buysellads",
+  "type": "brands",
   "title": "BuySellAds",
   "keywords": [],
   "categories": [],
@@ -2942,6 +3274,7 @@
 },
 {
   "name": "steam-symbol",
+  "type": "brands",
   "title": "Steam Symbol",
   "keywords": [],
   "categories": [
@@ -2952,6 +3285,7 @@
 },
 {
   "name": "asymmetrik",
+  "type": "brands",
   "title": "Asymmetrik, Ltd.",
   "keywords": [],
   "categories": [],
@@ -2960,6 +3294,7 @@
 },
 {
   "name": "angellist",
+  "type": "brands",
   "title": "AngelList",
   "keywords": [],
   "categories": [],
@@ -2968,6 +3303,7 @@
 },
 {
   "name": "wpforms",
+  "type": "brands",
   "title": "WPForms",
   "keywords": [],
   "categories": [],
@@ -2976,6 +3312,7 @@
 },
 {
   "name": "linode",
+  "type": "brands",
   "title": "Linode",
   "keywords": [],
   "categories": [],
@@ -2984,6 +3321,7 @@
 },
 {
   "name": "js-square",
+  "type": "brands",
   "title": "JavaScript (JS) Square",
   "keywords": [],
   "categories": [],
@@ -2992,6 +3330,7 @@
 },
 {
   "name": "avianex",
+  "type": "brands",
   "title": "avianex",
   "keywords": [],
   "categories": [],
@@ -3000,6 +3339,7 @@
 },
 {
   "name": "evernote",
+  "type": "brands",
   "title": "Evernote",
   "keywords": [],
   "categories": [],
@@ -3008,6 +3348,7 @@
 },
 {
   "name": "codepen",
+  "type": "brands",
   "title": "Codepen",
   "keywords": [],
   "categories": [],
@@ -3016,6 +3357,7 @@
 },
 {
   "name": "dribbble",
+  "type": "brands",
   "title": "Dribbble",
   "keywords": [],
   "categories": [],
@@ -3024,6 +3366,7 @@
 },
 {
   "name": "cc-amazon-pay",
+  "type": "brands",
   "title": "Amazon Pay Credit Card",
   "keywords": [],
   "categories": [
@@ -3034,6 +3377,7 @@
 },
 {
   "name": "xbox",
+  "type": "brands",
   "title": "Xbox",
   "keywords": [],
   "categories": [
@@ -3044,6 +3388,7 @@
 },
 {
   "name": "trello",
+  "type": "brands",
   "title": "Trello",
   "keywords": [
     "atlassian"
@@ -3054,6 +3399,7 @@
 },
 {
   "name": "adversal",
+  "type": "brands",
   "title": "Adversal",
   "keywords": [],
   "categories": [],
@@ -3062,6 +3408,7 @@
 },
 {
   "name": "dhl",
+  "type": "brands",
   "title": "DHL",
   "keywords": [
     "Dalsey",
@@ -3076,6 +3423,7 @@
 },
 {
   "name": "hornbill",
+  "type": "brands",
   "title": "Hornbill",
   "keywords": [],
   "categories": [],
@@ -3084,6 +3432,7 @@
 },
 {
   "name": "themeco",
+  "type": "brands",
   "title": "Themeco",
   "keywords": [],
   "categories": [],
@@ -3092,6 +3441,7 @@
 },
 {
   "name": "google-plus",
+  "type": "brands",
   "title": "Google Plus",
   "keywords": [
     "google-plus-circle",
@@ -3103,6 +3453,7 @@
 },
 {
   "name": "contao",
+  "type": "brands",
   "title": "Contao",
   "keywords": [],
   "categories": [],
@@ -3111,6 +3462,7 @@
 },
 {
   "name": "linkedin",
+  "type": "brands",
   "title": "LinkedIn",
   "keywords": [
     "linkedin-square"
@@ -3121,6 +3473,7 @@
 },
 {
   "name": "ideal",
+  "type": "brands",
   "title": "iDeal",
   "keywords": [],
   "categories": [],
@@ -3129,6 +3482,7 @@
 },
 {
   "name": "mandalorian",
+  "type": "brands",
   "title": "Mandalorian",
   "keywords": [],
   "categories": [],
@@ -3137,6 +3491,7 @@
 },
 {
   "name": "old-republic",
+  "type": "brands",
   "title": "Old Republic",
   "keywords": [
     "politics",
@@ -3150,6 +3505,7 @@
 },
 {
   "name": "qq",
+  "type": "brands",
   "title": "QQ",
   "keywords": [],
   "categories": [],
@@ -3158,6 +3514,7 @@
 },
 {
   "name": "vaadin",
+  "type": "brands",
   "title": "Vaadin",
   "keywords": [],
   "categories": [],
@@ -3166,6 +3523,7 @@
 },
 {
   "name": "uikit",
+  "type": "brands",
   "title": "UIkit",
   "keywords": [],
   "categories": [],
@@ -3174,6 +3532,7 @@
 },
 {
   "name": "react",
+  "type": "brands",
   "title": "React",
   "keywords": [],
   "categories": [],
@@ -3182,6 +3541,7 @@
 },
 {
   "name": "creative-commons-by",
+  "type": "brands",
   "title": "Creative Commons Attribution",
   "keywords": [],
   "categories": [],
@@ -3190,6 +3550,7 @@
 },
 {
   "name": "optin-monster",
+  "type": "brands",
   "title": "Optin Monster",
   "keywords": [],
   "categories": [],
@@ -3198,6 +3559,7 @@
 },
 {
   "name": "twitter",
+  "type": "brands",
   "title": "Twitter",
   "keywords": [
     "social network",
@@ -3209,6 +3571,7 @@
 },
 {
   "name": "less",
+  "type": "brands",
   "title": "Less",
   "keywords": [],
   "categories": [],
@@ -3217,6 +3580,7 @@
 },
 {
   "name": "dailymotion",
+  "type": "brands",
   "title": "dailymotion",
   "keywords": [],
   "categories": [],
@@ -3225,6 +3589,7 @@
 },
 {
   "name": "patreon",
+  "type": "brands",
   "title": "Patreon",
   "keywords": [],
   "categories": [],
@@ -3233,6 +3598,7 @@
 },
 {
   "name": "swift",
+  "type": "brands",
   "title": "Swift",
   "keywords": [],
   "categories": [],
@@ -3241,6 +3607,7 @@
 },
 {
   "name": "discord",
+  "type": "brands",
   "title": "Discord",
   "keywords": [],
   "categories": [],
@@ -3249,6 +3616,7 @@
 },
 {
   "name": "hacker-news-square",
+  "type": "brands",
   "title": "Hacker News Square",
   "keywords": [],
   "categories": [],
@@ -3257,6 +3625,7 @@
 },
 {
   "name": "opera",
+  "type": "brands",
   "title": "Opera",
   "keywords": [],
   "categories": [],
@@ -3265,6 +3634,7 @@
 },
 {
   "name": "gitter",
+  "type": "brands",
   "title": "Gitter",
   "keywords": [],
   "categories": [],
@@ -3273,6 +3643,7 @@
 },
 {
   "name": "buffer",
+  "type": "brands",
   "title": "Buffer",
   "keywords": [],
   "categories": [],
@@ -3281,6 +3652,7 @@
 },
 {
   "name": "css3",
+  "type": "brands",
   "title": "CSS 3 Logo",
   "keywords": [
     "code"
@@ -3291,6 +3663,7 @@
 },
 {
   "name": "renren",
+  "type": "brands",
   "title": "Renren",
   "keywords": [],
   "categories": [],
@@ -3299,6 +3672,7 @@
 },
 {
   "name": "ns8",
+  "type": "brands",
   "title": "NS8",
   "keywords": [],
   "categories": [],
@@ -3307,6 +3681,7 @@
 },
 {
   "name": "sistrix",
+  "type": "brands",
   "title": "SISTRIX",
   "keywords": [],
   "categories": [],
@@ -3315,6 +3690,7 @@
 },
 {
   "name": "vuejs",
+  "type": "brands",
   "title": "Vue.js",
   "keywords": [],
   "categories": [],
@@ -3323,6 +3699,7 @@
 },
 {
   "name": "facebook-square",
+  "type": "brands",
   "title": "Facebook Square",
   "keywords": [
     "social network"
@@ -3333,6 +3710,7 @@
 },
 {
   "name": "mixcloud",
+  "type": "brands",
   "title": "Mixcloud",
   "keywords": [],
   "categories": [],
@@ -3341,6 +3719,7 @@
 },
 {
   "name": "firstdraft",
+  "type": "brands",
   "title": "firstdraft",
   "keywords": [],
   "categories": [],
@@ -3349,6 +3728,7 @@
 },
 {
   "name": "slack",
+  "type": "brands",
   "title": "Slack Logo",
   "keywords": [
     "anchor",
@@ -3361,6 +3741,7 @@
 },
 {
   "name": "zhihu",
+  "type": "brands",
   "title": "Zhihu",
   "keywords": [],
   "categories": [],
@@ -3369,6 +3750,7 @@
 },
 {
   "name": "soundcloud",
+  "type": "brands",
   "title": "SoundCloud",
   "keywords": [],
   "categories": [
@@ -3379,6 +3761,7 @@
 },
 {
   "name": "product-hunt",
+  "type": "brands",
   "title": "Product Hunt",
   "keywords": [],
   "categories": [],
@@ -3387,6 +3770,7 @@
 },
 {
   "name": "wikipedia-w",
+  "type": "brands",
   "title": "Wikipedia W",
   "keywords": [],
   "categories": [],
@@ -3395,6 +3779,7 @@
 },
 {
   "name": "pied-piper-pp",
+  "type": "brands",
   "title": "Pied Piper PP Logo (Old)",
   "keywords": [],
   "categories": [],
@@ -3403,6 +3788,7 @@
 },
 {
   "name": "creative-commons-sampling",
+  "type": "brands",
   "title": "Creative Commons Sampling",
   "keywords": [],
   "categories": [],
@@ -3411,6 +3797,7 @@
 },
 {
   "name": "hooli",
+  "type": "brands",
   "title": "Hooli",
   "keywords": [],
   "categories": [],
@@ -3419,6 +3806,7 @@
 },
 {
   "name": "first-order",
+  "type": "brands",
   "title": "First Order",
   "keywords": [],
   "categories": [],
@@ -3427,6 +3815,7 @@
 },
 {
   "name": "glide-g",
+  "type": "brands",
   "title": "Glide G",
   "keywords": [],
   "categories": [],
@@ -3435,6 +3824,7 @@
 },
 {
   "name": "ember",
+  "type": "brands",
   "title": "Ember",
   "keywords": [],
   "categories": [],
@@ -3443,6 +3833,7 @@
 },
 {
   "name": "gitkraken",
+  "type": "brands",
   "title": "GitKraken",
   "keywords": [],
   "categories": [],
@@ -3451,6 +3842,7 @@
 },
 {
   "name": "steam-square",
+  "type": "brands",
   "title": "Steam Square",
   "keywords": [],
   "categories": [
@@ -3461,6 +3853,7 @@
 },
 {
   "name": "skype",
+  "type": "brands",
   "title": "Skype",
   "keywords": [],
   "categories": [],
@@ -3469,6 +3862,7 @@
 },
 {
   "name": "gofore",
+  "type": "brands",
   "title": "Gofore",
   "keywords": [],
   "categories": [],
@@ -3477,6 +3871,7 @@
 },
 {
   "name": "ebay",
+  "type": "brands",
   "title": "eBay",
   "keywords": [],
   "categories": [],
@@ -3485,6 +3880,7 @@
 },
 {
   "name": "cpanel",
+  "type": "brands",
   "title": "cPanel",
   "keywords": [],
   "categories": [],
@@ -3493,6 +3889,7 @@
 },
 {
   "name": "wordpress",
+  "type": "brands",
   "title": "WordPress Logo",
   "keywords": [],
   "categories": [],
@@ -3501,6 +3898,7 @@
 },
 {
   "name": "korvue",
+  "type": "brands",
   "title": "KORVUE",
   "keywords": [],
   "categories": [],
@@ -3509,6 +3907,7 @@
 },
 {
   "name": "cloudversify",
+  "type": "brands",
   "title": "cloudversify",
   "keywords": [],
   "categories": [],
@@ -3517,6 +3916,7 @@
 },
 {
   "name": "grunt",
+  "type": "brands",
   "title": "Grunt",
   "keywords": [],
   "categories": [],
@@ -3525,6 +3925,7 @@
 },
 {
   "name": "viadeo",
+  "type": "brands",
   "title": "Video",
   "keywords": [],
   "categories": [],
@@ -3533,6 +3934,7 @@
 },
 {
   "name": "wordpress-simple",
+  "type": "brands",
   "title": "Wordpress Simple",
   "keywords": [],
   "categories": [],
@@ -3541,6 +3943,7 @@
 },
 {
   "name": "blackberry",
+  "type": "brands",
   "title": "BlackBerry",
   "keywords": [],
   "categories": [],
@@ -3549,6 +3952,7 @@
 },
 {
   "name": "facebook-messenger",
+  "type": "brands",
   "title": "Facebook Messenger",
   "keywords": [],
   "categories": [],
@@ -3557,6 +3961,7 @@
 },
 {
   "name": "pushed",
+  "type": "brands",
   "title": "Pushed",
   "keywords": [],
   "categories": [],
@@ -3565,6 +3970,7 @@
 },
 {
   "name": "amilia",
+  "type": "brands",
   "title": "Amilia",
   "keywords": [],
   "categories": [],
@@ -3573,6 +3979,7 @@
 },
 {
   "name": "pied-piper-alt",
+  "type": "brands",
   "title": "Alternate Pied Piper Logo (Old)",
   "keywords": [],
   "categories": [],
@@ -3581,6 +3988,7 @@
 },
 {
   "name": "cloudsmith",
+  "type": "brands",
   "title": "Cloudsmith",
   "keywords": [],
   "categories": [],
@@ -3589,6 +3997,7 @@
 },
 {
   "name": "chrome",
+  "type": "brands",
   "title": "Chrome",
   "keywords": [
     "browser"
@@ -3599,6 +4008,7 @@
 },
 {
   "name": "forumbee",
+  "type": "brands",
   "title": "Forumbee",
   "keywords": [],
   "categories": [],
@@ -3607,6 +4017,7 @@
 },
 {
   "name": "snapchat-square",
+  "type": "brands",
   "title": "Snapchat Square",
   "keywords": [],
   "categories": [],
@@ -3615,6 +4026,7 @@
 },
 {
   "name": "node-js",
+  "type": "brands",
   "title": "Node.js JS",
   "keywords": [],
   "categories": [],
@@ -3623,6 +4035,7 @@
 },
 {
   "name": "maxcdn",
+  "type": "brands",
   "title": "MaxCDN",
   "keywords": [],
   "categories": [],
@@ -3631,6 +4044,7 @@
 },
 {
   "name": "apple",
+  "type": "brands",
   "title": "Apple",
   "keywords": [
     "fruit",
@@ -3646,6 +4060,7 @@
 },
 {
   "name": "napster",
+  "type": "brands",
   "title": "Napster",
   "keywords": [],
   "categories": [
@@ -3656,6 +4071,7 @@
 },
 {
   "name": "nimblr",
+  "type": "brands",
   "title": "Nimblr",
   "keywords": [],
   "categories": [],
@@ -3664,6 +4080,7 @@
 },
 {
   "name": "vnv",
+  "type": "brands",
   "title": "VNV",
   "keywords": [],
   "categories": [],
@@ -3672,6 +4089,7 @@
 },
 {
   "name": "waze",
+  "type": "brands",
   "title": "Waze",
   "keywords": [],
   "categories": [],
@@ -3680,6 +4098,7 @@
 },
 {
   "name": "telegram-plane",
+  "type": "brands",
   "title": "Telegram Plane",
   "keywords": [],
   "categories": [],
@@ -3688,6 +4107,7 @@
 },
 {
   "name": "odnoklassniki-square",
+  "type": "brands",
   "title": "Odnoklassniki Square",
   "keywords": [],
   "categories": [],
@@ -3696,6 +4116,7 @@
 },
 {
   "name": "google-plus-g",
+  "type": "brands",
   "title": "Google Plus G",
   "keywords": [
     "google-plus",
@@ -3707,6 +4128,7 @@
 },
 {
   "name": "palfed",
+  "type": "brands",
   "title": "Palfed",
   "keywords": [],
   "categories": [],
@@ -3715,6 +4137,7 @@
 },
 {
   "name": "weebly",
+  "type": "brands",
   "title": "Weebly",
   "keywords": [],
   "categories": [],
@@ -3723,6 +4146,7 @@
 },
 {
   "name": "autoprefixer",
+  "type": "brands",
   "title": "Autoprefixer",
   "keywords": [],
   "categories": [],
@@ -3731,6 +4155,7 @@
 },
 {
   "name": "searchengin",
+  "type": "brands",
   "title": "Searchengin",
   "keywords": [],
   "categories": [],
@@ -3739,6 +4164,7 @@
 },
 {
   "name": "pinterest-square",
+  "type": "brands",
   "title": "Pinterest Square",
   "keywords": [],
   "categories": [],
@@ -3747,6 +4173,7 @@
 },
 {
   "name": "megaport",
+  "type": "brands",
   "title": "Megaport",
   "keywords": [],
   "categories": [],
@@ -3755,6 +4182,7 @@
 },
 {
   "name": "typo3",
+  "type": "brands",
   "title": "Typo3",
   "keywords": [],
   "categories": [],
@@ -3763,6 +4191,7 @@
 },
 {
   "name": "deploydog",
+  "type": "brands",
   "title": "deploy.dog",
   "keywords": [],
   "categories": [],
@@ -3771,6 +4200,7 @@
 },
 {
   "name": "node",
+  "type": "brands",
   "title": "Node.js",
   "keywords": [],
   "categories": [],
@@ -3779,6 +4209,7 @@
 },
 {
   "name": "cc-mastercard",
+  "type": "brands",
   "title": "MasterCard Credit Card",
   "keywords": [],
   "categories": [
@@ -3789,6 +4220,7 @@
 },
 {
   "name": "twitter-square",
+  "type": "brands",
   "title": "Twitter Square",
   "keywords": [
     "social network",
@@ -3800,6 +4232,7 @@
 },
 {
   "name": "dashcube",
+  "type": "brands",
   "title": "DashCube",
   "keywords": [],
   "categories": [],
@@ -3808,6 +4241,7 @@
 },
 {
   "name": "get-pocket",
+  "type": "brands",
   "title": "Get Pocket",
   "keywords": [],
   "categories": [],
@@ -3816,6 +4250,7 @@
 },
 {
   "name": "ups",
+  "type": "brands",
   "title": "UPS",
   "keywords": [
     "United Parcel Service",
@@ -3828,6 +4263,7 @@
 },
 {
   "name": "medium-m",
+  "type": "brands",
   "title": "Medium M",
   "keywords": [],
   "categories": [],
@@ -3836,6 +4272,7 @@
 },
 {
   "name": "behance",
+  "type": "brands",
   "title": "Behance",
   "keywords": [],
   "categories": [],
@@ -3844,6 +4281,7 @@
 },
 {
   "name": "resolving",
+  "type": "brands",
   "title": "Resolving",
   "keywords": [],
   "categories": [],
@@ -3852,6 +4290,7 @@
 },
 {
   "name": "internet-explorer",
+  "type": "brands",
   "title": "Internet-explorer",
   "keywords": [
     "browser",
@@ -3863,6 +4302,7 @@
 },
 {
   "name": "staylinked",
+  "type": "brands",
   "title": "StayLinked",
   "keywords": [],
   "categories": [],
@@ -3871,6 +4311,7 @@
 },
 {
   "name": "firefox",
+  "type": "brands",
   "title": "Firefox",
   "keywords": [
     "browser"
@@ -3881,6 +4322,7 @@
 },
 {
   "name": "flickr",
+  "type": "brands",
   "title": "Flickr",
   "keywords": [],
   "categories": [],
@@ -3889,6 +4331,7 @@
 },
 {
   "name": "mixer",
+  "type": "brands",
   "title": "Mixer",
   "keywords": [],
   "categories": [],
@@ -3897,6 +4340,7 @@
 },
 {
   "name": "itunes",
+  "type": "brands",
   "title": "iTunes",
   "keywords": [],
   "categories": [],
