@@ -42,13 +42,14 @@ export type PersistedCustomFontV1 = {
 }
 
 export type PersistedShapeConfV1 =
-  | PersistedShapeConfRasterV1
+  | PersistedShapeConfClipartRasterV1
   | PersistedShapeConfCustomRasterV1
-  | PersistedShapeConfSvgV1
+  | PersistedShapeConfClipartSvgV1
+  | PersistedShapeConfIconV1
   | PersistedShapeConfCustomSvgV1
   | PersistedShapeConfCustomTextV1
 
-export type PersistedShapeConfRasterV1 = {
+export type PersistedShapeConfClipartRasterV1 = {
   kind: 'raster'
   transform: MatrixSerialized
   shapeId: ShapeId
@@ -60,8 +61,14 @@ export type PersistedShapeConfCustomRasterV1 = {
   url: string
   processing?: RasterProcessingConf
 }
-export type PersistedShapeConfSvgV1 = {
+export type PersistedShapeConfClipartSvgV1 = {
   kind: 'svg'
+  transform: MatrixSerialized
+  shapeId: ShapeId
+  processing?: SvgProcessingConf
+}
+export type PersistedShapeConfIconV1 = {
+  kind: 'icon'
   transform: MatrixSerialized
   shapeId: ShapeId
   processing?: SvgProcessingConf

@@ -253,6 +253,21 @@ export class EditorStore {
       await this.selectShape(imageShapes[5])
     }
 
+    if (
+      this.selectedShapeConf.kind === 'clipart:raster' ||
+      this.selectedShapeConf.kind === 'clipart:svg'
+    ) {
+      this.shapesPanel.shapeKind = 'image'
+      this.shapesPanel.image.selected = this.selectedShapeConf.id
+    } else if (
+      this.selectedShapeConf.kind === 'custom:raster' ||
+      this.selectedShapeConf.kind === 'custom:svg'
+    ) {
+      this.shapesPanel.shapeKind = 'custom image'
+    } else {
+      this.shapesPanel.shapeKind = this.selectedShapeConf.kind
+    }
+
     this.enterViewMode('shape')
 
     this.lifecycleState = 'initialized'
@@ -641,6 +656,7 @@ export class EditorStore {
       currentShapeConf.thumbnailUrl = canvas.toDataURL()
     }
     currentShapeConf.processedThumbnailUrl = canvas.toDataURL()
+    this.renderKey++
   }
 
   /** Used for undo/redo */
@@ -854,6 +870,13 @@ export class EditorStore {
           shapeId: shape.config.id,
           processing: shape.config.processing || {},
         }
+      } else if (shape.kind === 'icon') {
+        return {
+          kind: 'icon',
+          transform,
+          shapeId: shape.config.id,
+          processing: shape.config.processing || {},
+        }
       } else if (shape.kind === 'text') {
         return {
           kind: 'custom-text',
@@ -861,11 +884,7 @@ export class EditorStore {
           textStyle: shape.config.textStyle,
           transform,
         }
-      } else if (
-        shape.kind === 'icon' ||
-        shape.kind === 'full-canvas' ||
-        shape.kind === 'random-blob'
-      ) {
+      } else if (shape.kind === 'full-canvas' || shape.kind === 'random-blob') {
         // TODO
         throw new Error('not supported')
       } else {
@@ -1308,8 +1327,16 @@ export class EditorStore {
         kind: 'single-color',
         color: theme.shapeFill,
       }
+      if (shape.kind === 'icon') {
+        this.shapesPanel.icon.color = theme.shapeFill
+      }
     } else if (shape.kind === 'text') {
       shape.config.textStyle.color = theme.shapeFill
+      this.shapesPanel.text.color = theme.shapeFill
+    } else if (shape.kind === 'full-canvas') {
+      this.shapesPanel.fullCanvas.color = theme.shapeFill
+    } else if (shape.kind === 'random-blob') {
+      this.shapesPanel.blob.color = theme.shapeFill
     }
 
     // Shape items coloring
