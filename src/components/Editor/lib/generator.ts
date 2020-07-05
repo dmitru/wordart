@@ -67,7 +67,7 @@ export class Generator {
     this.isCancelled = false
     this.logger.debug('Generator: generate', task)
 
-    const shapeCanvasMaxExtent = 230
+    const shapeCanvasMaxExtent = 300
     const batchSize = 50
     const nIter = 100
 

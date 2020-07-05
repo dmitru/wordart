@@ -196,7 +196,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                   }
                 `}
                 backgroundColor="white"
-                url={shape.config.thumbnailUrl!}
+                url={shape.config.processedThumbnailUrl!}
               />
             )}
             <Box
@@ -217,7 +217,10 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                 />
               </Box>
 
-              <Box mb="3">
+              <Box display="flex" alignItems="center" mb="5">
+                <Text my="0" mr="3" fontWeight="semibold">
+                  Color
+                </Text>
                 <IconColorPicker updateShapeColoring={updateShapeColoring} />
               </Box>
 

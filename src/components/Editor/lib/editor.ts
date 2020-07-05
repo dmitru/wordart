@@ -98,7 +98,7 @@ export class Editor {
   private generator: Generator
   mode: EditorMode = 'view'
 
-  private aspectRatio: number
+  aspectRatio: number
   private editorItemIdGen = new UniqIdGenerator(3)
 
   /** Gets incremented after each change */
@@ -1004,7 +1004,8 @@ export class Editor {
         obj: shapeObj,
       }
     } else if (shapeConfig.kind === 'blob') {
-      shapeObj = await loadObjFromSvgString(shapeConfig.svg)
+      const pathObj = new fabric.Path(shapeConfig.svg)
+      shapeObj = new fabric.Group([pathObj])
 
       shape = {
         kind: 'blob',

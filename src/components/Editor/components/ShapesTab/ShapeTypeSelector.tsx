@@ -54,6 +54,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 description="A blob shape for quick and unique designs"
                 onClick={() => {
                   shapesPanel.shapeKind = 'blob'
+                  store.animateVisualize(false)
                 }}
               />
 
@@ -68,6 +69,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                   if (shapeConf) {
                     store.selectShape(shapeConf)
                   }
+                  store.animateVisualize(false)
                 }}
               />
 
@@ -82,6 +84,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                   if (shapeConf) {
                     store.selectShape(shapeConf)
                   }
+                  store.animateVisualize(false)
                 }}
               />
 
@@ -100,6 +103,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                   }
                   store.selectShape(textShape)
                   shapesPanel.shapeKind = 'text'
+                  store.animateVisualize(false)
                 }}
               />
 
@@ -108,6 +112,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 description="Upload your own image!"
                 onClick={() => {
                   shapesPanel.shapeKind = 'custom image'
+                  store.animateVisualize(false)
                 }}
               />
 
@@ -116,6 +121,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 description="Fill the entire canvas"
                 onClick={() => {
                   shapesPanel.shapeKind = 'full canvas'
+                  store.animateVisualize(false)
                 }}
               />
             </MenuList>

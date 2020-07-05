@@ -45,7 +45,7 @@ import { createCanvas } from 'lib/wordart/canvas-utils'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { FontPicker } from 'components/Editor/components/FontPicker'
 import { ShapeRandomBlobConf } from 'components/Editor/shape-config'
-import { generateBlobShape } from 'components/Editor/lib/blob-shape-gen'
+import { generateBlobShapePathData } from 'components/Editor/lib/blob-shape-gen'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -155,7 +155,7 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
     const canvas = createCanvas({ w: canvasSize, h: canvasSize })
     const c = new fabric.StaticCanvas(canvas)
 
-    const shapeObj = await loadObjFromSvgString(shape.config.svg)
+    const shapeObj = new fabric.Path(shape.config.svg)
     c.add(shapeObj)
     shapeObj.set({ fill: store.shapesPanel.blob.color })
 
@@ -176,10 +176,11 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
   }
 
   const updateBlobShape = async () => {
-    const blobShapeObj = generateBlobShape({
+    const blobShapeSvg = generateBlobShapePathData({
       color: store.shapesPanel.blob.color,
       points: store.shapesPanel.blob.points,
       complexity: store.shapesPanel.blob.complexity,
+      aspect: store.editor?.aspectRatio || 1,
     })
 
     const shapeConfig: ShapeRandomBlobConf = {
@@ -187,7 +188,7 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
       color: store.shapesPanel.blob.color,
       points: store.shapesPanel.blob.points,
       complexity: store.shapesPanel.blob.complexity,
-      svg: blobShapeObj.toSVG(),
+      svg: blobShapeSvg,
     }
 
     await store.selectShape(shapeConfig)
@@ -281,6 +282,21 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
                   onAfterChange={(value: number) => {
                     store.editor?.setShapeOpacity(value / 100)
                   }}
+                />
+              </Box>
+
+              <Box display="flex" alignItems="center" mb="5">
+                <Text my="0" mr="3" fontWeight="semibold">
+                  Color
+                </Text>
+                <ColorPickerPopover
+                  value={store.shapesPanel.blob.color}
+                  onChange={(color) => {
+                    store.shapesPanel.blob.color = color
+                    shape.config.color = color
+                    updateThumbnailDebounced()
+                  }}
+                  onAfterChange={() => updateShapeColoringDebounced()}
                 />
               </Box>
 
@@ -410,14 +426,13 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
                           updateThumbnailDebounced()
                         }}
                         resetValue={20}
-                        onAfterChange={updateShapeDebounced}
                         min={0}
                         max={100}
                         step={1}
                       />
                     </Box>
 
-                    <Box>
+                    <Box mb="1.5rem">
                       <Slider
                         label="Points"
                         value={store.shapesPanel.blob.points}
@@ -430,21 +445,6 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
                         min={3}
                         max={16}
                         step={1}
-                      />
-                    </Box>
-
-                    <Box display="flex" alignItems="center" mb="5">
-                      <Text my="0" mr="3" fontWeight="semibold">
-                        Color
-                      </Text>
-                      <ColorPickerPopover
-                        value={store.shapesPanel.blob.color}
-                        onChange={(color) => {
-                          store.shapesPanel.blob.color = color
-                          shape.config.color = color
-                          updateThumbnailDebounced()
-                        }}
-                        onAfterChange={() => updateShapeColoringDebounced()}
                       />
                     </Box>
 

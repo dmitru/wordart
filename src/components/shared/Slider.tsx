@@ -61,13 +61,13 @@ export const Slider: React.FC<SliderProps> = (props) => {
               Helvetica, Arial, sans-serif, 'Apple Color Emoji',
               'Segoe UI Emoji', 'Segoe UI Symbol';
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 1rem;
             margin-bottom: 0;
             ${horizontal
               ? `
               margin-right: 16px;
             `
-              : 'margin-bottom: 0.5rem;'}
+              : 'margin-bottom: 0.25rem;'}
             ${labelCss}
           `}
         >
@@ -75,7 +75,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
         </Text>
       )}
 
-      <Box display="flex" alignItems="center">
+      <Box display="flex" alignItems="center" flex="1" width="100%">
         <SliderImpl
           domain={[min, max]}
           values={[value]}

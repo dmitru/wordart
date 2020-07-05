@@ -1320,8 +1320,10 @@ export class EditorStore {
       shape.config.textStyle.color = theme.shapeFill
       this.shapesPanel.text.color = theme.shapeFill
     } else if (shape.kind === 'full-canvas') {
+      shape.config.color = theme.shapeFill
       this.shapesPanel.fullCanvas.color = theme.shapeFill
     } else if (shape.kind === 'blob') {
+      shape.config.color = theme.shapeFill
       this.shapesPanel.blob.color = theme.shapeFill
     }
 
@@ -1441,8 +1443,8 @@ export type LeftPanelShapesState = {
 export const leftPanelShapesInitialState: LeftPanelShapesState = {
   shapeKind: 'icon',
   blob: {
-    color: 'red',
-    complexity: 10,
+    color: '#4A90E2',
+    complexity: 40,
     points: 5,
   },
   customImage: {},
