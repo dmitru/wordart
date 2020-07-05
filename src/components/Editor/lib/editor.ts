@@ -641,6 +641,22 @@ export class Editor {
     setFillColor(shapeObj, textStyle.color)
   }
 
+  updateIconShapeColors = async (color: string) => {
+    if (this.shape?.kind !== 'icon') {
+      console.error(
+        `Unexpected shape type: expected icon, got ${this.shape?.kind}`
+      )
+      return
+    }
+
+    if (!this.shape.obj) {
+      return
+    }
+
+    const shapeObj = this.shape.obj
+    setFillColor(shapeObj, color)
+  }
+
   updateSvgShapeColors = async (config: SvgProcessingConf) => {
     if (
       this.shape?.kind !== 'clipart:svg' &&
@@ -706,15 +722,14 @@ export class Editor {
     if (config.kind === 'clipart:raster' || config.kind === 'custom:raster') {
       this.updateRasterShapeColors(config.processing)
     }
-    if (
-      config.kind === 'clipart:svg' ||
-      config.kind === 'custom:svg' ||
-      config.kind === 'icon'
-    ) {
+    if (config.kind === 'clipart:svg' || config.kind === 'custom:svg') {
       this.updateSvgShapeColors(config.processing)
     }
     if (config.kind === 'text') {
       this.updateTextShapeColors(config.textStyle)
+    }
+    if (config.kind === 'icon') {
+      this.updateIconShapeColors(config.color)
     }
     if (config.kind === 'blob') {
       this.updateBlobShapeColors(config.color)
@@ -838,11 +853,7 @@ export class Editor {
         color = chroma(colors[colorIndex])
         colorIndex = (colorIndex + 1) % colors.length
       } else if (coloring.kind === 'shape') {
-        if (
-          shape.kind === 'custom:svg' ||
-          shape.kind === 'clipart:svg' ||
-          shape.kind === 'icon'
-        ) {
+        if (shape.kind === 'custom:svg' || shape.kind === 'clipart:svg') {
           if (shape.config.processing.colors.kind === 'single-color') {
             const shapeColor = new paper.Color(
               shape.config.processing.colors.color
@@ -877,6 +888,13 @@ export class Editor {
               255 * shapeColor.blue
             )
           }
+        } else if (shape.kind === 'icon') {
+          const shapeColor = new paper.Color(shape.config.color)
+          color = chroma.rgb(
+            255 * shapeColor.red,
+            255 * shapeColor.green,
+            255 * shapeColor.blue
+          )
         } else if (
           shape.kind === 'custom:raster' ||
           shape.kind === 'clipart:raster'

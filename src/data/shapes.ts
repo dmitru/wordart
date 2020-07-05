@@ -25,12 +25,9 @@ export const svgIcons: ShapeIconConf[] = [
           kind: 'icon',
           title: icon.title,
           url: icon.url,
+          color: '#4A90E2',
           processedThumbnailUrl: icon.url,
           thumbnailUrl: icon.url,
-          processing: {
-            colors: { kind: 'original' },
-            edges: defaultEdgesProcessing,
-          },
           keywords: icon.keywords,
           categories: icon.categories,
         } as ShapeIconConf)

@@ -359,10 +359,8 @@ export const IconShapeColorPicker: React.FC<{
       <ColorPickerPopover
         value={store.shapesPanel.icon.color}
         onChange={(color) => {
-          shapeConf.processing.colors = {
-            kind: 'single-color',
-            color,
-          }
+          store.shapesPanel.icon.color = color
+          shapeConf.color = color
           store.updateColorForAllShapeTypes(color)
           onChange()
         }}

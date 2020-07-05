@@ -126,10 +126,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
 
   useEffect(() => {
     if (shapeConfig && shapeConfig.kind === 'icon') {
-      shapeConfig.processing.colors = {
-        kind: 'single-color',
-        color: store.shapesPanel.icon.color,
-      }
+      shapeConfig.color = store.shapesPanel.icon.color
       updateShapeColoringDebounced()
     }
   }, [])
@@ -410,10 +407,8 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                         if (shapeConfig.kind !== 'icon') {
                           return
                         }
-                        shapeConfig.processing.colors = {
-                          kind: 'single-color',
-                          color: store.shapesPanel.icon.color,
-                        }
+
+                        shapeConfig.color = store.shapesPanel.icon.color
 
                         if (
                           store.shapesPanel.icon.selected !== shapeConfig.id

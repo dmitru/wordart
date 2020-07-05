@@ -414,6 +414,7 @@ export class EditorStore {
         text: data.shape.text,
         textStyle: data.shape.textStyle,
       }
+      this.updateColorForAllShapeTypes(data.shape.textStyle.color)
       await this.selectShape(customShapeConf, false, false)
     } else if (data.shape.kind === 'blob') {
       const customShapeConf: ShapeConf = {
@@ -423,12 +424,14 @@ export class EditorStore {
         points: data.shape.points,
         pathData: data.shape.pathData,
       }
+      this.updateColorForAllShapeTypes(data.shape.color)
       await this.selectShape(customShapeConf, false, false)
     } else if (data.shape.kind === 'full-canvas') {
       const customShapeConf: ShapeConf = {
         kind: 'full-canvas',
         color: data.shape.color,
       }
+      this.updateColorForAllShapeTypes(data.shape.color)
       await this.selectShape(customShapeConf, false, false)
     } else if (
       (data.shape.kind === 'clipart:raster' ||
@@ -440,9 +443,16 @@ export class EditorStore {
       const shapeConf =
         this.availableIconShapes.find((s) => s.id === shapeId) ||
         this.availableImageShapes.find((s) => s.id === shapeId)
+
       if (!shapeConf) {
         throw new Error(`shape config not found for shape id ${shapeId}`)
       }
+
+      if (data.shape.kind === 'icon' && shapeConf.kind === 'icon') {
+        shapeConf.color = data.shape.color
+        this.updateColorForAllShapeTypes(data.shape.color)
+      }
+
       await this.selectShape(shapeConf, false, false)
     }
 
@@ -460,12 +470,8 @@ export class EditorStore {
 
     if (
       shape &&
-      (shape.kind === 'clipart:svg' ||
-        shape.kind === 'custom:svg' ||
-        shape.kind === 'icon') &&
-      (data.shape.kind === 'clipart:svg' ||
-        data.shape.kind === 'custom:svg' ||
-        data.shape.kind === 'icon') &&
+      (shape.kind === 'clipart:svg' || shape.kind === 'custom:svg') &&
+      (data.shape.kind === 'clipart:svg' || data.shape.kind === 'custom:svg') &&
       data.shape.processing
     ) {
       shape.config.processing = data.shape.processing
@@ -566,11 +572,8 @@ export class EditorStore {
         this.shapesPanel.blob.points = this.selectedShapeConf.points
       } else if (this.selectedShapeConf.kind === 'full-canvas') {
         this.shapesPanel.fullCanvas.color = this.selectedShapeConf.color
-      } else if (
-        this.selectedShapeConf.kind === 'icon' &&
-        this.selectedShapeConf.processing.colors.kind === 'single-color'
-      ) {
-        this.shapesPanel.icon.color = this.selectedShapeConf.processing.colors.color
+      } else if (this.selectedShapeConf.kind === 'icon') {
+        this.shapesPanel.icon.color = this.selectedShapeConf.color
       }
     }
 
@@ -934,7 +937,7 @@ export class EditorStore {
           kind: 'icon',
           transform,
           shapeId: shape.config.id,
-          processing: shape.config.processing || {},
+          color: shape.config.color,
         }
       } else if (shape.kind === 'text') {
         return {
@@ -1360,17 +1363,15 @@ export class EditorStore {
     // Shape fill
     this.updateColorForAllShapeTypes(theme.shapeFill)
 
-    if (
-      shape.kind === 'clipart:svg' ||
-      shape.kind === 'custom:svg' ||
-      shape.kind === 'icon'
-    ) {
+    if (shape.kind === 'clipart:svg' || shape.kind === 'custom:svg') {
       shape.config.processing.colors = {
         kind: 'single-color',
         color: theme.shapeFill,
       }
     } else if (shape.kind === 'text') {
       shape.config.textStyle.color = theme.shapeFill
+    } else if (shape.kind === 'icon') {
+      shape.config.color = theme.shapeFill
     } else if (shape.kind === 'full-canvas') {
       shape.config.color = theme.shapeFill
     } else if (shape.kind === 'blob') {

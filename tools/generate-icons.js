@@ -49,7 +49,6 @@ async function processIcons(dirPath, type) {
       title: iconInfo.label,
       keywords: iconInfo.search.terms,
       categories: iconToCategories[iconName] || [],
-      kind: 'svg',
       url: `/${fullPath}`,
     })
   }
@@ -72,7 +71,7 @@ async function process(kind) {
     categories: string[]
   }
   
-  export const icons = [${allIcons
+  export const icons: IconConfig[] = [${allIcons
     .map((icon) => JSON.stringify(icon, null, 2))
     .join(',\n')}]
     `

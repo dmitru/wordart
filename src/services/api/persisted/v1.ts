@@ -73,7 +73,7 @@ export type PersistedShapeConfIconV1 = {
   kind: 'icon'
   transform: MatrixSerialized
   shapeId: ShapeId
-  processing?: SvgProcessingConf
+  color: string
 }
 export type PersistedShapeConfBlobV1 = {
   kind: 'blob'

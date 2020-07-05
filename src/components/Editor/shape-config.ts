@@ -61,20 +61,22 @@ type ShapeSvgConfBase = {
   url: string
   thumbnailUrl: string
   processedThumbnailUrl: string
-  title: string
   processing: SvgProcessingConf
 }
 
 export type ShapeClipartSvgConf = ShapeSvgConfBase & {
   kind: ShapeClipartSvg['kind']
+  title: string
   id: ShapeId
 }
 export type ShapeCustomImageSvgConf = ShapeSvgConfBase & {
   kind: ShapeCustomImageSvg['kind']
 }
-export type ShapeIconConf = ShapeSvgConfBase & {
+export type ShapeIconConf = Omit<ShapeSvgConfBase, 'processing'> & {
   kind: ShapeIcon['kind']
   id: ShapeId
+  color: string
+  title: string
 }
 
 type ShapeRasterConfBase = {
@@ -88,6 +90,7 @@ type ShapeRasterConfBase = {
 
 export type ShapeClipartRasterConf = ShapeRasterConfBase & {
   kind: ShapeClipartRaster['kind']
+  title: string
   id: ShapeId
 }
 export type ShapeCustomImageRasterConf = ShapeRasterConfBase & {
