@@ -725,7 +725,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           </LeftWrapper>
 
           <RightWrapper>
-            <TopToolbar display="flex" alignItems="center" bg="light" px="5">
+            <TopToolbar display="flex" alignItems="center" px="5">
               <Modal
                 initialFocusRef={cancelVisualizationBtnRef}
                 finalFocusRef={cancelVisualizationBtnRef}

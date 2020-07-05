@@ -31,9 +31,7 @@ export type ShapeRasterConf =
 export type ShapeKind = ShapeConf['kind']
 
 export type ShapeTextConf = {
-  title: string
   thumbnailUrl: string
-  processedThumbnailUrl: string
   kind: 'text'
   text: string
   textStyle: ShapeTextStyle

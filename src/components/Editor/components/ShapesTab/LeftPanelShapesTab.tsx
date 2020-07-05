@@ -2,6 +2,7 @@ import { Box } from '@chakra-ui/core'
 import { ClipArtShapePicker } from 'components/Editor/components/ShapesTab/ClipArtShapePicker'
 import { IconShapePicker } from 'components/Editor/components/ShapesTab/IconShapePicker'
 import { ShapeTypeSelector } from 'components/Editor/components/ShapesTab/ShapeTypeSelector'
+import { TextShapePicker } from 'components/Editor/components/ShapesTab/TextShapePicker'
 import { observer } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
@@ -19,6 +20,7 @@ export const LeftPanelShapesTab: React.FC<{}> = observer(() => {
 
         {leftPanelShapesState.shapeKind === 'image' && <ClipArtShapePicker />}
         {leftPanelShapesState.shapeKind === 'icon' && <IconShapePicker />}
+        {leftPanelShapesState.shapeKind === 'text' && <TextShapePicker />}
       </Box>
     </>
   )

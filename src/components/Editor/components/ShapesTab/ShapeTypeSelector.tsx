@@ -12,10 +12,11 @@ import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescripti
 import { observer } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
+import { ShapeTextConf } from 'components/Editor/shape-config'
 
 export const ShapeTypeSelector: React.FC<{}> = observer(() => {
   const { editorPageStore: store } = useStore()
-  const { shapesPanel: leftPanelShapesState } = store
+  const { shapesPanel } = store
 
   return (
     <Menu placement="bottom-end">
@@ -27,12 +28,12 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
         px="3"
       >
         {'Shape type: '}
-        {leftPanelShapesState.shapeKind === 'random blob' && 'Blob'}
-        {leftPanelShapesState.shapeKind === 'image' && 'Clip art'}
-        {leftPanelShapesState.shapeKind === 'icon' && 'Icon'}
-        {leftPanelShapesState.shapeKind === 'custom image' && 'Custom image'}
-        {leftPanelShapesState.shapeKind === 'text' && 'Text'}
-        {leftPanelShapesState.shapeKind === 'full canvas' && 'Full canvas'}
+        {shapesPanel.shapeKind === 'random blob' && 'Blob'}
+        {shapesPanel.shapeKind === 'image' && 'Clip art'}
+        {shapesPanel.shapeKind === 'icon' && 'Icon'}
+        {shapesPanel.shapeKind === 'custom image' && 'Custom image'}
+        {shapesPanel.shapeKind === 'text' && 'Text'}
+        {shapesPanel.shapeKind === 'full canvas' && 'Full canvas'}
       </MenuButton>
 
       <Portal>
@@ -49,17 +50,17 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 title="Blob shape"
                 description="A random blob shape for quick and unique designs"
                 onClick={() => {
-                  leftPanelShapesState.shapeKind = 'random blob'
+                  shapesPanel.shapeKind = 'random blob'
                 }}
               />
 
               <MenuItemWithDescription
                 title="Clip Art"
-                description="Choose one of hundreds images"
+                description="Pick one of hundreds images"
                 onClick={() => {
-                  leftPanelShapesState.shapeKind = 'image'
+                  shapesPanel.shapeKind = 'image'
                   const shapeConf = store.getImageShapeConfById(
-                    leftPanelShapesState.image.selected
+                    shapesPanel.image.selected
                   )
                   if (shapeConf) {
                     store.selectShape(shapeConf)
@@ -69,11 +70,11 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
 
               <MenuItemWithDescription
                 title="Icon"
-                description="Choose one of thousands icons and emoticons"
+                description="Choose one of 1,500+ icons and emoticons"
                 onClick={() => {
-                  leftPanelShapesState.shapeKind = 'icon'
+                  shapesPanel.shapeKind = 'icon'
                   const shapeConf = store.getIconShapeConfById(
-                    leftPanelShapesState.icon.selected
+                    shapesPanel.icon.selected
                   )
                   if (shapeConf) {
                     store.selectShape(shapeConf)
@@ -83,9 +84,19 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
 
               <MenuItemWithDescription
                 title="Text"
-                description="Use custom text as shape"
+                description="Enter your own text to use as shape"
                 onClick={() => {
-                  leftPanelShapesState.shapeKind = 'text'
+                  const textShape: ShapeTextConf = {
+                    kind: 'text',
+                    text: shapesPanel.text.text,
+                    textStyle: {
+                      color: shapesPanel.text.color,
+                      fontId: shapesPanel.text.fontId,
+                    },
+                    thumbnailUrl: '',
+                  }
+                  store.selectShape(textShape)
+                  shapesPanel.shapeKind = 'text'
                 }}
               />
 
@@ -93,7 +104,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 title="Custom image"
                 description="Upload your own image!"
                 onClick={() => {
-                  leftPanelShapesState.shapeKind = 'custom image'
+                  shapesPanel.shapeKind = 'custom image'
                 }}
               />
 
@@ -101,7 +112,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 title="Full canvas"
                 description="Fill the entire canvas"
                 onClick={() => {
-                  leftPanelShapesState.shapeKind = 'full canvas'
+                  shapesPanel.shapeKind = 'full canvas'
                 }}
               />
             </MenuList>

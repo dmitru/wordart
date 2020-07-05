@@ -9,15 +9,20 @@ import {
   MenuList,
   Stack,
   Text,
+  Textarea,
 } from '@chakra-ui/core'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
 import chroma from 'chroma-js'
+import { fabric } from 'fabric'
 import {
   ShapeSelector,
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
-import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
+import {
+  applyTransformToObj,
+  createMultilineFabricTextGroup,
+} from 'components/Editor/lib/fabric-utils'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
@@ -35,11 +40,14 @@ import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { iconsCategories } from 'data/icon-categories'
 import { useDebounce } from 'use-debounce'
+import { createCanvas } from 'lib/wordart/canvas-utils'
+import { SectionLabel } from 'components/Editor/components/shared'
+import { FontPicker } from 'components/Editor/components/FontPicker'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
   mode: 'home' as TabMode,
-  isShowingCustomizeImage: false,
+  thumbnailPreview: '',
 }
 
 const state = observable<typeof initialState>({ ...initialState })
@@ -61,7 +69,7 @@ const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
   />
 ))
 
-export const IconShapePicker: React.FC<{}> = observer(() => {
+export const TextShapePicker: React.FC<{}> = observer(() => {
   const { editorPageStore: store } = useStore()
   const shapeStyle = store.styleOptions.shape
   const shape = store.getShape()
@@ -71,29 +79,18 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
     renderKey, // eslint-disable-line
   } = store
 
-  const allCategoryOptions = iconsCategories
+  const fonts = store.getAvailableFonts()
 
-  const allItems = store.availableIconShapes
+  const [updateShapeDebounced] = useDebouncedCallback(
+    store.updateShapeFromSelectedShapeConf,
+    300,
+    {
+      leading: false,
+      trailing: true,
+    }
+  )
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-
-  const [query, setQuery] = useState('')
-
-  const [debouncedQuery] = useDebounce(query, 300)
-
-  const matchingItems = useMemo(() => {
-    const query = debouncedQuery.trim().toLowerCase()
-    return allItems.filter(
-      (s) =>
-        (!query ||
-          (query && s.title.toLowerCase().includes(query)) ||
-          (s.keywords || []).includes(query)) &&
-        (!selectedCategory ||
-          (selectedCategory && (s.categories || []).includes(selectedCategory)))
-    )
-  }, [debouncedQuery, selectedCategory])
-
-  const [updateShapeColoring] = useDebouncedCallback(
+  const [updateShapeColoringDebounced] = useDebouncedCallback(
     async () => {
       if (!shape) {
         return
@@ -117,8 +114,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
       if (store.leftTabIsTransformingShape) {
         store.editor?.deselectShape()
       }
-      Object.assign(state, initialState)
-      store.leftTabIsTransformingShape = false
+      initialState.mode = 'home'
     }
   }, [])
 
@@ -145,8 +141,63 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
       </Tooltip>
     ) : null
 
-  const shapeConfig = store.getSelectedShapeConf()
-  if (!shape || shape.kind !== 'icon' || shapeConfig.kind !== 'icon') {
+  const updateTextThumbnailPreview = async () => {
+    if (!shape || shape.kind !== 'text') {
+      return
+    }
+    const fontInfo = store.getFontById(store.shapesPanel.text.fontId)
+    if (!fontInfo) {
+      return
+    }
+    const font = await store.fetchFontById(fontInfo.style.fontId)
+    if (!font) {
+      return
+    }
+
+    const canvasSize = 400
+    const pad = 10
+    const fontSize = 100
+
+    const canvas = createCanvas({ w: canvasSize, h: canvasSize })
+    const c = new fabric.StaticCanvas(canvas)
+
+    const text = store.shapesPanel.text.text
+    const group = createMultilineFabricTextGroup(
+      text,
+      font,
+      fontSize,
+      store.shapesPanel.text.color
+    )
+    if (group.height! > group.width!) {
+      group.scaleToHeight(canvasSize - 2 * pad)
+    } else {
+      group.scaleToWidth(canvasSize - 2 * pad)
+    }
+    group.setPositionByOrigin(
+      new fabric.Point(canvasSize / 2, canvasSize / 2),
+      'center',
+      'center'
+    )
+    c.add(group)
+
+    c.renderAll()
+    state.thumbnailPreview = c.toDataURL()
+    c.dispose()
+  }
+
+  useEffect(() => {
+    if (shape && shape.kind === 'text') {
+      updateTextThumbnailPreview()
+    }
+  }, [shape])
+
+  const [updateThumbnail] = useDebouncedCallback(
+    updateTextThumbnailPreview,
+    300,
+    { leading: false, trailing: true }
+  )
+
+  if (!shape || shape.kind !== 'text') {
     return <></>
   }
 
@@ -196,7 +247,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                   }
                 `}
                 backgroundColor="white"
-                url={shape.config.processedThumbnailUrl!}
+                url={state.thumbnailPreview}
               />
             )}
             <Box
@@ -215,10 +266,6 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                     store.editor?.setShapeOpacity(value / 100)
                   }}
                 />
-              </Box>
-
-              <Box mb="3">
-                <IconColorPicker updateShapeColoring={updateShapeColoring} />
               </Box>
 
               <Flex width="100%">
@@ -336,82 +383,55 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                   animate={{ x: 0, y: 0, opacity: 1 }}
                   exit={{ x: -400, y: 0, opacity: 0 }}
                 >
-                  <Box
-                    position="absolute"
-                    width="100%"
-                    height="100%"
-                    display="flex"
-                    flexDirection="column"
-                  >
-                    <Flex align="center" mt="2" mb="4">
-                      <Box mr="3">
-                        <Menu>
-                          <MenuButton
-                            variant={selectedCategory ? 'solid' : 'outline'}
-                            colorScheme={
-                              selectedCategory ? 'accent' : undefined
-                            }
-                            as={Button}
-                            rightIcon={<ChevronDownIcon />}
-                            size="sm"
-                            py="2"
-                            px="3"
-                          >
-                            {selectedCategory || 'All categories'}
-                          </MenuButton>
-                          <MenuList
-                            css={css`
-                              max-height: 300px;
-                              overflow: auto;
-                            `}
-                          >
-                            <MenuItem onClick={() => setSelectedCategory(null)}>
-                              Show all ({allItems.length})
-                            </MenuItem>
-                            <MenuDivider />
-                            {allCategoryOptions.map((item, index) => (
-                              <MenuItem
-                                key={item.label}
-                                onClick={() => setSelectedCategory(item.label)}
-                              >
-                                {item.label} ({item.count})
-                              </MenuItem>
-                            ))}
-                          </MenuList>
-                        </Menu>
-                      </Box>
-
-                      <SearchInput
-                        placeholder="Search..."
-                        value={query}
-                        onChange={setQuery}
-                      />
-                    </Flex>
-
-                    <ShapeSelector
-                      columns={6}
-                      overscanCount={3}
-                      shapes={matchingItems}
-                      onSelected={async (shapeConfig) => {
-                        if (shapeConfig.kind !== 'icon') {
-                          return
-                        }
-                        shapeConfig.processing.colors = {
-                          kind: 'single-color',
-                          color: store.shapesPanel.icon.color,
-                        }
-
-                        if (
-                          store.shapesPanel.icon.selected !== shapeConfig.id
-                        ) {
-                          store.shapesPanel.icon.selected = shapeConfig.id
-                          await store.selectShapeAndSaveUndo(shapeConfig)
-                        }
-                        store.animateVisualize(false)
+                  <Stack mb="4" p="2" position="absolute" width="100%">
+                    <Textarea
+                      mb="3"
+                      autoFocus
+                      value={store.shapesPanel.text.text}
+                      onChange={async (e: any) => {
+                        const text = e.target.value
+                        store.shapesPanel.text.text = text
+                        shape.config.text = text
+                        updateShapeDebounced()
+                        updateThumbnail()
                       }}
-                      selectedShapeId={store.shapesPanel.icon.selected}
+                      placeholder="Type text here..."
                     />
-                  </Box>
+
+                    <Box display="flex" alignItems="center" mb="5">
+                      <Text my="0" mr="3" fontWeight="semibold">
+                        Color
+                      </Text>
+                      <ColorPickerPopover
+                        value={store.shapesPanel.text.color}
+                        onChange={(color) => {
+                          store.shapesPanel.text.color = color
+                          shape.config.textStyle.color = color
+                          updateThumbnail()
+                        }}
+                        onAfterChange={() => updateShapeColoringDebounced()}
+                      />
+                    </Box>
+
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      css={css`
+                        min-height: 300px;
+                        height: calc(100vh - 520px);
+                      `}
+                    >
+                      <FontPicker
+                        selectedFontId={store.shapesPanel.text.fontId}
+                        onHighlighted={async (font, style) => {
+                          store.shapesPanel.text.fontId = style.fontId
+                          shape.config.textStyle.fontId = style.fontId
+                          updateThumbnail()
+                          updateShapeDebounced()
+                        }}
+                      />
+                    </Box>
+                  </Stack>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -421,38 +441,3 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
     </>
   )
 })
-
-const IconColorPicker = observer(
-  ({ updateShapeColoring }: { updateShapeColoring: () => void }) => {
-    const { editorPageStore: store } = useStore()
-    const shapeStyle = store.styleOptions.shape
-    const shape = store.getShape()
-    const shapeConfig = store.getSelectedShapeConf()
-
-    if (!shape || shapeConfig.kind !== 'icon') {
-      return <></>
-    }
-
-    return (
-      <Flex alignItems="center">
-        <ColorPickerPopover
-          disableAlpha
-          value={chroma(store.shapesPanel.icon.color).alpha(1).hex()}
-          onChange={(color) => {
-            runInAction(() => {
-              shapeConfig.processing.colors = {
-                kind: 'single-color',
-                color,
-              }
-              store.shapesPanel.icon.color = color
-            })
-          }}
-          onAfterChange={() => {
-            console.log('onAfterChange')
-            updateShapeColoring()
-          }}
-        />
-      </Flex>
-    )
-  }
-)

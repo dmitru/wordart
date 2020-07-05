@@ -656,7 +656,11 @@ export class EditorStore {
     if (!currentShapeConf.thumbnailUrl) {
       currentShapeConf.thumbnailUrl = canvas.toDataURL()
     }
-    currentShapeConf.processedThumbnailUrl = canvas.toDataURL()
+    if (currentShapeConf.kind === 'text') {
+      currentShapeConf.thumbnailUrl = canvas.toDataURL()
+    } else {
+      currentShapeConf.processedThumbnailUrl = canvas.toDataURL()
+    }
     this.renderKey++
   }
 
