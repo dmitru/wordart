@@ -21,7 +21,7 @@ import React, { useEffect } from 'react'
 import { FaCog } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
-import { useDebouncedCallback } from 'use-debounce/lib'
+import { useDebouncedCallback } from 'use-debounce'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -58,35 +58,23 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
     renderKey, // eslint-disable-line
   } = store
 
-  const fonts = store.getAvailableFonts()
+  const [updateShapeDebounced] = useDebouncedCallback(() => {
+    store.updateShapeFromSelectedShapeConf()
+  }, 300)
 
-  const [updateShapeDebounced] = useDebouncedCallback(
-    store.updateShapeFromSelectedShapeConf,
-    300,
-    {
-      leading: false,
-      trailing: true,
+  const [updateShapeColoringDebounced] = useDebouncedCallback(async () => {
+    const shape = store.getShape()
+    if (!shape) {
+      return
     }
-  )
-
-  const [updateShapeColoringDebounced] = useDebouncedCallback(
-    async () => {
-      if (!shape) {
-        return
-      }
-      const style = mkShapeStyleConfFromOptions(shapeStyle)
-      await store.editor?.updateShapeColors(shape.config, true)
-      store.updateShapeThumbnail()
-      if (style.items.coloring.kind === 'shape') {
-        store.editor?.setShapeItemsStyle(style.items)
-      }
-    },
-    20,
-    {
-      leading: true,
-      trailing: true,
+    const shapeStyle = store.styleOptions.shape
+    const style = mkShapeStyleConfFromOptions(shapeStyle)
+    await store.editor?.updateShapeColors(shape.config, true)
+    store.updateShapeThumbnail()
+    if (style.items.coloring.kind === 'shape') {
+      store.editor?.setShapeItemsStyle(style.items)
     }
-  )
+  }, 20)
 
   useEffect(() => {
     return () => {
@@ -170,10 +158,13 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
     }
   }, [shape])
 
-  const [updateThumbnail] = useDebouncedCallback(
+  const [updateThumbnailDebounced] = useDebouncedCallback(
     updateTextThumbnailPreview,
     300,
-    { leading: false, trailing: true }
+    {
+      leading: false,
+      trailing: true,
+    }
   )
 
   if (!shape || shape.kind !== 'text') {
@@ -370,9 +361,15 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
                       onChange={async (e: any) => {
                         const text = e.target.value
                         store.shapesPanel.text.text = text
+
+                        const shape = store.getShape()
+                        if (!shape || shape.kind !== 'text') {
+                          return
+                        }
+
                         shape.config.text = text
                         updateShapeDebounced()
-                        updateThumbnail()
+                        updateThumbnailDebounced()
                       }}
                       placeholder="Type text here..."
                     />
@@ -384,9 +381,13 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
                       <ColorPickerPopover
                         value={store.shapesPanel.text.color}
                         onChange={(color) => {
+                          const shape = store.getShape()
                           store.shapesPanel.text.color = color
+                          if (!shape || shape.kind !== 'text') {
+                            return
+                          }
                           shape.config.textStyle.color = color
-                          updateThumbnail()
+                          updateThumbnailDebounced()
                         }}
                         onAfterChange={() => updateShapeColoringDebounced()}
                       />
@@ -404,9 +405,13 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
                         selectedFontId={store.shapesPanel.text.fontId}
                         onHighlighted={async (font, style) => {
                           store.shapesPanel.text.fontId = style.fontId
+                          const shape = store.getShape()
+                          if (!shape || shape.kind !== 'text') {
+                            return
+                          }
                           shape.config.textStyle.fontId = style.fontId
-                          updateThumbnail()
-                          updateShapeDebounced()
+                          updateTextThumbnailPreview()
+                          store.updateShapeFromSelectedShapeConf()
                         }}
                       />
                     </Box>

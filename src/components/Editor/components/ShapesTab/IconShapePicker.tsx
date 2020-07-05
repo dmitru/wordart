@@ -113,6 +113,8 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
   )
 
   useEffect(() => {
+    // updateShapeColoring()
+
     return () => {
       if (store.leftTabIsTransformingShape) {
         store.editor?.deselectShape()

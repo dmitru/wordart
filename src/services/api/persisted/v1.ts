@@ -77,7 +77,7 @@ export type PersistedShapeConfIconV1 = {
 export type PersistedShapeConfBlobV1 = {
   kind: 'blob'
   transform: MatrixSerialized
-  svg: string
+  pathData: string
   color: string
   points: number
   complexity: number

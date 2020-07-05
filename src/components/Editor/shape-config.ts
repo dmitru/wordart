@@ -52,7 +52,7 @@ export type ShapeRandomBlobConf = {
   color: string
   points: number
   complexity: number
-  svg: string
+  pathData: string
 }
 
 type ShapeSvgConfBase = {

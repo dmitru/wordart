@@ -15,6 +15,7 @@ import { useStore } from 'services/root-store'
 import {
   ShapeTextConf,
   ShapeRandomBlobConf,
+  ShapeIconConf,
 } from 'components/Editor/shape-config'
 
 export const ShapeTypeSelector: React.FC<{}> = observer(() => {
@@ -92,6 +93,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 title="Text"
                 description="Enter your own text to use as shape"
                 onClick={() => {
+                  shapesPanel.shapeKind = 'text'
                   const textShape: ShapeTextConf = {
                     kind: 'text',
                     text: shapesPanel.text.text,
@@ -102,7 +104,6 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                     thumbnailUrl: '',
                   }
                   store.selectShape(textShape)
-                  shapesPanel.shapeKind = 'text'
                   store.animateVisualize(false)
                 }}
               />

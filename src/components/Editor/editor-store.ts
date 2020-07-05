@@ -132,8 +132,7 @@ export class EditorStore {
   @observable hasItemChanges = false
   @observable availableImageShapes: ShapeClipartConf[] = imageShapes
   @observable availableIconShapes: ShapeIconConf[] = iconShapes
-  // @TODO: refactor it to simply store reference to a ShapeConf
-  // @observable selectedShapeId: ShapeId = imageShapes[4].id
+
   @observable selectedShapeConf: ShapeConf = imageShapes[4]
 
   wordIdGen = new UniqIdGenerator(3)
@@ -249,24 +248,24 @@ export class EditorStore {
 
     if (params.serialized) {
       await this.loadSerialized(params.serialized)
+
+      if (
+        this.selectedShapeConf.kind === 'clipart:raster' ||
+        this.selectedShapeConf.kind === 'clipart:svg'
+      ) {
+        this.shapesPanel.shapeKind = 'image'
+        this.shapesPanel.image.selected = this.selectedShapeConf.id
+      } else if (
+        this.selectedShapeConf.kind === 'custom:raster' ||
+        this.selectedShapeConf.kind === 'custom:svg'
+      ) {
+        this.shapesPanel.shapeKind = 'custom image'
+      } else {
+        this.shapesPanel.shapeKind = this.selectedShapeConf.kind
+      }
     } else {
       await this.applyColorTheme(themePresets[0])
       await this.selectShape(imageShapes[5])
-    }
-
-    if (
-      this.selectedShapeConf.kind === 'clipart:raster' ||
-      this.selectedShapeConf.kind === 'clipart:svg'
-    ) {
-      this.shapesPanel.shapeKind = 'image'
-      this.shapesPanel.image.selected = this.selectedShapeConf.id
-    } else if (
-      this.selectedShapeConf.kind === 'custom:raster' ||
-      this.selectedShapeConf.kind === 'custom:svg'
-    ) {
-      this.shapesPanel.shapeKind = 'custom image'
-    } else {
-      this.shapesPanel.shapeKind = this.selectedShapeConf.kind
     }
 
     this.enterViewMode('shape')
@@ -888,7 +887,7 @@ export class EditorStore {
         return {
           kind: shape.kind,
           transform,
-          svg: shape.config.svg,
+          pathData: shape.config.pathData,
           color: shape.config.color,
           complexity: shape.config.complexity,
           points: shape.config.points,
@@ -1169,8 +1168,9 @@ export class EditorStore {
       return
     }
 
+    this.selectedShapeConf = shapeConfig
     await this.editor.setShape({
-      shapeConfig,
+      shapeConfig: this.selectedShapeConf,
       bgFillStyle: mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
       shapeStyle: mkShapeStyleConfFromOptions(this.styleOptions.shape),
       clear: true,
@@ -1178,26 +1178,19 @@ export class EditorStore {
       render,
     })
 
-    const { shape } = this.editor
-    if (!shape) {
-      return
-    }
-
-    this.selectedShapeConf = shapeConfig
     this.editor.version++
-
     this.updateShapeThumbnail()
   }
 
   /** Update shape based on the selected shape config (e.g. after shape config changes) */
   updateShapeFromSelectedShapeConf = async () => {
+    console.log('updateShapeFromSelectedShapeConf')
     if (!this.editor) {
       return
     }
 
-    const shape = this.selectedShapeConf
     await this.editor.setShape({
-      shapeConfig: shape,
+      shapeConfig: this.selectedShapeConf,
       bgFillStyle: mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
       shapeStyle: mkShapeStyleConfFromOptions(this.styleOptions.shape),
       clear: false,
@@ -1441,7 +1434,7 @@ export type LeftPanelShapesState = {
 }
 
 export const leftPanelShapesInitialState: LeftPanelShapesState = {
-  shapeKind: 'icon',
+  shapeKind: 'blob',
   blob: {
     color: '#4A90E2',
     complexity: 40,
@@ -1449,13 +1442,13 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
   },
   customImage: {},
   fullCanvas: {
-    color: 'pink',
+    color: '#4A90E2',
     padding: 0,
   },
   icon: {
     category: null,
     selected: iconShapes[0].id,
-    color: 'black',
+    color: '#4A90E2',
   },
   image: {
     category: null,
@@ -1463,7 +1456,7 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
   },
   text: {
     fontId: 'Pacifico:regular',
-    color: 'blue',
+    color: '#4A90E2',
     text: 'Hi',
   },
 }

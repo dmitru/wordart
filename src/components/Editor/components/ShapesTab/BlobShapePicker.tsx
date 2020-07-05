@@ -155,7 +155,7 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
     const canvas = createCanvas({ w: canvasSize, h: canvasSize })
     const c = new fabric.StaticCanvas(canvas)
 
-    const shapeObj = new fabric.Path(shape.config.svg)
+    const shapeObj = new fabric.Path(shape.config.pathData)
     c.add(shapeObj)
     shapeObj.set({ fill: store.shapesPanel.blob.color })
 
@@ -188,11 +188,13 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
       color: store.shapesPanel.blob.color,
       points: store.shapesPanel.blob.points,
       complexity: store.shapesPanel.blob.complexity,
-      svg: blobShapeSvg,
+      pathData: blobShapeSvg,
     }
 
     await store.selectShape(shapeConfig)
     updateBlobThumbnailPreview()
+
+    store.animateVisualize(false)
   }
 
   useEffect(() => {
@@ -449,7 +451,7 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
                     </Box>
 
                     <Button colorScheme="secondary" onClick={updateBlobShape}>
-                      Randomize
+                      Randomize shape
                     </Button>
                   </Stack>
                 </motion.div>

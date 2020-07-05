@@ -1004,7 +1004,7 @@ export class Editor {
         obj: shapeObj,
       }
     } else if (shapeConfig.kind === 'blob') {
-      const pathObj = new fabric.Path(shapeConfig.svg)
+      const pathObj = new fabric.Path(shapeConfig.pathData)
       shapeObj = new fabric.Group([pathObj])
 
       shape = {
