@@ -13,7 +13,12 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/core'
-import { AddIcon, ChevronDownIcon, CloseIcon, EditIcon } from '@chakra-ui/icons'
+import {
+  AddIcon,
+  ChevronDownIcon,
+  SmallCloseIcon,
+  EditIcon,
+} from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
 import { TextFields } from '@styled-icons/material-twotone/TextFields'
@@ -310,14 +315,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     {selectedCount === 0 && (
                       <>
                         <MenuDivider />
-                        <MenuItemWithIcon
-                          onClick={handleExportCSVClick}
-                          icon={<FaDownload />}
-                        >
-                          Export as CSV
-                        </MenuItemWithIcon>
-
-                        <MenuDivider />
 
                         <MenuItemWithIcon
                           onClick={handleFindAndReplaceClick}
@@ -325,13 +322,20 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                         >
                           Find and replace...
                         </MenuItemWithIcon>
+
+                        <MenuItemWithIcon
+                          onClick={handleExportCSVClick}
+                          icon={<FaDownload />}
+                        >
+                          Export as CSV
+                        </MenuItemWithIcon>
                       </>
                     )}
 
                     <MenuDivider />
 
                     <MenuItemWithIcon
-                      icon={<CloseIcon />}
+                      icon={<SmallCloseIcon />}
                       onClick={() => {
                         if (selectedCount > 0) {
                           for (const w of wordsToProcess) {
