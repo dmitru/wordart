@@ -281,7 +281,7 @@ export class EditorStore {
     this.editor.canvas.requestRenderAll()
   }
 
-  resetAllItems = async (target: TargetKind) => {
+  resetAllItems = async (target?: TargetKind) => {
     if (!this.editor) {
       return
     }
@@ -289,7 +289,12 @@ export class EditorStore {
     const versionBefore = this.editor.version
     const dataBefore = await this.serialize()
     const stateBefore = this.getStateSnapshot()
-    this.editor.resetAllItems(target)
+    if (target) {
+      this.editor.resetAllItems(target)
+    } else {
+      this.editor.resetAllItems('shape')
+      this.editor.resetAllItems('bg')
+    }
     this.editor.canvas.discardActiveObject(new Event('no-callbacks'))
 
     const dataAfter = await this.serialize()
@@ -354,25 +359,39 @@ export class EditorStore {
     this.editor?.canvas.requestRenderAll()
   }
 
-  @action enterEditItemsMode = (target: TargetKind) => {
+  @action enterEditItemsMode = (target?: TargetKind) => {
     this.mode = 'edit'
     if (!this.editor) {
       return
     }
-    this.editor.showLockBorders(target)
-    this.editor.enableItemsSelection(target)
+    if (target) {
+      this.editor.showLockBorders(target)
+      this.editor.enableItemsSelection(target)
+    } else {
+      this.editor.showLockBorders('shape')
+      this.editor.enableItemsSelection('shape')
+      this.editor.showLockBorders('bg')
+      this.editor.enableItemsSelection('bg')
+    }
     this.editor.enableSelectionMode()
   }
 
-  @action enterViewMode = (target: TargetKind) => {
+  @action enterViewMode = (target?: TargetKind) => {
     this.mode = 'view'
     if (!this.editor) {
       return
     }
     this.selectedItemData = null
     this.selectedItem = null
-    this.editor.hideLockBorders(target)
-    this.editor.disableItemsSelection(target)
+    if (target) {
+      this.editor.hideLockBorders(target)
+      this.editor.disableItemsSelection(target)
+    } else {
+      this.editor.hideLockBorders('shape')
+      this.editor.disableItemsSelection('shape')
+      this.editor.hideLockBorders('bg')
+      this.editor.disableItemsSelection('bg')
+    }
     this.editor.disableSelectionMode()
   }
 

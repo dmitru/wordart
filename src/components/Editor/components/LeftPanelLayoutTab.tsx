@@ -36,6 +36,7 @@ import styled from '@emotion/styled'
 import css from '@emotion/css'
 import { animateElement } from 'utils/animation'
 import { Tooltip } from 'components/shared/Tooltip'
+import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
 import { AddIcon } from '@chakra-ui/icons'
 
 const anglePresets: {
@@ -126,6 +127,8 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
     return (
       <Box px="5" py="6">
+        <LeftPanelTargetLayerDropdown />
+
         <Box mb="2.5rem">
           <SectionLabel>Placement</SectionLabel>
           <Slider

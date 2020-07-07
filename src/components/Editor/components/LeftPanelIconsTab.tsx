@@ -8,6 +8,7 @@ import {
   ShapeThumbnailBtn,
   ShapeSelector,
 } from 'components/Editor/components/ShapeSelector'
+import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
 import { observable } from 'mobx'
 import { uniqBy } from 'lodash'
 import { TargetKind } from 'components/Editor/lib/editor'
@@ -76,6 +77,8 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
             </Box>
           </>
         )}
+
+        {!state.isAdding && <LeftPanelTargetLayerDropdown />}
 
         {!state.isAdding && icons.length > 0 && (
           <Box display="flex" alignItems="center">

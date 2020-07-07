@@ -29,6 +29,7 @@ import { DragIndicator } from '@styled-icons/material/DragIndicator'
 import { FormatTextSize } from '@styled-icons/zondicons/FormatTextSize'
 import { FindAndReplaceModal } from 'components/Editor/components/FindAndReplaceModal'
 import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
+import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
 import { WordsEditorModal } from 'components/Editor/components/WordsEditorModal'
 import { WordConfigId } from 'components/Editor/editor-store'
 import { TargetKind } from 'components/Editor/lib/editor'
@@ -442,6 +443,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               `
             }
           >
+            <LeftPanelTargetLayerDropdown />
             {topToolbar}
             {allWords.length > 0 && toolbar}
           </Box>

@@ -11,6 +11,7 @@ import {
 import { AddIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
+import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
 import { AddCustomFontModal } from 'components/Editor/components/AddCustomFontModal'
 import { FontPickerModal } from 'components/Editor/components/FontPicker/FontPickerModal'
 import { SectionLabel } from 'components/Editor/components/shared'
@@ -77,6 +78,8 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
     return (
       <>
         <Box px="5" py="6">
+          <LeftPanelTargetLayerDropdown />
+
           <SectionLabel>Fonts to use</SectionLabel>
           <Box
             mt="3"

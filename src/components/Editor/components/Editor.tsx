@@ -300,8 +300,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         : store.editor.items.shape.items.length > 0
       : false
 
-    const leftTab =
-      store.targetTab === 'bg' ? state.leftTabBg : state.leftTabShape
+    const leftTab = state.leftTab
 
     const handleVisualizeClick = () => {
       if (store.targetTab === 'shape') {
@@ -552,30 +551,23 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           <LeftWrapper>
             <LeftBottomWrapper>
               <SideNavbar
-                activeIndex={
-                  store.targetTab === 'shape'
-                    ? leftPanelShapeTabs.findIndex(
-                        (s) => s === state.leftTabShape
-                      )
-                    : leftPanelBgTabs.findIndex((s) => s === state.leftTabBg)
-                }
-              >
-                {store.targetTab !== 'bg' && (
-                  <LeftNavbarBtn
-                    onClick={() => {
-                      state.leftTabShape = 'shapes'
-                    }}
-                    active={state.leftTabShape === 'shapes'}
-                  >
-                    <Shapes className="icon" />
-                    Shape
-                  </LeftNavbarBtn>
+                activeIndex={leftPanelTabs.findIndex(
+                  (s) => s === state.leftTab
                 )}
+              >
+                <LeftNavbarBtn
+                  onClick={() => {
+                    state.leftTab = 'shapes'
+                  }}
+                  active={state.leftTab === 'shapes'}
+                >
+                  <Shapes className="icon" />
+                  Shape
+                </LeftNavbarBtn>
 
                 <LeftNavbarBtn
                   onClick={() => {
-                    state.leftTabBg = 'words'
-                    state.leftTabShape = 'words'
+                    state.leftTab = 'words'
                   }}
                   active={leftTab === 'words'}
                 >
@@ -585,8 +577,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
                 <LeftNavbarBtn
                   onClick={() => {
-                    state.leftTabBg = 'fonts'
-                    state.leftTabShape = 'fonts'
+                    state.leftTab = 'fonts'
                   }}
                   active={leftTab === 'fonts'}
                 >
@@ -596,8 +587,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
                 <LeftNavbarBtn
                   onClick={() => {
-                    state.leftTabBg = 'symbols'
-                    state.leftTabShape = 'symbols'
+                    state.leftTab = 'symbols'
                   }}
                   active={leftTab === 'symbols'}
                 >
@@ -607,8 +597,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
                 <LeftNavbarBtn
                   onClick={() => {
-                    state.leftTabBg = 'layout'
-                    state.leftTabShape = 'layout'
+                    state.leftTab = 'layout'
                   }}
                   active={leftTab === 'layout'}
                 >
@@ -618,8 +607,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
                 <LeftNavbarBtn
                   onClick={() => {
-                    state.leftTabBg = 'colors'
-                    state.leftTabShape = 'colors'
+                    state.leftTab = 'colors'
                   }}
                   active={leftTab === 'colors'}
                 >
@@ -940,32 +928,46 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     />
                   </Tooltip>
 
-                  <Box mr="3" ml="3">
+                  <Box mr="3" ml="auto">
                     {store.mode === 'view' && hasItems && (
                       <>
+                        <Menu>
+                          <MenuButton
+                            mr="2"
+                            as={MenuDotsButton}
+                            variant="ghost"
+                          />
+
+                          <MenuList>
+                            <MenuItem
+                              onClick={() => {
+                                store.editor?.clearItems('shape', true)
+                              }}
+                            >
+                              <SmallCloseIcon color="gray.500" mr="2" />
+                              Delete all Shape items
+                            </MenuItem>
+
+                            <MenuItem
+                              onClick={() => {
+                                store.editor?.clearItems('bg', true)
+                              }}
+                            >
+                              <SmallCloseIcon color="gray.500" mr="2" />
+                              Delete all Background items
+                            </MenuItem>
+                          </MenuList>
+                        </Menu>
+
                         <Button
                           variant="outline"
                           py="1"
                           onClick={() => {
-                            store.enterEditItemsMode(store.targetTab)
+                            store.enterEditItemsMode()
                           }}
                         >
                           Edit Items
                         </Button>
-
-                        <Menu>
-                          <MenuButton ml="2" as={MenuDotsButton} />
-                          <MenuList>
-                            <MenuItem
-                              onClick={() => {
-                                store.editor?.clearItems(store.targetTab, true)
-                              }}
-                            >
-                              <SmallCloseIcon color="gray.500" mr="2" />
-                              Delete all items
-                            </MenuItem>
-                          </MenuList>
-                        </Menu>
                       </>
                     )}
 
@@ -973,21 +975,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       <>
                         <Button
                           mr="2"
-                          py="1"
-                          colorScheme="green"
-                          onClick={() => {
-                            store.enterViewMode(store.targetTab)
-                          }}
-                        >
-                          Done
-                        </Button>
-
-                        <Button
-                          mr="2"
-                          size="sm"
                           isDisabled={!store.hasItemChanges}
                           variant="ghost"
-                          onClick={() => store.resetAllItems(store.targetTab)}
+                          onClick={() => store.resetAllItems()}
                         >
                           Reset All
                         </Button>
@@ -1011,9 +1001,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                                 Reset Default Color
                               </Button>
                             </ColorPickerPopover>
+
                             <Button
                               ml="2"
-                              size="sm"
                               onClick={() => {
                                 if (!store.selectedItemData) {
                                   return
@@ -1022,6 +1012,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                                   !Boolean(store.selectedItemData.locked)
                                 )
                               }}
+                              css={css`
+                                width: 84px;
+                              `}
                             >
                               {store.selectedItemData.locked
                                 ? 'Unlock'
@@ -1029,66 +1022,20 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                             </Button>
                           </>
                         )}
+
+                        <Button
+                          ml="2"
+                          py="1"
+                          colorScheme="green"
+                          onClick={() => {
+                            store.enterViewMode()
+                          }}
+                        >
+                          Done
+                        </Button>
                       </>
                     )}
                   </Box>
-
-                  {store.mode === 'view' && (
-                    <Box mr="3" ml="auto" display="flex" alignItems="center">
-                      <Menu placement="bottom-end">
-                        <MenuButton
-                          as={Button}
-                          // variant="outline"
-                          rightIcon={<ChevronDownIcon />}
-                          py="2"
-                          px="3"
-                        >
-                          {store.targetTab === 'shape' ? 'Shape layer' : ''}
-                          {store.targetTab === 'bg' ? 'Background layer' : ''}
-                        </MenuButton>
-
-                        <Portal>
-                          <MenuTransition>
-                            {(styles) => (
-                              <MenuList
-                                // @ts-ignore
-                                css={css`
-                                  ${styles}
-                                  max-height: 300px;
-                                  max-width: 260px;
-                                `}
-                              >
-                                <MenuItemWithDescription
-                                  title="Shape"
-                                  description="Use this layer to place words and icons on the shape."
-                                  onClick={() => {
-                                    store.targetTab = 'shape'
-                                  }}
-                                />
-
-                                <MenuItemWithDescription
-                                  title="Background"
-                                  description="Use this layer to place words and icons on the background."
-                                  onClick={() => {
-                                    if (
-                                      store.getShapeConf()?.kind ===
-                                      'full-canvas'
-                                    ) {
-                                      alert(
-                                        'Background layer is not available when "Entire canvas" is selected in the Shapes panel'
-                                      )
-                                      return
-                                    }
-                                    store.targetTab = 'bg'
-                                  }}
-                                />
-                              </MenuList>
-                            )}
-                          </MenuTransition>
-                        </Portal>
-                      </Menu>
-                    </Box>
-                  )}
                 </>
               )}
 
@@ -1344,8 +1291,7 @@ const Canvas = styled.canvas`
 
 const state = observable({
   title: 'New wordart',
-  leftTabShape: 'shapes' as LeftPanelTab,
-  leftTabBg: 'words' as Omit<LeftPanelTab, 'shapes'>,
+  leftTab: 'shapes' as LeftPanelTab,
   leftPanelContext: 'normal' as 'normal' | 'resize',
   isShowingExport: false,
 })
@@ -1358,15 +1304,8 @@ export type LeftPanelTab =
   | 'symbols'
   | 'colors'
   | 'layout'
-const leftPanelShapeTabs: LeftPanelTab[] = [
+const leftPanelTabs: LeftPanelTab[] = [
   'shapes',
-  'words',
-  'fonts',
-  'symbols',
-  'layout',
-  'colors',
-]
-const leftPanelBgTabs: LeftPanelTab[] = [
   'words',
   'fonts',
   'symbols',
