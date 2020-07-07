@@ -1,4 +1,15 @@
-import { Box, Collapse, Flex, Text } from '@chakra-ui/core'
+import {
+  Box,
+  Collapse,
+  Flex,
+  Text,
+  Portal,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+} from '@chakra-ui/core'
 import css from '@emotion/css'
 import { useThrottleCallback } from '@react-hook/throttle'
 import { BackgroundColorOptions } from 'components/Editor/components/BackgroundColorOptions'
@@ -36,10 +47,109 @@ import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
+import {
+  ShapeStyleOptions,
+  BgStyleOptions,
+} from 'components/Editor/style-options'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
 }
+
+const ItemsAdvancedControls: React.FC<{
+  items: ShapeStyleOptions['items'] | BgStyleOptions['items']
+  onUpdate: () => void
+}> = ({ items, onUpdate }) => (
+  <Popover closeOnBlur closeOnEsc>
+    <PopoverTrigger>
+      <Button
+        ml="auto"
+        variant="ghost"
+        color="gray.500"
+        css={css`
+          width: 50px;
+        `}
+      >
+        <FaCog />
+      </Button>
+    </PopoverTrigger>
+    <Portal>
+      <PopoverContent width="330px">
+        <PopoverArrow />
+        <PopoverBody p={3}>
+          <Box pb="0.5rem" pt="4">
+            <Box>
+              <Slider
+                afterLabel="%"
+                label="Brightness"
+                value={items.brightness}
+                onChange={(value) => {
+                  const val = (value as any) as number
+                  items.brightness = val
+                }}
+                onAfterChange={onUpdate}
+                resetValue={0}
+                min={-100}
+                max={100}
+                step={1}
+              />
+            </Box>
+
+            <Flex direction="row" mb="0">
+              <Slider
+                css={css`
+                  flex: 1;
+                `}
+                afterLabel="%"
+                labelCss="width: 60px"
+                label="Opacity"
+                value={items.opacity}
+                onChange={(value) => {
+                  items.opacity = value
+                }}
+                onAfterChange={onUpdate}
+                resetValue={100}
+                min={0}
+                max={100}
+                step={1}
+              />
+            </Flex>
+
+            <Box mb="2">
+              <Slider
+                css={css`
+                  flex: 1;
+                `}
+                label={
+                  <>
+                    <Box display="flex" alignItems="center">
+                      Emphasize size
+                      <HelpTooltipIcon
+                        label="Make larger words brighter and smaller words dimmer"
+                        ml="2"
+                      />
+                    </Box>
+                  </>
+                }
+                afterLabel="%"
+                value={items.dimSmallerItems}
+                onChange={(value) => {
+                  const val = (value as any) as number
+                  items.dimSmallerItems = val
+                }}
+                onAfterChange={onUpdate}
+                min={0}
+                resetValue={40}
+                max={100}
+                step={1}
+              />
+            </Box>
+          </Box>
+        </PopoverBody>
+      </PopoverContent>
+    </Portal>
+  </Popover>
+)
 
 export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
   ({ target }) => {
@@ -328,33 +438,10 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                         />
                       </Box>
 
-                      <Button
-                        ml="auto"
-                        css={css`
-                          width: 50px;
-                          box-shadow: none !important;
-                        `}
-                        variant={
-                          store.leftColorTab.showShapeItemsAdvanced
-                            ? 'solid'
-                            : 'ghost'
-                        }
-                        colorScheme={
-                          store.leftColorTab.showShapeItemsAdvanced
-                            ? 'primary'
-                            : 'gray'
-                        }
-                        onClick={() => {
-                          store.leftColorTab.showShapeItemsAdvanced = !store
-                            .leftColorTab.showShapeItemsAdvanced
-                        }}
-                      >
-                        <FaCog
-                          style={{
-                            color: 'currentColor',
-                          }}
-                        />
-                      </Button>
+                      <ItemsAdvancedControls
+                        items={shapeStyle.items}
+                        onUpdate={updateShapeItemsColoring}
+                      />
                     </Box>
 
                     <Box mt="2">
@@ -364,82 +451,6 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                         onUpdate={updateShapeItemsColoring}
                       />
                     </Box>
-
-                    <Collapse
-                      isOpen={store.leftColorTab.showShapeItemsAdvanced}
-                    >
-                      <Box pb="0.5rem" pt="4">
-                        <Box>
-                          <Slider
-                            afterLabel="%"
-                            horizontal
-                            label="Brightness"
-                            value={shapeStyle.items.brightness}
-                            onChange={(value) => {
-                              const val = (value as any) as number
-                              shapeStyle.items.brightness = val
-                            }}
-                            onAfterChange={updateShapeItemsColoring}
-                            resetValue={0}
-                            min={-100}
-                            max={100}
-                            step={1}
-                          />
-                        </Box>
-
-                        <Flex direction="row" mb="0">
-                          <Slider
-                            css={css`
-                              flex: 1;
-                            `}
-                            afterLabel="%"
-                            labelCss="width: 60px"
-                            horizontal
-                            label="Opacity"
-                            value={shapeStyle.items.opacity}
-                            onChange={(value) => {
-                              shapeStyle.items.opacity = value
-                            }}
-                            onAfterChange={updateShapeItemsColoring}
-                            resetValue={100}
-                            min={0}
-                            max={100}
-                            step={1}
-                          />
-                        </Flex>
-
-                        <Box mb="2">
-                          <Slider
-                            css={css`
-                              flex: 1;
-                            `}
-                            horizontal
-                            label={
-                              <>
-                                <Box display="flex" alignItems="center">
-                                  Emphasize size
-                                  <HelpTooltipIcon
-                                    label="Make larger words brighter and smaller words dimmer"
-                                    ml="2"
-                                  />
-                                </Box>
-                              </>
-                            }
-                            afterLabel="%"
-                            value={shapeStyle.items.dimSmallerItems}
-                            onChange={(value) => {
-                              const val = (value as any) as number
-                              shapeStyle.items.dimSmallerItems = val
-                            }}
-                            onAfterChange={updateShapeItemsColoring}
-                            min={0}
-                            resetValue={40}
-                            max={100}
-                            step={1}
-                          />
-                        </Box>
-                      </Box>
-                    </Collapse>
                   </Box>
                   {/* </shape-items> */}
 
@@ -506,27 +517,10 @@ export const BgItemsStyleOptions: React.FC<{
           />
         </Box>
 
-        <Button
-          ml="auto"
-          css={css`
-            width: 50px;
-            box-shadow: none !important;
-          `}
-          variant={store.leftColorTab.showBgItemsAdvanced ? 'solid' : 'ghost'}
-          colorScheme={
-            store.leftColorTab.showBgItemsAdvanced ? 'primary' : 'gray'
-          }
-          onClick={() => {
-            store.leftColorTab.showBgItemsAdvanced = !store.leftColorTab
-              .showBgItemsAdvanced
-          }}
-        >
-          <FaCog
-            style={{
-              color: 'currentColor',
-            }}
-          />
-        </Button>
+        <ItemsAdvancedControls
+          items={bgStyle.items}
+          onUpdate={updateBgItemsColoring}
+        />
       </Box>
 
       <Box mt="2">
@@ -536,84 +530,6 @@ export const BgItemsStyleOptions: React.FC<{
           onUpdate={updateBgItemsColoring}
         />
       </Box>
-
-      <Collapse isOpen={store.leftColorTab.showBgItemsAdvanced}>
-        <Box pb="3" mt="4">
-          <Box>
-            <Slider
-              afterLabel="%"
-              horizontal
-              label="Brightness"
-              value={bgStyle.items.brightness}
-              onChange={(value) => {
-                const val = (value as any) as number
-                bgStyle.items.brightness = val
-              }}
-              onAfterChange={updateBgItemsColoring}
-              resetValue={0}
-              min={-100}
-              max={100}
-              step={1}
-            />
-          </Box>
-
-          <Flex direction="row" mb="0">
-            <Slider
-              css={css`
-                flex: 1;
-              `}
-              horizontal
-              afterLabel="%"
-              label="Opacity"
-              value={bgStyle.items.opacity}
-              onChange={(value) => {
-                bgStyle.items.opacity = value
-              }}
-              onAfterChange={updateBgItemsColoring}
-              min={0}
-              resetValue={100}
-              max={100}
-              step={1}
-            />
-          </Flex>
-
-          <Box mb="4">
-            <Slider
-              css={css`
-                flex: 1;
-              `}
-              horizontal
-              label={
-                <>
-                  <Box display="flex" alignItems="center">
-                    Emphasize size{' '}
-                    <Tooltip
-                      label="Make larger words brighter and smaller words dimmer"
-                      zIndex={100}
-                      showDelay={200}
-                    >
-                      <Text my="0" color="blue" cursor="help" ml="2">
-                        <FaQuestionCircle style={{ color: '#999' }} />
-                      </Text>
-                    </Tooltip>
-                  </Box>
-                </>
-              }
-              afterLabel="%"
-              value={bgStyle.items.dimSmallerItems}
-              onChange={(value) => {
-                const val = (value as any) as number
-                bgStyle.items.dimSmallerItems = val
-              }}
-              onAfterChange={updateBgItemsColoring}
-              min={0}
-              resetValue={40}
-              max={100}
-              step={1}
-            />
-          </Box>
-        </Box>
-      </Collapse>
     </Box>
   )
 })

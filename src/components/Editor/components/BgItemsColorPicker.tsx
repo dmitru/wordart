@@ -1,26 +1,22 @@
 import {
   Box,
-  Icon,
+  Button,
   Menu,
   MenuButton,
-  MenuItem,
   MenuList,
-  Portal,
-  Button,
   MenuTransition,
+  Portal,
 } from '@chakra-ui/core'
-import { AddIcon, ChevronDownIcon, CloseIcon } from '@chakra-ui/icons'
+import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
 import { BgStyleOptions } from 'components/Editor/style-options'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { DeleteButton } from 'components/shared/DeleteButton'
-import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { observer } from 'mobx-react'
 import React, { useState } from 'react'
 import { FiRefreshCw } from 'react-icons/fi'
-import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 
 export const BgItemsColorPickerKindDropdown: React.FC<{
   bgStyle: BgStyleOptions
@@ -104,7 +100,6 @@ export const BgItemsColorPickerInline: React.FC<{
               isDisabled={bgStyle.items.coloring.color.colors.length >= 8}
               colorScheme="secondary"
               leftIcon={<AddIcon />}
-              size="sm"
               onClick={() => {
                 bgStyle.items.coloring.color.colors.push(getRandomColor())
                 onUpdate()
@@ -115,7 +110,6 @@ export const BgItemsColorPickerInline: React.FC<{
 
             <Button
               variant="ghost"
-              size="sm"
               isDisabled={bgStyle.items.coloring.color.colors.length === 0}
               onClick={() => {
                 bgStyle.items.coloring.color.colors = bgStyle.items.coloring.color.colors.map(
@@ -129,32 +123,16 @@ export const BgItemsColorPickerInline: React.FC<{
               Random
             </Button>
 
-            <Menu placement="bottom">
-              <MenuButton
-                ml="2"
-                as={MenuDotsButton}
-                size="sm"
-                variant="ghost"
-              />
-              <Portal>
-                <MenuTransition>
-                  {(styles) => (
-                    // @ts-ignore
-                    <MenuList css={styles}>
-                      <MenuItemWithIcon
-                        icon={<CloseIcon />}
-                        onClick={() => {
-                          bgStyle.items.coloring.color.colors.length = 1
-                          onUpdate()
-                        }}
-                      >
-                        Clear all
-                      </MenuItemWithIcon>
-                    </MenuList>
-                  )}
-                </MenuTransition>
-              </Portal>
-            </Menu>
+            <Button
+              variant="ghost"
+              ml="2"
+              onClick={() => {
+                bgStyle.items.coloring.color.colors.length = 1
+                onUpdate()
+              }}
+            >
+              Clear all
+            </Button>
           </Box>
         )}
       </Box>
@@ -242,7 +220,6 @@ export const BgItemsColorPickerInline: React.FC<{
                 <Box>
                   <Button
                     variant="ghost"
-                    size="sm"
                     onClick={() => {
                       bgStyle.items.coloring.gradient.gradient = {
                         from: getRandomColor(),

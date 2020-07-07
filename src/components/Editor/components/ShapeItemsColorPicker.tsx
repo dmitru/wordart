@@ -1,12 +1,5 @@
-import {
-  Box,
-  Icon,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  PopoverArrow,
-} from '@chakra-ui/core'
+import { Box, Menu, MenuButton, MenuList } from '@chakra-ui/core'
+import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
 import {
@@ -16,12 +9,10 @@ import {
 import { Button } from 'components/shared/Button'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { DeleteButton } from 'components/shared/DeleteButton'
-import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { observer } from 'mobx-react'
 import React, { useState } from 'react'
 import { FiRefreshCw } from 'react-icons/fi'
-import { ChevronDownIcon, AddIcon, SmallCloseIcon } from '@chakra-ui/icons'
 
 export const ShapeItemsColorPickerKindDropdown: React.FC<{
   shapeStyle: ShapeStyleOptions
@@ -90,7 +81,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
     chroma
       .random()
       .luminance(isDarkBg ? 0.65 : 0.35)
-      .saturate(isDarkBg ? 0.3 : 0.4)
+      .saturate(isDarkBg ? 0.5 : 0.6)
       .hex()
 
   return (
@@ -102,7 +93,6 @@ export const ShapeItemsColorPickerInline: React.FC<{
               isDisabled={shapeStyle.items.coloring.color.colors.length >= 8}
               colorScheme="secondary"
               leftIcon={<AddIcon />}
-              size="sm"
               onClick={() => {
                 shapeStyle.items.coloring.color.colors.push(getRandomColor())
                 onUpdate()
@@ -113,7 +103,6 @@ export const ShapeItemsColorPickerInline: React.FC<{
 
             <Button
               variant="ghost"
-              size="sm"
               isDisabled={shapeStyle.items.coloring.color.colors.length === 0}
               onClick={() => {
                 shapeStyle.items.coloring.color.colors = shapeStyle.items.coloring.color.colors.map(
@@ -127,20 +116,16 @@ export const ShapeItemsColorPickerInline: React.FC<{
               Random
             </Button>
 
-            <Menu placement="bottom-end">
-              <MenuButton ml="2" as={MenuDotsButton} size="sm" />
-              <MenuList>
-                <MenuItem
-                  onClick={() => {
-                    shapeStyle.items.coloring.color.colors.length = 1
-                    onUpdate()
-                  }}
-                >
-                  <SmallCloseIcon size="20px" color="gray.500" mr="2" />
-                  Clear all
-                </MenuItem>
-              </MenuList>
-            </Menu>
+            <Button
+              variant="ghost"
+              ml="2"
+              onClick={() => {
+                shapeStyle.items.coloring.color.colors.length = 1
+                onUpdate()
+              }}
+            >
+              Clear all
+            </Button>
           </Box>
         )}
       </Box>
@@ -234,7 +219,6 @@ export const ShapeItemsColorPickerInline: React.FC<{
                   <Box>
                     <Button
                       variant="ghost"
-                      size="sm"
                       onClick={() => {
                         shapeStyle.items.coloring.gradient.gradient = {
                           from: getRandomColor(),

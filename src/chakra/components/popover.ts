@@ -1,25 +1,25 @@
-import { ComponentTheme, mode } from "@chakra-ui/theme-tools"
+import { ComponentTheme, mode } from '@chakra-ui/theme-tools'
 
 const Popover: ComponentTheme = {
   baseStyle: (props) => ({
     Content: {
-      bg: mode("white", "gray.700")(props),
-      border: "1px solid",
-      borderColor: "inherit",
-      borderRadius: "md",
-      boxShadow: "sm",
-      width: "100%",
-      maxWidth: "xs",
-      zIndex: "1",
+      bg: mode('white', 'gray.700')(props),
+      border: '1px solid',
+      borderColor: 'inherit',
+      borderRadius: 'md',
+      boxShadow: 'sm',
+      width: '100%',
+      maxWidth: 'xs',
+      zIndex: '3',
       _focus: {
         outline: 0,
-        boxShadow: "outline",
+        boxShadow: 'outline',
       },
     },
     Header: {
       paddingX: 3,
       paddingY: 2,
-      borderBottomWidth: "1px",
+      borderBottomWidth: '1px',
     },
     Body: {
       paddingX: 3,
@@ -28,7 +28,7 @@ const Popover: ComponentTheme = {
     Footer: {
       paddingX: 3,
       paddingY: 2,
-      borderTopWidth: "1px",
+      borderTopWidth: '1px',
     },
   }),
 }

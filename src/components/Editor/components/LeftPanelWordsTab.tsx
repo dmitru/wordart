@@ -205,16 +205,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
           Add
         </Button>
 
-        <Button
-          leftIcon={<EditIcon />}
-          colorScheme="secondary"
-          onClick={() => {
-            state.isShowingEditor = true
-          }}
-        >
-          Edit words
-        </Button>
-
         <Box ml="auto">
           <Button
             variant="outline"
@@ -726,7 +716,7 @@ const WordListRow: React.FC<
     }
 
     const wordCustomizeControl = (
-      <Popover closeOnBlur closeOnEsc>
+      <Popover closeOnBlur closeOnEsc placement="right">
         <PopoverTrigger>{customizeTrigger}</PopoverTrigger>
         <Portal>
           <PopoverContent zIndex={4000} width="280px">
