@@ -1,6 +1,6 @@
 import { Box, Flex, Heading, Stack, Text, Textarea } from '@chakra-ui/core'
 import { css } from '@emotion/core'
-import { FontPicker } from 'components/Editor/components/FontPicker/FontPicker'
+import { FontPickerModal } from 'components/Editor/components/FontPicker/FontPickerModal'
 import { ShapeThumbnailBtn } from 'components/Editor/components/ShapeSelector'
 import {
   applyTransformToObj,
@@ -17,7 +17,9 @@ import { createCanvas } from 'lib/wordart/canvas-utils'
 import { isEqual } from 'lodash'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import { BaseBtn } from 'components/shared/BaseBtn'
+import { SelectedFontThumbnail } from 'components/Editor/components/FontPicker/components'
 import { FaCog } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
@@ -52,6 +54,7 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
   const { editorPageStore: store } = useStore()
   const shapeStyle = store.styleOptions.shape
   const shape = store.getShape()
+  const [isShowingFontPicker, setIsShowingFontPicker] = useState(false)
 
   const {
     // @ts-ignore
@@ -353,57 +356,88 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
                   animate={{ x: 0, y: 0, opacity: 1 }}
                   exit={{ x: -400, y: 0, opacity: 0 }}
                 >
-                  <Stack mb="4" p="2" position="absolute" width="100%">
-                    <Textarea
-                      mb="3"
-                      autoFocus
-                      value={store.shapesPanel.text.text}
-                      onChange={async (e: any) => {
-                        const text = e.target.value
-                        store.shapesPanel.text.text = text
+                  <Stack
+                    mb="4"
+                    p="2"
+                    position="absolute"
+                    width="100%"
+                    spacing="5"
+                  >
+                    <Box>
+                      <Text fontWeight="semibold" color="gray.500">
+                        Text
+                      </Text>
 
-                        const shape = store.getShape()
-                        if (!shape || shape.kind !== 'text') {
-                          return
-                        }
+                      <Textarea
+                        mb="3"
+                        autoFocus
+                        value={store.shapesPanel.text.text}
+                        onChange={async (e: any) => {
+                          const text = e.target.value
+                          store.shapesPanel.text.text = text
 
-                        shape.config.text = text
-                        updateShapeDebounced()
-                        updateThumbnailDebounced()
-                      }}
-                      placeholder="Type text here..."
-                    />
+                          const shape = store.getShape()
+                          if (!shape || shape.kind !== 'text') {
+                            return
+                          }
+
+                          shape.config.text = text
+                          updateShapeDebounced()
+                          updateThumbnailDebounced()
+                        }}
+                        placeholder="Type text here..."
+                      />
+                    </Box>
 
                     <Box display="flex" alignItems="center" mb="5">
                       <TextShapeColorPicker
                         shapeConf={shape.config}
                         onAfterChange={updateShapeColoringDebounced}
                         onChange={updateThumbnailDebounced}
+                        placement="right"
                       />
                     </Box>
 
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      css={css`
-                        min-height: 300px;
-                        height: calc(100vh - 520px);
-                      `}
-                    >
-                      <FontPicker
-                        selectedFontId={store.shapesPanel.text.fontId}
-                        onHighlighted={async (font, style) => {
-                          store.shapesPanel.text.fontId = style.fontId
-                          const shape = store.getShape()
-                          if (!shape || shape.kind !== 'text') {
-                            return
-                          }
-                          shape.config.textStyle.fontId = style.fontId
-                          updateTextThumbnailPreview()
-                          store.updateShapeFromSelectedShapeConf()
-                        }}
-                      />
+                    <Box>
+                      <Text fontWeight="semibold" color="gray.500">
+                        Font
+                      </Text>
+                      <Box>
+                        <BaseBtn
+                          onClick={() => {
+                            setIsShowingFontPicker(true)
+                          }}
+                          as={SelectedFontThumbnail}
+                          mb="0"
+                          p="3"
+                        >
+                          <img
+                            src={
+                              store.getFontConfigById(
+                                store.shapesPanel.text.fontId
+                              )?.style.thumbnail
+                            }
+                          />
+                        </BaseBtn>
+                      </Box>
                     </Box>
+
+                    <FontPickerModal
+                      isOpen={isShowingFontPicker}
+                      onClose={() => setIsShowingFontPicker(false)}
+                      selectedFontId={store.shapesPanel.text.fontId}
+                      onSubmit={async (font, style) => {
+                        store.shapesPanel.text.fontId = style.fontId
+                        const shape = store.getShape()
+                        if (!shape || shape.kind !== 'text') {
+                          return
+                        }
+                        shape.config.textStyle.fontId = style.fontId
+                        updateTextThumbnailPreview()
+                        store.updateShapeFromSelectedShapeConf()
+                        setIsShowingFontPicker(false)
+                      }}
+                    />
                   </Stack>
                 </motion.div>
               )}

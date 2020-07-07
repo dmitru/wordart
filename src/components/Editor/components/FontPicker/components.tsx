@@ -1,26 +1,6 @@
-import {
-  Badge,
-  Box,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Stack,
-} from '@chakra-ui/core'
-import css from '@emotion/css'
+import { Badge, Box, IconButton } from '@chakra-ui/core'
 import styled from '@emotion/styled'
-import { FontPicker } from 'components/Editor/components/FontPicker/FontPicker'
-import { SectionLabel } from 'components/Editor/components/shared'
 import { BaseBtn } from 'components/shared/BaseBtn'
-import { Button } from 'components/shared/Button'
-import { FontConfig, FontStyleConfig } from 'data/fonts'
-import { sortBy, capitalize } from 'lodash'
-import { observer, useLocalStore } from 'mobx-react'
-import { useEffect, useMemo } from 'react'
-import { useStore } from 'services/root-store'
-import { animateElement } from 'utils/animation'
-import { ChevronDownIcon } from '@chakra-ui/icons'
 
 export type FontListButtonProps = {
   title: string

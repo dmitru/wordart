@@ -1,7 +1,5 @@
 import {
-  Badge,
   Box,
-  IconButton,
   Menu,
   MenuButton,
   MenuItem,
@@ -13,23 +11,17 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Stack,
 } from '@chakra-ui/core'
-import { noop } from 'lodash'
-import css from '@emotion/css'
-import styled from '@emotion/styled'
+import { ChevronDownIcon } from '@chakra-ui/icons'
+import { SelectedFontThumbnail } from 'components/Editor/components/FontPicker/components'
 import { FontPicker } from 'components/Editor/components/FontPicker/FontPicker'
-import { SectionLabel } from 'components/Editor/components/shared'
-import { BaseBtn } from 'components/shared/BaseBtn'
 import { Button } from 'components/shared/Button'
 import { FontConfig, FontStyleConfig } from 'data/fonts'
-import { sortBy, capitalize } from 'lodash'
+import { capitalize, noop, sortBy } from 'lodash'
 import { observer, useLocalStore } from 'mobx-react'
 import { useEffect, useMemo } from 'react'
 import { useStore } from 'services/root-store'
 import { animateElement } from 'utils/animation'
-import { ChevronDownIcon } from '@chakra-ui/icons'
-import { SelectedFontThumbnail } from 'components/Editor/components/FontPicker/components'
 
 export type FontPickerModalProps = {
   title?: string
@@ -180,7 +172,7 @@ export const FontPickerModal: React.FC<FontPickerModalProps> = observer(
                 </Button>
                 <Button
                   ml="3"
-                  colorScheme="primary"
+                  colorScheme="accent"
                   onClick={() => {
                     if (!selectedFont || !selectedFontStyle) {
                       return

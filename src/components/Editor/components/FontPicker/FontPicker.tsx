@@ -1,7 +1,5 @@
 import {
-  Badge,
   Box,
-  IconButton,
   Menu,
   MenuButton,
   MenuDivider,
@@ -11,8 +9,6 @@ import {
 } from '@chakra-ui/core'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
-import styled from '@emotion/styled'
-import { BaseBtn } from 'components/shared/BaseBtn'
 import { Button } from 'components/shared/Button'
 import { DeleteButton } from 'components/shared/DeleteButton'
 import { SearchInput } from 'components/shared/SearchInput'
@@ -23,7 +19,8 @@ import {
   popularFonts,
 } from 'data/fonts'
 import { capitalize, flatten, uniq } from 'lodash'
-import { observer, useLocalStore } from 'mobx-react'
+import { observable } from 'mobx'
+import { observer } from 'mobx-react'
 import { useMemo } from 'react'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList as List, ListProps } from 'react-window'
@@ -35,15 +32,15 @@ export type FontPickerProps = {
   onHighlighted: (font: FontConfig, fontStyle: FontStyleConfig) => void
 }
 
+const state = observable({
+  query: '',
+  style: 'popular',
+  language: 'any',
+})
+
 export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
   const { selectedFontId, onHighlighted } = props
   const { editorPageStore: store } = useStore()
-
-  const state = useLocalStore(() => ({
-    query: '',
-    style: 'popular',
-    language: 'any',
-  }))
 
   const allFonts = store.getAvailableFonts({
     popular: state.style === 'popular',

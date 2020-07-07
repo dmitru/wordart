@@ -9,7 +9,10 @@ import {
 } from '@chakra-ui/core'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
+import {
+  ColorPickerPopover,
+  ColorPickerPopoverProps,
+} from 'components/shared/ColorPickerPopover'
 import { observer } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
@@ -273,26 +276,30 @@ export const TextShapeColorPicker: React.FC<{
   onAfterChange?: () => void
   onChange?: () => void
   shapeConf: ShapeTextConf
-}> = observer(({ shapeConf, onAfterChange = noop, onChange = noop }) => {
-  const { editorPageStore: store } = useStore()
+  placement?: ColorPickerPopoverProps['placement']
+}> = observer(
+  ({ placement, shapeConf, onAfterChange = noop, onChange = noop }) => {
+    const { editorPageStore: store } = useStore()
 
-  return (
-    <Box display="flex" alignItems="center">
-      <Text my="0" mr="3" fontWeight="semibold" color="gray.500">
-        Color
-      </Text>
-      <ColorPickerPopover
-        value={store.shapesPanel.text.color}
-        onChange={(color) => {
-          shapeConf.textStyle.color = color
-          store.updateColorForAllShapeTypes(color)
-          onChange()
-        }}
-        onAfterChange={onAfterChange}
-      />
-    </Box>
-  )
-})
+    return (
+      <Box display="flex" alignItems="center">
+        <Text my="0" mr="3" fontWeight="semibold" color="gray.500">
+          Color
+        </Text>
+        <ColorPickerPopover
+          value={store.shapesPanel.text.color}
+          onChange={(color) => {
+            shapeConf.textStyle.color = color
+            store.updateColorForAllShapeTypes(color)
+            onChange()
+          }}
+          onAfterChange={onAfterChange}
+          placement={placement}
+        />
+      </Box>
+    )
+  }
+)
 
 export const BlobShapeColorPicker: React.FC<{
   onAfterChange?: () => void

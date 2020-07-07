@@ -1,17 +1,17 @@
 import {
   Box,
+  Button,
   Editable,
   EditableInput,
   EditablePreview,
   Heading,
-  Icon,
-  Button,
   IconButton,
   Menu,
   MenuButton,
   MenuDivider,
   MenuItem,
   MenuList,
+  MenuTransition,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -19,37 +19,36 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Portal,
   Progress,
   Skeleton,
   Stack,
   Text,
   useToast,
-  MenuTransition,
-  Portal,
 } from '@chakra-ui/core'
-import { SmallCloseIcon } from '@chakra-ui/icons'
-import { css } from '@emotion/core'
-import { getTabTitle } from 'utils/tab-title'
-import styled from '@emotion/styled'
 import {
-  ChevronDownIcon,
-  ArrowForwardIcon,
   ArrowBackIcon,
+  ArrowForwardIcon,
+  ChevronDownIcon,
+  SmallCloseIcon,
 } from '@chakra-ui/icons'
+import { css } from '@emotion/core'
+import styled from '@emotion/styled'
 import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
 import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
 import { Shapes } from '@styled-icons/fa-solid/Shapes'
-import { Font } from '@styled-icons/icomoon/Font'
 import { SmileBeam } from '@styled-icons/fa-solid/SmileBeam'
+import { Font } from '@styled-icons/icomoon/Font'
 import { TextFields } from '@styled-icons/material/TextFields'
 import { LayoutMasonry } from '@styled-icons/remix-fill/LayoutMasonry'
 import { LeftPanelColorsTab } from 'components/Editor/components/LeftPanelColorsTab'
 import { LeftPanelFontsTab } from 'components/Editor/components/LeftPanelFontsTab'
 import { LeftPanelIconsTab } from 'components/Editor/components/LeftPanelIconsTab'
 import { LeftPanelLayoutTab } from 'components/Editor/components/LeftPanelLayoutTab'
-import { LeftPanelShapesTab } from 'components/Editor/components/ShapesTab/LeftPanelShapesTab'
 import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTab'
+import { LeftPanelShapesTab } from 'components/Editor/components/ShapesTab/LeftPanelShapesTab'
 import { Spinner } from 'components/Editor/components/Spinner'
+import { WarningModal } from 'components/Editor/components/WarningModal'
 import {
   EditorStoreInitParams,
   pageSizePresets,
@@ -60,8 +59,11 @@ import {
 } from 'components/Editor/style'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
+import { MenuDotsButton } from 'components/shared/MenuDotsButton'
+import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 import { Tooltip } from 'components/shared/Tooltip'
+import { TopNavButton } from 'components/shared/TopNavButton'
 import { saveAs } from 'file-saver'
 import { Dimensions } from 'lib/wordart/canvas-utils'
 import 'lib/wordart/console-extensions'
@@ -71,6 +73,7 @@ import { useRouter } from 'next/dist/client/router'
 import Link from 'next/link'
 import { darken, desaturate } from 'polished'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { Helmet } from 'react-helmet'
 import { BsTrash } from 'react-icons/bs'
 import {
   FiChevronLeft,
@@ -89,11 +92,7 @@ import { WordcloudId } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import 'utils/canvas-to-blob'
-import { MenuDotsButton } from 'components/shared/MenuDotsButton'
-import { TopNavButton } from 'components/shared/TopNavButton'
-import { WarningModal } from 'components/Editor/components/WarningModal'
-import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
-import { Helmet } from 'react-helmet'
+import { getTabTitle } from 'utils/tab-title'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId

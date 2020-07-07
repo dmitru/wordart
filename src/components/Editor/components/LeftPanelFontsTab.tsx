@@ -12,7 +12,7 @@ import { AddIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
 import { AddCustomFontModal } from 'components/Editor/components/AddCustomFontModal'
-import { LeftPanelFontPicker } from 'components/Editor/components/FontPicker/LeftPanelFontPicker'
+import { FontPickerModal } from 'components/Editor/components/FontPicker/FontPickerModal'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { TargetKind } from 'components/Editor/lib/editor'
 import { BaseBtn } from 'components/shared/BaseBtn'
@@ -21,7 +21,6 @@ import { DeleteButton } from 'components/shared/DeleteButton'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { Tooltip } from 'components/shared/Tooltip'
 import { FontStyleConfig } from 'data/fonts'
-import { AnimatePresence, motion } from 'framer-motion'
 import { uniq } from 'lodash'
 import { observer, useLocalStore } from 'mobx-react'
 import { useStore } from 'services/root-store'
@@ -36,7 +35,6 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
     const style = store.styleOptions[target]
 
     const state = useLocalStore(() => ({
-      view: 'font-list' as 'font-list' | 'choose-font',
       isAddingFont: false,
       replacingFontIndex: undefined as undefined | number,
       isAddingCustomFont: false,
@@ -78,169 +76,123 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
 
     return (
       <>
-        <Box
-          position="relative"
-          overflow="hidden"
-          height="calc(100vh - 50px)"
-          width="100%"
-        >
-          <AnimatePresence initial={false}>
-            {state.view === 'font-list' && (
-              <motion.div
-                key="view"
-                initial={{ x: -355, y: 0, opacity: 0 }}
-                transition={{ ease: 'easeInOut', duration: 0.2 }}
-                animate={{ x: 0, y: 0, opacity: 1 }}
-                exit={{ x: -355, y: 0, opacity: 0 }}
-              >
-                <Box height="100%" px="5" py="6" position="absolute">
-                  <SectionLabel>Fonts to use</SectionLabel>
-                  <Box
-                    mt="3"
-                    mb="6"
-                    css={css`
-                      width: 340px;
-                      /* border-radius: 4px; */
-                      /* box-shadow: 0 0 4px 0 #0004; */
-                    `}
-                  >
-                    {fonts.map((fontStyle, index) => {
-                      return (
-                        <FontListButton
-                          key={fontStyle.fontId}
-                          thumbnail={fontStyle.thumbnail}
-                          title={fontStyle.title}
-                          isCustom={fontStyle.isCustom}
-                          showDelete={style.items.words.fontIds.length > 1}
-                          containerProps={{
-                            onClick: (e) => {
-                              if (e.isPropagationStopped()) {
-                                return
-                              }
-                              state.isAddingFont = false
-                              state.replacingFontIndex = index
-                              state.view = 'choose-font'
-                            },
-                          }}
-                          onChangeClick={() => {
-                            state.isAddingFont = false
-                            state.replacingFontIndex = index
-                            state.view = 'choose-font'
-                          }}
-                          onDeleteClick={() => {
-                            style.items.words.fontIds = style.items.words.fontIds.filter(
-                              (id) => id !== fontStyle.fontId
-                            )
-                          }}
-                        />
-                      )
-                    })}
-                  </Box>
+        <Box px="5" py="6">
+          <SectionLabel>Fonts to use</SectionLabel>
+          <Box
+            mt="3"
+            mb="6"
+            css={css`
+              width: 340px;
+            `}
+          >
+            {fonts.map((fontStyle, index) => {
+              return (
+                <FontListButton
+                  key={fontStyle.fontId}
+                  thumbnail={fontStyle.thumbnail}
+                  title={fontStyle.title}
+                  isCustom={fontStyle.isCustom}
+                  showDelete={style.items.words.fontIds.length > 1}
+                  containerProps={{
+                    onClick: (e) => {
+                      if (e.isPropagationStopped()) {
+                        return
+                      }
+                      state.isAddingFont = false
+                      state.replacingFontIndex = index
+                    },
+                  }}
+                  onChangeClick={() => {
+                    state.isAddingFont = false
+                    state.replacingFontIndex = index
+                  }}
+                  onDeleteClick={() => {
+                    style.items.words.fontIds = style.items.words.fontIds.filter(
+                      (id) => id !== fontStyle.fontId
+                    )
+                  }}
+                />
+              )
+            })}
+          </Box>
 
-                  <Box mt="3" display="flex" alignItems="center">
-                    <Button
-                      mr="3"
-                      onClick={() => {
-                        state.replacingFontIndex = undefined
-                        state.isAddingFont = true
-                        state.view = 'choose-font'
-                      }}
-                      leftIcon={<AddIcon />}
-                      colorScheme="primary"
-                    >
-                      Add more fonts
-                    </Button>
+          <Box mt="3" display="flex" alignItems="center">
+            <Button
+              mr="3"
+              onClick={() => {
+                state.replacingFontIndex = undefined
+                state.isAddingFont = true
+              }}
+              leftIcon={<AddIcon />}
+              colorScheme="primary"
+            >
+              Add more fonts
+            </Button>
 
-                    <Menu>
-                      <MenuButton as={MenuDotsButton} variant="ghost" />
+            <Menu>
+              <MenuButton as={MenuDotsButton} variant="ghost" />
 
-                      <MenuList>
-                        <MenuItem
-                          onClick={() => {
-                            state.isAddingCustomFont = true
-                          }}
-                        >
-                          Upload custom font...
-                        </MenuItem>
-                        <MenuItem>Reset defaults</MenuItem>
-                      </MenuList>
-                    </Menu>
-
-                    <Tooltip label="You can use up to 8 different fonts in your designs">
-                      <Box ml="auto">
-                        <Tag rounded="full" colorScheme="gray">
-                          <TagLabel>{(fonts || []).length} / 8</TagLabel>
-                        </Tag>
-                      </Box>
-                    </Tooltip>
-                  </Box>
-                </Box>
-              </motion.div>
-            )}
-
-            {state.view === 'choose-font' && (
-              <motion.div
-                key="customize"
-                initial={{ x: 355, y: 0, opacity: 0 }}
-                transition={{ ease: 'easeInOut', duration: 0.2 }}
-                animate={{ x: 0, y: 0, opacity: 1 }}
-                exit={{ x: 355, y: 0, opacity: 0 }}
-              >
-                <Box
-                  width="100%"
-                  height="calc(100vh - 50px)"
-                  px="5"
-                  py="6"
-                  position="absolute"
-                  display="flex"
-                  flexDirection="column"
+              <MenuList>
+                <MenuItem
+                  onClick={() => {
+                    state.isAddingCustomFont = true
+                  }}
                 >
-                  <LeftPanelFontPicker
-                    showCancel={state.isAddingFont}
-                    selectedFontId={
-                      style.items.words.fontIds[
-                        state.replacingFontIndex != null
-                          ? state.replacingFontIndex
-                          : 0
-                      ]
-                    }
-                    onCancel={() => {
-                      state.view = 'font-list'
-                    }}
-                    onHighlighted={(font, fontStyle) => {
-                      if (state.replacingFontIndex != null) {
-                        style.items.words.fontIds[state.replacingFontIndex] =
-                          fontStyle.fontId
-                        style.items.words.fontIds = uniq(
-                          style.items.words.fontIds
-                        )
-                        store.animateVisualize(false)
-                      }
-                    }}
-                    onSelected={(font, fontStyle) => {
-                      console.log('onSelected', font, fontStyle)
+                  Upload custom font...
+                </MenuItem>
+                <MenuItem>Reset defaults</MenuItem>
+              </MenuList>
+            </Menu>
 
-                      if (state.isAddingFont) {
-                        style.items.words.fontIds = uniq([
-                          ...style.items.words.fontIds,
-                          fontStyle.fontId,
-                        ])
-                      } else if (state.replacingFontIndex != null) {
-                        style.items.words.fontIds[state.replacingFontIndex] =
-                          fontStyle.fontId
-                        style.items.words.fontIds = uniq(
-                          style.items.words.fontIds
-                        )
-                      }
-                      state.view = 'font-list'
-                      store.animateVisualize(false)
-                    }}
-                  />
-                </Box>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            <Tooltip label="You can use up to 8 different fonts in your designs">
+              <Box ml="auto">
+                <Tag rounded="full" colorScheme="gray">
+                  <TagLabel>{(fonts || []).length} / 8</TagLabel>
+                </Tag>
+              </Box>
+            </Tooltip>
+          </Box>
         </Box>
+
+        <FontPickerModal
+          showCancel={state.isAddingFont}
+          selectedFontId={
+            style.items.words.fontIds[
+              state.replacingFontIndex != null ? state.replacingFontIndex : 0
+            ]
+          }
+          isOpen={state.isAddingFont || state.replacingFontIndex != null}
+          submitText={state.isAddingFont ? 'Add font' : 'Choose font'}
+          onClose={() => {
+            state.isAddingFont = false
+            state.replacingFontIndex = undefined
+          }}
+          onHighlighted={(font, fontStyle) => {
+            if (state.replacingFontIndex != null) {
+              style.items.words.fontIds[state.replacingFontIndex] =
+                fontStyle.fontId
+              style.items.words.fontIds = uniq(style.items.words.fontIds)
+              store.animateVisualize(false)
+            }
+          }}
+          onSubmit={(font, fontStyle) => {
+            if (state.isAddingFont) {
+              style.items.words.fontIds = uniq([
+                ...style.items.words.fontIds,
+                fontStyle.fontId,
+              ])
+            } else if (state.replacingFontIndex != null) {
+              style.items.words.fontIds[state.replacingFontIndex] =
+                fontStyle.fontId
+              style.items.words.fontIds = uniq(style.items.words.fontIds)
+            }
+
+            state.isAddingFont = false
+            state.replacingFontIndex = undefined
+
+            store.animateVisualize(false)
+          }}
+        />
 
         <AddCustomFontModal
           isOpen={state.isAddingCustomFont}
