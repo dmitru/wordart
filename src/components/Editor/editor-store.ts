@@ -1057,13 +1057,13 @@ export class EditorStore {
             ),
             words: {
               angles:
-                this.styleOptions.shape.items.words.anglesPreset === 'custom'
-                  ? this.styleOptions.shape.items.words.customAngles
+                this.styleOptions.bg.items.words.anglesPreset === 'custom'
+                  ? this.styleOptions.bg.items.words.customAngles
                   : getAnglesForPreset(
-                      this.styleOptions.shape.items.words.anglesPreset
+                      this.styleOptions.bg.items.words.anglesPreset
                     ),
-              fontIds: this.styleOptions.shape.items.words.fontIds,
-              wordList: this.styleOptions.shape.items.words.wordList,
+              fontIds: this.styleOptions.bg.items.words.fontIds,
+              wordList: this.styleOptions.bg.items.words.wordList,
             },
           },
           fill: serializeBgFill(this.styleOptions.bg.fill),
