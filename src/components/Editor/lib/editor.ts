@@ -1588,7 +1588,15 @@ export class Editor {
       shapeCanvas.height
     )
 
-    const wordFonts: Font[] = await this.fetchFonts(style.items.words.fontIds)
+    const defaultFontIds = style.items.words.fontIds
+    const allUsedFontIds = [
+      ...new Set([
+        ...defaultFontIds,
+        ...style.items.words.wordList.map((w) => w.fontId).filter(notEmpty),
+      ]),
+    ]
+    await this.fetchFonts(allUsedFontIds)
+    const defaultFonts: Font[] = await this.fetchFonts(defaultFontIds)
 
     const shapeConfig = this.store.getSelectedShapeConf()
     const wordConfigsById = keyBy(style.items.words.wordList, 'id')
@@ -1650,10 +1658,11 @@ export class Editor {
           .map((wc) => ({
             wordConfigId: wc.id,
             text: wc.text,
-            angles: style.items.words.angles,
+            angles: wc.angle != null ? [wc.angle] : style.items.words.angles,
             fillColors: ['red'],
-            // fonts: [fonts[0], fonts[1], fonts[2]],
-            fonts: wordFonts,
+            fonts: wc.fontId
+              ? [this.fontsInfo.get(wc.fontId)!.font]
+              : defaultFonts,
           })),
         // Icons
         icons: style.items.icons.iconList.map((shape) => ({
@@ -2054,7 +2063,7 @@ export class Editor {
         if (this.fontsInfo.has(fontId)) {
           return this.fontsInfo.get(fontId)!.font
         }
-        const { style } = this.store.getFontById(fontId)!
+        const { style } = this.store.getFontConfigById(fontId)!
         const font: Font = {
           otFont: await loadFont(style.url)!,
           id: fontId,

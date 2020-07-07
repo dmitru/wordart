@@ -21,7 +21,7 @@
       "@src/*": ["src/*"]
     }
   },
-  "exclude": ["node_modules", "src/lib/wordart/wasm/wasm-gen"],
+  "exclude": ["node_modules", "src/lib/wordart/wasm/wasm-gen", "src/data"],
   "include": [
     "./src",
     "next-env.d.ts",

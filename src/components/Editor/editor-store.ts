@@ -138,6 +138,7 @@ export class EditorStore {
   wordIdGen = new UniqIdGenerator(3)
   customImgIdGen = new UniqIdGenerator(3)
   customFontIdGen = new UniqIdGenerator(4)
+  fontsCache = new Map<FontId, opentype.Font>()
 
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
@@ -1179,7 +1180,7 @@ export class EditorStore {
     return result
   }
 
-  getFontById = (
+  getFontConfigById = (
     fontId: FontId
   ): { font: FontConfig; style: FontStyleConfig } | undefined => {
     for (const font of [...this.customFonts, ...fonts]) {
@@ -1191,10 +1192,22 @@ export class EditorStore {
     }
     return undefined
   }
-  fetchFontById = (fontId: FontId) =>
-    this.getFontById(fontId)
-      ? loadFont(this.getFontById(fontId)!.style.url!)
-      : Promise.resolve(null)
+
+  fetchFontById = async (fontId: FontId) => {
+    if (this.fontsCache.has(fontId)) {
+      return this.fontsCache.get(fontId)
+    }
+    const font = await (this.getFontConfigById(fontId)
+      ? loadFont(this.getFontConfigById(fontId)!.style.url!)
+      : Promise.resolve(null))
+    if (!font) {
+      return null
+    }
+    this.fontsCache.set(fontId, font)
+    return font
+  }
+
+  getFontById = (fontId: FontId) => this.fontsCache.get(fontId)
 
   getSelectedShapeConf = () => this.selectedShapeConf
 

@@ -1,6 +1,6 @@
 import { Box, Flex, Heading, Stack, Text, Textarea } from '@chakra-ui/core'
 import { css } from '@emotion/core'
-import { FontPicker } from 'components/Editor/components/FontPicker'
+import { FontPicker } from 'components/Editor/components/FontPicker/FontPicker'
 import { ShapeThumbnailBtn } from 'components/Editor/components/ShapeSelector'
 import {
   applyTransformToObj,
@@ -112,7 +112,7 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
     if (!shape || shape.kind !== 'text') {
       return
     }
-    const fontInfo = store.getFontById(store.shapesPanel.text.fontId)
+    const fontInfo = store.getFontConfigById(store.shapesPanel.text.fontId)
     if (!fontInfo) {
       return
     }

@@ -1,6 +1,8 @@
 import {
   Box,
   Checkbox,
+  Flex,
+  FormLabel,
   InputGroup,
   InputProps,
   InputRightElement,
@@ -8,29 +10,20 @@ import {
   MenuButton,
   MenuDivider,
   MenuList,
+  MenuTransition,
   Popover,
   PopoverArrow,
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
-  MenuTransition,
   Portal,
   Stack,
-  Text,
-  Flex,
   Switch,
-  FormLabel,
+  Text,
 } from '@chakra-ui/core'
-import {
-  AddIcon,
-  ChevronDownIcon,
-  SmallCloseIcon,
-  EditIcon,
-} from '@chakra-ui/icons'
+import { AddIcon, ChevronDownIcon, SmallCloseIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
-import { ColorSwatchButton } from 'components/shared/ColorSwatchButton'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { TextFields } from '@styled-icons/material-twotone/TextFields'
 import { DragIndicator } from '@styled-icons/material/DragIndicator'
 import { FormatTextSize } from '@styled-icons/zondicons/FormatTextSize'
@@ -39,14 +32,21 @@ import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
 import { WordsEditorModal } from 'components/Editor/components/WordsEditorModal'
 import { WordConfigId } from 'components/Editor/editor-store'
 import { TargetKind } from 'components/Editor/lib/editor'
+import {
+  mkBgStyleConfFromOptions,
+  mkShapeStyleConfFromOptions,
+} from 'components/Editor/style'
 import { WordListEntry } from 'components/Editor/style-options'
 import { Button } from 'components/shared/Button'
+import { BaseBtn } from 'components/shared/BaseBtn'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
+import { ColorSwatchButton } from 'components/shared/ColorSwatchButton'
 import { DeleteButton } from 'components/shared/DeleteButton'
-import { Slider } from 'components/shared/Slider'
 import { Input } from 'components/shared/Input'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 import { SearchInput } from 'components/shared/SearchInput'
+import { Slider } from 'components/shared/Slider'
 import { capitalize, noop } from 'lodash'
 import { observable } from 'mobx'
 import { observer, Observer } from 'mobx-react'
@@ -59,7 +59,7 @@ import {
   DraggableStateSnapshot,
   Droppable,
 } from 'react-beautiful-dnd'
-import { FaDownload, FaSearch, FaCog } from 'react-icons/fa'
+import { FaCog, FaDownload, FaSearch } from 'react-icons/fa'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import {
   areEqual,
@@ -68,10 +68,8 @@ import {
 } from 'react-window'
 import { useStore } from 'services/root-store'
 import { useToasts } from 'use-toasts'
-import {
-  mkShapeStyleConfFromOptions,
-  mkBgStyleConfFromOptions,
-} from 'components/Editor/style'
+import { FontPickerModal } from 'components/Editor/components/FontPicker/FontPickerModal'
+import { SelectedFontThumbnail } from 'components/Editor/components/FontPicker/components'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -649,6 +647,8 @@ const ListRow = React.memo<ListChildComponentProps>(
   areEqual
 )
 
+const defaultFontId = 'Pacifico:regular'
+
 const WordListRow: React.FC<
   {
     style?: React.CSSProperties
@@ -680,36 +680,51 @@ const WordListRow: React.FC<
     style = {},
     ...otherProps
   }) => {
+    const { editorPageStore: store } = useStore()
+    const [isShowingFontPicker, setIsShowingFontPicker] = useState(false)
+
     let customizeTrigger = (
       <WordCustomizeButton
         color="gray.500"
         width="40px"
         size="sm"
         variant="ghost"
+        css={css`
+          height: 40px;
+        `}
       >
         <FaCog />
       </WordCustomizeButton>
     )
 
-    if (word.color) {
-      customizeTrigger = (
-        <ColorSwatchButton
-          kind="color"
-          color={word.color || 'black'}
-          css={css`
-            min-width: 30px;
-            width: 40px;
-            height: 30px;
-          `}
-        />
-      )
-    } else if (
+    if (
       word.angle != null ||
       word.fontId != null ||
-      word.repeat != null
+      word.repeat != null ||
+      word.color != 'null'
     ) {
       customizeTrigger = (
-        <Button color="gray.500" width="40px" size="sm" variant="ghost">
+        <Button
+          color="gray.500"
+          size="sm"
+          variant="ghost"
+          css={css`
+            height: 40px;
+          `}
+        >
+          {word.color != null && (
+            <ColorSwatchButton
+              as="span"
+              kind="color"
+              color={word.color || 'black'}
+              css={css`
+                margin-right: 5px;
+                min-width: 30px;
+                width: 30px;
+                height: 30px;
+              `}
+            />
+          )}
           <FaCog />
         </Button>
       )
@@ -733,6 +748,7 @@ const WordListRow: React.FC<
                     } else {
                       word.repeat = false
                     }
+                    store.animateVisualize(false)
                   }}
                 />
 
@@ -770,6 +786,7 @@ const WordListRow: React.FC<
                   }
                 >
                   <ColorPickerPopover
+                    placement="left"
                     usePortal={false}
                     css={css`
                       height: 30px;
@@ -794,6 +811,7 @@ const WordListRow: React.FC<
                     } else {
                       word.angle = undefined
                     }
+                    store.animateVisualize(false)
                   }}
                 />
                 <FormLabel htmlFor={`${word.id}-custom-angle`} my="0" ml="2">
@@ -809,6 +827,7 @@ const WordListRow: React.FC<
                     onChange={(value) => {
                       word.angle = value
                     }}
+                    onAfterChange={() => store.animateVisualize(false)}
                     min={-90}
                     max={90}
                     step={1}
@@ -822,8 +841,9 @@ const WordListRow: React.FC<
                   id={`${word.id}-custom-font`}
                   isChecked={word.fontId != null ? true : false}
                   onChange={(e) => {
+                    store.animateVisualize(false)
                     if (e.target.checked) {
-                      word.fontId = 'Pacifico:regular'
+                      word.fontId = defaultFontId
                     } else {
                       word.fontId = undefined
                     }
@@ -837,7 +857,20 @@ const WordListRow: React.FC<
 
               {word.fontId != null && (
                 <Box mt="2">
-                  <Button>Change font</Button>
+                  <BaseBtn
+                    onClick={() => {
+                      setIsShowingFontPicker(true)
+                    }}
+                    as={SelectedFontThumbnail}
+                    mb="0"
+                    p="3"
+                  >
+                    <img
+                      src={
+                        store.getFontConfigById(word.fontId)?.style.thumbnail
+                      }
+                    />
+                  </BaseBtn>
                 </Box>
               )}
             </PopoverBody>
@@ -900,6 +933,17 @@ const WordListRow: React.FC<
         {...provided.draggableProps}
         style={style}
       >
+        <FontPickerModal
+          isOpen={isShowingFontPicker}
+          onClose={() => setIsShowingFontPicker(false)}
+          onSubmit={(font, fontStyle) => {
+            word.fontId = fontStyle.fontId
+            setIsShowingFontPicker(false)
+            store.animateVisualize(false)
+          }}
+          selectedFontId={word.fontId || defaultFontId}
+        />
+
         <Box color="gray.400" {...provided.dragHandleProps}>
           <DragIndicator
             size="20px"

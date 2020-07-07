@@ -6,6 +6,7 @@ import {
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
+  PopoverProps,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
@@ -21,6 +22,7 @@ export type ColorPickerPopoverProps = {
   onAfterChange?: (hex: string) => void
   usePortal?: boolean
   children?: React.ReactNode
+  placement?: PopoverProps['placement']
 } & Omit<ButtonProps, 'children' | 'onChange'>
 
 export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
@@ -31,6 +33,7 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
   children,
   colorSwatchOpacity = 1,
   usePortal = true,
+  placement = 'bottom',
   ...props
 }) => {
   const initialFocusRef = useRef(null)
@@ -85,7 +88,7 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
     <>
       <Popover
         initialFocusRef={initialFocusRef}
-        placement="bottom"
+        placement={placement}
         closeOnBlur
         closeOnEsc
       >

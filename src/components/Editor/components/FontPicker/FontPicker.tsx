@@ -28,6 +28,7 @@ import { useMemo } from 'react'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList as List, ListProps } from 'react-window'
 import { useStore } from 'services/root-store'
+import { FontListButton } from './components'
 
 export type FontPickerProps = {
   selectedFontId: string | null
@@ -272,80 +273,3 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
     </>
   )
 })
-
-export type FontListButtonProps = {
-  title: string
-  thumbnail: string
-  isCustom?: boolean
-  isSelected?: boolean
-  containerProps?: React.HTMLAttributes<HTMLDivElement>
-}
-
-export const FontListButton: React.FC<FontListButtonProps> = ({
-  title,
-  isCustom,
-  isSelected,
-  thumbnail,
-  containerProps = {},
-}) => {
-  return (
-    <FontButtonContainer
-      aria-label={`Font ${title}`}
-      selected={isSelected}
-      {...containerProps}
-    >
-      <FontButton>
-        <img src={thumbnail} />
-        {isCustom && (
-          <Badge mr="2" ml="auto" colorScheme="purple">
-            custom
-          </Badge>
-        )}
-      </FontButton>
-    </FontButtonContainer>
-  )
-}
-
-const Toolbar = styled(Box)``
-
-const FontDeleteButton = styled(IconButton)``
-
-const FontButton = styled(BaseBtn)`
-  border: none;
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  height: 38px;
-
-  img {
-    max-width: 270px;
-    height: 30px;
-    margin: 0;
-    object-fit: contain;
-  }
-`
-
-const FontButtonContainer = styled(Box)<{ theme: any; selected?: boolean }>`
-  ${FontDeleteButton} {
-    opacity: 0;
-    transition: 0.2s opacity;
-  }
-
-  transition: 0.1s background;
-
-  ${(p) => (p.selected ? `background: ${p.theme.colors.blue['100']};` : '')}
-
-  &:hover {
-    background: ${(p) =>
-      p.selected
-        ? `${p.theme.colors.blue['50']}`
-        : p.theme.colors.blackAlpha['50']};
-    ${FontDeleteButton} {
-      opacity: 1;
-    }
-  }
-`
-FontButtonContainer.defaultProps = {
-  display: 'flex',
-  alignItems: 'center',
-}

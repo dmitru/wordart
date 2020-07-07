@@ -27,6 +27,7 @@ import {
   MenuTransition,
   Portal,
 } from '@chakra-ui/core'
+import { SmallCloseIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
 import { getTabTitle } from 'utils/tab-title'
 import styled from '@emotion/styled'
@@ -961,13 +962,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                                 store.editor?.clearItems(store.targetTab, true)
                               }}
                             >
-                              <Icon
-                                name="small-close"
-                                size="20px"
-                                color="gray.500"
-                                mr="2"
-                              />
-                              Remove all items
+                              <SmallCloseIcon color="gray.500" mr="2" />
+                              Delete all items
                             </MenuItem>
                           </MenuList>
                         </Menu>

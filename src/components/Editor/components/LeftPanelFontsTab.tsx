@@ -1,33 +1,30 @@
 import {
   Badge,
   Box,
-  IconButton,
   Menu,
-  Icon,
   MenuButton,
   MenuItem,
   MenuList,
   Tag,
   TagLabel,
 } from '@chakra-ui/core'
+import { AddIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
-import { DotsThreeVertical } from '@styled-icons/entypo/DotsThreeVertical'
 import { AddCustomFontModal } from 'components/Editor/components/AddCustomFontModal'
+import { LeftPanelFontPicker } from 'components/Editor/components/FontPicker/LeftPanelFontPicker'
+import { SectionLabel } from 'components/Editor/components/shared'
 import { TargetKind } from 'components/Editor/lib/editor'
+import { BaseBtn } from 'components/shared/BaseBtn'
+import { Button } from 'components/shared/Button'
+import { DeleteButton } from 'components/shared/DeleteButton'
+import { MenuDotsButton } from 'components/shared/MenuDotsButton'
+import { Tooltip } from 'components/shared/Tooltip'
 import { FontStyleConfig } from 'data/fonts'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useStore } from 'services/root-store'
-import { BaseBtn } from 'components/shared/BaseBtn'
-import { observer, useLocalStore } from 'mobx-react'
-import { SectionLabel } from 'components/Editor/components/shared'
 import { uniq } from 'lodash'
-import { LeftPanelFontPicker } from 'components/Editor/components/LeftPanelFontPicker'
-import { Button } from 'components/shared/Button'
-import { MenuDotsButton } from 'components/shared/MenuDotsButton'
-import { DeleteButton } from 'components/shared/DeleteButton'
-import { Tooltip } from 'components/shared/Tooltip'
-import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
+import { observer, useLocalStore } from 'mobx-react'
+import { useStore } from 'services/root-store'
 
 export type LeftPanelFontsTabProps = {
   target: TargetKind
