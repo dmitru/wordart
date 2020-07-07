@@ -12,7 +12,7 @@ import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/Targe
 import { observable } from 'mobx'
 import { uniqBy } from 'lodash'
 import { TargetKind } from 'components/Editor/lib/editor'
-import { Box, Text } from '@chakra-ui/core'
+import { Box, Text, Checkbox } from '@chakra-ui/core'
 import { Slider } from 'components/shared/Slider'
 import { Button } from 'components/shared/Button'
 import { Tooltip } from 'components/shared/Tooltip'
@@ -186,6 +186,16 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                   max={100}
                   step={1}
                 />
+
+                <Checkbox
+                  mt="5"
+                  isChecked={style.items.placement.iconsRandomAngle}
+                  onChange={(e) => {
+                    style.items.placement.iconsRandomAngle = e.target.checked
+                  }}
+                >
+                  Rotate icons by random angles
+                </Checkbox>
               </Box>
             )}
           </>

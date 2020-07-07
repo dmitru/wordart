@@ -1394,6 +1394,10 @@ export class Editor {
         ? shapeConfig.processing?.edges?.amount
         : 0
 
+    const randomIconAngles = new Array(8)
+      .fill(null)
+      .map(() => Math.round(360 * Math.random()))
+
     const result = await this.generator.fillShape(
       {
         shape: {
@@ -1442,6 +1446,9 @@ export class Editor {
         // Icons
         icons: style.items.icons.iconList.map((shape) => ({
           shape: this.store.getIconShapeConfById(shape.shapeId)!,
+          angles: style.items.placement.iconsRandomAngle
+            ? randomIconAngles
+            : [0],
         })),
         iconsMaxSize: style.items.placement.iconsMaxSize,
         iconProbability: style.items.placement.iconsProportion / 100,
@@ -1599,6 +1606,10 @@ export class Editor {
         ? shapeConfig.processing?.edges?.amount
         : 0
 
+    const randomIconAngles = new Array(8)
+      .fill(null)
+      .map(() => Math.round(360 * Math.random()))
+
     const result = await this.generator.fillShape(
       {
         shape: {
@@ -1647,6 +1658,9 @@ export class Editor {
         // Icons
         icons: style.items.icons.iconList.map((shape) => ({
           shape: this.store.getIconShapeConfById(shape.shapeId)!,
+          angles: style.items.placement.iconsRandomAngle
+            ? randomIconAngles
+            : [0],
         })),
         iconsMaxSize: style.items.placement.iconsMaxSize,
         iconProbability: style.items.placement.iconsProportion / 100,

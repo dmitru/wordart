@@ -69,7 +69,7 @@ export class Generator {
 
     const shapeCanvasMaxExtent = 300
     const batchSize = 50
-    const nIter = 100
+    const nIter = 900
 
     const shapeCanvas = task.shape.canvas
     const shapeCanvasOriginalColors = task.shape.shapeCanvasOriginalColors
@@ -245,6 +245,8 @@ export class Generator {
     const t1 = performance.now()
 
     const wordAngles = uniq(flatten(task.words.map((w) => w.angles)))
+    const iconAngles = uniq(flatten(task.icons.map((w) => w.angles)))
+    const allAngles = uniq([...wordAngles, ...iconAngles])
 
     const hasWords = task.words.length > 0
     const hasIcons = task.icons.length > 0
@@ -321,7 +323,7 @@ export class Generator {
         inverseTransform: rotatedBoundsTransformInverted,
       }
     }
-    wordAngles.forEach((angle) =>
+    allAngles.forEach((angle) =>
       rotationInfos.set(angle, computeRotationInfo(angle))
     )
     if (hasIcons && !rotationInfos.has(0)) {
@@ -376,7 +378,7 @@ export class Generator {
           inverseTransform: rotatedBoundsTransformInverted,
         } = rotationInfo
 
-        if (wordAngles.length === 1 && wordAngles[0] === 0) {
+        if (allAngles.length === 1 && allAngles[0] === 0) {
           // Optimize for case of just 1 angle
           rotatedCtx = unrotatedCtx
           rotatedBoundsTransform = new paper.Matrix()
@@ -390,23 +392,12 @@ export class Generator {
           rotatedCtx.drawImage(unrotatedCtx.canvas, 0, 0)
           rotatedCtx.restore()
         }
-        // console.log('i = ', i, angle)
 
         const wordPathBounds = wordPathsBounds[wordIndex]
         const wordPath = wordPaths[wordIndex]
 
         // let scale = 1 - (0.5 * i) / nIter
         let scale = 1
-
-        // rotatedCtx.fillStyle = '#f002'
-        // rotatedCtx.fillRect(
-        //   0,
-        //   0,
-        //   rotatedCtx.canvas.width,
-        //   rotatedCtx.canvas.height
-        // )
-        // console.log(rotatedCanvasDimensions)
-        // console.screenshot(rotatedCtx.canvas)
 
         const rotatedImgData = rotatedCtx.getImageData(
           0,
@@ -441,15 +432,6 @@ export class Generator {
         if (!mostLargestRect) {
           mostLargestRect = largestRect
         }
-
-        // const [largestRect] = getLargestRect(
-        //   scratchImgData,
-        //   scratchCanvasBounds,
-        //   wordAspect
-        // )
-        // console.log('largestRect ', largestRect)
-
-        // shapeCtx.fillRect(...spreadRect(largestRect))
 
         if (largestRect.w < 1 || largestRect.h < 1) {
           break
@@ -558,7 +540,8 @@ export class Generator {
         const icon = icons[iconIndex]
         const rasterCanvas = iconRasterCanvases[iconIndex]
 
-        const angle = 0
+        const angle = sample(icon.angles)!
+
         const rotationInfo = rotationInfos.get(angle)
         if (!rotationInfo) {
           throw new Error(`rotation info is missing for angle ${angle}`)
@@ -572,7 +555,7 @@ export class Generator {
         } = rotationInfo
         // console.log('i = ', i, angle)
 
-        if (angle === 0) {
+        if (allAngles.length === 1 && allAngles[0] === 0) {
           // Optimize for case of just 1 angle
           rotatedCtx = unrotatedCtx
           rotatedBoundsTransform = new paper.Matrix()
@@ -589,15 +572,6 @@ export class Generator {
 
         // let scale = 1 - (0.5 * i) / nIter
         let scale = 1
-        // rotatedCtx.fillStyle = '#f002'
-        // rotatedCtx.fillRect(
-        //   0,
-        //   0,
-        //   rotatedCtx.canvas.width,
-        //   rotatedCtx.canvas.height
-        // )
-        // console.log(rotatedCanvasDimensions)
-        // console.screenshot(rotatedCtx.canvas)
 
         const rotatedImgData = rotatedCtx.getImageData(
           0,
@@ -634,20 +608,9 @@ export class Generator {
           mostLargestRect = largestRect
         }
 
-        // const [largestRect] = getLargestRect(
-        //   scratchImgData,
-        //   scratchCanvasBounds,
-        //   wordAspect
-        // )
-        // console.log('largestRect ', largestRect)
-
-        // shapeCtx.fillRect(...spreadRect(largestRect))
-
         if (largestRect.w < 1 || largestRect.h < 1) {
           break
         }
-
-        // let iconScale = 0.5
 
         let iconScale =
           scale *
@@ -661,10 +624,6 @@ export class Generator {
           iconScale *= maxMaxDim / maxDim
         }
 
-        // shapeCtx.strokeStyle = '#f008'
-        // shapeCtx.lineWidth = 2
-        // shapeCtx.strokeRect(...spreadRect(largestRect))
-
         unrotatedCtx.save()
         rotatedBoundsTransform.applyToContext(unrotatedCtx)
 
@@ -675,13 +634,6 @@ export class Generator {
         } else {
           unrotatedCtx.shadowBlur = 0
         }
-
-        // console.log(
-        //   'shapeCtx.shadowBlur',
-        //   shapeCtx.shadowBlur,
-        //   (task.itemPadding / 100) * (shapeCanvasMaxExtent / 100) * 1,
-        //   iconScale
-        // )
 
         if (
           iconScale * Math.min(largestRect.w, largestRect.h) >=
@@ -700,18 +652,6 @@ export class Generator {
           unrotatedCtx.translate(tx, ty)
           unrotatedCtx.scale(iconScale, iconScale)
 
-          // console.log('iconScale: ', iconScale)
-          // console.log('rasterCanvas: ', rasterCanvas.width, rasterCanvas.height)
-          // console.log(
-          //   'iconBounds: ',
-          //   iconBounds.x,
-          //   iconBounds.y,
-          //   iconBounds.w,
-          //   iconBounds.h
-          // )
-          // console.log('---------------------')
-
-          // shapeCtx.imageSmoothingEnabled = false
           unrotatedCtx.drawImage(
             rasterCanvas,
             0,
@@ -720,8 +660,6 @@ export class Generator {
             rasterCanvas.height,
             iconBounds.x,
             iconBounds.y,
-            // rasterCanvas.width,
-            // rasterCanvas.height
             iconBounds.w,
             iconBounds.h
           )
@@ -877,6 +815,8 @@ export type FillShapeTaskWordConfig = {
 
 export type FillShapeTaskIconConfig = {
   shape: ShapeConf
+  /** Rotation angles in degrees */
+  angles: number[]
 }
 
 export type FillShapeTaskResult = {

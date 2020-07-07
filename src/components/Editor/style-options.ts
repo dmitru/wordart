@@ -130,6 +130,7 @@ export type ShapePlacementConf = {
   iconsMaxSize: number
   /** Number: 0 - 100% */
   iconsProportion: number
+  iconsRandomAngle: boolean
 }
 
 export type BgPlacementConf = {
@@ -145,6 +146,7 @@ export type BgPlacementConf = {
   iconsMaxSize: number
   /** Number: 0 - 100% */
   iconsProportion: number
+  iconsRandomAngle: boolean
 }
 
 export type ColorString = string
