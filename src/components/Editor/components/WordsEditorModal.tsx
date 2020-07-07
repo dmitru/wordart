@@ -17,6 +17,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Input,
   Stack,
   Text,
 } from '@chakra-ui/core'
@@ -33,12 +34,12 @@ import { DragIndicator } from '@styled-icons/material/DragIndicator'
 import { FormatTextSize } from '@styled-icons/zondicons/FormatTextSize'
 import { FindAndReplaceModal } from 'components/Editor/components/FindAndReplaceModal'
 import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { WordConfigId } from 'components/Editor/editor-store'
 import { TargetKind } from 'components/Editor/lib/editor'
 import { WordListEntry } from 'components/Editor/style-options'
 import { Button } from 'components/shared/Button'
 import { DeleteButton } from 'components/shared/DeleteButton'
-import { Input } from 'components/shared/Input'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 import { SearchInput } from 'components/shared/SearchInput'
@@ -63,6 +64,42 @@ import {
 } from 'react-window'
 import { useStore } from 'services/root-store'
 import { useToasts } from 'use-toasts'
+
+const Table = styled.table`
+  min-width: 400px;
+  margin: 0 auto;
+  table-layout: fixed;
+`
+
+const TBody = styled.tbody`
+  border: 0;
+`
+
+const THead = styled.thead`
+  border: 0;
+  border-bottom: none;
+  background-color: silver;
+`
+
+const Row = styled.tr`
+  padding: 0;
+`
+
+const Cell = styled.td`
+  box-sizing: border-box;
+  padding: 0;
+
+  /* locking the width of the cells */
+  /* width: 50%; */
+`
+
+const Header = styled.header`
+  display: flex;
+  flex-direction: column;
+  width: 500px;
+  margin: 0 auto;
+  margin-bottom: ${10 * 2}px;
+`
 
 const reorder = (list: any[], startIndex: number, endIndex: number) => {
   const result = Array.from(list)
@@ -446,72 +483,88 @@ export const WordsEditorModal: React.FC<WordsEditorModalProps> = observer(
           >
             {allWords.length > 0 && (
               <Box flex="1" width="100%" py="3">
-                <DragDropContext
-                  onBeforeDragStart={() => setIsDragging(true)}
-                  onDragEnd={(result) => {
-                    setIsDragging(false)
-                    if (!result.destination) {
-                      return
-                    }
+                <AutoSizer defaultWidth={300} defaultHeight={600}>
+                  {({ height, width }) => (
+                    <Table
+                      css={css`
+                        width: ${width}px;
+                      `}
+                    >
+                      <THead>
+                        <Cell></Cell>
+                        <Cell>Word</Cell>
+                        <Cell>Color</Cell>
+                        <Cell>Angle</Cell>
+                        <Cell></Cell>
+                      </THead>
 
-                    words.wordList = reorder(
-                      words.wordList,
-                      result.source.index,
-                      result.destination.index
-                    )
-                  }}
-                >
-                  <Droppable
-                    droppableId="droppable"
-                    mode="virtual"
-                    renderClone={(provided, snapshot, rubric) => (
-                      <WordListRowDetailed
-                        style={provided.draggableProps.style}
-                        isSelected={state.selectedWords.has(
-                          filteredWords[rubric.source.index].id
-                        )}
-                        provided={provided}
-                        snapshot={snapshot}
-                        word={filteredWords[rubric.source.index]}
-                        showDragHandle={!state.textFilter}
-                      />
-                    )}
-                  >
-                    {(provided, snapshot) => {
-                      const itemsCount = snapshot.isUsingPlaceholder
-                        ? filteredWords.length + 1
-                        : filteredWords.length
+                      <DragDropContext
+                        onBeforeDragStart={() => setIsDragging(true)}
+                        onDragEnd={(result) => {
+                          setIsDragging(false)
+                          if (!result.destination) {
+                            return
+                          }
 
-                      return (
-                        <AutoSizer defaultWidth={300} defaultHeight={600}>
-                          {({ height, width }) => (
-                            <List
-                              overscanCount={3}
-                              height={height}
-                              itemCount={itemsCount}
-                              itemSize={40}
-                              width={width}
-                              ref={listRef}
-                              outerRef={provided.innerRef}
-                              itemData={{
-                                words: filteredWords,
-                                props: {
-                                  onSelectedChange: handleSelectionChange,
-                                  focusNextField,
-                                  focusPrevField,
-                                  onDelete: handleWordDelete,
-                                  onSubmit: handleWordEditsSubmit,
-                                },
-                              }}
-                            >
-                              {ListRow}
-                            </List>
+                          words.wordList = reorder(
+                            words.wordList,
+                            result.source.index,
+                            result.destination.index
+                          )
+                        }}
+                      >
+                        <Droppable
+                          droppableId="droppable"
+                          mode="virtual"
+                          renderClone={(provided, snapshot, rubric) => (
+                            <WordListRowDetailed
+                              style={provided.draggableProps.style}
+                              isSelected={state.selectedWords.has(
+                                filteredWords[rubric.source.index].id
+                              )}
+                              provided={provided}
+                              snapshot={snapshot}
+                              word={filteredWords[rubric.source.index]}
+                              showDragHandle={!state.textFilter}
+                            />
                           )}
-                        </AutoSizer>
-                      )
-                    }}
-                  </Droppable>
-                </DragDropContext>
+                        >
+                          {(provided, snapshot) => {
+                            const itemsCount = snapshot.isUsingPlaceholder
+                              ? filteredWords.length + 1
+                              : filteredWords.length
+
+                            return (
+                              <TBody>
+                                <List
+                                  overscanCount={3}
+                                  height={height}
+                                  itemCount={itemsCount}
+                                  itemSize={40}
+                                  width={width}
+                                  ref={listRef}
+                                  outerRef={provided.innerRef}
+                                  itemData={{
+                                    words: filteredWords,
+                                    props: {
+                                      onSelectedChange: handleSelectionChange,
+                                      focusNextField,
+                                      focusPrevField,
+                                      onDelete: handleWordDelete,
+                                      onSubmit: handleWordEditsSubmit,
+                                    },
+                                  }}
+                                >
+                                  {ListRow}
+                                </List>
+                              </TBody>
+                            )
+                          }}
+                        </Droppable>
+                      </DragDropContext>
+                    </Table>
+                  )}
+                </AutoSizer>
               </Box>
             )}
 
@@ -685,7 +738,7 @@ const WordListRowDetailed: React.FC<
     ...otherProps
   }) => {
     return (
-      <WordRow
+      <Row
         {...otherProps}
         aria-label=""
         ref={provided.innerRef}
@@ -714,65 +767,70 @@ const WordListRowDetailed: React.FC<
         {...provided.draggableProps}
         style={style}
       >
-        <Box color="gray.400" {...provided.dragHandleProps}>
-          <DragIndicator
-            size="20px"
-            css={css`
-              visibility: ${!showDragHandle ? 'hidden' : 'visible'};
-              position: relative;
-              top: -2px;
-              cursor: grab;
-            `}
+        <Cell>
+          <Box display="flex" alignItems="center">
+            <Box color="gray.400" {...provided.dragHandleProps}>
+              <DragIndicator
+                size="20px"
+                css={css`
+                  visibility: ${!showDragHandle ? 'hidden' : 'visible'};
+                  position: relative;
+                  top: -2px;
+                  cursor: grab;
+                `}
+              />
+            </Box>
+
+            <Checkbox
+              isChecked={isSelected}
+              onChange={() => {
+                onSelectedChange(word, !isSelected)
+              }}
+              p="10px"
+              px="8px"
+              size="lg"
+              tabIndex={-1}
+            />
+          </Box>
+        </Cell>
+
+        <Cell>
+          <WordInput
+            className="word-input"
+            autocomplete="off"
+            spellcheck="false"
+            autocorrect="off"
+            pl="8px"
+            flex="1"
+            value={word.text}
+            onFocus={(e: any) => {
+              e.target?.select()
+            }}
+            onChange={(e: any) => {
+              word.text = e.target.value
+            }}
+            onBlur={() => {
+              onSubmit(word)
+            }}
+            onKeyDown={(e: React.KeyboardEvent) => {
+              if (e.key === 'Enter') {
+                onSubmit(word)
+                focusNextField()
+              } else if (e.key === 'Tab') {
+                onSubmit(word)
+                focusNextField()
+              } else if (e.key === 'ArrowUp') {
+                e.nativeEvent.preventDefault()
+                focusPrevField()
+              } else if (e.key === 'ArrowDown') {
+                e.nativeEvent.preventDefault()
+                focusNextField()
+              }
+            }}
+            placeholder="Type here..."
           />
-        </Box>
 
-        <Checkbox
-          isChecked={isSelected}
-          onChange={() => {
-            onSelectedChange(word, !isSelected)
-          }}
-          p="10px"
-          px="8px"
-          size="lg"
-          tabIndex={-1}
-        />
-
-        <WordInput
-          className="word-input"
-          autocomplete="off"
-          spellcheck="false"
-          autocorrect="off"
-          pl="8px"
-          flex="1"
-          value={word.text}
-          onFocus={(e: any) => {
-            e.target?.select()
-          }}
-          onChange={(e: any) => {
-            word.text = e.target.value
-          }}
-          onBlur={() => {
-            onSubmit(word)
-          }}
-          onKeyDown={(e: React.KeyboardEvent) => {
-            if (e.key === 'Enter') {
-              onSubmit(word)
-              focusNextField()
-            } else if (e.key === 'Tab') {
-              onSubmit(word)
-              focusNextField()
-            } else if (e.key === 'ArrowUp') {
-              e.nativeEvent.preventDefault()
-              focusPrevField()
-            } else if (e.key === 'ArrowDown') {
-              e.nativeEvent.preventDefault()
-              focusNextField()
-            }
-          }}
-          placeholder="Type here..."
-        />
-
-        {/* <WordMenuButton
+          {/* <WordMenuButton
           tabIndex={-1}
           mr="1"
           size="sm"
@@ -784,13 +842,39 @@ const WordListRowDetailed: React.FC<
             }
           }}
         /> */}
+        </Cell>
 
-        <WordDeleteButton
-          tabIndex={-1}
-          size="sm"
-          onClick={() => onDelete(word)}
-        />
-      </WordRow>
+        <Cell>
+          <ColorPickerPopover
+            value={word.color || 'black'}
+            onChange={(color) => {
+              word.color = color
+            }}
+          />
+        </Cell>
+
+        <Cell
+          css={css`
+            width: 100px;
+          `}
+        >
+          <Input
+            value={word.angle || 0}
+            type="number"
+            onChange={(e) => {
+              word.angle = parseInt(e.target.value)
+            }}
+          />
+        </Cell>
+
+        <Cell>
+          <WordDeleteButton
+            tabIndex={-1}
+            size="sm"
+            onClick={() => onDelete(word)}
+          />
+        </Cell>
+      </Row>
     )
   }
 )
@@ -865,7 +949,7 @@ const WordList = styled(Box)`
 const WordDeleteButton = styled(DeleteButton)``
 const WordMenuButton = styled(MenuDotsButton)``
 
-const WordRow = styled(Box)`
+const WordRowDetailed = styled(Box)`
   width: 100%;
   padding: 0;
   padding-left: 10px;
@@ -895,7 +979,7 @@ const WordRow = styled(Box)`
   }
 `
 
-const WordRowNewInput = styled(WordRow)`
+const WordRowNewInput = styled(WordRowDetailed)`
   padding: 8px 16px;
   padding-top: 16px;
   border: none;
@@ -942,36 +1026,3 @@ const EmptyStateWordsUi: React.FC<{
     {children}
   </Box>
 )
-
-const Table = styled.table`
-  width: 500px;
-  margin: 0 auto;
-  table-layout: fixed;
-`
-
-const TBody = styled.tbody`
-  border: 0;
-`
-
-const THead = styled.thead`
-  border: 0;
-  border-bottom: none;
-  background-color: silver;
-`
-
-const Row = styled.tr``
-
-const Cell = styled.td`
-  box-sizing: border-box;
-  padding: 20px;
-  /* locking the width of the cells */
-  width: 50%;
-`
-
-const Header = styled.header`
-  display: flex;
-  flex-direction: column;
-  width: 500px;
-  margin: 0 auto;
-  margin-bottom: ${10 * 2}px;
-`

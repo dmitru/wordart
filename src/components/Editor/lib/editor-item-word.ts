@@ -75,9 +75,11 @@ export class EditorItemWord {
     wordPath: opentype.Path,
     wordPathData: string | any[],
     wordPathObj: fabric.Path,
-    pathBounds: BoundingBox
+    pathBounds: BoundingBox,
+    wordConfigId?: WordConfigId
   ) {
     this.id = id
+    this.wordConfigId = wordConfigId
     this.canvas = canvas
     this.font = font
 

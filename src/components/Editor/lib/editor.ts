@@ -846,94 +846,116 @@ export class Editor {
         continue
       }
 
-      let color: Color
+      let color: Color | undefined
 
-      if (coloring.kind === 'gradient' || coloring.kind === 'color') {
-        // const index = Math.floor(rng() * colors.length)
-        color = chroma(colors[colorIndex])
-        colorIndex = (colorIndex + 1) % colors.length
-      } else if (coloring.kind === 'shape') {
-        if (shape.kind === 'custom:svg' || shape.kind === 'clipart:svg') {
-          if (shape.config.processing.colors.kind === 'single-color') {
-            const shapeColor = new paper.Color(
-              shape.config.processing.colors.color
-            )
-            color = chroma.rgb(
-              255 * shapeColor.red,
-              255 * shapeColor.green,
-              255 * shapeColor.blue
-            )
-          } else if (shape.config.processing.colors.kind === 'color-map') {
-            const colorMapSorted = sortBy(
-              shape.originalColors.map((color, index) => ({
-                color,
-                index,
-              })),
-              ({ color }) => chroma.distance(color, item.shapeColor, 'rgb')
-            )
-            const shapeColorStringIndex = colorMapSorted[0].index
-            const shapeColorString =
-              shape.config.processing.colors.colors[shapeColorStringIndex]
-            const shapeColor = new paper.Color(shapeColorString)
-            color = chroma.rgb(
-              255 * shapeColor.red,
-              255 * shapeColor.green,
-              255 * shapeColor.blue
-            )
-          } else if (shape.config.processing.colors.kind === 'original') {
-            const shapeColor = new paper.Color(item.shapeColor)
-            color = chroma.rgb(
-              255 * shapeColor.red,
-              255 * shapeColor.green,
-              255 * shapeColor.blue
-            )
-          }
-        } else if (shape.kind === 'icon') {
-          const shapeColor = new paper.Color(shape.config.color)
-          color = chroma.rgb(
-            255 * shapeColor.red,
-            255 * shapeColor.green,
-            255 * shapeColor.blue
-          )
-        } else if (
-          shape.kind === 'custom:raster' ||
-          shape.kind === 'clipart:raster'
-        ) {
-          let colorString = item.shapeColor
-          if (shape.config.processing?.invert) {
-            colorString = shape.config.processing.invert.color
-          }
-          color = chroma(colorString)
-        } else if (shape.kind === 'text') {
-          const shapeColor = new paper.Color(shape.config.textStyle.color)
-          color = chroma.rgb(
-            255 * shapeColor.red,
-            255 * shapeColor.green,
-            255 * shapeColor.blue
-          )
-        } else if (shape.kind === 'blob') {
-          const shapeColor = new paper.Color(shape.config.color)
-          color = chroma.rgb(
-            255 * shapeColor.red,
-            255 * shapeColor.green,
-            255 * shapeColor.blue
-          )
-        } else if (shape.kind === 'full-canvas') {
-          const shapeColor = new paper.Color(shape.config.color)
-          color = chroma.rgb(
-            255 * shapeColor.red,
-            255 * shapeColor.green,
-            255 * shapeColor.blue
-          )
+      if (item.kind === 'word') {
+        const wordConfig = itemsStyleConf.words.wordList.find(
+          (wc) => wc.id === item.wordConfigId
+        )
+        // console.log(
+        //   'wordConfig = ',
+        //   item.defaultText,
+        //   item.wordConfigId,
+        //   itemsStyleConf.words.wordList,
+        //   wordConfig,
+        //   wordConfig?.color
+        // )
+        // Use custom color for that word
+        if (wordConfig && wordConfig.color != null) {
+          color = chroma(wordConfig.color)
         }
-      } else {
-        exhaustiveCheck(coloring)
       }
 
-      if (brightness != 0) {
-        color = color!
-          .brighten((2 * brightness) / 100)
-          .saturate(-(0.2 * brightness) / 100)
+      console.log('color = ', color)
+
+      if (!color) {
+        if (coloring.kind === 'gradient' || coloring.kind === 'color') {
+          // const index = Math.floor(rng() * colors.length)
+          color = chroma(colors[colorIndex])
+          colorIndex = (colorIndex + 1) % colors.length
+        } else if (coloring.kind === 'shape') {
+          if (shape.kind === 'custom:svg' || shape.kind === 'clipart:svg') {
+            if (shape.config.processing.colors.kind === 'single-color') {
+              const shapeColor = new paper.Color(
+                shape.config.processing.colors.color
+              )
+              color = chroma.rgb(
+                255 * shapeColor.red,
+                255 * shapeColor.green,
+                255 * shapeColor.blue
+              )
+            } else if (shape.config.processing.colors.kind === 'color-map') {
+              const colorMapSorted = sortBy(
+                shape.originalColors.map((color, index) => ({
+                  color,
+                  index,
+                })),
+                ({ color }) => chroma.distance(color, item.shapeColor, 'rgb')
+              )
+              const shapeColorStringIndex = colorMapSorted[0].index
+              const shapeColorString =
+                shape.config.processing.colors.colors[shapeColorStringIndex]
+              const shapeColor = new paper.Color(shapeColorString)
+              color = chroma.rgb(
+                255 * shapeColor.red,
+                255 * shapeColor.green,
+                255 * shapeColor.blue
+              )
+            } else if (shape.config.processing.colors.kind === 'original') {
+              const shapeColor = new paper.Color(item.shapeColor)
+              color = chroma.rgb(
+                255 * shapeColor.red,
+                255 * shapeColor.green,
+                255 * shapeColor.blue
+              )
+            }
+          } else if (shape.kind === 'icon') {
+            const shapeColor = new paper.Color(shape.config.color)
+            color = chroma.rgb(
+              255 * shapeColor.red,
+              255 * shapeColor.green,
+              255 * shapeColor.blue
+            )
+          } else if (
+            shape.kind === 'custom:raster' ||
+            shape.kind === 'clipart:raster'
+          ) {
+            let colorString = item.shapeColor
+            if (shape.config.processing?.invert) {
+              colorString = shape.config.processing.invert.color
+            }
+            color = chroma(colorString)
+          } else if (shape.kind === 'text') {
+            const shapeColor = new paper.Color(shape.config.textStyle.color)
+            color = chroma.rgb(
+              255 * shapeColor.red,
+              255 * shapeColor.green,
+              255 * shapeColor.blue
+            )
+          } else if (shape.kind === 'blob') {
+            const shapeColor = new paper.Color(shape.config.color)
+            color = chroma.rgb(
+              255 * shapeColor.red,
+              255 * shapeColor.green,
+              255 * shapeColor.blue
+            )
+          } else if (shape.kind === 'full-canvas') {
+            const shapeColor = new paper.Color(shape.config.color)
+            color = chroma.rgb(
+              255 * shapeColor.red,
+              255 * shapeColor.green,
+              255 * shapeColor.blue
+            )
+          }
+        } else {
+          exhaustiveCheck(coloring)
+        }
+
+        if (brightness != 0) {
+          color = color!
+            .brighten((2 * brightness) / 100)
+            .saturate(-(0.2 * brightness) / 100)
+        }
       }
 
       const hex = color!.hex()
@@ -1957,7 +1979,8 @@ export class Editor {
         paths.get(`${font.id}:${itemConfig.text}`)!,
         pathDatas.get(`${font.id}:${itemConfig.text}`)!,
         wordPathObjs.get(`${font.id}:${itemConfig.text}`)!,
-        pathBounds.get(`${font.id}:${itemConfig.text}`)!
+        pathBounds.get(`${font.id}:${itemConfig.text}`)!,
+        itemConfig.wordConfigId
       )
       item.setSelectable(this.itemsSelection)
 

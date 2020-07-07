@@ -8,10 +8,18 @@ import {
   MenuButton,
   MenuDivider,
   MenuList,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
   MenuTransition,
   Portal,
   Stack,
   Text,
+  Flex,
+  Switch,
+  FormLabel,
 } from '@chakra-ui/core'
 import {
   AddIcon,
@@ -21,6 +29,8 @@ import {
 } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
+import { ColorSwatchButton } from 'components/shared/ColorSwatchButton'
+import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { TextFields } from '@styled-icons/material-twotone/TextFields'
 import { DragIndicator } from '@styled-icons/material/DragIndicator'
 import { FormatTextSize } from '@styled-icons/zondicons/FormatTextSize'
@@ -32,6 +42,7 @@ import { TargetKind } from 'components/Editor/lib/editor'
 import { WordListEntry } from 'components/Editor/style-options'
 import { Button } from 'components/shared/Button'
 import { DeleteButton } from 'components/shared/DeleteButton'
+import { Slider } from 'components/shared/Slider'
 import { Input } from 'components/shared/Input'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
@@ -48,7 +59,7 @@ import {
   DraggableStateSnapshot,
   Droppable,
 } from 'react-beautiful-dnd'
-import { FaDownload, FaSearch } from 'react-icons/fa'
+import { FaDownload, FaSearch, FaCog } from 'react-icons/fa'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import {
   areEqual,
@@ -57,6 +68,10 @@ import {
 } from 'react-window'
 import { useStore } from 'services/root-store'
 import { useToasts } from 'use-toasts'
+import {
+  mkShapeStyleConfFromOptions,
+  mkBgStyleConfFromOptions,
+} from 'components/Editor/style'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -85,6 +100,8 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
   ({ target }) => {
     const { editorPageStore: store } = useStore()
     const style = store.styleOptions[target]
+    const shapeStyle = store.styleOptions.shape
+    const bgStyle = store.styleOptions.bg
     const words = style.items.words
 
     const toasts = useToasts()
@@ -279,6 +296,15 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                 {(styles) => (
                   <MenuList css={styles}>
                     <MenuItemWithIcon
+                      onClick={handleFindAndReplaceClick}
+                      icon={<FaSearch />}
+                    >
+                      Find and replace...
+                    </MenuItemWithIcon>
+
+                    <MenuDivider />
+
+                    <MenuItemWithIcon
                       icon={<FormatTextSize />}
                       onClick={() => {
                         for (const w of wordsToProcess) {
@@ -312,16 +338,11 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                       lowercase
                     </MenuItemWithIcon>
 
+                    <MenuItemWithIcon>Reset defaults</MenuItemWithIcon>
+
                     {selectedCount === 0 && (
                       <>
                         <MenuDivider />
-
-                        <MenuItemWithIcon
-                          onClick={handleFindAndReplaceClick}
-                          icon={<FaSearch />}
-                        >
-                          Find and replace...
-                        </MenuItemWithIcon>
 
                         <MenuItemWithIcon
                           onClick={handleExportCSVClick}
@@ -366,6 +387,16 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         </Box>
       </Stack>
     )
+
+    const handleWordColorChange = useCallback(() => {
+      if (target === 'shape') {
+        store.editor?.setShapeItemsStyle(
+          mkShapeStyleConfFromOptions(shapeStyle).items
+        )
+      } else {
+        store.editor?.setBgItemsStyle(mkBgStyleConfFromOptions(bgStyle).items)
+      }
+    }, [])
 
     const handleWordDelete = useCallback(
       (word: WordListEntry) => {
@@ -493,6 +524,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                   focusPrevField,
                                   onDelete: handleWordDelete,
                                   onSubmit: handleWordEditsSubmit,
+                                  onAfterColorChange: handleWordColorChange,
                                 },
                               }}
                             >
@@ -638,6 +670,7 @@ const WordListRow: React.FC<
     showDragHandle?: boolean
     onDelete?: (word: WordListEntry) => void
     onSubmit?: (word: WordListEntry) => void
+    onAfterColorChange?: () => void
     focusNextField?: () => void
     focusPrevField?: () => void
   } & { [key: string]: any }
@@ -646,6 +679,7 @@ const WordListRow: React.FC<
     word,
     isSelected,
     onSelectedChange = noop,
+    onAfterColorChange = noop,
     showDragHandle = true,
     provided,
     snapshot,
@@ -656,6 +690,195 @@ const WordListRow: React.FC<
     style = {},
     ...otherProps
   }) => {
+    let customizeTrigger = (
+      <WordCustomizeButton
+        color="gray.500"
+        width="40px"
+        size="sm"
+        variant="ghost"
+      >
+        <FaCog />
+      </WordCustomizeButton>
+    )
+
+    if (word.color) {
+      customizeTrigger = (
+        <ColorSwatchButton
+          kind="color"
+          color={word.color || 'black'}
+          css={css`
+            min-width: 30px;
+            width: 40px;
+            height: 30px;
+          `}
+        />
+      )
+    } else if (
+      word.angle != null ||
+      word.fontId != null ||
+      word.repeat != null
+    ) {
+      customizeTrigger = (
+        <Button color="gray.500" width="40px" size="sm" variant="ghost">
+          <FaCog />
+        </Button>
+      )
+    }
+
+    const wordCustomizeControl = (
+      <Popover closeOnBlur closeOnEsc>
+        <PopoverTrigger>{customizeTrigger}</PopoverTrigger>
+        <Portal>
+          <PopoverContent zIndex={4000} width="280px">
+            <PopoverArrow />
+            <PopoverBody p={5}>
+              {/* REPEAT WORD */}
+              <Flex>
+                <Switch
+                  id={`${word.id}-repeat`}
+                  isChecked={word.repeat === false ? false : true}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      word.repeat = undefined
+                    } else {
+                      word.repeat = false
+                    }
+                  }}
+                />
+
+                <FormLabel htmlFor={`${word.id}-repeat`} my="0" ml="2">
+                  Repeat word
+                </FormLabel>
+              </Flex>
+
+              {/* CUSTOM COLOR */}
+              <Flex align="center" mt="4">
+                <Switch
+                  id={`${word.id}-custom-color`}
+                  isChecked={word.color != null ? true : false}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      word.color = 'black'
+                    } else {
+                      word.color = undefined
+                    }
+                  }}
+                />
+
+                <FormLabel htmlFor={`${word.id}-custom-color`} my="0" ml="2">
+                  Custom color
+                </FormLabel>
+
+                <Box
+                  ml="3"
+                  css={
+                    !word.color &&
+                    css`
+                      visibility: hidden;
+                    `
+                  }
+                >
+                  <ColorPickerPopover
+                    usePortal={false}
+                    css={css`
+                      height: 30px;
+                    `}
+                    value={word.color || 'black'}
+                    onChange={(color) => {
+                      word.color = color
+                    }}
+                    onAfterChange={onAfterColorChange}
+                  />
+                </Box>
+              </Flex>
+
+              {/* CUSTOM ANGLE  */}
+              <Flex align="center" mt="4">
+                <Switch
+                  id={`${word.id}-custom-angle`}
+                  isChecked={word.angle != null ? true : false}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      word.angle = 0
+                    } else {
+                      word.angle = undefined
+                    }
+                  }}
+                />
+                <FormLabel htmlFor={`${word.id}-custom-angle`} my="0" ml="2">
+                  Custom angle
+                </FormLabel>
+              </Flex>
+
+              {word.angle != null && (
+                <Box mt="2" mb="4">
+                  <Slider
+                    afterLabel=""
+                    value={word.angle || 0}
+                    onChange={(value) => {
+                      word.angle = value
+                    }}
+                    min={-90}
+                    max={90}
+                    step={1}
+                  />
+                </Box>
+              )}
+
+              {/* CUSTOM FONT */}
+              <Flex align="center" mt="4">
+                <Switch
+                  id={`${word.id}-custom-font`}
+                  isChecked={word.fontId != null ? true : false}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      word.fontId = 'Pacifico:regular'
+                    } else {
+                      word.fontId = undefined
+                    }
+                  }}
+                />
+
+                <FormLabel htmlFor={`${word.id}-custom-font`} my="0" ml="2">
+                  Custom font
+                </FormLabel>
+              </Flex>
+
+              {word.fontId != null && (
+                <Box mt="2">
+                  <Button>Change font</Button>
+                </Box>
+              )}
+            </PopoverBody>
+          </PopoverContent>
+        </Portal>
+      </Popover>
+    )
+
+    const wordMenu = (
+      <Menu placement="bottom-end">
+        <MenuButton as={WordMenuButton} ml="2" />
+
+        <Portal>
+          <MenuTransition>
+            {(styles) => (
+              <MenuList css={styles}>
+                <MenuItemWithIcon>Reset defaults</MenuItemWithIcon>
+                <MenuItemWithIcon
+                  icon={<SmallCloseIcon />}
+                  onClick={() => {
+                    onDelete(word)
+                  }}
+                >
+                  Delete
+                </MenuItemWithIcon>
+              </MenuList>
+            )}
+          </MenuTransition>
+        </Portal>
+      </Menu>
+    )
+
     return (
       <WordRow
         {...otherProps}
@@ -744,24 +967,9 @@ const WordListRow: React.FC<
           placeholder="Type here..."
         />
 
-        {/* <WordMenuButton
-          tabIndex={-1}
-          mr="1"
-          size="sm"
-          onClick={() => {
-            store.deleteWord(target, word.id)
-            store.animateVisualize(false)
-            if (words.wordList.length === 0) {
-              focusNewWordInput()
-            }
-          }}
-        /> */}
+        {wordCustomizeControl}
 
-        <WordDeleteButton
-          tabIndex={-1}
-          size="sm"
-          onClick={() => onDelete(word)}
-        />
+        {wordMenu}
       </WordRow>
     )
   }
@@ -836,6 +1044,7 @@ const WordList = styled(Box)`
 
 const WordDeleteButton = styled(DeleteButton)``
 const WordMenuButton = styled(MenuDotsButton)``
+const WordCustomizeButton = styled(Button)``
 
 const WordRow = styled(Box)`
   width: 100%;
@@ -846,11 +1055,7 @@ const WordRow = styled(Box)`
   display: flex;
   align-items: center;
 
-  ${WordDeleteButton} {
-    opacity: 0;
-    transition: 0.2s opacity;
-  }
-  ${WordMenuButton} {
+  ${WordDeleteButton}, ${WordCustomizeButton}, ${WordMenuButton} {
     opacity: 0;
     transition: 0.2s opacity;
   }
@@ -860,8 +1065,7 @@ const WordRow = styled(Box)`
 
   &:hover {
     z-index: 20;
-    /* background: hsla(200, 81%, 97%, 1); */
-    ${WordDeleteButton}, ${WordMenuButton} {
+    ${WordDeleteButton}, ${WordCustomizeButton}, ${WordMenuButton} {
       opacity: 1;
     }
   }

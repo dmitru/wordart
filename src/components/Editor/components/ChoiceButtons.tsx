@@ -20,7 +20,8 @@ export const ChoiceButtons: React.FC<
           px="2"
           py="1"
           mr="0"
-          colorScheme={choice.value === value ? 'secondary' : undefined}
+          variant="solid"
+          colorScheme={choice.value === value ? 'primary' : undefined}
           onClick={() => {
             onChange(choice.value)
           }}
