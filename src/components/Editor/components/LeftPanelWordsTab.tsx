@@ -20,6 +20,11 @@ import {
   Stack,
   Switch,
   Text,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
 } from '@chakra-ui/core'
 import { AddIcon, ChevronDownIcon, SmallCloseIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
@@ -28,8 +33,11 @@ import { TextFields } from '@styled-icons/material-twotone/TextFields'
 import { DragIndicator } from '@styled-icons/material/DragIndicator'
 import { FormatTextSize } from '@styled-icons/zondicons/FormatTextSize'
 import { FindAndReplaceModal } from 'components/Editor/components/FindAndReplaceModal'
+import { SelectedFontThumbnail } from 'components/Editor/components/FontPicker/components'
+import { FontPickerModal } from 'components/Editor/components/FontPicker/FontPickerModal'
 import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
 import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
+import { ChoiceButtons } from 'components/Editor/components/ChoiceButtons'
 import { WordsEditorModal } from 'components/Editor/components/WordsEditorModal'
 import { WordConfigId } from 'components/Editor/editor-store'
 import { TargetKind } from 'components/Editor/lib/editor'
@@ -38,8 +46,8 @@ import {
   mkShapeStyleConfFromOptions,
 } from 'components/Editor/style'
 import { WordListEntry } from 'components/Editor/style-options'
-import { Button } from 'components/shared/Button'
 import { BaseBtn } from 'components/shared/BaseBtn'
+import { Button } from 'components/shared/Button'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { ColorSwatchButton } from 'components/shared/ColorSwatchButton'
 import { DeleteButton } from 'components/shared/DeleteButton'
@@ -69,8 +77,6 @@ import {
 } from 'react-window'
 import { useStore } from 'services/root-store'
 import { useToasts } from 'use-toasts'
-import { FontPickerModal } from 'components/Editor/components/FontPicker/FontPickerModal'
-import { SelectedFontThumbnail } from 'components/Editor/components/FontPicker/components'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -268,7 +274,12 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         <Box flex="1" ml="auto" display="flex" justifyContent="flex-end">
           <Menu placement="bottom-end">
             {selectedCount === 0 && (
-              <MenuButton as={MenuDotsButton} size="sm" variant="ghost" />
+              <MenuButton
+                as={MenuDotsButton}
+                size="sm"
+                variant="ghost"
+                mr="-10px"
+              />
             )}
             {selectedCount > 0 && (
               <MenuButton
@@ -283,6 +294,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             <Portal>
               <MenuTransition>
                 {(styles) => (
+                  // @ts-ignore
                   <MenuList css={styles}>
                     <MenuItemWithIcon
                       onClick={handleFindAndReplaceClick}
@@ -702,7 +714,7 @@ const WordListRow: React.FC<
     if (
       word.angle != null ||
       word.fontId != null ||
-      word.repeat != null ||
+      (word.repeats ?? -1) != -1 ||
       word.color != 'null'
     ) {
       customizeTrigger = (
@@ -714,6 +726,7 @@ const WordListRow: React.FC<
             height: 40px;
           `}
         >
+          {(word.repeats ?? -1) !== -1 && <Box mr="2">{word.repeats}</Box>}
           {word.color != null && (
             <ColorSwatchButton
               as="span"
@@ -732,6 +745,13 @@ const WordListRow: React.FC<
       )
     }
 
+    let repeatValue = 'repeat'
+    if (word.repeats === 1) {
+      repeatValue = 'once'
+    } else if ((word.repeats ?? -1) > 1) {
+      repeatValue = 'custom'
+    }
+
     const wordCustomizeControl = (
       <Popover closeOnBlur closeOnEsc placement="right">
         <PopoverTrigger>{customizeTrigger}</PopoverTrigger>
@@ -740,23 +760,50 @@ const WordListRow: React.FC<
             <PopoverArrow />
             <PopoverBody p={5}>
               {/* REPEAT WORD */}
-              <Flex>
-                <Switch
-                  id={`${word.id}-repeat`}
-                  isChecked={word.repeat === false ? false : true}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      word.repeat = undefined
-                    } else {
-                      word.repeat = false
+              <Flex direction="column">
+                <ChoiceButtons
+                  size="sm"
+                  mt="3"
+                  choices={[
+                    { title: 'Repeat word', value: 'repeat' },
+                    { title: 'Once', value: 'once' },
+                    { title: 'Custom', value: 'custom' },
+                  ]}
+                  value={repeatValue}
+                  onChange={(value) => {
+                    if (value === 'repeat') {
+                      word.repeats = -1
+                    } else if (value === 'once') {
+                      word.repeats = 1
+                    } else if (value === 'custom') {
+                      word.repeats = 2
                     }
-                    store.animateVisualize(false)
                   }}
                 />
 
-                <FormLabel htmlFor={`${word.id}-repeat`} my="0" ml="2">
-                  Repeat word
-                </FormLabel>
+                {repeatValue === 'custom' && (
+                  <Box mt="3" mb="4">
+                    <NumberInput
+                      size="sm"
+                      maxWidth="70px"
+                      value={word.repeats}
+                      min={2}
+                      max={50}
+                      step={1}
+                      onChange={(v) => {
+                        if (v > 0) {
+                          word.repeats = v
+                        }
+                      }}
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+                  </Box>
+                )}
               </Flex>
 
               {/* CUSTOM COLOR */}
@@ -883,11 +930,18 @@ const WordListRow: React.FC<
 
     const wordMenu = (
       <Menu placement="bottom-end">
-        <MenuButton as={WordMenuButton} ml="2" />
+        <MenuButton
+          as={WordMenuButton}
+          ml="2"
+          size="sm"
+          mr="-10px"
+          variant="ghost"
+        />
 
         <Portal>
           <MenuTransition>
             {(styles) => (
+              // @ts-ignore
               <MenuList css={styles}>
                 <MenuItemWithIcon>Reset defaults</MenuItemWithIcon>
                 <MenuItemWithIcon

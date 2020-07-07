@@ -1442,13 +1442,15 @@ export class Editor {
             fonts: wc.fontId
               ? [this.fontsInfo.get(wc.fontId)!.font]
               : defaultFonts,
+            repeats: wc.repeats ?? -1,
           })),
         // Icons
-        icons: style.items.icons.iconList.map((shape) => ({
-          shape: this.store.getIconShapeConfById(shape.shapeId)!,
+        icons: style.items.icons.iconList.map((icon) => ({
+          shape: this.store.getIconShapeConfById(icon.shapeId)!,
           angles: style.items.placement.iconsRandomAngle
             ? randomIconAngles
             : [0],
+          repeats: icon.repeats ?? -1,
         })),
         iconsMaxSize: style.items.placement.iconsMaxSize,
         iconProbability: style.items.placement.iconsProportion / 100,
@@ -1654,13 +1656,15 @@ export class Editor {
             fonts: wc.fontId
               ? [this.fontsInfo.get(wc.fontId)!.font]
               : defaultFonts,
+            repeats: wc.repeats ?? -1,
           })),
         // Icons
-        icons: style.items.icons.iconList.map((shape) => ({
-          shape: this.store.getIconShapeConfById(shape.shapeId)!,
+        icons: style.items.icons.iconList.map((icon) => ({
+          shape: this.store.getIconShapeConfById(icon.shapeId)!,
           angles: style.items.placement.iconsRandomAngle
             ? randomIconAngles
             : [0],
+          repeats: icon.repeats ?? -1,
         })),
         iconsMaxSize: style.items.placement.iconsMaxSize,
         iconProbability: style.items.placement.iconsProportion / 100,

@@ -102,7 +102,8 @@ export type WordItemsOptions = {
 export type WordListEntry = {
   id: WordConfigId
   text: string
-  repeat?: boolean
+  /** How many times to repeat, -1 means infinite repeat (default) */
+  repeats?: number
   /** custom angle for this word */
   angle?: number
   /** custom font for this word */
@@ -117,6 +118,10 @@ export type IconItemsOptions = {
 
 export type IconListEntry = {
   shapeId: ShapeId
+  /** How many times to repeat, -1 means infinite repeat */
+  repeats?: number
+  /** custom color for this icon */
+  color?: string
 }
 
 export type ShapePlacementConf = {

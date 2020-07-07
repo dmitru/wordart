@@ -15,10 +15,23 @@ export const ChoiceButtons: React.FC<
 > = ({ size = 'md', choices, value, onChange, ...props }) => {
   return (
     <Flex direction="row">
-      {choices.map((choice) => (
+      {choices.map((choice, index) => (
         <Button
+          {...(index < choices.length - 1
+            ? {
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
+              }
+            : {})}
+          {...(index > 0
+            ? {
+                borderTopLeftRadius: 0,
+                borderBottomLeftRadius: 0,
+              }
+            : {})}
           px="2"
           py="1"
+          size={size}
           mr="0"
           variant="solid"
           colorScheme={choice.value === value ? 'primary' : undefined}

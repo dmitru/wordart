@@ -69,7 +69,7 @@ export class Generator {
 
     const shapeCanvasMaxExtent = 300
     const batchSize = 50
-    const nIter = 900
+    const nIter = 100
 
     const shapeCanvas = task.shape.canvas
     const shapeCanvasOriginalColors = task.shape.shapeCanvasOriginalColors
@@ -220,12 +220,14 @@ export class Generator {
     }
 
     const words = flatten(
-      task.words.map((word) =>
+      task.words.map((word, taskWordIndex) =>
         word.fonts.map(
           (font) =>
             new WordInfo(
               `${font.id}-${word.text}`,
               word.wordConfigId,
+              taskWordIndex,
+              word,
               word.text,
               font
             )
@@ -248,8 +250,8 @@ export class Generator {
     const iconAngles = uniq(flatten(task.icons.map((w) => w.angles)))
     const allAngles = uniq([...wordAngles, ...iconAngles])
 
-    const hasWords = task.words.length > 0
-    const hasIcons = task.icons.length > 0
+    let hasWords = task.words.length > 0
+    let hasIcons = task.icons.length > 0
     let iconProbability = task.iconProbability
     if (hasWords && hasIcons) {
       iconProbability = task.iconProbability
@@ -333,15 +335,28 @@ export class Generator {
     unrotatedCtx.fillStyle = 'black'
     unrotatedCtx.globalCompositeOperation = 'destination-out'
 
-    let wordIndex = 0
-    let iconIndex = 0
-
     let mostLargestRect: Rect | undefined
 
     let tLastNotified = performance.now()
 
+    const wordMaxRepeats = new Array(task.words.length)
+      .fill(0)
+      .map((v, i) => task.words[i].repeats)
+    const iconMaxRepeats = new Array(task.icons.length)
+      .fill(0)
+      .map((v, i) => task.icons[i].repeats)
+    const wordRepeats = new Array(task.words.length).fill(0)
+    const iconRepeats = new Array(icons.length).fill(0)
+    let availableWords = [...words]
+    let availableIcons = [...icons]
+    let availableWordIndex = 0
+    let iconIndex = 0
+
     for (let i = 0; i < nIter; ++i) {
       let type: 'word' | 'icon' = 'word'
+
+      hasWords = availableWords.length > 0
+      hasIcons = availableIcons.length > 0
 
       if (this.isCancelled) {
         this.isCancelled = false
@@ -362,10 +377,23 @@ export class Generator {
       }
 
       if (type === 'word') {
-        const word = words[wordIndex]
-        const wordConfig = task.words.find(
+        const word = availableWords[availableWordIndex]
+
+        const wordConfigIndex = task.words.findIndex(
           (wc) => wc.wordConfigId === word.wordConfigId
         )!
+        if (wordConfigIndex < 0) {
+          console.error('wordConfigIndex < 0')
+          break
+        }
+
+        const wordIndex = words.findIndex((w) => w === word)
+        if (wordIndex < 0) {
+          console.error('wordIndex < 0')
+          break
+        }
+        const wordConfig = task.words[wordConfigIndex]
+
         const angle = sample(wordConfig.angles)!
         const rotationInfo = rotationInfos.get(angle)
         if (!rotationInfo) {
@@ -535,7 +563,24 @@ export class Generator {
 
         // console.screenshot(shapeCtx.canvas)
 
-        wordIndex = (wordIndex + 1) % words.length
+        console.log(
+          'availableWOrds: ',
+          availableWords,
+          word,
+          availableWordIndex,
+          wordIndex
+        )
+
+        wordRepeats[wordConfigIndex]++
+        availableWords = words.filter((w, index) => {
+          const wordConfIndex = w.wordConfigIndex
+          return (
+            wordMaxRepeats[wordConfIndex] === -1 ||
+            wordRepeats[wordConfIndex] < wordMaxRepeats[wordConfIndex]
+          )
+        })
+        console.log(wordRepeats, wordMaxRepeats)
+        availableWordIndex = (availableWordIndex + 1) % availableWords.length
       } else {
         const icon = icons[iconIndex]
         const rasterCanvas = iconRasterCanvases[iconIndex]
@@ -686,7 +731,7 @@ export class Generator {
             index: i,
             kind: 'shape',
             shapeColor,
-            shapeId: icon.shape.id,
+            shapeId: (icon.shape as ShapeIconConf).id,
             transform: new paper.Matrix()
               .translate(task.shape.bounds.left, task.shape.bounds.top)
               .scale(
@@ -811,12 +856,16 @@ export type FillShapeTaskWordConfig = {
   angles: number[]
   /** Fonts to use */
   fonts: Font[]
+  /** How many times to repeat, -1 means infinite repeat */
+  repeats: number
 }
 
 export type FillShapeTaskIconConfig = {
   shape: ShapeConf
   /** Rotation angles in degrees */
   angles: number[]
+  /** How many times to repeat, -1 means infinite repeat */
+  repeats: number
 }
 
 export type FillShapeTaskResult = {
@@ -861,50 +910,29 @@ export type WordGeneratedItem = {
 export class WordInfo {
   id: WordInfoId
   wordConfigId: WordConfigId
+  wordConfigIndex: number
   font: Font
   text: string
-  // symbols: Symbol[]
-  // symbolOffsets: number[]
   fontSize: number
+  taskWordConf: FillShapeTaskWordConfig
 
   constructor(
     id: WordInfoId,
     wordConfigId: WordConfigId,
+    wordConfigIndex: number,
+    taskWordConf: FillShapeTaskWordConfig,
     text: string,
     font: Font,
     fontSize = FONT_SIZE
   ) {
     this.id = id
+    this.wordConfigIndex = wordConfigIndex
     this.wordConfigId = wordConfigId
+    this.taskWordConf = taskWordConf
     this.font = font
     this.text = text
     this.fontSize = fontSize
-    // this.symbols = stringToSymbols(text, font, fontSize)
-
-    // this.symbolOffsets = this.symbols.map(
-    //   (symbol) =>
-    //     (fontSize * symbol.glyph.advanceWidth) / this.font.otFont.unitsPerEm
-    // )
   }
-
-  // getSymbolPaths = (): Path[] => {
-  //   const paths: Path[] = []
-  //   let currentOffset = 0
-  //   for (let i = 0; i < this.symbols.length; ++i) {
-  //     paths.push(this.symbols[i].glyph.getPath(currentOffset, 0, this.fontSize))
-  //     currentOffset += this.symbolOffsets[i]
-  //   }
-  //   return paths
-  // }
-
-  // draw = (ctx: CanvasRenderingContext2D) => {
-  //   ctx.save()
-  //   for (const [index, symbol] of this.symbols.entries()) {
-  //     symbol.draw(ctx)
-  //     ctx.translate(this.symbolOffsets[index], 0)
-  //   }
-  //   ctx.restore()
-  // }
 }
 
 export class Symbol {
@@ -922,13 +950,6 @@ export class Symbol {
     this.id = getSymbolAngleId(glyph, font)
     this.glyph = glyph
   }
-
-  // draw = (ctx: CanvasRenderingContext2D) => {
-  //   const path = this.glyph.getPath(0, 0, this.fontSize)
-  //   // @ts-ignore
-  //   path.fill = ctx.fillStyle
-  //   path.draw(ctx)
-  // }
 }
 
 export const getFontName = (font: Font): string => font.otFont.names.fullName.en

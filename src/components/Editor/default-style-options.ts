@@ -28,7 +28,7 @@ const defaultWordsListBackground: WordListEntry[] = ['back'].map(
 
 /** Defines initial state of editor style options UI for the Shape */
 export const defaultShapeStyleOptions: ShapeStyleOptions = {
-  opacity: 40,
+  opacity: 10,
   items: {
     dimSmallerItems: 20,
     brightness: 0,
