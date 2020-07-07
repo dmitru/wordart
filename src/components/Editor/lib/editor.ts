@@ -1356,10 +1356,6 @@ export class Editor {
       const ctx = canvasSubtract.getContext('2d')!
       for (const item of lockedItems) {
         ctx.save()
-        // ctx.translate(
-        //   -shapeObj.getBoundingRect(true).left || 0,
-        //   -shapeObj.getBoundingRect(true).top || 0
-        // )
         const saved = item.isShowingLockBorder
         item.setLockBorderVisibility(false)
         item.fabricObj.drawObject(ctx)
@@ -1368,8 +1364,15 @@ export class Editor {
       }
     }
 
-    // shapeRaster = undefined
-    const wordFonts: Font[] = await this.fetchFonts(style.items.words.fontIds)
+    const defaultFontIds = style.items.words.fontIds
+    const allUsedFontIds = [
+      ...new Set([
+        ...defaultFontIds,
+        ...style.items.words.wordList.map((w) => w.fontId).filter(notEmpty),
+      ]),
+    ]
+    await this.fetchFonts(allUsedFontIds)
+    const defaultFonts: Font[] = await this.fetchFonts(defaultFontIds)
 
     const shapeConfig = this.store.getSelectedShapeConf()
     const wordConfigsById = keyBy(style.items.words.wordList, 'id')
@@ -1430,10 +1433,11 @@ export class Editor {
           .map((wc) => ({
             wordConfigId: wc.id,
             text: wc.text,
-            angles: style.items.words.angles,
+            angles: wc.angle != null ? [wc.angle] : style.items.words.angles,
             fillColors: ['red'],
-            // fonts: [fonts[0], fonts[1], fonts[2]],
-            fonts: wordFonts,
+            fonts: wc.fontId
+              ? [this.fontsInfo.get(wc.fontId)!.font]
+              : defaultFonts,
           })),
         // Icons
         icons: style.items.icons.iconList.map((shape) => ({
@@ -1443,31 +1447,7 @@ export class Editor {
         iconProbability: style.items.placement.iconsProportion / 100,
       },
       async (batch, progressPercent) => {
-        // if (!addedFirstBatch) {
-        //   await this.deleteNonLockedShapeItems()
-        //   addedFirstBatch = true
-        // }
-        // const items: EditorItemConfig[] = []
-
-        // for (const genItem of batch) {
-        //   if (genItem.kind === 'word') {
-        //     const wordConfig = wordConfigsById[genItem.wordConfigId]
-        //     items.push({
-        //       ...genItem,
-        //       color: 'black',
-        //       locked: false,
-        //       text: wordConfig.text,
-        //       customColor: wordConfig.color,
-        //     })
-        //   }
-        // }
-        // await this.addShapeItems(items)
-        // console.log(
-        //   'this.store.visualizingProgress=',
-        //   this.store.visualizingProgress
-        // )
         this.store.visualizingProgress = progressPercent
-        // await this.setShapeItemsStyle(style.items)
         for (let i = 0; i < PROGRESS_REPORT_RAF_WAIT_COUNT; ++i) {
           await waitAnimationFrame()
         }
