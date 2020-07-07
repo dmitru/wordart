@@ -1090,6 +1090,36 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           header="There is no items to visualize"
           content="Please add some words or icons to your design before visualizing."
         />
+
+        <WarningModal
+          isOpen={store.langCheckErrors != null}
+          onClose={() => {
+            store.langCheckErrors = null
+          }}
+          header="Selected fonts don't support some symbols"
+          children={
+            <>
+              <p>
+                There are fonts that don't support some of the words you've
+                chosen.
+              </p>
+
+              <Box mb="4">
+                {(store.langCheckErrors ?? []).map((e, index) => (
+                  <Box key={index}>
+                    {e.font.otFont.names.fontFamily['en']} {e.word}
+                  </Box>
+                ))}
+              </Box>
+
+              <p>
+                Please choose other fonts that support this language. You can
+                easily find fonts for your language using the "Language" filter
+                in the font selector window.
+              </p>
+            </>
+          }
+        />
       </PageLayoutWrapper>
     )
   }

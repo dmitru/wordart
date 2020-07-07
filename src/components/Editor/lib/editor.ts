@@ -1313,6 +1313,26 @@ export class Editor {
       return
     }
 
+    const defaultFontIds = style.items.words.fontIds
+    const allUsedFontIds = [
+      ...new Set([
+        ...defaultFontIds,
+        ...style.items.words.wordList.map((w) => w.fontId).filter(notEmpty),
+      ]),
+    ]
+    const allUsedFonts = await this.fetchFonts(allUsedFontIds)
+    const defaultFonts: Font[] = await this.fetchFonts(defaultFontIds)
+
+    const langCheckErrors = checkLanguageSupport({
+      fonts: allUsedFonts,
+      words: style.items.words.wordList.map((w) => w.text),
+    })
+    if (langCheckErrors.length > 0) {
+      this.store.isVisualizing = false
+      this.store.langCheckErrors = langCheckErrors
+      return
+    }
+
     this.store.visualizingStep = 'generating'
     this.store.visualizingProgress = 0
     this.store.isVisualizing = true
@@ -1363,16 +1383,6 @@ export class Editor {
         ctx.restore()
       }
     }
-
-    const defaultFontIds = style.items.words.fontIds
-    const allUsedFontIds = [
-      ...new Set([
-        ...defaultFontIds,
-        ...style.items.words.wordList.map((w) => w.fontId).filter(notEmpty),
-      ]),
-    ]
-    await this.fetchFonts(allUsedFontIds)
-    const defaultFonts: Font[] = await this.fetchFonts(defaultFontIds)
 
     const shapeConfig = this.store.getSelectedShapeConf()
     const wordConfigsById = keyBy(style.items.words.wordList, 'id')
@@ -1539,6 +1549,27 @@ export class Editor {
     for (let i = 0; i < PROGRESS_REPORT_RAF_WAIT_COUNT; ++i) {
       await waitAnimationFrame()
     }
+
+    const defaultFontIds = style.items.words.fontIds
+    const allUsedFontIds = [
+      ...new Set([
+        ...defaultFontIds,
+        ...style.items.words.wordList.map((w) => w.fontId).filter(notEmpty),
+      ]),
+    ]
+    const allUsedFonts = await this.fetchFonts(allUsedFontIds)
+    const defaultFonts: Font[] = await this.fetchFonts(defaultFontIds)
+
+    const langCheckErrors = checkLanguageSupport({
+      fonts: allUsedFonts,
+      words: style.items.words.wordList.map((w) => w.text),
+    })
+    if (langCheckErrors.length > 0) {
+      this.store.isVisualizing = false
+      this.store.langCheckErrors = langCheckErrors
+      return
+    }
+
     await this.generator.init()
 
     const shapeClone = await cloneObj(shapeObj)
@@ -1576,16 +1607,6 @@ export class Editor {
       shapeCanvas.width,
       shapeCanvas.height
     )
-
-    const defaultFontIds = style.items.words.fontIds
-    const allUsedFontIds = [
-      ...new Set([
-        ...defaultFontIds,
-        ...style.items.words.wordList.map((w) => w.fontId).filter(notEmpty),
-      ]),
-    ]
-    await this.fetchFonts(allUsedFontIds)
-    const defaultFonts: Font[] = await this.fetchFonts(defaultFontIds)
 
     const shapeConfig = this.store.getSelectedShapeConf()
     const wordConfigsById = keyBy(style.items.words.wordList, 'id')
@@ -2072,6 +2093,32 @@ export class Editor {
       })
     )
   }
+}
+
+export type LangCheckError = {
+  font: Font
+  word: string
+}
+
+const checkLanguageSupport = (params: {
+  fonts: Font[]
+  words: string[]
+}): LangCheckError[] => {
+  const errors: LangCheckError[] = []
+
+  for (const font of params.fonts) {
+    for (const word of params.words) {
+      for (const char of word) {
+        if (
+          !font.otFont.hasChar(char) ||
+          font.otFont.charToGlyphIndex(char) === 0
+        ) {
+          errors.push({ font, word })
+        }
+      }
+    }
+  }
+  return errors
 }
 
 export type TargetKind = 'shape' | 'bg'
