@@ -852,21 +852,17 @@ export class Editor {
         const wordConfig = itemsStyleConf.words.wordList.find(
           (wc) => wc.id === item.wordConfigId
         )
-        // console.log(
-        //   'wordConfig = ',
-        //   item.defaultText,
-        //   item.wordConfigId,
-        //   itemsStyleConf.words.wordList,
-        //   wordConfig,
-        //   wordConfig?.color
-        // )
+
         // Use custom color for that word
         if (wordConfig && wordConfig.color != null) {
-          color = chroma(wordConfig.color)
+          const paperColor = new paper.Color(wordConfig.color)
+          color = chroma.rgb(
+            255 * paperColor.red,
+            255 * paperColor.green,
+            255 * paperColor.blue
+          )
         }
       }
-
-      console.log('color = ', color)
 
       if (!color) {
         if (coloring.kind === 'gradient' || coloring.kind === 'color') {
@@ -1493,7 +1489,6 @@ export class Editor {
           color: 'black',
           locked: false,
           text: wordConfig.text,
-          customColor: wordConfig.color,
         })
       } else if (genItem.kind === 'shape') {
         items.push({
@@ -1690,7 +1685,6 @@ export class Editor {
           color: 'black',
           locked: false,
           text: wordConfig.text,
-          customColor: wordConfig.color,
         })
       } else if (genItem.kind === 'shape') {
         items.push({

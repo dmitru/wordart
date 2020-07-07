@@ -615,7 +615,7 @@ export class EditorStore {
             wordsInfoMap.set(wordInfoId, {
               text: word.text,
               fontId,
-              wordConfigId: undefined,
+              wordConfigId: word.id,
             })
           }
           const { text, wordConfigId } = wordsInfoMap.get(wordInfoId)!
@@ -852,6 +852,7 @@ export class EditorStore {
           return {
             fontIndex,
             text: item.customText || item.defaultText,
+            id: item.wordConfigId,
           }
         })
         .filter(notEmpty)
@@ -872,7 +873,6 @@ export class EditorStore {
                 c: item.color,
                 cc: item.customColor,
                 t: serializeMatrix(item.transform),
-                wcId: item.wordConfigId,
                 sc: item.shapeColor,
                 l: item.locked,
                 wi: uniqWords.findIndex(

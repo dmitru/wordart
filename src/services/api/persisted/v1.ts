@@ -111,14 +111,13 @@ export type MatrixSerialized = [number, number, number, number, number, number]
 export type PersistedWordV1 = {
   text: string
   fontIndex: number
+  id?: string
 }
 
 export type PersistedItemWordV1 = {
   /** Kind */
   k: 'w'
   id: EditorItemId
-  /** Word config ID */
-  wcId?: number
   /** Word list index */
   wi: number
   /** Transform */

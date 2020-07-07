@@ -762,6 +762,7 @@ const WordListRow: React.FC<
                     } else {
                       word.color = undefined
                     }
+                    onAfterColorChange()
                   }}
                 />
 
