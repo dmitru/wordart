@@ -361,7 +361,7 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
                     p="2"
                     position="absolute"
                     width="100%"
-                    spacing="5"
+                    spacing="3"
                   >
                     <Box>
                       <Text fontWeight="semibold" color="gray.500">

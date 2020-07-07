@@ -199,23 +199,21 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
               {style.items.words.anglesPreset === 'custom' && (
                 <>
                   <Box mt="4">
-                    <Tooltip label="Add custom angle">
-                      <Button
-                        mr="1"
-                        colorScheme="secondary"
-                        isDisabled={style.items.words.customAngles.length >= 8}
-                        size="sm"
-                        leftIcon={<AddIcon />}
-                        onClick={() => {
-                          style.items.words.customAngles.push(
-                            Math.round(-90 + Math.random() * 180)
-                          )
-                          animateVisualize()
-                        }}
-                      >
-                        Add
-                      </Button>
-                    </Tooltip>
+                    <Button
+                      mr="1"
+                      colorScheme="secondary"
+                      isDisabled={style.items.words.customAngles.length >= 8}
+                      size="sm"
+                      leftIcon={<AddIcon />}
+                      onClick={() => {
+                        style.items.words.customAngles.push(
+                          Math.round(-90 + Math.random() * 180)
+                        )
+                        animateVisualize()
+                      }}
+                    >
+                      Add angle
+                    </Button>
 
                     <Button
                       size="sm"
