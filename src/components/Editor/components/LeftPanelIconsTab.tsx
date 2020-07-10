@@ -52,16 +52,17 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
           <>
             <SectionLabel>Choose an icon</SectionLabel>
 
-            <Button
-              width="50%"
-              leftIcon={<ChevronLeftIcon />}
-              variant="outline"
-              onClick={() => {
-                state.isAdding = false
-              }}
-            >
-              Cancel
-            </Button>
+            <Box>
+              <Button
+                leftIcon={<ChevronLeftIcon />}
+                variant="outline"
+                onClick={() => {
+                  state.isAdding = false
+                }}
+              >
+                Cancel
+              </Button>
+            </Box>
 
             <Box
               mt="3"
@@ -93,7 +94,6 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
           <Box display="flex" alignItems="center">
             <Button
               mr="3"
-              flex="1"
               colorScheme="primary"
               onClick={() => {
                 state.isAdding = true

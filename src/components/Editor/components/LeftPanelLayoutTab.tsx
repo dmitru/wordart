@@ -6,7 +6,15 @@ import { DeleteButton } from 'components/shared/DeleteButton'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { useCallback } from 'react'
 import { TargetKind } from 'components/Editor/lib/editor'
-import { Text, Box, Heading, Flex, Icon, Divider } from '@chakra-ui/core'
+import {
+  Text,
+  Box,
+  Heading,
+  Flex,
+  Icon,
+  Divider,
+  Checkbox,
+} from '@chakra-ui/core'
 import { WordAnglesPresetKind } from 'components/Editor/style-options'
 // @ts-ignore
 import VerImg from './img/ver.svg'
@@ -300,6 +308,16 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
               max={100}
               step={1}
             />
+
+            <Checkbox
+              mt="5"
+              isChecked={style.items.placement.iconsRandomAngle}
+              onChange={(e) => {
+                style.items.placement.iconsRandomAngle = e.target.checked
+              }}
+            >
+              Rotate icons by random angles
+            </Checkbox>
           </Box>
         )}
       </Box>
