@@ -715,7 +715,7 @@ const WordListRow: React.FC<
       word.angle != null ||
       word.fontId != null ||
       (word.repeats ?? -1) != -1 ||
-      word.color != 'null'
+      word.color != null
     ) {
       customizeTrigger = (
         <Button
