@@ -467,7 +467,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             mx="-20px"
             display="flex"
             flexDirection="column"
-            height="calc(100vh - 188px)"
+            height="calc(100vh - 258px)"
           >
             {allWords.length > 0 && (
               <Box flex="1" width="100%" py="3">
