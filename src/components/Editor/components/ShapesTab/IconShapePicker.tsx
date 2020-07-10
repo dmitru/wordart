@@ -1,42 +1,25 @@
-import {
-  Box,
-  Flex,
-  Heading,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Stack,
-  Text,
-} from '@chakra-ui/core'
-import { ChevronDownIcon } from '@chakra-ui/icons'
+import { Box, Flex, Stack, Text } from '@chakra-ui/core'
 import { css } from '@emotion/core'
-import chroma from 'chroma-js'
-import {
-  ShapeSelector,
-  ShapeThumbnailBtn,
-} from 'components/Editor/components/ShapeSelector'
+import { IconPicker } from 'components/Editor/components/IconPicker'
+import { IconShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
+import { ShapeThumbnailBtn } from 'components/Editor/components/ShapeSelector'
+import { SectionLabel } from 'components/Editor/components/shared'
 import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
-import { SearchInput } from 'components/shared/SearchInput'
 import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'
+import { iconsCategories } from 'data/icon-categories'
 import { AnimatePresence, motion } from 'framer-motion'
 import { isEqual } from 'lodash'
-import { observable, runInAction } from 'mobx'
+import { observable } from 'mobx'
 import { observer } from 'mobx-react'
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { FaCog } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
-import { useDebouncedCallback } from 'use-debounce/lib'
-import { iconsCategories } from 'data/icon-categories'
 import { useDebounce } from 'use-debounce'
-import { IconShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
-import { SectionLabel } from 'components/Editor/components/shared'
+import { useDebouncedCallback } from 'use-debounce/lib'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -353,61 +336,8 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                     display="flex"
                     flexDirection="column"
                   >
-                    <Flex align="center" mt="5" mb="4">
-                      <Box mr="3">
-                        <Menu>
-                          <MenuButton
-                            variant={selectedCategory ? 'solid' : 'outline'}
-                            colorScheme={
-                              selectedCategory ? 'accent' : undefined
-                            }
-                            as={Button}
-                            rightIcon={<ChevronDownIcon />}
-                            size="sm"
-                            py="2"
-                            px="3"
-                          >
-                            {selectedCategory || 'All categories'}
-                          </MenuButton>
-                          <MenuList
-                            css={css`
-                              max-height: 300px;
-                              overflow: auto;
-                            `}
-                          >
-                            <MenuItem onClick={() => setSelectedCategory(null)}>
-                              Show all ({allItems.length})
-                            </MenuItem>
-                            <MenuDivider />
-                            {allCategoryOptions.map((item, index) => (
-                              <MenuItem
-                                key={item.label}
-                                onClick={() => setSelectedCategory(item.label)}
-                              >
-                                {item.label} ({item.count})
-                              </MenuItem>
-                            ))}
-                          </MenuList>
-                        </Menu>
-                      </Box>
-
-                      <SearchInput
-                        placeholder="Search..."
-                        value={query}
-                        onChange={setQuery}
-                      />
-                    </Flex>
-
-                    <ShapeSelector
-                      columns={6}
-                      showProcessedThumbnails={false}
-                      overscanCount={3}
-                      shapes={matchingItems}
+                    <IconPicker
                       onSelected={async (shapeConfig) => {
-                        if (shapeConfig.kind !== 'icon') {
-                          return
-                        }
-
                         shapeConfig.color = store.shapesPanel.icon.color
 
                         if (
@@ -418,7 +348,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                         }
                         store.animateVisualize(false)
                       }}
-                      selectedShapeId={store.shapesPanel.icon.selected}
+                      selectedIconId={store.shapesPanel.icon.selected}
                     />
                   </Box>
                 </motion.div>

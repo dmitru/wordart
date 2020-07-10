@@ -19,6 +19,7 @@ import { Tooltip } from 'components/shared/Tooltip'
 import { SmileBeam } from '@styled-icons/fa-solid/SmileBeam'
 import { FaQuestionCircle } from 'react-icons/fa'
 import { ChevronLeftIcon } from '@chakra-ui/icons'
+import { IconPicker } from 'components/Editor/components/IconPicker'
 
 export type LeftPanelIconsTabProps = {
   target: TargetKind
@@ -59,15 +60,23 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 state.isAdding = false
               }}
             >
-              Back
+              Cancel
             </Button>
 
-            <Box mt="6" display="flex" flex="1" height="calc(100vh - 300px)">
-              <ShapeSelector
-                shapes={shapes}
-                onSelected={(shape) => {
+            <Box
+              mt="3"
+              display="flex"
+              flex="1"
+              height="calc(100vh - 300px)"
+              flexDirection="column"
+            >
+              <IconPicker
+                onSelected={async (shapeConfig) => {
                   style.items.icons.iconList = uniqBy(
-                    [...style.items.icons.iconList, { shapeId: shape.id }],
+                    [
+                      ...style.items.icons.iconList,
+                      { shapeId: shapeConfig.id },
+                    ],
                     'shapeId'
                   )
                   state.isAdding = false
