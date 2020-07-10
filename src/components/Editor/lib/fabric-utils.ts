@@ -77,7 +77,7 @@ export const cloneObj = (obj: fabric.Object, attrs: string[] = ['id']) =>
 
 export const cloneFabricCanvas = (
   canvas: fabric.Canvas,
-  attrs: string[] = ['id']
+  attrs: string[] = ['id', 'viewportTransform']
 ) =>
   new Promise<fabric.Canvas>((r) =>
     canvas!.clone((obj: fabric.Canvas) => r(obj), attrs)

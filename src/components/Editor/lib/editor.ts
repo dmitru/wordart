@@ -320,11 +320,32 @@ export class Editor {
 
   exportAsSvg = async (): Promise<string> => {
     const canvas = await cloneFabricCanvas(this.canvas)
-    canvas.backgroundColor = (this.bgRect.fill as string) || 'transparent'
-    return canvas.toSVG()
+    let bgColor = (this.bgRect.fill as string) || 'transparent'
+
+    const bgOpacity =
+      this.store.styleOptions.bg.fill.kind === 'transparent'
+        ? 0
+        : this.store.styleOptions.bg.fill.color.opacity
+
+    bgColor = chroma(bgColor).alpha(bgOpacity).hex('rgba')
+
+    canvas.backgroundColor = bgColor
+    return canvas.toSVG({
+      viewBox: {
+        x: 0,
+        y: 0,
+        width: this.projectBounds.width,
+        height: this.projectBounds.height,
+      },
+      width: this.projectBounds.width,
+      height: this.projectBounds.height,
+    })
   }
 
-  exportAsRaster = async (maxDimension = 1024): Promise<HTMLCanvasElement> => {
+  exportAsRaster = async (
+    maxDimension = 1024,
+    format: 'png' | 'jpeg' = 'png'
+  ): Promise<HTMLCanvasElement> => {
     const aspect = this.projectBounds.width / this.projectBounds.height
     const resultCanvas = createCanvas(
       aspect > 1
@@ -338,18 +359,11 @@ export class Editor {
           }
     )
 
-    // TODO: optimize this!
-    // const bgCanvas = await cloneFabricCanvas(this.bgCanvas)
-    // const canvas = await cloneFabricCanvas(this.canvas)
     const bgCanvas = this.bgCanvas
+    this.bgCanvas.backgroundColor = '#fff'
+    this.bgTransparentRect.opacity = 0
+    bgCanvas.renderAll()
     const canvas = this.canvas
-
-    // bgCanvas.viewportTransform![4] = 0
-    // bgCanvas.viewportTransform![5] = 0
-    // canvas.viewportTransform![4] = 0
-    // canvas.viewportTransform![5] = 0
-    // canvas.renderAll()
-    // bgCanvas.renderAll()
 
     const exportCanvasScale = resultCanvas.width / 1000 / canvas.getZoom()
 
@@ -370,9 +384,24 @@ export class Editor {
       )
     ).canvas
 
+    this.bgTransparentRect.opacity = 1
+    this.bgCanvas.backgroundColor = '#ddd'
+    bgCanvas.renderAll()
+
+    const resultCtx = resultCanvas.getContext('2d')!
+
+    const bgOpacity =
+      this.store.styleOptions.bg.fill.kind === 'transparent'
+        ? 0
+        : this.store.styleOptions.bg.fill.color.opacity
+
+    if (format === 'png') {
+      resultCtx.globalAlpha = bgOpacity
+    }
+
     copyCanvas(
       bgCanvasExported.getContext('2d')!,
-      resultCanvas.getContext('2d')!,
+      resultCtx,
       {
         x: 0,
         y: 0,
@@ -386,6 +415,8 @@ export class Editor {
         h: resultCanvas.height,
       }
     )
+
+    resultCtx.globalAlpha = 1
 
     const canvasExported = (
       await loadImageUrlToCanvasCtx(

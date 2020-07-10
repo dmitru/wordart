@@ -245,7 +245,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               const svgBlob = new Blob([svg], { type: 'image/svg' })
               saveAs(svgBlob, `${state.title || 'Untitled Design'}.svg`)
             } else {
-              const canvas = await store.editor.exportAsRaster(dimension)
+              const canvas = await store.editor.exportAsRaster(
+                dimension,
+                format
+              )
               canvas.toBlob((blob) => {
                 saveAs(
                   blob as Blob,
