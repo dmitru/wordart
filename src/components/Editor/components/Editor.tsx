@@ -333,7 +333,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     return (
       <PageLayoutWrapper>
         <Helmet>
-          <title>{getTabTitle(state.title)}</title>
+          <title>{getTabTitle(state.title || 'Untitled')}</title>
         </Helmet>
 
         <TopNavWrapper alignItems="center" display="flex">

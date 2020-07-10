@@ -10,11 +10,11 @@ const shapes = [
     kind: 'clipart:svg',
     url: '/shapes/svg/geometry/triangle.svg',
   },
-  {
-    title: 'Polygon 5-outline',
-    kind: 'clipart:svg',
-    url: '/shapes/svg/geometry/polygon-5-outline.svg',
-  },
+  // {
+  //   title: 'Polygon 5-outline',
+  //   kind: 'clipart:svg',
+  //   url: '/shapes/svg/geometry/polygon-5-outline.svg',
+  // },
   {
     title: 'Circle',
     kind: 'clipart:svg',
@@ -35,31 +35,31 @@ const shapes = [
     kind: 'clipart:svg',
     url: '/shapes/svg/geometry/polygon-5.svg',
   },
-  {
-    title: 'Star outline',
-    kind: 'clipart:svg',
-    url: '/shapes/svg/geometry/star-outline.svg',
-  },
-  {
-    title: 'Polygon 6-outline',
-    kind: 'clipart:svg',
-    url: '/shapes/svg/geometry/polygon-6-outline.svg',
-  },
+  // {
+  //   title: 'Star outline',
+  //   kind: 'clipart:svg',
+  //   url: '/shapes/svg/geometry/star-outline.svg',
+  // },
+  // {
+  //   title: 'Polygon 6-outline',
+  //   kind: 'clipart:svg',
+  //   url: '/shapes/svg/geometry/polygon-6-outline.svg',
+  // },
   {
     title: 'Star 24',
     kind: 'clipart:svg',
     url: '/shapes/svg/geometry/star-24.svg',
   },
-  {
-    title: 'Square outline',
-    kind: 'clipart:svg',
-    url: '/shapes/svg/geometry/square-outline.svg',
-  },
-  {
-    title: 'Circle outline',
-    kind: 'clipart:svg',
-    url: '/shapes/svg/geometry/circle-outline.svg',
-  },
+  // {
+  //   title: 'Square outline',
+  //   kind: 'clipart:svg',
+  //   url: '/shapes/svg/geometry/square-outline.svg',
+  // },
+  // {
+  //   title: 'Circle outline',
+  //   kind: 'clipart:svg',
+  //   url: '/shapes/svg/geometry/circle-outline.svg',
+  // },
   {
     title: 'Square',
     kind: 'clipart:svg',
@@ -95,11 +95,11 @@ const shapes = [
     kind: 'clipart:svg',
     url: '/shapes/svg/geometry/cross.svg',
   },
-  {
-    title: 'Circle outline-thick',
-    kind: 'clipart:svg',
-    url: '/shapes/svg/geometry/circle-outline-thick.svg',
-  },
+  // {
+  //   title: 'Circle outline-thick',
+  //   kind: 'clipart:svg',
+  //   url: '/shapes/svg/geometry/circle-outline-thick.svg',
+  // },
 ]
 
 export default shapes

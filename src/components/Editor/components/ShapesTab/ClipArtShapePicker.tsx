@@ -1,7 +1,6 @@
 import {
   Box,
   Flex,
-  Heading,
   Menu,
   MenuButton,
   MenuDivider,
@@ -12,12 +11,12 @@ import {
 } from '@chakra-ui/core'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
-import { CustomizeRasterImageModal } from 'components/Editor/components/CustomizeRasterImageModal'
 import { ShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
 import {
   ShapeSelector,
   ShapeThumbnailBtn,
 } from 'components/Editor/components/ShapeSelector'
+import { SectionLabel } from 'components/Editor/components/shared'
 import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
 import { ShapeClipartConf } from 'components/Editor/shape-config'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
@@ -34,7 +33,6 @@ import { FaCog } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
-import { SectionLabel } from 'components/Editor/components/shared'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -329,6 +327,7 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                       </Box>
 
                       <SearchInput
+                        autoFocus
                         placeholder="Search..."
                         value={query}
                         onChange={setQuery}
