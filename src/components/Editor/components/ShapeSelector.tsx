@@ -107,12 +107,14 @@ export const ShapeThumbnailBtn: React.FC<
     backgroundColor: string
     url: string
     active?: boolean
+    children?: React.ReactNode
   } & Omit<React.HTMLProps<HTMLButtonElement>, 'shape' | 'type'>
 > = observer(
   ({
     size = 106,
     padding = 8,
     url,
+    children,
     backgroundColor,
     active = false,
     onClick,
@@ -128,6 +130,7 @@ export const ShapeThumbnailBtn: React.FC<
         backgroundColor={backgroundColor}
       >
         <ShapeThumbnailBtnInnerImg src={url} size={size - 2 * padding} />
+        {children}
       </ShapeThumbnailBtnInner>
     )
     return null

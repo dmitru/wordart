@@ -753,7 +753,7 @@ const WordListRow: React.FC<
     }
 
     const wordCustomizeControl = (
-      <Popover closeOnBlur closeOnEsc placement="right">
+      <Popover closeOnBlur closeOnEsc placement="right" autoFocus={false}>
         <PopoverTrigger>{customizeTrigger}</PopoverTrigger>
         <Portal>
           <PopoverContent zIndex={4000} width="280px">
@@ -1133,8 +1133,8 @@ const WordList = styled(Box)`
   /* overflow: visible; */
 `
 
-const WordDeleteButton = styled(DeleteButton)``
 const WordMenuButton = styled(MenuDotsButton)``
+const WordDeleteButton = styled(DeleteButton)``
 const WordCustomizeButton = styled(Button)``
 
 const WordRow = styled(Box)`
