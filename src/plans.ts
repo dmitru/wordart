@@ -25,7 +25,7 @@ export const unlimitedPricingPlans: UnlimitedPricingPlan[] = [
   },
   {
     kind: 'unlimited',
-    id: 597590,
+    id: 597510,
     title: '1 Month',
     periodCount: 1,
     periodUnits: 'Month',
@@ -49,13 +49,13 @@ export const unlimitedPricingPlans: UnlimitedPricingPlan[] = [
 export const downloadsPricingPlans: DownloadsPricingPlan[] = [
   {
     kind: 'downloads-pack',
-    id: 497590,
+    id: 597590,
     title: '1 HD Download',
     downloads: 1,
   },
   {
     kind: 'downloads-pack',
-    id: 497591,
+    id: 600538,
     title: '5 HD Downloads',
     downloads: 1,
   },

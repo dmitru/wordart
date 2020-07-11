@@ -339,7 +339,7 @@ export const PricingPage = observer(() => {
 
                 <tr>
                   <th>Number of HQ downloads</th>
-                  <MainDetailsTableCell main="-" />
+                  <MainDetailsTableCell main="0" />
                   <MainDetailsTableCell
                     main={
                       <>
