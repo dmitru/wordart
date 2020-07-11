@@ -1,4 +1,5 @@
 export const Urls = {
+  landing: '/',
   login: '/login',
   loginRedirect: '/home',
 

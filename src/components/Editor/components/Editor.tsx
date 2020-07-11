@@ -288,11 +288,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       return <SpinnerSplashScreen />
     }
 
-    if (authStore.isLoggedIn !== true) {
-      router.replace(Urls.login)
-      return <SpinnerSplashScreen />
-    }
-
     const {
       // @ts-ignore
       Key, // eslint-disable-line
@@ -349,7 +344,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               margin-right: 0.5rem;
             `}
           />
-          <Link href={Urls.yourDesigns} passHref>
+          <Link
+            href={authStore.isLoggedIn ? Urls.yourDesigns : Urls.landing}
+            passHref
+          >
             <TopNavButton mr="1" variant="secondary" colorScheme="secondary">
               <FiChevronLeft
                 css={css`
