@@ -10,6 +10,7 @@ import { FaRegUserCircle } from 'react-icons/fa'
 import { useRouter } from 'next/dist/client/router'
 import css from '@emotion/css'
 import { AddIcon } from '@chakra-ui/icons'
+import { TopNavButton } from 'components/shared/TopNavButton'
 
 export type HeaderProps = {
   fullWidth?: boolean
@@ -57,20 +58,15 @@ export const Header: React.FC<HeaderProps> = observer(
             alignItems="center"
             display="flex"
           >
+            {pathname !== Urls.yourDesigns && (
+              <Link href={Urls.editor._next} as={Urls.editor.create} passHref>
+                <TopNavButton variant="accent" leftIcon={<AddIcon />} mr="3">
+                  Create
+                </TopNavButton>
+              </Link>
+            )}
             {isLoggedIn && (
               <>
-                {pathname !== Urls.yourDesigns && (
-                  <Link
-                    href={Urls.editor._next}
-                    as={Urls.editor.create}
-                    passHref
-                  >
-                    <Button colorScheme="accent" leftIcon={<AddIcon />} mr="3">
-                      Create
-                    </Button>
-                  </Link>
-                )}
-
                 <Link href={Urls.yourDesigns} passHref>
                   <TopNavLink active={pathname === Urls.yourDesigns}>
                     Your Designs
@@ -89,10 +85,14 @@ export const Header: React.FC<HeaderProps> = observer(
             {isNotLoggedIn && (
               <>
                 <Link href={Urls.login} passHref>
-                  <Button colorScheme="accent">Sign up</Button>
+                  <Button colorScheme="accent" mr="3">
+                    Sign up
+                  </Button>
                 </Link>
                 <Link href={Urls.login} passHref>
-                  <Button variant="outline">Log in</Button>
+                  <TopNavLink active={pathname === Urls.login}>
+                    Log in
+                  </TopNavLink>
                 </Link>
               </>
             )}

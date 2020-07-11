@@ -247,7 +247,7 @@ export const PricingPage = observer(() => {
             mx="auto"
           >
             <Text as="h1" textAlign="center" fontSize="42px">
-              Find the right price for you
+              Get the right plan for you
             </Text>
 
             <Text
