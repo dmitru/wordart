@@ -53,6 +53,7 @@ export const FoldersView = observer(() => {
   return (
     <Box
       maxWidth="300px"
+      ml="6"
       minWidth="200px"
       flex="1"
       width="100%"

@@ -63,8 +63,8 @@ const HeaderSliderContainer = styled.div`
   width: 800px;
 `
 const HeaderSlider = styled.div`
-  :global(.awssld__container) {
-    height: 760px;
+  .awssld__container {
+    height: 590px;
   }
 `
 
@@ -77,6 +77,8 @@ const widthLimit = css`
 
 const HeaderContentWidthLimit = styled.div`
   ${widthLimit}
+
+  padding: 0 20px;
 
   display: flex;
   align-items: flex-start;

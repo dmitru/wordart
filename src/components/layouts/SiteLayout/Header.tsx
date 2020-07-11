@@ -142,24 +142,10 @@ const TopNavLink = styled.a<{
   padding: 0 15px;
   position: relative;
   box-sizing: content-box;
+  text-transform: uppercase;
+  font-size: 0.9rem;
 
   ${(p) => p.active && `background: #0002;`}
-
-  ${(p) =>
-    p.active &&
-    `
-    &::after {
-      content: '';
-      display: block;
-      position: absolute;
-      height: 3px;
-      bottom: 10px;
-      left: 10px;
-      right: 10px;
-      background: #fff;
-      border-radius: 4px;
-    }
-  `}
 
   color: #fefeff;
 
