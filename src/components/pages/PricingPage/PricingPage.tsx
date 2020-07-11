@@ -49,7 +49,8 @@ export const PricingPage = observer(() => {
             <li>Unlimited number of HQ downloads</li>
             <li>Commercial use {commercialUseHelp}</li>
             <li>
-              More advanced features (<a href="#pricing-faq">Learn more</a>)
+              More advanced features (
+              <a href="#pricing-comparison">Learn more</a>)
             </li>
           </Box>
 
@@ -237,7 +238,7 @@ export const PricingPage = observer(() => {
           <title>{getTabTitle('Pricing')}</title>
         </Helmet>
 
-        <Box mt="3rem" mb="6rem">
+        <Box mb="4rem">
           <Box
             display="flex"
             flexDirection="column"
@@ -267,19 +268,23 @@ export const PricingPage = observer(() => {
           </Box>
 
           <Box
-            mt="2rem"
             display="flex"
             flexDirection="column"
             maxWidth="600px"
             textAlign="center"
             mx="auto"
           >
-            <Text as="h1" textAlign="center" fontSize="42px">
+            <Text
+              as="h1"
+              textAlign="center"
+              fontSize="42px"
+              id="pricing-comparison"
+            >
               Compare free and paid features
             </Text>
           </Box>
 
-          <Box id="pricing-comparison" mt="2rem">
+          <Box mt="2rem">
             <ComparisonTable>
               <thead>
                 <tr>
@@ -387,7 +392,7 @@ export const PricingPage = observer(() => {
             textAlign="center"
             mx="auto"
           >
-            <Text as="h1" textAlign="center" fontSize="42px">
+            <Text as="h1" id="pricing-faq" textAlign="center" fontSize="42px">
               Pricing FAQ
             </Text>
 

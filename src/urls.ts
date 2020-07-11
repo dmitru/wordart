@@ -1,12 +1,12 @@
 export const Urls = {
   login: '/login',
-  loginRedirect: '/dashboard',
+  loginRedirect: '/home',
 
   privacyPolicy: '/legal/privacy',
   termsOfUse: '/legal/terms',
 
   account: '/account',
-  dashboard: '/dashboard',
+  yourDesigns: '/home',
   faq: '/faq',
   pricing: '/pricing',
 

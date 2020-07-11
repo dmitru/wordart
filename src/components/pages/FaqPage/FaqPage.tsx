@@ -18,7 +18,7 @@ export const FaqPage = observer(() => {
           <title>{getTabTitle('FAQ')}</title>
         </Helmet>
 
-        <Box mt="3rem" mb="6rem">
+        <Box mb="6rem">
           <Box
             display="flex"
             flexDirection="column"
@@ -26,7 +26,7 @@ export const FaqPage = observer(() => {
             textAlign="center"
             mx="auto"
           >
-            <Text textAlign="center" fontSize="42px">
+            <Text as="h1" textAlign="center" fontSize="42px">
               Frequently Asked Questions
             </Text>
 
@@ -43,7 +43,7 @@ export const FaqPage = observer(() => {
           </Box>
 
           <Box id="faq" mt="1.5rem" maxWidth="700px" mx="auto">
-            <h1>General</h1>
+            <h1>General Questions</h1>
 
             <Question
               title="What is Wordcloudy? How can it be useful for me?"

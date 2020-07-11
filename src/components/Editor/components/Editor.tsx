@@ -349,7 +349,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               margin-right: 0.5rem;
             `}
           />
-          <Link href={Urls.dashboard} passHref>
+          <Link href={Urls.yourDesigns} passHref>
             <TopNavButton mr="1" variant="secondary" colorScheme="secondary">
               <FiChevronLeft
                 css={css`

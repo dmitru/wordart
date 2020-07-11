@@ -5,7 +5,6 @@ import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
 import { Box } from '@chakra-ui/core'
 import { Urls } from 'urls'
-import { TopNavButton } from 'components/shared/TopNavButton'
 import { Button } from 'components/shared/Button'
 import { FaRegUserCircle } from 'react-icons/fa'
 import { useRouter } from 'next/dist/client/router'
@@ -41,9 +40,14 @@ export const Header: React.FC<HeaderProps> = observer(
             </Link>
 
             <Link href={Urls.faq} passHref>
-              <TopNavButton ml="5" variant="secondary">
+              <TopNavLink active={pathname === Urls.faq} ml="5">
                 FAQ
-              </TopNavButton>
+              </TopNavLink>
+            </Link>
+            <Link href={Urls.pricing} passHref>
+              <TopNavLink active={pathname === Urls.pricing}>
+                Pricing
+              </TopNavLink>
             </Link>
           </Box>
 
@@ -55,7 +59,7 @@ export const Header: React.FC<HeaderProps> = observer(
           >
             {isLoggedIn && (
               <>
-                {pathname !== Urls.dashboard && (
+                {pathname !== Urls.yourDesigns && (
                   <Link
                     href={Urls.editor._next}
                     as={Urls.editor.create}
@@ -67,19 +71,18 @@ export const Header: React.FC<HeaderProps> = observer(
                   </Link>
                 )}
 
-                <Link href={Urls.dashboard} passHref>
-                  <TopNavButton variant="secondary">Your Designs</TopNavButton>
-                </Link>
-                <Link href={Urls.pricing} passHref>
-                  <TopNavButton variant="secondary">Pricing</TopNavButton>
+                <Link href={Urls.yourDesigns} passHref>
+                  <TopNavLink active={pathname === Urls.yourDesigns}>
+                    Your Designs
+                  </TopNavLink>
                 </Link>
                 <Link href={Urls.account} passHref>
-                  <TopNavButton variant="secondary">
+                  <TopNavLink active={pathname === Urls.account}>
                     <Box mr="2">
                       <FaRegUserCircle />
                     </Box>
                     Account
-                  </TopNavButton>
+                  </TopNavLink>
                 </Link>
               </>
             )}
@@ -104,6 +107,7 @@ export const LogoLink = styled.a`
   color: white;
   font-size: 1.6rem;
   height: 30px;
+  margin-right: 2rem;
   &,
   &:focus,
   &:hover {
@@ -126,4 +130,47 @@ export const ContentContainer = styled(Box)<{
   margin: 0 auto;
   padding: 10px 20px;
   height: 60px;
+`
+
+const TopNavLink = styled.a<{
+  active?: boolean
+}>`
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  height: 60px;
+  padding: 0 15px;
+  position: relative;
+  box-sizing: content-box;
+
+  ${(p) => p.active && `background: #0002;`}
+
+  ${(p) =>
+    p.active &&
+    `
+    &::after {
+      content: '';
+      display: block;
+      position: absolute;
+      height: 3px;
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
+      background: #fff;
+      border-radius: 4px;
+    }
+  `}
+
+  color: #fefeff;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    background: #fff2;
+
+    ${(p) =>
+      `
+        background: ${p.active ? '#0002' : '#00000014'};
+    `}
+  }
 `
