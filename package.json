@@ -75,6 +75,7 @@
     "polished": "^3.6.1",
     "quadtree-lib": "^1.0.9",
     "react": "^16.13.1",
+    "react-awesome-slider": "^4.1.0",
     "react-beautiful-dnd": "^13.0.0",
     "react-color": "^2.18.0",
     "react-compound-slider": "^2.5.0",

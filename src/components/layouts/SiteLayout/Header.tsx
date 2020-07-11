@@ -60,9 +60,9 @@ export const Header: React.FC<HeaderProps> = observer(
           >
             {pathname !== Urls.yourDesigns && (
               <Link href={Urls.editor._next} as={Urls.editor.create} passHref>
-                <TopNavButton variant="accent" leftIcon={<AddIcon />} mr="3">
+                <Button colorScheme="accent" leftIcon={<AddIcon />} mr="3">
                   Create
-                </TopNavButton>
+                </Button>
               </Link>
             )}
             {isLoggedIn && (
@@ -85,9 +85,9 @@ export const Header: React.FC<HeaderProps> = observer(
             {isNotLoggedIn && (
               <>
                 <Link href={Urls.login} passHref>
-                  <Button colorScheme="accent" mr="3">
+                  <TopNavButton variant="accent" mr="3">
                     Sign up
-                  </Button>
+                  </TopNavButton>
                 </Link>
                 <Link href={Urls.login} passHref>
                   <TopNavLink active={pathname === Urls.login}>
