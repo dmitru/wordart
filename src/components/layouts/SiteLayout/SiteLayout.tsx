@@ -20,7 +20,9 @@ export const SiteLayout: React.FC<SiteLayoutProps> = ({
   return (
     <SiteLayoutWrapper>
       <Header fullWidth={fullWidth} />
-      <ContentWrapper fullWidth={fullWidth}>{children}</ContentWrapper>
+      <ContentWrapper fullWidth={fullWidth} fullHeight={fullHeight}>
+        {children}
+      </ContentWrapper>
       {!noFooter && <Footer />}
     </SiteLayoutWrapper>
   )
@@ -35,7 +37,7 @@ const ContentWrapper = styled(Box)<{
   overflow-x: hidden;
   ${(p) => !p.fullWidth && 'max-width: 1000px'};
   ${(p) =>
-    !p.fullHeight &&
+    p.fullHeight &&
     'height: 100vh; height: calc(100vh - 60px); overflow: hidden;'};
   padding: 10px 20px;
   margin: 0 auto;

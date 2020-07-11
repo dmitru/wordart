@@ -1,12 +1,11 @@
 import 'mobx-react-lite/batchingForReactDom'
 import { RootStore } from 'services/root-store'
 import { Api } from 'services/api/api'
-import { observable, computed } from 'mobx'
+import { observable, computed, runInAction } from 'mobx'
 import { MyProfile } from 'services/api/types'
 import { AuthTokenStore } from 'services/auth-token-store'
 import jsonp from 'jsonp'
-import { plans, PricingPlanWithPrice, LocalizedPrice } from 'plans'
-import { keyBy } from 'lodash'
+import { plans, LocalizedPrice } from 'plans'
 import { config } from 'config'
 
 const IS_SSR = typeof window === 'undefined'
@@ -25,7 +24,7 @@ export class AuthStore {
   @observable hasInitialized = false
   @observable profile: MyProfile | null = null
 
-  @observable plans: PricingPlanWithPrice[] = plans
+  @observable planPrices = new Map<number, LocalizedPrice>()
 
   afterLogin: Function = () => null
 
@@ -57,8 +56,6 @@ export class AuthStore {
     return this.profile != null
   }
 
-  getPlans = () => this.plans
-
   fetchLocalizedPrices = async () => {
     const pricesFromPaddle = await new Promise<
       { productId: number; price: LocalizedPrice }[]
@@ -86,15 +83,17 @@ export class AuthStore {
             } as LocalizedPrice,
             productId: p.product_id,
           }))
+
+          runInAction(() => {
+            for (const { productId, price } of localizedPrices) {
+              this.planPrices.set(productId, price)
+            }
+          })
+
           resolve(localizedPrices)
         }
       )
     })
-    const plansById = keyBy(plans, 'id')
-    this.plans = pricesFromPaddle.map((p) => ({
-      price: p.price,
-      ...plansById[p.productId],
-    }))
   }
 
   initUsingSavedLocalAuthToken = async () => {

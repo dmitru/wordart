@@ -8,23 +8,29 @@ export type FooterProps = {}
 
 export const Footer: React.FC<FooterProps> = () => {
   return (
-    <FooterWrapper>
-      <ContentContainer>
-        Copyright 2020
-        <Link href={Urls.privacyPolicy} passHref>
-          <FooterLink>Privacy Policy</FooterLink>
-        </Link>
-        <Link href={Urls.termsOfUse} passHref>
-          <FooterLink>Terms of Use</FooterLink>
-        </Link>
+    <FooterWrapper bg="gray.100" py="6">
+      <ContentContainer
+        display="flex"
+        alignItems="center"
+        flexDirection="column"
+      >
+        <Box>
+          <Link href={Urls.privacyPolicy} passHref>
+            <FooterLink>Privacy Policy</FooterLink>
+          </Link>
+          <Link href={Urls.termsOfUse} passHref>
+            <FooterLink>Terms of Use</FooterLink>
+          </Link>
+        </Box>
+        <Box mt="6" color="gray.500">
+          Copyright 2019 – 2020. Made in Canada 🇨🇦
+        </Box>
       </ContentContainer>
     </FooterWrapper>
   )
 }
 
-export const FooterWrapper = styled(Box)<{ theme: any }>`
-  background: ${(p) => p.theme.colors.light1};
-`
+export const FooterWrapper = styled(Box)<{ theme: any }>``
 
 export const ContentContainer = styled(Box)<{ theme: any }>`
   width: 100%;

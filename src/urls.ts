@@ -7,6 +7,7 @@ export const Urls = {
 
   account: '/account',
   dashboard: '/dashboard',
+  faq: '/faq',
   pricing: '/pricing',
 
   editor: {

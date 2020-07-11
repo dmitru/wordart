@@ -563,14 +563,6 @@ export class Generator {
 
         // console.screenshot(shapeCtx.canvas)
 
-        console.log(
-          'availableWOrds: ',
-          availableWords,
-          word,
-          availableWordIndex,
-          wordIndex
-        )
-
         wordRepeats[wordConfigIndex]++
         availableWords = words.filter((w, index) => {
           const wordConfIndex = w.wordConfigIndex
@@ -579,7 +571,6 @@ export class Generator {
             wordRepeats[wordConfIndex] < wordMaxRepeats[wordConfIndex]
           )
         })
-        console.log(wordRepeats, wordMaxRepeats)
         availableWordIndex = (availableWordIndex + 1) % availableWords.length
       } else {
         const icon = icons[iconIndex]

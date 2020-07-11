@@ -26,19 +26,27 @@ export const Header: React.FC<HeaderProps> = observer(
 
     return (
       <HeaderWrapper>
-        <ContentContainer fullWidth={fullWidth}>
-          <Box>
+        <ContentContainer>
+          <Box display="flex" alignItems="center">
             <Link href="/" passHref>
               <LogoLink>
                 <img
                   src="/images/logo-white-text.svg"
                   css={css`
-                    height: 40px;
+                    height: 100%;
+                    width: auto;
                   `}
                 />
               </LogoLink>
             </Link>
+
+            <Link href={Urls.faq} passHref>
+              <TopNavButton ml="5" variant="secondary">
+                FAQ
+              </TopNavButton>
+            </Link>
           </Box>
+
           <Box
             flex="1"
             justifyContent="flex-end"
@@ -60,13 +68,13 @@ export const Header: React.FC<HeaderProps> = observer(
                 )}
 
                 <Link href={Urls.dashboard} passHref>
-                  <TopNavButton>Your Designs</TopNavButton>
+                  <TopNavButton variant="secondary">Your Designs</TopNavButton>
                 </Link>
                 <Link href={Urls.pricing} passHref>
-                  <TopNavButton>Pricing</TopNavButton>
+                  <TopNavButton variant="secondary">Pricing</TopNavButton>
                 </Link>
                 <Link href={Urls.account} passHref>
-                  <TopNavButton>
+                  <TopNavButton variant="secondary">
                     <Box mr="2">
                       <FaRegUserCircle />
                     </Box>
@@ -95,6 +103,7 @@ export const Header: React.FC<HeaderProps> = observer(
 export const LogoLink = styled.a`
   color: white;
   font-size: 1.6rem;
+  height: 30px;
   &,
   &:focus,
   &:hover {
