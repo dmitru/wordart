@@ -23,7 +23,10 @@ export const Footer: React.FC<FooterProps> = () => {
           </Link>
         </Box>
         <Box mt="6" color="gray.500">
-          Copyright 2019 – 2020. Made in Canada 🇨🇦
+          Copyright 2019 – 2020
+        </Box>
+        <Box mt="2" color="gray.500">
+          Made in Canada 🇨🇦
         </Box>
       </ContentContainer>
     </FooterWrapper>

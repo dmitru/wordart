@@ -245,7 +245,7 @@ export const PricingPage = observer(() => {
             textAlign="center"
             mx="auto"
           >
-            <Text textAlign="center" fontSize="42px">
+            <Text as="h1" textAlign="center" fontSize="42px">
               Find the right price for you
             </Text>
 
@@ -256,19 +256,8 @@ export const PricingPage = observer(() => {
               fontSize="lg"
               color="gray.600"
             >
-              WordCloudy is free for personal use! Try it for as long as you
-              like to see if it's right for you.
-            </Text>
-            <Text
-              textAlign="center"
-              maxWidth="480px"
-              mx="auto"
-              fontSize="lg"
-              color="gray.600"
-            >
-              Please purchase one of our plans to use designs commercially,
-              download at print-ready high quality or if you just want to
-              support the product.
+              WordCloudy is free for <em>non-commercial</em> use! Try it as long
+              as you like to see if it's right for you.
             </Text>
           </Box>
 
@@ -285,7 +274,7 @@ export const PricingPage = observer(() => {
             textAlign="center"
             mx="auto"
           >
-            <Text textAlign="center" fontSize="42px">
+            <Text as="h1" textAlign="center" fontSize="42px">
               Compare free and paid features
             </Text>
           </Box>
@@ -398,7 +387,7 @@ export const PricingPage = observer(() => {
             textAlign="center"
             mx="auto"
           >
-            <Text textAlign="center" fontSize="42px">
+            <Text as="h1" textAlign="center" fontSize="42px">
               Pricing FAQ
             </Text>
 
@@ -416,10 +405,10 @@ export const PricingPage = observer(() => {
 
           <Box id="pricing-faq" mt="1.5rem" maxWidth="700px" mx="auto">
             <Question>
-              <h1>
+              <h2>
                 <QuestionLink href="#are-plans-subscriptions">#</QuestionLink>
                 Are these plans subscriptions?
-              </h1>
+              </h2>
               <p>
                 No, all our plans are one-time payments. You will only be
                 charged once at the moment of purchase and no other automatic
@@ -428,10 +417,10 @@ export const PricingPage = observer(() => {
             </Question>
 
             <Question>
-              <h1>
+              <h2>
                 <QuestionLink href="#refund-policy">#</QuestionLink>If I'm not
                 happy with my purchase, can I get a refund?
-              </h1>
+              </h2>
               <p>
                 Absolutely! We prodive full refund within 7 days after the
                 purchase if you're not 100% satisfied.
@@ -439,41 +428,47 @@ export const PricingPage = observer(() => {
             </Question>
 
             <Question>
-              <h1>
+              <h2>
                 <QuestionLink href="#hq-sd-difference">#</QuestionLink>
-                What's the difference between Standard Quality and High Quality
-                (HQ)?
-              </h1>
+                What are Standard Quality and High Quality downloads? What's the
+                difference?
+              </h2>
+
+              <p>
+                Any design you create in Wordcloudy can be downloaded in one of
+                2 ways: as Standard Quality or High Quality (HQ) download. Here
+                are the differences:
+              </p>
 
               <strong>Standard Quality downloads:</strong>
               <ul>
+                <li>Can only be used for personal, non-commercial purposes</li>
                 <li>
                   Can be downloaded as PNG or JPEG images with maximum
                   dimensions of 1,024 px
                 </li>
-                <li>Only for personal, non-commercial use</li>
               </ul>
 
               <strong>High Quality (HQ) downloads:</strong>
               <ul>
+                <li>Can be used commercially without any limits</li>
+                <li>
+                  Has much better quality: can be downloaded as PNG or JPEG
+                  images with maximum dimensions of 4,024 px or as a vector SVG
+                  graphics for the highest possible quality.
+                </li>
                 <li>
                   Available only for users who purchased either Unlimited plan,
                   or a HQ download pack.
                 </li>
-                <li>
-                  Can be downloaded in much better quality, as PNG or JPEG
-                  images with maximum dimensions of 4,024 px or as a vector SVG
-                  graphics.
-                </li>
-                <li>Can be used commercially without any limits</li>
               </ul>
             </Question>
 
             <Question>
-              <h1>
+              <h2>
                 <QuestionLink href="#can-i-sell-designs">#</QuestionLink>
                 Can I sell my images to my clients or on stock image sites?
-              </h1>
+              </h2>
               <p>Yes, you can sell images downloaded in High Quality (HQ).</p>
               <p>
                 You cannot however sell images downloaded in Standard Quality –
@@ -482,10 +477,10 @@ export const PricingPage = observer(() => {
             </Question>
 
             <Question>
-              <h1>
+              <h2>
                 <QuestionLink href="#getting-help">#</QuestionLink>
                 Where can I get help or ask more questions?
-              </h1>
+              </h2>
               <p>TODO</p>
             </Question>
           </Box>
@@ -526,4 +521,6 @@ export const MainDetailsTableCell: React.FC<{
   </td>
 )
 
-const Question = styled(Box)``
+const Question = styled(Box)`
+  margin-bottom: 3rem;
+`
