@@ -26,7 +26,7 @@ export const PricingPage = observer(() => {
         position: relative;
         top: 3px;
       `}
-      label="Commercial use includes selling, distribution or any other uses of designs created with Wordcloudy for commercial purposes (e.g. with the intent to earn money)"
+      label="Commercial use includes selling, distribution or any other uses of designs created with Wordcloudy for commercial purposes"
     />
   )
 

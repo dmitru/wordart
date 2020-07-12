@@ -85,7 +85,7 @@ export const LoginPage = observer(() => {
           Log in to Your Account
         </h1>
 
-        <Stack spacing="2rem">
+        <Stack spacing="2rem" mt="3rem">
           <Stack
             flex="2"
             as="form"
@@ -149,7 +149,7 @@ export const LoginPage = observer(() => {
           </Stack>
         </Stack>
 
-        <Box mt="2rem" display="flex" flexDirection="column">
+        <Box mt="1rem" display="flex" flexDirection="column">
           <Text color="gray.500" mt="6" fontSize="lg" textAlign="center">
             Don't have an account?
           </Text>
