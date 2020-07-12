@@ -93,6 +93,8 @@ import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import 'utils/canvas-to-blob'
 import { getTabTitle } from 'utils/tab-title'
+import { ConfirmModalWithRecaptcha } from 'components/shared/ConfirmModalWithRecaptcha'
+import { uuid } from 'utils/uuid'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -117,45 +119,88 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const cancelVisualizationBtnRef = useRef<HTMLButtonElement>(null)
 
     const [isSaving, setIsSaving] = useState(false)
+    const [isShowingSignupModal, setIsShowingSignupModal] = useState(false)
+
     const [
       isShowingEmptyIconsWarning,
       setIsShowingEmptyIconsWarning,
     ] = useState(false)
 
+    const saveAnonymously = async (recaptcha: string) => {
+      if (isSaving || !store.editor || !isNew) {
+        return
+      }
+
+      setIsSaving(true)
+      try {
+        const thumbnailCanvas = await store.editor.exportAsRaster(380)
+        const thumbnail = thumbnailCanvas.toDataURL('image/jpeg', 0.85)
+        const editorData = await store.serialize()
+
+        const wordcloud = await wordcloudsStore.createAnonymous({
+          id: uuid(),
+          recaptcha,
+          title: state.title || 'Untitled Design',
+          editorData,
+          thumbnail,
+        })
+        router.replace(Urls.signup)
+
+        toast({
+          title: 'Your work is saved. Please sign up to continue.',
+          status: 'success',
+          duration: 10000,
+          position: 'bottom-right',
+          isClosable: true,
+        })
+      } finally {
+        setIsSaving(false)
+      }
+    }
+
     const handleSaveClick = useCallback(() => {
+      if (!authStore.isLoggedIn) {
+        setIsShowingSignupModal(true)
+        return
+      }
+
       const save = async () => {
         if (isSaving || !store.editor) {
           return
         }
         setIsSaving(true)
-        const thumbnailCanvas = await store.editor.exportAsRaster(380)
-        const thumbnail = thumbnailCanvas.toDataURL('image/jpeg', 0.85)
-        const editorData = await store.serialize()
 
-        if (isNew) {
-          const wordcloud = await wordcloudsStore.create({
-            title: state.title || 'Untitled Design',
-            editorData,
-            thumbnail,
+        try {
+          const thumbnailCanvas = await store.editor.exportAsRaster(380)
+          const thumbnail = thumbnailCanvas.toDataURL('image/jpeg', 0.85)
+          const editorData = await store.serialize()
+
+          if (isNew) {
+            const wordcloud = await wordcloudsStore.create({
+              title: state.title || 'Untitled Design',
+              editorData,
+              thumbnail,
+            })
+            router.replace(Urls.editor._next, Urls.editor.edit(wordcloud.id), {
+              shallow: true,
+            })
+          } else {
+            await wordcloudsStore.save(props.wordcloudId!, {
+              title: state.title || 'Untitled Design',
+              thumbnail,
+              editorData,
+            })
+          }
+          toast({
+            title: 'Your work is saved',
+            status: 'success',
+            duration: 2000,
+            position: 'bottom-right',
+            isClosable: true,
           })
-          router.replace(Urls.editor._next, Urls.editor.edit(wordcloud.id), {
-            shallow: true,
-          })
-        } else {
-          await wordcloudsStore.save(props.wordcloudId!, {
-            title: state.title || 'Untitled Design',
-            thumbnail,
-            editorData,
-          })
+        } finally {
+          setIsSaving(false)
         }
-        toast({
-          title: 'Your work is saved',
-          status: 'success',
-          duration: 2000,
-          position: 'bottom-right',
-          isClosable: true,
-        })
-        setIsSaving(false)
       }
 
       save()
@@ -1121,6 +1166,16 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             </>
           }
         />
+
+        <ConfirmModalWithRecaptcha
+          isOpen={isShowingSignupModal}
+          onCancel={() => setIsShowingSignupModal(false)}
+          onSubmit={saveAnonymously}
+          title="Please sign up to save your work"
+          submitText="Sign up and save"
+        >
+          TODO
+        </ConfirmModalWithRecaptcha>
       </PageLayoutWrapper>
     )
   }

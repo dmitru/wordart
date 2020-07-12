@@ -23,10 +23,11 @@ import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 
 export type HeaderProps = {
   fullWidth?: boolean
+  hideCreate?: boolean
 }
 
 export const Header: React.FC<HeaderProps> = observer(
-  ({ fullWidth = false }) => {
+  ({ fullWidth = false, hideCreate = false }) => {
     const { authStore } = useStore()
     const toasts = useToasts()
     const router = useRouter()
@@ -71,13 +72,15 @@ export const Header: React.FC<HeaderProps> = observer(
             alignItems="center"
             display="flex"
           >
-            {pathname !== Urls.yourDesigns && !isLoggedInAndNotVerified && (
-              <Link href={Urls.editor._next} as={Urls.editor.create} passHref>
-                <Button colorScheme="accent" leftIcon={<AddIcon />} mr="3">
-                  Create
-                </Button>
-              </Link>
-            )}
+            {!hideCreate &&
+              pathname !== Urls.yourDesigns &&
+              !isLoggedInAndNotVerified && (
+                <Link href={Urls.editor._next} as={Urls.editor.create} passHref>
+                  <Button colorScheme="accent" leftIcon={<AddIcon />} mr="3">
+                    Create
+                  </Button>
+                </Link>
+              )}
             {isLoggedIn && (
               <>
                 {!isLoggedInAndNotVerified && (

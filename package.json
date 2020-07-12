@@ -105,6 +105,7 @@
     "typography": "^0.16.19",
     "typography-theme-github": "^0.16.19",
     "use-debounce": "^3.4.2",
+    "uuid": "^8.2.0",
     "yaml": "^1.10.0",
     "yup": "^0.28.5"
   },
@@ -139,6 +140,7 @@
     "@types/stopword": "^0.3.0",
     "@types/styled-system": "^5.1.9",
     "@types/typography": "^0.16.3",
+    "@types/uuid": "^8.0.0",
     "@types/yup": "^0.28.3",
     "babel-jest": "^25.3.0",
     "babel-plugin-polished": "^1.1.0",

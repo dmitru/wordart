@@ -21,6 +21,7 @@ import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import * as Yup from 'yup'
 import { Recaptcha } from 'components/shared/recaptcha'
+import { config } from 'config'
 
 export type SignupFormValues = {
   email: string
@@ -112,11 +113,12 @@ export const SignupPage = observer(() => {
             maxWidth="340px"
           >
             <Recaptcha
-              sitekey="6LcSb7AZAAAAAFEeMHPNjMSzSHvQaoMsr87kb1C8"
+              sitekey={config.recaptcha.sitekey}
               size="invisible"
               ref={recaptchaRef}
               onVerify={onCaptchaResponse}
             />
+
             <FormControl id="email">
               <FormLabel>Email address</FormLabel>
               <Input type="email" name="email" ref={register} />

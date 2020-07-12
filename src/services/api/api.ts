@@ -17,6 +17,7 @@ import {
   CloneWordcloudDto,
   UpdateManyWordcloudsDto,
   EmailSignupParams,
+  CreateAnonymousWordcloudDto,
 } from 'services/api/types'
 import { apiClient, ApiResponseError } from './api-client'
 
@@ -58,6 +59,12 @@ export const Api = {
   wordclouds: {
     async create(data: CreateWordcloudDto): Promise<Wordcloud> {
       const response = await apiClient.post('/wordclouds', data)
+      return response.data as Wordcloud
+    },
+    async createAnonymous(
+      data: CreateAnonymousWordcloudDto
+    ): Promise<Wordcloud> {
+      const response = await apiClient.post('/wordclouds/anonymous', data)
       return response.data as Wordcloud
     },
     async copy(id: WordcloudId, data: CloneWordcloudDto): Promise<Wordcloud> {

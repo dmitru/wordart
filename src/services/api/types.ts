@@ -64,6 +64,14 @@ export type CreateWordcloudDto = {
   editorData: EditorPersistedData
 }
 
+export type CreateAnonymousWordcloudDto = {
+  id: string
+  recaptcha: string
+  title: string
+  thumbnail: string
+  editorData: EditorPersistedData
+}
+
 export type CloneWordcloudDto = {
   title: string
 }

@@ -14,7 +14,7 @@ export type SiteFormLayoutProps = {
 export const SiteFormLayout: React.FC<SiteFormLayoutProps> = ({ children }) => {
   return (
     <SiteFormLayoutWrapper bg="gray.100">
-      <Header fullWidth={false} />
+      <Header fullWidth={false} hideCreate />
       <ContentWrapper>{children}</ContentWrapper>
     </SiteFormLayoutWrapper>
   )

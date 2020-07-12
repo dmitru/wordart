@@ -12,6 +12,7 @@ import {
   FolderId,
   UpdateFolderDto,
   CloneWordcloudDto,
+  CreateAnonymousWordcloudDto,
 } from 'services/api/types'
 import { sortBy } from 'lodash'
 
@@ -46,6 +47,15 @@ export class WordcloudsStore {
   create = async (data: CreateWordcloudDto): Promise<Wordcloud> => {
     const wordcloud = await Api.wordclouds.create(data)
     this._wordclouds.push(wordcloud)
+    return wordcloud
+  }
+
+  createAnonymous = async (
+    data: CreateAnonymousWordcloudDto
+  ): Promise<Wordcloud> => {
+    const wordcloud = await Api.wordclouds.createAnonymous(data)
+    this._wordclouds.push(wordcloud)
+    window.localStorage.setItem('anonymousWordcloudId', data.id)
     return wordcloud
   }
 
