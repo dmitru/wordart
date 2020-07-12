@@ -1,4 +1,4 @@
 import { AccountPage } from 'components/pages/AccountPage/AccountPage'
-import { AuthGuardPage } from 'components/helpers/AuthGuardPage'
+import { LoggedInAndVerifiedPageGuard } from 'components/helpers/LoggedInAndVerifiedPageGuard'
 
-export default AuthGuardPage(AccountPage)
+export default LoggedInAndVerifiedPageGuard(AccountPage)

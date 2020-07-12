@@ -6,6 +6,7 @@ import { Box } from '@chakra-ui/core'
 
 export type SiteLayoutProps = {
   children: React.ReactNode
+  darkenBg?: boolean
   fullWidth?: boolean
   fullHeight?: boolean
   noFooter?: boolean
@@ -16,9 +17,10 @@ export const SiteLayout: React.FC<SiteLayoutProps> = ({
   fullWidth = false,
   fullHeight = false,
   noFooter = false,
+  darkenBg = false,
 }) => {
   return (
-    <SiteLayoutWrapper>
+    <SiteLayoutWrapper bg={darkenBg ? 'gray.100' : undefined}>
       <Header fullWidth={fullWidth} />
       <ContentWrapper fullWidth={fullWidth} fullHeight={fullHeight}>
         {children}
@@ -35,7 +37,7 @@ const ContentWrapper = styled(Box)<{
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  ${(p) => !p.fullWidth && 'max-width: 1000px; padding: 10px 20px;'};
+  ${(p) => !p.fullWidth && 'max-width: 1000px; padding: 10px 20px 60px;'};
   ${(p) =>
     p.fullHeight &&
     'height: 100vh; height: calc(100vh - 60px); overflow: hidden;'};

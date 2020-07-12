@@ -6,12 +6,23 @@ import { useRouter } from 'next/dist/client/router'
 
 const IS_SSR = typeof window === 'undefined'
 
-export const AuthGuardPage = (PageComponent: React.ComponentType) => {
+export const LoggedInAndVerifiedPageGuard = (
+  PageComponent: React.ComponentType
+) => {
   const ProtectedPage = observer(() => {
     const { authStore } = useStore()
     const router = useRouter()
 
     if (IS_SSR || !authStore.hasInitialized) {
+      return null
+    }
+
+    if (
+      authStore.isLoggedIn &&
+      !authStore.isEmailConfirmed &&
+      router.pathname !== Urls.verifyEmail
+    ) {
+      router.replace(Urls.verifyEmail)
       return <SpinnerSplashScreen />
     }
 

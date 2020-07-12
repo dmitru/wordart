@@ -3,14 +3,23 @@ import styled from '@emotion/styled'
 import Link from 'next/link'
 import { observer } from 'mobx-react'
 import { useStore } from 'services/root-store'
-import { Box } from '@chakra-ui/core'
+import {
+  Box,
+  Menu,
+  MenuButton,
+  Portal,
+  MenuTransition,
+  MenuList,
+} from '@chakra-ui/core'
 import { Urls } from 'urls'
 import { Button } from 'components/shared/Button'
-import { FaRegUserCircle } from 'react-icons/fa'
+import { FaRegUserCircle, FaSignOutAlt } from 'react-icons/fa'
 import { useRouter } from 'next/dist/client/router'
 import css from '@emotion/css'
-import { AddIcon } from '@chakra-ui/icons'
+import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import { TopNavButton } from 'components/shared/TopNavButton'
+import { useToasts } from 'use-toasts'
+import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 
 export type HeaderProps = {
   fullWidth?: boolean
@@ -19,10 +28,14 @@ export type HeaderProps = {
 export const Header: React.FC<HeaderProps> = observer(
   ({ fullWidth = false }) => {
     const { authStore } = useStore()
-    const { pathname } = useRouter()
+    const toasts = useToasts()
+    const router = useRouter()
+    const { pathname } = router
 
     const isLoggedIn = authStore.isLoggedIn === true
     const isNotLoggedIn = authStore.isLoggedIn === false
+    const isLoggedInAndNotVerified =
+      authStore.isLoggedIn === true && !authStore.isEmailConfirmed
 
     return (
       <HeaderWrapper>
@@ -58,7 +71,7 @@ export const Header: React.FC<HeaderProps> = observer(
             alignItems="center"
             display="flex"
           >
-            {pathname !== Urls.yourDesigns && (
+            {pathname !== Urls.yourDesigns && !isLoggedInAndNotVerified && (
               <Link href={Urls.editor._next} as={Urls.editor.create} passHref>
                 <Button colorScheme="accent" leftIcon={<AddIcon />} mr="3">
                   Create
@@ -67,24 +80,59 @@ export const Header: React.FC<HeaderProps> = observer(
             )}
             {isLoggedIn && (
               <>
-                <Link href={Urls.yourDesigns} passHref>
-                  <TopNavLink active={pathname === Urls.yourDesigns}>
-                    Your Designs
-                  </TopNavLink>
-                </Link>
-                <Link href={Urls.account} passHref>
-                  <TopNavLink active={pathname === Urls.account}>
+                {!isLoggedInAndNotVerified && (
+                  <Link href={Urls.yourDesigns} passHref>
+                    <TopNavLink active={pathname === Urls.yourDesigns}>
+                      Your Designs
+                    </TopNavLink>
+                  </Link>
+                )}
+
+                {/* Account menu */}
+                <Menu placement="bottom-end">
+                  <MenuButton as={TopNavMenuButton} py="2" px="3">
                     <Box mr="2">
                       <FaRegUserCircle />
                     </Box>
                     Account
-                  </TopNavLink>
-                </Link>
+                    <Box mr="2">
+                      <ChevronDownIcon />
+                    </Box>
+                  </MenuButton>
+
+                  <Portal>
+                    <MenuTransition>
+                      {(styles) => (
+                        <MenuList
+                          // @ts-ignore
+                          css={styles}
+                        >
+                          <MenuItemWithIcon
+                            icon={<FaRegUserCircle />}
+                            title="Your account"
+                            onClick={() => {
+                              router.push(Urls.account)
+                            }}
+                          />
+                          <MenuItemWithIcon
+                            icon={<FaSignOutAlt />}
+                            title="Log out"
+                            onClick={() => {
+                              authStore.logout()
+                              toasts.showInfo({ title: 'You have logged out' })
+                              router.replace(Urls.login)
+                            }}
+                          />
+                        </MenuList>
+                      )}
+                    </MenuTransition>
+                  </Portal>
+                </Menu>
               </>
             )}
             {isNotLoggedIn && (
               <>
-                <Link href={Urls.login} passHref>
+                <Link href={Urls.signup} passHref>
                   <TopNavButton variant="accent" mr="3">
                     Sign up
                   </TopNavButton>
@@ -132,9 +180,7 @@ export const ContentContainer = styled(Box)<{
   height: 60px;
 `
 
-const TopNavLink = styled.a<{
-  active?: boolean
-}>`
+const topNavLink = (p: { active?: boolean }) => css`
   color: white;
   display: inline-flex;
   align-items: center;
@@ -143,20 +189,33 @@ const TopNavLink = styled.a<{
   position: relative;
   box-sizing: content-box;
   text-transform: uppercase;
-  font-size: 0.9rem;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  box-shadow: none !important;
 
-  ${(p) => p.active && `background: #0002;`}
+  background: transparent !important;
+  ${p.active && `background: #0002;`}
 
   color: #fefeff;
 
   &:hover,
   &:focus {
     text-decoration: none;
-    background: #fff2;
+    background: #fff2 !important;
 
-    ${(p) =>
-      `
-        background: ${p.active ? '#0002' : '#00000014'};
-    `}
+    background: ${p.active ? '#0002' : '#00000014'} !important;
   }
+`
+
+const TopNavLink = styled.a<{
+  active?: boolean
+}>`
+  ${topNavLink}
+`
+
+const TopNavMenuButton = styled.button<{
+  active?: boolean
+}>`
+  ${topNavLink}
 `

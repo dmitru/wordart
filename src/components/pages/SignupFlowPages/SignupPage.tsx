@@ -21,41 +21,43 @@ import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import * as Yup from 'yup'
 
-export type LoginFormValues = {
+export type SignupFormValues = {
   email: string
   password: string
+  passwordRepeat: string
 }
 
-const loginEmailSchema = Yup.object().shape({
+const signupEmailSchema = Yup.object().shape({
   email: Yup.string()
     .email('Must be a valid email')
     .required('Please enter your email'),
   password: Yup.string()
     .min(8, 'Password must be at least 8 symbols long')
     .required('Please enter your password'),
+  passwordRepeat: Yup.string().required('Please repeat the same password'),
 })
 
-export const LoginPage = observer(() => {
+export const SignupPage = observer(() => {
   const { authStore } = useStore()
   const router = useRouter()
 
   const [error, setError] = useState('')
 
   const { register, handleSubmit, errors, formState } = useForm<
-    LoginFormValues
+    SignupFormValues
   >({
-    resolver: yupResolver(loginEmailSchema),
+    resolver: yupResolver(signupEmailSchema),
   })
-  const onSubmit = async (values: LoginFormValues) => {
+  const onSubmit = async (values: SignupFormValues) => {
     try {
-      await authStore.loginWithEmail(values)
-      router.replace(Urls.loginRedirect)
+      await authStore.signupWithEmail(values)
+      router.replace(Urls.signupCompleted)
     } catch (error) {
       if (
         error.isAxiosError &&
-        (error as ApiResponseError).response.status === 401
+        (error as ApiResponseError).response.status === 409
       ) {
-        setError('Email or password is incorrect.')
+        setError('This email is already used.')
       } else {
         setError(
           'Sorry, there was a problem on our end. Please contact our support or try again later.'
@@ -70,7 +72,7 @@ export const LoginPage = observer(() => {
         bg="white"
         mt="3rem"
         mx="auto"
-        maxWidth="400px"
+        maxWidth="720px"
         p="6"
         boxShadow="lg"
         borderRadius="lg"
@@ -82,23 +84,30 @@ export const LoginPage = observer(() => {
             text-align: center;
           `}
         >
-          Log in to your account
+          Sign up
         </h1>
 
-        <Stack spacing="2rem">
+        <Stack
+          spacing="2rem"
+          direction="row"
+          display="flex"
+          flexDirection="row"
+          alignItems="flex-start"
+        >
           <Stack
             flex="2"
             as="form"
             onSubmit={handleSubmit(onSubmit)}
             spacing="4"
+            maxWidth="340px"
           >
             <FormControl id="email">
-              <Input
-                placeholder="Your email"
-                type="email"
-                name="email"
-                ref={register}
-              />
+              <FormLabel>Email address</FormLabel>
+              <Input type="email" name="email" ref={register} />
+              <FormHelperText>
+                We'll send you a confirmation email and will never share your
+                data with anyone.
+              </FormHelperText>
               {errors.email && (
                 <FormHelperText color="red.500">
                   {errors.email?.message}
@@ -107,12 +116,8 @@ export const LoginPage = observer(() => {
             </FormControl>
 
             <FormControl id="password">
-              <Input
-                placeholder="Password"
-                type="password"
-                name="password"
-                ref={register}
-              />
+              <FormLabel>Password</FormLabel>
+              <Input type="password" name="password" ref={register} />
               {errors.password && (
                 <FormHelperText color="red.500">
                   {errors.password?.message}
@@ -120,46 +125,52 @@ export const LoginPage = observer(() => {
               )}
             </FormControl>
 
+            <FormControl id="passwordRepeat">
+              <FormLabel>Repeat password</FormLabel>
+              <Input type="password" name="passwordRepeat" ref={register} />
+              {errors.passwordRepeat && (
+                <FormHelperText color="red.500">
+                  {errors.passwordRepeat?.message}
+                </FormHelperText>
+              )}
+            </FormControl>
+
             <Button
               type="submit"
-              colorScheme="primary"
+              colorScheme="accent"
               isLoading={formState.isSubmitting}
             >
-              Log in
+              Sign up
             </Button>
 
             {error && <Text color="red.500">{error}</Text>}
           </Stack>
 
-          <Stack flex="1" spacing="3" pt="1rem" mb="5" justifyContent="center">
+          <Stack flex="1" spacing="3" pt="2rem" mb="5" justifyContent="center">
             <Button
               as="a"
               colorScheme="primary"
               href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}
             >
-              Log in with Google
+              Sign up with Google
             </Button>
             <Button
               as="a"
               colorScheme="facebook"
               href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/facebook`}
             >
-              Log in with Facebook
+              Sign up with Facebook
             </Button>
           </Stack>
         </Stack>
-
-        <Box mt="2rem" display="flex" flexDirection="column">
-          <Text color="gray.500" mt="6" fontSize="lg" textAlign="center">
-            Don't have an account?
-          </Text>
-          <Link passHref href={Urls.signup}>
-            <Button as="a" colorScheme="accent">
-              Create account
-            </Button>
-          </Link>
-        </Box>
       </Box>
+
+      <Text color="gray.500" mt="6" textAlign="center">
+        Already have an account?{' '}
+        <Link passHref href={Urls.login}>
+          <a>Sign in here.</a>
+        </Link>
+      </Text>
     </SiteFormLayout>
   )
 })

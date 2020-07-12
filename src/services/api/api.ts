@@ -16,8 +16,9 @@ import {
   UpdateFolderDto,
   CloneWordcloudDto,
   UpdateManyWordcloudsDto,
+  EmailSignupParams,
 } from 'services/api/types'
-import { apiClient } from './api-client'
+import { apiClient, ApiResponseError } from './api-client'
 
 export const Api = {
   setAuthToken: apiClient.setAuthToken,
@@ -102,14 +103,34 @@ export const Api = {
 
   auth: {
     async login({
-      emailOrUsername,
+      email,
       password,
     }: EmailLoginParams): Promise<{ authToken: string }> {
       const response = await apiClient.post('/auth/login', {
-        username: emailOrUsername,
+        username: email,
         password,
       })
       return response.data as { authToken: string }
+    },
+
+    async signup({
+      email,
+      password,
+    }: EmailSignupParams): Promise<{ authToken: string }> {
+      const response = await apiClient.post('/auth/signup', {
+        email,
+        password,
+      })
+      return response.data as { authToken: string }
+    },
+
+    async verifyEmail(emailVerificationToken: string): Promise<void> {
+      console.log('sending...')
+      const response = await apiClient.post('/auth/email-verification', {
+        emailVerificationToken,
+      })
+      console.log('response = ', response)
+      return response.data
     },
 
     async getMyProfile(): Promise<MyProfile> {

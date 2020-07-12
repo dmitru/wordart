@@ -1,4 +1,4 @@
 import { DashboardPage } from 'components/pages/DashboardPage/DashboardPage'
-import { AuthGuardPage } from 'components/helpers/AuthGuardPage'
+import { LoggedInAndVerifiedPageGuard } from 'components/helpers/LoggedInAndVerifiedPageGuard'
 
-export default AuthGuardPage(DashboardPage)
+export default LoggedInAndVerifiedPageGuard(DashboardPage)

@@ -6,13 +6,15 @@ export type MyProfile = {
   email: string
   paddleUserId?: number
   hdDownloadsLeft?: number
+  isEmailConfirmed: boolean
 }
 
 export type UserProfile = {
   id: UserId
   username: string
 }
-export type EmailLoginParams = { emailOrUsername: string; password: string }
+export type EmailLoginParams = { email: string; password: string }
+export type EmailSignupParams = { email: string; password: string }
 
 export type UserId = string
 

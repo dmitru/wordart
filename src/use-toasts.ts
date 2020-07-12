@@ -14,6 +14,12 @@ export const useToasts = () => {
         status: 'warning',
         ...params,
       }),
+    showInfo: (params: UseToastOptions) =>
+      toasts({
+        ...commonParams,
+        status: 'info',
+        ...params,
+      }),
     showSuccess: (params: UseToastOptions) =>
       toasts({
         ...commonParams,

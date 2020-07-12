@@ -129,6 +129,7 @@ const Button: ComponentTheme = {
     colorScheme: 'gray',
   },
   baseStyle: {
+    textDecoration: 'none !important',
     lineHeight: '1.2',
     borderRadius: 'md',
     fontWeight: 'semibold',

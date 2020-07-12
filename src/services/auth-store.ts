@@ -46,6 +46,16 @@ export class AuthStore {
     }
   }
 
+  @computed get isEmailConfirmed() {
+    if (IS_SSR) {
+      return false
+    }
+    if (!this.hasInitialized) {
+      return undefined
+    }
+    return this.profile?.isEmailConfirmed === true
+  }
+
   @computed get isLoggedIn() {
     if (IS_SSR) {
       return false
@@ -54,6 +64,14 @@ export class AuthStore {
       return undefined
     }
     return this.profile != null
+  }
+
+  verifyEmail = async (token: string) => {
+    await Api.auth.verifyEmail(token)
+    if (!this.profile) {
+      return
+    }
+    this.profile.isEmailConfirmed = true
   }
 
   fetchLocalizedPrices = async () => {
@@ -116,13 +134,31 @@ export class AuthStore {
     }
   }
 
-  loginWithEmailOrUsername = async (params: {
-    emailOrUsername: string
+  loginWithEmail = async (params: {
+    email: string
     password: string
   }): Promise<void> => {
     console.log('loginWithEmailOrUsername')
     try {
       const { authToken } = await Api.auth.login(params)
+      Api.setAuthToken(authToken)
+      AuthTokenStore.setAuthToken(authToken)
+
+      const profile = await Api.auth.getMyProfile()
+      this.profile = profile
+      this.afterLogin()
+    } catch (error) {
+      throw error
+    }
+  }
+
+  signupWithEmail = async (params: {
+    email: string
+    password: string
+  }): Promise<void> => {
+    console.log('signupWithEmail')
+    try {
+      const { authToken } = await Api.auth.signup(params)
       Api.setAuthToken(authToken)
       AuthTokenStore.setAuthToken(authToken)
 
