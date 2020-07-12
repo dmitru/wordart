@@ -113,14 +113,8 @@ export const Api = {
       return response.data as { authToken: string }
     },
 
-    async signup({
-      email,
-      password,
-    }: EmailSignupParams): Promise<{ authToken: string }> {
-      const response = await apiClient.post('/auth/signup', {
-        email,
-        password,
-      })
+    async signup(params: EmailSignupParams): Promise<{ authToken: string }> {
+      const response = await apiClient.post('/auth/signup', params)
       return response.data as { authToken: string }
     },
 

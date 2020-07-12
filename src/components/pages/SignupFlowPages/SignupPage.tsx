@@ -14,12 +14,13 @@ import { SiteFormLayout } from 'components/layouts/SiteLayout/SiteFormLayout'
 import { observer } from 'mobx-react'
 import { useRouter } from 'next/dist/client/router'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { ApiResponseError } from 'services/api/api-client'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import * as Yup from 'yup'
+import { Recaptcha } from 'components/shared/recaptcha'
 
 export type SignupFormValues = {
   email: string
@@ -40,17 +41,22 @@ const signupEmailSchema = Yup.object().shape({
 export const SignupPage = observer(() => {
   const { authStore } = useStore()
   const router = useRouter()
+  const recaptchaRef = useRef<Recaptcha>(null)
 
   const [error, setError] = useState('')
 
-  const { register, handleSubmit, errors, formState } = useForm<
+  const { register, handleSubmit, errors, getValues, formState } = useForm<
     SignupFormValues
   >({
     resolver: yupResolver(signupEmailSchema),
   })
-  const onSubmit = async (values: SignupFormValues) => {
+
+  const onCaptchaResponse = async (token: string) => {
+    recaptchaRef.current?.reset()
+    console.log('onCaptchaResponse = ', token)
+
     try {
-      await authStore.signupWithEmail(values)
+      await authStore.signupWithEmail({ ...getValues(), recaptcha: token })
       router.replace(Urls.signupCompleted)
     } catch (error) {
       if (
@@ -64,6 +70,10 @@ export const SignupPage = observer(() => {
         )
       }
     }
+  }
+
+  const onSubmit = async (values: SignupFormValues) => {
+    recaptchaRef.current?.execute()
   }
 
   return (
@@ -101,6 +111,12 @@ export const SignupPage = observer(() => {
             spacing="4"
             maxWidth="340px"
           >
+            <Recaptcha
+              sitekey="6LcSb7AZAAAAAFEeMHPNjMSzSHvQaoMsr87kb1C8"
+              size="invisible"
+              ref={recaptchaRef}
+              onVerify={onCaptchaResponse}
+            />
             <FormControl id="email">
               <FormLabel>Email address</FormLabel>
               <Input type="email" name="email" ref={register} />

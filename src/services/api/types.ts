@@ -14,7 +14,11 @@ export type UserProfile = {
   username: string
 }
 export type EmailLoginParams = { email: string; password: string }
-export type EmailSignupParams = { email: string; password: string }
+export type EmailSignupParams = {
+  email: string
+  password: string
+  recaptcha: string
+}
 
 export type UserId = string
 

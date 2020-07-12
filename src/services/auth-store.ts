@@ -155,6 +155,7 @@ export class AuthStore {
   signupWithEmail = async (params: {
     email: string
     password: string
+    recaptcha: string
   }): Promise<void> => {
     console.log('signupWithEmail')
     try {
