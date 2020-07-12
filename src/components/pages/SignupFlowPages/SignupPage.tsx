@@ -94,7 +94,7 @@ export const SignupPage = observer(() => {
             text-align: center;
           `}
         >
-          Sign up
+          Create Account
         </h1>
 
         <Stack
@@ -121,8 +121,8 @@ export const SignupPage = observer(() => {
               <FormLabel>Email address</FormLabel>
               <Input type="email" name="email" ref={register} />
               <FormHelperText>
-                We'll send you a confirmation email and will never share your
-                data with anyone.
+                We'll send you a confirmation email. We never share your data
+                with anyone.
               </FormHelperText>
               {errors.email && (
                 <FormHelperText color="red.500">

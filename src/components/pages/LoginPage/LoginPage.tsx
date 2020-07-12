@@ -82,7 +82,7 @@ export const LoginPage = observer(() => {
             text-align: center;
           `}
         >
-          Log in to your account
+          Log in to Your Account
         </h1>
 
         <Stack spacing="2rem">
