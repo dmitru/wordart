@@ -17,7 +17,8 @@ export class RootStore {
     this.authStore = new AuthStore(this)
     this.wordcloudsStore = new WordcloudsStore(this)
 
-    this.authStore.afterLogin = () => {
+    this.authStore.afterLogin = async () => {
+      await this.wordcloudsStore.restoreAnonymousIfNeeded()
       this.wordcloudsStore.fetchWordclouds()
       this.wordcloudsStore.fetchFolders()
     }

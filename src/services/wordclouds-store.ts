@@ -50,6 +50,22 @@ export class WordcloudsStore {
     return wordcloud
   }
 
+  restoreAnonymousIfNeeded = async () => {
+    const savedAnonymousWordcloudId = window.localStorage.getItem(
+      'anonymousWordcloudId'
+    )
+    if (!savedAnonymousWordcloudId) {
+      return
+    }
+
+    const restoredWordcloud = await Api.wordclouds.restoreAnonymous(
+      savedAnonymousWordcloudId
+    )
+    this._wordclouds.push(restoredWordcloud)
+
+    window.localStorage.removeItem('anonymousWordcloudId')
+  }
+
   createAnonymous = async (
     data: CreateAnonymousWordcloudDto
   ): Promise<Wordcloud> => {

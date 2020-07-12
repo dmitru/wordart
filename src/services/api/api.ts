@@ -67,6 +67,12 @@ export const Api = {
       const response = await apiClient.post('/wordclouds/anonymous', data)
       return response.data as Wordcloud
     },
+    async restoreAnonymous(id: WordcloudId): Promise<Wordcloud> {
+      const response = await apiClient.put(
+        `/wordclouds/${id}/restore-anonymous`
+      )
+      return response.data as Wordcloud
+    },
     async copy(id: WordcloudId, data: CloneWordcloudDto): Promise<Wordcloud> {
       const response = await apiClient.post(`/wordclouds/${id}/copy`, data)
       return response.data as Wordcloud

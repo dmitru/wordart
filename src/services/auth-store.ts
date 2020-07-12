@@ -26,8 +26,6 @@ export class AuthStore {
 
   @observable planPrices = new Map<number, LocalizedPrice>()
 
-  afterLogin: Function = () => null
-
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
 
@@ -45,6 +43,9 @@ export class AuthStore {
       this.fetchLocalizedPrices()
     }
   }
+
+  /** Called after log in, regardless of the method */
+  afterLogin: Function = () => null
 
   @computed get isEmailConfirmed() {
     if (IS_SSR) {

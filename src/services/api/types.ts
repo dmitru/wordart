@@ -65,7 +65,7 @@ export type CreateWordcloudDto = {
 }
 
 export type CreateAnonymousWordcloudDto = {
-  id: string
+  id: WordcloudId
   recaptcha: string
   title: string
   thumbnail: string
