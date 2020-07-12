@@ -3,7 +3,7 @@ import 'lib/wordart/console-extensions'
 import { observer, useLocalStore } from 'mobx-react'
 import React, { useEffect } from 'react'
 import { useStore } from 'services/root-store'
-import { Box, Stack, Button, Spinner } from '@chakra-ui/core'
+import { Box, Stack, Button, Spinner, Text } from '@chakra-ui/core'
 import { Order } from 'services/api/types'
 import { Api } from 'services/api/api'
 import { Urls } from 'urls'
@@ -28,7 +28,12 @@ export const AccountPage = observer(() => {
       <Box>
         <h1>Your account</h1>
         <Box>
-          <pre>{JSON.stringify(authStore.profile, null, 2)}</pre>
+          <Text fontWeight="semibold" fontSize="xl">
+            {authStore.profile?.displayName}
+          </Text>
+          <Text>
+            <strong>Email:</strong> {authStore.profile?.email}
+          </Text>
           <Button
             variant="outline"
             onClick={() => {
@@ -38,6 +43,8 @@ export const AccountPage = observer(() => {
           >
             Log out
           </Button>
+
+          <pre>{JSON.stringify(authStore.profile, null, 2)}</pre>
         </Box>
 
         <h1>Your orders</h1>

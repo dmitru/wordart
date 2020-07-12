@@ -2,10 +2,12 @@ import { EditorPersistedDataV1 } from 'services/api/persisted/v1'
 
 export type MyProfile = {
   id: UserId
-  username: string
+  displayName: string
+  profilePicture?: string
   email: string
   paddleUserId?: number
   hdDownloadsLeft?: number
+  unlimitedPlanExpiresAt?: string
   isEmailConfirmed: boolean
 }
 

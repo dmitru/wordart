@@ -4,6 +4,7 @@ import { useRouter } from 'next/dist/client/router'
 import { AuthTokenStore } from 'services/auth-token-store'
 import { useEffect } from 'react'
 import { Urls } from 'urls'
+import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 
 const LoginSuccessPage = observer(() => {
   const { authStore } = useStore()
@@ -19,7 +20,7 @@ const LoginSuccessPage = observer(() => {
     }
   }, [router?.query?.authToken])
 
-  return <>Loading...</>
+  return <SpinnerSplashScreen />
 })
 
 export default LoginSuccessPage
