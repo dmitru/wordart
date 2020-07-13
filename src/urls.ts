@@ -6,8 +6,8 @@ export const Urls = {
   verifyEmail: '/signup/verify-email',
   emailVerification: '/auth/verify-email',
 
-  resetPasswordRequest: '/reset-password',
-  resetPasswordForm: '/reset-password/new-password',
+  resetPasswordRequest: '/reset-password-request',
+  resetPasswordForm: '/reset-password',
 
   loginRedirect: '/home',
 

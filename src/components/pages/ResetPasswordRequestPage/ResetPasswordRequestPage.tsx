@@ -3,7 +3,6 @@ import {
   Button,
   FormControl,
   FormHelperText,
-  FormLabel,
   Input,
   Stack,
   Text,
@@ -12,9 +11,9 @@ import { css } from '@emotion/core'
 import { yupResolver } from '@hookform/resolvers'
 import { SiteFormLayout } from 'components/layouts/SiteLayout/SiteFormLayout'
 import { observer } from 'mobx-react'
-import { useRouter } from 'next/dist/client/router'
 import Link from 'next/link'
-import React, { useRef, useState } from 'react'
+import { useRouter } from 'next/dist/client/router'
+import React, { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { ApiResponseError } from 'services/api/api-client'
 import { useStore } from 'services/root-store'
@@ -23,33 +22,27 @@ import * as Yup from 'yup'
 import { Recaptcha } from 'components/shared/recaptcha'
 import { config } from 'config'
 
-export type SignupFormValues = {
+export type ResetPasswordRequestFormValues = {
   email: string
-  password: string
-  passwordRepeat: string
 }
 
-const signupEmailSchema = Yup.object().shape({
+const ResetPasswordRequestSchema = Yup.object().shape({
   email: Yup.string()
     .email('Must be a valid email')
     .required('Please enter your email'),
-  password: Yup.string()
-    .min(8, 'Password must be at least 8 symbols long')
-    .required('Please enter your password'),
-  passwordRepeat: Yup.string().required('Please repeat the same password'),
 })
 
-export const SignupPage = observer(() => {
+export const ResetPasswordRequestPage = observer(() => {
   const { authStore } = useStore()
   const router = useRouter()
   const recaptchaRef = useRef<Recaptcha>(null)
 
   const [error, setError] = useState('')
 
-  const { register, handleSubmit, errors, getValues, formState } = useForm<
-    SignupFormValues
+  const { register, getValues, handleSubmit, errors, formState } = useForm<
+    ResetPasswordRequestFormValues
   >({
-    resolver: yupResolver(signupEmailSchema),
+    resolver: yupResolver(ResetPasswordRequestSchema),
   })
 
   const onCaptchaResponse = async (token: string) => {
@@ -73,7 +66,7 @@ export const SignupPage = observer(() => {
     }
   }
 
-  const onSubmit = async (values: SignupFormValues) => {
+  const onSubmit = async (values: ResetPasswordRequestFormValues) => {
     recaptchaRef.current?.execute()
   }
 
@@ -82,7 +75,7 @@ export const SignupPage = observer(() => {
       <Box
         bg="white"
         mx="auto"
-        maxWidth="420px"
+        maxWidth="400px"
         p="6"
         boxShadow="lg"
         borderRadius="lg"
@@ -95,38 +88,21 @@ export const SignupPage = observer(() => {
             margin-bottom: 0;
           `}
         >
-          Create Account
+          Reset your password
         </h1>
 
-        <Stack
-          spacing="1rem"
-          // direction="row"
-          display="flex"
-          // alignItems="flex-start"
-        >
-          <Stack flex="1" spacing="3" mt="6" mb="4" justifyContent="center">
-            <Button
-              as="a"
-              colorScheme="primary"
-              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}
-            >
-              Sign up with Google
-            </Button>
-            <Button
-              as="a"
-              colorScheme="facebook"
-              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/facebook`}
-            >
-              Sign up with Facebook
-            </Button>
-          </Stack>
-
+        <Stack spacing="2rem" mt="6">
           <Stack
             flex="2"
             as="form"
             onSubmit={handleSubmit(onSubmit)}
             spacing="4"
           >
+            <Text>
+              Enter your email below and we'll send you instructions on how to
+              reset your password.
+            </Text>
+
             <Recaptcha
               sitekey={config.recaptcha.siteKey}
               size="invisible"
@@ -135,12 +111,12 @@ export const SignupPage = observer(() => {
             />
 
             <FormControl id="email">
-              <FormLabel>Email address</FormLabel>
-              <Input type="email" name="email" ref={register} />
-              <FormHelperText>
-                We'll send you a confirmation email. We never share your data
-                with anyone.
-              </FormHelperText>
+              <Input
+                placeholder="Your email"
+                type="email"
+                name="email"
+                ref={register}
+              />
               {errors.email && (
                 <FormHelperText color="red.500">
                   {errors.email?.message}
@@ -148,32 +124,12 @@ export const SignupPage = observer(() => {
               )}
             </FormControl>
 
-            <FormControl id="password">
-              <FormLabel>Password</FormLabel>
-              <Input type="password" name="password" ref={register} />
-              {errors.password && (
-                <FormHelperText color="red.500">
-                  {errors.password?.message}
-                </FormHelperText>
-              )}
-            </FormControl>
-
-            <FormControl id="passwordRepeat">
-              <FormLabel>Repeat password</FormLabel>
-              <Input type="password" name="passwordRepeat" ref={register} />
-              {errors.passwordRepeat && (
-                <FormHelperText color="red.500">
-                  {errors.passwordRepeat?.message}
-                </FormHelperText>
-              )}
-            </FormControl>
-
             <Button
               type="submit"
-              colorScheme="accent"
+              colorScheme="primary"
               isLoading={formState.isSubmitting}
             >
-              Sign up
+              Reset your password
             </Button>
 
             {error && <Text color="red.500">{error}</Text>}
@@ -182,9 +138,12 @@ export const SignupPage = observer(() => {
       </Box>
 
       <Text color="gray.500" mt="6" textAlign="center">
-        Already have an account?{' '}
         <Link passHref href={Urls.login}>
-          <a>Sign in here.</a>
+          <a>Sign in</a>
+        </Link>
+        {' or '}
+        <Link passHref href={Urls.signup}>
+          <a>create an account.</a>
         </Link>
       </Text>
     </SiteFormLayout>

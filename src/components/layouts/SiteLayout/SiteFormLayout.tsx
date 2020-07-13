@@ -28,6 +28,7 @@ const ContentWrapper = styled(Box)`
   padding: 10px 20px;
   margin: 0 auto;
   flex: 1 0 auto;
+  padding-top: 3rem;
 `
 
 const SiteFormLayoutWrapper = styled(Box)`

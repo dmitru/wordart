@@ -3,7 +3,6 @@ import {
   Button,
   FormControl,
   FormHelperText,
-  FormLabel,
   Input,
   Stack,
   Text,
@@ -68,9 +67,8 @@ export const LoginPage = observer(() => {
     <SiteFormLayout>
       <Box
         bg="white"
-        mt="3rem"
         mx="auto"
-        maxWidth="400px"
+        maxWidth="420px"
         p="6"
         boxShadow="lg"
         borderRadius="lg"
@@ -86,8 +84,8 @@ export const LoginPage = observer(() => {
           Log in to Your Account
         </h1>
 
-        <Stack spacing="2rem" mt="3rem">
-          <Stack flex="1" spacing="3" pt="1rem" mb="5" justifyContent="center">
+        <Stack spacing="6" mt="6">
+          <Stack flex="1" spacing="3" mb="5" justifyContent="center">
             <Button
               as="a"
               colorScheme="primary"
@@ -145,6 +143,12 @@ export const LoginPage = observer(() => {
             >
               Log in
             </Button>
+
+            <Box mt="3" mb="3">
+              <Link passHref href={Urls.resetPasswordRequest}>
+                <a>Forgot your password?</a>
+              </Link>
+            </Box>
 
             {error && <Text color="red.500">{error}</Text>}
           </Stack>

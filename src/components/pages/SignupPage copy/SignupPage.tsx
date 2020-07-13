@@ -11,17 +11,16 @@ import {
 import { css } from '@emotion/core'
 import { yupResolver } from '@hookform/resolvers'
 import { SiteFormLayout } from 'components/layouts/SiteLayout/SiteFormLayout'
+import '../ResetPasswordRequestPage/node_modules/lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
 import { useRouter } from 'next/dist/client/router'
 import Link from 'next/link'
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { ApiResponseError } from 'services/api/api-client'
-import { useStore } from 'services/root-store'
-import { Urls } from 'urls'
+import { ApiResponseError } from '../ResetPasswordRequestPage/node_modules/services/api/api-client'
+import { useStore } from '../ResetPasswordRequestPage/node_modules/services/root-store'
+import { Urls } from '../ResetPasswordRequestPage/node_modules/urls'
 import * as Yup from 'yup'
-import { Recaptcha } from 'components/shared/recaptcha'
-import { config } from 'config'
 
 export type SignupFormValues = {
   email: string
@@ -42,23 +41,17 @@ const signupEmailSchema = Yup.object().shape({
 export const SignupPage = observer(() => {
   const { authStore } = useStore()
   const router = useRouter()
-  const recaptchaRef = useRef<Recaptcha>(null)
 
   const [error, setError] = useState('')
 
-  const { register, handleSubmit, errors, getValues, formState } = useForm<
+  const { register, handleSubmit, errors, formState } = useForm<
     SignupFormValues
   >({
     resolver: yupResolver(signupEmailSchema),
   })
-
-  const onCaptchaResponse = async (token: string) => {
-    recaptchaRef.current?.reset()
-    console.log('onCaptchaResponse = ', token)
-
+  const onSubmit = async (values: SignupFormValues) => {
     try {
-      await authStore.signupWithEmail({ ...getValues(), recaptcha: token })
-      router.replace(Urls.signupCompleted)
+      await authStore.signupWithEmail(values)
     } catch (error) {
       if (
         error.isAxiosError &&
@@ -73,16 +66,17 @@ export const SignupPage = observer(() => {
     }
   }
 
-  const onSubmit = async (values: SignupFormValues) => {
-    recaptchaRef.current?.execute()
+  if (authStore.isLoggedIn === true) {
+    router.replace(Urls.loginRedirect)
   }
 
   return (
     <SiteFormLayout>
       <Box
         bg="white"
+        mt="3rem"
         mx="auto"
-        maxWidth="420px"
+        maxWidth="720px"
         p="6"
         boxShadow="lg"
         borderRadius="lg"
@@ -92,55 +86,29 @@ export const SignupPage = observer(() => {
             border: none;
             margin-top: 1rem;
             text-align: center;
-            margin-bottom: 0;
           `}
         >
-          Create Account
+          Sign up
         </h1>
 
         <Stack
-          spacing="1rem"
-          // direction="row"
+          spacing="2rem"
+          direction="row"
           display="flex"
-          // alignItems="flex-start"
+          flexDirection="row"
+          alignItems="flex-start"
         >
-          <Stack flex="1" spacing="3" mt="6" mb="4" justifyContent="center">
-            <Button
-              as="a"
-              colorScheme="primary"
-              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}
-            >
-              Sign up with Google
-            </Button>
-            <Button
-              as="a"
-              colorScheme="facebook"
-              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/facebook`}
-            >
-              Sign up with Facebook
-            </Button>
-          </Stack>
-
           <Stack
             flex="2"
             as="form"
             onSubmit={handleSubmit(onSubmit)}
             spacing="4"
+            maxWidth="340px"
           >
-            <Recaptcha
-              sitekey={config.recaptcha.siteKey}
-              size="invisible"
-              ref={recaptchaRef}
-              onVerify={onCaptchaResponse}
-            />
-
             <FormControl id="email">
               <FormLabel>Email address</FormLabel>
               <Input type="email" name="email" ref={register} />
-              <FormHelperText>
-                We'll send you a confirmation email. We never share your data
-                with anyone.
-              </FormHelperText>
+              <FormHelperText>We'll never share your email.</FormHelperText>
               {errors.email && (
                 <FormHelperText color="red.500">
                   {errors.email?.message}
@@ -177,6 +145,23 @@ export const SignupPage = observer(() => {
             </Button>
 
             {error && <Text color="red.500">{error}</Text>}
+          </Stack>
+
+          <Stack flex="1" spacing="3" pt="2rem" mb="5" justifyContent="center">
+            <Button
+              as="a"
+              colorScheme="primary"
+              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}
+            >
+              Sign up with Google
+            </Button>
+            <Button
+              as="a"
+              colorScheme="facebook"
+              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/facebook`}
+            >
+              Sign up with Facebook
+            </Button>
           </Stack>
         </Stack>
       </Box>
