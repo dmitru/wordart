@@ -9,6 +9,16 @@ export type MyProfile = {
   hdDownloadsLeft?: number
   unlimitedPlanExpiresAt?: string
   isEmailConfirmed: boolean
+  limits: UserLimits
+}
+
+export type UserLimits = {
+  isActiveUnlimitedPlan: boolean
+  isActiveDownloadsPack: boolean
+  canDownloadHd: boolean
+  maxFolders: number
+  maxWordclouds: number
+  canUploadCustomMedia: boolean
 }
 
 export type UserProfile = {
