@@ -21,6 +21,7 @@ import { Urls } from 'urls'
 import * as Yup from 'yup'
 import { Recaptcha } from 'components/shared/recaptcha'
 import { config } from 'config'
+import { Api } from 'services/api/api'
 
 export type ResetPasswordRequestFormValues = {
   email: string
@@ -37,6 +38,8 @@ export const ResetPasswordRequestPage = observer(() => {
   const router = useRouter()
   const recaptchaRef = useRef<Recaptcha>(null)
 
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [hasSubmitted, setHasSubmitted] = useState(false)
   const [error, setError] = useState('')
 
   const { register, getValues, handleSubmit, errors, formState } = useForm<
@@ -47,26 +50,22 @@ export const ResetPasswordRequestPage = observer(() => {
 
   const onCaptchaResponse = async (token: string) => {
     recaptchaRef.current?.reset()
-    console.log('onCaptchaResponse = ', token)
 
     try {
-      await authStore.signupWithEmail({ ...getValues(), recaptcha: token })
+      await Api.auth.resetPasswordRequest({ ...getValues(), recaptcha: token })
       router.replace(Urls.signupCompleted)
+      setHasSubmitted(true)
     } catch (error) {
-      if (
-        error.isAxiosError &&
-        (error as ApiResponseError).response.status === 409
-      ) {
-        setError('This email is already used.')
-      } else {
-        setError(
-          'Sorry, there was a problem on our end. Please contact our support or try again later.'
-        )
-      }
+      setError(
+        'Sorry, there was a problem on our end. Please contact our support or try again later.'
+      )
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   const onSubmit = async (values: ResetPasswordRequestFormValues) => {
+    setIsSubmitting(true)
     recaptchaRef.current?.execute()
   }
 
@@ -80,61 +79,89 @@ export const ResetPasswordRequestPage = observer(() => {
         boxShadow="lg"
         borderRadius="lg"
       >
-        <h1
-          css={css`
-            border: none;
-            margin-top: 1rem;
-            text-align: center;
-            margin-bottom: 0;
-          `}
-        >
-          Reset your password
-        </h1>
+        {hasSubmitted && (
+          <>
+            <h1
+              css={css`
+                border: none;
+                margin-top: 1rem;
+                text-align: center;
+                margin-bottom: 0;
+              `}
+            >
+              Check your email
+            </h1>
 
-        <Stack spacing="2rem" mt="6">
-          <Stack
-            flex="2"
-            as="form"
-            onSubmit={handleSubmit(onSubmit)}
-            spacing="4"
-          >
-            <Text>
-              Enter your email below and we'll send you instructions on how to
-              reset your password.
+            <Text mt="6" textAlign="center">
+              We've emailed you a link to reset your password.
             </Text>
 
-            <Recaptcha
-              sitekey={config.recaptcha.siteKey}
-              size="invisible"
-              ref={recaptchaRef}
-              onVerify={onCaptchaResponse}
-            />
+            <Text color="gray.500" textAlign="center" mt="6">
+              Still having problems resetting your password? Please contact our
+              support for help.
+            </Text>
+          </>
+        )}
 
-            <FormControl id="email">
-              <Input
-                placeholder="Your email"
-                type="email"
-                name="email"
-                ref={register}
-              />
-              {errors.email && (
-                <FormHelperText color="red.500">
-                  {errors.email?.message}
-                </FormHelperText>
-              )}
-            </FormControl>
-
-            <Button
-              type="submit"
-              colorScheme="primary"
-              isLoading={formState.isSubmitting}
+        {!hasSubmitted && (
+          <>
+            <h1
+              css={css`
+                border: none;
+                margin-top: 1rem;
+                text-align: center;
+                margin-bottom: 0;
+              `}
             >
               Reset your password
-            </Button>
+            </h1>
 
-            {error && <Text color="red.500">{error}</Text>}
-          </Stack>
-        </Stack>
+            <Stack spacing="2rem" mt="6">
+              <Stack
+                flex="2"
+                as="form"
+                onSubmit={handleSubmit(onSubmit)}
+                spacing="4"
+              >
+                <Text>
+                  Enter your email below and we'll send you instructions on how
+                  to reset your password.
+                </Text>
+
+                <Recaptcha
+                  sitekey={config.recaptcha.siteKey}
+                  size="invisible"
+                  ref={recaptchaRef}
+                  onVerify={onCaptchaResponse}
+                />
+
+                <FormControl id="email">
+                  <Input
+                    placeholder="Your email"
+                    type="email"
+                    name="email"
+                    ref={register}
+                  />
+                  {errors.email && (
+                    <FormHelperText color="red.500">
+                      {errors.email?.message}
+                    </FormHelperText>
+                  )}
+                </FormControl>
+
+                <Button
+                  type="submit"
+                  colorScheme="primary"
+                  isLoading={formState.isSubmitting || isSubmitting}
+                >
+                  Reset your password
+                </Button>
+
+                {error && <Text color="red.500">{error}</Text>}
+              </Stack>
+            </Stack>
+          </>
+        )}
       </Box>
 
       <Text color="gray.500" mt="6" textAlign="center">

@@ -45,6 +45,7 @@ export const LoginPage = observer(() => {
   >({
     resolver: yupResolver(loginEmailSchema),
   })
+
   const onSubmit = async (values: LoginFormValues) => {
     try {
       await authStore.loginWithEmail(values)

@@ -132,12 +132,25 @@ export const Api = {
     },
 
     async verifyEmail(emailVerificationToken: string): Promise<void> {
-      console.log('sending...')
       const response = await apiClient.post('/auth/email-verification', {
         emailVerificationToken,
       })
-      console.log('response = ', response)
       return response.data
+    },
+
+    async resetPasswordRequest(params: {
+      email: string
+      recaptcha: string
+    }): Promise<void> {
+      await apiClient.post('/auth/reset-password-request', params)
+    },
+
+    async resetPassword(params: {
+      newPassword: string
+      passwordResetToken: string
+    }): Promise<{ authToken: string }> {
+      const response = await apiClient.post('/auth/reset-password', params)
+      return response.data as { authToken: string }
     },
 
     async getMyProfile(): Promise<MyProfile> {
