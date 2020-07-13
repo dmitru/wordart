@@ -81,7 +81,7 @@ export const PricingPage = observer(() => {
                   </Text>
 
                   <>
-                    <Text my="0" fontWeight="semibold" fontSize="36px">
+                    <Text my="0" fontWeight="semibold" fontSize="26px">
                       ${price?.price?.net ?? 0}
                     </Text>
                     <Text my="0" ml="3" fontSize="md" color="gray.500">
@@ -171,12 +171,12 @@ export const PricingPage = observer(() => {
                   `}
                   borderRadius="lg"
                 >
-                  <Text my="0" flex="1" mr="3" fontSize="xl">
+                  <Text my="0" flex="1" mr="3" fontSize="lg">
                     {plan.title}
                   </Text>
 
                   <>
-                    <Text my="0" fontWeight="semibold" fontSize="36px">
+                    <Text my="0" fontWeight="semibold" fontSize="26px">
                       ${price?.price?.net ?? 0}
                     </Text>
                     <Text my="0" ml="3" fontSize="md" color="gray.500">
@@ -242,7 +242,7 @@ export const PricingPage = observer(() => {
           <Box
             display="flex"
             flexDirection="column"
-            maxWidth="600px"
+            maxWidth="660px"
             textAlign="center"
             mx="auto"
           >
