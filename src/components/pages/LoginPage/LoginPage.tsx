@@ -80,12 +80,30 @@ export const LoginPage = observer(() => {
             border: none;
             margin-top: 1rem;
             text-align: center;
+            margin-bottom: 0;
           `}
         >
           Log in to Your Account
         </h1>
 
         <Stack spacing="2rem" mt="3rem">
+          <Stack flex="1" spacing="3" pt="1rem" mb="5" justifyContent="center">
+            <Button
+              as="a"
+              colorScheme="primary"
+              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}
+            >
+              Log in with Google
+            </Button>
+            <Button
+              as="a"
+              colorScheme="facebook"
+              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/facebook`}
+            >
+              Log in with Facebook
+            </Button>
+          </Stack>
+
           <Stack
             flex="2"
             as="form"
@@ -129,23 +147,6 @@ export const LoginPage = observer(() => {
             </Button>
 
             {error && <Text color="red.500">{error}</Text>}
-          </Stack>
-
-          <Stack flex="1" spacing="3" pt="1rem" mb="5" justifyContent="center">
-            <Button
-              as="a"
-              colorScheme="primary"
-              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}
-            >
-              Log in with Google
-            </Button>
-            <Button
-              as="a"
-              colorScheme="facebook"
-              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/facebook`}
-            >
-              Log in with Facebook
-            </Button>
           </Stack>
         </Stack>
 

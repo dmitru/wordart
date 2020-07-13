@@ -81,6 +81,7 @@ import { createCanvas } from 'lib/wordart/canvas-utils'
 import { animateElement } from 'utils/animation'
 import { themePresets } from 'components/Editor/theme-presets'
 import { iconsCategories } from 'data/icon-categories'
+import { icons, loadIconsConfig } from 'data/icons'
 
 export type EditorMode = 'view' | 'edit'
 
@@ -159,9 +160,12 @@ export class EditorStore {
   @action initEditor = async (params: EditorStoreInitParams) => {
     this.logger.debug('initEditor', params)
     this.lifecycleState = 'initializing'
-    if (fonts.length === 0) {
-      await loadFontsConfig()
-    }
+
+    await Promise.all([
+      fonts.length === 0 ? loadFontsConfig() : Promise.resolve(),
+      icons.length === 0 ? loadIconsConfig() : Promise.resolve(),
+    ])
+    this.availableIconShapes = icons
 
     this.styleOptions.shape.items.words.fontIds = [
       this.getAvailableFonts({ popular: true })[0].defaultStyle.fontId,
@@ -1549,7 +1553,7 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
   },
   icon: {
     category: null,
-    selected: iconShapes[0].id,
+    selected: 'fa-solid-heart',
     color: '#4A90E2',
   },
   image: {

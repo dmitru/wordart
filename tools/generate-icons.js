@@ -61,23 +61,27 @@ async function process(kind) {
 
   const allIcons = [...solidIcons]
 
-  const exportString = `
-  export type IconConfig = {
-    type: string
-    title: string
-    name: string
-    url: string
-    keywords: string[]
-    categories: string[]
-  }
-  
-  export const icons: IconConfig[] = [${allIcons
-    .map((icon) => JSON.stringify(icon, null, 2))
-    .join(',\n')}]
-    `
+  // const exportString = `
+  // export type IconConfig = {
+  //   type: string
+  //   title: string
+  //   name: string
+  //   url: string
+  //   keywords: string[]
+  //   categories: string[]
+  // }
 
-  const resultFile = path.join(__dirname, '..', `src/data/icons-fa-${kind}.ts`)
-  await fs.promises.writeFile(resultFile, exportString)
+  // export const icons: IconConfig[] = [${allIcons
+  //   .map((icon) => JSON.stringify(icon, null, 2))
+  //   .join(',\n')}]
+  //   `
+
+  const resultFile = path.join(
+    __dirname,
+    '..',
+    `src/data/icons-fa-${kind}.json`
+  )
+  await fs.promises.writeFile(resultFile, JSON.stringify(allIcons, null, 2))
 }
 
 const kinds = ['solid', 'regular', 'brands']

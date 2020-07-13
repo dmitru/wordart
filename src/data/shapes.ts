@@ -1,6 +1,4 @@
-import { icons as iconsFaRegular } from 'data/icons-fa-regular'
-import { icons as iconsFaSolid } from 'data/icons-fa-solid'
-import { icons as iconsFaBrands } from 'data/icons-fa-brands'
+import { icons } from 'data/icons'
 import { ShapeClipartConf, ShapeIconConf } from 'components/Editor/shape-config'
 import animalsShapes from './shapes-animals'
 import geoShapes from './shapes-geo'
@@ -11,29 +9,6 @@ import { sortBy } from 'lodash'
 const defaultEdgesProcessing = {
   amount: 80,
 }
-
-export const svgIcons: ShapeIconConf[] = [
-  ...iconsFaSolid,
-  ...iconsFaRegular,
-  ...iconsFaBrands,
-]
-  .filter((i) => i != null)
-  .map((icon) =>
-    icon
-      ? ({
-          id: `fa-${icon.type}-${icon.name}`,
-          kind: 'icon',
-          title: icon.title,
-          url: icon.url,
-          color: '#4A90E2',
-          processedThumbnailUrl: icon.url,
-          thumbnailUrl: icon.url,
-          keywords: icon.keywords,
-          categories: icon.categories,
-        } as ShapeIconConf)
-      : null
-  )
-  .filter((x) => x != null) as ShapeIconConf[]
 
 // @ts-ignore
 const unsortedImageShapes: ShapeClipartConf[] = [
@@ -176,7 +151,7 @@ const getSortedIconsShapes = (): ShapeIconConf[] => {
   }
 
   return sortBy(
-    svgIcons,
+    icons,
     (s) => (s.categories ? categoryOrderMap[s.categories[0]] : 999999),
     (s) => s.title
   )
