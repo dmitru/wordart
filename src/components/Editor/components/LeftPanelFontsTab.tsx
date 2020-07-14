@@ -73,6 +73,10 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
         subsets: ['custom'],
         categories: ['custom'],
       })
+
+      if (style.items.words.fontIds.length < 8) {
+        style.items.words.fontIds.push(fontId)
+      }
     }
 
     return (
