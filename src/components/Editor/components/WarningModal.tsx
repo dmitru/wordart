@@ -29,14 +29,15 @@ export const WarningModal: React.FC<WarningModalProps> = observer(
           <ModalContent>
             {header && <ModalHeader>{header}</ModalHeader>}
             <ModalBody>
-              <Box display="flex" alignItems="flex-start">
+              <Box display="flex" alignItems="center" flexDirection="column">
                 <Box
                   mr="1rem"
+                  mb="6"
                   bg="red.50"
                   color="red.300"
-                  minWidth="60px"
-                  height="60px"
-                  fontSize="40px"
+                  minWidth="80px"
+                  height="80px"
+                  fontSize="60px"
                   borderRadius="100%"
                   display="flex"
                   alignItems="center"

@@ -1142,26 +1142,23 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           onClose={() => {
             store.langCheckErrors = null
           }}
-          header="Selected fonts don't support some symbols"
+          header="Please choose different fonts"
           children={
             <>
-              <p>
-                There are fonts that don't support some of the words you've
-                chosen.
-              </p>
-
+              <p>Selected fonts don't support symbols used in these words:</p>
               <Box mb="4">
-                {(store.langCheckErrors ?? []).map((e, index) => (
-                  <Box key={index}>
-                    {e.font.otFont.names.fontFamily['en']} {e.word}
-                  </Box>
+                {(store.langCheckErrors ?? []).slice(10).map((e, index) => (
+                  <Box key={index}>{e.word}</Box>
                 ))}
               </Box>
-
               <p>
-                Please choose other fonts that support this language. You can
-                easily find fonts for your language using the "Language" filter
-                in the font selector window.
+                <strong>
+                  Please choose other fonts that support these languages.
+                </strong>
+              </p>
+              <p>
+                You can easily find fonts for your language using the "Language"
+                filter in the font selector window.
               </p>
             </>
           }

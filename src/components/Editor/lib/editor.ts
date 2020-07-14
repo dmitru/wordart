@@ -28,7 +28,11 @@ import {
   setFillColor,
   loadObjFromSvgString,
 } from 'components/Editor/lib/fabric-utils'
-import { Font, Generator } from 'components/Editor/lib/generator'
+import {
+  Font,
+  Generator,
+  FillShapeTaskWordConfig,
+} from 'components/Editor/lib/generator'
 import { Shape, SvgShapeColorsMapEntry } from 'components/Editor/shape'
 import {
   ShapeConf,
@@ -67,6 +71,7 @@ import { consoleLoggers } from 'utils/console-logger'
 import { UniqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { exhaustiveCheck } from 'utils/type-utils'
+import { WordListEntry } from 'components/Editor/style-options'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
@@ -1351,13 +1356,15 @@ export class Editor {
         ...style.items.words.wordList.map((w) => w.fontId).filter(notEmpty),
       ]),
     ]
-    const allUsedFonts = await this.fetchFonts(allUsedFontIds)
+    await this.fetchFonts(allUsedFontIds)
     const defaultFonts: Font[] = await this.fetchFonts(defaultFontIds)
 
-    const langCheckErrors = checkLanguageSupport({
-      fonts: allUsedFonts,
-      words: style.items.words.wordList.map((w) => w.text),
+    const { processedWordList, langCheckErrors } = this.processWordList({
+      wordConfigs: style.items.words.wordList,
+      defaultFonts,
+      defaultAngles: style.items.words.angles,
     })
+
     if (langCheckErrors.length > 0) {
       this.store.isVisualizing = false
       this.store.langCheckErrors = langCheckErrors
@@ -1473,18 +1480,7 @@ export class Editor {
         itemPadding: Math.max(1, 100 - style.items.placement.itemDensity),
         // Words
         wordsMaxSize: style.items.placement.wordsMaxSize,
-        words: style.items.words.wordList
-          .filter((wc) => wc.text.trim())
-          .map((wc) => ({
-            wordConfigId: wc.id,
-            text: wc.text,
-            angles: wc.angle != null ? [wc.angle] : style.items.words.angles,
-            fillColors: ['red'],
-            fonts: wc.fontId
-              ? [this.fontsInfo.get(wc.fontId)!.font]
-              : defaultFonts,
-            repeats: wc.repeats ?? -1,
-          })),
+        words: processedWordList,
         // Icons
         icons: style.items.icons.iconList.map((icon) => ({
           shape: this.store.getIconShapeConfById(icon.shapeId)!,
@@ -1588,13 +1584,15 @@ export class Editor {
         ...style.items.words.wordList.map((w) => w.fontId).filter(notEmpty),
       ]),
     ]
-    const allUsedFonts = await this.fetchFonts(allUsedFontIds)
+    await this.fetchFonts(allUsedFontIds)
     const defaultFonts: Font[] = await this.fetchFonts(defaultFontIds)
 
-    const langCheckErrors = checkLanguageSupport({
-      fonts: allUsedFonts,
-      words: style.items.words.wordList.map((w) => w.text),
+    const { processedWordList, langCheckErrors } = this.processWordList({
+      wordConfigs: style.items.words.wordList,
+      defaultFonts,
+      defaultAngles: style.items.words.angles,
     })
+
     if (langCheckErrors.length > 0) {
       this.store.isVisualizing = false
       this.store.langCheckErrors = langCheckErrors
@@ -1698,18 +1696,7 @@ export class Editor {
         itemPadding: Math.max(1, 100 - style.items.placement.itemDensity),
         // Words
         wordsMaxSize: style.items.placement.wordsMaxSize,
-        words: style.items.words.wordList
-          .filter((wc) => wc.text.trim())
-          .map((wc) => ({
-            wordConfigId: wc.id,
-            text: wc.text,
-            angles: wc.angle != null ? [wc.angle] : style.items.words.angles,
-            fillColors: ['red'],
-            fonts: wc.fontId
-              ? [this.fontsInfo.get(wc.fontId)!.font]
-              : defaultFonts,
-            repeats: wc.repeats ?? -1,
-          })),
+        words: processedWordList,
         // Icons
         icons: style.items.icons.iconList.map((icon) => ({
           shape: this.store.getIconShapeConfById(icon.shapeId)!,
@@ -2124,32 +2111,71 @@ export class Editor {
       })
     )
   }
-}
 
-export type LangCheckError = {
-  font: Font
-  word: string
-}
+  /** Converts WordListEntry[] into FillShapeTaskWordConfig[], doing some validation and error checking */
+  processWordList = (params: {
+    wordConfigs: WordListEntry[]
+    defaultFonts: Font[]
+    defaultAngles: number[]
+  }): {
+    processedWordList: FillShapeTaskWordConfig[]
+    langCheckErrors: LangProcessingError[]
+  } => {
+    const processedWordList: FillShapeTaskWordConfig[] = []
+    const errors: LangProcessingError[] = []
 
-const checkLanguageSupport = (params: {
-  fonts: Font[]
-  words: string[]
-}): LangCheckError[] => {
-  const errors: LangCheckError[] = []
+    for (const wc of params.wordConfigs) {
+      const { fontId } = wc
 
-  for (const font of params.fonts) {
-    for (const word of params.words) {
-      for (const char of word) {
-        if (
-          !font.otFont.hasChar(char) ||
-          font.otFont.charToGlyphIndex(char) === 0
-        ) {
-          errors.push({ font, word })
+      const text = wc.text.trim()
+      if (text.length === 0) {
+        continue
+      }
+
+      const fonts = fontId
+        ? [this.fontsInfo.get(fontId)!.font]
+        : params.defaultFonts
+      const supportedFonts: Font[] = []
+
+      for (const font of fonts) {
+        let isSupported = true
+        for (const char of text) {
+          if (
+            !font.otFont.hasChar(char) ||
+            font.otFont.charToGlyphIndex(char) === 0
+          ) {
+            isSupported = false
+            break
+          }
+        }
+
+        if (isSupported) {
+          supportedFonts.push(font)
         }
       }
+
+      if (supportedFonts.length === 0) {
+        errors.push({ word: text })
+      } else {
+        processedWordList.push({
+          wordConfigId: wc.id,
+          text,
+          angles: wc.angle != null ? [wc.angle] : params.defaultAngles,
+          fonts: supportedFonts,
+          repeats: wc.repeats ?? -1,
+        })
+      }
+    }
+
+    return {
+      processedWordList,
+      langCheckErrors: errors,
     }
   }
-  return errors
+}
+
+type LangProcessingError = {
+  word: string
 }
 
 export type TargetKind = 'shape' | 'bg'

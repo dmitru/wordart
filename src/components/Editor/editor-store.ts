@@ -7,7 +7,6 @@ import {
   Editor,
   EditorInitParams,
   TargetKind,
-  LangCheckError,
 } from 'components/Editor/lib/editor'
 import {
   EditorItem,
@@ -109,7 +108,7 @@ export class EditorStore {
 
   visualizeAnimatedLastTime: Date | null = null
 
-  @observable langCheckErrors: LangCheckError[] | null = null
+  @observable langCheckErrors: { word: string }[] | null = null
   @observable isVisualizing = false
   @observable visualizingProgress = null as number | null
   @observable visualizingStep: 'generating' | 'drawing' | null = null
