@@ -53,7 +53,6 @@ export const ResetPasswordRequestPage = observer(() => {
 
     try {
       await Api.auth.resetPasswordRequest({ ...getValues(), recaptcha: token })
-      router.replace(Urls.signupCompleted)
       setHasSubmitted(true)
     } catch (error) {
       setError(
