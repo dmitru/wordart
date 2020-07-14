@@ -44,17 +44,23 @@ export const SignupPage = observer(() => {
   const router = useRouter()
   const recaptchaRef = useRef<Recaptcha>(null)
 
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  const { register, handleSubmit, errors, getValues, formState } = useForm<
-    SignupFormValues
-  >({
+  const {
+    register,
+    handleSubmit,
+    errors,
+    getValues,
+    formState,
+    setError: setFormError,
+    clearErrors,
+  } = useForm<SignupFormValues>({
     resolver: yupResolver(signupEmailSchema),
   })
 
   const onCaptchaResponse = async (token: string) => {
     recaptchaRef.current?.reset()
-    console.log('onCaptchaResponse = ', token)
 
     try {
       await authStore.signupWithEmail({ ...getValues(), recaptcha: token })
@@ -70,10 +76,32 @@ export const SignupPage = observer(() => {
           'Sorry, there was a problem on our end. Please contact our support or try again later.'
         )
       }
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   const onSubmit = async (values: SignupFormValues) => {
+    clearErrors()
+
+    if (!values.password.match(/^[^\s]+$/)) {
+      setFormError('password', {
+        type: 'manual',
+        message: 'Your password must not contain white space',
+      })
+      return
+    }
+
+    if (values.passwordRepeat !== values.password) {
+      setFormError('passwordRepeat', {
+        message: 'Passwords should match',
+        type: 'manual',
+      })
+      return
+    }
+
+    setIsSubmitting(true)
+
     recaptchaRef.current?.execute()
   }
 
@@ -171,7 +199,7 @@ export const SignupPage = observer(() => {
             <Button
               type="submit"
               colorScheme="accent"
-              isLoading={formState.isSubmitting}
+              isLoading={formState.isSubmitting || isSubmitting}
             >
               Sign up
             </Button>

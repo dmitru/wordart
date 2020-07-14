@@ -17,7 +17,6 @@ import React, { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { FaChevronRight } from 'react-icons/fa'
 import { Api } from 'services/api/api'
-import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import * as Yup from 'yup'
 
@@ -39,13 +38,36 @@ export const ResetPasswordFormPage = observer(() => {
   const [hasSubmitted, setHasSubmitted] = useState(false)
   const [error, setError] = useState('')
 
-  const { register, handleSubmit, errors, formState } = useForm<
-    ResetPasswordFormFormValues
-  >({
+  const {
+    register,
+    handleSubmit,
+    errors,
+    formState,
+    setError: setFormError,
+    clearErrors,
+  } = useForm<ResetPasswordFormFormValues>({
     resolver: yupResolver(ResetPasswordFormSchema),
   })
 
   const onSubmit = async (values: ResetPasswordFormFormValues) => {
+    clearErrors()
+
+    if (!values.password.match(/^[^\s]+$/)) {
+      setFormError('password', {
+        type: 'manual',
+        message: 'Your password must not contain white space',
+      })
+      return
+    }
+
+    if (values.passwordRepeat !== values.password) {
+      setFormError('passwordRepeat', {
+        message: 'Passwords should match',
+        type: 'manual',
+      })
+      return
+    }
+
     try {
       const passwordResetToken = qs.parse(window.location.search)
         ?.passwordResetToken as string
@@ -56,6 +78,7 @@ export const ResetPasswordFormPage = observer(() => {
         newPassword: values.password,
         passwordResetToken,
       })
+      window.location.search = ''
       setHasSubmitted(true)
     } catch (error) {
       setError(
@@ -148,9 +171,9 @@ export const ResetPasswordFormPage = observer(() => {
                     name="passwordRepeat"
                     ref={register}
                   />
-                  {errors.password && (
+                  {errors.passwordRepeat && (
                     <FormHelperText color="red.500">
-                      {errors.password?.message}
+                      {errors.passwordRepeat?.message}
                     </FormHelperText>
                   )}
                 </FormControl>
