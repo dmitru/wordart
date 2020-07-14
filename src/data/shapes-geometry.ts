@@ -75,11 +75,11 @@ const shapes = [
     kind: 'clipart:svg',
     url: '/shapes/svg/geometry/star-10.svg',
   },
-  {
-    title: 'Star',
-    kind: 'clipart:svg',
-    url: '/shapes/svg/geometry/star.svg',
-  },
+  // {
+  //   title: 'Star',
+  //   kind: 'clipart:svg',
+  //   url: '/shapes/svg/geometry/star.svg',
+  // },
   {
     title: 'Square rotated',
     kind: 'clipart:svg',
