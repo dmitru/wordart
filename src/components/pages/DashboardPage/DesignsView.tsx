@@ -124,9 +124,15 @@ export const DesignsView = observer(() => {
 
   return (
     <>
-      <Box flex="3" display="flex" flexDirection="column">
+      <Box flex="3" display="flex" flexDirection="column" overflow="hidden">
         {/* Toolbar */}
-        <Box mt="4" mb="4" display="flex" alignItems="center">
+        <Box
+          py="4"
+          zIndex="1"
+          boxShadow="0 0px 3px 0 rgba(0,0,0,0.1), 0 0px 2px 0 rgba(0,0,0,0.06)"
+          display="flex"
+          alignItems="center"
+        >
           <Button
             as="a"
             css={css`
@@ -213,235 +219,243 @@ export const DesignsView = observer(() => {
             </Box>
           )}
         </Box>
+        <Flex
+          flex="1"
+          wrap="wrap"
+          alignItems="flex-start"
+          justifyItems="flex-start"
+          justifyContent="flex-start"
+          alignContent="flex-start"
+          mr="1rem"
+          css={css`
+            min-height: calc(100vh - 200px);
+            overflow-y: auto;
+            background: #f8f8f8;
+            padding: 2rem;
+            box-shadow: inset 0 0 8px 0 #0003;
+            margin-bottom: 1rem;
+          `}
+        >
+          {!store.hasFetchedWordclouds && (
+            <Box
+              display="flex"
+              width="100%"
+              alignItems="center"
+              justifyContent="center"
+              minHeight="50vh"
+            >
+              <Spinner size="xl" mx="auto" />
+            </Box>
+          )}
 
-        {!store.hasFetchedWordclouds && <Spinner />}
-        {store.hasFetchedWordclouds && (
-          <Flex
-            flex="1"
-            wrap="wrap"
-            alignItems="flex-start"
-            justifyItems="flex-start"
-            justifyContent="flex-start"
-            alignContent="flex-start"
-            css={css`
-              min-height: calc(100vh - 200px);
-              overflow-y: auto;
-              background: #f8f8f8;
-              padding: 2rem;
-              box-shadow: inset 0 0 6px 0 #0001;
-              margin-bottom: 1rem;
-            `}
-          >
-            {allWordclouds.length === 0 && (
-              <Box
-                mx="auto"
-                p="4"
-                fontSize="lg"
-                bg="white"
-                boxShadow="sm"
-                maxWidth="600px"
-                width="100%"
-              >
-                <Heading as="h1" size="lg">
-                  Welcome to WordCloudy!
-                </Heading>
+          {store.hasFetchedWordclouds && allWordclouds.length === 0 && (
+            <Box
+              mx="auto"
+              p="4"
+              fontSize="lg"
+              bg="white"
+              boxShadow="sm"
+              maxWidth="600px"
+              width="100%"
+            >
+              <Heading as="h1" size="lg">
+                Welcome to WordCloudy!
+              </Heading>
 
-                <Box display="flex">
-                  <Button
-                    as="a"
-                    css={css`
-                      &,
-                      &:hover,
-                      &:focus {
-                        text-decoration: none !important;
-                      }
-                    `}
-                    href={Urls.editor.create}
-                    target="_blank"
-                    colorScheme="accent"
-                    leftIcon={<AddIcon />}
-                    mr="3"
-                    size="lg"
-                  >
-                    Create your First Design
-                  </Button>
+              <Box display="flex">
+                <Button
+                  as="a"
+                  css={css`
+                    &,
+                    &:hover,
+                    &:focus {
+                      text-decoration: none !important;
+                    }
+                  `}
+                  href={Urls.editor.create}
+                  target="_blank"
+                  colorScheme="accent"
+                  leftIcon={<AddIcon />}
+                  mr="3"
+                  size="lg"
+                >
+                  Create your First Design
+                </Button>
 
-                  <Button variant="outline" size="lg">
-                    Check out tutorials
-                  </Button>
-                </Box>
+                <Button variant="outline" size="lg">
+                  Check out tutorials
+                </Button>
               </Box>
-            )}
+            </Box>
+          )}
 
-            {allWordclouds.length > 0 && wordcloudsInFolder.length === 0 && (
+          {allWordclouds.length > 0 && wordcloudsInFolder.length === 0 && (
+            <Box
+              display="flex"
+              maxWidth="600px"
+              width="100%"
+              mx="auto"
+              alignItems="center"
+              flexDirection="column"
+              boxShadow="sm"
+              borderColor="gray.100"
+              borderWidth="1px"
+              p="6"
+              bg="white"
+            >
               <Box
+                mb="1rem"
+                bg="primary.50"
+                color="primary.400"
+                width="90px"
+                height="90px"
+                borderRadius="100%"
+                borderWidth="2px"
+                borderColor="primary.100"
                 display="flex"
-                maxWidth="600px"
-                width="100%"
-                mx="auto"
                 alignItems="center"
-                flexDirection="column"
-                boxShadow="sm"
-                borderColor="gray.100"
-                borderWidth="1px"
-                p="6"
-                bg="white"
+                justifyContent="center"
               >
-                <Box
-                  mb="1rem"
-                  bg="primary.50"
-                  color="primary.400"
-                  width="90px"
-                  height="90px"
-                  borderRadius="100%"
-                  borderWidth="2px"
-                  borderColor="primary.100"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  {dashboardUiState.folder !== 'no folder' && (
-                    <FaRegFolder size={48} />
-                  )}
-                  {dashboardUiState.folder === 'no folder' && (
-                    <FaSearch size={40} />
-                  )}
-                </Box>
-
-                <Text
-                  fontSize="xl"
-                  flex={1}
-                  textAlign="center"
-                  color="gray.600"
-                  mb="0"
-                >
-                  {dashboardUiState.folder === 'no folder' &&
-                    'Nothinig to show'}
-                  {dashboardUiState.folder !== 'no folder' &&
-                    'This folder is empty'}
-                </Text>
-
-                <Text
-                  mt="4"
-                  fontSize="md"
-                  flex={1}
-                  textAlign="center"
-                  color="gray.500"
-                  maxWidth="300px"
-                >
-                  {dashboardUiState.folder !== 'no folder' &&
-                    `You can move some of you designs to this folder, or create a new design here.`}
-                  {dashboardUiState.folder === 'no folder' &&
-                    `All your designs are already in folders.`}
-                </Text>
-
+                {dashboardUiState.folder !== 'no folder' && (
+                  <FaRegFolder size={48} />
+                )}
                 {dashboardUiState.folder === 'no folder' && (
-                  <Button
-                    colorScheme="secondary"
-                    onClick={() => {
-                      dashboardUiState.folder = 'all'
-                    }}
-                  >
-                    Show all designs
-                  </Button>
+                  <FaSearch size={40} />
                 )}
               </Box>
-            )}
 
-            {/* No search results */}
-            {wordcloudsInFolder.length > 0 && wordcloudsFiltered.length === 0 && (
-              <Box
-                display="flex"
-                maxWidth="600px"
-                width="100%"
-                mx="auto"
-                alignItems="center"
-                flexDirection="column"
-                boxShadow="sm"
-                borderColor="gray.100"
-                borderWidth="1px"
-                p="6"
-                bg="white"
+              <Text
+                fontSize="xl"
+                flex={1}
+                textAlign="center"
+                color="gray.600"
+                mb="0"
               >
-                <Box
-                  mb="1rem"
-                  bg="primary.50"
-                  color="primary.400"
-                  width="90px"
-                  height="90px"
-                  borderRadius="100%"
-                  borderWidth="2px"
-                  borderColor="primary.100"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <FaSearch size={40} />
-                </Box>
+                {dashboardUiState.folder === 'no folder' && 'Nothinig to show'}
+                {dashboardUiState.folder !== 'no folder' &&
+                  'This folder is empty'}
+              </Text>
 
-                <Text
-                  fontSize="xl"
-                  flex={1}
-                  textAlign="center"
-                  color="gray.600"
-                  mb="0"
-                >
-                  No results to show
-                </Text>
+              <Text
+                mt="4"
+                fontSize="md"
+                flex={1}
+                textAlign="center"
+                color="gray.500"
+                maxWidth="300px"
+              >
+                {dashboardUiState.folder !== 'no folder' &&
+                  `You can move some of you designs to this folder, or create a new design here.`}
+                {dashboardUiState.folder === 'no folder' &&
+                  `All your designs are already in folders.`}
+              </Text>
 
-                <Text
-                  mt="4"
-                  fontSize="md"
-                  flex={1}
-                  textAlign="center"
-                  color="gray.500"
-                  maxWidth="400px"
+              {dashboardUiState.folder === 'no folder' && (
+                <Button
+                  colorScheme="secondary"
+                  onClick={() => {
+                    dashboardUiState.folder = 'all'
+                  }}
                 >
-                  There are no designs matching the filter.
-                </Text>
+                  Show all designs
+                </Button>
+              )}
+            </Box>
+          )}
+
+          {/* No search results */}
+          {wordcloudsInFolder.length > 0 && wordcloudsFiltered.length === 0 && (
+            <Box
+              display="flex"
+              maxWidth="600px"
+              width="100%"
+              mx="auto"
+              alignItems="center"
+              flexDirection="column"
+              boxShadow="sm"
+              borderColor="gray.100"
+              borderWidth="1px"
+              p="6"
+              bg="white"
+            >
+              <Box
+                mb="1rem"
+                bg="primary.50"
+                color="primary.400"
+                width="90px"
+                height="90px"
+                borderRadius="100%"
+                borderWidth="2px"
+                borderColor="primary.100"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <FaSearch size={40} />
               </Box>
-            )}
 
-            {wordcloudsInFolder.length > 0 &&
-              wordcloudsFiltered.length > 0 &&
-              wordcloudsFiltered.map((wc) => (
-                <WordcloudThumbnail
-                  key={wc.id}
-                  wordcloud={wc}
-                  isSelecting={isSelecting}
-                  onClick={(e) => {
-                    if (isSelecting) {
-                      e.preventDefault()
+              <Text
+                fontSize="xl"
+                flex={1}
+                textAlign="center"
+                color="gray.600"
+                mb="0"
+              >
+                No results to show
+              </Text>
 
-                      if (!selection.has(wc.id)) {
-                        selection.add(wc.id)
-                      } else {
-                        selection.delete(wc.id)
-                      }
-                    } else {
-                      // Open the editor...
-                    }
-                  }}
-                  onOpenInEditor={() => {
-                    console.log('onOpenInEditor', isSelecting)
-                    openUrlInNewTab(Urls.editor.edit(wc.id))
-                  }}
-                  onMoveToFolder={() => setMovindWordclouds([wc])}
-                  onRename={() => setRenamingWordcloud(wc)}
-                  onDuplicate={() => setDuplicatingWordcloud(wc)}
-                  onDelete={() => setDeletingWordclouds([wc])}
-                  isSelected={selection.has(wc.id)}
-                  onSelectionChange={(isSelected) => {
-                    if (isSelected) {
+              <Text
+                mt="4"
+                fontSize="md"
+                flex={1}
+                textAlign="center"
+                color="gray.500"
+                maxWidth="400px"
+              >
+                There are no designs matching the filter.
+              </Text>
+            </Box>
+          )}
+
+          {wordcloudsInFolder.length > 0 &&
+            wordcloudsFiltered.length > 0 &&
+            wordcloudsFiltered.map((wc) => (
+              <WordcloudThumbnail
+                key={wc.id}
+                wordcloud={wc}
+                isSelecting={isSelecting}
+                onClick={(e) => {
+                  if (isSelecting) {
+                    e.preventDefault()
+
+                    if (!selection.has(wc.id)) {
                       selection.add(wc.id)
                     } else {
                       selection.delete(wc.id)
                     }
-                  }}
-                />
-              ))}
-          </Flex>
-        )}
+                  } else {
+                    // Open the editor...
+                  }
+                }}
+                onOpenInEditor={() => {
+                  console.log('onOpenInEditor', isSelecting)
+                  openUrlInNewTab(Urls.editor.edit(wc.id))
+                }}
+                onMoveToFolder={() => setMovindWordclouds([wc])}
+                onRename={() => setRenamingWordcloud(wc)}
+                onDuplicate={() => setDuplicatingWordcloud(wc)}
+                onDelete={() => setDeletingWordclouds([wc])}
+                isSelected={selection.has(wc.id)}
+                onSelectionChange={(isSelected) => {
+                  if (isSelected) {
+                    selection.add(wc.id)
+                  } else {
+                    selection.delete(wc.id)
+                  }
+                }}
+              />
+            ))}
+        </Flex>
 
         {/* Move to folder */}
         <MoveToFolderModal
@@ -466,7 +480,6 @@ export const DesignsView = observer(() => {
           }}
           onCancel={() => setMovindWordclouds(null)}
         ></MoveToFolderModal>
-
         {/* Rename */}
         <PromptModal
           isOpen={renamingWordcloud != null}
@@ -487,7 +500,6 @@ export const DesignsView = observer(() => {
             placeholder: 'Enter name...',
           }}
         />
-
         {/* Duplicate */}
         <PromptModal
           isOpen={duplicatingWordcloud != null}
@@ -508,7 +520,6 @@ export const DesignsView = observer(() => {
             placeholder: 'Enter name for the copy...',
           }}
         />
-
         {/* Delete */}
         <ConfirmModal
           isOpen={deletingWordclouds != null}
