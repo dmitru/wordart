@@ -77,7 +77,7 @@ export const FaqPage = observer(() => {
             </Question>
 
             <Question
-              title="Do I need to create an account?"
+              title="Do I need to have an account to use Wordcloudy?"
               id="do-i-need-account"
             >
               <p>
@@ -85,12 +85,13 @@ export const FaqPage = observer(() => {
                 account.
               </p>
               <p>
-                However, having an account allows you to save your designs for
-                later, and you'll also need an account if you're looking to{' '}
+                But having an account allows you to save your designs for later,
+                and you'll also need an account if you're looking to{' '}
                 <Link href={Urls.pricing} passHref>
-                  <a>purchase one of our plans.</a>
+                  <a>purchase one of our plans </a>
                 </Link>
-                .
+                to download your designs in high quality and/or use them
+                commercially.
               </p>
             </Question>
 

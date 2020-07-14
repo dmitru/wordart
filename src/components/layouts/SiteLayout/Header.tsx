@@ -198,7 +198,7 @@ const topNavLink = (p: { active?: boolean }) => css`
   box-shadow: none !important;
 
   background: transparent !important;
-  ${p.active && `background: #0002;`}
+  ${p.active && `background: #0002 !important;`}
 
   color: #fefeff;
 
