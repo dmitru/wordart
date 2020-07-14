@@ -404,6 +404,8 @@ export class EditorStore {
   }
 
   @action loadSerialized = async (serialized: EditorPersistedData) => {
+    console.log('FISH: loadSerialized = ', this.shapesPanel.shapeKind)
+
     const shouldShowModal =
       serialized.data.bgItems.items.length > 0 ||
       serialized.data.shapeItems.items.length > 0
@@ -588,8 +590,6 @@ export class EditorStore {
     ) {
       this.shapesPanel.shapeKind = 'custom image'
     } else {
-      this.shapesPanel.shapeKind = this.selectedShapeConf.kind
-
       if (this.selectedShapeConf.kind === 'text') {
         this.shapesPanel.text.text = this.selectedShapeConf.text
         this.shapesPanel.text.color = this.selectedShapeConf.textStyle.color
@@ -603,6 +603,12 @@ export class EditorStore {
       } else if (this.selectedShapeConf.kind === 'icon') {
         this.shapesPanel.icon.color = this.selectedShapeConf.color
       }
+
+      console.log(
+        'FISH: editor.store.shapesPanel.shapeKind = ',
+        this.shapesPanel.shapeKind
+      )
+      this.shapesPanel.shapeKind = this.selectedShapeConf.kind
     }
 
     const deserializeItems = async ({
@@ -836,7 +842,8 @@ export class EditorStore {
   }
 
   serialize = async (): Promise<EditorPersistedData> => {
-    this.logger.debug('serialize')
+    this.logger.debug('serialize', this.getShape()!.kind)
+    console.log('FISH: serialize = ', this.shapesPanel.shapeKind)
     if (!this.editor) {
       throw new Error('editor is not initialized')
     }
@@ -1243,6 +1250,7 @@ export class EditorStore {
     updateShapeColors = true,
     render = true
   ) => {
+    console.log('FISH: ', 'selectShapeAndSaveUndo', shapeConfig.kind)
     if (!this.editor) {
       return
     }
@@ -1250,8 +1258,11 @@ export class EditorStore {
     const stateBefore = this.getStateSnapshot()
 
     const persistedDataBefore = await this.serialize()
+    console.log('FISH: Before: ', persistedDataBefore.data.shape.kind)
     await this.selectShape(shapeConfig, updateShapeColors, render)
     const persistedDataAfter = await this.serialize()
+    console.log('FISH: After: ', persistedDataAfter.data.shape.kind)
+
     this.editor.pushUndoFrame({
       kind: 'visualize',
       dataBefore: persistedDataBefore,
@@ -1271,6 +1282,7 @@ export class EditorStore {
     updateShapeColors = true,
     render = true
   ) => {
+    console.log('FISH: ', 'selectShape', shapeConfig.kind)
     if (!this.editor) {
       return
     }
@@ -1552,7 +1564,7 @@ export type LeftPanelShapesState = {
 }
 
 export const leftPanelShapesInitialState: LeftPanelShapesState = {
-  shapeKind: 'blob',
+  shapeKind: 'image',
   blob: {
     color: '#4A90E2',
     complexity: 40,
@@ -1575,7 +1587,7 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
     singleColor: '#4A90E2',
   },
   text: {
-    fontId: 'Pacifico:regular',
+    fontId: 'Luckiest Guy:regular',
     color: '#4A90E2',
     text: 'Hi',
   },

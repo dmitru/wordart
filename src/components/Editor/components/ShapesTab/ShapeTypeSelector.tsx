@@ -8,6 +8,7 @@ import {
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
 import { Button } from 'components/shared/Button'
+import { generateBlobShapePathData } from 'components/Editor/lib/blob-shape-gen'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { observer } from 'mobx-react'
 import React from 'react'
@@ -56,6 +57,21 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 description="A blob shape for quick and unique designs"
                 onClick={() => {
                   shapesPanel.shapeKind = 'blob'
+                  const blobShapeSvg = generateBlobShapePathData({
+                    color: store.shapesPanel.blob.color,
+                    points: store.shapesPanel.blob.points,
+                    complexity: store.shapesPanel.blob.complexity,
+                    aspect: store.editor?.aspectRatio || 1,
+                  })
+
+                  store.selectShapeAndSaveUndo({
+                    kind: 'blob',
+                    color: store.shapesPanel.blob.color,
+                    points: store.shapesPanel.blob.points,
+                    complexity: store.shapesPanel.blob.complexity,
+                    pathData: blobShapeSvg,
+                  })
+
                   store.animateVisualize(false)
                 }}
               />
@@ -69,7 +85,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                     shapesPanel.image.selected
                   )
                   if (shapeConf) {
-                    store.selectShape(shapeConf)
+                    store.selectShapeAndSaveUndo(shapeConf)
                   }
                   store.animateVisualize(false)
                 }}
@@ -84,7 +100,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                     shapesPanel.icon.selected
                   )
                   if (shapeConf) {
-                    store.selectShape(shapeConf)
+                    store.selectShapeAndSaveUndo(shapeConf)
                   }
                   store.animateVisualize(false)
                 }}
@@ -104,7 +120,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                     },
                     thumbnailUrl: '',
                   }
-                  store.selectShape(textShape)
+                  store.selectShapeAndSaveUndo(textShape)
                   store.animateVisualize(false)
                 }}
               />
@@ -122,12 +138,11 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
                 title="Full canvas"
                 description="Use the entire canvas as a shape"
                 onClick={() => {
-                  shapesPanel.shapeKind = 'full-canvas'
-                  const textShape: ShapeFullCanvasConf = {
+                  store.selectShapeAndSaveUndo({
                     kind: 'full-canvas',
                     color: shapesPanel.fullCanvas.color,
-                  }
-                  store.selectShape(textShape)
+                  })
+                  shapesPanel.shapeKind = 'full-canvas'
                   store.animateVisualize(false)
                 }}
               />

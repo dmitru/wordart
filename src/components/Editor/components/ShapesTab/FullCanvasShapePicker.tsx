@@ -145,7 +145,7 @@ export const FullCanvasShapePicker: React.FC<{}> = observer(() => {
       updateBlobThumbnailPreview()
     }
 
-    if (!shape || shape.kind !== 'full-canvas') {
+    if (!shape) {
       updateFullCanvas()
     }
   }, [shape])

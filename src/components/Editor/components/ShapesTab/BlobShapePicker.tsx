@@ -149,7 +149,7 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
     c.dispose()
   }
 
-  const updateBlobShape = async () => {
+  const updateBlobShape = async (saveUndoFrame = true) => {
     const blobShapeSvg = generateBlobShapePathData({
       color: store.shapesPanel.blob.color,
       points: store.shapesPanel.blob.points,
@@ -165,7 +165,11 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
       pathData: blobShapeSvg,
     }
 
-    await store.selectShapeAndSaveUndo(shapeConfig)
+    if (saveUndoFrame) {
+      await store.selectShapeAndSaveUndo(shapeConfig)
+    } else {
+      await store.selectShape(shapeConfig)
+    }
     updateBlobThumbnailPreview()
 
     store.animateVisualize(false)
@@ -174,10 +178,6 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
   useEffect(() => {
     if (shape && shape.kind === 'blob') {
       updateBlobThumbnailPreview()
-    }
-
-    if (!shape || shape.kind !== 'blob') {
-      updateBlobShape()
     }
   }, [shape])
 
