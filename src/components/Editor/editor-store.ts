@@ -134,6 +134,7 @@ export class EditorStore {
   @observable hasItemChanges = false
   @observable availableImageShapes: ShapeClipartConf[] = imageShapes
   @observable availableIconShapes: ShapeIconConf[] = iconShapes
+  @observable hasUnsavedChanges = false
 
   @observable selectedShapeConf: ShapeConf = imageShapes[4]
 
@@ -262,6 +263,8 @@ export class EditorStore {
     this.enterViewMode('shape')
 
     this.lifecycleState = 'initialized'
+
+    this.hasUnsavedChanges = false
   }
 
   setItemLock = (lockValue: boolean) => {
@@ -1259,6 +1262,8 @@ export class EditorStore {
       versionBefore,
     })
     this.editor.version++
+
+    this.hasUnsavedChanges = true
   }
 
   @action selectShape = async (
@@ -1281,6 +1286,7 @@ export class EditorStore {
     })
 
     this.editor.version++
+    this.hasUnsavedChanges = true
     this.updateShapeThumbnail()
   }
 
@@ -1305,6 +1311,7 @@ export class EditorStore {
   }
 
   @action deleteWord = (target: TargetKind, wordId: WordConfigId) => {
+    this.hasUnsavedChanges = true
     const style = this.styleOptions[target]
     style.items.words.wordList = style.items.words.wordList.filter(
       (w) => w.id !== wordId
@@ -1312,6 +1319,7 @@ export class EditorStore {
   }
 
   @action clearWords = (target: TargetKind) => {
+    this.hasUnsavedChanges = true
     const style = this.styleOptions[target]
     const ids = style.items.words.wordList.map((w) => w.id)
     this.wordIdGen.removeIds(ids)
@@ -1320,6 +1328,7 @@ export class EditorStore {
   }
 
   @action addWords = (target: TargetKind, words: string[]) => {
+    this.hasUnsavedChanges = true
     const style = this.styleOptions[target]
     for (const text of words) {
       style.items.words.wordList.push({
@@ -1330,6 +1339,7 @@ export class EditorStore {
   }
 
   @action addWord = (target: TargetKind, text = '') => {
+    this.hasUnsavedChanges = true
     const style = this.styleOptions[target]
     style.items.words.wordList.push({
       id: this.wordIdGen.get(),
@@ -1342,6 +1352,7 @@ export class EditorStore {
     wordId: WordConfigId,
     update: Partial<Omit<WordListEntry, 'id'>>
   ) => {
+    this.hasUnsavedChanges = true
     const style = this.styleOptions[target]
     const word = style.items.words.wordList.find((w) => w.id === wordId)
     if (!word) {
@@ -1355,6 +1366,7 @@ export class EditorStore {
     if (!this.editor) {
       return
     }
+    this.hasUnsavedChanges = true
     const aspect =
       pageSize.kind === 'preset'
         ? pageSize.preset.aspect
@@ -1383,6 +1395,8 @@ export class EditorStore {
     if (!shape) {
       return
     }
+
+    this.hasUnsavedChanges = true
 
     // Shape
     shapeStyle.opacity = theme.shapeOpacity

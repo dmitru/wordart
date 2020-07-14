@@ -746,6 +746,8 @@ export class Editor {
   }
 
   updateShapeColors = async (config: ShapeConf, render = true) => {
+    this.store.hasUnsavedChanges = true
+
     this.logger.debug(
       'updateShapeColors',
       render,
@@ -782,6 +784,7 @@ export class Editor {
 
   setShapeOpacity = (opacity: number, render = true) => {
     this.logger.debug('setShapeOpacity', opacity)
+    this.store.hasUnsavedChanges = true
     if (!this.shape) {
       return
     }
@@ -813,6 +816,7 @@ export class Editor {
     itemsStyleConf: BgStyleConf['items'] | ShapeStyleConf['items'],
     render = true
   ) => {
+    this.store.hasUnsavedChanges = true
     const { coloring, dimSmallerItems, brightness } = itemsStyleConf
     const { items } = this.items[target]
     this.logger.debug(
@@ -1017,6 +1021,7 @@ export class Editor {
     render?: boolean
   }) => {
     console.log('setShape', params)
+    this.store.hasUnsavedChanges = true
     const { shapeConfig, updateShapeColors = true, render = true } = params
 
     if (!shapeConfig) {
@@ -1276,6 +1281,7 @@ export class Editor {
     itemConfigs: EditorItemConfig[],
     render = true
   ) => {
+    this.store.hasUnsavedChanges = true
     if (!this.shape?.obj) {
       console.error('No shape')
       return
@@ -1543,6 +1549,7 @@ export class Editor {
     this.version++
 
     this.store.renderKey++
+    this.store.hasUnsavedChanges = true
   }
 
   generateShapeItems = async (params: { style: ShapeStyleConf }) => {
@@ -1758,11 +1765,13 @@ export class Editor {
     })
     this.version++
     this.store.renderKey++
+    this.store.hasUnsavedChanges = true
   }
 
   @action pushUndoFrame = (frame: UndoFrame) => {
     this.undoStack.push(frame)
     this.store.renderKey++
+    this.store.hasUnsavedChanges = true
   }
 
   private applyItemUpdateUndoFrame = (
@@ -1877,6 +1886,7 @@ export class Editor {
 
     this.canvas.requestRenderAll()
     this.store.renderKey++
+    this.store.hasUnsavedChanges = true
   }
 
   destroy = () => {
@@ -1894,6 +1904,7 @@ export class Editor {
     this.enableSelectionMode()
     this.canvas.setActiveObject(this.shape.obj)
     this.canvas.requestRenderAll()
+    this.store.hasUnsavedChanges = true
   }
 
   deselectShape = () => {

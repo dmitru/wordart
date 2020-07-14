@@ -61,7 +61,6 @@ import {
 import { BaseBtn } from 'components/shared/BaseBtn'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
-import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 import { Tooltip } from 'components/shared/Tooltip'
 import { TopNavButton } from 'components/shared/TopNavButton'
@@ -96,10 +95,13 @@ import 'utils/canvas-to-blob'
 import { getTabTitle } from 'utils/tab-title'
 import { ConfirmModalWithRecaptcha } from 'components/shared/ConfirmModalWithRecaptcha'
 import { uuid } from 'utils/uuid'
+import { useWarnIfUnsavedChanges } from 'utils/use-warn-if-unsaved-changes'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
 }
+
+const UnsavedChangesMsg = 'If you leave the page, unsaved changes will be lost.'
 
 export const EditorComponent: React.FC<EditorComponentProps> = observer(
   (props) => {
@@ -115,12 +117,21 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const { authStore } = useStore()
     const { profile } = authStore
+
     const router = useRouter()
 
     const cancelVisualizationBtnRef = useRef<HTMLButtonElement>(null)
 
-    const [isSaving, setIsSaving] = useState(false)
+    const isSaving = useRef(false)
     const [isShowingSignupModal, setIsShowingSignupModal] = useState(false)
+
+    const hasUnsavedChanges = useCallback((url?: string) => {
+      if (url?.startsWith('/editor/')) {
+        return false
+      }
+      return store.hasUnsavedChanges
+    }, [])
+    useWarnIfUnsavedChanges(hasUnsavedChanges, UnsavedChangesMsg)
 
     const [
       isShowingEmptyIconsWarning,
@@ -128,11 +139,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     ] = useState(false)
 
     const saveAnonymously = async (recaptcha: string) => {
-      if (isSaving || !store.editor || !isNew) {
+      if (isSaving.current || !store.editor || !isNew) {
         return
       }
 
-      setIsSaving(true)
+      isSaving.current = true
       try {
         const thumbnailCanvas = await store.editor.exportAsRaster(380)
         const thumbnail = thumbnailCanvas.toDataURL('image/jpeg', 0.85)
@@ -155,7 +166,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           isClosable: true,
         })
       } finally {
-        setIsSaving(false)
+        isSaving.current = false
       }
     }
 
@@ -166,10 +177,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       }
 
       const save = async () => {
-        if (isSaving || !store.editor) {
+        if (isSaving.current || !store.editor) {
           return
         }
-        setIsSaving(true)
+        isSaving.current = true
 
         try {
           const thumbnailCanvas = await store.editor.exportAsRaster(380)
@@ -199,13 +210,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             position: 'bottom-right',
             isClosable: true,
           })
+          store.hasUnsavedChanges = false
         } finally {
-          setIsSaving(false)
+          isSaving.current = false
         }
       }
 
       save()
-    }, [isSaving, authStore.isLoggedIn, props.wordcloudId])
+    }, [authStore.isLoggedIn, props.wordcloudId])
 
     useEffect(() => {
       const init = async () => {
@@ -508,7 +520,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           <Button
             colorScheme="secondary"
             onClick={handleSaveClick}
-            isLoading={isSaving}
+            isLoading={isSaving.current}
             mr="2"
             css={css`
               width: 90px;
@@ -538,6 +550,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             value={state.title}
             onChange={(value) => {
               state.title = value
+              store.hasUnsavedChanges = true
             }}
             selectAllOnFocus={false}
             placeholder="Untitled Design"
