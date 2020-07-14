@@ -49,6 +49,7 @@ import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTa
 import { LeftPanelShapesTab } from 'components/Editor/components/ShapesTab/LeftPanelShapesTab'
 import { Spinner } from 'components/Editor/components/Spinner'
 import { WarningModal } from 'components/Editor/components/WarningModal'
+import Hotkeys from 'react-hot-keys'
 import {
   EditorStoreInitParams,
   pageSizePresets,
@@ -159,7 +160,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     }
 
     const handleSaveClick = useCallback(() => {
-      if (!authStore.isLoggedIn) {
+      if (authStore.isLoggedIn === false) {
         setIsShowingSignupModal(true)
         return
       }
@@ -204,7 +205,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       }
 
       save()
-    }, [isSaving, props.wordcloudId])
+    }, [isSaving, authStore.isLoggedIn, props.wordcloudId])
 
     useEffect(() => {
       const init = async () => {
@@ -378,6 +379,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         <Helmet>
           <title>{getTabTitle(state.title || 'Untitled')}</title>
         </Helmet>
+
+        <Hotkeys
+          keyName="cmd+s,ctrl+s"
+          onKeyDown={(shortcut, event) => {
+            event.preventDefault()
+            handleSaveClick()
+          }}
+        />
 
         <TopNavWrapper alignItems="center" display="flex">
           <img
