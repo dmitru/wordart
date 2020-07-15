@@ -171,6 +171,21 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     }
 
     const handleSaveClick = useCallback(() => {
+      const showToast = () =>
+        toast({
+          id: 'work-saved',
+          title: 'Your work is saved',
+          status: 'success',
+          duration: 2000,
+          position: 'bottom-right',
+          isClosable: true,
+        })
+
+      if (!store.hasUnsavedChanges) {
+        showToast()
+        return
+      }
+
       if (authStore.isLoggedIn === false) {
         setIsShowingSignupModal(true)
         return
@@ -203,13 +218,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               editorData,
             })
           }
-          toast({
-            title: 'Your work is saved',
-            status: 'success',
-            duration: 2000,
-            position: 'bottom-right',
-            isClosable: true,
-          })
+          showToast()
           store.hasUnsavedChanges = false
         } finally {
           isSaving.current = false
@@ -217,7 +226,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       }
 
       save()
-    }, [authStore.isLoggedIn, props.wordcloudId])
+    }, [authStore.isLoggedIn, props.wordcloudId, store.hasUnsavedChanges])
 
     useEffect(() => {
       const init = async () => {

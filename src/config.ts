@@ -1,4 +1,7 @@
 export const config = {
+  supportEmail: 'support@wordcloudy.com',
+  contactEmail: 'contact@wordcloudy.com',
+
   paddle: {
     vendorId: 597590,
   },

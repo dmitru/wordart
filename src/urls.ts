@@ -18,6 +18,7 @@ export const Urls = {
   yourDesigns: '/home',
   faq: '/faq',
   pricing: '/pricing',
+  contact: '/contact',
 
   editor: {
     _next: '/editor/[...id]',
