@@ -118,7 +118,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
               </Button>
 
               <Box marginLeft="auto">
-                <Menu placement="bottom-end">
+                <Menu isLazy placement="bottom-end">
                   <MenuButton as={MenuDotsButton} size="sm" />
                   <MenuList>
                     <MenuGroup title="Formatting">
@@ -162,7 +162,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     <MenuItem onClick={() => store.clearWords(target)}>
                       <Icon
                         name="small-close"
-                        size="20px"
+                        fontSize="20px"
                         color="gray.500"
                         mr="2"
                       />

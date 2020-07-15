@@ -4,7 +4,7 @@ export const useToasts = () => {
   const toasts = useToast()
   const commonParams: UseToastOptions = {
     position: 'bottom-right',
-    duration: 3000,
+    duration: 100000,
     isClosable: true,
   }
   return {
@@ -24,7 +24,7 @@ export const useToasts = () => {
       toasts({
         ...commonParams,
         status: 'success',
-        ...params,
+        // ...params,
       }),
     showError: (params: UseToastOptions) =>
       toasts({

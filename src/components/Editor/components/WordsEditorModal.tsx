@@ -305,7 +305,7 @@ export const WordsEditorModal: React.FC<WordsEditorModalProps> = observer(
 
         {/* Words / selection actions */}
         <Box flex="1" ml="auto" display="flex" justifyContent="flex-end">
-          <Menu placement="bottom-end">
+          <Menu isLazy placement="bottom-end">
             {selectedCount === 0 && (
               <MenuButton as={MenuDotsButton} size="sm" variant="ghost" />
             )}

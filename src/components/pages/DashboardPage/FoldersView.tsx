@@ -150,7 +150,7 @@ export const FoldersView = observer(() => {
               </FolderRowTag>
 
               <Box>
-                <Menu placement="bottom-end">
+                <Menu isLazy placement="bottom-end">
                   <MenuButton
                     as={FolderMenuButton}
                     noShadows={false}

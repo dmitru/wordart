@@ -176,7 +176,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           id: 'work-saved',
           title: 'Your work is saved',
           status: 'success',
-          duration: 2000,
+          // duration: 2000,
           position: 'bottom-right',
           isClosable: true,
         })
@@ -433,7 +433,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             </TopNavButton>
           </Link>
 
-          <Menu>
+          <Menu isLazy>
             <MenuButton mr="2" as={TopNavButton} variant="primary">
               <FiMenu
                 css={css`
@@ -571,9 +571,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           >
             <EditablePreview
               width="100%"
+              py="0"
               css={css`
                 text-overflow: ellipsis;
                 overflow-x: hidden;
+                overflow-y: hidden;
                 white-space: nowrap;
               `}
             />
@@ -705,6 +707,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           <Heading size="md" mt="0" mb="3">
                             Page Size
                           </Heading>
+
                           {pageSizePresets.map((preset) => (
                             <Button
                               colorScheme={
@@ -1008,7 +1011,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   <Box mr="3" ml="auto">
                     {store.mode === 'view' && hasItems && (
                       <>
-                        <Menu>
+                        <Menu isLazy>
                           <MenuButton
                             mr="2"
                             as={MenuDotsButton}

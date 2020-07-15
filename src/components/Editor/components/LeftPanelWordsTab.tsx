@@ -272,7 +272,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
         {/* Words / selection actions */}
         <Box flex="1" ml="auto" display="flex" justifyContent="flex-end">
-          <Menu placement="bottom-end">
+          <Menu isLazy placement="bottom-end">
             {selectedCount === 0 && (
               <MenuButton
                 as={MenuDotsButton}
@@ -929,7 +929,7 @@ const WordListRow: React.FC<
     )
 
     const wordMenu = (
-      <Menu placement="bottom-end">
+      <Menu isLazy placement="bottom-end">
         <MenuButton
           as={WordMenuButton}
           ml="2"

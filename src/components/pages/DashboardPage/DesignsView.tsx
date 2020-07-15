@@ -162,7 +162,7 @@ export const DesignsView = observer(() => {
 
           {isSelecting && (
             <Box ml="3">
-              <Menu>
+              <Menu isLazy>
                 <MenuButton
                   as={Button}
                   colorScheme="accent"

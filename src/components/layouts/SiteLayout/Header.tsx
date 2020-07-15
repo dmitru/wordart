@@ -99,7 +99,7 @@ export const Header: React.FC<HeaderProps> = observer(
                 )}
 
                 {/* Account menu */}
-                <Menu placement="bottom-end">
+                <Menu isLazy placement="bottom-end">
                   <MenuButton as={TopNavMenuButton} py="2" px="3">
                     <Box mr="2">
                       <FaRegUserCircle />

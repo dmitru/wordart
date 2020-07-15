@@ -31,7 +31,7 @@ export const TargetLayerDropdown = observer(() => {
   const { editorPageStore: store } = useStore()
 
   return (
-    <Menu placement="bottom-start">
+    <Menu isLazy placement="bottom-start">
       <MenuButton as={Button} rightIcon={<ChevronDownIcon />} py="2" px="3">
         {store.targetTab === 'shape' ? 'Shape layer' : ''}
         {store.targetTab === 'bg' ? 'Background layer' : ''}
@@ -41,7 +41,6 @@ export const TargetLayerDropdown = observer(() => {
         <MenuTransition>
           {(styles) => (
             <MenuList
-              // @ts-ignore
               css={css`
                 ${styles}
                 max-height: 300px;

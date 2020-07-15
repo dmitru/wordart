@@ -116,7 +116,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
             mr="3"
             mb="2"
           >
-            <Menu placement="bottom-start">
+            <Menu isLazy placement="bottom-start">
               <MenuButton
                 variant={state.style !== 'popular' ? 'solid' : 'ghost'}
                 colorScheme={state.style !== 'popular' ? 'accent' : undefined}
@@ -182,7 +182,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
             mr="3"
             mb="2"
           >
-            <Menu placement="bottom-start">
+            <Menu isLazy placement="bottom-start">
               <MenuButton
                 mr="1"
                 size="sm"

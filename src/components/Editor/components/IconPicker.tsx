@@ -3,6 +3,8 @@ import {
   Flex,
   Menu,
   MenuButton,
+  Portal,
+  MenuTransition,
   MenuDivider,
   MenuItem,
   MenuList,
@@ -59,7 +61,7 @@ export const IconPicker: React.FC<IconPickerProps> = observer(
       <>
         <Flex align="center" mt="5" mb="4">
           <Box mr="3">
-            <Menu>
+            <Menu isLazy>
               <MenuButton
                 variant={selectedCategory ? 'solid' : 'outline'}
                 colorScheme={selectedCategory ? 'accent' : undefined}
@@ -71,31 +73,39 @@ export const IconPicker: React.FC<IconPickerProps> = observer(
               >
                 {selectedCategory || 'All categories'}
               </MenuButton>
-              <MenuList
-                css={css`
-                  max-height: 300px;
-                  overflow: auto;
-                `}
-              >
-                <MenuItem
-                  onClick={() => {
-                    state.selectedCategory = null
-                  }}
-                >
-                  Show all ({allItems.length})
-                </MenuItem>
-                <MenuDivider />
-                {allCategoryOptions.map((item, index) => (
-                  <MenuItem
-                    key={item.label}
-                    onClick={() => {
-                      state.selectedCategory = item.label
-                    }}
-                  >
-                    {item.label} ({item.count})
-                  </MenuItem>
-                ))}
-              </MenuList>
+              <Portal>
+                <MenuTransition>
+                  {(styles) => (
+                    <MenuList
+                      // @ts-ignore
+                      css={css`
+                        ${styles}
+                        max-height: 300px;
+                        overflow: auto;
+                      `}
+                    >
+                      <MenuItem
+                        onClick={() => {
+                          state.selectedCategory = null
+                        }}
+                      >
+                        Show all ({allItems.length})
+                      </MenuItem>
+                      <MenuDivider />
+                      {allCategoryOptions.map((item, index) => (
+                        <MenuItem
+                          key={item.label}
+                          onClick={() => {
+                            state.selectedCategory = item.label
+                          }}
+                        >
+                          {item.label} ({item.count})
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  )}
+                </MenuTransition>
+              </Portal>
             </Menu>
           </Box>
 

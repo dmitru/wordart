@@ -18,11 +18,7 @@ export const SearchInput: React.FC<
   }
 > = ({ onChange, noBorder = true, size = 'sm', ...props }) => (
   <InputGroup flex={1} size={size}>
-    <InputLeftElement
-      css={css`
-        top: 12px;
-      `}
-    >
+    <InputLeftElement>
       <SearchIcon color="gray.400" />
     </InputLeftElement>
 

@@ -23,7 +23,7 @@ export const BgItemsColorPickerKindDropdown: React.FC<{
   onUpdate: () => void
 }> = observer(({ bgStyle, onUpdate }) => {
   return (
-    <Menu placement="bottom-start">
+    <Menu isLazy placement="bottom-start">
       <MenuButton as={Button} rightIcon={<ChevronDownIcon />} py="2" px="3">
         {/* {bgStyle.items.coloring.kind === 'shape' && 'Color: Same as shape'} */}
         {bgStyle.items.coloring.kind === 'color' && 'Color: Custom'}

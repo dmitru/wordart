@@ -96,7 +96,7 @@ export const FontPickerModal: React.FC<FontPickerModalProps> = observer(
                         )}
 
                         <Box mt="3">
-                          <Menu placement="bottom-start">
+                          <Menu isLazy placement="bottom-start">
                             <MenuButton
                               isDisabled={selectedFont.font.styles.length < 2}
                               marginLeft="auto"

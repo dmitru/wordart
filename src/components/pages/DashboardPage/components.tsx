@@ -243,7 +243,7 @@ type WordcloudThumbnailMenuProps = {
 const WordcloudThumbnailMenu: React.FC<WordcloudThumbnailMenuProps> = React.memo<
   WordcloudThumbnailMenuProps
 >((props) => (
-  <Menu>
+  <Menu isLazy>
     <MenuButton as={ThumbnailMenuButton} noShadows={false} variant="solid" />
     <MenuTransition>
       {(styles) => (

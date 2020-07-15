@@ -225,7 +225,7 @@ export const SvgShapeColorKindDropdown: React.FC<{
   }
 
   return (
-    <Menu>
+    <Menu isLazy>
       <MenuButton
         variant="outline"
         as={Button}

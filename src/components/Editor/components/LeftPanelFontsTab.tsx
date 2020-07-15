@@ -136,7 +136,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
               Add more fonts
             </Button>
 
-            <Menu>
+            <Menu isLazy>
               <MenuButton as={MenuDotsButton} variant="ghost" />
 
               <MenuList>

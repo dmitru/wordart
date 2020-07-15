@@ -19,7 +19,7 @@ export const ShapeItemsColorPickerKindDropdown: React.FC<{
   onUpdate: () => void
 }> = observer(({ shapeStyle, onUpdate }) => {
   return (
-    <Menu placement="bottom-start">
+    <Menu isLazy placement="bottom-start">
       <MenuButton
         variant="outline"
         as={Button}

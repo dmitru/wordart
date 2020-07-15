@@ -25,7 +25,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
   const { shapesPanel } = store
 
   return (
-    <Menu placement="bottom-end">
+    <Menu isLazy placement="bottom-end">
       <MenuButton
         as={Button}
         colorScheme="secondary"

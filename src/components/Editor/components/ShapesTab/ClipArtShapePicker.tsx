@@ -288,7 +288,7 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                   >
                     <Flex align="center" mt="2" mb="4">
                       <Box mr="3">
-                        <Menu>
+                        <Menu isLazy>
                           <MenuButton
                             variant={selectedCategory ? 'solid' : 'outline'}
                             colorScheme={
