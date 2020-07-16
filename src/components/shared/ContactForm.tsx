@@ -11,11 +11,14 @@ import {
 } from '@chakra-ui/core'
 import { yupResolver } from '@hookform/resolvers'
 import { observer } from 'mobx-react'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { useStore } from 'services/root-store'
 import * as Yup from 'yup'
 import { config } from 'config'
+import { Recaptcha } from 'components/shared/recaptcha'
+import { Api } from 'services/api/api'
+import { GenericEmailSupportErrorMessage } from 'constants/messages'
 
 export type ContactFormValues = {
   email: string
@@ -31,33 +34,41 @@ const contactFormSchema = Yup.object().shape({
 })
 
 export const ContactForm = observer(() => {
-  const { authStore } = useStore()
+  const recaptchaRef = useRef<Recaptcha>(null)
 
+  const { authStore } = useStore()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  console.log(
-    'authStore.profile',
-    authStore.profile?.email,
-    authStore.hasInitialized
-  )
-
-  const { register, handleSubmit, errors, formState, reset } = useForm<
-    ContactFormValues
-  >({
+  const {
+    register,
+    getValues,
+    handleSubmit,
+    errors,
+    formState,
+    reset,
+  } = useForm<ContactFormValues>({
     defaultValues: {
       email: authStore.profile?.email || '',
     },
     resolver: yupResolver(contactFormSchema),
   })
 
-  const onSubmit = async (values: ContactFormValues) => {
+  const onCaptchaResponse = async (token: string) => {
+    recaptchaRef.current?.reset()
+
     try {
-      // await authStore.loginWithEmail(values)
+      await Api.feedback.sendForm({ ...getValues(), recaptcha: token })
     } catch (error) {
-      setError(
-        `Sorry, there was a problem on our end. Please email our support at ${config.supportEmail}.`
-      )
+      setError(GenericEmailSupportErrorMessage)
+    } finally {
+      setIsSubmitting(false)
     }
+  }
+
+  const onSubmit = async (values: ContactFormValues) => {
+    setIsSubmitting(true)
+    recaptchaRef.current?.execute()
   }
 
   useEffect(() => {
@@ -80,6 +91,13 @@ export const ContactForm = observer(() => {
       spacing="4"
       maxWidth="500px"
     >
+      <Recaptcha
+        sitekey={config.recaptcha.siteKey}
+        size="invisible"
+        ref={recaptchaRef}
+        onVerify={onCaptchaResponse}
+      />
+
       <FormControl id="email">
         <FormLabel>Email address</FormLabel>
         <Input
@@ -123,7 +141,7 @@ export const ContactForm = observer(() => {
       <Button
         type="submit"
         colorScheme="primary"
-        isLoading={formState.isSubmitting}
+        isLoading={formState.isSubmitting || isSubmitting}
       >
         Send your message
       </Button>

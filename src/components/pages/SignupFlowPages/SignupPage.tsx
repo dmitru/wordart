@@ -101,7 +101,6 @@ export const SignupPage = observer(() => {
     }
 
     setIsSubmitting(true)
-
     recaptchaRef.current?.execute()
   }
 

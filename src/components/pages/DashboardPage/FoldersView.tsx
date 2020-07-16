@@ -168,6 +168,7 @@ export const FoldersView = observer(() => {
                     <MenuTransition>
                       {(styles) => (
                         <MenuList
+                          // @ts-ignore
                           css={styles}
                           fontWeight="normal"
                           onClick={(e: React.MouseEvent) => {

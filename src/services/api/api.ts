@@ -19,11 +19,24 @@ import {
   EmailSignupParams,
   CreateAnonymousWordcloudDto,
 } from 'services/api/types'
-import { apiClient, ApiResponseError } from './api-client'
+import { apiClient } from './api-client'
 
 export const Api = {
   setAuthToken: apiClient.setAuthToken,
   clearAuthToken: apiClient.clearAuthToken,
+
+  feedback: {
+    async sendForm(data: {
+      email: string
+      name?: string
+      subject?: string
+      message: string
+      recaptcha: string
+    }) {
+      const response = await apiClient.post('/users/contact-form', data)
+      return response.data
+    },
+  },
 
   extractor: {
     async fromUrl(data: {
