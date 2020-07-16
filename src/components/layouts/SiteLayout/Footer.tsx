@@ -15,6 +15,9 @@ export const Footer: React.FC<FooterProps> = () => {
         flexDirection="column"
       >
         <Box>
+          <Link href={Urls.contact} passHref>
+            <FooterLink>Contact</FooterLink>
+          </Link>
           <Link href={Urls.privacyPolicy} passHref>
             <FooterLink>Privacy Policy</FooterLink>
           </Link>

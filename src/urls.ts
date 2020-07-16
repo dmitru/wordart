@@ -1,4 +1,6 @@
 export const Urls = {
+  blog: 'https://blog.wordcloudy.com',
+
   landing: '/',
   login: '/login',
   signup: '/signup',

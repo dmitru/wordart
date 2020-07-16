@@ -115,7 +115,7 @@ const HeaderCtaContainer = styled.div`
 `
 
 const HeaderCreateNowButton = styled(Button)`
-  max-width: 300px;
+  max-width: 180px;
 `
 
 const HeaderCtaInfo = styled.span`
