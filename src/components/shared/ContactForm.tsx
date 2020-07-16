@@ -23,6 +23,7 @@ import { GenericEmailSupportErrorMessage } from 'constants/messages'
 export type ContactFormValues = {
   email: string
   name: string
+  subject: string
   message: string
 }
 
@@ -99,7 +100,7 @@ export const ContactForm = observer(() => {
       />
 
       <FormControl id="email">
-        <FormLabel>Email address</FormLabel>
+        <FormLabel>Your email address</FormLabel>
         <Input
           placeholder="How can we reach you?"
           type="email"
@@ -123,11 +124,25 @@ export const ContactForm = observer(() => {
         )}
       </FormControl>
 
+      <FormControl id="subject">
+        <FormLabel>Subject</FormLabel>
+        <Input
+          placeholder="Summary of what your message is about"
+          name="subject"
+          ref={register}
+        />
+        {errors.subject && (
+          <FormHelperText color="red.500">
+            {errors.subject?.message}
+          </FormHelperText>
+        )}
+      </FormControl>
+
       <FormControl id="message">
         <FormLabel>Your message</FormLabel>
         <Textarea
           rows={10}
-          placeholder="Describe your problem in detail, ask a question, etc"
+          placeholder="Ask a question, describe your problem in detail, etc"
           name="message"
           ref={register}
         />
