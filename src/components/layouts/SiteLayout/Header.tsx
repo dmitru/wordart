@@ -54,15 +54,15 @@ export const Header: React.FC<HeaderProps> = observer(
               </LogoLink>
             </Link>
 
-            <Link href={Urls.faq} passHref>
-              <TopNavLink active={pathname === Urls.faq} ml="5">
-                FAQ
-              </TopNavLink>
-            </Link>
-
             <Link href={Urls.pricing} passHref>
               <TopNavLink active={pathname === Urls.pricing}>
                 Pricing
+              </TopNavLink>
+            </Link>
+
+            <Link href={Urls.faq} passHref>
+              <TopNavLink active={pathname === Urls.faq} ml="5">
+                FAQ
               </TopNavLink>
             </Link>
 

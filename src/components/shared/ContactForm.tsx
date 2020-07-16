@@ -34,7 +34,11 @@ const contactFormSchema = Yup.object().shape({
   message: Yup.string().required('Please provide your message'),
 })
 
-export const ContactForm = observer(() => {
+export type ContactFormProps = {
+  onSubmit?: () => void
+}
+
+export const ContactForm = observer((props: ContactFormProps) => {
   const recaptchaRef = useRef<Recaptcha>(null)
 
   const { authStore } = useStore()
@@ -60,6 +64,9 @@ export const ContactForm = observer(() => {
 
     try {
       await Api.feedback.sendForm({ ...getValues(), recaptcha: token })
+      if (props.onSubmit) {
+        props.onSubmit()
+      }
     } catch (error) {
       setError(GenericEmailSupportErrorMessage)
     } finally {

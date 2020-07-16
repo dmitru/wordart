@@ -1,16 +1,23 @@
-import { Box, Text } from '@chakra-ui/core'
+import { Box, Text, Button } from '@chakra-ui/core'
 import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
 import { ContactForm } from 'components/shared/ContactForm'
 import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
-import Link from 'next/link'
-import React from 'react'
+import React, { useState } from 'react'
 import { Helmet } from 'react-helmet'
 import { config } from 'config'
-import { Urls } from 'urls'
 import { getTabTitle } from 'utils/tab-title'
+import { useToasts } from 'use-toasts'
 
 export const ContactPage = observer(() => {
+  const toasts = useToasts()
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+
+  const handleSubmit = () => {
+    toasts.showSuccess({ title: 'Your message has been sent!' })
+    setHasSubmitted(true)
+  }
+
   return (
     <SiteLayout>
       <Box>
@@ -19,23 +26,42 @@ export const ContactPage = observer(() => {
         </Helmet>
 
         <Box mb="6rem">
-          <Box id="Contact" mt="1.5rem" maxWidth="700px" mx="auto">
-            <h1>Contact Form</h1>
+          <Box mt="1.5rem" maxWidth="700px" mx="auto">
+            {hasSubmitted ? (
+              <>
+                <h1>Thank you!</h1>
 
-            <Box maxWidth="600px">
-              <Text>
-                You can contact us with this form, or send us an email to{' '}
-                <a href={`mailto://${config.supportEmail}`}>
-                  {config.supportEmail}
-                </a>
-                .
-              </Text>
-              <Text>We're trying to answer all messages within 24 hours.</Text>
-            </Box>
+                <Text>
+                  We've received your message and will try to reply to the
+                  provided email within 24 hours.
+                </Text>
 
-            <Box>
-              <ContactForm />
-            </Box>
+                <Button variant="link" onClick={() => setHasSubmitted(false)}>
+                  Send another message
+                </Button>
+              </>
+            ) : (
+              <>
+                <h1>Contact Form</h1>
+
+                <Box maxWidth="600px">
+                  <Text>
+                    You can contact us with this form, or send us an email to{' '}
+                    <a href={`mailto://${config.supportEmail}`}>
+                      {config.supportEmail}
+                    </a>
+                    .
+                  </Text>
+                  <Text>
+                    We're trying to answer all messages within 24 hours.
+                  </Text>
+                </Box>
+
+                <Box>
+                  <ContactForm onSubmit={handleSubmit} />
+                </Box>
+              </>
+            )}
           </Box>
         </Box>
       </Box>
