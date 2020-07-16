@@ -5,6 +5,8 @@ import {
   MenuList,
   PopoverArrow,
   Text,
+  MenuTransition,
+  Portal,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
 import {
@@ -161,28 +163,36 @@ export const FoldersView = observer(() => {
                       e.nativeEvent.stopPropagation()
                     }}
                   />
-                  <MenuList
-                    fontWeight="normal"
-                    onClick={(e: React.MouseEvent) => {
-                      e.stopPropagation()
-                      e.nativeEvent.preventDefault()
-                      e.nativeEvent.stopPropagation()
-                    }}
-                  >
-                    <MenuItemWithIcon
-                      icon={<FaPencilAlt />}
-                      onClick={() => setRenamingFolder(f)}
-                    >
-                      Rename
-                    </MenuItemWithIcon>
-                    <MenuItemWithIcon
-                      icon={<FaTimes />}
-                      onClick={() => setDeletingFolder(f)}
-                    >
-                      Delete
-                    </MenuItemWithIcon>
-                    {/* <PopoverArrow /> */}
-                  </MenuList>
+
+                  <Portal>
+                    <MenuTransition>
+                      {(styles) => (
+                        <MenuList
+                          css={styles}
+                          fontWeight="normal"
+                          onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation()
+                            e.nativeEvent.preventDefault()
+                            e.nativeEvent.stopPropagation()
+                          }}
+                        >
+                          <MenuItemWithIcon
+                            icon={<FaPencilAlt />}
+                            onClick={() => setRenamingFolder(f)}
+                          >
+                            Rename
+                          </MenuItemWithIcon>
+                          <MenuItemWithIcon
+                            icon={<FaTimes />}
+                            onClick={() => setDeletingFolder(f)}
+                          >
+                            Delete
+                          </MenuItemWithIcon>
+                          {/* <PopoverArrow /> */}
+                        </MenuList>
+                      )}
+                    </MenuTransition>
+                  </Portal>
                 </Menu>
               </Box>
             </FolderRow>

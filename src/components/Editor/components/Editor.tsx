@@ -442,88 +442,94 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               />
               Menu
             </MenuButton>
-            <MenuList zIndex={4}>
-              <MenuItem>
-                <FiFilePlus
-                  css={css`
-                    margin-right: 4px;
-                  `}
-                />
-                New...
-              </MenuItem>
-              <MenuItem onClick={handleSaveClick}>
-                <FiSave
-                  css={css`
-                    margin-right: 4px;
-                  `}
-                />
-                Save
-              </MenuItem>
-              <MenuItem>
-                <FiCopy
-                  css={css`
-                    margin-right: 4px;
-                  `}
-                />
-                Make Copy
-              </MenuItem>
-              <MenuItem>
-                <FiEdit
-                  css={css`
-                    margin-right: 4px;
-                  `}
-                />
-                Rename
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  state.leftPanelContext = 'resize'
-                }}
-              >
-                <IoMdResize
-                  css={css`
-                    margin-right: 4px;
-                  `}
-                />
-                Page Size...
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem>
-                <FiPrinter
-                  css={css`
-                    margin-right: 4px;
-                  `}
-                />
-                Print
-              </MenuItem>
-              <MenuItem>
-                <FiDownload
-                  onClick={openExport}
-                  css={css`
-                    margin-right: 4px;
-                  `}
-                />{' '}
-                Download as Image
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem>
-                <BsTrash
-                  css={css`
-                    margin-right: 4px;
-                  `}
-                />
-                Delete
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem>
-                <FiChevronLeft
-                  css={css`
-                    margin-right: 4px;
-                  `}
-                />
-                Go Back to Your Designs
-              </MenuItem>
-            </MenuList>
+            <Portal>
+              <MenuTransition>
+                {(styles) => (
+                  <MenuList css={styles} zIndex={4}>
+                    <MenuItem>
+                      <FiFilePlus
+                        css={css`
+                          margin-right: 4px;
+                        `}
+                      />
+                      New...
+                    </MenuItem>
+                    <MenuItem onClick={handleSaveClick}>
+                      <FiSave
+                        css={css`
+                          margin-right: 4px;
+                        `}
+                      />
+                      Save
+                    </MenuItem>
+                    <MenuItem>
+                      <FiCopy
+                        css={css`
+                          margin-right: 4px;
+                        `}
+                      />
+                      Make Copy
+                    </MenuItem>
+                    <MenuItem>
+                      <FiEdit
+                        css={css`
+                          margin-right: 4px;
+                        `}
+                      />
+                      Rename
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        state.leftPanelContext = 'resize'
+                      }}
+                    >
+                      <IoMdResize
+                        css={css`
+                          margin-right: 4px;
+                        `}
+                      />
+                      Page Size...
+                    </MenuItem>
+                    <MenuDivider />
+                    <MenuItem>
+                      <FiPrinter
+                        css={css`
+                          margin-right: 4px;
+                        `}
+                      />
+                      Print
+                    </MenuItem>
+                    <MenuItem>
+                      <FiDownload
+                        onClick={openExport}
+                        css={css`
+                          margin-right: 4px;
+                        `}
+                      />{' '}
+                      Download as Image
+                    </MenuItem>
+                    <MenuDivider />
+                    <MenuItem>
+                      <BsTrash
+                        css={css`
+                          margin-right: 4px;
+                        `}
+                      />
+                      Delete
+                    </MenuItem>
+                    <MenuDivider />
+                    <MenuItem>
+                      <FiChevronLeft
+                        css={css`
+                          margin-right: 4px;
+                        `}
+                      />
+                      Go Back to Your Designs
+                    </MenuItem>
+                  </MenuList>
+                )}
+              </MenuTransition>
+            </Portal>
           </Menu>
 
           <Button
@@ -1018,25 +1024,31 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                             variant="ghost"
                           />
 
-                          <MenuList>
-                            <MenuItem
-                              onClick={() => {
-                                store.editor?.clearItems('shape', true)
-                              }}
-                            >
-                              <SmallCloseIcon color="gray.500" mr="2" />
-                              Delete all Shape items
-                            </MenuItem>
+                          <Portal>
+                            <MenuTransition>
+                              {(styles) => (
+                                <MenuList css={styles}>
+                                  <MenuItem
+                                    onClick={() => {
+                                      store.editor?.clearItems('shape', true)
+                                    }}
+                                  >
+                                    <SmallCloseIcon color="gray.500" mr="2" />
+                                    Delete all Shape items
+                                  </MenuItem>
 
-                            <MenuItem
-                              onClick={() => {
-                                store.editor?.clearItems('bg', true)
-                              }}
-                            >
-                              <SmallCloseIcon color="gray.500" mr="2" />
-                              Delete all Background items
-                            </MenuItem>
-                          </MenuList>
+                                  <MenuItem
+                                    onClick={() => {
+                                      store.editor?.clearItems('bg', true)
+                                    }}
+                                  >
+                                    <SmallCloseIcon color="gray.500" mr="2" />
+                                    Delete all Background items
+                                  </MenuItem>
+                                </MenuList>
+                              )}
+                            </MenuTransition>
+                          </Portal>
                         </Menu>
 
                         <Button

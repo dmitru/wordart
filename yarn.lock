@@ -2922,11 +2922,6 @@
   resolved "https://registry.yarnpkg.com/@react-hook/throttle/-/throttle-2.1.3.tgz#a55d22f13691657ad40115176382ff495ff35053"
   integrity sha512-iDMSu6awo6oU9exUq74+1qDn9EnMr7S/tMzqp92VNqDc+C8NpW4a4pVaxBCIQLD8LkF8I0DiTD22waazREk6KQ==
 
-"@scarf/scarf@^1.0.0":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@scarf/scarf/-/scarf-1.0.6.tgz#52011dfb19187b53b75b7b6eac20da0810ddd88f"
-  integrity sha512-y4+DuXrAd1W5UIY3zTcsosi/1GyYT8k5jGnZ/wG7UUHVrU+MHlH4Mp87KK2/lvMW4+H7HVcdB+aJhqywgXksjA==
-
 "@sinonjs/commons@^1.7.0":
   version "1.7.2"
   resolved "https://registry.yarnpkg.com/@sinonjs/commons/-/commons-1.7.2.tgz#505f55c74e0272b43f6c52d81946bed7058fc0e2"
@@ -10503,15 +10498,6 @@ react-use@^14.2.0:
     ts-easing "^0.2.0"
     tslib "^1.10.0"
 
-react-virtual@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/react-virtual/-/react-virtual-2.2.0.tgz#bd9d2925a9778d8f12f22b1acacb2bd22069a7eb"
-  integrity sha512-ZiXj6DwHuUT4KRWl4GxkvF+WzQTXRmLn8+fgMbrsHB23NQeH+4rWB9NykzhzqwbZF/c5vzzT2MPcl3N+OgrDaA==
-  dependencies:
-    "@reach/observe-rect" "^1.1.0"
-    "@scarf/scarf" "^1.0.0"
-    ts-toolbelt "^6.4.2"
-
 react-virtualized-auto-sizer@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/react-virtualized-auto-sizer/-/react-virtualized-auto-sizer-1.0.2.tgz#a61dd4f756458bbf63bd895a92379f9b70f803bd"
@@ -12141,11 +12127,6 @@ ts-pnp@^1.1.6:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/ts-pnp/-/ts-pnp-1.2.0.tgz#a500ad084b0798f1c3071af391e65912c86bca92"
   integrity sha512-csd+vJOb/gkzvcCHgTGSChYpy5f1/XKNsmvBGO4JXS+z1v2HobugDz4s1IeFXM3wZB44uczs+eazB5Q/ccdhQw==
-
-ts-toolbelt@^6.4.2:
-  version "6.9.9"
-  resolved "https://registry.yarnpkg.com/ts-toolbelt/-/ts-toolbelt-6.9.9.tgz#e6cfd8ec7d425d2a06bda3b4fe9577ceaf2abda8"
-  integrity sha512-5a8k6qfbrL54N4Dw+i7M6kldrbjgDWb5Vit8DnT+gwThhvqMg8KtxLE5Vmnft+geIgaSOfNJyAcnmmlflS+Vdg==
 
 tslib@^1.0.0, tslib@^1.11.2, tslib@^1.9.3:
   version "1.13.0"
