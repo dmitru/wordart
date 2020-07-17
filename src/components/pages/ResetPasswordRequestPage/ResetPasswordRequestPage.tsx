@@ -169,8 +169,9 @@ export const ResetPasswordRequestPage = observer(() => {
         </Link>
         {' or '}
         <Link passHref href={Urls.signup}>
-          <a>create an account.</a>
-        </Link>
+          <a>create an account</a>
+        </Link>{' '}
+        instead.
       </Text>
     </SiteFormLayout>
   )

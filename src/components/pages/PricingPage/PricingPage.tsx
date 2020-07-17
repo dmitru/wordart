@@ -393,7 +393,7 @@ export const PricingPage = observer(() => {
               fontSize={['sm', 'lg']}
               color="gray.600"
             >
-              WordCloudy is free for <em>non-commercial</em> use! Try it as long
+              WordCloudy is free for <em>non-commercial</em> use. Try it as long
               as you like to see if it's right for you.
             </Text>
           </Box>

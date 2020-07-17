@@ -125,11 +125,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
                     </MenuLink>
                   </Link>
 
-                  <MenuLink
-                    href={Urls.blog}
-                    target="_blank"
-                    active={pathname === Urls.login}
-                  >
+                  <MenuLink href={Urls.blog} target="_blank">
                     Blog
                   </MenuLink>
 
