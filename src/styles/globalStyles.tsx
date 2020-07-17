@@ -52,6 +52,8 @@ export const globalStyles = (
       }
 
       ${typography.toString()}
+
+      @import url('https://fonts.googleapis.com/css2?family=Lalezar&display=swap');
     `}
   />
 )

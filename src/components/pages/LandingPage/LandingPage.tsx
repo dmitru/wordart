@@ -104,7 +104,7 @@ const HeaderTitle = styled.h1`
 const HeaderSubtitle = styled.h2`
   color: #9ba1ac;
   font-size: 28px;
-  font-weight: 300;
+  font-weight: 400;
   border-bottom: none;
 `
 

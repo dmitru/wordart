@@ -1,7 +1,9 @@
-import theme, { Theme } from '@chakra-ui/theme'
+import theme, { Theme as ChakraTheme } from '@chakra-ui/theme'
 import colors from './foundations/colors'
 
-const myTheme: Theme = {
+export type Theme = ChakraTheme
+
+const myTheme: ChakraTheme = {
   ...theme,
   colors,
   components: {
