@@ -214,6 +214,7 @@ const MenuLink = (
     {...props}
     bg={props.active ? 'gray.200' : 'white'}
     color={props.variant === 'accent' ? 'accent.500' : undefined}
+    _hover={{ bg: 'gray.100' }}
   />
 )
 
@@ -258,6 +259,8 @@ export const MobileHeaderWrapper = styled(Box)<{ theme: any }>`
 
 const MenuContainer = styled(Box)`
   position: fixed;
+  overflow: auto;
+  padding-bottom: 60px;
   z-index: 1;
   top: 0;
   left: 0;
