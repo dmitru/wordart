@@ -4,7 +4,7 @@ import { observer } from 'mobx-react'
 import React from 'react'
 import styled from '@emotion/styled'
 import css from '@emotion/css'
-import { Button } from '@chakra-ui/core'
+import { Button, Box } from '@chakra-ui/core'
 import AwesomeSlider from 'react-awesome-slider'
 // @ts-ignore
 
@@ -13,26 +13,16 @@ import AwesomeSlider from 'react-awesome-slider'
 export const LandingPage = observer(() => {
   return (
     <SiteLayout fullWidth>
-      <HeaderContainer>
-        <img
-          src="/landing/wave-header.svg"
-          css={css`
-            position: absolute;
-            width: 100%;
-            min-width: 100%;
-            height: auto;
-            max-width: unset;
-            z-index: -1;
-            left: 0;
-            bottom: 20vh;
-          `}
-        />
+      <HeaderContainer bg="gray.100">
         <HeaderContentWidthLimit>
           <HeaderTitleContainer>
             <HeaderTitle>
-              Create print-ready, <em>unique</em> word designs in no time!
+              Create <em>unique</em> word designs in no time!
             </HeaderTitle>
-            <HeaderSubtitle>Easy-to-use online art generator</HeaderSubtitle>
+            <HeaderSubtitle>
+              Easy-to-use online art generator. Produce attractive, print-ready
+              designs with no prior graphics skills.
+            </HeaderSubtitle>
             <HeaderCtaContainer>
               <HeaderCreateNowButton colorScheme="accent" size="lg">
                 Create now
@@ -50,6 +40,20 @@ export const LandingPage = observer(() => {
             </HeaderSlider>
           </HeaderSliderContainer>
         </HeaderContentWidthLimit>
+
+        <div className="custom-shape-divider-bottom-1594969392">
+          <svg
+            data-name="Layer 1"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1200 120"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
+              className="shape-fill"
+            />
+          </svg>
+        </div>
       </HeaderContainer>
     </SiteLayout>
   )
@@ -88,6 +92,29 @@ const HeaderContainer = styled.div`
   position: relative;
   min-height: 100vh;
   min-height: calc(100vh - 90px);
+
+  background: #f6fafe;
+
+  .custom-shape-divider-bottom-1594969392 {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    transform: rotate(180deg);
+  }
+
+  .custom-shape-divider-bottom-1594969392 svg {
+    position: relative;
+    display: block;
+    width: calc(128% + 1.3px);
+    height: 137px;
+  }
+
+  .custom-shape-divider-bottom-1594969392 .shape-fill {
+    fill: #fff;
+  }
 `
 
 const HeaderTitleContainer = styled.div`
@@ -97,14 +124,19 @@ const HeaderTitleContainer = styled.div`
 `
 
 const HeaderTitle = styled.h1`
-  color: #474e5b;
+  position: relative;
+  color: #3c526f;
   border-bottom: none;
   font-size: 48px;
+  font-weight: 800;
+  font-family: 'Nunito', sans-serif;
 `
 const HeaderSubtitle = styled.h2`
-  color: #9ba1ac;
-  font-size: 28px;
-  font-weight: 400;
+  color: #3c526f;
+  font-family: 'Nunito', sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 24px;
   border-bottom: none;
 `
 
@@ -121,5 +153,6 @@ const HeaderCreateNowButton = styled(Button)`
 const HeaderCtaInfo = styled.span`
   margin-top: 20px;
   font-size: 20px;
-  color: #9ba1ac;
+  font-family: 'Nunito', sans-serif;
+  color: #3c526f;
 `

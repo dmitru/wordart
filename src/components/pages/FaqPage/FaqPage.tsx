@@ -41,7 +41,7 @@ export const FaqPage = observer(() => {
               <Link passHref href={Urls.contact}>
                 <a>Contact our friendly support</a>
               </Link>{' '}
-              – we'll be happy to help you.
+              – we're happy to help you.
             </Text>
           </Box>
 

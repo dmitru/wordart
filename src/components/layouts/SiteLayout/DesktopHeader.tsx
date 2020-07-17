@@ -220,8 +220,8 @@ const topNavLink = (p: { active?: boolean }) => css`
   position: relative;
   box-sizing: content-box;
   text-transform: uppercase;
-  font-size: 0.9rem !important;
-  font-weight: 600 !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
   cursor: pointer;
   box-shadow: none !important;
 

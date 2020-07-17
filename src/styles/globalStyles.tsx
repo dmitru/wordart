@@ -2,7 +2,12 @@ import { css, Global } from '@emotion/core'
 import Typography from 'typography'
 // @ts-ignore
 import typographyTheme from 'typography-theme-github'
-const typography = new Typography(typographyTheme)
+const typography = new Typography({
+  ...typographyTheme,
+  bodyFontFamily: ['Roboto'],
+  headerWeight: 500,
+  headerFontFamily: ['Nunito', 'sans-serif'],
+})
 
 export const globalStyles = (
   <Global
@@ -53,7 +58,9 @@ export const globalStyles = (
 
       ${typography.toString()}
 
-      @import url('https://fonts.googleapis.com/css2?family=Lalezar&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;500;600;700;800&family=Nunito:wght@300;400;600;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;500;600;700;800&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;500;600;700;800&family=Nunito:wght@300;400;600;700&family=Roboto:wght@300;400;500;700&display=swap');
     `}
   />
 )

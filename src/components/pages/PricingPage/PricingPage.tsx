@@ -184,7 +184,6 @@ export const PricingPage = observer(() => {
           <Box
             p="5"
             fontSize="xl"
-            fontWeight="semibold"
             bg="gray.100"
             textAlign="center"
             borderRadius="lg"
@@ -278,7 +277,6 @@ export const PricingPage = observer(() => {
           <Box
             p="5"
             fontSize={['lg', 'lg', 'xl']}
-            fontWeight="semibold"
             bg="gray.100"
             textAlign="center"
             borderRadius="lg"

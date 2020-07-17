@@ -5,6 +5,11 @@ export type Theme = ChakraTheme
 
 const myTheme: ChakraTheme = {
   ...theme,
+  fonts: {
+    ...theme.fonts,
+    // heading: `Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
+    // body: `"Maven Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
+  },
   colors,
   components: {
     ...theme.components,
@@ -18,8 +23,11 @@ const myTheme: ChakraTheme = {
       ...theme.components.Button,
       baseStyle: {
         ...theme.components.Button.baseStyle,
-        // @ts-ignore
-        textDecoration: 'none !important',
+        container: {
+          ...theme.components.Button.baseStyle.container,
+          textDecoration: 'none !important',
+          fontWeight: '500',
+        },
       },
     },
     Menu: {
