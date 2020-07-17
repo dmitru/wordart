@@ -5,7 +5,6 @@ import styled from '@emotion/styled'
 import css from '@emotion/css'
 import { Button, Box, Text, Stack } from '@chakra-ui/core'
 import AwesomeSlider from 'react-awesome-slider'
-import AutoplaySlider from 'react-awesome-slider/hoc/autoplay'
 
 export const LandingPage = observer(() => {
   return (
