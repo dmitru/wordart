@@ -5,6 +5,7 @@ import styled from '@emotion/styled'
 import css from '@emotion/css'
 import { Button, Box, Text, Stack } from '@chakra-ui/core'
 import AwesomeSlider from 'react-awesome-slider'
+import AutoplaySlider from 'react-awesome-slider/hoc/autoplay'
 
 export const LandingPage = observer(() => {
   return (
@@ -16,9 +17,10 @@ export const LandingPage = observer(() => {
               Create <em>unique</em> word designs in no time!
             </HeaderTitle>
             <HeaderSubtitle>
-              Easy-to-use online art generator. Produce attractive results with
-              no prior design skills, and download them in professional
-              print-ready quality.
+              Easy-to-use online art generator.
+              <br />
+              <br /> Create attractive results with no prior design skills, and
+              download them in professional print-ready quality.
             </HeaderSubtitle>
 
             <HeaderCtaContainer>
@@ -47,6 +49,10 @@ export const LandingPage = observer(() => {
             <HeaderSlider>
               <AwesomeSlider>
                 <div data-src="/gallery/gallery-0.png" />
+                <div data-src="/gallery/gallery-1.png" />
+                <div data-src="/gallery/gallery-1.png" />
+                <div data-src="/gallery/gallery-1.png" />
+                <div data-src="/gallery/gallery-1.png" />
                 <div data-src="/gallery/gallery-1.png" />
               </AwesomeSlider>
             </HeaderSlider>
@@ -340,5 +346,6 @@ const CtaFooterSection = styled(Box)`
     color: #3c526f;
   }
 
+  margin-top: 80px;
   margin-bottom: 120px;
 `
