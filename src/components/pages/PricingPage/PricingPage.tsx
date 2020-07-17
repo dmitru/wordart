@@ -20,6 +20,29 @@ export const PricingPage = observer(() => {
     unlimitedPricingPlans[0].id
   )
 
+  const noLimitsHelpIcon = (
+    <HelpTooltipIcon label="Enjoy no limits as long as there are unused HQ downloads in your account + 1 week after that" />
+  )
+
+  const qualityHelpIcon = (
+    <HelpTooltipIcon
+      label={
+        <>
+          <ul>
+            <li>
+              <strong>Standard quality:</strong> PNG or JPEG format, up to
+              1024px
+            </li>
+            <li>
+              <strong>High Quality (HQ):</strong> PNG, JPEG (up to 4096px) or
+              SVG vector format
+            </li>
+          </ul>
+        </>
+      }
+    />
+  )
+
   const commercialUseHelp = (
     <HelpTooltipIcon
       css={css`
@@ -342,29 +365,6 @@ export const PricingPage = observer(() => {
         </Box>
       </Box>
     </Box>
-  )
-
-  const noLimitsHelpIcon = (
-    <HelpTooltipIcon label="Enjoy no limits as long as there are unused HQ downloads in your account + 1 week after that" />
-  )
-
-  const qualityHelpIcon = (
-    <HelpTooltipIcon
-      label={
-        <>
-          <ul>
-            <li>
-              <strong>Standard quality:</strong> PNG or JPEG format, up to
-              1024px
-            </li>
-            <li>
-              <strong>High Quality (HQ):</strong> PNG, JPEG (up to 4096px) or
-              SVG vector format
-            </li>
-          </ul>
-        </>
-      }
-    />
   )
 
   return (
