@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from '@emotion/styled'
+import css from '@emotion/css'
 import Link from 'next/link'
 import { Urls } from 'urls'
 import { Box } from '@chakra-ui/core'
@@ -14,7 +15,15 @@ export const Footer: React.FC<FooterProps> = () => {
         alignItems="center"
         flexDirection="column"
       >
-        <Box>
+        <Box
+          css={css`
+            @media screen and (max-width: 768px) {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+            }
+          `}
+        >
           <Link href={Urls.contact} passHref>
             <FooterLink>Contact</FooterLink>
           </Link>

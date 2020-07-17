@@ -26,7 +26,7 @@ export const FaqPage = observer(() => {
             textAlign="center"
             mx="auto"
           >
-            <Text as="h1" textAlign="center" fontSize="42px">
+            <Text as="h1" textAlign="center">
               Frequently Asked Questions
             </Text>
 
@@ -37,8 +37,11 @@ export const FaqPage = observer(() => {
               fontSize="lg"
               color="gray.600"
             >
-              Still have questions or looking for help? Contact our friendly
-              support – we'll be happy to help you.
+              Read the FAQ and still have questions or looking for help?{' '}
+              <Link passHref href={Urls.contact}>
+                <a>Contact our friendly support</a>
+              </Link>{' '}
+              – we'll be happy to help you.
             </Text>
           </Box>
 

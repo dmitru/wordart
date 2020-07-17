@@ -30,9 +30,133 @@ export const PricingPage = observer(() => {
     />
   )
 
+  const comparisonSection = (
+    <Box
+      css={css`
+        @media screen and (max-width: 768px) {
+          display: none;
+        }
+      `}
+    >
+      <Box
+        display="flex"
+        flexDirection="column"
+        maxWidth="600px"
+        textAlign="center"
+        mx="auto"
+      >
+        <Text as="h1" textAlign="center" id="pricing-comparison">
+          Compare free and paid features
+        </Text>
+      </Box>
+
+      <Box mt="2rem">
+        <ComparisonTable>
+          <thead>
+            <tr>
+              <th></th>
+              <th>FREE</th>
+              <th>UNLIMITED</th>
+              <th>HQ DOWNLOAD PACKS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Download quality</th>
+              <MainDetailsTableCell main={<>Standard{qualityHelpIcon}</>} />
+              <MainDetailsTableCell
+                main={
+                  <>
+                    Standard or High
+                    {qualityHelpIcon}
+                  </>
+                }
+              />
+              <MainDetailsTableCell
+                main={
+                  <>
+                    Standard or High&nbsp;
+                    {qualityHelpIcon}
+                  </>
+                }
+              />
+            </tr>
+
+            <tr>
+              <th>Allowed use</th>
+              <MainDetailsTableCell main="Personal use only" />
+              <MainDetailsTableCell
+                main={
+                  <>
+                    Commercial
+                    <HelpTooltipIcon label="HQ downloads can be used for any commercial purposes. Standard-quality downloads may still not be used commercially" />
+                  </>
+                }
+              />
+              <MainDetailsTableCell
+                main={
+                  <>
+                    Commercial
+                    <HelpTooltipIcon label="HQ downloads can be used for any commercial purposes. Standard-quality downloads may still not be used commercially" />
+                  </>
+                }
+              />
+            </tr>
+
+            <tr>
+              <th>Number of HQ downloads</th>
+              <MainDetailsTableCell main="0" />
+              <MainDetailsTableCell
+                main={
+                  <>
+                    Unlimited
+                    <HelpTooltipIcon label="No limit for HQ downloads" />
+                  </>
+                }
+              />
+              <MainDetailsTableCell
+                main={
+                  <>
+                    Limited
+                    <HelpTooltipIcon label="Limited number of HQ downloads, depending on the package" />
+                  </>
+                }
+              />
+            </tr>
+
+            <tr>
+              <th>Max. number of saved designs</th>
+              <MainDetailsTableCell main="10" />
+              <MainDetailsTableCell main="Unlimited" />
+              <MainDetailsTableCell main={<>Unlimited {noLimitsHelpIcon}</>} />
+            </tr>
+
+            <tr>
+              <th>Custom fonts and image shapes</th>
+              <MainDetailsTableCell
+                main={
+                  <>
+                    Partial support
+                    <HelpTooltipIcon label="You'll be able to create and download your design with custom images and fonts, but you won't be able to save it to your Wordcloudy account" />{' '}
+                  </>
+                }
+              />
+              <MainDetailsTableCell main="Yes" />
+              <MainDetailsTableCell main="Yes" />
+            </tr>
+          </tbody>
+        </ComparisonTable>
+      </Box>
+    </Box>
+  )
+
   const unlimitedPlans = (
-    <Box mt="3rem" mb="5rem" mx="6">
-      <Box width="380px">
+    <Box
+      mt={['1rem', '1rem', '3rem']}
+      mb={['1rem', '1rem', '1rem']}
+      mx={[2, 6]}
+    >
+      <Box width={['300px', '340px', '340px', '360px']}>
         <Box boxShadow="lg" borderRadius="lg">
           <Box
             p="5"
@@ -45,7 +169,7 @@ export const PricingPage = observer(() => {
             Unlimited Plans
           </Box>
 
-          <Box as="ul" color="gray.500" mt="5" pr="4">
+          <Box as="ul" color="gray.500" mt="5" pr="4" fontSize={['sm', 'md']}>
             <li>Unlimited number of HQ downloads</li>
             <li>Commercial use {commercialUseHelp}</li>
             <li>
@@ -54,13 +178,13 @@ export const PricingPage = observer(() => {
             </li>
           </Box>
 
-          <Box p="5">
+          <Box p="5" pt={['0', '3']}>
             {unlimitedPricingPlans.map((plan) => {
               const price = authStore.planPrices.get(plan.id)
               return (
                 <Box
                   px="3"
-                  py="1"
+                  py={['3']}
                   display="flex"
                   alignItems="center"
                   key={plan.id}
@@ -76,15 +200,19 @@ export const PricingPage = observer(() => {
                   `}
                   borderRadius="lg"
                 >
-                  <Text my="0" flex="1" mr="3" fontSize="xl">
+                  <Text my="0" flex="1" mr="3" fontSize={['sm', 'md', 'lg']}>
                     {plan.title}
                   </Text>
 
                   <>
-                    <Text my="0" fontWeight="semibold" fontSize="26px">
+                    <Text
+                      my="0"
+                      fontWeight="semibold"
+                      fontSize={['sm', 'md', 'xl']}
+                    >
                       ${price?.price?.net ?? 0}
                     </Text>
-                    <Text my="0" ml="3" fontSize="md" color="gray.500">
+                    <Text my="0" ml="3" fontSize="sm" color="gray.500">
                       {price?.currency ?? 'USD'}
                     </Text>
                   </>
@@ -109,7 +237,7 @@ export const PricingPage = observer(() => {
             </Box>
           </Box>
         </Box>
-        <Text color="gray.400" fontSize="sm" mt="5">
+        <Text color="gray.400" fontSize="sm" mt="5" mx="3">
           * All plans are one-time payment, not a recurring subscription.
         </Text>
       </Box>
@@ -117,12 +245,16 @@ export const PricingPage = observer(() => {
   )
 
   const downloadPlans = (
-    <Box mt="3rem" mb="5rem" mx="6">
-      <Box width="380px">
+    <Box
+      mt={['2rem', '2rem', '3rem']}
+      mb={['2rem', '2rem', '2rem']}
+      mx={[2, 6]}
+    >
+      <Box width={['300px', '340px', '340px', '360px']}>
         <Box boxShadow="lg" borderRadius="lg">
           <Box
             p="5"
-            fontSize="xl"
+            fontSize={['lg', 'lg', 'xl']}
             fontWeight="semibold"
             bg="gray.100"
             textAlign="center"
@@ -131,9 +263,9 @@ export const PricingPage = observer(() => {
             High Quality Download Packs
           </Box>
 
-          <Box as="ul" color="gray.500" mt="5" pr="4">
+          <Box as="ul" color="gray.500" mt="5" pr="4" fontSize={['sm', 'md']}>
             <li>
-              A limited number of HQ downloads
+              Fixed number of HQ downloads
               <HelpTooltipIcon
                 mr="3"
                 css={css`
@@ -149,13 +281,13 @@ export const PricingPage = observer(() => {
             </li>
           </Box>
 
-          <Box p="5">
+          <Box p="5" pt={['0', '3']}>
             {downloadsPricingPlans.map((plan) => {
               const price = authStore.planPrices.get(plan.id)
               return (
                 <Box
                   px="3"
-                  py="1"
+                  py={['3']}
                   display="flex"
                   alignItems="center"
                   key={plan.id}
@@ -171,15 +303,19 @@ export const PricingPage = observer(() => {
                   `}
                   borderRadius="lg"
                 >
-                  <Text my="0" flex="1" mr="3" fontSize="lg">
+                  <Text my="0" flex="1" mr="3" fontSize={['sm', 'md', 'lg']}>
                     {plan.title}
                   </Text>
 
                   <>
-                    <Text my="0" fontWeight="semibold" fontSize="26px">
+                    <Text
+                      my="0"
+                      fontWeight="semibold"
+                      fontSize={['sm', 'md', 'xl']}
+                    >
                       ${price?.price?.net ?? 0}
                     </Text>
-                    <Text my="0" ml="3" fontSize="md" color="gray.500">
+                    <Text my="0" ml="3" fontSize="sm" color="gray.500">
                       {price?.currency ?? 'USD'}
                     </Text>
                   </>
@@ -246,7 +382,7 @@ export const PricingPage = observer(() => {
             textAlign="center"
             mx="auto"
           >
-            <Text as="h1" textAlign="center" fontSize="42px">
+            <Text as="h1" textAlign="center">
               Get the right plan for you
             </Text>
 
@@ -254,7 +390,7 @@ export const PricingPage = observer(() => {
               textAlign="center"
               maxWidth="480px"
               mx="auto"
-              fontSize="lg"
+              fontSize={['sm', 'lg']}
               color="gray.600"
             >
               WordCloudy is free for <em>non-commercial</em> use! Try it as long
@@ -262,137 +398,28 @@ export const PricingPage = observer(() => {
             </Text>
           </Box>
 
-          <Box display="flex" flexWrap="wrap" mx="auto" justifyContent="center">
+          <Box
+            display="flex"
+            mx="auto"
+            alignItems={['center', 'center', 'flex-start']}
+            justifyContent="center"
+            flexDirection={['column', 'column', 'row']}
+          >
             {downloadPlans}
             {unlimitedPlans}
           </Box>
 
+          {comparisonSection}
+
           <Box
+            mt={['1rem', '1rem', '4rem']}
             display="flex"
             flexDirection="column"
             maxWidth="600px"
             textAlign="center"
             mx="auto"
           >
-            <Text
-              as="h1"
-              textAlign="center"
-              fontSize="42px"
-              id="pricing-comparison"
-            >
-              Compare free and paid features
-            </Text>
-          </Box>
-
-          <Box mt="2rem">
-            <ComparisonTable>
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>FREE</th>
-                  <th>UNLIMITED</th>
-                  <th>HQ DOWNLOAD PACKS</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>Download quality</th>
-                  <MainDetailsTableCell main={<>Standard{qualityHelpIcon}</>} />
-                  <MainDetailsTableCell
-                    main={
-                      <>
-                        Standard or High
-                        {qualityHelpIcon}
-                      </>
-                    }
-                  />
-                  <MainDetailsTableCell
-                    main={
-                      <>
-                        Standard or High&nbsp;
-                        {qualityHelpIcon}
-                      </>
-                    }
-                  />
-                </tr>
-
-                <tr>
-                  <th>Allowed use</th>
-                  <MainDetailsTableCell main="Personal use only" />
-                  <MainDetailsTableCell
-                    main={
-                      <>
-                        Commercial
-                        <HelpTooltipIcon label="HQ downloads can be used for any commercial purposes. Standard-quality downloads may still not be used commercially" />
-                      </>
-                    }
-                  />
-                  <MainDetailsTableCell
-                    main={
-                      <>
-                        Commercial
-                        <HelpTooltipIcon label="HQ downloads can be used for any commercial purposes. Standard-quality downloads may still not be used commercially" />
-                      </>
-                    }
-                  />
-                </tr>
-
-                <tr>
-                  <th>Number of HQ downloads</th>
-                  <MainDetailsTableCell main="0" />
-                  <MainDetailsTableCell
-                    main={
-                      <>
-                        Unlimited
-                        <HelpTooltipIcon label="No limit for HQ downloads" />
-                      </>
-                    }
-                  />
-                  <MainDetailsTableCell
-                    main={
-                      <>
-                        Limited
-                        <HelpTooltipIcon label="Limited number of HQ downloads, depending on the package" />
-                      </>
-                    }
-                  />
-                </tr>
-
-                <tr>
-                  <th>Max. number of saved designs</th>
-                  <MainDetailsTableCell main="10" />
-                  <MainDetailsTableCell main="Unlimited" />
-                  <MainDetailsTableCell
-                    main={<>Unlimited {noLimitsHelpIcon}</>}
-                  />
-                </tr>
-
-                <tr>
-                  <th>Custom fonts and image shapes</th>
-                  <MainDetailsTableCell
-                    main={
-                      <>
-                        Partial support
-                        <HelpTooltipIcon label="You'll be able to create and download your design with custom images and fonts, but you won't be able to save it to your Wordcloudy account" />{' '}
-                      </>
-                    }
-                  />
-                  <MainDetailsTableCell main="Yes" />
-                  <MainDetailsTableCell main="Yes" />
-                </tr>
-              </tbody>
-            </ComparisonTable>
-          </Box>
-
-          <Box
-            mt="4rem"
-            display="flex"
-            flexDirection="column"
-            maxWidth="600px"
-            textAlign="center"
-            mx="auto"
-          >
-            <Text as="h1" id="pricing-faq" textAlign="center" fontSize="42px">
+            <Text as="h1" id="pricing-faq" textAlign="center">
               Pricing FAQ
             </Text>
 
