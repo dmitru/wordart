@@ -22,6 +22,7 @@ export type EditorItemConfigWord = {
   color: string
   /** Color of the shape at the location where item was placed */
   shapeColor: string
+  opacity: number
 }
 
 export type GlyphInfo = {
@@ -55,6 +56,8 @@ export class EditorItemWord {
   customColor?: string
   /** Default color of the item, determined by the coloring style */
   color: string
+  opacity: number
+  selectable = true
 
   fabricObj: fabric.Group
   wordObj: fabric.Object
@@ -106,6 +109,7 @@ export class EditorItemWord {
 
     this.customColor = conf.customColor
     this.color = conf.color || 'black'
+    this.opacity = conf.opacity
 
     const wordGroup = new fabric.Group(
       [
@@ -158,7 +162,18 @@ export class EditorItemWord {
     applyTransformToObj(wordGroup, conf.transform.values as MatrixSerialized)
   }
 
+  setHidden = (value: boolean) => {
+    if (value) {
+      this.fabricObj.opacity = 0
+      this.fabricObj.selectable = false
+    } else {
+      this.fabricObj.opacity = this.opacity
+      this.fabricObj.selectable = this.selectable
+    }
+  }
+
   setSelectable = (value: boolean) => {
+    this.selectable = value
     this.fabricObj.selectable = value
   }
 
@@ -174,6 +189,7 @@ export class EditorItemWord {
   }
 
   private _updateOpacity = (opacity: number) => {
+    this.opacity = opacity
     this.fabricObj.opacity = opacity
   }
 

@@ -18,8 +18,8 @@ export const LandingPage = observer(() => {
             <HeaderSubtitle>
               Easy-to-use online art generator.
               <br />
-              <br /> Create attractive results with no prior design skills, and
-              download them in professional print-ready quality.
+              <br /> Create attractive art in professional print-ready quality
+              even with no design skills.
             </HeaderSubtitle>
 
             <HeaderCtaContainer>

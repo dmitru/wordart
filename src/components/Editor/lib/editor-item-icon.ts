@@ -122,6 +122,16 @@ export class EditorItemShape {
     applyTransformToObj(shapeGroup, conf.transform.values as MatrixSerialized)
   }
 
+  setHidden = (value: boolean) => {
+    if (value) {
+      this.fabricObj.opacity = 0
+      this.fabricObj.selectable = false
+    } else {
+      // this.fabricObj.opacity = this.opacity
+      // this.fabricObj.selectable = this.selectable
+    }
+  }
+
   setSelectable = (value: boolean) => {
     this.fabricObj.selectable = value
   }

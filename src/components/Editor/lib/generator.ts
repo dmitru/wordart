@@ -69,7 +69,7 @@ export class Generator {
 
     const shapeCanvasMaxExtent = 300
     const batchSize = 50
-    const nIter = 100
+    const nIter = task.itemsMaxCount || 500
 
     const shapeCanvas = task.shape.canvas
     const shapeCanvasOriginalColors = task.shape.shapeCanvasOriginalColors
@@ -794,6 +794,7 @@ export class Generator {
 
 /** Describes a task of filling a shape with items (usually words) */
 export type FillShapeTask = {
+  itemsMaxCount: number | 'auto'
   shape: {
     canvas: HTMLCanvasElement
     /** Subtract this canvas from `canvas` before starting generation */

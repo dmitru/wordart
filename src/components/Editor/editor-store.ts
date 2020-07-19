@@ -1373,6 +1373,18 @@ export class EditorStore {
     set(word, update)
   }
 
+  @action setMaxItemsCount = (
+    target: TargetKind,
+    maxCount: number | 'auto'
+  ) => {
+    this.styleOptions[target].items.placement.itemsMaxCount = maxCount
+
+    // TODO: hide extra items if possible
+    if (maxCount !== 'auto') {
+      this.editor?.hideItemsAfter(target, maxCount)
+    }
+  }
+
   @action setPageSize = (pageSize: PageSize) => {
     this.pageSize = pageSize
     if (!this.editor) {

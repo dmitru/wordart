@@ -4,7 +4,7 @@ import { Slider } from 'components/shared/Slider'
 import { Button } from 'components/shared/Button'
 import { DeleteButton } from 'components/shared/DeleteButton'
 import { SectionLabel } from 'components/Editor/components/shared'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { TargetKind } from 'components/Editor/lib/editor'
 import {
   Text,
@@ -129,9 +129,33 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
     const { editorPageStore: store } = useStore()
     const style = store.styleOptions[target]
 
-    const animateVisualize = useCallback(() => {
-      store.animateVisualize(false)
+    const animateVisualize = useCallback((debounce = false) => {
+      store.animateVisualize(debounce)
     }, [])
+
+    const itemsCount = useMemo(() => {
+      const itemsParent = store.editor.items[target]
+      if (!itemsParent) {
+        return undefined
+      }
+      return itemsParent.items.length
+    }, [store.renderKey, target])
+
+    const handleMaxItemsCountChange = useCallback(
+      (value: number) => {
+        store.setMaxItemsCount(target, value)
+      },
+      [target, itemsCount]
+    )
+
+    const handleAfterMaxItemsCountChange = useCallback(() => {
+      if (
+        itemsCount != null &&
+        style.items.placement.itemsMaxCount > itemsCount
+      ) {
+        animateVisualize(true)
+      }
+    }, [style, itemsCount])
 
     return (
       <Box px="5" py="6">
@@ -139,6 +163,26 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
         <Box mb="2.5rem">
           <SectionLabel>Placement</SectionLabel>
+          <Box mb="4">
+            <Slider
+              // horizontal
+              label="Max. items count"
+              value={style.items.placement.itemsMaxCount}
+              onChange={handleMaxItemsCountChange}
+              onAfterChange={handleAfterMaxItemsCountChange}
+              min={1}
+              max={700}
+              step={1}
+            />
+          </Box>
+
+          {/* {itemsCount != null &&
+            style.items.placement.itemsMaxCount > itemsCount && (
+              <Text color="gray.500" fontSize="sm">
+                Re-visualization required
+              </Text>
+            )} */}
+
           <Slider
             horizontal
             label="Density"

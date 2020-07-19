@@ -129,6 +129,8 @@ export type ShapePlacementConf = {
   shapePadding: number
   /** Number: 0 - 100% */
   itemDensity: number
+  /** Max number of placed items */
+  itemsMaxCount: number | 'auto'
   /** Number: 0 - 100% */
   wordsMaxSize: number
   /** Number: 0 - 100% */
@@ -145,6 +147,8 @@ export type BgPlacementConf = {
   shapePadding: number
   /** Number: 0 - 100% */
   itemDensity: number
+  /** Max number of placed items */
+  itemsMaxCount: number | 'auto'
   /** Number: 0 - 100% */
   wordsMaxSize: number
   /** Number: 0 - 100% */

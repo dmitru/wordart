@@ -509,6 +509,17 @@ export class Editor {
     this.version++
   }
 
+  hideItemsAfter = (target: TargetKind, count: number) => {
+    if (!this.items[target] || !this.items[target].items) {
+      return
+    }
+    for (const [index, item] of this.items[target].items.entries()) {
+      item.setHidden(index > count)
+    }
+    this.canvas.requestRenderAll()
+    this.version++
+  }
+
   setAspectRatio = (aspect: number, render = true) => {
     this.aspectRatio = aspect
     this.projectBounds = new paper.Rectangle({
@@ -1454,6 +1465,7 @@ export class Editor {
 
     const result = await this.generator.fillShape(
       {
+        itemsMaxCount: style.items.placement.itemsMaxCount,
         shape: {
           canvas: sceneCanvas,
           canvasSubtract,
@@ -1671,6 +1683,7 @@ export class Editor {
 
     const result = await this.generator.fillShape(
       {
+        itemsMaxCount: style.items.placement.itemsMaxCount,
         shape: {
           canvas: shapeCanvas,
           canvasSubtract,
@@ -1769,7 +1782,6 @@ export class Editor {
   }
 
   @action pushUndoFrame = (frame: UndoFrame) => {
-    debugger
     this.undoStack.push(frame)
     this.store.renderKey++
     this.store.hasUnsavedChanges = true
