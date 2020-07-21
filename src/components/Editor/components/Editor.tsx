@@ -112,6 +112,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const bgCanvasRef = useRef<HTMLCanvasElement>(null)
     const canvasWrapperRef = useRef<HTMLDivElement>(null)
     const { editorPageStore: store, wordcloudsStore } = useStore()
+    const { isSaving } = store
 
     const isNew = props.wordcloudId == null
 
@@ -121,8 +122,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const router = useRouter()
 
     const cancelVisualizationBtnRef = useRef<HTMLButtonElement>(null)
-
-    const isSaving = useRef(false)
     const [isShowingSignupModal, setIsShowingSignupModal] = useState(false)
 
     const hasUnsavedChanges = useCallback((url?: string) => {
@@ -139,11 +138,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     ] = useState(false)
 
     const saveAnonymously = async (recaptcha: string) => {
-      if (isSaving.current || !store.editor || !isNew) {
+      if (isSaving || !store.editor || !isNew) {
         return
       }
 
-      isSaving.current = true
+      isSaving = true
       try {
         const thumbnailCanvas = await store.editor.exportAsRaster(380)
         const thumbnail = thumbnailCanvas.toDataURL('image/jpeg', 0.85)
@@ -166,7 +165,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           isClosable: true,
         })
       } finally {
-        isSaving.current = false
+        isSaving = false
       }
     }
 
@@ -192,10 +191,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       }
 
       const save = async () => {
-        if (isSaving.current || !store.editor) {
+        if (isSaving || !store.editor) {
           return
         }
-        isSaving.current = true
+        store.isSaving = true
 
         try {
           const thumbnailCanvas = await store.editor.exportAsRaster(380)
@@ -221,7 +220,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           showToast()
           store.hasUnsavedChanges = false
         } finally {
-          isSaving.current = false
+          store.isSaving = false
         }
       }
 
@@ -536,7 +535,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           <Button
             colorScheme="secondary"
             onClick={handleSaveClick}
-            isLoading={isSaving.current}
+            isLoading={isSaving}
             mr="2"
             css={css`
               width: 90px;

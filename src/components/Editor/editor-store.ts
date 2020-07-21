@@ -100,6 +100,7 @@ export class EditorStore {
   rootStore: RootStore
   editor: Editor | null = null
   @observable renderKey = 1
+  @observable isSaving = false
 
   @observable leftColorTab = {
     showShapeItemsAdvanced: false,
