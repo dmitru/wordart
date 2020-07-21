@@ -14,20 +14,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "baseUrl": "./src",
+    "baseUrl": "src",
+    "types": [],
     "downlevelIteration": true,
-    "rootDirs": ["./src"],
-    "paths": {
-      "@src/*": ["src/*"]
-    }
+    "rootDirs": ["src"]
   },
-  "exclude": ["node_modules", "src/lib/wordart/wasm/wasm-gen", "src/data"],
+  "exclude": ["node_modules", "src/lib/wordart/wasm", "src/data"],
   "include": [
-    "./src",
+    "src",
     "next-env.d.ts",
-    "**/*.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
     "tools/generators/index.js",
     "next.config.js",
     "tools/generate-icons.js"

@@ -9,7 +9,13 @@ export const HelpTooltipIcon: React.FC<
     BoxProps
   >
 > = ({ label, tooltipProps = {}, ...props }) => (
-  <Tooltip label={label} zIndex={100} showDelay={200} {...tooltipProps}>
+  <Tooltip
+    // @ts-ignore
+    label={label}
+    zIndex={100}
+    showDelay={200}
+    {...tooltipProps}
+  >
     <Box
       my="0"
       cursor="help"

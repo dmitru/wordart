@@ -1,8 +1,6 @@
 import theme, { Theme as ChakraTheme } from '@chakra-ui/theme'
 import colors from './foundations/colors'
 
-export type Theme = ChakraTheme
-
 const myTheme: ChakraTheme = {
   ...theme,
   fonts: {
@@ -71,5 +69,7 @@ const myTheme: ChakraTheme = {
     },
   },
 }
+
+export type Theme = typeof myTheme
 
 export default myTheme

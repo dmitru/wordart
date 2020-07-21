@@ -116,7 +116,7 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
                         }
                       `}
                     >
-                      Your account
+                      Account
                     </span>
 
                     <Box mr="2">

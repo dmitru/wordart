@@ -20,7 +20,7 @@ import { ApiResponseError } from 'services/api/api-client'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import * as Yup from 'yup'
-import { Recaptcha } from 'components/shared/recaptcha'
+import { Recaptcha } from 'components/shared/Recaptcha'
 import { config } from 'config'
 
 export type SignupFormValues = {

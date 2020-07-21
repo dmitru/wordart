@@ -11,7 +11,7 @@ import {
 import { Button } from 'components/shared/Button'
 import { observer } from 'mobx-react'
 import { useState, useRef, useEffect } from 'react'
-import { Recaptcha } from 'components/shared/recaptcha'
+import { Recaptcha } from 'components/shared/Recaptcha'
 import { config } from 'config'
 
 export type ConfirmModalWithRecaptchaProps = {

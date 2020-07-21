@@ -5,10 +5,8 @@ import {
   Button,
   Link as ChakraLink,
   LinkProps,
-  Modal,
-  ModalContent,
-  ModalOverlay,
 } from '@chakra-ui/core'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRightIcon, AddIcon, CloseIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
@@ -21,6 +19,7 @@ import { IoMdMenu } from 'react-icons/io'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { useToasts } from 'use-toasts'
+import { LockBodyScroll } from 'utils/use-lock-body-scroll'
 
 export type MobileHeaderProps = {
   fullWidth?: boolean
@@ -73,14 +72,30 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
           </ContentContainer>
         </MobileHeaderWrapper>
 
-        <Modal
-          closeOnOverlayClick={false}
-          isOpen={isShowing}
-          onClose={() => setIsShowing(false)}
-        >
-          <ModalOverlay>
-            <ModalContent>
-              <MenuContainer bg="white" p="4">
+        <AnimatePresence initial={false}>
+          {isShowing && (
+            <>
+              <motion.nav
+                initial="closed"
+                animate="open"
+                exit="closed"
+                transition={{ ease: 'easeOut', duration: 0.3 }}
+                variants={{
+                  open: { opacity: 1, y: '0%' },
+                  closed: { opacity: 0, y: '-100%' },
+                }}
+                css={css`
+                  position: fixed;
+                  overflow: auto;
+                  background: #fff;
+                  padding-bottom: 60px;
+                  z-index: 1000;
+                  top: 0;
+                  left: 0;
+                  height: 100%;
+                  width: 100%;
+                `}
+              >
                 <Box mt="60px" display="flex" flexDirection="column">
                   {!hideCreate &&
                     pathname !== Urls.yourDesigns &&
@@ -93,6 +108,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
                             passHref
                           >
                             <Button
+                              ml="3"
                               maxWidth="500px"
                               active={pathname === Urls.landing}
                               colorScheme="accent"
@@ -179,7 +195,9 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
                     </>
                   )}
                 </Box>
+
                 <IconButton
+                  aria-label="Close menu"
                   onClick={() => setIsShowing(false)}
                   variant="ghost"
                   css={css`
@@ -192,14 +210,19 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
                 >
                   <CloseIcon color="gray.800" />
                 </IconButton>
-              </MenuContainer>
-            </ModalContent>
-          </ModalOverlay>
-        </Modal>
+              </motion.nav>
+            </>
+          )}
+        </AnimatePresence>
       </>
     )
 
-    return <>{MobileHeader}</>
+    return (
+      <>
+        {isShowing && <LockBodyScroll />}
+        {MobileHeader}
+      </>
+    )
   }
 )
 
@@ -251,17 +274,6 @@ export const MobileHeaderWrapper = styled(Box)<{ theme: any }>`
     display: none;
   }
   background: ${(p) => p.theme.colors.header.bg};
-`
-
-const MenuContainer = styled(Box)`
-  position: fixed;
-  overflow: auto;
-  padding-bottom: 60px;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
 `
 
 export const ContentContainer = styled(Box)<{

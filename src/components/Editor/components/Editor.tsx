@@ -445,6 +445,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             <Portal>
               <MenuTransition>
                 {(styles) => (
+                  // @ts-ignore
                   <MenuList css={styles} zIndex={4}>
                     <MenuItem>
                       <FiFilePlus
@@ -1027,6 +1028,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           <Portal>
                             <MenuTransition>
                               {(styles) => (
+                                // @ts-ignore
                                 <MenuList css={styles}>
                                   <MenuItem
                                     onClick={() => {

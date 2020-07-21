@@ -16,7 +16,7 @@ import { useForm } from 'react-hook-form'
 import { useStore } from 'services/root-store'
 import * as Yup from 'yup'
 import { config } from 'config'
-import { Recaptcha } from 'components/shared/recaptcha'
+import { Recaptcha } from 'components/shared/Recaptcha'
 import { Api } from 'services/api/api'
 import { GenericEmailSupportErrorMessage } from 'constants/messages'
 
