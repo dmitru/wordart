@@ -142,7 +142,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         return
       }
 
-      isSaving = true
+      store.isSaving = true
       try {
         const thumbnailCanvas = await store.editor.exportAsRaster(380)
         const thumbnail = thumbnailCanvas.toDataURL('image/jpeg', 0.85)
@@ -165,7 +165,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           isClosable: true,
         })
       } finally {
-        isSaving = false
+        store.isSaving = false
       }
     }
 
