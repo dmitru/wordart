@@ -20,6 +20,7 @@ import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { useToasts } from 'use-toasts'
 import { LockBodyScroll } from 'utils/use-lock-body-scroll'
+import Headroom from 'react-headroom'
 
 export type MobileHeaderProps = {
   fullWidth?: boolean
@@ -33,7 +34,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
     const router = useRouter()
     const { pathname } = router
 
-    const [isShowing, setIsShowing] = useState(true)
+    const [isShowing, setIsShowing] = useState(false)
 
     // Close menu on navigation
     useEffect(() => {
@@ -41,36 +42,37 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
     }, [pathname])
 
     const isLoggedIn = authStore.isLoggedIn === true
-    const isNotLoggedIn = authStore.isLoggedIn === false
     const isLoggedInAndNotVerified =
       authStore.isLoggedIn === true && !authStore.isEmailConfirmed
 
     const MobileHeader = (
       <>
-        <MobileHeaderWrapper>
-          <ContentContainer>
-            <Link href="/" passHref>
-              <LogoLink>
-                <img
-                  src="/images/logo-white-text.svg"
-                  css={css`
-                    height: 100%;
-                    width: auto;
-                  `}
-                />
-              </LogoLink>
-            </Link>
+        <Headroom style={{ zIndex: 100 }}>
+          <MobileHeaderWrapper>
+            <ContentContainer>
+              <Link href="/" passHref>
+                <LogoLink>
+                  <img
+                    src="/images/logo-white-text.svg"
+                    css={css`
+                      height: 100%;
+                      width: auto;
+                    `}
+                  />
+                </LogoLink>
+              </Link>
 
-            <BurgerMenuButton onClick={() => setIsShowing(true)}>
-              <IoMdMenu
-                css={css`
-                  margin-right: 8px;
-                `}
-              />{' '}
-              Menu
-            </BurgerMenuButton>
-          </ContentContainer>
-        </MobileHeaderWrapper>
+              <BurgerMenuButton onClick={() => setIsShowing(true)}>
+                <IoMdMenu
+                  css={css`
+                    margin-right: 8px;
+                  `}
+                />{' '}
+                Menu
+              </BurgerMenuButton>
+            </ContentContainer>
+          </MobileHeaderWrapper>
+        </Headroom>
 
         <AnimatePresence initial={false}>
           {isShowing && (

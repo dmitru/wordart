@@ -6,10 +6,13 @@ import css from '@emotion/css'
 import { Button, Box, Text, Stack } from '@chakra-ui/core'
 import AwesomeSlider from 'react-awesome-slider'
 
+const mobileHeaderBreakpoint = `@media screen and (max-width: 1100px)`
+const xsBreakpoint = `@media screen and (max-width: 500px)`
+
 export const LandingPage = observer(() => {
   return (
     <SiteLayout fullWidth>
-      <HeaderContainer bg="gray.100">
+      <HeaderContainer>
         <HeaderContentWidthLimit>
           <HeaderTitleContainer>
             <HeaderTitle>
@@ -17,19 +20,25 @@ export const LandingPage = observer(() => {
             </HeaderTitle>
             <HeaderSubtitle>
               Easy-to-use online art generator.
-              <br />
+              <br
+                css={css`
+                  ${mobileHeaderBreakpoint} {
+                    display: none;
+                  }
+                `}
+              />
               <br /> Create attractive art in professional print-ready quality
               even with no design skills.
             </HeaderSubtitle>
 
             <HeaderCtaContainer>
               <HeaderCtaInfo mb="3">Try without a sign-up!</HeaderCtaInfo>
-              <Stack spacing="3" direction="row" alignItems="center">
-                <HeaderCreateNowButton
-                  colorScheme="accent"
-                  size="lg"
-                  minWidth="200px"
-                >
+              <Stack
+                spacing="3"
+                direction={['column', 'row']}
+                alignItems="center"
+              >
+                <HeaderCreateNowButton colorScheme="accent" size="lg">
                   Create now
                 </HeaderCreateNowButton>
                 <HeaderCtaInfo>or</HeaderCtaInfo>
@@ -37,6 +46,7 @@ export const LandingPage = observer(() => {
                   colorScheme="accent"
                   variant="outline"
                   size="lg"
+                  bg="white"
                 >
                   Sign up
                 </HeaderCreateNowButton>
@@ -82,7 +92,6 @@ export const LandingPage = observer(() => {
         flexWrap="wrap"
         alignItems="flex-start"
         justifyContent="center"
-        mt="60px"
       >
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot>
@@ -160,7 +169,7 @@ export const LandingPage = observer(() => {
       </FeaturesSection>
 
       <CtaFooterSection>
-        <h1>Ready to create your unique designs?</h1>
+        <h1>Ready to create your own unique designs?</h1>
         <Text mt="0" mb="6">
           It's fast and fun with Wordcloudy – the world's leading word designs
           generator app.
@@ -172,20 +181,6 @@ export const LandingPage = observer(() => {
     </SiteLayout>
   )
 })
-
-const HeaderSliderContainer = styled.div`
-  box-shadow: 0 0 8px 0 #0003;
-  transform: rotate(1deg);
-  border-radius: 8px;
-  margin-top: 80px;
-  width: 800px;
-  z-index: 2;
-`
-const HeaderSlider = styled.div`
-  .awssld__container {
-    height: 590px;
-  }
-`
 
 const widthLimit = css`
   max-width: 1300px;
@@ -201,12 +196,23 @@ const HeaderContentWidthLimit = styled.div`
 
   display: flex;
   align-items: flex-start;
+
+  ${mobileHeaderBreakpoint} {
+    max-width: unset;
+    padding: 0 30px;
+    padding-bottom: 150px;
+    flex-direction: column;
+  }
 `
 
 const HeaderContainer = styled.div`
   position: relative;
   min-height: 100vh;
-  min-height: calc(100vh - 200px);
+  min-height: calc(100vh - 120px);
+
+  ${mobileHeaderBreakpoint} {
+    min-height: unset;
+  }
 
   background: #f6fafe;
 
@@ -225,6 +231,10 @@ const HeaderContainer = styled.div`
     display: block;
     width: calc(168% + 1.3px);
     height: 140px;
+
+    ${xsBreakpoint} {
+      width: calc(268% + 1.3px);
+    }
   }
 
   .custom-shape-divider-bottom-1594969392 .shape-fill {
@@ -233,9 +243,27 @@ const HeaderContainer = styled.div`
 `
 
 const HeaderTitleContainer = styled.div`
+  position: relative;
+  z-index: 2;
   max-width: 430px;
   margin-top: 50px;
   margin-right: 80px;
+
+  @media screen and (max-width: 1200px) {
+    margin-top: 10px;
+  }
+
+  ${mobileHeaderBreakpoint} {
+    max-width: 600px;
+    text-align: center;
+    margin-top: 30px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  ${xsBreakpoint} {
+    margin-top: 10px;
+  }
 `
 
 const HeaderTitle = styled.h1`
@@ -246,8 +274,13 @@ const HeaderTitle = styled.h1`
   font-weight: 800;
   font-family: 'Nunito', sans-serif;
 
+  ${xsBreakpoint} {
+    font-size: 36px;
+  }
+
   em {
     position: relative;
+    display: inline-block;
     z-index: 2;
 
     &:before {
@@ -257,7 +290,7 @@ const HeaderTitle = styled.h1`
       background: hsl(358, 80%, 65%);
       height: 4px;
       width: 100%;
-      bottom: 10px;
+      bottom: 3px;
       z-index: -1;
       left: 0;
       border-radius: 8px;
@@ -271,16 +304,27 @@ const HeaderSubtitle = styled.h2`
   font-weight: 300;
   line-height: 30px;
   border-bottom: none;
+
+  ${xsBreakpoint} {
+    font-size: 18px;
+    line-height: 26px;
+  }
 `
 
 const HeaderCtaContainer = styled.div`
   margin-top: 60px;
   display: flex;
   flex-direction: column;
+
+  ${mobileHeaderBreakpoint} {
+    margin-top: 20px;
+    align-items: center;
+  }
 `
 
 const HeaderCreateNowButton = styled(Button)`
-  max-width: 180px;
+  max-width: 200px;
+  width: 100%;
 `
 
 const HeaderCtaInfo = styled(Box)`
@@ -288,12 +332,56 @@ const HeaderCtaInfo = styled(Box)`
   font-family: 'Nunito', sans-serif;
   font-weight: 300;
   color: #3c526f;
+
+  ${xsBreakpoint} {
+    display: none;
+    font-size: 18px;
+    line-height: 26px;
+  }
+`
+
+const HeaderSliderContainer = styled.div`
+  box-shadow: 0 0 8px 0 #0003;
+  transform: rotate(1deg);
+  border-radius: 8px;
+  margin-top: 80px;
+  width: 800px;
+  z-index: 2;
+
+  @media screen and (max-width: 1200px) {
+    margin-right: -100px;
+  }
+
+  ${mobileHeaderBreakpoint} {
+    margin-right: 0;
+    margin-top: 50px;
+    width: 100%;
+    transform: none;
+  }
+`
+const HeaderSlider = styled.div`
+  .awssld__container {
+    height: 590px;
+
+    ${xsBreakpoint} {
+      height: 50vh;
+    }
+  }
 `
 
 // ---------- Features section -----------------
 
 const FeaturesSection = styled(Stack)`
   margin-bottom: 60px;
+
+  margin-top: -10px;
+  @media screen and (max-height: 850px) {
+    margin-top: 40px;
+  }
+
+  ${mobileHeaderBreakpoint} {
+    margin-top: -50px;
+  }
 `
 
 const UiFeature = styled(Box)`
@@ -325,6 +413,8 @@ const UiScreenshot = styled(Box)`
 const CtaFooterSection = styled(Box)`
   text-align: center;
 
+  margin: 0 20px;
+
   h1 {
     color: #3c526f;
     border-bottom: none;
@@ -335,7 +425,8 @@ const CtaFooterSection = styled(Box)`
   }
 
   button {
-    width: 300px;
+    max-width: 300px;
+    width: 100%;
   }
 
   p {
