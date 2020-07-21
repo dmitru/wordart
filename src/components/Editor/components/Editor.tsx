@@ -29,7 +29,7 @@ import {
 import {
   ArrowBackIcon,
   ArrowForwardIcon,
-  ChevronDownIcon,
+  DownloadIcon,
   SmallCloseIcon,
 } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
@@ -49,7 +49,6 @@ import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTa
 import { LeftPanelShapesTab } from 'components/Editor/components/ShapesTab/LeftPanelShapesTab'
 import { Spinner } from 'components/Editor/components/Spinner'
 import { WarningModal } from 'components/Editor/components/WarningModal'
-import Hotkeys from 'react-hot-keys'
 import {
   EditorStoreInitParams,
   pageSizePresets,
@@ -60,6 +59,7 @@ import {
 } from 'components/Editor/style'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
+import { ConfirmModalWithRecaptcha } from 'components/shared/ConfirmModalWithRecaptcha'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 import { Tooltip } from 'components/shared/Tooltip'
@@ -74,6 +74,7 @@ import Link from 'next/link'
 import { darken, desaturate } from 'polished'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Helmet } from 'react-helmet'
+import Hotkeys from 'react-hot-keys'
 import { BsTrash } from 'react-icons/bs'
 import {
   FiChevronLeft,
@@ -93,9 +94,8 @@ import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import 'utils/canvas-to-blob'
 import { getTabTitle } from 'utils/tab-title'
-import { ConfirmModalWithRecaptcha } from 'components/shared/ConfirmModalWithRecaptcha'
-import { uuid } from 'utils/uuid'
 import { useWarnIfUnsavedChanges } from 'utils/use-warn-if-unsaved-changes'
+import { uuid } from 'utils/uuid'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -273,64 +273,76 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     //
     // Exporting
     //
+    type DownloadFormat = 'sd-png' | 'sd-jpeg' | 'hd-png' | 'hd-jpeg' | 'hd-svg'
+
     const [isExporting, setIsExporting] = useState(false)
-    const handleDownloadClick = useCallback(
-      (hd = false, format: 'svg' | 'png' | 'jpeg') => {
-        const startExport = async () => {
-          const dimension = hd ? 4096 : 1024
-          if (!store.editor) {
-            return
-          }
+    const [selectedFormat, setSelectedFormat] = useState<DownloadFormat>(
+      'sd-png'
+    )
 
-          setIsExporting(true)
+    const handleDownloadClick = useCallback(() => {
+      const hd =
+        selectedFormat === 'hd-jpeg' ||
+        selectedFormat === 'hd-png' ||
+        selectedFormat === 'hd-svg'
+      const format = ({
+        'sd-png': 'png',
+        'hd-png': 'png',
+        'sd-jpeg': 'jpeg',
+        'hd-jpeg': 'jpeg',
+        'hd-svg': 'svg',
+      } as { [format in DownloadFormat]: string })[selectedFormat]
 
-          try {
-            // TODO: hit API for HD download
-            if (hd) {
-              const result = await Api.wordclouds.hdDownload({
-                wordcloudVersion: store.editor.version,
-                wordloudKey: store.editor.key,
-              })
-
-              if (!result.canDownload) {
-                console.log('Can not download! :(')
-                // TODO: open upgrade / buy modal
-                return
-              }
-            }
-
-            const mimeType =
-              {
-                png: 'image/png',
-                jpeg: 'image/jpeg',
-                svg: 'image/svg',
-              }[format] || 'image/png'
-
-            if (format === 'svg') {
-              const svg = await store.editor.exportAsSvg()
-              const svgBlob = new Blob([svg], { type: 'image/svg' })
-              saveAs(svgBlob, `${state.title || 'Untitled Design'}.svg`)
-            } else {
-              const canvas = await store.editor.exportAsRaster(
-                dimension,
-                format
-              )
-              canvas.toBlob((blob) => {
-                saveAs(
-                  blob as Blob,
-                  `${state.title || 'Untitled Design'}.${format}`
-                )
-              }, mimeType)
-            }
-          } finally {
-            setIsExporting(false)
-          }
+      const startExport = async () => {
+        const dimension = hd ? 4096 : 1024
+        if (!store.editor) {
+          return
         }
 
-        startExport()
-      },
-      [store]
-    )
+        setIsExporting(true)
+
+        try {
+          // TODO: hit API for HD download
+          if (hd) {
+            const result = await Api.wordclouds.hdDownload({
+              wordcloudVersion: store.editor.version,
+              wordloudKey: store.editor.key,
+            })
+
+            if (!result.canDownload) {
+              console.log('Can not download! :(')
+              // TODO: open upgrade / buy modal
+              return
+            }
+          }
+
+          const mimeType =
+            {
+              png: 'image/png',
+              jpeg: 'image/jpeg',
+              svg: 'image/svg',
+            }[format] || 'image/png'
+
+          if (format === 'svg') {
+            const svg = await store.editor.exportAsSvg()
+            const svgBlob = new Blob([svg], { type: 'image/svg' })
+            saveAs(svgBlob, `${state.title || 'Untitled Design'}.svg`)
+          } else {
+            const canvas = await store.editor.exportAsRaster(dimension, format)
+            canvas.toBlob((blob) => {
+              saveAs(
+                blob as Blob,
+                `${state.title || 'Untitled Design'}.${format}`
+              )
+            }, mimeType)
+          }
+        } finally {
+          setIsExporting(false)
+        }
+      }
+
+      startExport()
+    }, [store, selectedFormat])
 
     const closeExport = useCallback(() => {
       state.isShowingExport = false
@@ -827,13 +839,18 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       ) : (
                         <>
                           <Text fontSize="lg">
-                            <strong>Standard Download,</strong> personal use
+                            <strong>Standard Download,</strong> for personal use
                             only
                           </Text>
                           <Stack direction="row" spacing="3" flexWrap="wrap">
                             <ExportButton
                               variant="outline"
-                              onClick={() => handleDownloadClick(false, 'png')}
+                              boxShadow={
+                                selectedFormat === 'sd-png'
+                                  ? '0 0 0 3px rgb(237, 93, 98) !important'
+                                  : 'none'
+                              }
+                              onClick={() => setSelectedFormat('sd-png')}
                             >
                               <Text mt="0" fontSize="lg" fontWeight="bold">
                                 PNG
@@ -845,9 +862,15 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                                 Higher quality
                               </Text>
                             </ExportButton>
+
                             <ExportButton
                               variant="outline"
-                              onClick={() => handleDownloadClick(false, 'jpeg')}
+                              boxShadow={
+                                selectedFormat === 'sd-jpeg'
+                                  ? '0 0 0 3px rgb(237, 93, 98) !important'
+                                  : 'none'
+                              }
+                              onClick={() => setSelectedFormat('sd-jpeg')}
                             >
                               <Text mt="0" fontSize="lg" fontWeight="bold">
                                 JPEG
@@ -869,7 +892,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                             <Stack direction="row" spacing="3" flexWrap="wrap">
                               <ExportButton
                                 variant="outline"
-                                onClick={() => handleDownloadClick(true, 'png')}
+                                boxShadow={
+                                  selectedFormat === 'hg-png'
+                                    ? '0 0 0 3px rgb(237, 93, 98) !important'
+                                    : 'none'
+                                }
+                                onClick={() => setSelectedFormat('hg-png')}
                               >
                                 <Text mt="0" fontSize="lg">
                                   PNG (HD)
@@ -881,9 +909,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
                               <ExportButton
                                 variant="outline"
-                                onClick={() =>
-                                  handleDownloadClick(true, 'jpeg')
+                                boxShadow={
+                                  selectedFormat === 'hd-jpeg'
+                                    ? '0 0 0 3px rgb(237, 93, 98) !important'
+                                    : 'none'
                                 }
+                                onClick={() => setSelectedFormat('hd-jpeg')}
                               >
                                 <Text mt="0" fontSize="lg">
                                   JPEG (HD)
@@ -895,7 +926,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
                               <ExportButton
                                 variant="outline"
-                                onClick={() => handleDownloadClick(true, 'svg')}
+                                boxShadow={
+                                  selectedFormat === 'hd-svg'
+                                    ? '0 0 0 3px rgb(237, 93, 98) !important'
+                                    : 'none'
+                                }
+                                onClick={() => setSelectedFormat('hd-svg')}
                               >
                                 <Text mt="0" fontSize="lg">
                                   SVG
@@ -909,6 +945,15 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         </>
                       )}
                     </ModalBody>
+                    <ModalFooter>
+                      <Button
+                        colorScheme="accent"
+                        leftIcon={<DownloadIcon />}
+                        onClick={handleDownloadClick}
+                      >
+                        Download
+                      </Button>
+                    </ModalFooter>
                     <ModalCloseButton />
                   </ModalContent>
                 </ModalOverlay>
