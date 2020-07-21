@@ -348,7 +348,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       state.isShowingExport = false
     }, [])
     const openExport = useCallback(() => {
-      state.isShowingExport = true
+      const itemsCount =
+        (store.editor?.items?.shape?.items?.length || 0) +
+        (store.editor?.items?.bg?.items?.length || 0)
+      if (itemsCount > 0) {
+        state.isShowingExport = true
+      } else {
+        state.isShowingExportNoItemsWarning = true
+      }
     }, [])
 
     const cancelVisualization = () => {
@@ -818,6 +825,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
           <RightWrapper>
             <TopToolbar display="flex" alignItems="center" px="5">
+              <WarningModal
+                header="Your design is empty"
+                content="Please add some words or icons to your design and click Visualize first."
+                isOpen={state.isShowingExportNoItemsWarning}
+                onClose={() => {
+                  state.isShowingExportNoItemsWarning = false
+                }}
+              />
               <Modal
                 initialFocusRef={cancelVisualizationBtnRef}
                 finalFocusRef={cancelVisualizationBtnRef}
@@ -886,18 +901,18 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
                           <Box mt="6">
                             <Text fontSize="lg">
-                              <strong>HD Download,</strong> personal or
+                              <strong>HQ Download,</strong> personal or
                               commercial use
                             </Text>
                             <Stack direction="row" spacing="3" flexWrap="wrap">
                               <ExportButton
                                 variant="outline"
                                 boxShadow={
-                                  selectedFormat === 'hg-png'
+                                  selectedFormat === 'hd-png'
                                     ? '0 0 0 3px rgb(237, 93, 98) !important'
                                     : 'none'
                                 }
-                                onClick={() => setSelectedFormat('hg-png')}
+                                onClick={() => setSelectedFormat('hd-png')}
                               >
                                 <Text mt="0" fontSize="lg">
                                   PNG (HD)
@@ -1469,6 +1484,7 @@ const state = observable({
   leftTab: 'shapes' as LeftPanelTab,
   leftPanelContext: 'normal' as 'normal' | 'resize',
   isShowingExport: false,
+  isShowingExportNoItemsWarning: false,
 })
 
 export type TargetTab = 'shape' | 'bg'
