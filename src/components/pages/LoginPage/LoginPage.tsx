@@ -19,6 +19,8 @@ import { ApiResponseError } from 'services/api/api-client'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import * as Yup from 'yup'
+import { Helmet } from 'react-helmet'
+import { getTabTitle } from 'utils/tab-title'
 
 export type LoginFormValues = {
   email: string
@@ -66,6 +68,10 @@ export const LoginPage = observer(() => {
 
   return (
     <SiteFormLayout>
+      <Helmet>
+        <title>{getTabTitle('Log in')}</title>
+      </Helmet>
+
       <Box
         bg="white"
         mx="auto"

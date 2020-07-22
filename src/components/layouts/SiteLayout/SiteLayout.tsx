@@ -1,8 +1,10 @@
-import React from 'react'
-import styled from '@emotion/styled'
-import { Header } from 'components/layouts/SiteLayout/Header'
-import { Footer } from 'components/layouts/SiteLayout/Footer'
 import { Box } from '@chakra-ui/core'
+import styled from '@emotion/styled'
+import { Footer } from 'components/layouts/SiteLayout/Footer'
+import { Header } from 'components/layouts/SiteLayout/Header'
+import React from 'react'
+import { Helmet } from 'react-helmet'
+import { getTabTitle } from 'utils/tab-title'
 
 export type SiteLayoutProps = {
   children: React.ReactNode
@@ -21,6 +23,9 @@ export const SiteLayout: React.FC<SiteLayoutProps> = ({
 }) => {
   return (
     <SiteLayoutWrapper bg={darkenBg ? 'gray.100' : undefined}>
+      <Helmet>
+        <title>{getTabTitle()}</title>
+      </Helmet>
       <Header fullWidth={fullWidth} />
       <ContentWrapper fullWidth={fullWidth} fullHeight={fullHeight}>
         {children}

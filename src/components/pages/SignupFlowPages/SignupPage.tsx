@@ -22,6 +22,8 @@ import { Urls } from 'urls'
 import * as Yup from 'yup'
 import { Recaptcha } from 'components/shared/Recaptcha'
 import { config } from 'config'
+import { Helmet } from 'react-helmet'
+import { getTabTitle } from 'utils/tab-title'
 
 export type SignupFormValues = {
   email: string
@@ -106,6 +108,10 @@ export const SignupPage = observer(() => {
 
   return (
     <SiteFormLayout>
+      <Helmet>
+        <title>{getTabTitle('Sign up')}</title>
+      </Helmet>
+
       <Box
         bg="white"
         mx="auto"
