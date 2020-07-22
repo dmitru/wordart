@@ -71,7 +71,7 @@ import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 import { Tooltip } from 'components/shared/Tooltip'
 import { TopNavButton } from 'components/shared/TopNavButton'
 import { saveAs } from 'file-saver'
-import { Dimensions } from 'lib/wordart/canvas-utils'
+import { Dimensions, canvasToDataUri } from 'lib/wordart/canvas-utils'
 import 'lib/wordart/console-extensions'
 import { observer, useLocalStore } from 'mobx-react'
 import { useRouter } from 'next/dist/client/router'
@@ -383,6 +383,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       })
     }
 
+    useEffect(() => {
+      window.addEventListener('beforeprint', (evt) => {
+        console.log('beforeprint = ', evt)
+        evt.preventDefault()
+      })
+    }, [])
+
     if (!router || !authStore.hasInitialized) {
       return <SpinnerSplashScreen />
     }
@@ -425,6 +432,21 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           style: mkBgStyleConfFromOptions(store.styleOptions.bg),
         })
       }
+    }
+
+    const handlePrint = async () => {
+      if (!store.editor) {
+        return
+      }
+      const printJS = require('print-js')
+      const canvas = await store.editor.exportAsRaster(1200)
+      const dataUrl = canvasToDataUri(canvas)
+      printJS({
+        printable: dataUrl,
+        type: 'image',
+        style: 'width: 100%',
+        maxWidth: 2048,
+      })
     }
 
     return (
@@ -524,7 +546,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       Page Size...
                     </MenuItem>
                     <MenuDivider />
-                    <MenuItem>
+                    <MenuItem onClick={handlePrint}>
                       <FiPrinter
                         css={css`
                           margin-right: 4px;

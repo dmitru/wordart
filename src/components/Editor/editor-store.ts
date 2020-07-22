@@ -129,8 +129,8 @@ export class EditorStore {
     kind: 'preset',
     preset: pageSizePresets[1],
     custom: {
-      width: 1.12,
-      height: 1,
+      width: 16,
+      height: 9,
     },
   }
 
@@ -1533,12 +1533,6 @@ export type PageSizePreset = {
 
 export const pageSizePresets: PageSizePreset[] = [
   {
-    id: 'square',
-    title: 'Square',
-    subtitle: 'Aspect: 1 x 1',
-    aspect: 1,
-  },
-  {
     id: 'a-paper-landscape',
     title: 'Paper Landscape',
     subtitle: 'Paper sizes from A2 to A6',
@@ -1549,6 +1543,12 @@ export const pageSizePresets: PageSizePreset[] = [
     title: 'Paper Portrait',
     subtitle: 'Paper sizes from A2 to A6',
     aspect: 210 / 297,
+  },
+  {
+    id: 'square',
+    title: 'Square',
+    subtitle: 'Aspect: 1 x 1',
+    aspect: 1,
   },
   {
     id: '4:3',
