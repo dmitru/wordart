@@ -127,7 +127,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
         </SliderImpl>
 
         {resetValue != null && (
-          <Tooltip label="Reset defaults">
+          <Tooltip label="Reset default">
             <IconButton
               aria-label="Reset default"
               icon={<FiRefreshCw />}
