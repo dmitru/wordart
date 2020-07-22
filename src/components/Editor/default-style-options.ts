@@ -22,7 +22,7 @@ const defaultWordsList: WordListEntry[] = [
     } as WordListEntry)
 )
 
-const defaultWordsListBackground: WordListEntry[] = ['back'].map(
+const defaultWordsListBackground: WordListEntry[] = [].map(
   (s, index) => ({ id: `${index}`, text: s } as WordListEntry)
 )
 

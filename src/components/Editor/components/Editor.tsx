@@ -407,31 +407,24 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const leftTab = state.leftTab
 
     const handleVisualizeClick = () => {
-      if (store.targetTab === 'shape') {
-        const wordsCount = store.styleOptions.shape.items.words.wordList.length
-        const itemsCount = store.styleOptions.shape.items.icons.iconList.length
+      const wordsCount =
+        store.styleOptions.shape.items.words.wordList.length +
+        store.styleOptions.bg.items.words.wordList.length
+      const itemsCount =
+        store.styleOptions.shape.items.icons.iconList.length +
+        store.styleOptions.bg.items.icons.iconList.length
 
-        if (wordsCount + itemsCount === 0) {
-          setIsShowingEmptyIconsWarning(true)
-          return
-        }
-
-        store.editor?.generateShapeItems({
-          style: mkShapeStyleConfFromOptions(store.styleOptions.shape),
-        })
-      } else {
-        const wordsCount = store.styleOptions.bg.items.words.wordList.length
-        const itemsCount = store.styleOptions.bg.items.icons.iconList.length
-
-        if (wordsCount + itemsCount === 0) {
-          setIsShowingEmptyIconsWarning(true)
-          return
-        }
-
-        store.editor?.generateBgItems({
-          style: mkBgStyleConfFromOptions(store.styleOptions.bg),
-        })
+      if (wordsCount + itemsCount === 0) {
+        setIsShowingEmptyIconsWarning(true)
+        return
       }
+
+      store.editor?.generateShapeItems({
+        style: mkShapeStyleConfFromOptions(store.styleOptions.shape),
+      })
+      store.editor?.generateBgItems({
+        style: mkBgStyleConfFromOptions(store.styleOptions.bg),
+      })
     }
 
     const handlePrint = async () => {
