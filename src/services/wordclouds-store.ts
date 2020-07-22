@@ -14,7 +14,7 @@ import {
   CloneWordcloudDto,
   CreateAnonymousWordcloudDto,
 } from 'services/api/types'
-import { sortBy, uniqBy } from 'lodash'
+import { sortBy } from 'lodash'
 import { BroadcastChannel } from 'broadcast-channel'
 
 type WordcloudChannelMessage =

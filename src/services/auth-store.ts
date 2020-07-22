@@ -1,12 +1,13 @@
 import 'mobx-react-lite/batchingForReactDom'
 import { RootStore } from 'services/root-store'
 import { Api } from 'services/api/api'
-import { observable, computed, runInAction } from 'mobx'
+import { observable, computed, runInAction, action } from 'mobx'
 import { MyProfile } from 'services/api/types'
 import { AuthTokenStore } from 'services/auth-token-store'
 import jsonp from 'jsonp'
 import { plans, LocalizedPrice } from 'plans'
 import { config } from 'config'
+import { BroadcastChannel } from 'broadcast-channel'
 
 const IS_SSR = typeof window === 'undefined'
 
@@ -18,8 +19,26 @@ declare global {
   }
 }
 
+type AuthChannelMessage =
+  | {
+      kind: 'login'
+      data: {
+        profile: MyProfile
+        authToken: string
+      }
+    }
+  | {
+      kind: 'logout'
+    }
+  | {
+      kind: 'profile-update'
+      data: Partial<MyProfile>
+    }
+
 export class AuthStore {
   rootStore: RootStore
+
+  channel = new BroadcastChannel<AuthChannelMessage>('auth')
 
   @observable hasInitialized = false
   @observable profile: MyProfile | null = null
@@ -29,6 +48,8 @@ export class AuthStore {
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
 
+    this.channel.addEventListener('message', this.handleChannelMsg)
+
     if (!IS_SSR) {
       window.Paddle.Setup({
         vendor: config.paddle.vendorId,
@@ -36,11 +57,38 @@ export class AuthStore {
           if (data.event === 'Checkout.Complete') {
             const checkoutId = data.eventData.checkout.id
             const updatedProfile = await Api.orders.process({ checkoutId })
+
+            this.channel.postMessage({
+              kind: 'profile-update',
+              data: updatedProfile,
+            })
+
             this.profile = updatedProfile
           }
         },
       })
       this.fetchLocalizedPrices()
+    }
+  }
+
+  @action handleChannelMsg = (msg: AuthChannelMessage) => {
+    switch (msg.kind) {
+      case 'login': {
+        this.profile = msg.data.profile
+        Api.setAuthToken(msg.data.authToken)
+        this.afterLogin()
+        break
+      }
+      case 'profile-update': {
+        // @ts-ignore
+        this.profile = { ...this.profile, ...msg.data }
+        break
+      }
+      case 'logout': {
+        this.profile = null
+        Api.clearAuthToken()
+        break
+      }
     }
   }
 
@@ -73,6 +121,11 @@ export class AuthStore {
       return
     }
     this.profile.isEmailConfirmed = true
+
+    this.channel.postMessage({
+      kind: 'profile-update',
+      data: { isEmailConfirmed: true },
+    })
   }
 
   fetchLocalizedPrices = async () => {
@@ -123,6 +176,12 @@ export class AuthStore {
       try {
         const profile = await Api.auth.getMyProfile()
         this.profile = profile
+
+        this.channel.postMessage({
+          kind: 'login',
+          data: { profile, authToken },
+        })
+
         this.afterLogin()
       } catch {
         Api.clearAuthToken()
@@ -147,6 +206,12 @@ export class AuthStore {
 
       const profile = await Api.auth.getMyProfile()
       this.profile = profile
+
+      this.channel.postMessage({
+        kind: 'login',
+        data: { profile, authToken },
+      })
+
       this.afterLogin()
     } catch (error) {
       throw error
@@ -166,6 +231,12 @@ export class AuthStore {
 
       const profile = await Api.auth.getMyProfile()
       this.profile = profile
+
+      this.channel.postMessage({
+        kind: 'login',
+        data: { profile, authToken },
+      })
+
       this.afterLogin()
     } catch (error) {
       throw error
@@ -175,6 +246,11 @@ export class AuthStore {
   logout = () => {
     AuthTokenStore.clearAuthToken()
     Api.clearAuthToken()
+
+    this.channel.postMessage({
+      kind: 'logout',
+    })
+
     this.profile = null
   }
 }
