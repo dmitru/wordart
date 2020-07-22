@@ -68,18 +68,20 @@ export class WordcloudsStore {
           const wcld = this._wordclouds.get(id)
           if (wcld) {
             this._wordclouds.set(id, { ...wcld, ...msg.data })
-            // TODO: update all folders
+            this.updateFoldersAfterWcldUpdate(id)
           }
         }
         break
       }
       case 'wcld-create': {
         this._wordclouds.set(msg.data.id, msg.data)
+        this.updateFoldersAfterWcldUpdate(msg.data.id)
         break
       }
       case 'wcld-delete': {
         for (const id of msg.ids) {
           this._wordclouds.delete(id)
+          this.updateFoldersAfterWcldRemove(id)
         }
         break
       }
@@ -98,8 +100,45 @@ export class WordcloudsStore {
       case 'folder-delete': {
         for (const id of msg.ids) {
           this._folders.delete(id)
+          this.updateFoldersAfterFolderRemove(id)
         }
         break
+      }
+    }
+  }
+
+  @action updateFoldersAfterFolderRemove = (folderId: FolderId) => {
+    for (const [id, wordcloud] of this._wordclouds) {
+      if (wordcloud.folderId === folderId) {
+        wordcloud.folderId = null
+      }
+    }
+  }
+
+  @action updateFoldersAfterWcldRemove = (wcldId: WordcloudId) => {
+    for (const [id, folder] of this._folders) {
+      if (folder.wordclouds.includes(wcldId)) {
+        folder.wordclouds = folder.wordclouds.filter((id) => id !== wcldId)
+      }
+    }
+  }
+
+  @action updateFoldersAfterWcldUpdate = (wcldId: WordcloudId) => {
+    const wordcloud = this._wordclouds.get(wcldId)
+    if (!wordcloud) {
+      return
+    }
+
+    if (!wordcloud.folderId) {
+      for (const [id, folder] of this._folders) {
+        if (folder.wordclouds.includes(wcldId)) {
+          folder.wordclouds = folder.wordclouds.filter((id) => id !== wcldId)
+        }
+      }
+    } else {
+      const folder = this._folders.get(wordcloud.folderId)
+      if (folder && !folder.wordclouds.includes(wordcloud.folderId)) {
+        folder.wordclouds.push(wordcloud.folderId)
       }
     }
   }
@@ -170,13 +209,7 @@ export class WordcloudsStore {
     this._wordclouds.set(wordcloud.id, wordcloud)
 
     // Update folders
-    if (wordcloud.folderId != null) {
-      const folder = this._folders.get(wordcloud.folderId)
-      if (folder) {
-        folder.wordclouds.push(wordcloud.id)
-      }
-    }
-
+    this.updateFoldersAfterWcldUpdate(wordcloud.id)
     this.channel.postMessage({
       kind: 'wcld-create',
       data: toJS(wordcloud, { recurseEverything: true }),
@@ -188,11 +221,9 @@ export class WordcloudsStore {
   @action delete = async (ids: WordcloudId[]): Promise<void> => {
     await Api.wordclouds.deleteMany(ids)
     const idsSet = new Set(ids)
-    for (const [folderId, folder] of this._folders) {
-      folder.wordclouds = folder.wordclouds.filter((id) => !idsSet.has(id))
-    }
 
     for (const id of idsSet) {
+      this.updateFoldersAfterWcldRemove(id)
       this._wordclouds.delete(id)
     }
 
@@ -265,11 +296,7 @@ export class WordcloudsStore {
 
   @action deleteFolder = async (id: FolderId): Promise<void> => {
     await Api.folders.delete(id)
-    for (const [wcId, wc] of this._wordclouds) {
-      if (wc.folderId === id) {
-        wc.folderId = null
-      }
-    }
+    this.updateFoldersAfterFolderRemove(id)
     this._folders.delete(id)
     this.channel.postMessage({
       kind: 'folder-delete',
