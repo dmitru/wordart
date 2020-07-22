@@ -244,7 +244,15 @@ const WordcloudThumbnailMenu: React.FC<WordcloudThumbnailMenuProps> = React.memo
   WordcloudThumbnailMenuProps
 >((props) => (
   <Menu isLazy>
-    <MenuButton as={ThumbnailMenuButton} noShadows={false} variant="solid" />
+    <MenuButton
+      as={ThumbnailMenuButton}
+      noShadows={false}
+      variant="outline"
+      bg="gray.100"
+      _hover={{
+        bg: 'gray.300',
+      }}
+    />
     <MenuTransition>
       {(styles) => (
         // @ts-ignore

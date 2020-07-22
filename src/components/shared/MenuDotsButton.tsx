@@ -12,7 +12,6 @@ export const MenuDotsButton = React.forwardRef<
     aria-label="Menu"
     size={size}
     ref={ref}
-    {...props}
     px="2"
     ml={ml}
     mr={mr}
@@ -24,6 +23,7 @@ export const MenuDotsButton = React.forwardRef<
       `}
     `}
     variant="ghost"
+    {...props}
   >
     <DotsThreeHorizontal size={18} />
   </Button>
