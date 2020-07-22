@@ -92,7 +92,6 @@ const reorder = (list: any[], startIndex: number, endIndex: number) => {
 const state = observable({
   isShowingImport: false,
   isShowingFindAndReplace: false,
-  isShowingEditor: false,
   textFilter: '',
   newWordText: '',
   selectedWords: new Set<WordConfigId>(),
@@ -620,14 +619,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
           isOpen={state.isShowingFindAndReplace}
           onClose={() => {
             state.isShowingFindAndReplace = false
-          }}
-        />
-
-        <WordsEditorModal
-          target={target}
-          isOpen={state.isShowingEditor}
-          onClose={() => {
-            state.isShowingEditor = false
           }}
         />
       </Box>
