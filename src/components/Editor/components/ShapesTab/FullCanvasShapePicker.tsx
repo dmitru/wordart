@@ -17,7 +17,7 @@ import React, { useEffect } from 'react'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
-import { FullCanvasShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
+import { FullCanvasShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
 
 const initialState = {
   thumbnailPreview: '',

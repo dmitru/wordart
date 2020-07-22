@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/core'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
-import { ShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
+import { ShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
 import {
   ShapeSelector,
   ShapeThumbnailBtn,

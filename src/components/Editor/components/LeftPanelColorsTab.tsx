@@ -13,7 +13,7 @@ import {
 import css from '@emotion/css'
 import { useThrottleCallback } from '@react-hook/throttle'
 import { BackgroundColorOptions } from 'components/Editor/components/BackgroundColorOptions'
-import { ShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
+import { ShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
 import {
   ShapeItemsColorPickerInline,
   ShapeItemsColorPickerKindDropdown,

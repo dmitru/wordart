@@ -1,6 +1,6 @@
 import { Box, Flex, Heading, Stack, Text } from '@chakra-ui/core'
 import { css } from '@emotion/core'
-import { BlobShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
+import { BlobShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
 import { ShapeThumbnailBtn } from 'components/Editor/components/ShapeSelector'
 import { generateBlobShapePathData } from 'components/Editor/lib/blob-shape-gen'
 import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'

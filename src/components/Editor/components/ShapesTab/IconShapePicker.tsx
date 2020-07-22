@@ -1,7 +1,7 @@
 import { Box, Flex, Stack, Text } from '@chakra-ui/core'
 import { css } from '@emotion/core'
 import { IconPicker } from 'components/Editor/components/IconPicker'
-import { IconShapeColorPicker } from 'components/Editor/components/ShapeColorpicker'
+import { IconShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
 import { ShapeThumbnailBtn } from 'components/Editor/components/ShapeSelector'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'

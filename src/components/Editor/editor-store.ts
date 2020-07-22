@@ -1286,7 +1286,6 @@ export class EditorStore {
     updateShapeColors = true,
     render = true
   ) => {
-    console.log('FISH: ', 'selectShape', shapeConfig.kind)
     if (!this.editor) {
       return
     }
