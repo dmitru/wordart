@@ -49,6 +49,7 @@
     "axios": "^0.19.2",
     "babel-plugin-emotion": "^10.0.33",
     "babel-plugin-module-resolver": "^4.0.0",
+    "broadcast-channel": "^3.1.0",
     "canvas": "^2.6.1",
     "chroma-js": "^2.1.0",
     "downshift": "^5.4.2",

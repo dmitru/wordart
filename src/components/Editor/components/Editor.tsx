@@ -51,7 +51,7 @@ import { LeftPanelFontsTab } from 'components/Editor/components/LeftPanelFontsTa
 import { LeftPanelIconsTab } from 'components/Editor/components/LeftPanelIconsTab'
 import { LeftPanelLayoutTab } from 'components/Editor/components/LeftPanelLayoutTab'
 import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTab'
-import { LeftPanelResizeTab } from 'components/Editor/components/LeftPanelResizeTab '
+import { LeftPanelResizeTab } from 'components/Editor/components/LeftPanelResizeTab'
 import { LeftPanelShapesTab } from 'components/Editor/components/ShapesTab/LeftPanelShapesTab'
 import { Spinner } from 'components/Editor/components/Spinner'
 import { WarningModal } from 'components/Editor/components/WarningModal'
@@ -763,7 +763,20 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   {store.lifecycleState === 'initialized' ? (
                     <>
                       {state.leftPanelContext === 'resize' && (
-                        <LeftPanelResizeTab />
+                        <LeftPanelResizeTab>
+                          <Box>
+                            <Button
+                              mt="4"
+                              width="100%"
+                              colorScheme="accent"
+                              onClick={() => {
+                                state.leftPanelContext = 'normal'
+                              }}
+                            >
+                              Done
+                            </Button>
+                          </Box>
+                        </LeftPanelResizeTab>
                       )}
 
                       {state.leftPanelContext === 'normal' && (

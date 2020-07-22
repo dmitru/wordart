@@ -12,11 +12,12 @@ import {
 import { pageSizePresets } from 'components/Editor/editor-store'
 import { observer } from 'mobx-react'
 import React from 'react'
-import { WordcloudId } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { SectionLabel } from './shared'
 
-export const LeftPanelResizeTab: React.FC<{}> = observer((props) => {
+export const LeftPanelResizeTab: React.FC<{
+  children: React.ReactNode
+}> = observer((props) => {
   const { editorPageStore: store, wordcloudsStore } = useStore()
 
   return (
@@ -101,7 +102,7 @@ export const LeftPanelResizeTab: React.FC<{}> = observer((props) => {
                 min={1}
                 max={8192}
                 onChange={(value) => {
-                  store.pageSize.custom.width = value
+                  store.pageSize.custom.width = (value as any) as number
                 }}
               >
                 <NumberInputField />
@@ -120,7 +121,7 @@ export const LeftPanelResizeTab: React.FC<{}> = observer((props) => {
                 min={1}
                 max={8192}
                 onChange={(value) => {
-                  store.pageSize.custom.height = value
+                  store.pageSize.custom.height = (value as any) as number
                 }}
               >
                 <NumberInputField />
@@ -143,18 +144,7 @@ export const LeftPanelResizeTab: React.FC<{}> = observer((props) => {
         </>
       )}
 
-      <Box>
-        <Button
-          mt="4"
-          width="100%"
-          colorScheme="accent"
-          onClick={() => {
-            state.leftPanelContext = 'normal'
-          }}
-        >
-          Done
-        </Button>
-      </Box>
+      {children}
     </Box>
   )
 })
