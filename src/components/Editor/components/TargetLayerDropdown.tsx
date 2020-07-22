@@ -61,7 +61,7 @@ export const TargetLayerDropdown = observer(() => {
                 onClick={() => {
                   if (store.getShapeConf()?.kind === 'full-canvas') {
                     alert(
-                      'Background layer is not available when "Entire canvas" is selected in the Shapes panel'
+                      'Background layer is not available when "Entire canvas" is selected in the "Shape" panel'
                     )
                     return
                   }

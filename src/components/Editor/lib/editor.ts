@@ -1031,7 +1031,6 @@ export class Editor {
     updateShapeColors?: boolean
     render?: boolean
   }) => {
-    console.log('FISH: setShape', params, params.shapeConfig.kind)
     this.store.hasUnsavedChanges = true
     const { shapeConfig, updateShapeColors = true, render = true } = params
 

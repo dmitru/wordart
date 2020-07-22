@@ -128,6 +128,10 @@ export class EditorStore {
   @observable pageSize: PageSize = {
     kind: 'preset',
     preset: pageSizePresets[1],
+    custom: {
+      width: 1.12,
+      height: 1,
+    },
   }
 
   @observable leftTabIsTransformingShape = false
@@ -405,8 +409,6 @@ export class EditorStore {
   }
 
   @action loadSerialized = async (serialized: EditorPersistedData) => {
-    console.log('FISH: loadSerialized = ', this.shapesPanel.shapeKind)
-
     const shouldShowModal =
       serialized.data.bgItems.items.length > 0 ||
       serialized.data.shapeItems.items.length > 0
@@ -658,6 +660,7 @@ export class EditorStore {
             index: index,
             color: item.c,
             customColor: item.cc,
+            opacity: 1,
             locked: item.l || false,
             shapeColor: item.sc,
             kind: 'word',
@@ -1386,17 +1389,24 @@ export class EditorStore {
     }
   }
 
-  @action setPageSize = (pageSize: PageSize) => {
-    this.pageSize = pageSize
+  @action setPageSize = (pageSize: Partial<PageSize>) => {
+    this.pageSize = { ...this.pageSize, ...pageSize }
     if (!this.editor) {
       return
     }
     this.hasUnsavedChanges = true
     const aspect =
-      pageSize.kind === 'preset'
-        ? pageSize.preset.aspect
-        : pageSize.width / pageSize.height
+      this.pageSize.kind === 'preset'
+        ? this.pageSize.preset.aspect
+        : this.pageSize.custom.width / this.pageSize.custom.height
+
     this.editor.setAspectRatio(aspect)
+
+    // Reset the shape
+    const shapeConf = this.getShapeConf()
+    if (shapeConf) {
+      this.selectShape(shapeConf, false, true)
+    }
   }
 
   animateVisualize = (debounce = true) => {
@@ -1505,20 +1515,19 @@ export class EditorStore {
 
 export type WordConfigId = string
 
-export type PageSize =
-  | {
-      kind: 'preset'
-      preset: PageSizePreset
-    }
-  | {
-      kind: 'custom'
-      width: number
-      height: number
-    }
+export type PageSize = {
+  kind: 'preset' | 'custom'
+  preset: PageSizePreset
+  custom: {
+    width: number
+    height: number
+  }
+}
 
 export type PageSizePreset = {
   id: string
   title: string
+  subtitle?: string
   aspect: number
 }
 
@@ -1526,16 +1535,31 @@ export const pageSizePresets: PageSizePreset[] = [
   {
     id: 'square',
     title: 'Square',
+    subtitle: 'Aspect: 1 x 1',
     aspect: 1,
+  },
+  {
+    id: 'a-paper-landscape',
+    title: 'Paper Landscape',
+    subtitle: 'Paper sizes from A2 to A6',
+    aspect: 297 / 210,
+  },
+  {
+    id: 'a-paper-portrait',
+    title: 'Paper Portrait',
+    subtitle: 'Paper sizes from A2 to A6',
+    aspect: 210 / 297,
   },
   {
     id: '4:3',
     title: 'Landscape',
+    subtitle: 'Aspect: 4 x 3',
     aspect: 4 / 3,
   },
   {
     id: '3:4',
     title: 'Portrait',
+    subtitle: 'Aspect: 3 x 4',
     aspect: 3 / 4,
   },
 ]

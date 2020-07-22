@@ -19,6 +19,11 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
   Portal,
   Progress,
   Skeleton,
@@ -67,8 +72,7 @@ import { TopNavButton } from 'components/shared/TopNavButton'
 import { saveAs } from 'file-saver'
 import { Dimensions } from 'lib/wordart/canvas-utils'
 import 'lib/wordart/console-extensions'
-import { observable } from 'mobx'
-import { observer } from 'mobx-react'
+import { observer, useLocalStore } from 'mobx-react'
 import { useRouter } from 'next/dist/client/router'
 import Link from 'next/link'
 import { darken, desaturate } from 'polished'
@@ -96,6 +100,7 @@ import 'utils/canvas-to-blob'
 import { getTabTitle } from 'utils/tab-title'
 import { useWarnIfUnsavedChanges } from 'utils/use-warn-if-unsaved-changes'
 import { uuid } from 'utils/uuid'
+import { SectionLabel } from './shared'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -105,6 +110,14 @@ const UnsavedChangesMsg = 'If you leave the page, unsaved changes will be lost.'
 
 export const EditorComponent: React.FC<EditorComponentProps> = observer(
   (props) => {
+    const state = useLocalStore(() => ({
+      title: 'New wordart',
+      leftTab: 'shapes' as LeftPanelTab,
+      leftPanelContext: 'normal' as 'normal' | 'resize',
+      isShowingExport: false,
+      isShowingExportNoItemsWarning: false,
+    }))
+
     const toast = useToast()
     const aspectRatio = 4 / 3
     const [canvasSize] = useState<Dimensions>({ w: 900 * aspectRatio, h: 900 })
@@ -655,15 +668,21 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           <LeftWrapper>
             <LeftBottomWrapper>
               <SideNavbar
-                activeIndex={leftPanelTabs.findIndex(
-                  (s) => s === state.leftTab
-                )}
+                activeIndex={
+                  state.leftPanelContext === 'normal'
+                    ? leftPanelTabs.findIndex((s) => s === state.leftTab)
+                    : undefined
+                }
               >
                 <LeftNavbarBtn
                   onClick={() => {
                     state.leftTab = 'shapes'
+                    state.leftPanelContext = 'normal'
                   }}
-                  active={state.leftTab === 'shapes'}
+                  active={
+                    state.leftTab === 'shapes' &&
+                    state.leftPanelContext === 'normal'
+                  }
                 >
                   <Shapes className="icon" />
                   Shape
@@ -672,8 +691,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 <LeftNavbarBtn
                   onClick={() => {
                     state.leftTab = 'words'
+                    state.leftPanelContext = 'normal'
                   }}
-                  active={leftTab === 'words'}
+                  active={
+                    leftTab === 'words' && state.leftPanelContext === 'normal'
+                  }
                 >
                   <TextFields className="icon" />
                   Words
@@ -682,8 +704,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 <LeftNavbarBtn
                   onClick={() => {
                     state.leftTab = 'fonts'
+                    state.leftPanelContext = 'normal'
                   }}
-                  active={leftTab === 'fonts'}
+                  active={
+                    leftTab === 'fonts' && state.leftPanelContext === 'normal'
+                  }
                 >
                   <Font className="icon" />
                   Fonts
@@ -692,8 +717,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 <LeftNavbarBtn
                   onClick={() => {
                     state.leftTab = 'symbols'
+                    state.leftPanelContext = 'normal'
                   }}
-                  active={leftTab === 'symbols'}
+                  active={
+                    leftTab === 'symbols' && state.leftPanelContext === 'normal'
+                  }
                 >
                   <SmileBeam className="icon" />
                   Icons
@@ -702,8 +730,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 <LeftNavbarBtn
                   onClick={() => {
                     state.leftTab = 'layout'
+                    state.leftPanelContext = 'normal'
                   }}
-                  active={leftTab === 'layout'}
+                  active={
+                    leftTab === 'layout' && state.leftPanelContext === 'normal'
+                  }
                 >
                   <LayoutMasonry className="icon" />
                   Layout
@@ -712,8 +743,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 <LeftNavbarBtn
                   onClick={() => {
                     state.leftTab = 'colors'
+                    state.leftPanelContext = 'normal'
                   }}
-                  active={leftTab === 'colors'}
+                  active={
+                    leftTab === 'colors' && state.leftPanelContext === 'normal'
+                  }
                 >
                   <ColorPalette className="icon" />
                   Colors
@@ -728,53 +762,134 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   {store.lifecycleState === 'initialized' ? (
                     <>
                       {state.leftPanelContext === 'resize' && (
-                        <Box px="3" py="3">
-                          <Heading size="md" mt="0" mb="3">
-                            Page Size
-                          </Heading>
+                        <Box px="3" py="5">
+                          <SectionLabel>Page size</SectionLabel>
 
-                          {pageSizePresets.map((preset) => (
+                          <Box display="flex" flexWrap="wrap">
+                            {pageSizePresets.map((preset) => (
+                              <Button
+                                variant="outline"
+                                outline={
+                                  store.pageSize.kind === 'preset' &&
+                                  store.pageSize.preset.id === preset.id
+                                    ? '3px solid hsl(358, 80%, 65%) !important'
+                                    : undefined
+                                }
+                                mr="2"
+                                mb="3"
+                                key={preset.id}
+                                onClick={() => {
+                                  store.setPageSize({ kind: 'preset', preset })
+                                  store.animateVisualize(false)
+                                }}
+                                display="flex"
+                                flexDirection="column"
+                                justifyContent="center"
+                                width="160px"
+                                minHeight="70px"
+                              >
+                                <Text fontSize="md">{preset.title}</Text>
+                                <Text my="0" fontSize="xs" color="gray.500">
+                                  {preset.subtitle}
+                                </Text>
+                              </Button>
+                            ))}
                             <Button
-                              colorScheme={
-                                store.pageSize.kind === 'preset' &&
-                                store.pageSize.preset.id === preset.id
-                                  ? 'primary'
+                              variant="outline"
+                              outline={
+                                store.pageSize.kind === 'custom'
+                                  ? '3px solid hsl(358, 80%, 65%) !important'
                                   : undefined
                               }
                               mr="2"
                               mb="3"
-                              key={preset.id}
+                              display="flex"
+                              flexDirection="column"
+                              justifyContent="center"
+                              width="160px"
+                              minHeight="70px"
                               onClick={() => {
-                                store.setPageSize({ kind: 'preset', preset })
-                                store.animateVisualize(false)
+                                store.setPageSize({
+                                  kind: 'custom',
+                                })
                               }}
                             >
-                              {preset.title}
+                              <Text fontSize="md">Custom</Text>
+                              <Text my="0" fontSize="xs" color="gray.500">
+                                Choose your own
+                              </Text>
                             </Button>
-                          ))}
-                          <Button
-                            colorScheme={
-                              store.pageSize.kind === 'custom'
-                                ? 'primary'
-                                : undefined
-                            }
-                            mr="2"
-                            mb="3"
-                            onClick={() => {
-                              store.setPageSize({
-                                kind: 'custom',
-                                height: 2,
-                                width: 4,
-                              })
-                            }}
-                          >
-                            Custom
-                          </Button>
+                          </Box>
+
+                          {/* Custom aspect ratio input */}
+                          {store.pageSize.kind === 'custom' && (
+                            <>
+                              <Box mt="5">
+                                <SectionLabel>Custom aspect ratio</SectionLabel>
+                              </Box>
+
+                              <Stack
+                                spacing="2"
+                                mt="5"
+                                mb="4"
+                                direction="row"
+                                alignItems="flex-end"
+                              >
+                                <Box>
+                                  <Text mb="1">Width</Text>
+                                  <NumberInput
+                                    step={1}
+                                    value={store.pageSize.custom.width}
+                                    min={1}
+                                    max={8192}
+                                    onChange={(value) => {
+                                      store.pageSize.custom.width = value
+                                    }}
+                                  >
+                                    <NumberInputField />
+                                    <NumberInputStepper>
+                                      <NumberIncrementStepper />
+                                      <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                  </NumberInput>
+                                </Box>
+
+                                <Box>
+                                  <Text mb="1">Height</Text>
+                                  <NumberInput
+                                    step={1}
+                                    value={store.pageSize.custom.height}
+                                    min={1}
+                                    max={8192}
+                                    onChange={(value) => {
+                                      store.pageSize.custom.height = value
+                                    }}
+                                  >
+                                    <NumberInputField />
+                                    <NumberInputStepper>
+                                      <NumberIncrementStepper />
+                                      <NumberDecrementStepper />
+                                    </NumberInputStepper>
+                                  </NumberInput>
+                                </Box>
+
+                                <Button
+                                  colorScheme="primary"
+                                  onClick={() => {
+                                    store.setPageSize({})
+                                  }}
+                                >
+                                  Update
+                                </Button>
+                              </Stack>
+                            </>
+                          )}
 
                           <Box>
                             <Button
                               mt="4"
-                              colorScheme="green"
+                              width="100%"
+                              colorScheme="accent"
                               onClick={() => {
                                 state.leftPanelContext = 'normal'
                               }}
@@ -1354,7 +1469,7 @@ const LeftPanel = styled(Box)`
   width: 350px;
 `
 
-const SideNavbar = styled.div<{ theme: any; activeIndex: number }>`
+const SideNavbar = styled.div<{ theme: any; activeIndex?: number }>`
   /* background: ${(p) =>
     darken(0.1, desaturate(0.5, p.theme.colors.dark4))}; */
   /* border-bottom: 1px solid #cecece; */
@@ -1373,15 +1488,20 @@ const SideNavbar = styled.div<{ theme: any; activeIndex: number }>`
     content: '';
     display: block;
     transition: 0.2s transform;
-    transform: translateY(${(p) => p.activeIndex * 75}px);
+    ${(p) =>
+      p.activeIndex != null
+        ? `
+        transform: translateY(${p.activeIndex * 75}px);
+        background: ${p.theme.colors.leftPanel.bgActive};
+        border-left: 8px solid ${p.theme.colors.primary}; 
+        `
+        : ''};
     top: 0;
     left: 0;
     position: absolute;
     height: 75px;
     width: 100%;
     z-index: 0;
-    background: ${(p) => p.theme.colors.leftPanel.bgActive};
-    border-left: 8px solid ${(p) => p.theme.colors.primary}; 
   }
 `
 
@@ -1478,14 +1598,6 @@ const Canvas = styled.canvas`
   top: 0;
   left: 0;
 `
-
-const state = observable({
-  title: 'New wordart',
-  leftTab: 'shapes' as LeftPanelTab,
-  leftPanelContext: 'normal' as 'normal' | 'resize',
-  isShowingExport: false,
-  isShowingExportNoItemsWarning: false,
-})
 
 export type TargetTab = 'shape' | 'bg'
 export type LeftPanelTab =
