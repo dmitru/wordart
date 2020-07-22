@@ -229,7 +229,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
 )
 
 const MenuLink = (
-  props: LinkProps & { active: boolean; variant?: 'accent' }
+  props: LinkProps & { active?: boolean; variant?: 'accent' }
 ) => (
   <MenuLinkStyled
     {...props}

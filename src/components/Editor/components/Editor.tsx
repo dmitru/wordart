@@ -305,7 +305,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         'sd-jpeg': 'jpeg',
         'hd-jpeg': 'jpeg',
         'hd-svg': 'svg',
-      } as { [format in DownloadFormat]: string })[selectedFormat]
+      } as { [format in DownloadFormat]: string })[selectedFormat] as
+        | 'svg'
+        | 'png'
+        | 'jpeg'
 
       const startExport = async () => {
         const dimension = hd ? 4096 : 1024

@@ -173,50 +173,52 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
       <Box>
         <>
           <Box display="flex" alignItems="flex-start" mb="3">
-            {shape && (
-              <ShapeThumbnailBtn
-                css={css`
-                  width: 180px;
-                  height: 180px;
-                  min-width: 180px;
-                  cursor: default !important;
+            {shape &&
+              (shape.kind === 'clipart:raster' ||
+                shape.kind === 'clipart:svg') && (
+                <ShapeThumbnailBtn
+                  css={css`
+                    width: 180px;
+                    height: 180px;
+                    min-width: 180px;
+                    cursor: default !important;
 
-                  padding: 10px;
-                  border: 2px solid #e9e9e9;
+                    padding: 10px;
+                    border: 2px solid #e9e9e9;
 
-                  img {
+                    img {
+                      position: relative;
+                      z-index: 2;
+                      width: 165px;
+                      height: 165px;
+                    }
+
+                    &,
+                    &:hover,
+                    &:focus {
+                      background-image: url(/images/editor/transparent-bg.svg);
+                      background-repeat: repeat;
+                      background-size: 15px;
+                    }
+
                     position: relative;
-                    z-index: 2;
-                    width: 165px;
-                    height: 165px;
-                  }
 
-                  &,
-                  &:hover,
-                  &:focus {
-                    background-image: url(/images/editor/transparent-bg.svg);
-                    background-repeat: repeat;
-                    background-size: 15px;
-                  }
-
-                  position: relative;
-
-                  &:after {
-                    position: absolute;
-                    content: '';
-                    width: 100%;
-                    height: 100%;
-                    top: 0;
-                    left: 0;
-                    z-index: 1;
-                    background: white !important;
-                    opacity: 0.6;
-                  }
-                `}
-                backgroundColor="white"
-                url={shape.config.processedThumbnailUrl!}
-              />
-            )}
+                    &:after {
+                      position: absolute;
+                      content: '';
+                      width: 100%;
+                      height: 100%;
+                      top: 0;
+                      left: 0;
+                      z-index: 1;
+                      background: white !important;
+                      opacity: 0.6;
+                    }
+                  `}
+                  backgroundColor="white"
+                  url={shape.config.processedThumbnailUrl!}
+                />
+              )}
             <Box
               flex={1}
               ml="3"

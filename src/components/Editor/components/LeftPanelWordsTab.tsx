@@ -38,7 +38,6 @@ import { FontPickerModal } from 'components/Editor/components/FontPicker/FontPic
 import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
 import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
 import { ChoiceButtons } from 'components/Editor/components/ChoiceButtons'
-import { WordsEditorModal } from 'components/Editor/components/WordsEditorModal'
 import { WordConfigId } from 'components/Editor/editor-store'
 import { TargetKind } from 'components/Editor/lib/editor'
 import {
@@ -791,8 +790,8 @@ const WordListRow: React.FC<
                       max={50}
                       step={1}
                       onChange={(v) => {
-                        if (v > 0) {
-                          word.repeats = v
+                        if (((v as any) as number) > 0) {
+                          word.repeats = (v as any) as number
                         }
                       }}
                     >

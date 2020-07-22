@@ -192,7 +192,7 @@ export const ThemePresetThumbnail: React.FC<{ theme: ThemePreset }> = ({
 
 export const ThemePresetThumbnailContainer = styled(Box)<{
   isActive: boolean
-  theme: Theme
+  theme: any
 }>`
   display: flex;
   flex-direction: column;

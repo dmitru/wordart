@@ -7,6 +7,7 @@ import {
   ShapeConf,
   ShapeId,
   ShapeClipartConf,
+  ShapeIconConf,
 } from 'components/Editor/shape-config'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList as List, ListProps } from 'react-window'

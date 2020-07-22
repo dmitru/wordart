@@ -268,7 +268,7 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
           color="gray.600"
           ml="2"
           mr="2"
-          onClickCapture={(e) => {
+          onClickCapture={(e: any) => {
             e.preventDefault()
             e.stopPropagation()
             e.nativeEvent.stopImmediatePropagation()

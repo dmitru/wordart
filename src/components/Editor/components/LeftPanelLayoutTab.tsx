@@ -134,6 +134,9 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
     }, [])
 
     const itemsCount = useMemo(() => {
+      if (!store.editor) {
+        return
+      }
       const itemsParent = store.editor.items[target]
       if (!itemsParent) {
         return undefined
@@ -163,18 +166,20 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
         <Box mb="2.5rem">
           <SectionLabel>Placement</SectionLabel>
-          <Box mb="4">
-            <Slider
-              // horizontal
-              label="Max. items count"
-              value={style.items.placement.itemsMaxCount}
-              onChange={handleMaxItemsCountChange}
-              onAfterChange={handleAfterMaxItemsCountChange}
-              min={1}
-              max={700}
-              step={1}
-            />
-          </Box>
+          {style.items.placement.itemsMaxCount !== 'auto' && (
+            <Box mb="4">
+              <Slider
+                // horizontal
+                label="Max. items count"
+                value={style.items.placement.itemsMaxCount}
+                onChange={handleMaxItemsCountChange}
+                onAfterChange={handleAfterMaxItemsCountChange}
+                min={1}
+                max={700}
+                step={1}
+              />
+            </Box>
+          )}
 
           {/* {itemsCount != null &&
             style.items.placement.itemsMaxCount > itemsCount && (

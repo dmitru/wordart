@@ -73,7 +73,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
       <IconCustomizeButton
         size="sm"
         variant="solid"
-        onClick={(e) => {
+        onClick={(e: any) => {
           e.stopPropagation()
         }}
         css={css`
@@ -247,8 +247,8 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                                   max={50}
                                   step={1}
                                   onChange={(v) => {
-                                    if (v > 0) {
-                                      icon.repeats = v
+                                    if (((v as any) as number) > 0) {
+                                      icon.repeats = (v as any) as number
                                     }
                                   }}
                                 >
@@ -265,9 +265,9 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                           {/* CUSTOM COLOR */}
                           <Flex align="center" mt="4">
                             <Switch
-                              id={`${icon.id}-custom-color`}
+                              id={`${icon.shapeId}-custom-color`}
                               isChecked={icon.color != null ? true : false}
-                              onChange={(e) => {
+                              onChange={(e: any) => {
                                 if (e.target.checked) {
                                   icon.color = 'black'
                                 } else {
@@ -278,7 +278,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                             />
 
                             <FormLabel
-                              htmlFor={`${icon.id}-custom-color`}
+                              htmlFor={`${icon.shapeId}-custom-color`}
                               my="0"
                               ml="2"
                             >
@@ -347,7 +347,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                             height: 16px;
                           }
                         `}
-                        onClick={(e) => {
+                        onClick={(e: any) => {
                           style.items.icons.iconList = style.items.icons.iconList.filter(
                             (i) => i.shapeId !== icon.shapeId
                           )
@@ -392,7 +392,6 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                           label="How many icons compared to words will be placed. E.g. 30%
                           means 30% icons, 70% words"
                           zIndex={100}
-                          showDelay={200}
                         >
                           <Text
                             my="0"

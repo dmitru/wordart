@@ -1529,6 +1529,7 @@ export class Editor {
         const wordConfig = wordConfigsById[genItem.wordConfigId]
         items.push({
           ...genItem,
+          opacity: 1,
           color: 'black',
           locked: false,
           text: wordConfig.text,
@@ -1747,6 +1748,7 @@ export class Editor {
         const wordConfig = wordConfigsById[genItem.wordConfigId]
         items.push({
           ...genItem,
+          opacity: 1,
           color: 'black',
           locked: false,
           text: wordConfig.text,

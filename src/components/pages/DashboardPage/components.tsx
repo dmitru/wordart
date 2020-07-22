@@ -212,6 +212,7 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
         <Text
           as="a"
           color="gray.600"
+          // @ts-ignore
           href={isSelecting ? '#' : Urls.editor.edit(wordcloud.id)}
           rel={isSelecting ? '' : 'noopener noreferrer'}
           target={isSelecting ? '' : '_blank'}
@@ -305,7 +306,7 @@ export const FoldersList = styled(Box)``
 
 export const FolderMenuButton = styled(MenuDotsButton)``
 
-export const FolderRowTag = styled(Tag)<{ theme: Theme }>`
+export const FolderRowTag = styled(Tag)<{ theme: any }>`
   transition: all 0;
   background: ${(p) => p.theme.colors.primary['50']};
   color: ${(p) => p.theme.colors.gray['600']};

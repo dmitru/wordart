@@ -41,6 +41,7 @@ export const TargetLayerDropdown = observer(() => {
         <MenuTransition>
           {(styles) => (
             <MenuList
+              // @ts-ignore
               css={css`
                 ${styles}
                 max-height: 300px;
