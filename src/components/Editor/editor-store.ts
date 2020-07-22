@@ -1414,7 +1414,7 @@ export class EditorStore {
         (!this.visualizeAnimatedLastTime ||
           (this.visualizeAnimatedLastTime != null &&
             new Date().getTime() - this.visualizeAnimatedLastTime.getTime() >
-              5000))) ||
+              2000))) ||
       !debounce
     ) {
       this.visualizeAnimatedLastTime = new Date()
