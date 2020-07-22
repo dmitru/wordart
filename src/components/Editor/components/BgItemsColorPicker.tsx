@@ -34,12 +34,10 @@ export const BgItemsColorPickerKindDropdown: React.FC<{
           <Portal>
             <MenuList
               // @ts-ignore
-              css={css`
-                ${styles}
-                background: white;
-                max-height: 300px;
-                overflow: auto;
-              `}
+              css={styles}
+              bg="white"
+              maxHeight="300px"
+              overflow="auto"
             >
               {/* <MenuItemWithDescription
           title="Same as shape"

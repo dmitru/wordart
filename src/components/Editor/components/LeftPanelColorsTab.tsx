@@ -134,7 +134,8 @@ const ItemsAdvancedControls: React.FC<{
                 afterLabel="%"
                 value={items.dimSmallerItems}
                 onChange={(value) => {
-                  const val = (value as any) as number
+                  console.log('dimSmallerItems')
+                  const val = value
                   items.dimSmallerItems = val
                 }}
                 onAfterChange={onUpdate}

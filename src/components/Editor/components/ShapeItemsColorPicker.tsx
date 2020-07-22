@@ -1,4 +1,11 @@
-import { Box, Menu, MenuButton, MenuList } from '@chakra-ui/core'
+import {
+  Box,
+  Menu,
+  MenuButton,
+  MenuTransition,
+  Portal,
+  MenuList,
+} from '@chakra-ui/core'
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
@@ -31,38 +38,45 @@ export const ShapeItemsColorPickerKindDropdown: React.FC<{
         {shapeStyle.items.coloring.kind === 'color' && 'Color: Custom'}
         {shapeStyle.items.coloring.kind === 'gradient' && 'Color: Scale'}
       </MenuButton>
-      <MenuList
-        css={css`
-          max-height: 300px;
-          overflow: auto;
-        `}
-      >
-        <MenuItemWithDescription
-          title="Same as shape"
-          description="Items will have color of the shape"
-          onClick={() => {
-            shapeStyle.items.coloring.kind = 'shape'
-            onUpdate()
-          }}
-        />
-        <MenuItemWithDescription
-          title="Custom"
-          description="Choose one or more custom colors"
-          onClick={() => {
-            shapeStyle.items.coloring.kind = 'color'
-            onUpdate()
-          }}
-        />
+      <MenuTransition>
+        {(styles) => (
+          <Portal>
+            <MenuList
+              // @ts-ignore
+              css={styles}
+              bg="white"
+              maxHeight="300px"
+              overflow="auto"
+            >
+              <MenuItemWithDescription
+                title="Same as shape"
+                description="Items will have color of the shape"
+                onClick={() => {
+                  shapeStyle.items.coloring.kind = 'shape'
+                  onUpdate()
+                }}
+              />
+              <MenuItemWithDescription
+                title="Custom"
+                description="Choose one or more custom colors"
+                onClick={() => {
+                  shapeStyle.items.coloring.kind = 'color'
+                  onUpdate()
+                }}
+              />
 
-        <MenuItemWithDescription
-          title="Color scale"
-          description="Choose 2 colors to use all colors in between"
-          onClick={() => {
-            shapeStyle.items.coloring.kind = 'gradient'
-            onUpdate()
-          }}
-        />
-      </MenuList>
+              <MenuItemWithDescription
+                title="Color scale"
+                description="Choose 2 colors to use all colors in between"
+                onClick={() => {
+                  shapeStyle.items.coloring.kind = 'gradient'
+                  onUpdate()
+                }}
+              />
+            </MenuList>
+          </Portal>
+        )}
+      </MenuTransition>
     </Menu>
   )
 })
