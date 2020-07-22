@@ -514,7 +514,7 @@ export class Editor {
       return
     }
     for (const [index, item] of this.items[target].items.entries()) {
-      item.setHidden(index > count)
+      item.setHidden(index >= count)
     }
     this.canvas.requestRenderAll()
     this.version++

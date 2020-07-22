@@ -126,8 +126,9 @@ export const Slider: React.FC<SliderProps> = (props) => {
           </Tracks>
         </SliderImpl>
 
+        {/* TODO: focus on the slider handle */}
         {resetValue != null && (
-          <Tooltip label="Reset default">
+          <Tooltip label="Reset default" isDisabled={value === resetValue}>
             <IconButton
               aria-label="Reset default"
               icon={<FiRefreshCw />}
@@ -135,9 +136,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
               size="sm"
               color="gray.400"
               ml="2"
-              css={css`
-                visibility: ${value === resetValue ? 'hidden' : 'visible'};
-              `}
+              isDisabled={value === resetValue}
               onClick={() => {
                 onChange(resetValue)
                 onAfterChange(resetValue)

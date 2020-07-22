@@ -15,7 +15,6 @@ export const Tooltip: React.FC<
     props.children || null
   ) : (
     <CTooltip
-      zIndex={1000}
       openDelay={250}
       hasArrow
       placement="bottom"

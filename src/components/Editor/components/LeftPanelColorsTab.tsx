@@ -1,27 +1,26 @@
 import {
   Box,
-  Collapse,
   Flex,
-  Text,
-  Portal,
   Popover,
   PopoverArrow,
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
+  Portal,
 } from '@chakra-ui/core'
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import { useThrottleCallback } from '@react-hook/throttle'
 import { BackgroundColorOptions } from 'components/Editor/components/BackgroundColorOptions'
+import {
+  BgItemsColorPickerInline,
+  BgItemsColorPickerKindDropdown,
+} from 'components/Editor/components/BgItemsColorPicker'
 import { ShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
 import {
   ShapeItemsColorPickerInline,
   ShapeItemsColorPickerKindDropdown,
 } from 'components/Editor/components/ShapeItemsColorPicker'
-import {
-  BgItemsColorPickerInline,
-  BgItemsColorPickerKindDropdown,
-} from 'components/Editor/components/BgItemsColorPicker'
 import { SectionLabel } from 'components/Editor/components/shared'
 import {
   ThemePresetThumbnail,
@@ -34,23 +33,21 @@ import {
   mkShapeStyleConfFromOptions,
   ThemePreset,
 } from 'components/Editor/style'
+import {
+  BgStyleOptions,
+  ShapeStyleOptions,
+} from 'components/Editor/style-options'
 import { themePresets } from 'components/Editor/theme-presets'
 import { Button } from 'components/shared/Button'
+import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
 import { Slider } from 'components/shared/Slider'
-import { Tooltip } from 'components/shared/Tooltip'
 import { AnimatePresence, motion } from 'framer-motion'
 import { cloneDeep } from 'lodash'
 import { toJS } from 'mobx'
-import { observer, useLocalStore } from 'mobx-react'
-import { FaCog, FaQuestionCircle } from 'react-icons/fa'
+import { observer, useLocalStore, Observer } from 'mobx-react'
+import { FaCog } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
-import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
-import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
-import {
-  ShapeStyleOptions,
-  BgStyleOptions,
-} from 'components/Editor/style-options'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -77,75 +74,78 @@ const ItemsAdvancedControls: React.FC<{
       <PopoverContent width="330px">
         <PopoverArrow />
         <PopoverBody p={3}>
-          <Box pb="0.5rem" pt="4">
-            <Box>
-              <Slider
-                afterLabel="%"
-                label="Brightness"
-                value={items.brightness}
-                onChange={(value) => {
-                  const val = (value as any) as number
-                  items.brightness = val
-                }}
-                onAfterChange={onUpdate}
-                resetValue={0}
-                min={-100}
-                max={100}
-                step={1}
-              />
-            </Box>
+          <Observer>
+            {() => (
+              <Box pb="0.5rem" pt="4">
+                <Box>
+                  <Slider
+                    afterLabel="%"
+                    label="Brightness"
+                    value={items.brightness}
+                    onChange={(value) => {
+                      const val = (value as any) as number
+                      items.brightness = val
+                    }}
+                    onAfterChange={onUpdate}
+                    resetValue={0}
+                    min={-100}
+                    max={100}
+                    step={1}
+                  />
+                </Box>
 
-            <Flex direction="row" mb="0">
-              <Slider
-                css={css`
-                  flex: 1;
-                `}
-                afterLabel="%"
-                labelCss="width: 60px"
-                label="Opacity"
-                value={items.opacity}
-                onChange={(value) => {
-                  items.opacity = value
-                }}
-                onAfterChange={onUpdate}
-                resetValue={100}
-                min={0}
-                max={100}
-                step={1}
-              />
-            </Flex>
+                <Flex direction="row" mb="0">
+                  <Slider
+                    css={css`
+                      flex: 1;
+                    `}
+                    afterLabel="%"
+                    labelCss="width: 60px"
+                    label="Opacity"
+                    value={items.opacity}
+                    onChange={(value) => {
+                      items.opacity = value
+                    }}
+                    onAfterChange={onUpdate}
+                    resetValue={100}
+                    min={0}
+                    max={100}
+                    step={1}
+                  />
+                </Flex>
 
-            <Box mb="2">
-              <Slider
-                css={css`
-                  flex: 1;
-                `}
-                label={
-                  <>
-                    <Box display="flex" alignItems="center">
-                      Emphasize size
-                      <HelpTooltipIcon
-                        label="Make larger words brighter and smaller words dimmer"
-                        ml="2"
-                      />
-                    </Box>
-                  </>
-                }
-                afterLabel="%"
-                value={items.dimSmallerItems}
-                onChange={(value) => {
-                  console.log('dimSmallerItems')
-                  const val = value
-                  items.dimSmallerItems = val
-                }}
-                onAfterChange={onUpdate}
-                min={0}
-                resetValue={40}
-                max={100}
-                step={1}
-              />
-            </Box>
-          </Box>
+                <Box mb="2">
+                  <Slider
+                    css={css`
+                      flex: 1;
+                    `}
+                    label={
+                      <>
+                        <Box display="flex" alignItems="center">
+                          Emphasize size
+                          <HelpTooltipIcon
+                            label="Make larger words brighter and smaller words dimmer"
+                            ml="2"
+                          />
+                        </Box>
+                      </>
+                    }
+                    afterLabel="%"
+                    value={items.dimSmallerItems}
+                    onChange={(value) => {
+                      const val = value
+                      items.dimSmallerItems = val
+                    }}
+                    onAfterChange={onUpdate}
+                    min={0}
+                    resetValue={40}
+                    max={100}
+                    step={1}
+                  />
+                </Box>
+              </Box>
+            )}
+          </Observer>
         </PopoverBody>
       </PopoverContent>
     </Portal>

@@ -63,6 +63,23 @@ const myTheme: ChakraTheme = {
         }
       },
     },
+    Tooltip: {
+      ...theme.components.Tooltip,
+      baseStyle: (props) => {
+        const baseStyle = theme.components.Tooltip.baseStyle(props)
+        return {
+          ...baseStyle,
+          container: {
+            ...baseStyle.container,
+            zIndex: 1001,
+          },
+          arrow: {
+            ...baseStyle.arrow,
+            zIndex: 1001,
+          },
+        }
+      },
+    },
     Modal: {
       ...theme.components.Modal,
       baseStyle: (props) => {
@@ -71,7 +88,7 @@ const myTheme: ChakraTheme = {
           ...baseStyle,
           overlay: {
             ...baseStyle.overlay,
-            zIndex: 1000,
+            zIndex: 1002,
           },
         }
       },

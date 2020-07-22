@@ -12,8 +12,6 @@ export const HelpTooltipIcon: React.FC<
   <Tooltip
     // @ts-ignore
     label={label}
-    zIndex={100}
-    showDelay={200}
     {...tooltipProps}
   >
     <Box
