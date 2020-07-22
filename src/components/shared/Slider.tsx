@@ -10,10 +10,11 @@ import {
   Tracks,
 } from 'react-compound-slider'
 import { noop } from 'lodash'
+import { Tooltip } from 'components/shared/Tooltip'
 import { css } from '@emotion/core'
 import { darken, lighten } from 'polished'
-import { Text, Box } from '@chakra-ui/core'
-import { DeleteButton } from 'components/shared/DeleteButton'
+import { Text, Box, IconButton } from '@chakra-ui/core'
+import { FiRefreshCw } from 'react-icons/fi'
 
 export type SliderProps = {
   value: number
@@ -126,17 +127,23 @@ export const Slider: React.FC<SliderProps> = (props) => {
         </SliderImpl>
 
         {resetValue != null && (
-          <DeleteButton
-            color="gray.400"
-            ml="2"
-            css={css`
-              visibility: ${value === resetValue ? 'hidden' : 'visible'};
-            `}
-            onClick={() => {
-              onChange(resetValue)
-              onAfterChange(resetValue)
-            }}
-          />
+          <Tooltip label="Reset defaults">
+            <IconButton
+              aria-label="Reset default"
+              icon={<FiRefreshCw />}
+              variant="ghost"
+              size="sm"
+              color="gray.400"
+              ml="2"
+              css={css`
+                visibility: ${value === resetValue ? 'hidden' : 'visible'};
+              `}
+              onClick={() => {
+                onChange(resetValue)
+                onAfterChange(resetValue)
+              }}
+            />
+          </Tooltip>
         )}
       </Box>
 

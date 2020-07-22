@@ -103,7 +103,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
       <Box
         mt="2"
         css={css`
-          background: hsl(220, 36%, 95%);
+          /* background: hsl(220, 36%, 95%); */
           margin: 0 -20px;
           padding: 8px 20px 4px;
         `}
@@ -221,6 +221,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
 
         <Box display="flex" mb="1">
           <SearchInput
+            noBorder={false}
             placeholder="Find font..."
             value={state.query}
             onChange={(value) => {
@@ -249,7 +250,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
 
         {fonts.length === 0 && (
           <>
-            <Text textAlign="center" color="gray.500" fontSize="lg">
+            <Text textAlign="center" color="gray.500" fontSize="lg" mt="6">
               No fonts found for your search criteria.
             </Text>
             <Button

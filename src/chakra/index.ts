@@ -15,6 +15,15 @@ const myTheme: ChakraTheme = {
       ...theme.components.Input,
       baseStyle: {
         ...theme.components.Input.baseStyle,
+        field: {
+          ...theme.components.Input.baseStyle.field,
+          _placeholder: {
+            // @ts-ignore
+            ...theme.components.Input.baseStyle.field._placeholder,
+            opacity: 1,
+            color: 'gray.500',
+          },
+        },
       },
     },
     Button: {
