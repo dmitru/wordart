@@ -1,25 +1,20 @@
-import { Box, Flex, Heading, Stack, Text } from '@chakra-ui/core'
-import { css } from '@emotion/core'
+import { Box, Stack } from '@chakra-ui/core'
 import { BlobShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
-import { ShapeThumbnailBtn } from 'components/Editor/components/ShapeSelector'
 import { generateBlobShapePathData } from 'components/Editor/lib/blob-shape-gen'
-import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
 import { ShapeRandomBlobConf } from 'components/Editor/shape-config'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
 import { Slider } from 'components/shared/Slider'
-import { Tooltip } from 'components/shared/Tooltip'
 import { fabric } from 'fabric'
-import { AnimatePresence, motion } from 'framer-motion'
 import { createCanvas } from 'lib/wordart/canvas-utils'
-import { isEqual } from 'lodash'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import React, { useEffect } from 'react'
-import { FaCog } from 'react-icons/fa'
-import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
+import { SectionLabel } from '../shared'
+import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
+import css from '@emotion/css'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -94,29 +89,6 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
       initialState.mode = 'home'
     }
   }, [])
-
-  const resetTransformBtn =
-    shape && !isEqual(shape.originalTransform, shape.transform) ? (
-      <Tooltip
-        label="Center shape and restore its original size"
-        isDisabled={isEqual(shape.originalTransform, shape.transform)}
-      >
-        <Button
-          ml="1"
-          variant="outline"
-          onClick={() => {
-            store.editor?.clearItems('shape')
-            store.editor?.clearItems('bg')
-            applyTransformToObj(shape.obj, shape.originalTransform)
-            shape.transform = [...shape.originalTransform] as MatrixSerialized
-            store.editor?.canvas.requestRenderAll()
-            store.renderKey++
-          }}
-        >
-          Reset original
-        </Button>
-      </Tooltip>
-    ) : null
 
   const updateBlobThumbnailPreview = async () => {
     const shape = store.getShape()
@@ -199,50 +171,8 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
       <Box>
         <>
           <Box display="flex" alignItems="flex-start" mb="3">
-            {shape && (
-              <ShapeThumbnailBtn
-                css={css`
-                  width: 180px;
-                  height: 180px;
-                  min-width: 180px;
-                  cursor: default !important;
+            <BigShapeThumbnail url={state.thumbnailPreview} />
 
-                  padding: 10px;
-                  border: 2px solid #e9e9e9;
-
-                  img {
-                    position: relative;
-                    z-index: 2;
-                    width: 165px;
-                    height: 165px;
-                  }
-
-                  &,
-                  &:hover,
-                  &:focus {
-                    background-image: url(/images/editor/transparent-bg.svg);
-                    background-repeat: repeat;
-                    background-size: 15px;
-                  }
-
-                  position: relative;
-
-                  &:after {
-                    position: absolute;
-                    content: '';
-                    width: 100%;
-                    height: 100%;
-                    top: 0;
-                    left: 0;
-                    z-index: 1;
-                    background: white !important;
-                    opacity: 0.6;
-                  }
-                `}
-                backgroundColor="white"
-                url={state.thumbnailPreview}
-              />
-            )}
             <Box
               flex={1}
               ml="3"
@@ -268,162 +198,61 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
                   onChange={updateThumbnailDebounced}
                 />
               </Box>
-
-              <Flex width="100%">
-                {state.mode === 'home' && (
-                  <Button
-                    variant="outline"
-                    display="flex"
-                    flex="1"
-                    onClick={() => {
-                      state.mode = 'customize shape'
-                    }}
-                  >
-                    <FaCog style={{ marginRight: '5px' }} />
-                    Customize
-                  </Button>
-                )}
-
-                {state.mode === 'customize shape' && (
-                  <Button
-                    flex="1"
-                    colorScheme="accent"
-                    onClick={() => {
-                      state.mode = 'home'
-                      if (store.leftTabIsTransformingShape) {
-                        store.leftTabIsTransformingShape = false
-                        store.editor?.deselectShape()
-                      }
-                    }}
-                  >
-                    Done
-                  </Button>
-                )}
-              </Flex>
             </Box>
           </Box>
 
-          <Box position="relative" width="100%" height="calc(100vh - 350px)">
-            <AnimatePresence initial={false}>
-              {shape && state.mode === 'customize shape' && (
-                <motion.div
-                  key="customize"
-                  initial={{ x: 355, y: 0, opacity: 0 }}
-                  transition={{ ease: 'easeInOut', duration: 0.2 }}
-                  animate={{ x: 0, y: 0, opacity: 1 }}
-                  exit={{ x: 355, y: 0, opacity: 0 }}
-                >
-                  <Stack mb="4" p="2" position="absolute" width="100%">
-                    <Box mt="6">
-                      <Heading size="md" m="0" display="flex">
-                        Resize, rotate, transform
-                      </Heading>
-                      {!store.leftTabIsTransformingShape && (
-                        <>
-                          <Stack direction="row" mt="3" spacing="3">
-                            <Button
-                              colorScheme="primary"
-                              onClick={() => {
-                                if (!store.editor) {
-                                  return
-                                }
-                                const totalItemsCount =
-                                  (store.editor.items.shape.items.length || 0) +
-                                  (store.editor.items.bg.items.length || 0)
-                                if (
-                                  totalItemsCount > 0 &&
-                                  !window.confirm(
-                                    'All unlocked words will be removed. Do you want to continue?'
-                                  )
-                                ) {
-                                  return
-                                }
-                                store.leftTabIsTransformingShape = true
-                                store.editor.selectShape()
-                              }}
-                            >
-                              Transform shape
-                            </Button>
-                            {resetTransformBtn}
-                          </Stack>
-                        </>
-                      )}
+          <Box
+            mt="5"
+            mx="-5"
+            px="5"
+            css={css`
+              overflow: auto;
+              height: calc(100vh - 340px);
+            `}
+          >
+            <SectionLabel>Customize Shape</SectionLabel>
+            <Stack mb="4" p="2" mt="6">
+              <Box>
+                <Slider
+                  label="Complexity"
+                  afterLabel="%"
+                  value={store.shapesPanel.blob.complexity}
+                  onChange={(value) => {
+                    store.shapesPanel.blob.complexity = value
+                    updateThumbnailDebounced()
+                  }}
+                  onAfterChange={() => updateBlobShape()}
+                  resetValue={70}
+                  min={0}
+                  max={100}
+                  step={1}
+                />
+              </Box>
 
-                      {store.leftTabIsTransformingShape && (
-                        <Box>
-                          <Text mt="2">
-                            Drag the shape to move or rotate it.
-                          </Text>
-                          <Stack direction="row" mt="3" spacing="2">
-                            <Button
-                              colorScheme="accent"
-                              onClick={() => {
-                                store.leftTabIsTransformingShape = false
-                                store.editor?.deselectShape()
-                                store.editor?.clearItems('shape')
-                                store.editor?.clearItems('bg')
-                                store.animateVisualize(false)
-                              }}
-                            >
-                              Apply
-                            </Button>
-                            {resetTransformBtn}
-                          </Stack>
-                        </Box>
-                      )}
-                    </Box>
-                  </Stack>
-                </motion.div>
-              )}
+              <Box mb="1rem">
+                <Slider
+                  label="Points"
+                  value={store.shapesPanel.blob.points}
+                  onChange={(value) => {
+                    store.shapesPanel.blob.points = value
+                    updateThumbnailDebounced()
+                  }}
+                  resetValue={5}
+                  onAfterChange={() => updateBlobShape()}
+                  min={3}
+                  max={10}
+                  step={1}
+                />
+              </Box>
 
-              {state.mode === 'home' && (
-                <motion.div
-                  key="main"
-                  transition={{ ease: 'easeInOut', duration: 0.2 }}
-                  initial={{ x: -400, y: 0, opacity: 0 }}
-                  animate={{ x: 0, y: 0, opacity: 1 }}
-                  exit={{ x: -400, y: 0, opacity: 0 }}
-                >
-                  <Stack mb="4" p="2" mt="6" position="absolute" width="100%">
-                    <Box>
-                      <Slider
-                        label="Complexity"
-                        afterLabel="%"
-                        value={store.shapesPanel.blob.complexity}
-                        onChange={(value) => {
-                          store.shapesPanel.blob.complexity = value
-                          updateThumbnailDebounced()
-                        }}
-                        resetValue={20}
-                        min={0}
-                        max={100}
-                        step={1}
-                      />
-                    </Box>
+              <Button colorScheme="secondary" onClick={updateBlobShape}>
+                Randomize shape
+              </Button>
+            </Stack>
 
-                    <Box mb="1.5rem">
-                      <Slider
-                        label="Points"
-                        value={store.shapesPanel.blob.points}
-                        onChange={(value) => {
-                          store.shapesPanel.blob.points = value
-                          updateThumbnailDebounced()
-                        }}
-                        resetValue={5}
-                        onAfterChange={updateShapeDebounced}
-                        min={3}
-                        max={16}
-                        step={1}
-                      />
-                    </Box>
-
-                    <Button colorScheme="secondary" onClick={updateBlobShape}>
-                      Randomize shape
-                    </Button>
-                  </Stack>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <Box mt="6" mb="2rem">
+              <ShapeTransformLeftPanelSection />
+            </Box>
           </Box>
         </>
       </Box>

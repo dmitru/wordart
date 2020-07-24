@@ -24,12 +24,10 @@ import {
 import { Font } from 'components/Editor/lib/generator'
 import { Shape } from 'components/Editor/shape'
 import {
-  ShapeConf,
-  ShapeId,
-  ShapeTextConf,
   ShapeClipartConf,
-  ShapeKind,
+  ShapeConf,
   ShapeIconConf,
+  ShapeId,
 } from 'components/Editor/shape-config'
 import {
   getAnglesForPreset,
@@ -46,6 +44,7 @@ import {
   ShapeStyleOptions,
   WordListEntry,
 } from 'components/Editor/style-options'
+import { themePresets } from 'components/Editor/theme-presets'
 import { ItemUpdateUndoData } from 'components/Editor/undo'
 import {
   FontConfig,
@@ -55,32 +54,30 @@ import {
   loadFontsConfig,
   popularFonts,
 } from 'data/fonts'
-import { imageShapes, iconShapes } from 'data/shapes'
+import { icons, loadIconsConfig } from 'data/icons'
+import { iconShapes, imageShapes } from 'data/shapes'
+import { createCanvas } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
-import { cloneDeep, sortBy, uniq, uniqBy } from 'lodash'
-import { action, observable, set, toJS, computed } from 'mobx'
+import { cloneDeep, uniq, uniqBy } from 'lodash'
+import { action, observable, set, toJS } from 'mobx'
 import paper from 'paper'
 import {
   MatrixSerialized,
+  PersistedCustomFontV1,
   PersistedItemShapeV1,
   PersistedItemV1,
   PersistedItemWordV1,
   PersistedShapeConfV1,
   PersistedWordV1,
-  PersistedCustomFontV1,
 } from 'services/api/persisted/v1'
 import { EditorPersistedData } from 'services/api/types'
 import { RootStore } from 'services/root-store'
+import { animateElement } from 'utils/animation'
 import { consoleLoggers } from 'utils/console-logger'
 import { UniqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
 import { exhaustiveCheck } from 'utils/type-utils'
-import { createCanvas } from 'lib/wordart/canvas-utils'
-import { animateElement } from 'utils/animation'
-import { themePresets } from 'components/Editor/theme-presets'
-import { iconsCategories } from 'data/icon-categories'
-import { icons, loadIconsConfig } from 'data/icons'
 
 export type EditorMode = 'view' | 'edit'
 
@@ -1603,7 +1600,7 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
   shapeKind: 'image',
   blob: {
     color: '#4A90E2',
-    complexity: 40,
+    complexity: 70,
     points: 5,
   },
   customImage: {

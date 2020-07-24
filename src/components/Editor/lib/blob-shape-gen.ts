@@ -19,7 +19,7 @@ export const generateBlobShapePathData = (params: {
   }
 
   const rBase = 150
-  const rVariance = (100 * params.complexity) / 100
+  const rVariance = (100 * params.complexity) / 100 / 4
 
   const ps: [number, number][] = []
   for (let i = 0; i < params.points; ++i) {

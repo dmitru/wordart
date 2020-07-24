@@ -4,10 +4,12 @@ import { ClipArtShapePicker } from 'components/Editor/components/ShapesTab/ClipA
 import { IconShapePicker } from 'components/Editor/components/ShapesTab/IconShapePicker'
 import { ShapeTypeSelector } from 'components/Editor/components/ShapesTab/ShapeTypeSelector'
 import { TextShapePicker } from 'components/Editor/components/ShapesTab/TextShapePicker'
+import { CustomImageShapePicker } from 'components/Editor/components/ShapesTab/CustomImageShapePicker'
 import { observer } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
 import { FullCanvasShapePicker } from 'components/Editor/components/ShapesTab/FullCanvasShapePicker'
+import css from '@emotion/css'
 
 export const LeftPanelShapesTab: React.FC<{}> = observer(() => {
   const {
@@ -24,6 +26,9 @@ export const LeftPanelShapesTab: React.FC<{}> = observer(() => {
         {leftPanelShapesState.shapeKind === 'icon' && <IconShapePicker />}
         {leftPanelShapesState.shapeKind === 'text' && <TextShapePicker />}
         {leftPanelShapesState.shapeKind === 'blob' && <BlobShapePicker />}
+        {leftPanelShapesState.shapeKind === 'custom image' && (
+          <CustomImageShapePicker />
+        )}
         {leftPanelShapesState.shapeKind === 'full-canvas' && (
           <FullCanvasShapePicker />
         )}

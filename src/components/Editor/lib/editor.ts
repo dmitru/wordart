@@ -250,21 +250,22 @@ export class Editor {
         return
       }
 
-      if (
-        target === shape?.obj &&
-        (shape.kind === 'custom:svg' ||
-          shape.kind === 'clipart:svg' ||
-          shape.kind === 'icon') &&
-        shape.objOriginalColors
-      ) {
+      if (target === shape?.obj) {
         const transform = getObjTransformMatrix(shape.obj)
         shape.transform = transform
-        applyTransformToObj(shape.objOriginalColors, transform)
+
+        if (
+          (shape.kind === 'custom:svg' ||
+            shape.kind === 'clipart:svg' ||
+            shape.kind === 'icon') &&
+          shape.objOriginalColors
+        ) {
+          applyTransformToObj(shape.objOriginalColors, transform)
+        }
+
         this.store.renderKey++
-
-        this.canvas.requestRenderAll()
-
         this.version++
+        this.canvas.requestRenderAll()
       } else {
         for (const targetKind of ['shape', 'bg'] as TargetKind[]) {
           const item = this.items[targetKind].fabricObjToItem.get(target)
@@ -275,6 +276,7 @@ export class Editor {
           }
         }
 
+        this.store.renderKey++
         this.version++
       }
     })

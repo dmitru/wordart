@@ -105,8 +105,8 @@ export const ShapeThumbnailBtn: React.FC<
   {
     size?: number
     padding?: number
-    backgroundColor: string
-    url: string
+    backgroundColor?: string
+    url?: string
     active?: boolean
     children?: React.ReactNode
   } & Omit<React.HTMLProps<HTMLButtonElement>, 'shape' | 'type'>
@@ -114,14 +114,14 @@ export const ShapeThumbnailBtn: React.FC<
   ({
     size = 106,
     padding = 8,
-    url,
+    url = null,
     children,
-    backgroundColor,
+    backgroundColor = 'white',
     active = false,
     onClick,
     ...rest
   }) => {
-    return (
+    return url ? (
       <ShapeThumbnailBtnInner
         {...rest}
         padding={padding}
@@ -133,8 +133,7 @@ export const ShapeThumbnailBtn: React.FC<
         <ShapeThumbnailBtnInnerImg src={url} size={size - 2 * padding} />
         {children}
       </ShapeThumbnailBtnInner>
-    )
-    return null
+    ) : null
   }
 )
 
