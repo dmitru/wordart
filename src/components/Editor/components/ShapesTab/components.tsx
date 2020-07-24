@@ -23,7 +23,7 @@ export const ResetShapeTransformButton: React.FC<{}> = observer(() => {
   const resetTransformBtn =
     shape && !isEqual(shape.originalTransform, shape.transform) ? (
       <Tooltip
-        label="Center shape and restore its original size"
+        label="Center the shape and restore its original size"
         isDisabled={isEqual(shape.originalTransform, shape.transform)}
       >
         <Button
@@ -99,7 +99,7 @@ export const ShapeTransformLeftPanelSection: React.FC<{}> = observer(() => {
           <Text mt="2">Drag the shape to move or rotate it.</Text>
           <Stack direction="row" mt="3" spacing="2">
             <Button
-              flex={1}
+              minWidth={140}
               colorScheme="accent"
               onClick={() => {
                 store.leftTabIsTransformingShape = false
