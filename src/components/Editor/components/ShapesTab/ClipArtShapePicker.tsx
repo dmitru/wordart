@@ -8,6 +8,8 @@ import {
   MenuList,
   Stack,
   Text,
+  MenuTransition,
+  Portal,
 } from '@chakra-ui/core'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
@@ -33,6 +35,7 @@ import { FaCog } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
+import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -176,48 +179,7 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
             {shape &&
               (shape.kind === 'clipart:raster' ||
                 shape.kind === 'clipart:svg') && (
-                <ShapeThumbnailBtn
-                  css={css`
-                    width: 180px;
-                    height: 180px;
-                    min-width: 180px;
-                    cursor: default !important;
-
-                    padding: 10px;
-                    border: 2px solid #e9e9e9;
-
-                    img {
-                      position: relative;
-                      z-index: 2;
-                      width: 165px;
-                      height: 165px;
-                    }
-
-                    &,
-                    &:hover,
-                    &:focus {
-                      background-image: url(/images/editor/transparent-bg.svg);
-                      background-repeat: repeat;
-                      background-size: 15px;
-                    }
-
-                    position: relative;
-
-                    &:after {
-                      position: absolute;
-                      content: '';
-                      width: 100%;
-                      height: 100%;
-                      top: 0;
-                      left: 0;
-                      z-index: 1;
-                      background: white !important;
-                      opacity: 0.6;
-                    }
-                  `}
-                  backgroundColor="white"
-                  url={shape.config.processedThumbnailUrl!}
-                />
+                <BigShapeThumbnail url={shape.config.processedThumbnailUrl!} />
               )}
             <Box
               flex={1}
@@ -306,25 +268,37 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                               ? selectedCategory.label
                               : 'All categories'}
                           </MenuButton>
-                          <MenuList
-                            css={css`
-                              max-height: 300px;
-                              overflow: auto;
-                            `}
-                          >
-                            <MenuItem onClick={() => setSelectedCategory(null)}>
-                              Show all ({store.availableImageShapes.length})
-                            </MenuItem>
-                            <MenuDivider />
-                            {allCategoryOptions.map((item, index) => (
-                              <MenuItem
-                                key={item.value}
-                                onClick={() => setSelectedCategory(item)}
-                              >
-                                {item.label} ({shapesPerCategoryCounts[index]})
-                              </MenuItem>
-                            ))}
-                          </MenuList>
+                          <MenuTransition>
+                            {(styles) => (
+                              <Portal>
+                                <MenuList
+                                  // @ts-ignore
+                                  css={css`
+                                    ${styles}
+                                    max-height: 300px;
+                                    overflow: auto;
+                                  `}
+                                >
+                                  <MenuItem
+                                    onClick={() => setSelectedCategory(null)}
+                                  >
+                                    Show all (
+                                    {store.availableImageShapes.length})
+                                  </MenuItem>
+                                  <MenuDivider />
+                                  {allCategoryOptions.map((item, index) => (
+                                    <MenuItem
+                                      key={item.value}
+                                      onClick={() => setSelectedCategory(item)}
+                                    >
+                                      {item.label} (
+                                      {shapesPerCategoryCounts[index]})
+                                    </MenuItem>
+                                  ))}
+                                </MenuList>
+                              </Portal>
+                            )}
+                          </MenuTransition>
                         </Menu>
                       </Box>
 
@@ -366,80 +340,8 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                     <SectionLabel>Colors</SectionLabel>
                     <ShapeColorPicker onUpdate={updateShapeColoring} />
 
-                    {/* {shape.kind === 'raster' && (
-                      <>
-                        <Heading size="md" m="0" mb="3" display="flex">
-                          Image
-                        </Heading>
-
-                        <Box>
-                          <Button
-                            colorScheme="accent"
-                            onClick={() => {
-                              state.isShowingCustomizeImage = true
-                            }}
-                          >
-                            Customize Image
-                          </Button>
-                        </Box>
-                      </>
-                    )} */}
-
                     <Box mt="6">
-                      <SectionLabel>Resize, rotate, transform</SectionLabel>
-                      {!store.leftTabIsTransformingShape && (
-                        <>
-                          <Stack direction="row" mt="3" spacing="3">
-                            <Button
-                              colorScheme="primary"
-                              onClick={() => {
-                                if (!store.editor) {
-                                  return
-                                }
-                                const totalItemsCount =
-                                  (store.editor.items.shape.items.length || 0) +
-                                  (store.editor.items.bg.items.length || 0)
-                                if (
-                                  totalItemsCount > 0 &&
-                                  !window.confirm(
-                                    'All unlocked words will be removed. Do you want to continue?'
-                                  )
-                                ) {
-                                  return
-                                }
-                                store.leftTabIsTransformingShape = true
-                                store.editor.selectShape()
-                              }}
-                            >
-                              Transform shape
-                            </Button>
-                            {resetTransformBtn}
-                          </Stack>
-                        </>
-                      )}
-
-                      {store.leftTabIsTransformingShape && (
-                        <Box>
-                          <Text mt="2">
-                            Drag the shape to move or rotate it.
-                          </Text>
-                          <Stack direction="row" mt="3" spacing="2">
-                            <Button
-                              colorScheme="accent"
-                              onClick={() => {
-                                store.leftTabIsTransformingShape = false
-                                store.editor?.deselectShape()
-                                store.editor?.clearItems('shape')
-                                store.editor?.clearItems('bg')
-                                store.animateVisualize(false)
-                              }}
-                            >
-                              Apply
-                            </Button>
-                            {resetTransformBtn}
-                          </Stack>
-                        </Box>
-                      )}
+                      <ShapeTransformLeftPanelSection />
                     </Box>
                   </Stack>
                 </motion.div>

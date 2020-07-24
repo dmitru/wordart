@@ -4,8 +4,11 @@ import {
   Menu,
   MenuButton,
   MenuItem,
+  IconButton,
   MenuList,
   Text,
+  MenuTransition,
+  Portal,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
@@ -28,6 +31,7 @@ import {
   ShapeIconConf,
 } from 'components/Editor/shape-config'
 import { noop, isEqual } from 'lodash'
+import { FiRefreshCw } from 'react-icons/fi'
 import { ShapeClipartSvg, ShapeCustomImageSvg } from 'components/Editor/shape'
 
 export const ShapeColorPicker: React.FC<{
@@ -95,9 +99,13 @@ export const SvgShapeColorPicker: React.FC<{
 
   const resetDefaultColorsBtn = (
     <Tooltip label="Reset default colors">
-      <DeleteButton
+      <IconButton
         ml="2"
-        size="md"
+        aria-label="Reset default"
+        icon={<FiRefreshCw />}
+        variant="ghost"
+        size="sm"
+        color="gray.500"
         onClick={() => {
           shapeConfig.processing.colors = {
             kind: 'original',
@@ -130,9 +138,13 @@ export const SvgShapeColorPicker: React.FC<{
             />
             {shapeConfig.processing.colors.kind === 'single-color' && (
               <Tooltip label="Reset default color">
-                <DeleteButton
+                <IconButton
+                  aria-label="Reset default"
+                  icon={<FiRefreshCw />}
+                  variant="ghost"
+                  size="sm"
+                  color="gray.500"
                   ml="2"
-                  size="md"
                   onClick={() => {
                     shapeConfig.processing.colors.kind = 'original'
                     onAfterChange()
@@ -236,38 +248,46 @@ export const SvgShapeColorKindDropdown: React.FC<{
         {selectedOption === 'color-map' && 'Multicolor'}
         {selectedOption === 'single-color' && 'Single color'}
       </MenuButton>
-      <MenuList
-        css={css`
-          max-height: 300px;
-          overflow: auto;
-        `}
-      >
-        {shape.colorMap.length > 1 && (
-          <MenuItemWithDescription
-            title="Multicolor"
-            description="Customize individual colors of the shape"
-            onClick={() => {
-              shapeConfig.processing.colors = {
-                kind: 'color-map',
-                colors: shape.customColors,
-              }
-              onUpdate()
-            }}
-          />
-        )}
+      <MenuTransition>
+        {(styles) => (
+          <Portal>
+            <MenuList
+              // @ts-ignore
+              css={css`
+                ${styles}
+                max-height: 300px;
+                overflow: auto;
+              `}
+            >
+              {shape.colorMap.length > 1 && (
+                <MenuItemWithDescription
+                  title="Multicolor"
+                  description="Customize individual colors of the shape"
+                  onClick={() => {
+                    shapeConfig.processing.colors = {
+                      kind: 'color-map',
+                      colors: shape.customColors,
+                    }
+                    onUpdate()
+                  }}
+                />
+              )}
 
-        <MenuItemWithDescription
-          title="Single color"
-          onClick={() => {
-            shapeConfig.processing.colors = {
-              kind: 'single-color',
-              color: store.shapesPanel.image.singleColor,
-            }
-            onUpdate()
-          }}
-          description="Choose one color to fill the entire shape"
-        />
-      </MenuList>
+              <MenuItemWithDescription
+                title="Single color"
+                onClick={() => {
+                  shapeConfig.processing.colors = {
+                    kind: 'single-color',
+                    color: store.shapesPanel.image.singleColor,
+                  }
+                  onUpdate()
+                }}
+                description="Choose one color to fill the entire shape"
+              />
+            </MenuList>
+          </Portal>
+        )}
+      </MenuTransition>
     </Menu>
   )
 })

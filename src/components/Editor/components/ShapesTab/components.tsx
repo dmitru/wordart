@@ -56,7 +56,7 @@ export const ShapeTransformLeftPanelSection: React.FC<{}> = observer(() => {
     renderKey, // eslint-disable-line
   } = store
 
-  if (!shape || shape.kind !== 'blob') {
+  if (!shape) {
     return <></>
   }
 

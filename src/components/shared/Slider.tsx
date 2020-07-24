@@ -12,7 +12,7 @@ import {
 import { noop } from 'lodash'
 import { Tooltip } from 'components/shared/Tooltip'
 import { css } from '@emotion/core'
-import { darken, lighten } from 'polished'
+import { lighten } from 'polished'
 import { Text, Box, IconButton } from '@chakra-ui/core'
 import { FiRefreshCw } from 'react-icons/fi'
 
