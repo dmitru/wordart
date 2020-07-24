@@ -8,7 +8,7 @@ import { Slider } from 'components/shared/Slider'
 import { fabric } from 'fabric'
 import { createCanvas } from 'lib/wordart/canvas-utils'
 import { observable } from 'mobx'
-import { observer } from 'mobx-react'
+import { observer, useLocalStore } from 'mobx-react'
 import React, { useEffect } from 'react'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
@@ -20,6 +20,7 @@ type TabMode = 'home' | 'customize shape'
 const initialState = {
   mode: 'home' as TabMode,
   thumbnailPreview: '',
+  isUpdatingBlobShape: false,
 }
 
 const state = observable<typeof initialState>({ ...initialState })
@@ -50,17 +51,6 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
     // @ts-ignore
     renderKey, // eslint-disable-line
   } = store
-
-  const fonts = store.getAvailableFonts()
-
-  const [updateShapeDebounced] = useDebouncedCallback(
-    store.updateShapeFromSelectedShapeConf,
-    300,
-    {
-      leading: false,
-      trailing: true,
-    }
-  )
 
   const [updateShapeColoringDebounced] = useDebouncedCallback(
     async () => {
@@ -122,6 +112,7 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
   }
 
   const updateBlobShape = async (saveUndoFrame = true) => {
+    state.isUpdatingBlobShape = true
     const blobShapeSvg = generateBlobShapePathData({
       color: store.shapesPanel.blob.color,
       points: store.shapesPanel.blob.points,
@@ -144,6 +135,7 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
     }
     updateBlobThumbnailPreview()
 
+    state.isUpdatingBlobShape = false
     store.animateVisualize(false)
   }
 
@@ -245,7 +237,12 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
                 />
               </Box>
 
-              <Button colorScheme="secondary" onClick={updateBlobShape}>
+              <Button
+                colorScheme="secondary"
+                onClick={updateBlobShape}
+                isDisabled={state.isUpdatingBlobShape}
+                isLoading={state.isUpdatingBlobShape}
+              >
                 Randomize shape
               </Button>
             </Stack>

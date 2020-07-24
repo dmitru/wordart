@@ -39,7 +39,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
         {shapesPanel.shapeKind === 'icon' && 'Icon'}
         {shapesPanel.shapeKind === 'custom image' && 'Custom image'}
         {shapesPanel.shapeKind === 'text' && 'Text'}
-        {shapesPanel.shapeKind === 'full-canvas' && 'Fill entire canvas'}
+        {shapesPanel.shapeKind === 'full-canvas' && 'Fill whole canvas'}
       </MenuButton>
 
       <Portal>
@@ -135,7 +135,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
               />
 
               <MenuItemWithDescription
-                title="Full canvas"
+                title="Fill whole canvas"
                 description="Use the entire canvas as a shape"
                 onClick={() => {
                   store.selectShapeAndSaveUndo({
