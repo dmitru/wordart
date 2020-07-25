@@ -24,6 +24,7 @@ import { FaCog } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce'
+import { ShapeTransformLeftPanelSection } from './components'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -223,6 +224,7 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
                 url={state.thumbnailPreview}
               />
             )}
+
             <Box
               flex={1}
               ml="3"
@@ -240,208 +242,98 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
                   }}
                 />
               </Box>
-
-              <Flex width="100%">
-                {state.mode === 'home' && (
-                  <Button
-                    variant="outline"
-                    display="flex"
-                    flex="1"
-                    onClick={() => {
-                      state.mode = 'customize shape'
-                    }}
-                  >
-                    <FaCog style={{ marginRight: '5px' }} />
-                    Customize
-                  </Button>
-                )}
-
-                {state.mode === 'customize shape' && (
-                  <Button
-                    flex="1"
-                    colorScheme="accent"
-                    onClick={() => {
-                      state.mode = 'home'
-                      if (store.leftTabIsTransformingShape) {
-                        store.leftTabIsTransformingShape = false
-                        store.editor?.deselectShape()
-                      }
-                    }}
-                  >
-                    Done
-                  </Button>
-                )}
-              </Flex>
             </Box>
           </Box>
 
-          <Box position="relative" width="100%" height="calc(100vh - 350px)">
-            <AnimatePresence initial={false}>
-              {shape && state.mode === 'customize shape' && (
-                <motion.div
-                  key="customize"
-                  initial={{ x: 355, y: 0, opacity: 0 }}
-                  transition={{ ease: 'easeInOut', duration: 0.2 }}
-                  animate={{ x: 0, y: 0, opacity: 1 }}
-                  exit={{ x: 355, y: 0, opacity: 0 }}
-                >
-                  <Stack mb="4" p="2" position="absolute" width="100%">
-                    <Box mt="6">
-                      <Heading size="md" m="0" display="flex">
-                        Resize, rotate, transform
-                      </Heading>
-                      {!store.leftTabIsTransformingShape && (
-                        <>
-                          <Stack direction="row" mt="3" spacing="3">
-                            <Button
-                              colorScheme="primary"
-                              onClick={() => {
-                                if (!store.editor) {
-                                  return
-                                }
-                                const totalItemsCount =
-                                  (store.editor.items.shape.items.length || 0) +
-                                  (store.editor.items.bg.items.length || 0)
-                                if (
-                                  totalItemsCount > 0 &&
-                                  !window.confirm(
-                                    'All unlocked words will be removed. Do you want to continue?'
-                                  )
-                                ) {
-                                  return
-                                }
-                                store.leftTabIsTransformingShape = true
-                                store.editor.selectShape()
-                              }}
-                            >
-                              Transform shape
-                            </Button>
-                            {resetTransformBtn}
-                          </Stack>
-                        </>
-                      )}
+          <Box
+            mt="5"
+            mx="-5"
+            px="5"
+            css={css`
+              overflow: auto;
+              height: calc(100vh - 340px);
+            `}
+          >
+            <Stack mb="4" p="2" width="100%" spacing="3">
+              <Box>
+                <Text fontWeight="semibold" color="gray.500">
+                  Text
+                </Text>
 
-                      {store.leftTabIsTransformingShape && (
-                        <Box>
-                          <Text mt="2">
-                            Drag the shape to move or rotate it.
-                          </Text>
-                          <Stack direction="row" mt="3" spacing="2">
-                            <Button
-                              colorScheme="accent"
-                              onClick={() => {
-                                store.leftTabIsTransformingShape = false
-                                store.editor?.deselectShape()
-                                store.editor?.clearItems('shape')
-                                store.editor?.clearItems('bg')
-                                store.animateVisualize(false)
-                              }}
-                            >
-                              Apply
-                            </Button>
-                            {resetTransformBtn}
-                          </Stack>
-                        </Box>
-                      )}
-                    </Box>
-                  </Stack>
-                </motion.div>
-              )}
+                <Textarea
+                  mb="3"
+                  autoFocus
+                  value={store.shapesPanel.text.text}
+                  onChange={async (e: any) => {
+                    const text = e.target.value
+                    store.shapesPanel.text.text = text
 
-              {state.mode === 'home' && (
-                <motion.div
-                  key="main"
-                  transition={{ ease: 'easeInOut', duration: 0.2 }}
-                  initial={{ x: -400, y: 0, opacity: 0 }}
-                  animate={{ x: 0, y: 0, opacity: 1 }}
-                  exit={{ x: -400, y: 0, opacity: 0 }}
-                >
-                  <Stack
-                    mb="4"
-                    p="2"
-                    position="absolute"
-                    width="100%"
-                    spacing="3"
+                    const shape = store.getShape()
+                    if (!shape || shape.kind !== 'text') {
+                      return
+                    }
+
+                    shape.config.text = text
+                    updateShapeDebounced()
+                    updateThumbnailDebounced()
+                  }}
+                  placeholder="Type text here..."
+                />
+              </Box>
+
+              <Box display="flex" alignItems="center" mb="5">
+                <TextShapeColorPicker
+                  shapeConf={shape.config}
+                  onAfterChange={updateShapeColoringDebounced}
+                  onChange={updateThumbnailDebounced}
+                  placement="right"
+                />
+              </Box>
+
+              <Box>
+                <Text fontWeight="semibold" color="gray.500">
+                  Font
+                </Text>
+                <Box>
+                  <BaseBtn
+                    onClick={() => {
+                      setIsShowingFontPicker(true)
+                    }}
+                    as={SelectedFontThumbnail}
+                    mb="0"
+                    p="3"
                   >
-                    <Box>
-                      <Text fontWeight="semibold" color="gray.500">
-                        Text
-                      </Text>
-
-                      <Textarea
-                        mb="3"
-                        autoFocus
-                        value={store.shapesPanel.text.text}
-                        onChange={async (e: any) => {
-                          const text = e.target.value
-                          store.shapesPanel.text.text = text
-
-                          const shape = store.getShape()
-                          if (!shape || shape.kind !== 'text') {
-                            return
-                          }
-
-                          shape.config.text = text
-                          updateShapeDebounced()
-                          updateThumbnailDebounced()
-                        }}
-                        placeholder="Type text here..."
-                      />
-                    </Box>
-
-                    <Box display="flex" alignItems="center" mb="5">
-                      <TextShapeColorPicker
-                        shapeConf={shape.config}
-                        onAfterChange={updateShapeColoringDebounced}
-                        onChange={updateThumbnailDebounced}
-                        placement="right"
-                      />
-                    </Box>
-
-                    <Box>
-                      <Text fontWeight="semibold" color="gray.500">
-                        Font
-                      </Text>
-                      <Box>
-                        <BaseBtn
-                          onClick={() => {
-                            setIsShowingFontPicker(true)
-                          }}
-                          as={SelectedFontThumbnail}
-                          mb="0"
-                          p="3"
-                        >
-                          <img
-                            src={
-                              store.getFontConfigById(
-                                store.shapesPanel.text.fontId
-                              )?.style.thumbnail
-                            }
-                          />
-                        </BaseBtn>
-                      </Box>
-                    </Box>
-
-                    <FontPickerModal
-                      isOpen={isShowingFontPicker}
-                      onClose={() => setIsShowingFontPicker(false)}
-                      selectedFontId={store.shapesPanel.text.fontId}
-                      onSubmit={async (font, style) => {
-                        store.shapesPanel.text.fontId = style.fontId
-                        const shape = store.getShape()
-                        if (!shape || shape.kind !== 'text') {
-                          return
-                        }
-                        shape.config.textStyle.fontId = style.fontId
-                        updateTextThumbnailPreview()
-                        store.updateShapeFromSelectedShapeConf()
-                        setIsShowingFontPicker(false)
-                      }}
+                    <img
+                      src={
+                        store.getFontConfigById(store.shapesPanel.text.fontId)
+                          ?.style.thumbnail
+                      }
                     />
-                  </Stack>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  </BaseBtn>
+                </Box>
+              </Box>
+
+              <FontPickerModal
+                isOpen={isShowingFontPicker}
+                onClose={() => setIsShowingFontPicker(false)}
+                selectedFontId={store.shapesPanel.text.fontId}
+                onSubmit={async (font, style) => {
+                  store.shapesPanel.text.fontId = style.fontId
+                  const shape = store.getShape()
+                  if (!shape || shape.kind !== 'text') {
+                    return
+                  }
+                  shape.config.textStyle.fontId = style.fontId
+                  updateTextThumbnailPreview()
+                  store.updateShapeFromSelectedShapeConf()
+                  setIsShowingFontPicker(false)
+                }}
+              />
+            </Stack>
+
+            <Box mt="6" mb="2rem">
+              <ShapeTransformLeftPanelSection />
+            </Box>
           </Box>
         </>
       </Box>
