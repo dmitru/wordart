@@ -639,7 +639,7 @@ export class Editor {
 
   updateRasterShapeColors = (config: RasterProcessingConf) => {
     // @TODO
-    throw new Error('not implemented')
+    console.error('not implemented')
   }
 
   updateBlobShapeColors = async (color: string) => {

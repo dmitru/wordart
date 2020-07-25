@@ -6,33 +6,25 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  Stack,
-  Text,
   MenuTransition,
   Portal,
+  Stack,
 } from '@chakra-ui/core'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
 import { ShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
-import {
-  ShapeSelector,
-  ShapeThumbnailBtn,
-} from 'components/Editor/components/ShapeSelector'
+import { ShapeSelector } from 'components/Editor/components/ShapeSelector'
 import { SectionLabel } from 'components/Editor/components/shared'
-import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
 import { ShapeClipartConf } from 'components/Editor/shape-config'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
 import { SearchInput } from 'components/shared/SearchInput'
 import { Slider } from 'components/shared/Slider'
-import { Tooltip } from 'components/shared/Tooltip'
 import { AnimatePresence, motion } from 'framer-motion'
-import { isEqual } from 'lodash'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import React, { useEffect, useState } from 'react'
 import { FaCog } from 'react-icons/fa'
-import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
@@ -147,29 +139,6 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
       store.leftTabIsTransformingShape = false
     }
   }, [])
-
-  const resetTransformBtn =
-    shape && !isEqual(shape.originalTransform, shape.transform) ? (
-      <Tooltip
-        label="Center shape and restore its original size"
-        isDisabled={isEqual(shape.originalTransform, shape.transform)}
-      >
-        <Button
-          ml="1"
-          variant="outline"
-          onClick={() => {
-            store.editor?.clearItems('shape')
-            store.editor?.clearItems('bg')
-            applyTransformToObj(shape.obj, shape.originalTransform)
-            shape.transform = [...shape.originalTransform] as MatrixSerialized
-            store.editor?.canvas.requestRenderAll()
-            store.renderKey++
-          }}
-        >
-          Reset original
-        </Button>
-      </Tooltip>
-    ) : null
 
   return (
     <>
@@ -350,40 +319,6 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
           </Box>
         </>
       </Box>
-
-      {/* {shape && shape.kind === 'raster' && (
-        <CustomizeRasterImageModal
-          isOpen={state.isShowingCustomizeImage}
-          key={shape.id}
-          value={{
-            invert: shape.config.processing?.invert != null,
-            invertColor: shape.config.processing?.invert?.color || 'black',
-            removeLightBackground:
-              shape.config.processing?.removeLightBackground?.threshold || 0,
-            originalUrl: shape.url,
-          }}
-          onClose={() => {
-            state.isShowingCustomizeImage = false
-          }}
-          onSubmit={async (thumbnailUrl, value) => {
-            shape.config.processedThumbnailUrl = thumbnailUrl
-            shape.config.processing = {
-              invert: value.invert
-                ? {
-                    color: value.invertColor,
-                  }
-                : undefined,
-              removeLightBackground: value.removeLightBackground
-                ? {
-                    threshold: value.removeLightBackground,
-                  }
-                : undefined,
-            }
-            await store.updateShapeFromSelectedShapeConf()
-            store.updateShapeThumbnail()
-          }}
-        />
-      )} */}
     </>
   )
 })

@@ -18,51 +18,47 @@ import {
   processRasterImg,
 } from 'lib/wordart/canvas-utils'
 import { observer, useLocalStore } from 'mobx-react'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 
-export type AddCustomImageModalProps = {
+export type CustomizeRasterImageModalProps = {
   isOpen: boolean
-  onSubmit: (params: { thumbnailUrl: string; state: State }) => void
+  value: ProcessingParams
+  onSubmit: (processedThumbnailUrl: string, value: ProcessingParams) => void
   onClose: () => void
 }
 
-type State = {
-  originalUrl: string | null
+type ProcessingParams = {
+  originalUrl: string
   invert: boolean
   invertColor: string
   removeLightBackground: number
 }
 
-const initialState: State = {
-  originalUrl: null,
-  invert: false,
-  invertColor: 'black',
-  removeLightBackground: 0.95,
-}
-
-export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
+export const CustomizeRasterImageModal: React.FC<CustomizeRasterImageModalProps> = observer(
   (props) => {
-    const { isOpen } = props
+    const { isOpen, value } = props
     const originalImgCanvas = useRef<HTMLCanvasElement | null>(null)
 
-    const state = useLocalStore<State>(() => initialState)
+    const state = useLocalStore<ProcessingParams>(() => value)
 
     const close = () => {
-      Object.assign(state, initialState)
       props.onClose()
     }
 
-    const processedImgCanvasRef = useRef<HTMLCanvasElement>(null)
+    const processedImgCanvasRef = useRef<HTMLCanvasElement | null>(null)
 
-    const updateImgPreview = (state: State) => {
+    const updateImgPreview = (state: ProcessingParams) => {
+      console.log('updateImgPreview 1')
       if (!originalImgCanvas.current) {
         return
       }
+      console.log('updateImgPreview  2')
       const c = processedImgCanvasRef.current
       if (!c) {
         return
       }
+      console.log('updateImgPreview 3')
 
       const ctx = c.getContext('2d')!
       const ctxOriginal = originalImgCanvas.current.getContext('2d')!
@@ -93,37 +89,32 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
       })
     }
 
+    const setProcessedImgCanvasRef = (ref: HTMLCanvasElement) => {
+      processedImgCanvasRef.current = ref
+      if (!isOpen) {
+        return
+      }
+
+      const loadOriginalImg = async () => {
+        const ctxOriginal = await loadImageUrlToCanvasCtxWithMaxSize(
+          value.originalUrl,
+          1000
+        )
+        originalImgCanvas.current = ctxOriginal.canvas
+        updateImgPreview(state)
+      }
+
+      loadOriginalImg()
+    }
+
     const updateImgPreviewThrottled = updateImgPreview
-
-    const { getRootProps, getInputProps } = useDropzone({
-      onDropAccepted: (files) => {
-        const reader = new FileReader()
-        reader.onload = async () => {
-          if (!processedImgCanvasRef.current) {
-            return
-          }
-          const ctxOriginal = await loadImageUrlToCanvasCtxWithMaxSize(
-            reader.result as string,
-            1000
-          )
-          state.originalUrl = ctxOriginal.canvas.toDataURL()
-          originalImgCanvas.current = ctxOriginal.canvas
-          updateImgPreview(state)
-        }
-        reader.readAsDataURL(files[0])
-      },
-    })
-
-    const hasChosenImage = !!state.originalUrl
 
     return (
       <Modal isOpen={isOpen} onClose={close}>
         <ModalOverlay>
           <ModalContent maxWidth="350px">
-            <ModalHeader>
-              {hasChosenImage ? 'Customize image' : 'Choose image to upload'}
-            </ModalHeader>
-            <ModalCloseButton />
+            <ModalHeader>Customize Image</ModalHeader>
+
             <ModalBody>
               <Box
                 mt="4"
@@ -135,7 +126,11 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
                       `
                 }
               >
-                <canvas ref={processedImgCanvasRef} width="300" height="300" />
+                <canvas
+                  ref={setProcessedImgCanvasRef}
+                  width="300"
+                  height="300"
+                />
 
                 <Box mt="3">
                   <Box>
@@ -176,49 +171,26 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
                   </Box>
                 </Box>
               </Box>
-
-              {!state.originalUrl && (
-                <Box {...getRootProps({ className: 'dropzone' })} py="4">
-                  <input {...getInputProps({})} />
-                  <p>
-                    Click or drag image files here - JPEG, PNG and SVG files are
-                    supported.
-                  </p>
-                  <Button mt="4" colorScheme="accent" size="lg">
-                    Click to choose file...
-                  </Button>
-                </Box>
-              )}
             </ModalBody>
 
             <ModalFooter>
               {state.originalUrl && (
                 <Button
-                  variant="ghost"
-                  onClick={() => {
-                    state.originalUrl = null
-                  }}
-                >
-                  Choose another image
-                </Button>
-              )}
-              {state.originalUrl && (
-                <Button
                   colorScheme="accent"
                   onClick={() => {
-                    props.onSubmit({
-                      state,
-                      thumbnailUrl: processedImgCanvasRef.current?.toDataURL(
-                        'image/png'
-                      )!,
-                    })
+                    props.onSubmit(
+                      processedImgCanvasRef.current?.toDataURL()!,
+                      state
+                    )
                     close()
                   }}
                 >
-                  Import
+                  Done
                 </Button>
               )}
             </ModalFooter>
+
+            <ModalCloseButton />
           </ModalContent>
         </ModalOverlay>
       </Modal>
@@ -226,4 +198,4 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
   }
 )
 
-AddCustomImageModal.displayName = 'AddCustomImageModal'
+CustomizeRasterImageModal.displayName = 'CustomizeRasterImageModal'
