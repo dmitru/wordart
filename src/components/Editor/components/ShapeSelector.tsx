@@ -1,7 +1,7 @@
+import React, { useRef, useEffect } from 'react'
 import { observer } from 'mobx-react'
 import styled from '@emotion/styled'
 import { noop } from 'lodash'
-import { darken } from 'polished'
 import { Box, BoxProps } from '@chakra-ui/core'
 import {
   ShapeConf,
@@ -32,6 +32,18 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
     onSelected = noop,
     ...rest
   }) => {
+    const listRef = useRef<List>(null)
+
+    useEffect(() => {
+      if (listRef.current && selectedShapeId != null) {
+        // Scroll to the current item
+        const itemIndex = shapes.findIndex((s) => s.id === selectedShapeId)
+        if (itemIndex > -1) {
+          listRef.current.scrollToItem(Math.ceil(itemIndex / columns), 'smart')
+        }
+      }
+    }, [listRef.current])
+
     const cols = columns
     const rows = Math.ceil(shapes.length / cols)
 
@@ -90,6 +102,7 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
                 itemCount={rows}
                 itemSize={itemHeight}
                 width={itemWidth * cols + 26}
+                ref={listRef}
               >
                 {ThumbnailsRow}
               </List>
