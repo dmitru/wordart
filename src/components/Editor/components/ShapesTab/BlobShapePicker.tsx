@@ -1,14 +1,13 @@
-import { Box, Stack } from '@chakra-ui/core'
+import { Box, Button, Stack } from '@chakra-ui/core'
 import { BlobShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
 import { generateBlobShapePathData } from 'components/Editor/lib/blob-shape-gen'
 import { ShapeRandomBlobConf } from 'components/Editor/shape-config'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
-import { Button } from 'components/shared/Button'
 import { Slider } from 'components/shared/Slider'
 import { fabric } from 'fabric'
 import { createCanvas } from 'lib/wordart/canvas-utils'
 import { observable } from 'mobx'
-import { observer, useLocalStore } from 'mobx-react'
+import { observer } from 'mobx-react'
 import React, { useEffect } from 'react'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
@@ -238,7 +237,7 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
               </Box>
 
               <Button
-                colorScheme="secondary"
+                // colorScheme="secondary"
                 onClick={updateBlobShape}
                 isDisabled={state.isUpdatingBlobShape}
                 isLoading={state.isUpdatingBlobShape}

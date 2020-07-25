@@ -17,7 +17,7 @@ export const BackgroundColorOptions: React.FC<{
     <>
       <Box>
         {bgStyle.fill.kind === 'color' && (
-          <Box display="flex">
+          <Box display="flex" alignItems="center">
             <ColorPickerPopover
               disableAlpha
               colorSwatchOpacity={bgStyle.fill.color.opacity / 100}
@@ -35,6 +35,7 @@ export const BackgroundColorOptions: React.FC<{
                 css={css`
                   flex: 1;
                   margin-right: 20px;
+                  margin-bottom: 0;
                 `}
                 horizontal
                 afterLabel="%"

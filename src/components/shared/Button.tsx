@@ -14,7 +14,7 @@ export const Button = React.forwardRef<ButtonProps, any>((props, ref) => (
     css={css`
       cursor: pointer;
 
-      &,
+      /* &,
       &:focus,
       &:active {
         ${
@@ -34,7 +34,7 @@ export const Button = React.forwardRef<ButtonProps, any>((props, ref) => (
       }
 
       ${props.variant === 'ghost' && `box-shadow: none !important;`}
-      ${props.variant === 'ghost' && !props.color && ` color: #485660;`}
+      ${props.variant === 'ghost' && !props.color && ` color: #485660;`} */
     `}
   />
 ))

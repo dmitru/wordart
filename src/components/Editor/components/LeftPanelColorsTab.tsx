@@ -260,7 +260,6 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                       css={css`
                         min-width: 120px;
                       `}
-                      variant="outline"
                       leftIcon={<ChevronLeftIcon />}
                       onClick={() => {
                         state.view = 'normal'

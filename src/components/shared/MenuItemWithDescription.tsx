@@ -23,7 +23,7 @@ export const MenuItemWithDescription = React.forwardRef<
       {icon}
     </Box>
     <Box display="flex" flexDirection="column">
-      <Text my="0" fontWeight="semibold">
+      <Text my="0" fontWeight="medium">
         {title}
       </Text>
       {description && (
