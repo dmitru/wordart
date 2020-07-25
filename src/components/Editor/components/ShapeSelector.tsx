@@ -39,7 +39,7 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
         // Scroll to the current item
         const itemIndex = shapes.findIndex((s) => s.id === selectedShapeId)
         if (itemIndex > -1) {
-          listRef.current.scrollToItem(Math.ceil(itemIndex / columns), 'smart')
+          listRef.current.scrollToItem(Math.ceil(itemIndex / columns), 'center')
         }
       }
     }, [listRef.current])

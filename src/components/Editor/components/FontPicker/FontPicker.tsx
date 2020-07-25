@@ -21,7 +21,7 @@ import {
 import { capitalize, flatten, uniq } from 'lodash'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
-import { useMemo } from 'react'
+import { useMemo, useRef, useEffect } from 'react'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList as List, ListProps } from 'react-window'
 import { useStore } from 'services/root-store'
@@ -45,6 +45,8 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
   const allFonts = store.getAvailableFonts({
     popular: state.style === 'popular',
   })
+
+  const listRef = useRef<List>(null)
 
   const styleOptions = uniq(
     flatten(allFonts.map((f) => f.font.categories || []))
@@ -76,6 +78,18 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
       ),
     [selectedFontId]
   )
+
+  useEffect(() => {
+    if (listRef.current && selectedFont != null) {
+      // Scroll to the current item
+      const itemIndex = fonts.findIndex(
+        (s) => s.font.title === selectedFont.font.title
+      )
+      if (itemIndex > -1) {
+        listRef.current.scrollToItem(itemIndex, 'center')
+      }
+    }
+  }, [listRef.current])
 
   const FontListRow: ListProps['children'] = ({ index, style }) => {
     const font = fonts[index]
@@ -236,6 +250,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
           <AutoSizer defaultWidth={900} defaultHeight={700}>
             {({ height }) => (
               <List
+                ref={listRef}
                 overscanCount={20}
                 height={height}
                 itemCount={fonts.length}
