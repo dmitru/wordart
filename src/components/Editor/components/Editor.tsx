@@ -1324,7 +1324,7 @@ const PageLayoutWrapper = styled.div`
 
 const EditorLayout = styled.div`
   display: flex;
-  height: calc(100% - 50px);
+  height: calc(100% - 60px);
   width: 100%;
   margin: 0 auto;
   overflow: hidden;
@@ -1457,7 +1457,7 @@ const LeftNavbarBtn = styled(BaseBtn)<{ theme: any; active: boolean }>`
 
 const LeftPanelContent = styled(Box)<{ theme: any; noScroll: boolean }>`
   flex: 1;
-  height: ${(p) => (p.noScroll ? '100%' : 'calc(100vh - 50px)')};
+  height: ${(p) => (p.noScroll ? '100%' : 'calc(100vh - 60px)')};
   overflow: auto;
   background: white;
 

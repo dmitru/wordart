@@ -234,7 +234,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           position="relative"
           overflow="hidden"
           width="100%"
-          height="calc(100vh - 50px)"
+          height="calc(100vh - 60px)"
           css={css`
             &::-webkit-scrollbar {
               display: none; /* Chrome Safari */
@@ -343,7 +343,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
               >
                 <Box
                   position="absolute"
-                  height="calc(100vh - 50px)"
+                  height="calc(100vh - 60px)"
                   overflowY="auto"
                   px="5"
                   py="6"

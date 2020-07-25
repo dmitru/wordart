@@ -1,35 +1,27 @@
-import { Box, Flex, Heading, Stack, Text, Textarea } from '@chakra-ui/core'
+import { Box, Stack, Text } from '@chakra-ui/core'
 import { css } from '@emotion/core'
+import { SelectedFontThumbnail } from 'components/Editor/components/FontPicker/components'
 import { FontPickerModal } from 'components/Editor/components/FontPicker/FontPickerModal'
-import { ShapeThumbnailBtn } from 'components/Editor/components/ShapeSelector'
-import {
-  applyTransformToObj,
-  createMultilineFabricTextGroup,
-} from 'components/Editor/lib/fabric-utils'
-import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
-import { Button } from 'components/shared/Button'
 import { TextShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
+import { createMultilineFabricTextGroup } from 'components/Editor/lib/fabric-utils'
+import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
+import { BaseBtn } from 'components/shared/BaseBtn'
+import { EditableTextarea } from 'components/shared/EditableTextarea'
 import { Slider } from 'components/shared/Slider'
-import { Tooltip } from 'components/shared/Tooltip'
 import { fabric } from 'fabric'
-import { AnimatePresence, motion } from 'framer-motion'
 import { createCanvas } from 'lib/wordart/canvas-utils'
-import { isEqual } from 'lodash'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
-import React, { useEffect, useState } from 'react'
-import { BaseBtn } from 'components/shared/BaseBtn'
-import { SelectedFontThumbnail } from 'components/Editor/components/FontPicker/components'
-import { FaCog } from 'react-icons/fa'
-import { MatrixSerialized } from 'services/api/persisted/v1'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce'
-import { ShapeTransformLeftPanelSection } from './components'
+import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
   mode: 'home' as TabMode,
   thumbnailPreview: '',
+  previewText: '',
 }
 
 const state = observable<typeof initialState>({ ...initialState })
@@ -62,9 +54,9 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
     renderKey, // eslint-disable-line
   } = store
 
-  const [updateShapeDebounced] = useDebouncedCallback(() => {
-    store.updateShapeFromSelectedShapeConf()
-  }, 300)
+  useEffect(() => {
+    state.previewText = store.shapesPanel.text.text
+  }, [])
 
   const [updateShapeColoringDebounced] = useDebouncedCallback(async () => {
     const shape = store.getShape()
@@ -89,29 +81,6 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
     }
   }, [])
 
-  const resetTransformBtn =
-    shape && !isEqual(shape.originalTransform, shape.transform) ? (
-      <Tooltip
-        label="Center shape and restore its original size"
-        isDisabled={isEqual(shape.originalTransform, shape.transform)}
-      >
-        <Button
-          ml="1"
-          variant="outline"
-          onClick={() => {
-            store.editor?.clearItems('shape')
-            store.editor?.clearItems('bg')
-            applyTransformToObj(shape.obj, shape.originalTransform)
-            shape.transform = [...shape.originalTransform] as MatrixSerialized
-            store.editor?.canvas.requestRenderAll()
-            store.renderKey++
-          }}
-        >
-          Reset original
-        </Button>
-      </Tooltip>
-    ) : null
-
   const updateTextThumbnailPreview = async () => {
     if (!shape || shape.kind !== 'text') {
       return
@@ -132,7 +101,8 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
     const canvas = createCanvas({ w: canvasSize, h: canvasSize })
     const c = new fabric.StaticCanvas(canvas)
 
-    const text = store.shapesPanel.text.text
+    const text = state.previewText
+
     const group = createMultilineFabricTextGroup(
       text,
       font,
@@ -180,50 +150,7 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
       <Box>
         <>
           <Box display="flex" alignItems="flex-start" mb="3">
-            {shape && (
-              <ShapeThumbnailBtn
-                css={css`
-                  width: 180px;
-                  height: 180px;
-                  min-width: 180px;
-                  cursor: default !important;
-
-                  padding: 10px;
-                  border: 2px solid #e9e9e9;
-
-                  img {
-                    position: relative;
-                    z-index: 2;
-                    width: 165px;
-                    height: 165px;
-                  }
-
-                  &,
-                  &:hover,
-                  &:focus {
-                    background-image: url(/images/editor/transparent-bg.svg);
-                    background-repeat: repeat;
-                    background-size: 15px;
-                  }
-
-                  position: relative;
-
-                  &:after {
-                    position: absolute;
-                    content: '';
-                    width: 100%;
-                    height: 100%;
-                    top: 0;
-                    left: 0;
-                    z-index: 1;
-                    background: white !important;
-                    opacity: 0.6;
-                  }
-                `}
-                backgroundColor="white"
-                url={state.thumbnailPreview}
-              />
-            )}
+            {shape && <BigShapeThumbnail url={state.thumbnailPreview} />}
 
             <Box
               flex={1}
@@ -242,6 +169,15 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
                   }}
                 />
               </Box>
+
+              <Box mb="5">
+                <TextShapeColorPicker
+                  shapeConf={shape.config}
+                  onAfterChange={updateShapeColoringDebounced}
+                  onChange={updateThumbnailDebounced}
+                  placement="right"
+                />
+              </Box>
             </Box>
           </Box>
 
@@ -256,60 +192,66 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
           >
             <Stack mb="4" p="2" width="100%" spacing="3">
               <Box>
-                <Text fontWeight="semibold" color="gray.500">
-                  Text
-                </Text>
-
-                <Textarea
-                  mb="3"
-                  autoFocus
-                  value={store.shapesPanel.text.text}
-                  onChange={async (e: any) => {
-                    const text = e.target.value
-                    store.shapesPanel.text.text = text
-
-                    const shape = store.getShape()
-                    if (!shape || shape.kind !== 'text') {
-                      return
-                    }
-
-                    shape.config.text = text
-                    updateShapeDebounced()
-                    updateThumbnailDebounced()
-                  }}
-                  placeholder="Type text here..."
-                />
-              </Box>
-
-              <Box display="flex" alignItems="center" mb="5">
-                <TextShapeColorPicker
-                  shapeConf={shape.config}
-                  onAfterChange={updateShapeColoringDebounced}
-                  onChange={updateThumbnailDebounced}
-                  placement="right"
-                />
-              </Box>
-
-              <Box>
-                <Text fontWeight="semibold" color="gray.500">
-                  Font
-                </Text>
                 <Box>
-                  <BaseBtn
-                    onClick={() => {
-                      setIsShowingFontPicker(true)
-                    }}
-                    as={SelectedFontThumbnail}
-                    mb="0"
-                    p="3"
-                  >
-                    <img
-                      src={
-                        store.getFontConfigById(store.shapesPanel.text.fontId)
-                          ?.style.thumbnail
+                  <Text fontWeight="semibold" color="gray.500">
+                    Font
+                  </Text>
+                  <Box>
+                    <BaseBtn
+                      onClick={() => {
+                        setIsShowingFontPicker(true)
+                      }}
+                      as={SelectedFontThumbnail}
+                      mb="0"
+                      p="3"
+                    >
+                      <img
+                        src={
+                          store.getFontConfigById(store.shapesPanel.text.fontId)
+                            ?.style.thumbnail
+                        }
+                      />
+                    </BaseBtn>
+                  </Box>
+                </Box>
+
+                <Box mt="5">
+                  <Text fontWeight="semibold" color="gray.500" mb="2">
+                    Text
+                  </Text>
+
+                  <EditableTextarea
+                    mb="3"
+                    value={store.shapesPanel.text.text}
+                    onSave={async (value) => {
+                      store.shapesPanel.text.text = value
+
+                      const shape = store.getShape()
+                      if (!shape || shape.kind !== 'text') {
+                        return
                       }
-                    />
-                  </BaseBtn>
+
+                      state.previewText = value
+                      updateThumbnailDebounced()
+
+                      store.selectShapeAndSaveUndo({
+                        ...shape.config,
+                        text: value,
+                      })
+                    }}
+                    onEdit={(value) => {
+                      state.previewText = value
+                      updateThumbnailDebounced()
+                    }}
+                    onSaveCancel={(value) => {
+                      state.previewText = value
+                      updateThumbnailDebounced()
+                    }}
+                    textareaProps={{
+                      autoFocus: true,
+                      placeholder: 'Type your text here...',
+                    }}
+                  />
                 </Box>
               </Box>
 
@@ -323,9 +265,15 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
                   if (!shape || shape.kind !== 'text') {
                     return
                   }
-                  shape.config.textStyle.fontId = style.fontId
+                  store.selectShapeAndSaveUndo({
+                    ...shape.config,
+                    textStyle: {
+                      ...shape.config.textStyle,
+                      fontId: style.fontId,
+                    },
+                  })
+
                   updateTextThumbnailPreview()
-                  store.updateShapeFromSelectedShapeConf()
                   setIsShowingFontPicker(false)
                 }}
               />
