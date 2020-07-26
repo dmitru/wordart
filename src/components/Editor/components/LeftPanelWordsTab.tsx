@@ -226,6 +226,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
           resetWordDefaults(word)
         })
       })
+      onAfterColorChange()
     }
 
     const toolbar = (
@@ -693,6 +694,7 @@ const WordListRow: React.FC<
       runInAction(() => {
         resetWordDefaults(word)
       })
+      onAfterColorChange()
     }
 
     let customizeTrigger = (
