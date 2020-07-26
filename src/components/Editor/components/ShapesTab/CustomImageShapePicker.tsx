@@ -89,17 +89,9 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
             )}
             {shape && shape.kind === 'custom:raster' && (
               <>
-                <Button
-                  colorScheme="secondary"
-                  onClick={() => {
-                    state.isShowingUploadModal = true
-                  }}
-                >
-                  Change image
-                </Button>
-
                 {shape.kind === 'custom:raster' && (
                   <Button
+                    colorScheme="primary"
                     onClick={() => {
                       state.isShowingCustomizeImage = true
                     }}
@@ -107,6 +99,14 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
                     Customize
                   </Button>
                 )}
+
+                <Button
+                  onClick={() => {
+                    state.isShowingUploadModal = true
+                  }}
+                >
+                  Change image
+                </Button>
               </>
             )}
           </Stack>
