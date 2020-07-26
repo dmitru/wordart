@@ -1,48 +1,40 @@
-import { observer } from 'mobx-react'
-import { useStore } from 'services/root-store'
-import styled from '@emotion/styled'
-import * as evaicons from '@styled-icons/evaicons-outline'
-import { SectionLabel } from './shared'
-import { ShapeThumbnailBtn } from 'components/Editor/components/ShapeSelector'
-import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
-import { observable } from 'mobx'
-import { uniqBy } from 'lodash'
-import { TargetKind } from 'components/Editor/lib/editor'
 import {
   Box,
-  Text,
   Checkbox,
   Popover,
+  PopoverArrow,
+  PopoverContent,
   PopoverTrigger,
   Portal,
-  PopoverContent,
-  PopoverArrow,
-  PopoverBody,
-  Flex,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
-  Switch,
-  FormLabel,
+  Stack,
+  Text,
 } from '@chakra-ui/core'
-import { Slider } from 'components/shared/Slider'
-import { Button } from 'components/shared/Button'
-import { Tooltip } from 'components/shared/Tooltip'
-import { SmileBeam } from '@styled-icons/fa-solid/SmileBeam'
-import { FaQuestionCircle, FaCog } from 'react-icons/fa'
 import { ChevronLeftIcon } from '@chakra-ui/icons'
-import { IconPicker } from 'components/Editor/components/IconPicker'
-import { DeleteButton } from 'components/shared/DeleteButton'
 import css from '@emotion/css'
-import { ChoiceButtons } from 'components/Editor/components/ChoiceButtons'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
-import { useCallback } from 'react'
+import styled from '@emotion/styled'
+import * as evaicons from '@styled-icons/evaicons-outline'
+import { SmileBeam } from '@styled-icons/fa-solid/SmileBeam'
+import { IconPicker } from 'components/Editor/components/IconPicker'
+import { ShapeThumbnailBtn } from 'components/Editor/components/ShapeSelector'
+import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
+import { TargetKind } from 'components/Editor/lib/editor'
 import {
-  mkShapeStyleConfFromOptions,
   mkBgStyleConfFromOptions,
+  mkShapeStyleConfFromOptions,
 } from 'components/Editor/style'
+import { Button } from 'components/shared/Button'
+import { DeleteButton } from 'components/shared/DeleteButton'
+import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
+import { Slider } from 'components/shared/Slider'
+import { Tooltip } from 'components/shared/Tooltip'
+import { uniqBy } from 'lodash'
+import { observable } from 'mobx'
+import { observer } from 'mobx-react'
+import { useCallback } from 'react'
+import { FaCog } from 'react-icons/fa'
+import { useStore } from 'services/root-store'
+import { CustomizeIconPopover } from './CustomizeIcon'
+import { SectionLabel } from './shared'
 
 export type LeftPanelIconsTabProps = {
   target: TargetKind
@@ -63,13 +55,10 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
     const bgStyle = store.styleOptions.bg
     const icons = style.items.icons.iconList
 
-    const shapes = store.availableIconShapes
-
     const isShowingSelector =
       state.isAdding || state.isReplacingIconIndex != null
 
     let customizeTrigger = (
-      // <Tooltip label="Customize">
       <IconCustomizeButton
         size="sm"
         variant="solid"
@@ -77,9 +66,6 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
           e.stopPropagation()
         }}
         css={css`
-          position: absolute;
-          right: 4px;
-          bottom: 4px;
           svg {
             width: 16px;
             height: 16px;
@@ -88,7 +74,6 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
       >
         <FaCog />
       </IconCustomizeButton>
-      // </Tooltip>
     )
 
     const handleIconColorChange = useCallback(() => {
@@ -196,167 +181,78 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
           <>
             <IconsList mt="6" flexWrap="wrap" display="flex">
               {icons.map((icon, index) => {
-                let repeatValue = 'repeat'
-                if (icon.repeats === 1) {
-                  repeatValue = 'once'
-                } else if ((icon.repeats ?? -1) > 1) {
-                  repeatValue = 'custom'
-                }
-
                 const iconCustomizeControl = (
-                  <Popover
-                    closeOnBlur
-                    closeOnEsc
-                    placement="right"
-                    autoFocus={false}
-                  >
-                    <PopoverTrigger>{customizeTrigger}</PopoverTrigger>
-                    <Portal>
-                      <PopoverContent zIndex={4000} width="280px">
-                        <PopoverArrow />
-                        <PopoverBody p={5}>
-                          {/* REPEAT WORD */}
-                          <Flex direction="column">
-                            <ChoiceButtons
-                              size="sm"
-                              mt="3"
-                              choices={[
-                                { title: 'Repeat icon', value: 'repeat' },
-                                { title: 'Once', value: 'once' },
-                                { title: 'Custom', value: 'custom' },
-                              ]}
-                              value={repeatValue}
-                              onChange={(value) => {
-                                if (value === 'repeat') {
-                                  icon.repeats = -1
-                                } else if (value === 'once') {
-                                  icon.repeats = 1
-                                } else if (value === 'custom') {
-                                  icon.repeats = 2
-                                }
-                              }}
-                            />
-
-                            {repeatValue === 'custom' && (
-                              <Box mt="3" mb="4">
-                                <NumberInput
-                                  size="sm"
-                                  maxWidth="70px"
-                                  value={icon.repeats}
-                                  min={2}
-                                  max={50}
-                                  step={1}
-                                  onChange={(v) => {
-                                    if (((v as any) as number) > 0) {
-                                      icon.repeats = (v as any) as number
-                                    }
-                                  }}
-                                >
-                                  <NumberInputField />
-                                  <NumberInputStepper>
-                                    <NumberIncrementStepper />
-                                    <NumberDecrementStepper />
-                                  </NumberInputStepper>
-                                </NumberInput>
-                              </Box>
-                            )}
-                          </Flex>
-
-                          {/* CUSTOM COLOR */}
-                          <Flex align="center" mt="4">
-                            <Switch
-                              id={`${icon.shapeId}-custom-color`}
-                              isChecked={icon.color != null ? true : false}
-                              onChange={(e: any) => {
-                                if (e.target.checked) {
-                                  icon.color = 'black'
-                                } else {
-                                  icon.color = undefined
-                                }
-                                handleIconColorChange()
-                              }}
-                            />
-
-                            <FormLabel
-                              htmlFor={`${icon.shapeId}-custom-color`}
-                              my="0"
-                              ml="2"
-                            >
-                              Custom color
-                            </FormLabel>
-
-                            <Box
-                              ml="3"
-                              css={
-                                !icon.color &&
-                                css`
-                                  visibility: hidden;
-                                `
-                              }
-                            >
-                              <ColorPickerPopover
-                                placement="left"
-                                usePortal={false}
-                                css={css`
-                                  height: 30px;
-                                `}
-                                value={icon.color || 'black'}
-                                onChange={(color) => {
-                                  icon.color = color
-                                }}
-                                onAfterChange={handleIconColorChange}
-                              />
-                            </Box>
-                          </Flex>
-                        </PopoverBody>
-                      </PopoverContent>
-                    </Portal>
-                  </Popover>
+                  <CustomizeIconPopover
+                    trigger={customizeTrigger}
+                    icon={icon}
+                    onAfterColorChange={handleIconColorChange}
+                  />
                 )
 
                 return (
-                  <IconThumbnailContainer
+                  <Popover
+                    trigger="hover"
+                    placement="bottom"
                     key={icon.shapeId}
-                    css={css`
-                      width: 106px;
-                      position: relative;
-                    `}
                   >
-                    <ShapeThumbnailBtn
-                      onClick={() => {
-                        state.isReplacingIconIndex = index
-                      }}
-                      backgroundColor="white"
-                      url={
-                        store.getIconShapeConfById(icon.shapeId)!.thumbnailUrl
-                      }
-                    />
-
-                    <Tooltip label="Delete">
-                      <IconDeleteButton
-                        variant="solid"
-                        size="sm"
+                    <PopoverTrigger>
+                      <IconThumbnailContainer
                         css={css`
-                          position: absolute;
-                          top: 4px;
-                          right: 4px;
-                          font-size: 20px;
-
-                          svg {
-                            width: 16px;
-                            height: 16px;
-                          }
+                          width: 106px;
+                          height: 106px;
+                          /* position: relative; */
                         `}
-                        onClick={(e: any) => {
-                          style.items.icons.iconList = style.items.icons.iconList.filter(
-                            (i) => i.shapeId !== icon.shapeId
-                          )
-                          store.animateVisualize(false)
-                        }}
-                      />
-                    </Tooltip>
-                    {iconCustomizeControl}
-                  </IconThumbnailContainer>
+                      >
+                        <ShapeThumbnailBtn
+                          onClick={() => {
+                            state.isReplacingIconIndex = index
+                          }}
+                          backgroundColor="white"
+                          css={css`
+                            svg {
+                              fill: red;
+                              stroke: red;
+                            }
+                          `}
+                          url={
+                            store.getIconShapeConfById(icon.shapeId)!
+                              .thumbnailUrl
+                          }
+                        />
+                      </IconThumbnailContainer>
+                    </PopoverTrigger>
+                    <Portal>
+                      <PopoverContent width="120px">
+                        <PopoverArrow />
+                        <Stack direction="row" spacing="3" p="4">
+                          <Tooltip label="Delete">
+                            <IconDeleteButton
+                              variant="solid"
+                              size="sm"
+                              css={css`
+                                /* position: absolute;
+                                top: 4px;
+                                right: 4px; */
+                                font-size: 20px;
+
+                                svg {
+                                  width: 16px;
+                                  height: 16px;
+                                }
+                              `}
+                              onClick={(e: any) => {
+                                style.items.icons.iconList = style.items.icons.iconList.filter(
+                                  (i) => i.shapeId !== icon.shapeId
+                                )
+                                store.animateVisualize(false)
+                              }}
+                            />
+                          </Tooltip>
+                          {iconCustomizeControl}
+                        </Stack>
+                      </PopoverContent>
+                    </Portal>
+                  </Popover>
                 )
               })}
             </IconsList>
@@ -377,6 +273,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                     onAfterChange={() => {
                       store.animateVisualize(false)
                     }}
+                    resetValue={30}
                     min={20}
                     max={100}
                     step={1}
@@ -386,24 +283,11 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 <Slider
                   label={
                     <>
-                      <Box display="flex" alignItems="center">
-                        Amount{' '}
-                        <Tooltip
-                          label="How many icons compared to words will be placed. E.g. 30%
+                      Amount
+                      <HelpTooltipIcon
+                        label="How many icons compared to words will be placed. For example, 30%
                           means 30% icons, 70% words"
-                          zIndex={100}
-                        >
-                          <Text
-                            my="0"
-                            cursor="help"
-                            ml="2"
-                            fontSize="lg"
-                            color="gray.400"
-                          >
-                            <FaQuestionCircle />
-                          </Text>
-                        </Tooltip>
-                      </Box>
+                      />
                     </>
                   }
                   afterLabel="%"
@@ -415,6 +299,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                   onAfterChange={() => {
                     store.animateVisualize(false)
                   }}
+                  resetValue={30}
                   min={0}
                   max={100}
                   step={1}
@@ -425,6 +310,7 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                   isChecked={style.items.placement.iconsRandomAngle}
                   onChange={(e) => {
                     style.items.placement.iconsRandomAngle = e.target.checked
+                    store.animateVisualize(false)
                   }}
                 >
                   Rotate icons by random angles

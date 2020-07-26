@@ -17,6 +17,7 @@ import { SketchPicker } from 'react-color'
 export type ColorPickerPopoverProps = {
   value: string
   colorSwatchOpacity?: number
+  before?: React.ReactNode
   disableAlpha?: boolean
   onChange?: (hex: string) => void
   onAfterChange?: (hex: string) => void
@@ -27,6 +28,7 @@ export type ColorPickerPopoverProps = {
 
 export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
   value,
+  before = null,
   disableAlpha,
   onAfterChange,
   onChange,
@@ -48,6 +50,7 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
     >
       <PopoverArrow />
       <PopoverBody p={2}>
+        {before}
         <SketchPicker
           css={css`
             box-shadow: none !important;

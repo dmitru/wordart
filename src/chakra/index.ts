@@ -11,7 +11,9 @@ const myTheme: ChakraTheme = {
       baseStyle: {
         ...theme.components.Input.baseStyle,
         field: {
+          // @ts-ignore
           ...theme.components.Input.baseStyle.field,
+          // @ts-ignore
           _placeholder: {
             // @ts-ignore
             ...theme.components.Input.baseStyle.field._placeholder,
@@ -25,6 +27,7 @@ const myTheme: ChakraTheme = {
       ...theme.components.Button,
       baseStyle: {
         ...theme.components.Button.baseStyle,
+        // @ts-ignore
         textDecoration: 'none !important',
         fontWeight: '500',
       },
@@ -32,6 +35,7 @@ const myTheme: ChakraTheme = {
     Menu: {
       ...theme.components.Menu,
       baseStyle: (props) => {
+        // @ts-ignore
         const baseStyle = theme.components.Menu.baseStyle(props)
         return {
           ...baseStyle,
@@ -44,7 +48,9 @@ const myTheme: ChakraTheme = {
     },
     Popover: {
       ...theme.components.Popover,
+      // @ts-ignore
       baseStyle: (props) => {
+        // @ts-ignore
         const baseStyle = theme.components.Popover.baseStyle(props)
         return {
           ...baseStyle,
@@ -58,6 +64,7 @@ const myTheme: ChakraTheme = {
     Tooltip: {
       ...theme.components.Tooltip,
       baseStyle: (props) => {
+        // @ts-ignore
         const baseStyle = theme.components.Tooltip.baseStyle(props)
         return {
           ...baseStyle,
@@ -68,6 +75,7 @@ const myTheme: ChakraTheme = {
     Modal: {
       ...theme.components.Modal,
       baseStyle: (props) => {
+        // @ts-ignore
         const baseStyle = theme.components.Modal.baseStyle(props)
         return {
           ...baseStyle,

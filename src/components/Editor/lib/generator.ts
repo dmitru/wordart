@@ -343,15 +343,17 @@ export class Generator {
     const wordMaxRepeats = new Array(task.words.length)
       .fill(0)
       .map((v, i) => task.words[i].repeats)
+    const wordRepeats = new Array(task.words.length).fill(0)
+    let availableWords = [...words]
+    let availableWordIndex = 0
+
     const iconMaxRepeats = new Array(task.icons.length)
       .fill(0)
       .map((v, i) => task.icons[i].repeats)
-    const wordRepeats = new Array(task.words.length).fill(0)
     const iconRepeats = new Array(icons.length).fill(0)
-    let availableWords = [...words]
     let availableIcons = [...icons]
-    let availableWordIndex = 0
-    let iconIndex = 0
+
+    let availableIconIndex = 0
 
     for (let i = 0; i < nIter; ++i) {
       let type: 'word' | 'icon' = 'word'
@@ -574,7 +576,22 @@ export class Generator {
         })
         availableWordIndex = (availableWordIndex + 1) % availableWords.length
       } else {
-        const icon = icons[iconIndex]
+        const icon = availableIcons[availableIconIndex]
+
+        const iconConfigIndex = task.icons.findIndex(
+          (wc) => wc.iconConfigId === icon.iconConfigId
+        )!
+        if (iconConfigIndex < 0) {
+          console.error('iconConfigIndex < 0')
+          break
+        }
+
+        const iconIndex = icons.findIndex((w) => w === icon)
+        if (iconIndex < 0) {
+          console.error('iconIndex < 0')
+          break
+        }
+
         const rasterCanvas = iconRasterCanvases[iconIndex]
 
         const angle = sample(icon.angles)!
@@ -753,7 +770,16 @@ export class Generator {
 
         // console.screenshot(shapeCtx.canvas)
 
-        iconIndex = (iconIndex + 1) % icons.length
+        iconRepeats[iconIndex]++
+        availableIcons = icons.filter((w, index) => {
+          const wordConfIndex = index
+          return (
+            iconMaxRepeats[index] === -1 ||
+            iconRepeats[index] < iconMaxRepeats[index]
+          )
+        })
+
+        availableIconIndex = (availableIconIndex + 1) % availableIcons.length
       }
 
       if (currentBatch.length >= batchSize && onProgressCallback) {
@@ -854,6 +880,7 @@ export type FillShapeTaskWordConfig = {
 }
 
 export type FillShapeTaskIconConfig = {
+  iconConfigId: string
   shape: ShapeConf
   /** Rotation angles in degrees */
   angles: number[]

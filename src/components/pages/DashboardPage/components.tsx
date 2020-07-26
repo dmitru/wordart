@@ -257,6 +257,7 @@ const WordcloudThumbnailMenu: React.FC<WordcloudThumbnailMenuProps> = React.memo
     />
     <MenuTransition>
       {(styles) => (
+        // @ts-ignore
         <MenuList css={styles}>
           <MenuItemWithIcon
             icon={<FaChevronRight />}

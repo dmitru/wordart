@@ -915,6 +915,21 @@ export class Editor {
         }
       }
 
+      if (item.kind === 'shape') {
+        const iconConfig = itemsStyleConf.icons.iconList.find(
+          (i) => i.shapeId === item.shapeId
+        )
+        // Use custom color for that icon
+        if (iconConfig && iconConfig.color != null) {
+          const paperColor = new paper.Color(iconConfig.color)
+          color = chroma.rgb(
+            255 * paperColor.red,
+            255 * paperColor.green,
+            255 * paperColor.blue
+          )
+        }
+      }
+
       if (!color) {
         if (coloring.kind === 'gradient' || coloring.kind === 'color') {
           // const index = Math.floor(rng() * colors.length)
@@ -1500,6 +1515,7 @@ export class Editor {
         words: processedWordList,
         // Icons
         icons: style.items.icons.iconList.map((icon) => ({
+          iconConfigId: icon.shapeId,
           shape: this.store.getIconShapeConfById(icon.shapeId)!,
           angles: style.items.placement.iconsRandomAngle
             ? randomIconAngles
@@ -1724,6 +1740,7 @@ export class Editor {
         words: processedWordList,
         // Icons
         icons: style.items.icons.iconList.map((icon) => ({
+          iconConfigId: icon.shapeId,
           shape: this.store.getIconShapeConfById(icon.shapeId)!,
           angles: style.items.placement.iconsRandomAngle
             ? randomIconAngles
@@ -1965,7 +1982,7 @@ export class Editor {
     this.store.visualizingStep = 'drawing'
     this.store.visualizingProgress = 0
 
-    const items: EditorItem[] = []
+    const items: { item: EditorItem; index: number }[] = []
     const itemsById: Map<EditorItemId, EditorItem> = new Map()
     const fabricObjToItem: Map<fabric.Object, EditorItem> = new Map()
 
@@ -2028,7 +2045,10 @@ export class Editor {
     }
 
     // Process all fonts...
-    for (const [index, itemConfig] of allWordItems.entries()) {
+    for (const [index, itemConfig] of itemConfigs.entries()) {
+      if (itemConfig.kind !== 'word') {
+        continue
+      }
       if (index % 50 === 0) {
         this.store.visualizingProgress =
           index / (allWordItems.length + allIconItems.length)
@@ -2054,7 +2074,7 @@ export class Editor {
       )
       item.setSelectable(this.itemsSelection)
 
-      items.push(item)
+      items.push({ item, index })
       itemsById.set(item.id, item)
       fabricObjToItem.set(item.fabricObj, item)
     }
@@ -2066,7 +2086,11 @@ export class Editor {
         shapeObj: fabric.Object
       }
     >()
-    for (const [index, itemConfig] of allIconItems.entries()) {
+    for (const [index, itemConfig] of itemConfigs.entries()) {
+      if (itemConfig.kind !== 'shape') {
+        continue
+      }
+
       const { shapeId } = itemConfig
       if (shapesById.has(shapeId)) {
         continue
@@ -2082,7 +2106,11 @@ export class Editor {
       }
     }
 
-    for (const [index, itemConfig] of allIconItems.entries()) {
+    for (const [index, itemConfig] of itemConfigs.entries()) {
+      if (itemConfig.kind !== 'shape') {
+        continue
+      }
+
       if (index % 50 === 0) {
         this.store.visualizingProgress =
           index / (allWordItems.length + allIconItems.length)
@@ -2110,7 +2138,7 @@ export class Editor {
       )
       item.setSelectable(this.itemsSelection)
 
-      items.push(item)
+      items.push({ item, index })
       itemsById.set(item.id, item)
       fabricObjToItem.set(item.fabricObj, item)
     }
@@ -2118,7 +2146,8 @@ export class Editor {
     this.store.visualizingProgress = 1
 
     return {
-      items,
+      // Sort the items in their placement order
+      items: sortBy(items, ({ index }) => index).map(({ item }) => item),
       fabricObjToItem,
       itemsById,
     }

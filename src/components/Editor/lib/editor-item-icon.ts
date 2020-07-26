@@ -21,6 +21,7 @@ export type EditorItemConfigShape = {
   color: string
   /** Color of the shape at the location where item was placed */
   shapeColor: string
+  opacity?: number
 }
 
 export class EditorItemShape {
@@ -45,6 +46,8 @@ export class EditorItemShape {
   customColor?: string
   /** Default color of the item, determined by the coloring style */
   color: string
+  opacity: number
+  selectable = true
 
   fabricObj: fabric.Group
   shapeObj: fabric.Object
@@ -105,6 +108,7 @@ export class EditorItemShape {
     this.shapeId = conf.shapeId
     this.placedIndex = conf.index
     this.bounds = bounds
+    this.opacity = conf.opacity || 1
 
     this.setLocked(conf.locked)
 
@@ -127,12 +131,13 @@ export class EditorItemShape {
       this.fabricObj.opacity = 0
       this.fabricObj.selectable = false
     } else {
-      // this.fabricObj.opacity = this.opacity
-      // this.fabricObj.selectable = this.selectable
+      this.fabricObj.opacity = this.opacity
+      this.fabricObj.selectable = this.selectable
     }
   }
 
   setSelectable = (value: boolean) => {
+    this.selectable = value
     this.fabricObj.selectable = value
   }
 
@@ -148,6 +153,7 @@ export class EditorItemShape {
   }
 
   private _updateOpacity = (opacity: number) => {
+    this.opacity = opacity
     this.fabricObj.opacity = opacity
   }
 

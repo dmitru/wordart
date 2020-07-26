@@ -175,6 +175,8 @@ export const DesignsView = observer(() => {
                 <MenuTransition>
                   {(styles) => (
                     <Portal>
+                      {/* 
+                      @ts-ignore */}
                       <MenuList css={styles}>
                         <MenuItemWithIcon
                           icon={<FaRegFolder />}
