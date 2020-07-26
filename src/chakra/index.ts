@@ -3,11 +3,6 @@ import colors from './foundations/colors'
 
 const myTheme: ChakraTheme = {
   ...theme,
-  fonts: {
-    ...theme.fonts,
-    // heading: `Nunito, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
-    // body: `"Maven Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
-  },
   colors,
   components: {
     ...theme.components,

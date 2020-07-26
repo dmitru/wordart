@@ -1,8 +1,6 @@
 import {
   Box,
   Checkbox,
-  Flex,
-  FormLabel,
   InputGroup,
   InputProps,
   InputRightElement,
@@ -11,20 +9,9 @@ import {
   MenuDivider,
   MenuList,
   MenuTransition,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
   Portal,
   Stack,
-  Switch,
   Text,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
 } from '@chakra-ui/core'
 import { AddIcon, ChevronDownIcon, SmallCloseIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
@@ -33,11 +20,8 @@ import { TextFields } from '@styled-icons/material-twotone/TextFields'
 import { DragIndicator } from '@styled-icons/material/DragIndicator'
 import { FormatTextSize } from '@styled-icons/zondicons/FormatTextSize'
 import { FindAndReplaceModal } from 'components/Editor/components/FindAndReplaceModal'
-import { SelectedFontThumbnail } from 'components/Editor/components/FontPicker/components'
-import { FontPickerModal } from 'components/Editor/components/FontPicker/FontPickerModal'
 import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
 import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
-import { ChoiceButtons } from 'components/Editor/components/ChoiceButtons'
 import { WordConfigId } from 'components/Editor/editor-store'
 import { TargetKind } from 'components/Editor/lib/editor'
 import {
@@ -45,18 +29,15 @@ import {
   mkShapeStyleConfFromOptions,
 } from 'components/Editor/style'
 import { WordListEntry } from 'components/Editor/style-options'
-import { BaseBtn } from 'components/shared/BaseBtn'
 import { Button } from 'components/shared/Button'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { ColorSwatchButton } from 'components/shared/ColorSwatchButton'
 import { DeleteButton } from 'components/shared/DeleteButton'
 import { Input } from 'components/shared/Input'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 import { SearchInput } from 'components/shared/SearchInput'
-import { Slider } from 'components/shared/Slider'
 import { capitalize, noop } from 'lodash'
-import { observable } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import { observer, Observer } from 'mobx-react'
 import pluralize from 'pluralize'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
@@ -68,6 +49,7 @@ import {
   Droppable,
 } from 'react-beautiful-dnd'
 import { FaCog, FaDownload, FaSearch } from 'react-icons/fa'
+import { MdFormatSize } from 'react-icons/md'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import {
   areEqual,
@@ -76,6 +58,8 @@ import {
 } from 'react-window'
 import { useStore } from 'services/root-store'
 import { useToasts } from 'use-toasts'
+import { CustomizeWordPopover } from './CustomizeWord'
+import { FiRefreshCw } from 'react-icons/fi'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -154,6 +138,11 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         )
       : allWords
 
+    const selectedOrAllWords =
+      state.selectedWords.size > 0
+        ? allWords.filter((w) => state.selectedWords.has(w.id))
+        : allWords
+
     const [isDragging, setIsDragging] = useState(false)
 
     const selectedCount = state.selectedWords.size
@@ -226,6 +215,17 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     }
     const handleFindAndReplaceClick = () => {
       state.isShowingFindAndReplace = true
+    }
+
+    const hasCustomizations =
+      selectedOrAllWords.find(hasWordCustomizations) != null
+
+    const handleResetDefaults = () => {
+      runInAction(() => {
+        selectedOrAllWords.forEach((word) => {
+          resetWordDefaults(word)
+        })
+      })
     }
 
     const toolbar = (
@@ -304,7 +304,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     <MenuDivider />
 
                     <MenuItemWithIcon
-                      icon={<FormatTextSize />}
+                      icon={<MdFormatSize />}
                       onClick={() => {
                         for (const w of wordsToProcess) {
                           w.text = capitalize(w.text)
@@ -315,7 +315,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                       Capitalize
                     </MenuItemWithIcon>
                     <MenuItemWithIcon
-                      icon={<FormatTextSize />}
+                      icon={<MdFormatSize />}
                       onClick={() => {
                         for (const w of wordsToProcess) {
                           w.text = w.text.toLocaleUpperCase()
@@ -326,7 +326,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                       UPPERCASE
                     </MenuItemWithIcon>
                     <MenuItemWithIcon
-                      icon={<FormatTextSize />}
+                      icon={<MdFormatSize />}
                       onClick={() => {
                         for (const w of wordsToProcess) {
                           w.text = w.text.toLocaleLowerCase()
@@ -337,7 +337,14 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                       lowercase
                     </MenuItemWithIcon>
 
-                    <MenuItemWithIcon>Reset defaults</MenuItemWithIcon>
+                    {hasCustomizations && (
+                      <MenuItemWithIcon
+                        onClick={handleResetDefaults}
+                        icon={<FiRefreshCw />}
+                      >
+                        Reset defaults
+                      </MenuItemWithIcon>
+                    )}
 
                     {selectedCount === 0 && (
                       <>
@@ -651,8 +658,6 @@ const ListRow = React.memo<ListChildComponentProps>(
   areEqual
 )
 
-const defaultFontId = 'Pacifico:regular'
-
 const WordListRow: React.FC<
   {
     style?: React.CSSProperties
@@ -684,8 +689,11 @@ const WordListRow: React.FC<
     style = {},
     ...otherProps
   }) => {
-    const { editorPageStore: store } = useStore()
-    const [isShowingFontPicker, setIsShowingFontPicker] = useState(false)
+    const handleResetDefaults = () => {
+      runInAction(() => {
+        resetWordDefaults(word)
+      })
+    }
 
     let customizeTrigger = (
       <WordCustomizeButton
@@ -701,12 +709,9 @@ const WordListRow: React.FC<
       </WordCustomizeButton>
     )
 
-    if (
-      word.angle != null ||
-      word.fontId != null ||
-      (word.repeats ?? -1) != -1 ||
-      word.color != null
-    ) {
+    const hasCustomizations = hasWordCustomizations(word)
+
+    if (hasCustomizations) {
       customizeTrigger = (
         <Button
           color="gray.500"
@@ -743,179 +748,11 @@ const WordListRow: React.FC<
     }
 
     const wordCustomizeControl = (
-      <Popover closeOnBlur closeOnEsc placement="right" autoFocus={false}>
-        <PopoverTrigger>{customizeTrigger}</PopoverTrigger>
-        <Portal>
-          <PopoverContent zIndex={4000} width="280px">
-            <PopoverArrow />
-            <PopoverBody p={5}>
-              {/* REPEAT WORD */}
-              <Flex direction="column">
-                <ChoiceButtons
-                  size="sm"
-                  mt="3"
-                  choices={[
-                    { title: 'Repeat word', value: 'repeat' },
-                    { title: 'Once', value: 'once' },
-                    { title: 'Custom', value: 'custom' },
-                  ]}
-                  value={repeatValue}
-                  onChange={(value) => {
-                    if (value === 'repeat') {
-                      word.repeats = -1
-                    } else if (value === 'once') {
-                      word.repeats = 1
-                    } else if (value === 'custom') {
-                      word.repeats = 2
-                    }
-                  }}
-                />
-
-                {repeatValue === 'custom' && (
-                  <Box mt="3" mb="4">
-                    <NumberInput
-                      size="sm"
-                      maxWidth="70px"
-                      value={word.repeats}
-                      min={2}
-                      max={50}
-                      step={1}
-                      onChange={(v) => {
-                        if (((v as any) as number) > 0) {
-                          word.repeats = (v as any) as number
-                        }
-                      }}
-                    >
-                      <NumberInputField />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
-                  </Box>
-                )}
-              </Flex>
-
-              {/* CUSTOM COLOR */}
-              <Flex align="center" mt="4">
-                <Switch
-                  id={`${word.id}-custom-color`}
-                  isChecked={word.color != null ? true : false}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      word.color = 'black'
-                    } else {
-                      word.color = undefined
-                    }
-                    onAfterColorChange()
-                  }}
-                />
-
-                <FormLabel htmlFor={`${word.id}-custom-color`} my="0" ml="2">
-                  Custom color
-                </FormLabel>
-
-                <Box
-                  ml="3"
-                  css={
-                    !word.color &&
-                    css`
-                      visibility: hidden;
-                    `
-                  }
-                >
-                  <ColorPickerPopover
-                    placement="left"
-                    usePortal={false}
-                    css={css`
-                      height: 30px;
-                    `}
-                    value={word.color || 'black'}
-                    onChange={(color) => {
-                      word.color = color
-                    }}
-                    onAfterChange={onAfterColorChange}
-                  />
-                </Box>
-              </Flex>
-
-              {/* CUSTOM ANGLE  */}
-              <Flex align="center" mt="4">
-                <Switch
-                  id={`${word.id}-custom-angle`}
-                  isChecked={word.angle != null ? true : false}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      word.angle = 0
-                    } else {
-                      word.angle = undefined
-                    }
-                    store.animateVisualize(false)
-                  }}
-                />
-                <FormLabel htmlFor={`${word.id}-custom-angle`} my="0" ml="2">
-                  Custom angle
-                </FormLabel>
-              </Flex>
-
-              {word.angle != null && (
-                <Box mt="2" mb="4">
-                  <Slider
-                    afterLabel=""
-                    value={word.angle || 0}
-                    onChange={(value) => {
-                      word.angle = value
-                    }}
-                    onAfterChange={() => store.animateVisualize(false)}
-                    min={-90}
-                    max={90}
-                    step={1}
-                  />
-                </Box>
-              )}
-
-              {/* CUSTOM FONT */}
-              <Flex align="center" mt="4">
-                <Switch
-                  id={`${word.id}-custom-font`}
-                  isChecked={word.fontId != null ? true : false}
-                  onChange={(e) => {
-                    store.animateVisualize(false)
-                    if (e.target.checked) {
-                      word.fontId = defaultFontId
-                    } else {
-                      word.fontId = undefined
-                    }
-                  }}
-                />
-
-                <FormLabel htmlFor={`${word.id}-custom-font`} my="0" ml="2">
-                  Custom font
-                </FormLabel>
-              </Flex>
-
-              {word.fontId != null && (
-                <Box mt="2">
-                  <BaseBtn
-                    onClick={() => {
-                      setIsShowingFontPicker(true)
-                    }}
-                    as={SelectedFontThumbnail}
-                    mb="0"
-                    p="3"
-                  >
-                    <img
-                      src={
-                        store.getFontConfigById(word.fontId)?.style.thumbnail
-                      }
-                    />
-                  </BaseBtn>
-                </Box>
-              )}
-            </PopoverBody>
-          </PopoverContent>
-        </Portal>
-      </Popover>
+      <CustomizeWordPopover
+        trigger={customizeTrigger}
+        word={word}
+        onAfterColorChange={onAfterColorChange}
+      />
     )
 
     const wordMenu = (
@@ -933,7 +770,14 @@ const WordListRow: React.FC<
             {(styles) => (
               // @ts-ignore
               <MenuList css={styles}>
-                <MenuItemWithIcon>Reset defaults</MenuItemWithIcon>
+                {hasCustomizations && (
+                  <MenuItemWithIcon
+                    icon={<FiRefreshCw />}
+                    onClick={handleResetDefaults}
+                  >
+                    Reset defaults
+                  </MenuItemWithIcon>
+                )}
                 <MenuItemWithIcon
                   icon={<SmallCloseIcon />}
                   onClick={() => {
@@ -979,17 +823,6 @@ const WordListRow: React.FC<
         {...provided.draggableProps}
         style={style}
       >
-        <FontPickerModal
-          isOpen={isShowingFontPicker}
-          onClose={() => setIsShowingFontPicker(false)}
-          onSubmit={(font, fontStyle) => {
-            word.fontId = fontStyle.fontId
-            setIsShowingFontPicker(false)
-            store.animateVisualize(false)
-          }}
-          selectedFontId={word.fontId || defaultFontId}
-        />
-
         <Box color="gray.400" {...provided.dragHandleProps}>
           <DragIndicator
             size="20px"
@@ -1049,7 +882,6 @@ const WordListRow: React.FC<
         />
 
         {wordCustomizeControl}
-
         {wordMenu}
       </WordRow>
     )
@@ -1103,6 +935,19 @@ const NewWordInput: React.FC<{
     </WordRowNewInput>
   )
 }
+
+const resetWordDefaults = (word: WordListEntry) => {
+  word.repeats = -1
+  word.color = undefined
+  word.angle = undefined
+  word.fontId = undefined
+}
+
+const hasWordCustomizations = (word: WordListEntry) =>
+  word.angle != null ||
+  word.fontId != null ||
+  (word.repeats ?? -1) != -1 ||
+  word.color != null
 
 const WordInput = styled(Input)<{ hasBorder?: boolean }>`
   background: transparent;
