@@ -174,6 +174,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                 value={style.items.placement.itemsMaxCount}
                 onChange={handleMaxItemsCountChange}
                 onAfterChange={handleAfterMaxItemsCountChange}
+                resetValue={300}
                 min={1}
                 max={700}
                 step={1}
@@ -198,6 +199,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
               style.items.placement.itemDensity = val
             }}
             onAfterChange={animateVisualize}
+            resetValue={85}
             min={0}
             max={100}
             step={1}
@@ -213,6 +215,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
               style.items.placement.shapePadding = val
             }}
             onAfterChange={animateVisualize}
+            resetValue={15}
             min={0}
             max={100}
             step={1}
@@ -235,6 +238,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                     style.items.placement.wordsMaxSize = val
                   }}
                   onAfterChange={animateVisualize}
+                  resetValue={70}
                   min={20}
                   max={100}
                   step={1}
@@ -301,6 +305,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                             style.items.words.customAngles[index] = val
                           }}
                           onAfterChange={animateVisualize}
+                          resetValue={0}
                           min={-90}
                           max={90}
                           step={1}
@@ -339,6 +344,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                 style.items.placement.iconsMaxSize = val
               }}
               onAfterChange={animateVisualize}
+              resetValue={30}
               min={20}
               max={100}
               step={1}
@@ -353,6 +359,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                 style.items.placement.iconsProportion = val
               }}
               onAfterChange={animateVisualize}
+              resetValue={50}
               min={0}
               max={100}
               step={1}
