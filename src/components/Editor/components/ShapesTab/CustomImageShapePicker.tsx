@@ -9,6 +9,7 @@ import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
 import { CustomizeRasterImageModal } from './CustomImages/CustomizeRasterImageModal'
 import { AddCustomImageModal } from './CustomImages/AddCustomImageModal'
 import { FaUpload } from 'react-icons/fa'
+import { ShapeCustomImageRasterConf } from 'components/Editor/shape-config'
 
 const initialState = {
   isShowingUploadModal: false,
@@ -17,6 +18,8 @@ const initialState = {
 }
 
 const state = observable<typeof initialState>({ ...initialState })
+
+let lastShapeConfig: ShapeCustomImageRasterConf | undefined
 
 export type LeftPanelShapesTabProps = {}
 
@@ -36,6 +39,12 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
       // state.thumbnailPreview = shape.config.processedThumbnailUrl
     }
   }, [shape])
+
+  useEffect(() => {
+    if (lastShapeConfig && (!shape || shape.kind !== lastShapeConfig.kind)) {
+      store.selectShapeAndSaveUndo(lastShapeConfig)
+    }
+  }, [])
 
   // Reset on unmount
   useEffect(() => {
@@ -125,7 +134,7 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
           state.isShowingUploadModal = false
         }}
         onSubmit={(value) => {
-          store.selectShapeAndSaveUndo({
+          const shapeConf: ShapeCustomImageRasterConf = {
             kind: 'custom:raster',
             processedThumbnailUrl: value.processedThumbnailUrl!,
             thumbnailUrl: value.processedThumbnailUrl!,
@@ -135,17 +144,16 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
                     amount: value.removeEdges,
                   }
                 : undefined,
-              invert: value.invert
-                ? {
-                    color: value.invertColor,
-                  }
-                : undefined,
+              invert: undefined,
               removeLightBackground: {
-                threshold: value.removeLightBackground,
+                threshold: value.removeLightBackgroundThreshold,
               },
             },
             url: value.originalUrl!,
-          })
+          }
+          lastShapeConfig = shapeConf
+
+          store.selectShapeAndSaveUndo(shapeConf)
         }}
       />
 

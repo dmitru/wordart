@@ -211,7 +211,6 @@ export class EditorStore {
       },
       onItemUpdated: (item, newTransform) => {
         // TODO
-        console.log('onItemUpdated', item.transform)
         const before: ItemUpdateUndoData = {
           customColor: item.customColor,
           locked: item.locked,
@@ -620,7 +619,6 @@ export class EditorStore {
       words: PersistedWordV1[]
       fontIds: FontId[]
     }): Promise<EditorItemConfig[]> => {
-      console.log('deserializeItems: ', { words, items, fontIds })
       // Fetch all required Fonts
       const fontsById = new Map<FontId, Font>()
       for (const fontId of fontIds) {
@@ -844,7 +842,6 @@ export class EditorStore {
 
   serialize = async (): Promise<EditorPersistedData> => {
     this.logger.debug('serialize', this.getShape()!.kind)
-    console.log('FISH: serialize = ', this.shapesPanel.shapeKind)
     if (!this.editor) {
       throw new Error('editor is not initialized')
     }
@@ -1251,7 +1248,6 @@ export class EditorStore {
     updateShapeColors = true,
     render = true
   ) => {
-    console.log('FISH: ', 'selectShapeAndSaveUndo', shapeConfig.kind)
     if (!this.editor) {
       return
     }
@@ -1259,10 +1255,8 @@ export class EditorStore {
     const stateBefore = this.getStateSnapshot()
 
     const persistedDataBefore = await this.serialize()
-    console.log('FISH: Before: ', persistedDataBefore.data.shape.kind)
     await this.selectShape(shapeConfig, updateShapeColors, render)
     const persistedDataAfter = await this.serialize()
-    console.log('FISH: After: ', persistedDataAfter.data.shape.kind)
 
     this.editor.pushUndoFrame({
       kind: 'visualize',
@@ -1304,7 +1298,6 @@ export class EditorStore {
 
   /** Update shape based on the selected shape config (e.g. after shape config changes) */
   updateShapeFromSelectedShapeConf = async () => {
-    console.log('updateShapeFromSelectedShapeConf')
     if (!this.editor) {
       return
     }
