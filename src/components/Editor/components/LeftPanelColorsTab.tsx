@@ -48,6 +48,7 @@ import { observer, useLocalStore, Observer } from 'mobx-react'
 import { FaCog } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
+import { defaultShapeStyleOptions } from '../default-style-options'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -402,6 +403,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                         onAfterChange={(value) => {
                           store.editor?.setShapeOpacity(value / 100)
                         }}
+                        resetValue={defaultShapeStyleOptions.opacity}
                         min={0}
                         max={100}
                         step={1}
