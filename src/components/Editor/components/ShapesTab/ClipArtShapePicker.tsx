@@ -168,10 +168,9 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                 />
               </Box>
 
-              <Flex marginTop="70px" width="100%">
+              <Flex marginTop="65px" width="100%">
                 {state.mode === 'home' && (
                   <Button
-                    variant="outline"
                     display="flex"
                     flex="1"
                     onClick={() => {
@@ -223,7 +222,6 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                       <Box mr="3">
                         <Menu isLazy>
                           <MenuButton
-                            variant={selectedCategory ? 'solid' : 'outline'}
                             colorScheme={
                               selectedCategory ? 'accent' : undefined
                             }

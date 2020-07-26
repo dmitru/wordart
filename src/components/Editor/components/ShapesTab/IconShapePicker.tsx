@@ -209,7 +209,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                 />
               </Box>
 
-              <Box display="flex" alignItems="center" mb="5">
+              <Box display="flex" alignItems="center" mb="5" mt="2">
                 <IconShapeColorPicker
                   shapeConf={shape.config}
                   onAfterChange={updateShapeColoringDebounced}
@@ -219,7 +219,6 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
               <Flex width="100%">
                 {state.mode === 'home' && (
                   <Button
-                    variant="outline"
                     display="flex"
                     flex="1"
                     onClick={() => {

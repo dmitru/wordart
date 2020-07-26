@@ -63,7 +63,6 @@ export const IconPicker: React.FC<IconPickerProps> = observer(
           <Box mr="3">
             <Menu isLazy>
               <MenuButton
-                variant={selectedCategory ? 'solid' : 'outline'}
                 colorScheme={selectedCategory ? 'accent' : undefined}
                 as={Button}
                 rightIcon={<ChevronDownIcon />}

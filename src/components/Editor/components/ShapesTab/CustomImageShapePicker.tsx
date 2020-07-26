@@ -79,7 +79,7 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
               <Button
                 mt="4"
                 leftIcon={<FaUpload />}
-                colorScheme="secondary"
+                colorScheme="primary"
                 onClick={() => {
                   state.isShowingUploadModal = true
                 }}
@@ -124,25 +124,27 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
         onClose={() => {
           state.isShowingUploadModal = false
         }}
-        onSubmit={({ thumbnailUrl, state }) => {
+        onSubmit={(value) => {
           store.selectShapeAndSaveUndo({
             kind: 'custom:raster',
-            processedThumbnailUrl: thumbnailUrl,
-            thumbnailUrl: thumbnailUrl,
+            processedThumbnailUrl: value.processedThumbnailUrl!,
+            thumbnailUrl: value.processedThumbnailUrl!,
             processing: {
-              edges: {
-                amount: 80,
-              },
-              invert: state.invert
+              edges: value.removeEdges
                 ? {
-                    color: state.invertColor,
+                    amount: value.removeEdges,
+                  }
+                : undefined,
+              invert: value.invert
+                ? {
+                    color: value.invertColor,
                   }
                 : undefined,
               removeLightBackground: {
-                threshold: state.removeLightBackground,
+                threshold: value.removeLightBackground,
               },
             },
-            url: state.originalUrl!,
+            url: value.originalUrl!,
           })
         }}
       />
@@ -151,6 +153,7 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
         <CustomizeRasterImageModal
           isOpen={state.isShowingCustomizeImage}
           value={{
+            processedThumbnailUrl: shape.url,
             removeLightBackground:
               (shape.config.processing?.removeLightBackground?.threshold || 0) >
               0,
@@ -162,10 +165,10 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
           onClose={() => {
             state.isShowingCustomizeImage = false
           }}
-          onSubmit={async (thumbnailUrl, value) => {
-            state.thumbnailPreview = thumbnailUrl
+          onSubmit={async (value) => {
+            state.thumbnailPreview = value.processedThumbnailUrl
 
-            shape.config.processedThumbnailUrl = thumbnailUrl
+            shape.config.processedThumbnailUrl = value.processedThumbnailUrl
             shape.config.processing = {
               invert: undefined,
               removeLightBackground: value.removeLightBackground

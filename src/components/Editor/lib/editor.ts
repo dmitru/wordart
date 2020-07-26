@@ -1475,7 +1475,7 @@ export class Editor {
           processing: {
             removeWhiteBg: {
               enabled: enableRemoveWhiteBg,
-              lightnessThreshold: 98,
+              lightnessThreshold: 2,
             },
             shrink: {
               enabled: style.items.placement.shapePadding > 0,
@@ -1700,7 +1700,7 @@ export class Editor {
           processing: {
             removeWhiteBg: {
               enabled: enableRemoveWhiteBg,
-              lightnessThreshold: 98,
+              lightnessThreshold: 2,
             },
             shrink: {
               enabled: style.items.placement.shapePadding > 0,

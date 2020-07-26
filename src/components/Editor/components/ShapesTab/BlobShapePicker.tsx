@@ -14,6 +14,7 @@ import { useDebouncedCallback } from 'use-debounce/lib'
 import { SectionLabel } from '../shared'
 import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
 import css from '@emotion/css'
+import { FiRefreshCw } from 'react-icons/fi'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -182,7 +183,7 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
                 />
               </Box>
 
-              <Box display="flex" alignItems="center" mb="5">
+              <Box display="flex" alignItems="center" mt="3">
                 <BlobShapeColorPicker
                   shapeConf={shape.config}
                   onAfterChange={updateShapeColoringDebounced}
@@ -240,8 +241,9 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
                 onClick={() => updateBlobShape()}
                 isDisabled={state.isUpdatingBlobShape}
                 isLoading={state.isUpdatingBlobShape}
+                leftIcon={<FiRefreshCw />}
               >
-                Randomize shape
+                Randomize
               </Button>
             </Stack>
 

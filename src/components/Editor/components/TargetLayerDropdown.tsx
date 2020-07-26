@@ -32,7 +32,13 @@ export const TargetLayerDropdown = observer(() => {
 
   return (
     <Menu isLazy placement="bottom-start">
-      <MenuButton as={Button} rightIcon={<ChevronDownIcon />} py="2" px="3">
+      <MenuButton
+        as={Button}
+        rightIcon={<ChevronDownIcon />}
+        py="2"
+        px="3"
+        colorScheme="secondary"
+      >
         {store.targetTab === 'shape' ? 'Shape layer' : ''}
         {store.targetTab === 'bg' ? 'Background layer' : ''}
       </MenuButton>

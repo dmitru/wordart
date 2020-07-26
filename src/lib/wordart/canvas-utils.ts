@@ -157,10 +157,15 @@ export const clampPixelOpacityUp = (canvas: HTMLCanvasElement) => {
 
 export const removeLightPixels = (
   canvas: HTMLCanvasElement,
-  threshold = 0.95
+  lightnessThreshold = 5
 ) => {
+  if (lightnessThreshold === 0) {
+    return
+  }
   const ctx = canvas.getContext('2d')!
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+  const lightnessThresholdNorm = 255 - (255 * lightnessThreshold) / 100
+
   for (let row = 0; row < imgData.height; ++row) {
     for (let col = 0; col < imgData.width; ++col) {
       const imgDataIndex = (row * imgData.width + col) * 4
@@ -169,7 +174,7 @@ export const removeLightPixels = (
       const b = imgData.data[imgDataIndex + 2]
       const value = (r + r + g + g + g + b) / 6
       // If the pixel isn't dark enough...
-      if (value >= 255 * threshold) {
+      if (value >= lightnessThresholdNorm) {
         // Make that pixel transparent
         imgData.data[imgDataIndex + 0] = 255
         imgData.data[imgDataIndex + 1] = 255
@@ -268,6 +273,24 @@ export const loadImageUrlToCanvasCtx = async (
   return ctx
 }
 
+export const hasTransparentPixels = (canvas: HTMLCanvasElement): boolean => {
+  const ctx = canvas.getContext('2d')!
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+
+  for (let row = 0; row < imgData.height; ++row) {
+    for (let col = 0; col < imgData.width; ++col) {
+      const imgDataIndex = (row * imgData.width + col) * 4
+      const a = imgData.data[imgDataIndex + 3]
+
+      if (a === 0) {
+        return true
+      }
+    }
+  }
+
+  return false
+}
+
 export const processRasterImg = (
   canvas: HTMLCanvasElement,
   processing: RasterProcessingConf
@@ -283,11 +306,12 @@ export const processRasterImg = (
     ? chroma(processing.invert.color).rgb()
     : [0, 0, 0]
   const threshold = processing.removeLightBackground?.threshold || 0
+  const lightnessThresholdNorm = 255 - (255 * threshold) / 100
 
   for (let row = 0; row < imgData.height; ++row) {
     for (let col = 0; col < imgData.width; ++col) {
       const imgDataIndex = (row * imgData.width + col) * 4
-      if (processing.removeLightBackground) {
+      if (threshold > 0) {
         // removeLightPixels
         const r = imgData.data[imgDataIndex + 0]
         const g = imgData.data[imgDataIndex + 1]
@@ -295,7 +319,7 @@ export const processRasterImg = (
         const value = (r + r + g + g + g + b) / 6
 
         // If the pixel isn't dark enough...
-        if (value >= 255 * threshold) {
+        if (value >= lightnessThresholdNorm) {
           // Make that pixel transparent
           imgData.data[imgDataIndex + 0] = 255
           imgData.data[imgDataIndex + 1] = 255

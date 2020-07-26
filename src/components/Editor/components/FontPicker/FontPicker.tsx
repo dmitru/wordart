@@ -132,7 +132,6 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
           >
             <Menu isLazy placement="bottom-start">
               <MenuButton
-                variant={state.style !== 'popular' ? 'solid' : 'ghost'}
                 colorScheme={state.style !== 'popular' ? 'accent' : undefined}
                 as={Button}
                 rightIcon={<ChevronDownIcon />}
@@ -202,7 +201,6 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
                 size="sm"
                 as={Button}
                 colorScheme={state.language === 'any' ? undefined : 'accent'}
-                variant={state.language === 'any' ? 'ghost' : 'solid'}
                 rightIcon={<ChevronDownIcon />}
               >
                 {state.language === 'any'
@@ -235,7 +233,6 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
 
         <Box display="flex" mb="1">
           <SearchInput
-            noBorder={false}
             placeholder="Find font..."
             value={state.query}
             onChange={(value) => {

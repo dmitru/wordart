@@ -112,7 +112,7 @@ export class Generator {
     if (task.shape.processing.removeWhiteBg.enabled) {
       removeLightPixels(
         unrotatedCtx.canvas,
-        task.shape.processing.removeWhiteBg.lightnessThreshold / 100
+        task.shape.processing.removeWhiteBg.lightnessThreshold
       )
     }
 
