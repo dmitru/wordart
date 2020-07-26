@@ -321,6 +321,21 @@ export const processRasterImg = (
   }
 
   ctx.putImageData(imgData, 0, 0)
+
+  if (processing.edges && processing.edges.amount > 0) {
+    const maxExtent = Math.max(canvas.width, canvas.height)
+    const edgesCanvas = detectEdges(
+      ctx.canvas,
+      (17 * (1 - processing.edges.amount / 100) * maxExtent) / 300,
+      30,
+      100
+    )
+
+    ctx.save()
+    ctx.globalCompositeOperation = 'destination-out'
+    ctx.drawImage(edgesCanvas, 0, 0)
+    ctx.restore()
+  }
 }
 
 export const loadImageUrlToCanvasCtxWithMaxSize = async (
@@ -414,7 +429,7 @@ export const detectEdges = (
   const imgData = ctx.getImageData(0, 0, w, h)
   const dataU32 = new Uint32Array(imgData.data.buffer)
 
-  console.screenshot(ctx.canvas)
+  // console.screenshot(ctx.canvas)
 
   const jsfeatMatrix = new jsfeat.matrix_t(w, h, jsfeat.U8C1_t)
   jsfeat.imgproc.grayscale(imgData.data, w, h, jsfeatMatrix)
@@ -433,7 +448,7 @@ export const detectEdges = (
 
   const result = createCanvasCtxCopy(ctx)
   result.putImageData(imgData, 0, 0)
-  console.screenshot(result.canvas)
+  // console.screenshot(result.canvas)
 
   const t2 = performance.now()
   console.log(`removeEdges: ${(t2 - t1).toFixed(0)}ms`)

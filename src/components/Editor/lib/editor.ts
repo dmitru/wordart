@@ -1683,6 +1683,12 @@ export class Editor {
       .fill(null)
       .map(() => Math.round(360 * Math.random()))
 
+    console.log('edgesAmount = ', edgesAmount)
+    console.log(
+      'blur = ',
+      17 * (1 - (enableEdges && edgesAmount != null ? edgesAmount : 0) / 100)
+    )
+
     const result = await this.generator.fillShape(
       {
         itemsMaxCount: style.items.placement.itemsMaxCount,
@@ -1703,10 +1709,9 @@ export class Editor {
             edges: {
               enabled: enableEdges,
               blur:
-                (17 *
-                  (1 -
-                    (enableEdges && edgesAmount != null ? edgesAmount : 0))) /
-                100,
+                17 *
+                (1 -
+                  (enableEdges && edgesAmount != null ? edgesAmount : 0) / 100),
               lowThreshold: 30,
               highThreshold: 100,
             },

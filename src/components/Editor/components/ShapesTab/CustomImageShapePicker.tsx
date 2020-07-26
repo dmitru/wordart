@@ -8,6 +8,7 @@ import { useStore } from 'services/root-store'
 import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
 import { CustomizeRasterImageModal } from './CustomImages/CustomizeRasterImageModal'
 import { AddCustomImageModal } from './CustomImages/AddCustomImageModal'
+import { FaUpload } from 'react-icons/fa'
 
 const initialState = {
   isShowingUploadModal: false,
@@ -72,19 +73,13 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
           </Box>
         )}
 
-        <Box
-          mt="5"
-          mx="-5"
-          px="5"
-          css={css`
-            overflow: auto;
-            height: calc(100vh - 340px);
-          `}
-        >
+        <Box mt="5" mx="-5" px="5">
           <Stack direction="row" spacing="3">
             {!(shape && shape.kind === 'custom:raster') && (
               <Button
-                colorScheme="primary"
+                mt="4"
+                leftIcon={<FaUpload />}
+                colorScheme="secondary"
                 onClick={() => {
                   state.isShowingUploadModal = true
                 }}
@@ -95,7 +90,7 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
             {shape && shape.kind === 'custom:raster' && (
               <>
                 <Button
-                  colorScheme="primary"
+                  colorScheme="secondary"
                   onClick={() => {
                     state.isShowingUploadModal = true
                   }}
@@ -156,10 +151,12 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
         <CustomizeRasterImageModal
           isOpen={state.isShowingCustomizeImage}
           value={{
-            invert: shape.config.processing?.invert != null,
-            invertColor: shape.config.processing?.invert?.color || 'black',
             removeLightBackground:
+              (shape.config.processing?.removeLightBackground?.threshold || 0) >
+              0,
+            removeLightBackgroundThreshold:
               shape.config.processing?.removeLightBackground?.threshold || 0,
+            removeEdges: shape.config.processing?.edges?.amount || 0,
             originalUrl: shape.url,
           }}
           onClose={() => {
@@ -170,14 +167,15 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
 
             shape.config.processedThumbnailUrl = thumbnailUrl
             shape.config.processing = {
-              invert: value.invert
-                ? {
-                    color: value.invertColor,
-                  }
-                : undefined,
+              invert: undefined,
               removeLightBackground: value.removeLightBackground
                 ? {
-                    threshold: value.removeLightBackground,
+                    threshold: value.removeLightBackgroundThreshold,
+                  }
+                : undefined,
+              edges: value.removeEdges
+                ? {
+                    amount: value.removeEdges,
                   }
                 : undefined,
             }

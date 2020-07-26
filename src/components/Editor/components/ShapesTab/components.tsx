@@ -67,7 +67,6 @@ export const ShapeTransformLeftPanelSection: React.FC<{}> = observer(() => {
         <>
           <Stack direction="row" mt="3" spacing="3">
             <Button
-              colorScheme="primary"
               onClick={() => {
                 if (!store.editor) {
                   return

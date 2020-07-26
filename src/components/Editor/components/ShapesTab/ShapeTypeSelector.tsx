@@ -28,7 +28,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
     <Menu isLazy placement="bottom-end">
       <MenuButton
         as={Button}
-        colorScheme="secondary"
+        colorScheme="primary"
         rightIcon={<ChevronDownIcon />}
         py="2"
         px="3"

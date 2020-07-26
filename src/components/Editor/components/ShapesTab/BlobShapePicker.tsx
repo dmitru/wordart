@@ -237,8 +237,7 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
               </Box>
 
               <Button
-                // colorScheme="secondary"
-                onClick={updateBlobShape}
+                onClick={() => updateBlobShape()}
                 isDisabled={state.isUpdatingBlobShape}
                 isLoading={state.isUpdatingBlobShape}
               >

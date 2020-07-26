@@ -71,11 +71,11 @@ const myTheme: ChakraTheme = {
           ...baseStyle,
           container: {
             ...baseStyle.container,
-            zIndex: 1001,
+            zIndex: 1003,
           },
           arrow: {
             ...baseStyle.arrow,
-            zIndex: 1001,
+            zIndex: 1003,
           },
         }
       },
@@ -86,6 +86,10 @@ const myTheme: ChakraTheme = {
         const baseStyle = theme.components.Modal.baseStyle(props)
         return {
           ...baseStyle,
+          header: {
+            ...baseStyle.header,
+            fontWeight: 'normal',
+          },
           overlay: {
             ...baseStyle.overlay,
             zIndex: 1002,

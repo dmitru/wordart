@@ -58,7 +58,7 @@ export const Slider: React.FC<SliderProps> = (props) => {
       {label && (
         <Text
           color="gray.500"
-          fontWeight="semibold"
+          fontWeight="medium"
           my="0"
           css={css`
             ${horizontal

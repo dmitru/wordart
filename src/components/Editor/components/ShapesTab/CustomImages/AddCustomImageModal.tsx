@@ -1,7 +1,9 @@
 import {
   Box,
   Button,
-  Checkbox,
+  Text,
+  Switch,
+  FormLabel,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -137,7 +139,7 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
               >
                 <canvas ref={processedImgCanvasRef} width="300" height="300" />
 
-                <Box mt="3">
+                <Box mt="6">
                   <Box>
                     <Slider
                       label="Remove light background"
@@ -153,17 +155,19 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
                     />
                   </Box>
 
-                  <Box mb="3" height="30px">
-                    <Checkbox
-                      mr="5"
+                  <Box mt="5" height="40px" alignItems="center" display="flex">
+                    <Switch
+                      id="invert-color"
+                      mr="2"
                       isChecked={state.invert}
                       onChange={(e) => {
                         state.invert = e.target.checked
                         updateImgPreviewThrottled(state)
                       }}
-                    >
-                      Invert color
-                    </Checkbox>
+                    />
+                    <FormLabel mr="5" htmlFor="invert-color">
+                      Invert background?
+                    </FormLabel>
                     {state.invert && (
                       <ColorPickerPopover
                         value={state.invertColor}
@@ -186,9 +190,10 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
                 >
                   <input {...getInputProps({})} />
                   <p>
-                    Click or drag image files here - JPEG, PNG and SVG files are
+                    Click or drag image files here - JPEG and PNG files are
                     supported.
                   </p>
+                  <Text color="gray.500">File size limit: 5 Mb.</Text>
                   <Button mt="4" colorScheme="accent" size="lg">
                     Click to choose file...
                   </Button>

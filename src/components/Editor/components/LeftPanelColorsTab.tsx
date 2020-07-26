@@ -236,12 +236,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
           width="100%"
           height="calc(100vh - 60px)"
           css={css`
-            &::-webkit-scrollbar {
-              display: none; /* Chrome Safari */
-            }
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE 10+ */
-            overflow-y: scroll;
+            overflow-y: auto;
             overflow-x: hidden;
           `}
         >

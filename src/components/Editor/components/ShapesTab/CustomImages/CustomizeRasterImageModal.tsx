@@ -1,12 +1,13 @@
 import {
   Box,
   Button,
-  Checkbox,
+  Switch,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalFooter,
+  FormLabel,
   ModalHeader,
   ModalOverlay,
 } from '@chakra-ui/core'
@@ -18,8 +19,8 @@ import {
   processRasterImg,
 } from 'lib/wordart/canvas-utils'
 import { observer, useLocalStore } from 'mobx-react'
-import { useRef, useEffect } from 'react'
-import { useDropzone } from 'react-dropzone'
+import { useRef } from 'react'
+import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
 
 export type CustomizeRasterImageModalProps = {
   isOpen: boolean
@@ -30,9 +31,9 @@ export type CustomizeRasterImageModalProps = {
 
 type ProcessingParams = {
   originalUrl: string
-  invert: boolean
-  invertColor: string
-  removeLightBackground: number
+  removeLightBackground: boolean
+  removeLightBackgroundThreshold: number
+  removeEdges: number
 }
 
 export const CustomizeRasterImageModal: React.FC<CustomizeRasterImageModalProps> = observer(
@@ -76,16 +77,14 @@ export const CustomizeRasterImageModal: React.FC<CustomizeRasterImageModalProps>
 
       processRasterImg(ctx.canvas, {
         edges: {
-          amount: 0,
+          amount: state.removeEdges,
         },
-        invert: state.invert
+        invert: undefined,
+        removeLightBackground: state.removeLightBackground
           ? {
-              color: state.invertColor,
+              threshold: state.removeLightBackgroundThreshold,
             }
           : undefined,
-        removeLightBackground: {
-          threshold: state.removeLightBackground,
-        },
       })
     }
 
@@ -130,44 +129,64 @@ export const CustomizeRasterImageModal: React.FC<CustomizeRasterImageModalProps>
                   ref={setProcessedImgCanvasRef}
                   width="300"
                   height="300"
+                  css={css`
+                    background-image: url(/images/editor/transparent-bg.svg);
+                    background-repeat: repeat;
+                    background-size: 15px;
+                  `}
                 />
 
-                <Box mt="3">
-                  <Box>
-                    <Slider
-                      label="Remove light background"
-                      value={state.removeLightBackground * 100}
-                      onChange={(value) => {
-                        state.removeLightBackground = value / 100
+                <Box mt="6">
+                  <Box alignItems="center" display="flex">
+                    <Switch
+                      id="remove-bg"
+                      mr="2"
+                      isChecked={state.removeLightBackground}
+                      onChange={(e) => {
+                        state.removeLightBackground = e.target.checked
                         updateImgPreviewThrottled(state)
+                      }}
+                    />
+                    <FormLabel mr="5" htmlFor="remove-bg">
+                      Remove light background
+                    </FormLabel>
+                  </Box>
+
+                  {state.removeLightBackground && (
+                    <Box mt="4">
+                      <Slider
+                        afterLabel="%"
+                        label="Remove light background"
+                        value={100 - state.removeLightBackgroundThreshold * 100}
+                        onChange={(value) => {
+                          state.removeLightBackgroundThreshold = 1 - value / 100
+                        }}
+                        onAfterChange={() => updateImgPreviewThrottled(state)}
+                        min={0}
+                        max={100}
+                        step={1}
+                      />
+                    </Box>
+                  )}
+
+                  <Box mt="4">
+                    <Slider
+                      afterLabel="%"
+                      label={
+                        <>
+                          Detect & remove edges
+                          <HelpTooltipIcon label="This setting prevents words from crossing boundaries between areas of different colors. The right setting depends on the image, so you may want to try different values and re-visualize a few times before the result looks good!" />
+                        </>
+                      }
+                      value={state.removeEdges}
+                      onChange={(value) => {
+                        state.removeEdges = value
                       }}
                       onAfterChange={() => updateImgPreviewThrottled(state)}
                       min={0}
                       max={100}
                       step={1}
                     />
-                  </Box>
-
-                  <Box mb="3" height="30px">
-                    <Checkbox
-                      mr="5"
-                      isChecked={state.invert}
-                      onChange={(e) => {
-                        state.invert = e.target.checked
-                        updateImgPreviewThrottled(state)
-                      }}
-                    >
-                      Invert color
-                    </Checkbox>
-                    {state.invert && (
-                      <ColorPickerPopover
-                        value={state.invertColor}
-                        onChange={(color) => {
-                          state.invertColor = color
-                          updateImgPreviewThrottled(state)
-                        }}
-                      />
-                    )}
                   </Box>
                 </Box>
               </Box>
