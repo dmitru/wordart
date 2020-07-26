@@ -25,11 +25,8 @@ const myTheme: ChakraTheme = {
       ...theme.components.Button,
       baseStyle: {
         ...theme.components.Button.baseStyle,
-        container: {
-          ...theme.components.Button.baseStyle.container,
-          textDecoration: 'none !important',
-          fontWeight: '500',
-        },
+        textDecoration: 'none !important',
+        fontWeight: '500',
       },
     },
     Menu: {
@@ -38,8 +35,8 @@ const myTheme: ChakraTheme = {
         const baseStyle = theme.components.Menu.baseStyle(props)
         return {
           ...baseStyle,
-          menuList: {
-            ...baseStyle.menuList,
+          list: {
+            ...baseStyle.list,
             zIndex: 1000,
           },
         }
@@ -64,14 +61,7 @@ const myTheme: ChakraTheme = {
         const baseStyle = theme.components.Tooltip.baseStyle(props)
         return {
           ...baseStyle,
-          container: {
-            ...baseStyle.container,
-            zIndex: 1003,
-          },
-          arrow: {
-            ...baseStyle.arrow,
-            zIndex: 1003,
-          },
+          zIndex: 1003,
         }
       },
     },

@@ -5,6 +5,8 @@ import {
   Menu,
   MenuButton,
   MenuList,
+  MenuTransition,
+  Portal,
   Text,
 } from '@chakra-ui/core'
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
@@ -170,28 +172,38 @@ export const DesignsView = observer(() => {
                 >
                   {selection.size} selected
                 </MenuButton>
-                <MenuList>
-                  <MenuItemWithIcon
-                    icon={<FaRegFolder />}
-                    onClick={() =>
-                      setMovindWordclouds(
-                        store.wordclouds.filter((w) => selection.has(w.id))
-                      )
-                    }
-                  >
-                    Move to folder
-                  </MenuItemWithIcon>
-                  <MenuItemWithIcon
-                    icon={<FaTimes />}
-                    onClick={() =>
-                      setDeletingWordclouds(
-                        store.wordclouds.filter((w) => selection.has(w.id))
-                      )
-                    }
-                  >
-                    Delete
-                  </MenuItemWithIcon>
-                </MenuList>
+                <MenuTransition>
+                  {(styles) => (
+                    <Portal>
+                      <MenuList css={styles}>
+                        <MenuItemWithIcon
+                          icon={<FaRegFolder />}
+                          onClick={() =>
+                            setMovindWordclouds(
+                              store.wordclouds.filter((w) =>
+                                selection.has(w.id)
+                              )
+                            )
+                          }
+                        >
+                          Move to folder
+                        </MenuItemWithIcon>
+                        <MenuItemWithIcon
+                          icon={<FaTimes />}
+                          onClick={() =>
+                            setDeletingWordclouds(
+                              store.wordclouds.filter((w) =>
+                                selection.has(w.id)
+                              )
+                            )
+                          }
+                        >
+                          Delete
+                        </MenuItemWithIcon>
+                      </MenuList>
+                    </Portal>
+                  )}
+                </MenuTransition>
               </Menu>
 
               <Button

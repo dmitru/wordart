@@ -95,7 +95,7 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
         p="3"
         mb="0"
         fontSize="lg"
-        fontWeight="semibold"
+        fontWeight="medium"
         background={isSelected ? '#ffdedf' : 'white'}
       >
         {wordcloud.title}
@@ -196,17 +196,16 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
         }}
       />
 
-      {!isSelecting && (
-        <WordcloudThumbnailMenu
-          wordcloud={wordcloud}
-          onDelete={onDelete}
-          onMoveToFolder={onMoveToFolder}
-          onSelect={onSelect}
-          onRename={onRename}
-          onDuplicate={onDuplicate}
-          onOpenInEditor={onOpenInEditor}
-        />
-      )}
+      <WordcloudThumbnailMenu
+        wordcloud={wordcloud}
+        isHidden={isSelecting}
+        onDelete={onDelete}
+        onMoveToFolder={onMoveToFolder}
+        onSelect={onSelect}
+        onRename={onRename}
+        onDuplicate={onDuplicate}
+        onOpenInEditor={onOpenInEditor}
+      />
 
       <Box cursor="pointer">
         <Text
@@ -232,6 +231,7 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
 }
 
 type WordcloudThumbnailMenuProps = {
+  isHidden?: boolean
   wordcloud: Wordcloud
   onMoveToFolder: () => void
   onDuplicate: () => void
@@ -247,6 +247,7 @@ const WordcloudThumbnailMenu: React.FC<WordcloudThumbnailMenuProps> = React.memo
   <Menu isLazy>
     <MenuButton
       as={ThumbnailMenuButton}
+      visibility={props.isHidden ? 'hidden' : 'visible'}
       noShadows={false}
       variant="outline"
       bg="gray.100"
@@ -256,11 +257,10 @@ const WordcloudThumbnailMenu: React.FC<WordcloudThumbnailMenuProps> = React.memo
     />
     <MenuTransition>
       {(styles) => (
-        // @ts-ignore
         <MenuList css={styles}>
           <MenuItemWithIcon
             icon={<FaChevronRight />}
-            fontWeight="semibold"
+            fontWeight="medium"
             onClick={props.onOpenInEditor}
           >
             Open in Editor...
@@ -298,9 +298,7 @@ const WordcloudThumbnailMenu: React.FC<WordcloudThumbnailMenuProps> = React.memo
   </Menu>
 ))
 
-export const ThumbnailMenuButton = styled(MenuDotsButton)`
-  /* background: #fff; */
-`
+export const ThumbnailMenuButton = styled(MenuDotsButton)``
 
 export const FoldersList = styled(Box)``
 
@@ -310,6 +308,8 @@ export const FolderRowTag = styled(Tag)<{ theme: any }>`
   transition: all 0;
   background: ${(p) => p.theme.colors.primary['50']};
   color: ${(p) => p.theme.colors.gray['600']};
+  display: inline-flex;
+  justify-content: center;
 `
 
 export const FolderRow = styled(Box)<{

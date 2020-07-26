@@ -108,11 +108,13 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
 
                   {/* Account menu */}
                   <Menu isLazy placement="bottom-end">
-                    <MenuButton as={TopNavMenuButton} py="2" px="3">
-                      <Box mr="2">
-                        <FaRegUserCircle />
-                      </Box>
-
+                    <MenuButton
+                      as={TopNavMenuButton}
+                      py="2"
+                      px="3"
+                      leftIcon={<FaRegUserCircle />}
+                      rightIcon={<ChevronDownIcon />}
+                    >
                       <span
                         css={css`
                           @media screen and (max-width: 980px) {
@@ -122,10 +124,6 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
                       >
                         Account
                       </span>
-
-                      <Box mr="2">
-                        <ChevronDownIcon />
-                      </Box>
                     </MenuButton>
 
                     <Portal>
@@ -252,7 +250,7 @@ const TopNavLink = styled.a<{
   ${topNavLink}
 `
 
-const TopNavMenuButton = styled.button<{
+const TopNavMenuButton = styled(Button)<{
   active?: boolean
 }>`
   ${topNavLink}

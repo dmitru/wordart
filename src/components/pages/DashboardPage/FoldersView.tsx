@@ -67,7 +67,7 @@ export const FoldersView = observer(() => {
       <FoldersList mr="4" mt="96px">
         <FolderRow
           fontSize="lg"
-          fontWeight="semibold"
+          fontWeight="medium"
           color="gray.600"
           py={2}
           px={3}
@@ -85,7 +85,7 @@ export const FoldersView = observer(() => {
         {store.folders.length > 0 && (
           <FolderRow
             fontSize="lg"
-            fontWeight="semibold"
+            fontWeight="medium"
             color="gray.600"
             py={2}
             px={3}
@@ -106,7 +106,7 @@ export const FoldersView = observer(() => {
           fontSize="sm"
           mb="2"
           mt="6"
-          fontWeight="semibold"
+          fontWeight="medium"
           color="gray.500"
         >
           Folders
@@ -130,7 +130,7 @@ export const FoldersView = observer(() => {
             <FolderRow
               hideCountOnHover
               fontSize="lg"
-              fontWeight="semibold"
+              fontWeight="medium"
               color="gray.600"
               py={2}
               px={3}

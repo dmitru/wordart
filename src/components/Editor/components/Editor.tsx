@@ -488,12 +488,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           </Link>
 
           <Menu isLazy>
-            <MenuButton mr="2" as={TopNavButton} variant="primary">
-              <FiMenu
-                css={css`
-                  margin-right: 4px;
-                `}
-              />
+            <MenuButton
+              mr="2"
+              as={TopNavButton}
+              variant="primary"
+              leftIcon={<FiMenu />}
+            >
               Menu
             </MenuButton>
             <Portal>
