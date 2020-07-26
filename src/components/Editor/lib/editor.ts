@@ -114,6 +114,7 @@ export class Editor {
 
   undoStack = new UndoStack()
   @observable isUndoing = false
+  @observable isRedoing = false
 
   items: {
     shape: {
@@ -856,18 +857,18 @@ export class Editor {
       if (item.kind === 'word') {
         const wordPathBb = item.pathBounds!
         const scaling = item.transform.scaling
-        const wordH = (wordPathBb.y2 - wordPathBb.y1) * scaling.y
-        const wordW = (wordPathBb.x2 - wordPathBb.x1) * scaling.x
-        const wordArea = Math.sqrt(wordH * wordW)
-        return wordArea
+        const h = (wordPathBb.y2 - wordPathBb.y1) * scaling.y
+        const w = (wordPathBb.x2 - wordPathBb.x1) * scaling.x
+        const area = Math.sqrt(Math.sqrt(h * w))
+        return area
       }
       if (item.kind === 'shape') {
         const bounds = item.bounds
         const scaling = item.transform.scaling
-        const wordH = bounds.width * scaling.y
-        const wordW = bounds.height * scaling.x
-        const wordArea = Math.sqrt(Math.sqrt(wordH * wordW))
-        return wordArea
+        const h = bounds.width * scaling.y
+        const w = bounds.height * scaling.x
+        const area = Math.sqrt(Math.sqrt(h * w))
+        return area
       }
       return 0
     })
@@ -1854,7 +1855,7 @@ export class Editor {
 
   @action redo = async () => {
     const frame = this.undoStack.redo()
-    this.isUndoing = true
+    this.isRedoing = true
 
     console.log('redo', frame)
     if (frame.kind === 'visualize') {
@@ -1867,16 +1868,16 @@ export class Editor {
       this.applyItemUpdateUndoFrame(frame, 'forward')
       this.version = frame.versionAfter
     }
-    this.isUndoing = false
+    this.isRedoing = false
     this.canvas.requestRenderAll()
     this.store.renderKey++
   }
 
   @computed get canUndo() {
-    return !this.isUndoing && this.undoStack.canUndo
+    return !this.isUndoing && !this.isRedoing && this.undoStack.canUndo
   }
   @computed get canRedo() {
-    return !this.isUndoing && this.undoStack.canRedo
+    return !this.isUndoing && !this.isRedoing && this.undoStack.canRedo
   }
 
   clear = async (clearCanvas = true) => {
@@ -1898,10 +1899,14 @@ export class Editor {
     this.items.shape.itemsById.clear()
   }
 
-  clearItems = (target: TargetKind, removeLocked = false) => {
+  clearItems = async (target: TargetKind, removeLocked = false) => {
     if (this.items[target].items.length === 0) {
       return
     }
+
+    const persistedDataBefore = await this.store.serialize()
+    const stateBefore = this.store.getStateSnapshot()
+
     const nonLockedItems = [
       ...(target === 'shape'
         ? this.items.shape.itemsById.values()
@@ -1919,6 +1924,20 @@ export class Editor {
     this.items[target].items = this.items[target].items.filter(
       (i) => i.locked && !removeLocked
     )
+
+    const persistedDataAfter = await this.store.serialize()
+
+    this.pushUndoFrame({
+      kind: 'visualize',
+      dataBefore: persistedDataBefore,
+      dataAfter: persistedDataAfter,
+      stateBefore,
+      stateAfter: this.store.getStateSnapshot(),
+      versionAfter: this.version + 1,
+      versionBefore: this.version,
+    })
+
+    this.version++
 
     this.canvas.requestRenderAll()
     this.store.renderKey++

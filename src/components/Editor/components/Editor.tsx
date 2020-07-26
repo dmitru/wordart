@@ -401,11 +401,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       // @ts-ignore
       Key, // eslint-disable-line
     } = store
-    const hasItems = store.editor
-      ? store.targetTab === 'bg'
-        ? store.editor.items.bg.items.length > 0
-        : store.editor.items.shape.items.length > 0
+
+    const hasShapeItems = store.editor
+      ? store.editor.items.shape.items.length > 0
       : false
+    const hasBgItems = store.editor
+      ? store.editor.items.bg.items.length > 0
+      : false
+    const hasItems = hasShapeItems || hasBgItems
 
     const leftTab = state.leftTab
 
@@ -1065,6 +1068,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     isDisabled={!store.editor?.canUndo}
                   >
                     <IconButton
+                      isLoading={store.editor?.isUndoing}
                       ml="3"
                       icon={<ArrowBackIcon />}
                       aria-label="Undo"
@@ -1082,6 +1086,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   >
                     <IconButton
                       ml="1"
+                      isLoading={store.editor?.isRedoing}
                       icon={<ArrowForwardIcon />}
                       aria-label="Redo"
                       variant="outline"
@@ -1109,6 +1114,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                                     onClick={() => {
                                       store.editor?.clearItems('shape', true)
                                     }}
+                                    isDisabled={!hasShapeItems}
                                   >
                                     <SmallCloseIcon color="gray.500" mr="2" />
                                     Delete all Shape items
@@ -1118,6 +1124,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                                     onClick={() => {
                                       store.editor?.clearItems('bg', true)
                                     }}
+                                    isDisabled={!hasBgItems}
                                   >
                                     <SmallCloseIcon color="gray.500" mr="2" />
                                     Delete all Background items
