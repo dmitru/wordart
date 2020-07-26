@@ -65,7 +65,7 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
     },
     placement: {
       iconsRandomAngle: false,
-      itemsMaxCount: 200,
+      itemsMaxCount: 300,
       iconsMaxSize: 30,
       iconsProportion: 20,
       shapePadding: 15,
@@ -118,7 +118,7 @@ export const defaultBgStyleOptions: BgStyleOptions = {
       margins: 10,
       iconsRandomAngle: false,
       iconsMaxSize: 30,
-      itemsMaxCount: 200,
+      itemsMaxCount: 300,
       iconsProportion: 20,
       shapePadding: 15,
       itemDensity: 85,
