@@ -7,18 +7,13 @@ import {
 } from '@chakra-ui/core'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
-import { Button } from 'components/shared/Button'
 import { generateBlobShapePathData } from 'components/Editor/lib/blob-shape-gen'
+import { ShapeTextConf } from 'components/Editor/shape-config'
+import { Button } from 'components/shared/Button'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { observer } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
-import {
-  ShapeTextConf,
-  ShapeRandomBlobConf,
-  ShapeIconConf,
-  ShapeFullCanvasConf,
-} from 'components/Editor/shape-config'
 
 export const ShapeTypeSelector: React.FC<{}> = observer(() => {
   const { editorPageStore: store } = useStore()

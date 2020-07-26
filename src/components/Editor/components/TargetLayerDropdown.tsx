@@ -13,6 +13,7 @@ import css from '@emotion/css'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { useStore } from 'services/root-store'
+import { BsLayersHalf } from 'react-icons/bs'
 
 export const LeftPanelTargetLayerDropdown = () => (
   <Box
@@ -34,6 +35,7 @@ export const TargetLayerDropdown = observer(() => {
     <Menu isLazy placement="bottom-start">
       <MenuButton
         as={Button}
+        leftIcon={<BsLayersHalf />}
         rightIcon={<ChevronDownIcon />}
         py="2"
         px="3"

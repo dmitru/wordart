@@ -10,10 +10,7 @@ import {
   ModalOverlay,
   Text,
 } from '@chakra-ui/core'
-import {
-  loadImageUrlToCanvasCtxWithMaxSize,
-  hasTransparentPixels,
-} from 'lib/wordart/canvas-utils'
+import { loadImageUrlToCanvasCtxWithMaxSize } from 'lib/wordart/canvas-utils'
 import { set } from 'mobx'
 import { observer, useLocalStore } from 'mobx-react'
 import { useDropzone } from 'react-dropzone'
@@ -32,7 +29,7 @@ const initialState: CustomizeRasterOptions = {
   processedThumbnailUrl: '',
   originalUrl: '',
   removeLightBackgroundThreshold: 5,
-  removeLightBackground: true,
+  removeLightBackground: false,
   removeEdges: 70,
 }
 
@@ -58,9 +55,9 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
           state.originalUrl = ctxOriginal.canvas.toDataURL()
           state.processedThumbnailUrl = state.originalUrl
 
-          state.removeLightBackground = !hasTransparentPixels(
-            ctxOriginal.canvas
-          )
+          // state.removeLightBackground = !hasTransparentPixels(
+          //   ctxOriginal.canvas
+          // )
         }
         reader.readAsDataURL(files[0])
       },

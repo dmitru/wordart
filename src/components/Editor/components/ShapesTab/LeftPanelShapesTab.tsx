@@ -18,7 +18,14 @@ export const LeftPanelShapesTab: React.FC<{}> = observer(() => {
   return (
     <>
       <Box px="5" py="6">
-        <Box mb="5">
+        <Box
+          mb="4"
+          shadow="md"
+          css={css`
+            margin: -1.5rem -1.5rem 2rem;
+            padding: 10px 1.5rem;
+          `}
+        >
           <ShapeTypeSelector />
         </Box>
 

@@ -26,23 +26,22 @@ import {
   loadObjFromSvgUrl,
   objAsCanvasElement,
   setFillColor,
-  loadObjFromSvgString,
 } from 'components/Editor/lib/fabric-utils'
 import {
+  FillShapeTaskWordConfig,
   Font,
   Generator,
-  FillShapeTaskWordConfig,
 } from 'components/Editor/lib/generator'
 import { Shape, SvgShapeColorsMapEntry } from 'components/Editor/shape'
 import {
+  RasterProcessingConf,
   ShapeConf,
   ShapeId,
-  ShapeTextConf,
   ShapeTextStyle,
   SvgProcessingConf,
-  RasterProcessingConf,
 } from 'components/Editor/shape-config'
 import { BgStyleConf, ShapeStyleConf } from 'components/Editor/style'
+import { WordListEntry } from 'components/Editor/style-options'
 import {
   UndoFrame,
   UndoItemUpdateFrame,
@@ -60,7 +59,7 @@ import {
 } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { flatten, groupBy, keyBy, max, min, sortBy } from 'lodash'
-import { toJS, action, observable, computed } from 'mobx'
+import { action, computed, observable, toJS } from 'mobx'
 import { nanoid } from 'nanoid/non-secure'
 import { BoundingBox, Glyph } from 'opentype.js'
 import paper from 'paper'
@@ -71,7 +70,6 @@ import { consoleLoggers } from 'utils/console-logger'
 import { UniqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { exhaustiveCheck } from 'utils/type-utils'
-import { WordListEntry } from 'components/Editor/style-options'
 
 export type EditorInitParams = {
   canvas: HTMLCanvasElement
