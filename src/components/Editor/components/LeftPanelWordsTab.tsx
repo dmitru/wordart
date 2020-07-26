@@ -18,7 +18,6 @@ import css from '@emotion/css'
 import styled from '@emotion/styled'
 import { TextFields } from '@styled-icons/material-twotone/TextFields'
 import { DragIndicator } from '@styled-icons/material/DragIndicator'
-import { FormatTextSize } from '@styled-icons/zondicons/FormatTextSize'
 import { FindAndReplaceModal } from 'components/Editor/components/FindAndReplaceModal'
 import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
 import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
@@ -48,7 +47,8 @@ import {
   DraggableStateSnapshot,
   Droppable,
 } from 'react-beautiful-dnd'
-import { FaCog, FaDownload, FaSearch } from 'react-icons/fa'
+import { FaCog } from 'react-icons/fa'
+import { FiSearch, FiDownload } from 'react-icons/fi'
 import { MdFormatSize } from 'react-icons/md'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import {
@@ -296,7 +296,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                   <MenuList css={styles}>
                     <MenuItemWithIcon
                       onClick={handleFindAndReplaceClick}
-                      icon={<FaSearch />}
+                      icon={<FiSearch />}
                     >
                       Find and replace...
                     </MenuItemWithIcon>
@@ -352,7 +352,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
                         <MenuItemWithIcon
                           onClick={handleExportCSVClick}
-                          icon={<FaDownload />}
+                          icon={<FiDownload />}
                         >
                           Export as CSV
                         </MenuItemWithIcon>
