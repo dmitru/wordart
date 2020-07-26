@@ -876,21 +876,20 @@ export class EditorStore {
           .filter(notEmpty)
       )
 
-      const words: PersistedWordV1[] = items
-        .map((item) => {
-          if (item.kind !== 'word') {
-            return null
-          }
-          const fontIndex = fontIds.findIndex((fId) => fId === item.font.id)
-          return {
-            fontIndex,
-            text: item.customText || item.defaultText,
-            id: item.wordConfigId,
-          }
-        })
-        .filter(notEmpty)
+      const words: (PersistedWordV1 | null)[] = items.map((item) => {
+        if (item.kind !== 'word') {
+          return null
+        }
+        const fontIndex = fontIds.findIndex((fId) => fId === item.font.id)
+        return {
+          fontIndex,
+          text: item.customText || item.defaultText,
+          id: item.wordConfigId,
+        }
+      })
+
       const uniqWords: PersistedWordV1[] = uniqBy(
-        words,
+        words.filter(notEmpty),
         (w) => `${w.fontIndex}.${w.text}`
       )
 
@@ -910,8 +909,8 @@ export class EditorStore {
                 l: item.locked,
                 wi: uniqWords.findIndex(
                   (uw) =>
-                    uw.fontIndex === words[index].fontIndex &&
-                    uw.text === words[index].text
+                    uw.fontIndex === words[index]!.fontIndex &&
+                    uw.text === words[index]!.text
                 ),
               } as PersistedItemWordV1
             }
