@@ -12,7 +12,7 @@ export const SpinnerSplashScreen = () => (
       justifyContent="center"
     >
       <Spinner size="xl" color="gray.300" />
-      <Heading color="gray.500" size="lg">
+      <Heading color="gray.500" size="lg" fontWeight="normal">
         Wordcloudy
       </Heading>
     </Box>

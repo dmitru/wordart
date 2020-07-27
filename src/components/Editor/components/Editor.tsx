@@ -184,7 +184,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     }
 
     const handleSaveClick = useCallback(() => {
-      const showToast = () =>
+      const showSaveToast = () =>
         toast({
           id: 'work-saved',
           title: 'Your work is saved',
@@ -195,7 +195,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         })
 
       if (!store.hasUnsavedChanges) {
-        showToast()
+        showSaveToast()
         return
       }
 
@@ -231,7 +231,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               editorData,
             })
           }
-          showToast()
+          showSaveToast()
           store.hasUnsavedChanges = false
         } finally {
           store.isSaving = false
@@ -261,11 +261,25 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             if (wordcloud) {
               state.title = wordcloud.title
             }
-            const editorData = await Api.wordclouds.fetchEditorData(
-              props.wordcloudId
-            )
 
-            editorParams.serialized = editorData
+            try {
+              const editorData = await Api.wordclouds.fetchEditorData(
+                props.wordcloudId
+              )
+              editorParams.serialized = editorData
+            } catch (error) {
+              console.error(error)
+              toast({
+                title: 'Error loading the design',
+                description:
+                  "Sorry, we couldn't load this design. If you believe it's a problem on our end, please contact our support at support@wordcloudy.com",
+                status: 'error',
+                position: 'bottom-right',
+                isClosable: true,
+                duration: 8000,
+              })
+              router.replace(Urls.yourDesigns)
+            }
           } else {
             state.title = 'New wordart'
           }
