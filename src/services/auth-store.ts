@@ -8,6 +8,7 @@ import jsonp from 'jsonp'
 import { plans, LocalizedPrice } from 'plans'
 import { config } from 'config'
 import { BroadcastChannel } from 'broadcast-channel'
+import { state as upgradeModalState } from 'components/upgrade/UpgradeModal'
 
 const IS_SSR = typeof window === 'undefined'
 
@@ -62,6 +63,8 @@ export class AuthStore {
               kind: 'profile-update',
               data: updatedProfile,
             })
+
+            upgradeModalState.isOpen = false
 
             this.profile = updatedProfile
           }

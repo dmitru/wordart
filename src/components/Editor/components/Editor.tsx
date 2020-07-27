@@ -884,6 +884,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 finalFocusRef={cancelVisualizationBtnRef}
                 isOpen={state.isShowingExport}
                 onClose={closeExport}
+                trapFocus={false}
               >
                 <ModalOverlay>
                   <ModalContent

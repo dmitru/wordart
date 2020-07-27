@@ -28,7 +28,7 @@ export type UpgradeModalProps = {
 export const UpgradeModal: React.FC<UpgradeModalProps> = observer(
   ({ variant, isOpen, onClose }) => {
     return (
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} trapFocus={false}>
         <ModalOverlay>
           <ModalContent
             css={css`
@@ -52,7 +52,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = observer(
   }
 )
 
-const state = observable({
+export const state = observable({
   isOpen: false,
   variant: null as UpgradeModalVariant | null,
 })

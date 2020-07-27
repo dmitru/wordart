@@ -114,7 +114,7 @@ export const PricingPlans = observer(() => {
                   })
                 }}
               >
-                Sign up
+                Buy now
               </Button>
             </Box>
           </Box>
@@ -204,7 +204,7 @@ export const PricingPlans = observer(() => {
                   })
                 }}
               >
-                Sign up
+                Buy now
               </Button>
             </Box>
           </Box>
