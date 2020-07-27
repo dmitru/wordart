@@ -1,16 +1,15 @@
+import { Box, Button, Text } from '@chakra-ui/core'
+import css from '@emotion/css'
+import styled from '@emotion/styled'
 import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
+import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
 import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
-import React, { useEffect, useState } from 'react'
-import { useStore } from 'services/root-store'
-import { Box, Button, Text } from '@chakra-ui/core'
-import { unlimitedPricingPlans, downloadsPricingPlans } from 'plans'
+import { downloadsPricingPlans, unlimitedPricingPlans } from 'plans'
+import React, { useState } from 'react'
 import { Helmet } from 'react-helmet'
+import { useStore } from 'services/root-store'
 import { getTabTitle } from 'utils/tab-title'
-import css from '@emotion/css'
-import { FaRegCheckCircle } from 'react-icons/fa'
-import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
-import styled from '@emotion/styled'
 
 export const PricingPage = observer(() => {
   const { authStore } = useStore()

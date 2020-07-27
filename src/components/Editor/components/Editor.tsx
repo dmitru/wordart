@@ -102,6 +102,10 @@ import { getTabTitle } from 'utils/tab-title'
 import { useWarnIfUnsavedChanges } from 'utils/use-warn-if-unsaved-changes'
 import { uuid } from 'utils/uuid'
 import { SectionLabel } from './shared'
+import {
+  UpgradeModalContainer,
+  useUpgradeModal,
+} from 'components/upgrade/UpgradeModal'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -119,6 +123,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       isShowingExportNoItemsWarning: false,
     }))
 
+    const upgradeModal = useUpgradeModal()
     const toast = useToast()
     const aspectRatio = 4 / 3
     const [canvasSize] = useState<Dimensions>({ w: 900 * aspectRatio, h: 900 })
@@ -324,6 +329,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         | 'png'
         | 'jpeg'
 
+      if (hd) {
+        if (!profile) {
+          // TODO: show signup modal
+          return
+        }
+      }
+
       const startExport = async () => {
         const dimension = hd ? 4096 : 1024
         if (!store.editor) {
@@ -333,7 +345,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         setIsExporting(true)
 
         try {
-          // TODO: hit API for HD download
           if (hd) {
             const result = await Api.wordclouds.hdDownload({
               wordcloudVersion: store.editor.version,
@@ -342,7 +353,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
             if (!result.canDownload) {
               console.log('Can not download! :(')
-              // TODO: open upgrade / buy modal
+              upgradeModal.show('hq-download')
               return
             }
           }
@@ -373,7 +384,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       }
 
       startExport()
-    }, [store, selectedFormat])
+    }, [store, selectedFormat, profile])
 
     const closeExport = useCallback(() => {
       state.isShowingExport = false
@@ -471,6 +482,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         <Helmet>
           <title>{getTabTitle(state.title || 'Untitled')}</title>
         </Helmet>
+
+        <UpgradeModalContainer />
 
         <Hotkeys
           keyName="cmd+s,ctrl+s"
