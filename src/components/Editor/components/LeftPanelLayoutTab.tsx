@@ -46,6 +46,7 @@ import { animateElement } from 'utils/animation'
 import { Tooltip } from 'components/shared/Tooltip'
 import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
 import { AddIcon } from '@chakra-ui/icons'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 const anglePresets: {
   kind: WordAnglesPresetKind
@@ -126,7 +127,7 @@ export type LeftPanelLayoutTabProps = {
 
 export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
   ({ target }) => {
-    const { editorPageStore: store } = useStore()
+    const store = useEditorStore()!
     const style = store.styleOptions[target]
 
     const animateVisualize = useCallback((debounce = false) => {

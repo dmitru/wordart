@@ -21,6 +21,7 @@ import { observer } from 'mobx-react'
 import React, { useMemo } from 'react'
 import { useStore } from 'services/root-store'
 import { useDebounce } from 'use-debounce'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 const state = observable({
   query: '',
@@ -34,7 +35,7 @@ export type IconPickerProps = {
 
 export const IconPicker: React.FC<IconPickerProps> = observer(
   ({ selectedIconId, onSelected }) => {
-    const { editorPageStore: store } = useStore()
+    const store = useEditorStore()!
 
     const allCategoryOptions = iconsCategories
 

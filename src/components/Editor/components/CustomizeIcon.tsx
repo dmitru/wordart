@@ -23,6 +23,7 @@ import { observer, useLocalStore } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
 import { IconListEntry } from '../style-options'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 export type CustomizeIconOptions = {
   // Repeat
@@ -56,7 +57,7 @@ export type CustomizeIconPopoverProps = {
 }
 export const CustomizeIconPopover: React.FC<CustomizeIconPopoverProps> = observer(
   ({ icon, trigger, onAfterColorChange }) => {
-    const { editorPageStore: store } = useStore()
+    const store = useEditorStore()!
 
     const state = useLocalStore(() => ({
       value: getValueFromWordEntry(icon),

@@ -71,13 +71,14 @@ import {
   PersistedWordV1,
 } from 'services/api/persisted/v1'
 import { EditorPersistedData } from 'services/api/types'
-import { RootStore } from 'services/root-store'
+import { RootStore, rootStore } from 'services/root-store'
 import { animateElement } from 'utils/animation'
 import { consoleLoggers } from 'utils/console-logger'
 import { UniqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
 import { exhaustiveCheck } from 'utils/type-utils'
+import React, { useContext } from 'react'
 
 export type EditorMode = 'view' | 'edit'
 
@@ -145,7 +146,7 @@ export class EditorStore {
   customFontIdGen = new UniqIdGenerator(4)
   fontsCache = new Map<FontId, opentype.Font>()
 
-  constructor(rootStore: RootStore) {
+  constructor() {
     this.rootStore = rootStore
   }
 
@@ -1648,4 +1649,11 @@ export type BlobShapeOptions = {
 
 export type FullCanvasShapeOptions = {
   color: string
+}
+
+export const EditorStoreContext = React.createContext<EditorStore | null>(null)
+
+export const useEditorStore = () => {
+  const editorStore = useContext(EditorStoreContext)
+  return editorStore
 }

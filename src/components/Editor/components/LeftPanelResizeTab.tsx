@@ -13,12 +13,14 @@ import { pageSizePresets } from 'components/Editor/editor-store'
 import { observer } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
+import { useEditorStore } from 'components/Editor/editor-store'
 import { SectionLabel } from './shared'
 
 export const LeftPanelResizeTab: React.FC<{
   children: React.ReactNode
 }> = observer(({ children }) => {
-  const { editorPageStore: store, wordcloudsStore } = useStore()
+  const { wordcloudsStore } = useStore()
+  const store = useEditorStore()!
 
   return (
     <Box px="3" py="5">

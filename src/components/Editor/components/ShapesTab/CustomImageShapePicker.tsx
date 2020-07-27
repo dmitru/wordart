@@ -4,12 +4,12 @@ import { Slider } from 'components/shared/Slider'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import React, { useEffect } from 'react'
-import { useStore } from 'services/root-store'
 import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
 import { CustomizeRasterImageModal } from './CustomImages/CustomizeRasterImageModal'
 import { AddCustomImageModal } from './CustomImages/AddCustomImageModal'
 import { FaUpload } from 'react-icons/fa'
 import { ShapeCustomImageRasterConf } from 'components/Editor/shape-config'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 const initialState = {
   isShowingUploadModal: false,
@@ -24,7 +24,7 @@ let lastShapeConfig: ShapeCustomImageRasterConf | undefined
 export type LeftPanelShapesTabProps = {}
 
 export const CustomImageShapePicker: React.FC<{}> = observer(() => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
   const shapeStyle = store.styleOptions.shape
   const shape = store.getShape()
 

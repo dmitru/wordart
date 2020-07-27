@@ -14,9 +14,10 @@ import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescripti
 import { observer } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 export const ShapeTypeSelector: React.FC<{}> = observer(() => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
   const { shapesPanel } = store
 
   return (

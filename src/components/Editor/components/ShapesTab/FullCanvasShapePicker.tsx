@@ -18,6 +18,7 @@ import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { FullCanvasShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 const initialState = {
   thumbnailPreview: '',
@@ -43,7 +44,7 @@ const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
 ))
 
 export const FullCanvasShapePicker: React.FC<{}> = observer(() => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
   const shapeStyle = store.styleOptions.shape
   const shape = store.getShape()
 

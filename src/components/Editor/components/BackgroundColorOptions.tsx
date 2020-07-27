@@ -5,12 +5,12 @@ import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { Slider } from 'components/shared/Slider'
 import { observer } from 'mobx-react'
 import React from 'react'
-import { useStore } from 'services/root-store'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 export const BackgroundColorOptions: React.FC<{
   onUpdate: () => void
 }> = observer(({ onUpdate }) => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
   const bgStyle = store.styleOptions.bg
 
   return (

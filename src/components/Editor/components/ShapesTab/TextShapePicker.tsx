@@ -16,6 +16,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce'
 import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -44,7 +45,7 @@ const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
 ))
 
 export const TextShapePicker: React.FC<{}> = observer(() => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
   const shapeStyle = store.styleOptions.shape
   const shape = store.getShape()
   const [isShowingFontPicker, setIsShowingFontPicker] = useState(false)

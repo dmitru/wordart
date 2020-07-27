@@ -15,6 +15,7 @@ import { SectionLabel } from '../shared'
 import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
 import css from '@emotion/css'
 import { FiRefreshCw } from 'react-icons/fi'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -43,7 +44,7 @@ const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
 ))
 
 export const BlobShapePicker: React.FC<{}> = observer(() => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
   const shapeStyle = store.styleOptions.shape
   const shape = store.getShape()
 

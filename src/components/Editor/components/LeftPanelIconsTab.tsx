@@ -35,6 +35,7 @@ import { FaCog } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 import { CustomizeIconPopover } from './CustomizeIcon'
 import { SectionLabel } from './shared'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 export type LeftPanelIconsTabProps = {
   target: TargetKind
@@ -49,7 +50,7 @@ const state = observable({
 
 export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
   ({ target }) => {
-    const { editorPageStore: store } = useStore()
+    const store = useEditorStore()!
     const style = store.styleOptions[target]
     const shapeStyle = store.styleOptions.shape
     const bgStyle = store.styleOptions.bg

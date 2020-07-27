@@ -33,11 +33,12 @@ import {
 import { noop, isEqual } from 'lodash'
 import { FiRefreshCw } from 'react-icons/fi'
 import { ShapeClipartSvg, ShapeCustomImageSvg } from 'components/Editor/shape'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 export const ShapeColorPicker: React.FC<{
   onUpdate: () => void
 }> = observer(({ onUpdate }) => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
   const shape = store.getShape()
   if (!shape) {
     return <></>
@@ -76,7 +77,7 @@ export const SvgShapeColorPicker: React.FC<{
   onAfterChange?: () => void
   onChange?: () => void
 }> = observer(({ shape, onAfterChange = noop, onChange = noop }) => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
   const shapeConfig = shape.config
   const colorsCount = shape.originalColors.length
   const colorsKind = shapeConfig.processing.colors.kind
@@ -226,7 +227,7 @@ export const SvgShapeColorKindDropdown: React.FC<{
   shape: ShapeClipartSvg | ShapeCustomImageSvg
   onAfterChange: () => void
 }> = observer(({ shape, onAfterChange: onUpdate }) => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
   const shapeConfig = shape.config
   const colorsCount = shape.originalColors.length
   const colorsKind = shapeConfig.processing.colors.kind
@@ -299,7 +300,7 @@ export const TextShapeColorPicker: React.FC<{
   placement?: ColorPickerPopoverProps['placement']
 }> = observer(
   ({ placement, shapeConf, onAfterChange = noop, onChange = noop }) => {
-    const { editorPageStore: store } = useStore()
+    const store = useEditorStore()!
 
     return (
       <Box display="flex" alignItems="center">
@@ -326,7 +327,7 @@ export const BlobShapeColorPicker: React.FC<{
   onChange?: () => void
   shapeConf: ShapeRandomBlobConf
 }> = observer(({ shapeConf, onAfterChange = noop, onChange = noop }) => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
 
   return (
     <Box display="flex" alignItems="center">
@@ -351,7 +352,7 @@ export const FullCanvasShapeColorPicker: React.FC<{
   onChange?: () => void
   shapeConf: ShapeFullCanvasConf
 }> = observer(({ shapeConf, onAfterChange = noop, onChange = noop }) => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
 
   return (
     <Box display="flex" alignItems="center">
@@ -376,7 +377,7 @@ export const IconShapeColorPicker: React.FC<{
   onChange?: () => void
   shapeConf: ShapeIconConf
 }> = observer(({ shapeConf, onAfterChange = noop, onChange = noop }) => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
 
   return (
     <Box display="flex" alignItems="center">

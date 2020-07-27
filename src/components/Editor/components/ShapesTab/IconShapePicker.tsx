@@ -20,6 +20,7 @@ import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useStore } from 'services/root-store'
 import { useDebounce } from 'use-debounce'
 import { useDebouncedCallback } from 'use-debounce/lib'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -47,7 +48,7 @@ const ShapeOpacitySlider = observer(({ style, onAfterChange }: any) => (
 ))
 
 export const IconShapePicker: React.FC<{}> = observer(() => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
   const shapeStyle = store.styleOptions.shape
   const shape = store.getShape()
 

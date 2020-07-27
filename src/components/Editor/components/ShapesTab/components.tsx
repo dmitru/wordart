@@ -10,9 +10,10 @@ import { SectionLabel } from '../shared'
 import { Stack, Box, Text } from '@chakra-ui/core'
 import styled from '@emotion/styled'
 import { ShapeThumbnailBtn } from '../ShapeSelector'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 export const ResetShapeTransformButton: React.FC<{}> = observer(() => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
   const shape = store.getShape()
 
   const {
@@ -47,7 +48,7 @@ export const ResetShapeTransformButton: React.FC<{}> = observer(() => {
 })
 
 export const ShapeTransformLeftPanelSection: React.FC<{}> = observer(() => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
   const shapeStyle = store.styleOptions.shape
   const shape = store.getShape()
 

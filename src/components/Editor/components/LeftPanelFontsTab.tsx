@@ -25,6 +25,7 @@ import { FontStyleConfig } from 'data/fonts'
 import { uniq } from 'lodash'
 import { observer, useLocalStore } from 'mobx-react'
 import { useStore } from 'services/root-store'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 export type LeftPanelFontsTabProps = {
   target: TargetKind
@@ -32,7 +33,7 @@ export type LeftPanelFontsTabProps = {
 
 export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
   ({ target }) => {
-    const { editorPageStore: store } = useStore()
+    const store = useEditorStore()!
     const style = store.styleOptions[target]
 
     const state = useLocalStore(() => ({

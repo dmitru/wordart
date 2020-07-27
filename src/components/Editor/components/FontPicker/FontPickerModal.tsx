@@ -22,6 +22,7 @@ import { observer, useLocalStore } from 'mobx-react'
 import { useEffect, useMemo } from 'react'
 import { useStore } from 'services/root-store'
 import { animateElement } from 'utils/animation'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 export type FontPickerModalProps = {
   title?: string
@@ -48,7 +49,7 @@ export const FontPickerModal: React.FC<FontPickerModalProps> = observer(
       onClose,
       onHighlighted = noop,
     } = props
-    const { editorPageStore: store } = useStore()
+    const store = useEditorStore()!
 
     const state = useLocalStore(() => ({
       selectedFontId: null as string | null,

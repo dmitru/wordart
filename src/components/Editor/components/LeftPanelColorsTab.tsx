@@ -49,6 +49,7 @@ import { FaCog } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { defaultShapeStyleOptions } from '../default-style-options'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 export type LeftPanelColorsTabProps = {
   target: TargetKind
@@ -155,7 +156,7 @@ const ItemsAdvancedControls: React.FC<{
 
 export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
   ({ target }) => {
-    const { editorPageStore: store } = useStore()
+    const store = useEditorStore()!
     const {
       // @ts-ignore
       renderKey, // eslint-disable-line
@@ -491,7 +492,7 @@ export const BgItemsStyleOptions: React.FC<{
   target: TargetKind
   updateBgItemsColoring: () => void
 }> = observer(({ updateBgItemsColoring, target }) => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
   const {
     // @ts-ignore
     renderKey, // eslint-disable-line

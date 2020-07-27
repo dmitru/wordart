@@ -60,6 +60,7 @@ import { useStore } from 'services/root-store'
 import { useToasts } from 'use-toasts'
 import { CustomizeWordPopover } from './CustomizeWord'
 import { FiRefreshCw } from 'react-icons/fi'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -85,7 +86,7 @@ let ignoreBlur = false
 
 export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
   ({ target }) => {
-    const { editorPageStore: store } = useStore()
+    const store = useEditorStore()!
     const style = store.styleOptions[target]
     const shapeStyle = store.styleOptions.shape
     const bgStyle = store.styleOptions.bg
@@ -220,13 +221,23 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     const hasCustomizations =
       selectedOrAllWords.find(hasWordCustomizations) != null
 
+    const handleWordColorChange = useCallback(() => {
+      if (target === 'shape') {
+        store.editor?.setShapeItemsStyle(
+          mkShapeStyleConfFromOptions(shapeStyle).items
+        )
+      } else {
+        store.editor?.setBgItemsStyle(mkBgStyleConfFromOptions(bgStyle).items)
+      }
+    }, [])
+
     const handleResetDefaults = () => {
       runInAction(() => {
         selectedOrAllWords.forEach((word) => {
           resetWordDefaults(word)
         })
       })
-      onAfterColorChange()
+      handleWordColorChange()
     }
 
     const toolbar = (
@@ -394,16 +405,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         </Box>
       </Stack>
     )
-
-    const handleWordColorChange = useCallback(() => {
-      if (target === 'shape') {
-        store.editor?.setShapeItemsStyle(
-          mkShapeStyleConfFromOptions(shapeStyle).items
-        )
-      } else {
-        store.editor?.setBgItemsStyle(mkBgStyleConfFromOptions(bgStyle).items)
-      }
-    }, [])
 
     const handleWordDelete = useCallback(
       (word: WordListEntry) => {

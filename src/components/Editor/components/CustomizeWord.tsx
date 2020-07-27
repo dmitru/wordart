@@ -28,6 +28,7 @@ import { FontId } from 'data/fonts'
 import { observer, useLocalStore } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
+import { useEditorStore } from 'components/Editor/editor-store'
 import { WordListEntry } from '../style-options'
 
 export type CustomizeWordOptions = {
@@ -72,7 +73,7 @@ export type CustomizeWordPopoverProps = {
 }
 export const CustomizeWordPopover: React.FC<CustomizeWordPopoverProps> = observer(
   ({ word, trigger, onAfterColorChange }) => {
-    const { editorPageStore: store } = useStore()
+    const store = useEditorStore()!
 
     const state = useLocalStore(() => ({
       value: getValueFromWordEntry(word),

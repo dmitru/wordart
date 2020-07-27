@@ -10,11 +10,10 @@ import React from 'react'
 import { useStore } from 'services/root-store'
 import { FullCanvasShapePicker } from 'components/Editor/components/ShapesTab/FullCanvasShapePicker'
 import css from '@emotion/css'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 export const LeftPanelShapesTab: React.FC<{}> = observer(() => {
-  const {
-    editorPageStore: { shapesPanel: leftPanelShapesState },
-  } = useStore()
+  const { shapesPanel: leftPanelShapesState } = useEditorStore()!
   return (
     <>
       <Box px="5" py="6">

@@ -26,6 +26,7 @@ import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList as List, ListProps } from 'react-window'
 import { useStore } from 'services/root-store'
 import { FontListButton } from './components'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 export type FontPickerProps = {
   selectedFontId: string | null
@@ -40,7 +41,7 @@ const state = observable({
 
 export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
   const { selectedFontId, onHighlighted } = props
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
 
   const allFonts = store.getAvailableFonts({
     popular: state.style === 'popular',

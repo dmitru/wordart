@@ -58,6 +58,9 @@ import { WarningModal } from 'components/Editor/components/WarningModal'
 import {
   EditorStoreInitParams,
   pageSizePresets,
+  useEditorStore,
+  EditorStore,
+  EditorStoreContext,
 } from 'components/Editor/editor-store'
 import {
   mkBgStyleConfFromOptions,
@@ -115,6 +118,8 @@ const UnsavedChangesMsg = 'If you leave the page, unsaved changes will be lost.'
 
 export const EditorComponent: React.FC<EditorComponentProps> = observer(
   (props) => {
+    const [store] = useState(() => new EditorStore())
+
     const state = useLocalStore(() => ({
       title: 'New wordart',
       leftTab: 'shapes' as LeftPanelTab,
@@ -130,7 +135,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const bgCanvasRef = useRef<HTMLCanvasElement>(null)
     const canvasWrapperRef = useRef<HTMLDivElement>(null)
-    const { editorPageStore: store, wordcloudsStore } = useStore()
+    const { wordcloudsStore } = useStore()
     const { isSaving } = store
 
     const isNew = props.wordcloudId == null
@@ -478,220 +483,221 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     }
 
     return (
-      <PageLayoutWrapper>
-        <Helmet>
-          <title>{getTabTitle(state.title || 'Untitled')}</title>
-        </Helmet>
+      <EditorStoreContext.Provider value={store}>
+        <PageLayoutWrapper>
+          <Helmet>
+            <title>{getTabTitle(state.title || 'Untitled')}</title>
+          </Helmet>
 
-        <UpgradeModalContainer />
+          <UpgradeModalContainer />
 
-        <Hotkeys
-          keyName="cmd+s,ctrl+s"
-          onKeyDown={(shortcut, event) => {
-            event.preventDefault()
-            handleSaveClick()
-          }}
-        />
-
-        <TopNavWrapper alignItems="center" display="flex">
-          <img
-            src="/images/logo.svg"
-            css={css`
-              height: 40px;
-              margin: 0;
-              margin-left: 0.5rem;
-              margin-right: 0.5rem;
-            `}
+          <Hotkeys
+            keyName="cmd+s,ctrl+s"
+            onKeyDown={(shortcut, event) => {
+              event.preventDefault()
+              handleSaveClick()
+            }}
           />
-          <Link
-            href={authStore.isLoggedIn ? Urls.yourDesigns : Urls.landing}
-            passHref
-          >
-            <TopNavButton mr="1" variant="secondary" colorScheme="secondary">
-              <FiChevronLeft
+
+          <TopNavWrapper alignItems="center" display="flex">
+            <img
+              src="/images/logo.svg"
+              css={css`
+                height: 40px;
+                margin: 0;
+                margin-left: 0.5rem;
+                margin-right: 0.5rem;
+              `}
+            />
+            <Link
+              href={authStore.isLoggedIn ? Urls.yourDesigns : Urls.landing}
+              passHref
+            >
+              <TopNavButton mr="1" variant="secondary" colorScheme="secondary">
+                <FiChevronLeft
+                  css={css`
+                    margin-right: 4px;
+                  `}
+                />
+                Home
+              </TopNavButton>
+            </Link>
+
+            <Menu isLazy>
+              <MenuButton
+                mr="2"
+                as={TopNavButton}
+                variant="primary"
+                leftIcon={<FiMenu />}
+              >
+                Menu
+              </MenuButton>
+              <Portal>
+                <MenuTransition>
+                  {(styles) => (
+                    // @ts-ignore
+                    <MenuList css={styles} zIndex={4}>
+                      <MenuItem>
+                        <FiFilePlus
+                          css={css`
+                            margin-right: 4px;
+                          `}
+                        />
+                        New...
+                      </MenuItem>
+                      <MenuItem onClick={handleSaveClick}>
+                        <FiSave
+                          css={css`
+                            margin-right: 4px;
+                          `}
+                        />
+                        Save
+                      </MenuItem>
+                      <MenuItem>
+                        <FiCopy
+                          css={css`
+                            margin-right: 4px;
+                          `}
+                        />
+                        Make Copy
+                      </MenuItem>
+                      <MenuItem>
+                        <FiEdit
+                          css={css`
+                            margin-right: 4px;
+                          `}
+                        />
+                        Rename
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          state.leftPanelContext = 'resize'
+                        }}
+                      >
+                        <IoMdResize
+                          css={css`
+                            margin-right: 4px;
+                          `}
+                        />
+                        Page Size...
+                      </MenuItem>
+                      <MenuDivider />
+                      <MenuItem onClick={handlePrint}>
+                        <FiPrinter
+                          css={css`
+                            margin-right: 4px;
+                          `}
+                        />
+                        Print
+                      </MenuItem>
+                      <MenuItem>
+                        <FiDownload
+                          onClick={openExport}
+                          css={css`
+                            margin-right: 4px;
+                          `}
+                        />{' '}
+                        Download as Image
+                      </MenuItem>
+                      <MenuDivider />
+                      <MenuItem>
+                        <BsTrash
+                          css={css`
+                            margin-right: 4px;
+                          `}
+                        />
+                        Delete
+                      </MenuItem>
+                      <MenuDivider />
+                      <MenuItem>
+                        <FiChevronLeft
+                          css={css`
+                            margin-right: 4px;
+                          `}
+                        />
+                        Go Back to Your Designs
+                      </MenuItem>
+                    </MenuList>
+                  )}
+                </MenuTransition>
+              </Portal>
+            </Menu>
+
+            <Button
+              colorScheme="secondary"
+              onClick={handleSaveClick}
+              isLoading={isSaving}
+              mr="2"
+              css={css`
+                width: 90px;
+              `}
+            >
+              <FiSave
                 css={css`
                   margin-right: 4px;
                 `}
               />
-              Home
-            </TopNavButton>
-          </Link>
+              Save
+            </Button>
 
-          <Menu isLazy>
-            <MenuButton
+            <Editable
+              css={css`
+                background: #fff3;
+                padding: 5px 8px;
+                overflow: hidden;
+                border-radius: 4px;
+                display: flex;
+                height: 40px;
+
+                &:hover {
+                  background: #ffffff15;
+                }
+              `}
+              value={state.title}
+              onChange={(value) => {
+                state.title = value
+                store.hasUnsavedChanges = true
+              }}
+              selectAllOnFocus={false}
+              placeholder="Untitled Design"
+              color="white"
+              fontSize="xl"
+              maxWidth="200px"
+              flex={1}
               mr="2"
-              as={TopNavButton}
-              variant="primary"
-              leftIcon={<FiMenu />}
             >
-              Menu
-            </MenuButton>
-            <Portal>
-              <MenuTransition>
-                {(styles) => (
-                  // @ts-ignore
-                  <MenuList css={styles} zIndex={4}>
-                    <MenuItem>
-                      <FiFilePlus
-                        css={css`
-                          margin-right: 4px;
-                        `}
-                      />
-                      New...
-                    </MenuItem>
-                    <MenuItem onClick={handleSaveClick}>
-                      <FiSave
-                        css={css`
-                          margin-right: 4px;
-                        `}
-                      />
-                      Save
-                    </MenuItem>
-                    <MenuItem>
-                      <FiCopy
-                        css={css`
-                          margin-right: 4px;
-                        `}
-                      />
-                      Make Copy
-                    </MenuItem>
-                    <MenuItem>
-                      <FiEdit
-                        css={css`
-                          margin-right: 4px;
-                        `}
-                      />
-                      Rename
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        state.leftPanelContext = 'resize'
-                      }}
-                    >
-                      <IoMdResize
-                        css={css`
-                          margin-right: 4px;
-                        `}
-                      />
-                      Page Size...
-                    </MenuItem>
-                    <MenuDivider />
-                    <MenuItem onClick={handlePrint}>
-                      <FiPrinter
-                        css={css`
-                          margin-right: 4px;
-                        `}
-                      />
-                      Print
-                    </MenuItem>
-                    <MenuItem>
-                      <FiDownload
-                        onClick={openExport}
-                        css={css`
-                          margin-right: 4px;
-                        `}
-                      />{' '}
-                      Download as Image
-                    </MenuItem>
-                    <MenuDivider />
-                    <MenuItem>
-                      <BsTrash
-                        css={css`
-                          margin-right: 4px;
-                        `}
-                      />
-                      Delete
-                    </MenuItem>
-                    <MenuDivider />
-                    <MenuItem>
-                      <FiChevronLeft
-                        css={css`
-                          margin-right: 4px;
-                        `}
-                      />
-                      Go Back to Your Designs
-                    </MenuItem>
-                  </MenuList>
-                )}
-              </MenuTransition>
-            </Portal>
-          </Menu>
+              <EditablePreview
+                width="100%"
+                py="0"
+                css={css`
+                  text-overflow: ellipsis;
+                  overflow-x: hidden;
+                  overflow-y: hidden;
+                  white-space: nowrap;
+                `}
+              />
+              <EditableInput
+                css={css`
+                  background-color: white;
+                  color: black;
+                `}
+              />
+            </Editable>
 
-          <Button
-            colorScheme="secondary"
-            onClick={handleSaveClick}
-            isLoading={isSaving}
-            mr="2"
-            css={css`
-              width: 90px;
-            `}
-          >
-            <FiSave
-              css={css`
-                margin-right: 4px;
-              `}
-            />
-            Save
-          </Button>
+            <TopNavButton
+              variant="secondary"
+              onClick={openExport}
+              colorScheme="secondary"
+            >
+              <FiDownload
+                css={css`
+                  margin-right: 4px;
+                `}
+              />
+              Download
+            </TopNavButton>
 
-          <Editable
-            css={css`
-              background: #fff3;
-              padding: 5px 8px;
-              overflow: hidden;
-              border-radius: 4px;
-              display: flex;
-              height: 40px;
-
-              &:hover {
-                background: #ffffff15;
-              }
-            `}
-            value={state.title}
-            onChange={(value) => {
-              state.title = value
-              store.hasUnsavedChanges = true
-            }}
-            selectAllOnFocus={false}
-            placeholder="Untitled Design"
-            color="white"
-            fontSize="xl"
-            maxWidth="200px"
-            flex={1}
-            mr="2"
-          >
-            <EditablePreview
-              width="100%"
-              py="0"
-              css={css`
-                text-overflow: ellipsis;
-                overflow-x: hidden;
-                overflow-y: hidden;
-                white-space: nowrap;
-              `}
-            />
-            <EditableInput
-              css={css`
-                background-color: white;
-                color: black;
-              `}
-            />
-          </Editable>
-
-          <TopNavButton
-            variant="secondary"
-            onClick={openExport}
-            colorScheme="secondary"
-          >
-            <FiDownload
-              css={css`
-                margin-right: 4px;
-              `}
-            />
-            Download
-          </TopNavButton>
-
-          {/* <TopNavButton
+            {/* <TopNavButton
             onClick={openExport}
             isLoading={isExporting}
             loadingText="Saving..."
@@ -705,633 +711,641 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             Order Prints
           </TopNavButton> */}
 
-          <TopNavButton colorScheme="secondary" mr="2" ml="auto">
-            <FiHelpCircle
-              css={css`
-                margin-right: 4px;
-              `}
-            />
-            Help & Tutorials
-          </TopNavButton>
-
-          <Button colorScheme="accent">Upgrade</Button>
-        </TopNavWrapper>
-
-        <EditorLayout>
-          <LeftWrapper>
-            <LeftBottomWrapper>
-              <SideNavbar
-                activeIndex={
-                  state.leftPanelContext === 'normal'
-                    ? leftPanelTabs.findIndex((s) => s === state.leftTab)
-                    : undefined
-                }
-              >
-                <LeftNavbarBtn
-                  onClick={() => {
-                    state.leftTab = 'shapes'
-                    state.leftPanelContext = 'normal'
-                  }}
-                  active={
-                    state.leftTab === 'shapes' &&
-                    state.leftPanelContext === 'normal'
-                  }
-                >
-                  <Shapes className="icon" />
-                  Shape
-                </LeftNavbarBtn>
-
-                <LeftNavbarBtn
-                  onClick={() => {
-                    state.leftTab = 'words'
-                    state.leftPanelContext = 'normal'
-                  }}
-                  active={
-                    leftTab === 'words' && state.leftPanelContext === 'normal'
-                  }
-                >
-                  <TextFields className="icon" />
-                  Words
-                </LeftNavbarBtn>
-
-                <LeftNavbarBtn
-                  onClick={() => {
-                    state.leftTab = 'fonts'
-                    state.leftPanelContext = 'normal'
-                  }}
-                  active={
-                    leftTab === 'fonts' && state.leftPanelContext === 'normal'
-                  }
-                >
-                  <Font className="icon" />
-                  Fonts
-                </LeftNavbarBtn>
-
-                <LeftNavbarBtn
-                  onClick={() => {
-                    state.leftTab = 'symbols'
-                    state.leftPanelContext = 'normal'
-                  }}
-                  active={
-                    leftTab === 'symbols' && state.leftPanelContext === 'normal'
-                  }
-                >
-                  <SmileBeam className="icon" />
-                  Icons
-                </LeftNavbarBtn>
-
-                <LeftNavbarBtn
-                  onClick={() => {
-                    state.leftTab = 'layout'
-                    state.leftPanelContext = 'normal'
-                  }}
-                  active={
-                    leftTab === 'layout' && state.leftPanelContext === 'normal'
-                  }
-                >
-                  <LayoutMasonry className="icon" />
-                  Layout
-                </LeftNavbarBtn>
-
-                <LeftNavbarBtn
-                  onClick={() => {
-                    state.leftTab = 'colors'
-                    state.leftPanelContext = 'normal'
-                  }}
-                  active={
-                    leftTab === 'colors' && state.leftPanelContext === 'normal'
-                  }
-                >
-                  <ColorPalette className="icon" />
-                  Colors
-                </LeftNavbarBtn>
-              </SideNavbar>
-
-              <LeftPanel>
-                <LeftPanelContent
-                  id="left-panel-content"
-                  noScroll={leftTab === 'shapes'}
-                >
-                  {store.lifecycleState === 'initialized' ? (
-                    <>
-                      {state.leftPanelContext === 'resize' && (
-                        <LeftPanelResizeTab>
-                          <Box>
-                            <Button
-                              mt="4"
-                              width="100%"
-                              colorScheme="accent"
-                              onClick={() => {
-                                state.leftPanelContext = 'normal'
-                              }}
-                            >
-                              Done
-                            </Button>
-                          </Box>
-                        </LeftPanelResizeTab>
-                      )}
-
-                      {state.leftPanelContext === 'normal' && (
-                        <>
-                          {leftTab === 'shapes' && <LeftPanelShapesTab />}
-                          {leftTab === 'words' && (
-                            <>
-                              <LeftPanelWordsTab target={store.targetTab} />
-                            </>
-                          )}
-                          {leftTab === 'fonts' && (
-                            <>
-                              <LeftPanelFontsTab target={store.targetTab} />
-                            </>
-                          )}
-                          {leftTab === 'symbols' && (
-                            <LeftPanelIconsTab target={store.targetTab} />
-                          )}
-                          {leftTab === 'colors' && (
-                            <LeftPanelColorsTab target={store.targetTab} />
-                          )}
-
-                          {leftTab === 'layout' && (
-                            <LeftPanelLayoutTab target={store.targetTab} />
-                          )}
-                        </>
-                      )}
-                    </>
-                  ) : (
-                    <Box px="5" py="6">
-                      <Skeleton height="50px" my="10px" />
-                      <Skeleton height="30px" my="10px" />
-                      <Skeleton height="300px" my="10px" />
-                    </Box>
-                  )}
-                </LeftPanelContent>
-              </LeftPanel>
-            </LeftBottomWrapper>
-          </LeftWrapper>
-
-          <RightWrapper>
-            <TopToolbar display="flex" alignItems="center" px="5">
-              <WarningModal
-                header="Your design is empty"
-                content="Please add some words or icons to your design and click Visualize first."
-                isOpen={state.isShowingExportNoItemsWarning}
-                onClose={() => {
-                  state.isShowingExportNoItemsWarning = false
-                }}
+            <TopNavButton colorScheme="secondary" mr="2" ml="auto">
+              <FiHelpCircle
+                css={css`
+                  margin-right: 4px;
+                `}
               />
-              <Modal
-                initialFocusRef={cancelVisualizationBtnRef}
-                finalFocusRef={cancelVisualizationBtnRef}
-                isOpen={state.isShowingExport}
-                onClose={closeExport}
-                trapFocus={false}
-              >
-                <ModalOverlay>
-                  <ModalContent
-                    css={css`
-                      max-width: 530px;
-                    `}
+              Help & Tutorials
+            </TopNavButton>
+
+            <Button colorScheme="accent">Upgrade</Button>
+          </TopNavWrapper>
+
+          <EditorLayout>
+            <LeftWrapper>
+              <LeftBottomWrapper>
+                <SideNavbar
+                  activeIndex={
+                    state.leftPanelContext === 'normal'
+                      ? leftPanelTabs.findIndex((s) => s === state.leftTab)
+                      : undefined
+                  }
+                >
+                  <LeftNavbarBtn
+                    onClick={() => {
+                      state.leftTab = 'shapes'
+                      state.leftPanelContext = 'normal'
+                    }}
+                    active={
+                      state.leftTab === 'shapes' &&
+                      state.leftPanelContext === 'normal'
+                    }
                   >
-                    <ModalHeader>Choose Download Format</ModalHeader>
-                    <ModalBody pb={6}>
-                      {isExporting ? (
-                        <>
-                          <Spinner />
-                        </>
-                      ) : (
-                        <>
-                          <Text fontSize="lg">
-                            <strong>Standard Download,</strong> for personal use
-                            only
-                          </Text>
-                          <Stack direction="row" spacing="3" flexWrap="wrap">
-                            <ExportButton
-                              variant="outline"
-                              boxShadow={
-                                selectedFormat === 'sd-png'
-                                  ? '0 0 0 3px rgb(237, 93, 98) !important'
-                                  : 'none'
-                              }
-                              onClick={() => setSelectedFormat('sd-png')}
-                            >
-                              <Text mt="0" fontSize="lg" fontWeight="bold">
-                                PNG
-                              </Text>
-                              <Text mb="0" fontSize="sm" fontWeight="normal">
-                                1024 px
-                              </Text>
-                              <Text mb="0" fontSize="sm" fontWeight="normal">
-                                Higher quality
-                              </Text>
-                            </ExportButton>
+                    <Shapes className="icon" />
+                    Shape
+                  </LeftNavbarBtn>
 
-                            <ExportButton
-                              variant="outline"
-                              boxShadow={
-                                selectedFormat === 'sd-jpeg'
-                                  ? '0 0 0 3px rgb(237, 93, 98) !important'
-                                  : 'none'
-                              }
-                              onClick={() => setSelectedFormat('sd-jpeg')}
-                            >
-                              <Text mt="0" fontSize="lg" fontWeight="bold">
-                                JPEG
-                              </Text>
-                              <Text mb="0" fontSize="sm" fontWeight="normal">
-                                1024 px
-                              </Text>
-                              <Text mb="0" fontSize="sm" fontWeight="normal">
-                                Smaller file size
-                              </Text>
-                            </ExportButton>
-                          </Stack>
+                  <LeftNavbarBtn
+                    onClick={() => {
+                      state.leftTab = 'words'
+                      state.leftPanelContext = 'normal'
+                    }}
+                    active={
+                      leftTab === 'words' && state.leftPanelContext === 'normal'
+                    }
+                  >
+                    <TextFields className="icon" />
+                    Words
+                  </LeftNavbarBtn>
 
-                          <Box mt="6">
+                  <LeftNavbarBtn
+                    onClick={() => {
+                      state.leftTab = 'fonts'
+                      state.leftPanelContext = 'normal'
+                    }}
+                    active={
+                      leftTab === 'fonts' && state.leftPanelContext === 'normal'
+                    }
+                  >
+                    <Font className="icon" />
+                    Fonts
+                  </LeftNavbarBtn>
+
+                  <LeftNavbarBtn
+                    onClick={() => {
+                      state.leftTab = 'symbols'
+                      state.leftPanelContext = 'normal'
+                    }}
+                    active={
+                      leftTab === 'symbols' &&
+                      state.leftPanelContext === 'normal'
+                    }
+                  >
+                    <SmileBeam className="icon" />
+                    Icons
+                  </LeftNavbarBtn>
+
+                  <LeftNavbarBtn
+                    onClick={() => {
+                      state.leftTab = 'layout'
+                      state.leftPanelContext = 'normal'
+                    }}
+                    active={
+                      leftTab === 'layout' &&
+                      state.leftPanelContext === 'normal'
+                    }
+                  >
+                    <LayoutMasonry className="icon" />
+                    Layout
+                  </LeftNavbarBtn>
+
+                  <LeftNavbarBtn
+                    onClick={() => {
+                      state.leftTab = 'colors'
+                      state.leftPanelContext = 'normal'
+                    }}
+                    active={
+                      leftTab === 'colors' &&
+                      state.leftPanelContext === 'normal'
+                    }
+                  >
+                    <ColorPalette className="icon" />
+                    Colors
+                  </LeftNavbarBtn>
+                </SideNavbar>
+
+                <LeftPanel>
+                  <LeftPanelContent
+                    id="left-panel-content"
+                    noScroll={leftTab === 'shapes'}
+                  >
+                    {store.lifecycleState === 'initialized' ? (
+                      <>
+                        {state.leftPanelContext === 'resize' && (
+                          <LeftPanelResizeTab>
+                            <Box>
+                              <Button
+                                mt="4"
+                                width="100%"
+                                colorScheme="accent"
+                                onClick={() => {
+                                  state.leftPanelContext = 'normal'
+                                }}
+                              >
+                                Done
+                              </Button>
+                            </Box>
+                          </LeftPanelResizeTab>
+                        )}
+
+                        {state.leftPanelContext === 'normal' && (
+                          <>
+                            {leftTab === 'shapes' && <LeftPanelShapesTab />}
+                            {leftTab === 'words' && (
+                              <>
+                                <LeftPanelWordsTab target={store.targetTab} />
+                              </>
+                            )}
+                            {leftTab === 'fonts' && (
+                              <>
+                                <LeftPanelFontsTab target={store.targetTab} />
+                              </>
+                            )}
+                            {leftTab === 'symbols' && (
+                              <LeftPanelIconsTab target={store.targetTab} />
+                            )}
+                            {leftTab === 'colors' && (
+                              <LeftPanelColorsTab target={store.targetTab} />
+                            )}
+
+                            {leftTab === 'layout' && (
+                              <LeftPanelLayoutTab target={store.targetTab} />
+                            )}
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <Box px="5" py="6">
+                        <Skeleton height="50px" my="10px" />
+                        <Skeleton height="30px" my="10px" />
+                        <Skeleton height="300px" my="10px" />
+                      </Box>
+                    )}
+                  </LeftPanelContent>
+                </LeftPanel>
+              </LeftBottomWrapper>
+            </LeftWrapper>
+
+            <RightWrapper>
+              <TopToolbar display="flex" alignItems="center" px="5">
+                <WarningModal
+                  header="Your design is empty"
+                  content="Please add some words or icons to your design and click Visualize first."
+                  isOpen={state.isShowingExportNoItemsWarning}
+                  onClose={() => {
+                    state.isShowingExportNoItemsWarning = false
+                  }}
+                />
+                <Modal
+                  initialFocusRef={cancelVisualizationBtnRef}
+                  finalFocusRef={cancelVisualizationBtnRef}
+                  isOpen={state.isShowingExport}
+                  onClose={closeExport}
+                  trapFocus={false}
+                >
+                  <ModalOverlay>
+                    <ModalContent
+                      css={css`
+                        max-width: 530px;
+                      `}
+                    >
+                      <ModalHeader>Choose Download Format</ModalHeader>
+                      <ModalBody pb={6}>
+                        {isExporting ? (
+                          <>
+                            <Spinner />
+                          </>
+                        ) : (
+                          <>
                             <Text fontSize="lg">
-                              <strong>HQ Download,</strong> personal or
-                              commercial use
+                              <strong>Standard Download,</strong> for personal
+                              use only
                             </Text>
                             <Stack direction="row" spacing="3" flexWrap="wrap">
                               <ExportButton
                                 variant="outline"
                                 boxShadow={
-                                  selectedFormat === 'hd-png'
+                                  selectedFormat === 'sd-png'
                                     ? '0 0 0 3px rgb(237, 93, 98) !important'
                                     : 'none'
                                 }
-                                onClick={() => setSelectedFormat('hd-png')}
+                                onClick={() => setSelectedFormat('sd-png')}
                               >
-                                <Text mt="0" fontSize="lg">
-                                  PNG (HD)
+                                <Text mt="0" fontSize="lg" fontWeight="bold">
+                                  PNG
                                 </Text>
-                                <Text mb="0" fontSize="sm">
-                                  4096 px
+                                <Text mb="0" fontSize="sm" fontWeight="normal">
+                                  1024 px
+                                </Text>
+                                <Text mb="0" fontSize="sm" fontWeight="normal">
+                                  Higher quality
                                 </Text>
                               </ExportButton>
 
                               <ExportButton
                                 variant="outline"
                                 boxShadow={
-                                  selectedFormat === 'hd-jpeg'
+                                  selectedFormat === 'sd-jpeg'
                                     ? '0 0 0 3px rgb(237, 93, 98) !important'
                                     : 'none'
                                 }
-                                onClick={() => setSelectedFormat('hd-jpeg')}
+                                onClick={() => setSelectedFormat('sd-jpeg')}
                               >
-                                <Text mt="0" fontSize="lg">
-                                  JPEG (HD)
+                                <Text mt="0" fontSize="lg" fontWeight="bold">
+                                  JPEG
                                 </Text>
-                                <Text mb="0" fontSize="sm">
-                                  4096 px
+                                <Text mb="0" fontSize="sm" fontWeight="normal">
+                                  1024 px
                                 </Text>
-                              </ExportButton>
-
-                              <ExportButton
-                                variant="outline"
-                                boxShadow={
-                                  selectedFormat === 'hd-svg'
-                                    ? '0 0 0 3px rgb(237, 93, 98) !important'
-                                    : 'none'
-                                }
-                                onClick={() => setSelectedFormat('hd-svg')}
-                              >
-                                <Text mt="0" fontSize="lg">
-                                  SVG
-                                </Text>
-                                <Text mb="0" fontSize="sm">
-                                  Vector format
+                                <Text mb="0" fontSize="sm" fontWeight="normal">
+                                  Smaller file size
                                 </Text>
                               </ExportButton>
                             </Stack>
-                          </Box>
-                        </>
-                      )}
-                    </ModalBody>
-                    <ModalFooter>
-                      <Button
-                        colorScheme="accent"
-                        leftIcon={<DownloadIcon />}
-                        onClick={handleDownloadClick}
-                      >
-                        Download
-                      </Button>
-                    </ModalFooter>
-                    <ModalCloseButton />
-                  </ModalContent>
-                </ModalOverlay>
-              </Modal>
 
-              <Modal
-                initialFocusRef={cancelVisualizationBtnRef}
-                finalFocusRef={cancelVisualizationBtnRef}
-                isOpen={store.isVisualizing}
-                onClose={cancelVisualization}
-                closeOnOverlayClick={false}
-                closeOnEsc={false}
-              >
-                <ModalOverlay>
-                  <ModalContent>
-                    <ModalHeader>
-                      {store.visualizingStep === 'generating'
-                        ? 'Generating'
-                        : 'Visualizing'}
-                      : {Math.round(100 * (store.visualizingProgress || 0))}%
-                    </ModalHeader>
-                    <ModalBody pb={6}>
-                      <Stack>
-                        <Progress
-                          isAnimated
-                          hasStripe
-                          css={css`
-                            &,
-                            * {
-                              transition: all 0.2s !important;
-                            }
-                          `}
-                          color="accent"
-                          height="32px"
-                          value={(store.visualizingProgress || 0) * 100}
-                        />
-                        <Text fontSize="lg"></Text>
-                      </Stack>
-                    </ModalBody>
-
-                    <ModalFooter>
-                      <Button
-                        ref={cancelVisualizationBtnRef}
-                        onClick={cancelVisualization}
-                      >
-                        Cancel
-                      </Button>
-                    </ModalFooter>
-                  </ModalContent>
-                </ModalOverlay>
-              </Modal>
-
-              {store.lifecycleState === 'initialized' && (
-                <>
-                  <Button
-                    id="btn-visualize"
-                    css={css`
-                      width: 128px;
-                    `}
-                    colorScheme="accent"
-                    isLoading={store.isVisualizing}
-                    onClick={handleVisualizeClick}
-                  >
-                    <MagicWand
-                      size={24}
-                      css={css`
-                        margin-right: 4px;
-                      `}
-                    />
-                    Visualize
-                  </Button>
-
-                  <Tooltip
-                    label="Undo"
-                    aria-label="Undo"
-                    hasArrow
-                    zIndex={5}
-                    isDisabled={!store.editor?.canUndo}
-                  >
-                    <IconButton
-                      isLoading={store.editor?.isUndoing}
-                      ml="3"
-                      icon={<ArrowBackIcon />}
-                      aria-label="Undo"
-                      variant="outline"
-                      isDisabled={!store.editor?.canUndo}
-                      onClick={store.editor?.undo}
-                    />
-                  </Tooltip>
-                  <Tooltip
-                    label="Redo"
-                    aria-label="Redo"
-                    hasArrow
-                    zIndex={5}
-                    isDisabled={!store.editor?.canRedo}
-                  >
-                    <IconButton
-                      ml="1"
-                      isLoading={store.editor?.isRedoing}
-                      icon={<ArrowForwardIcon />}
-                      aria-label="Redo"
-                      variant="outline"
-                      isDisabled={!store.editor?.canRedo}
-                      onClick={store.editor?.redo}
-                    />
-                  </Tooltip>
-
-                  <Box mr="3" ml="auto">
-                    {store.mode === 'view' && hasItems && (
-                      <>
-                        <Menu isLazy>
-                          <MenuButton
-                            mr="2"
-                            as={MenuDotsButton}
-                            variant="ghost"
-                          />
-
-                          <Portal>
-                            <MenuTransition>
-                              {(styles) => (
-                                // @ts-ignore
-                                <MenuList css={styles}>
-                                  <MenuItem
-                                    onClick={() => {
-                                      store.editor?.clearItems('shape', true)
-                                    }}
-                                    isDisabled={!hasShapeItems}
-                                  >
-                                    <SmallCloseIcon color="gray.500" mr="2" />
-                                    Delete all Shape items
-                                  </MenuItem>
-
-                                  <MenuItem
-                                    onClick={() => {
-                                      store.editor?.clearItems('bg', true)
-                                    }}
-                                    isDisabled={!hasBgItems}
-                                  >
-                                    <SmallCloseIcon color="gray.500" mr="2" />
-                                    Delete all Background items
-                                  </MenuItem>
-                                </MenuList>
-                              )}
-                            </MenuTransition>
-                          </Portal>
-                        </Menu>
-
-                        <Button
-                          variant="outline"
-                          py="1"
-                          onClick={() => {
-                            store.enterEditItemsMode()
-                          }}
-                        >
-                          Edit Items
-                        </Button>
-                      </>
-                    )}
-
-                    {store.mode === 'edit' && (
-                      <>
-                        <Button
-                          mr="2"
-                          isDisabled={!store.hasItemChanges}
-                          variant="ghost"
-                          onClick={() => store.resetAllItems()}
-                        >
-                          Reset All
-                        </Button>
-
-                        {store.selectedItemData && (
-                          <>
-                            <ColorPickerPopover
-                              value={
-                                store.selectedItemData.customColor ||
-                                store.selectedItemData.color
-                              }
-                              onAfterChange={(color) => {
-                                store.setItemCustomColor(color)
-                              }}
-                            >
-                              <Button
-                                onClick={() => {
-                                  store.resetItemCustomColor()
-                                }}
+                            <Box mt="6">
+                              <Text fontSize="lg">
+                                <strong>HQ Download,</strong> personal or
+                                commercial use
+                              </Text>
+                              <Stack
+                                direction="row"
+                                spacing="3"
+                                flexWrap="wrap"
                               >
-                                Reset Default Color
-                              </Button>
-                            </ColorPickerPopover>
+                                <ExportButton
+                                  variant="outline"
+                                  boxShadow={
+                                    selectedFormat === 'hd-png'
+                                      ? '0 0 0 3px rgb(237, 93, 98) !important'
+                                      : 'none'
+                                  }
+                                  onClick={() => setSelectedFormat('hd-png')}
+                                >
+                                  <Text mt="0" fontSize="lg">
+                                    PNG (HD)
+                                  </Text>
+                                  <Text mb="0" fontSize="sm">
+                                    4096 px
+                                  </Text>
+                                </ExportButton>
 
-                            <Button
-                              ml="2"
-                              onClick={() => {
-                                if (!store.selectedItemData) {
-                                  return
-                                }
-                                store.setItemLock(
-                                  !Boolean(store.selectedItemData.locked)
-                                )
-                              }}
-                              css={css`
-                                width: 84px;
-                              `}
-                            >
-                              {store.selectedItemData.locked
-                                ? 'Unlock'
-                                : 'Lock'}
-                            </Button>
+                                <ExportButton
+                                  variant="outline"
+                                  boxShadow={
+                                    selectedFormat === 'hd-jpeg'
+                                      ? '0 0 0 3px rgb(237, 93, 98) !important'
+                                      : 'none'
+                                  }
+                                  onClick={() => setSelectedFormat('hd-jpeg')}
+                                >
+                                  <Text mt="0" fontSize="lg">
+                                    JPEG (HD)
+                                  </Text>
+                                  <Text mb="0" fontSize="sm">
+                                    4096 px
+                                  </Text>
+                                </ExportButton>
+
+                                <ExportButton
+                                  variant="outline"
+                                  boxShadow={
+                                    selectedFormat === 'hd-svg'
+                                      ? '0 0 0 3px rgb(237, 93, 98) !important'
+                                      : 'none'
+                                  }
+                                  onClick={() => setSelectedFormat('hd-svg')}
+                                >
+                                  <Text mt="0" fontSize="lg">
+                                    SVG
+                                  </Text>
+                                  <Text mb="0" fontSize="sm">
+                                    Vector format
+                                  </Text>
+                                </ExportButton>
+                              </Stack>
+                            </Box>
                           </>
                         )}
-
+                      </ModalBody>
+                      <ModalFooter>
                         <Button
-                          ml="2"
-                          py="1"
-                          colorScheme="green"
-                          onClick={() => {
-                            store.enterViewMode()
-                          }}
+                          colorScheme="accent"
+                          leftIcon={<DownloadIcon />}
+                          onClick={handleDownloadClick}
                         >
-                          Done
+                          Download
                         </Button>
-                      </>
-                    )}
-                  </Box>
-                </>
-              )}
+                      </ModalFooter>
+                      <ModalCloseButton />
+                    </ModalContent>
+                  </ModalOverlay>
+                </Modal>
 
-              {store.lifecycleState !== 'initialized' && (
-                <>
-                  <Skeleton height="30px" width="100px" mr="20px" />
-                  <Skeleton height="30px" width="300px" mr="20px" />
-                </>
-              )}
-            </TopToolbar>
-
-            <CanvasWrappper ref={canvasWrapperRef}>
-              <CanvasContainer>
-                <Canvas
-                  width={canvasSize.w}
-                  height={canvasSize.h}
-                  ref={bgCanvasRef}
-                  id="bg"
-                />
-                <Canvas
-                  width={canvasSize.w}
-                  height={canvasSize.h}
-                  ref={canvasRef}
-                  id="scene"
-                />
-              </CanvasContainer>
-              {store.lifecycleState !== 'initialized' && (
-                <Box
-                  position="absolute"
-                  width="100%"
-                  height="100%"
-                  display="flex"
-                  flexDir="column"
-                  alignItems="center"
-                  justifyContent="center"
+                <Modal
+                  initialFocusRef={cancelVisualizationBtnRef}
+                  finalFocusRef={cancelVisualizationBtnRef}
+                  isOpen={store.isVisualizing}
+                  onClose={cancelVisualization}
+                  closeOnOverlayClick={false}
+                  closeOnEsc={false}
                 >
-                  <Spinner />
-                  <Text mt="4" fontSize="lg">
-                    Initializing...
-                  </Text>
+                  <ModalOverlay>
+                    <ModalContent>
+                      <ModalHeader>
+                        {store.visualizingStep === 'generating'
+                          ? 'Generating'
+                          : 'Visualizing'}
+                        : {Math.round(100 * (store.visualizingProgress || 0))}%
+                      </ModalHeader>
+                      <ModalBody pb={6}>
+                        <Stack>
+                          <Progress
+                            isAnimated
+                            hasStripe
+                            css={css`
+                              &,
+                              * {
+                                transition: all 0.2s !important;
+                              }
+                            `}
+                            color="accent"
+                            height="32px"
+                            value={(store.visualizingProgress || 0) * 100}
+                          />
+                          <Text fontSize="lg"></Text>
+                        </Stack>
+                      </ModalBody>
+
+                      <ModalFooter>
+                        <Button
+                          ref={cancelVisualizationBtnRef}
+                          onClick={cancelVisualization}
+                        >
+                          Cancel
+                        </Button>
+                      </ModalFooter>
+                    </ModalContent>
+                  </ModalOverlay>
+                </Modal>
+
+                {store.lifecycleState === 'initialized' && (
+                  <>
+                    <Button
+                      id="btn-visualize"
+                      css={css`
+                        width: 128px;
+                      `}
+                      colorScheme="accent"
+                      isLoading={store.isVisualizing}
+                      onClick={handleVisualizeClick}
+                    >
+                      <MagicWand
+                        size={24}
+                        css={css`
+                          margin-right: 4px;
+                        `}
+                      />
+                      Visualize
+                    </Button>
+
+                    <Tooltip
+                      label="Undo"
+                      aria-label="Undo"
+                      hasArrow
+                      zIndex={5}
+                      isDisabled={!store.editor?.canUndo}
+                    >
+                      <IconButton
+                        isLoading={store.editor?.isUndoing}
+                        ml="3"
+                        icon={<ArrowBackIcon />}
+                        aria-label="Undo"
+                        variant="outline"
+                        isDisabled={!store.editor?.canUndo}
+                        onClick={store.editor?.undo}
+                      />
+                    </Tooltip>
+                    <Tooltip
+                      label="Redo"
+                      aria-label="Redo"
+                      hasArrow
+                      zIndex={5}
+                      isDisabled={!store.editor?.canRedo}
+                    >
+                      <IconButton
+                        ml="1"
+                        isLoading={store.editor?.isRedoing}
+                        icon={<ArrowForwardIcon />}
+                        aria-label="Redo"
+                        variant="outline"
+                        isDisabled={!store.editor?.canRedo}
+                        onClick={store.editor?.redo}
+                      />
+                    </Tooltip>
+
+                    <Box mr="3" ml="auto">
+                      {store.mode === 'view' && hasItems && (
+                        <>
+                          <Menu isLazy>
+                            <MenuButton
+                              mr="2"
+                              as={MenuDotsButton}
+                              variant="ghost"
+                            />
+
+                            <Portal>
+                              <MenuTransition>
+                                {(styles) => (
+                                  // @ts-ignore
+                                  <MenuList css={styles}>
+                                    <MenuItem
+                                      onClick={() => {
+                                        store.editor?.clearItems('shape', true)
+                                      }}
+                                      isDisabled={!hasShapeItems}
+                                    >
+                                      <SmallCloseIcon color="gray.500" mr="2" />
+                                      Delete all Shape items
+                                    </MenuItem>
+
+                                    <MenuItem
+                                      onClick={() => {
+                                        store.editor?.clearItems('bg', true)
+                                      }}
+                                      isDisabled={!hasBgItems}
+                                    >
+                                      <SmallCloseIcon color="gray.500" mr="2" />
+                                      Delete all Background items
+                                    </MenuItem>
+                                  </MenuList>
+                                )}
+                              </MenuTransition>
+                            </Portal>
+                          </Menu>
+
+                          <Button
+                            variant="outline"
+                            py="1"
+                            onClick={() => {
+                              store.enterEditItemsMode()
+                            }}
+                          >
+                            Edit Items
+                          </Button>
+                        </>
+                      )}
+
+                      {store.mode === 'edit' && (
+                        <>
+                          <Button
+                            mr="2"
+                            isDisabled={!store.hasItemChanges}
+                            variant="ghost"
+                            onClick={() => store.resetAllItems()}
+                          >
+                            Reset All
+                          </Button>
+
+                          {store.selectedItemData && (
+                            <>
+                              <ColorPickerPopover
+                                value={
+                                  store.selectedItemData.customColor ||
+                                  store.selectedItemData.color
+                                }
+                                onAfterChange={(color) => {
+                                  store.setItemCustomColor(color)
+                                }}
+                              >
+                                <Button
+                                  onClick={() => {
+                                    store.resetItemCustomColor()
+                                  }}
+                                >
+                                  Reset Default Color
+                                </Button>
+                              </ColorPickerPopover>
+
+                              <Button
+                                ml="2"
+                                onClick={() => {
+                                  if (!store.selectedItemData) {
+                                    return
+                                  }
+                                  store.setItemLock(
+                                    !Boolean(store.selectedItemData.locked)
+                                  )
+                                }}
+                                css={css`
+                                  width: 84px;
+                                `}
+                              >
+                                {store.selectedItemData.locked
+                                  ? 'Unlock'
+                                  : 'Lock'}
+                              </Button>
+                            </>
+                          )}
+
+                          <Button
+                            ml="2"
+                            py="1"
+                            colorScheme="green"
+                            onClick={() => {
+                              store.enterViewMode()
+                            }}
+                          >
+                            Done
+                          </Button>
+                        </>
+                      )}
+                    </Box>
+                  </>
+                )}
+
+                {store.lifecycleState !== 'initialized' && (
+                  <>
+                    <Skeleton height="30px" width="100px" mr="20px" />
+                    <Skeleton height="30px" width="300px" mr="20px" />
+                  </>
+                )}
+              </TopToolbar>
+
+              <CanvasWrappper ref={canvasWrapperRef}>
+                <CanvasContainer>
+                  <Canvas
+                    width={canvasSize.w}
+                    height={canvasSize.h}
+                    ref={bgCanvasRef}
+                    id="bg"
+                  />
+                  <Canvas
+                    width={canvasSize.w}
+                    height={canvasSize.h}
+                    ref={canvasRef}
+                    id="scene"
+                  />
+                </CanvasContainer>
+                {store.lifecycleState !== 'initialized' && (
+                  <Box
+                    position="absolute"
+                    width="100%"
+                    height="100%"
+                    display="flex"
+                    flexDir="column"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Spinner />
+                    <Text mt="4" fontSize="lg">
+                      Initializing...
+                    </Text>
+                  </Box>
+                )}
+              </CanvasWrappper>
+            </RightWrapper>
+          </EditorLayout>
+
+          <WarningModal
+            isOpen={isShowingEmptyIconsWarning}
+            onClose={() => {
+              setIsShowingEmptyIconsWarning(false)
+            }}
+            header="There is no items to visualize"
+            content="Please add some words or icons to your design before visualizing."
+          />
+
+          <WarningModal
+            isOpen={store.langCheckErrors != null}
+            onClose={() => {
+              store.langCheckErrors = null
+            }}
+            header="Please choose different fonts"
+            children={
+              <>
+                <p>Selected fonts don't support symbols used in these words:</p>
+                <Box mb="4">
+                  {(store.langCheckErrors ?? []).slice(10).map((e, index) => (
+                    <Box key={index}>{e.word}</Box>
+                  ))}
                 </Box>
-              )}
-            </CanvasWrappper>
-          </RightWrapper>
-        </EditorLayout>
+                <p>
+                  <strong>
+                    Please choose other fonts that support these languages.
+                  </strong>
+                </p>
+                <p>
+                  You can easily find fonts for your language using the
+                  "Language" filter in the font selector window.
+                </p>
+              </>
+            }
+          />
 
-        <WarningModal
-          isOpen={isShowingEmptyIconsWarning}
-          onClose={() => {
-            setIsShowingEmptyIconsWarning(false)
-          }}
-          header="There is no items to visualize"
-          content="Please add some words or icons to your design before visualizing."
-        />
-
-        <WarningModal
-          isOpen={store.langCheckErrors != null}
-          onClose={() => {
-            store.langCheckErrors = null
-          }}
-          header="Please choose different fonts"
-          children={
-            <>
-              <p>Selected fonts don't support symbols used in these words:</p>
-              <Box mb="4">
-                {(store.langCheckErrors ?? []).slice(10).map((e, index) => (
-                  <Box key={index}>{e.word}</Box>
-                ))}
-              </Box>
-              <p>
-                <strong>
-                  Please choose other fonts that support these languages.
-                </strong>
-              </p>
-              <p>
-                You can easily find fonts for your language using the "Language"
-                filter in the font selector window.
-              </p>
-            </>
-          }
-        />
-
-        <ConfirmModalWithRecaptcha
-          isOpen={isShowingSignupModal}
-          onCancel={() => setIsShowingSignupModal(false)}
-          onSubmit={saveAnonymously}
-          title="Please sign up to save your work"
-          submitText="Sign up and save"
-        >
-          TODO
-        </ConfirmModalWithRecaptcha>
-      </PageLayoutWrapper>
+          <ConfirmModalWithRecaptcha
+            isOpen={isShowingSignupModal}
+            onCancel={() => setIsShowingSignupModal(false)}
+            onSubmit={saveAnonymously}
+            title="Please sign up to save your work"
+            submitText="Sign up and save"
+          >
+            TODO
+          </ConfirmModalWithRecaptcha>
+        </PageLayoutWrapper>
+      </EditorStoreContext.Provider>
     )
   }
 )

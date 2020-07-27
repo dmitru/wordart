@@ -14,6 +14,7 @@ import { ChevronDownIcon } from '@chakra-ui/icons'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { useStore } from 'services/root-store'
 import { BsLayersHalf } from 'react-icons/bs'
+import { useEditorStore } from 'components/Editor/editor-store'
 
 export const LeftPanelTargetLayerDropdown = () => (
   <Box
@@ -29,7 +30,7 @@ export const LeftPanelTargetLayerDropdown = () => (
 )
 
 export const TargetLayerDropdown = observer(() => {
-  const { editorPageStore: store } = useStore()
+  const store = useEditorStore()!
 
   return (
     <Menu isLazy placement="bottom-start">
