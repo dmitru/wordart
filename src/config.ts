@@ -14,6 +14,7 @@ export const config = {
   contactEmail: 'contact@wordcloudy.com',
 
   sentry: {
+    enabled: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
     environment: 'dev',
   },
