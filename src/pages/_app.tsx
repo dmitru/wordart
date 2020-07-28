@@ -15,13 +15,14 @@ const emotionCache = createCache({
 
 export default class MyApp extends App {
   render() {
-    const { Component, pageProps } = this.props
+    // @ts-ignore
+    const { Component, pageProps, err } = this.props
     return (
       <CacheProvider value={emotionCache}>
         <ChakraProvider theme={theme}>
           <CSSReset />
           {globalStyles}
-          <Component {...pageProps} />
+          <Component {...pageProps} err={err} />
         </ChakraProvider>
       </CacheProvider>
     )

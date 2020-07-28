@@ -4,7 +4,6 @@ import {
   Editable,
   EditableInput,
   EditablePreview,
-  Heading,
   IconButton,
   Menu,
   MenuButton,
@@ -19,11 +18,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
   Portal,
   Progress,
   Skeleton,
@@ -39,6 +33,7 @@ import {
 } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
 import styled from '@emotion/styled'
+import * as Sentry from '@sentry/react'
 import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
 import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
 import { Shapes } from '@styled-icons/fa-solid/Shapes'
@@ -50,17 +45,16 @@ import { LeftPanelColorsTab } from 'components/Editor/components/LeftPanelColors
 import { LeftPanelFontsTab } from 'components/Editor/components/LeftPanelFontsTab'
 import { LeftPanelIconsTab } from 'components/Editor/components/LeftPanelIconsTab'
 import { LeftPanelLayoutTab } from 'components/Editor/components/LeftPanelLayoutTab'
-import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTab'
 import { LeftPanelResizeTab } from 'components/Editor/components/LeftPanelResizeTab'
+import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTab'
 import { LeftPanelShapesTab } from 'components/Editor/components/ShapesTab/LeftPanelShapesTab'
 import { Spinner } from 'components/Editor/components/Spinner'
 import { WarningModal } from 'components/Editor/components/WarningModal'
 import {
-  EditorStoreInitParams,
-  pageSizePresets,
-  useEditorStore,
   EditorStore,
   EditorStoreContext,
+  EditorStoreInitParams,
+  pageSizePresets,
 } from 'components/Editor/editor-store'
 import {
   mkBgStyleConfFromOptions,
@@ -73,8 +67,12 @@ import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 import { Tooltip } from 'components/shared/Tooltip'
 import { TopNavButton } from 'components/shared/TopNavButton'
+import {
+  UpgradeModalContainer,
+  useUpgradeModal,
+} from 'components/upgrade/UpgradeModal'
 import { saveAs } from 'file-saver'
-import { Dimensions, canvasToDataUri } from 'lib/wordart/canvas-utils'
+import { canvasToDataUri, Dimensions } from 'lib/wordart/canvas-utils'
 import 'lib/wordart/console-extensions'
 import { observer, useLocalStore } from 'mobx-react'
 import { useRouter } from 'next/dist/client/router'
@@ -104,11 +102,6 @@ import 'utils/canvas-to-blob'
 import { getTabTitle } from 'utils/tab-title'
 import { useWarnIfUnsavedChanges } from 'utils/use-warn-if-unsaved-changes'
 import { uuid } from 'utils/uuid'
-import { SectionLabel } from './shared'
-import {
-  UpgradeModalContainer,
-  useUpgradeModal,
-} from 'components/upgrade/UpgradeModal'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -139,6 +132,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const { isSaving } = store
 
     const isNew = props.wordcloudId == null
+
+    useEffect(() => {
+      Sentry.configureScope((scope) => {
+        scope.setTag('wordcloud_id', props.wordcloudId || 'unsaved')
+      })
+    }, [props.wordcloudId])
 
     const { authStore } = useStore()
     const { profile } = authStore

@@ -3,7 +3,7 @@ import { configure } from 'mobx'
 import 'mobx-react-lite/batchingForReactDom'
 import { AuthStore } from 'services/auth-store'
 import { WordcloudsStore } from 'services/wordclouds-store'
-import { EditorStore } from 'components/Editor/editor-store'
+import * as Sentry from '@sentry/react'
 
 configure({})
 
@@ -19,6 +19,14 @@ export class RootStore {
       await this.wordcloudsStore.restoreAnonymousIfNeeded()
       this.wordcloudsStore.fetchWordclouds()
       this.wordcloudsStore.fetchFolders()
+
+      Sentry.configureScope((scope) => {
+        if (this.authStore.profile) {
+          scope.setUser({
+            email: this.authStore.profile.email,
+          })
+        }
+      })
     }
     this.authStore.initUsingSavedLocalAuthToken()
   }

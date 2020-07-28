@@ -1,11 +1,21 @@
+import packageJson from '../package.json'
+
 export const config = {
+  isDevEnv: process.env.NODE_ENV === 'development',
+
+  release: {
+    version: packageJson.version,
+    hash: process.env.REACT_APP_COMMIT_SHA || 'missing-app-hash',
+  },
+
+  noIndex: process.env.REACT_APP_DISABLE_NO_INDEX !== 'true',
+
   supportEmail: 'support@wordcloudy.com',
   contactEmail: 'contact@wordcloudy.com',
 
-  airbrake: {
-    host: 'http://blog.wordcloudy.com:8080',
-    projectId: 1,
-    projectKey: 'd906bdbe58241819ddac9b5e99738180',
+  sentry: {
+    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    environment: 'dev',
   },
 
   paddle: {
