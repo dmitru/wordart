@@ -2,6 +2,12 @@ export const config = {
   supportEmail: 'support@wordcloudy.com',
   contactEmail: 'contact@wordcloudy.com',
 
+  airbrake: {
+    host: 'http://blog.wordcloudy.com:8080',
+    projectId: 1,
+    projectKey: 'd906bdbe58241819ddac9b5e99738180',
+  },
+
   paddle: {
     vendorId: 597590,
   },

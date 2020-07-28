@@ -27,6 +27,7 @@
   },
   "homepage": "https://gitlab.com/dmitriy.borodiy/online-tuner#readme",
   "dependencies": {
+    "@airbrake/browser": "^1.4.0",
     "@chakra-ui/core": "^1.0.0-rc.0",
     "@chakra-ui/icons": "^1.0.0-rc.0",
     "@chakra-ui/theme": "^1.0.0-rc.0",
