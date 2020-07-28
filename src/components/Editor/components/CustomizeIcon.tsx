@@ -120,7 +120,7 @@ export const CustomizeIconPopover: React.FC<CustomizeIconPopoverProps> = observe
                     <NumberInput
                       size="sm"
                       maxWidth="70px"
-                      value={icon.repeats}
+                      value={state.value.customRepeat}
                       min={1}
                       max={50}
                       step={1}

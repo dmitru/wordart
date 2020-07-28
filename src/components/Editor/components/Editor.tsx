@@ -130,7 +130,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const upgradeModal = useUpgradeModal()
     const toast = useToast()
-    const aspectRatio = 4 / 3
+    const aspectRatio = pageSizePresets[0].aspect
     const [canvasSize] = useState<Dimensions>({ w: 900 * aspectRatio, h: 900 })
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const bgCanvasRef = useRef<HTMLCanvasElement>(null)
@@ -204,7 +204,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           isClosable: true,
         })
 
-      if (!store.hasUnsavedChanges) {
+      if (!store.hasUnsavedChanges && !isNew) {
         showSaveToast()
         return
       }

@@ -19,7 +19,6 @@ import { SectionLabel } from './shared'
 export const LeftPanelResizeTab: React.FC<{
   children: React.ReactNode
 }> = observer(({ children }) => {
-  const { wordcloudsStore } = useStore()
   const store = useEditorStore()!
 
   return (

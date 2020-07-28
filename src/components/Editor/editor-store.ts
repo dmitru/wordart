@@ -125,7 +125,7 @@ export class EditorStore {
 
   @observable pageSize: PageSize = {
     kind: 'preset',
-    preset: pageSizePresets[1],
+    preset: pageSizePresets[0],
     custom: {
       width: 16,
       height: 9,
@@ -423,6 +423,23 @@ export class EditorStore {
       serialized.data.sceneSize.w / serialized.data.sceneSize.h,
       false
     )
+
+    const matchingPageSizePreset = pageSizePresets.find(
+      (p) =>
+        Math.abs(
+          p.aspect - serialized.data.sceneSize.w / serialized.data.sceneSize.h
+        ) /
+          p.aspect <
+        1e-1
+    )
+    if (matchingPageSizePreset) {
+      this.pageSize.kind = 'preset'
+      this.pageSize.preset = matchingPageSizePreset
+    } else {
+      this.pageSize.kind = 'custom'
+      this.pageSize.custom.width = serialized.data.sceneSize.w
+      this.pageSize.custom.height = serialized.data.sceneSize.h
+    }
 
     for (const font of serialized.data.customFonts) {
       await this.addCustomFont(font)
@@ -1059,8 +1076,8 @@ export class EditorStore {
             }))
         ),
         sceneSize: {
-          w: roundFloat(this.editor.getSceneBounds(0).width, 3),
-          h: roundFloat(this.editor.getSceneBounds(0).height, 3),
+          w: Math.round(this.editor.getSceneBounds(0).width),
+          h: Math.round(this.editor.getSceneBounds(0).height),
         },
         shapeStyle: {
           opacity: this.styleOptions.shape.opacity,

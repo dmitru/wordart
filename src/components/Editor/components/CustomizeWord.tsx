@@ -148,7 +148,7 @@ export const CustomizeWordPopover: React.FC<CustomizeWordPopoverProps> = observe
                     <NumberInput
                       size="sm"
                       maxWidth="70px"
-                      value={word.repeats}
+                      value={state.value.customRepeat}
                       min={1}
                       max={50}
                       step={1}
