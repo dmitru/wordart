@@ -24,7 +24,7 @@ export const useToasts = () => {
       toasts({
         ...commonParams,
         status: 'success',
-        // ...params,
+        ...params,
       }),
     showError: (params: UseToastOptions) =>
       toasts({
