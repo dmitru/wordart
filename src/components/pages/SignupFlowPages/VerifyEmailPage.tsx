@@ -1,20 +1,18 @@
-import { Box, Text, Button, Spinner } from '@chakra-ui/core'
+import { Box, Button, Spinner, Text } from '@chakra-ui/core'
 import { css } from '@emotion/core'
-import { useRouter } from 'next/dist/client/router'
 import { SiteFormLayout } from 'components/layouts/SiteLayout/SiteFormLayout'
 import { observer } from 'mobx-react'
-import React, { useEffect, useState } from 'react'
-import { Urls } from 'urls'
 import Link from 'next/link'
-import { useStore } from 'services/root-store'
-import { FaChevronRight } from 'react-icons/fa'
 import qs from 'query-string'
+import React, { useEffect, useState } from 'react'
+import { FaChevronRight } from 'react-icons/fa'
+import { useStore } from 'services/root-store'
+import { Urls } from 'urls'
 
 export const VerifyEmailPage = observer(() => {
   const [status, setStatus] = useState('verifying')
 
   const { authStore } = useStore()
-  const router = useRouter()
 
   useEffect(() => {
     const verify = async () => {
