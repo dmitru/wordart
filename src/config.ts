@@ -5,10 +5,10 @@ export const config = {
 
   release: {
     version: packageJson.version,
-    hash: process.env.REACT_APP_COMMIT_SHA || 'missing-app-hash',
+    hash: process.env.NEXT_PUBLIC_COMMIT_SHA || 'missing-app-hash',
   },
 
-  noIndex: process.env.REACT_APP_DISABLE_NO_INDEX !== 'true',
+  noIndex: process.env.NEXT_PUBLIC_DISABLE_NO_INDEX !== 'true',
 
   supportEmail: 'support@wordcloudy.com',
   contactEmail: 'contact@wordcloudy.com',
@@ -17,6 +17,11 @@ export const config = {
     enabled: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
     environment: 'dev',
+  },
+
+  ga: {
+    enabled: !!process.env.NEXT_PUBLIC_GA_TRACKING_CODE,
+    trackingCode: process.env.NEXT_PUBLIC_GA_TRACKING_CODE,
   },
 
   paddle: {

@@ -11,6 +11,7 @@ import { PricingPlans } from 'components/pages/PricingPage/PricingPlans'
 import { observable, runInAction } from 'mobx'
 import { observer } from 'mobx-react'
 import Link from 'next/link'
+import { analytics, StructuredEvents } from 'services/analytics'
 import { Urls } from 'urls'
 
 export type UpgradeModalVariant =
@@ -23,7 +24,7 @@ export type UpgradeModalVariant =
 
 const getTitle = (variant: UpgradeModalVariant) => {
   if (variant === 'hq-download') {
-    return 'Upgrade to download images for commercial use in high quality, use custom images and fonts and more!'
+    return 'Upgrade to download images for commercial use in high quality, unlock custom images, fonts and more!'
   }
   if (variant === 'folder-limits') {
     return `You've reached a limit on number of folders you can create in your account. Upgrade now to create more folders, download images for commercial use in high quality, use custom images and fonts and more!`
@@ -62,10 +63,10 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = observer(
             <ModalBody>
               <Text
                 textAlign="center"
-                mt="1.5rem"
-                mb="0"
                 fontWeight="normal"
-                fontSize="lg"
+                fontSize="xl"
+                margin="1.5rem auto 0"
+                maxWidth="600px"
               >
                 {getTitle(variant)}
               </Text>
@@ -108,6 +109,7 @@ export const UpgradeModalContainer = observer(() => {
 export const useUpgradeModal = () => {
   return {
     show: (variant: UpgradeModalVariant) => {
+      analytics.trackStructured(StructuredEvents.mkShowUpgradeWindow(variant))
       runInAction(() => {
         state.variant = variant
         state.isOpen = true

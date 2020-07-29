@@ -1,9 +1,11 @@
-import React, { useContext } from 'react'
+import * as Sentry from '@sentry/react'
 import { configure } from 'mobx'
 import 'mobx-react-lite/batchingForReactDom'
+import React, { useContext } from 'react'
 import { AuthStore } from 'services/auth-store'
 import { WordcloudsStore } from 'services/wordclouds-store'
-import * as Sentry from '@sentry/react'
+import { analytics } from './analytics'
+import { CustomMetricIndices } from './analytics/events'
 
 configure({})
 
@@ -14,8 +16,20 @@ export class RootStore {
   constructor() {
     this.authStore = new AuthStore(this)
     this.wordcloudsStore = new WordcloudsStore(this)
+    this.init()
+  }
+
+  private init = async () => {
+    if (typeof window !== 'undefined') {
+      analytics.setMetric(CustomMetricIndices.screenWidth, window.innerWidth)
+      analytics.setMetric(CustomMetricIndices.screenHeight, window.innerHeight)
+    }
 
     this.authStore.afterLogin = async () => {
+      if (this.authStore.profile) {
+        analytics.setUserId(this.authStore.profile.id)
+      }
+
       await this.wordcloudsStore.restoreAnonymousIfNeeded()
       this.wordcloudsStore.fetchWordclouds()
       this.wordcloudsStore.fetchFolders()
@@ -28,7 +42,9 @@ export class RootStore {
         }
       })
     }
-    this.authStore.initUsingSavedLocalAuthToken()
+    await this.authStore.initUsingSavedLocalAuthToken()
+
+    analytics.trackPageView()
   }
 }
 

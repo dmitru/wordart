@@ -1,19 +1,18 @@
-import Document, {
-  DocumentContext,
-  Head,
-  Main,
-  NextScript,
-} from 'next/document'
-import { extractCritical } from 'emotion-server'
-import 'lib/wordart/console-extensions'
-import { getTabTitle } from 'utils/tab-title'
+import { config } from 'config'
+import Document, { Head, Main, NextScript } from 'next/document'
 
 export default class MyDocument extends Document {
-  // static async getInitialProps(ctx: DocumentContext) {
-  //   const page = await ctx.renderPage()
-  //   const styles = extractCritical(page.html)
-  //   return { ...page, ...styles }
-  // }
+  getGoogleAnalyticsTags() {
+    return {
+      __html: `
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+      
+        gtag('config', '${config.ga.trackingCode}');
+      `,
+    }
+  }
 
   render() {
     return (
@@ -21,16 +20,21 @@ export default class MyDocument extends Document {
         <Head>
           <link rel="shortcut icon" href="/favicon.svg" />
           <script src="https://cdn.paddle.com/paddle/paddle.js"></script>
-          <style
-          // @ts-ignore
-          // data-emotion-css={this.props.ids.join(' ')}
-          // @ts-ignore
-          // dangerouslySetInnerHTML={{ __html: this.props.css }}
-          />
         </Head>
         <body>
           <Main />
           <NextScript />
+
+          {config.ga.enabled && (
+            <>
+              <script
+                async
+                src={`https://www.googletagmanager.com/gtag/js?id=${config.ga.trackingCode}`}
+              />
+              {/* We call the function above to inject the contents of the script tag */}
+              <script dangerouslySetInnerHTML={this.getGoogleAnalyticsTags()} />
+            </>
+          )}
         </body>
       </html>
     )

@@ -1,15 +1,16 @@
-import 'mobx-react-lite/batchingForReactDom'
-import { RootStore } from 'services/root-store'
-import { Api } from 'services/api/api'
-import { observable, computed, runInAction, action } from 'mobx'
-import { MyProfile } from 'services/api/types'
-import { AuthTokenStore } from 'services/auth-token-store'
-import jsonp from 'jsonp'
-import { plans, LocalizedPrice } from 'plans'
-import { config } from 'config'
 import { BroadcastChannel } from 'broadcast-channel'
 import { state as upgradeModalState } from 'components/upgrade/UpgradeModal'
+import { config } from 'config'
+import jsonp from 'jsonp'
+import { action, computed, observable, runInAction } from 'mobx'
+import 'mobx-react-lite/batchingForReactDom'
+import { LocalizedPrice, plans } from 'plans'
+import { Api } from 'services/api/api'
+import { MyProfile } from 'services/api/types'
+import { AuthTokenStore } from 'services/auth-token-store'
+import { RootStore } from 'services/root-store'
 import { consoleLoggers } from 'utils/console-logger'
+import { analytics, StructuredEvents } from './analytics'
 
 const IS_SSR = typeof window === 'undefined'
 
@@ -59,7 +60,26 @@ export class AuthStore {
         eventCallback: async (data: any) => {
           this.logger.debug('Paddle event: ', data.event)
 
+          if (data.event === 'Checkout.Loaded') {
+            const planId = data.eventData.product.id
+            const plan = plans.find((plan) => plan.id === planId)
+            if (plan) {
+              analytics.trackStructured(
+                StructuredEvents.mkShowPaymentModal(plan)
+              )
+            }
+          }
+
           if (data.event === 'Checkout.Complete') {
+            const planId = data.eventData.product.id
+
+            const plan = plans.find((plan) => plan.id === planId)
+            if (plan) {
+              analytics.trackStructured(
+                StructuredEvents.mkPayForProUpgradePaypal(plan)
+              )
+            }
+
             const checkoutId = data.eventData.checkout.id
             const {
               profile: updatedProfile,
@@ -285,6 +305,8 @@ export class AuthStore {
     this.channel.postMessage({
       kind: 'logout',
     })
+
+    analytics.setUserId('anynymous')
 
     this.profile = null
   }
