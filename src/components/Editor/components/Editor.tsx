@@ -23,7 +23,6 @@ import {
   Skeleton,
   Stack,
   Text,
-  useToast,
 } from '@chakra-ui/core'
 import {
   ArrowBackIcon,
@@ -102,6 +101,7 @@ import 'utils/canvas-to-blob'
 import { getTabTitle } from 'utils/tab-title'
 import { useWarnIfUnsavedChanges } from 'utils/use-warn-if-unsaved-changes'
 import { uuid } from 'utils/uuid'
+import { useToasts } from 'use-toasts'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -122,7 +122,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     }))
 
     const upgradeModal = useUpgradeModal()
-    const toast = useToast()
+    const toast = useToasts()
+
+    useEffect(() => {
+      // @ts-ignore
+      window['toast'] = toast
+    }, [])
+
     const aspectRatio = pageSizePresets[0].aspect
     const [canvasSize] = useState<Dimensions>({ w: 900 * aspectRatio, h: 900 })
     const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -180,11 +186,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         })
         router.replace(Urls.signup)
 
-        toast({
+        toast.showSuccess({
           title: 'Your work is saved. Please sign up to continue.',
-          status: 'success',
           duration: 10000,
-          position: 'bottom-right',
           isClosable: true,
         })
       } finally {
@@ -194,12 +198,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const handleSaveClick = useCallback(() => {
       const showSaveToast = () =>
-        toast({
+        toast.showSuccess({
           id: 'work-saved',
           title: 'Your work is saved',
-          status: 'success',
           // duration: 2000,
-          position: 'bottom-right',
           isClosable: true,
         })
 
@@ -278,12 +280,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               editorParams.serialized = editorData
             } catch (error) {
               console.error(error)
-              toast({
+              toast.showError({
                 title: 'Error loading the design',
                 description:
                   "Sorry, we couldn't load this design. If you believe it's a problem on our end, please contact our support at support@wordcloudy.com",
-                status: 'error',
-                position: 'bottom-right',
                 isClosable: true,
                 duration: 8000,
               })
@@ -335,7 +335,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
       if (hd) {
         if (!profile) {
-          // TODO: show signup modal
+          upgradeModal.show('hq-download')
           return
         }
       }
@@ -406,11 +406,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const cancelVisualization = () => {
       store.editor?.cancelVisualization()
-      toast({
+      toast.showInfo({
         title: 'Visualization cancelled',
-        status: 'info',
         duration: 2000,
-        position: 'bottom-right',
         isClosable: true,
       })
     }
@@ -887,9 +885,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     state.isShowingExportNoItemsWarning = false
                   }}
                 />
+
                 <Modal
-                  initialFocusRef={cancelVisualizationBtnRef}
-                  finalFocusRef={cancelVisualizationBtnRef}
                   isOpen={state.isShowingExport}
                   onClose={closeExport}
                   trapFocus={false}

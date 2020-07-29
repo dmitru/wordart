@@ -9,6 +9,7 @@ import { plans, LocalizedPrice } from 'plans'
 import { config } from 'config'
 import { BroadcastChannel } from 'broadcast-channel'
 import { state as upgradeModalState } from 'components/upgrade/UpgradeModal'
+import { consoleLoggers } from 'utils/console-logger'
 
 const IS_SSR = typeof window === 'undefined'
 
@@ -37,6 +38,7 @@ type AuthChannelMessage =
     }
 
 export class AuthStore {
+  logger = consoleLoggers.authStore
   rootStore: RootStore
 
   channel = new BroadcastChannel<AuthChannelMessage>('auth')
@@ -55,17 +57,47 @@ export class AuthStore {
       window.Paddle.Setup({
         vendor: config.paddle.vendorId,
         eventCallback: async (data: any) => {
+          this.logger.debug('Paddle event: ', data.event)
+
           if (data.event === 'Checkout.Complete') {
             const checkoutId = data.eventData.checkout.id
-            const updatedProfile = await Api.orders.process({ checkoutId })
+            const {
+              profile: updatedProfile,
+              authToken,
+              isNewUser,
+            } = await Api.orders.process({ checkoutId })
 
             this.channel.postMessage({
               kind: 'profile-update',
               data: updatedProfile,
             })
 
-            upgradeModalState.isOpen = false
+            if (authToken) {
+              this.logger.debug('new account created, signing in')
 
+              Api.setAuthToken(authToken)
+              AuthTokenStore.setAuthToken(authToken)
+              this.afterLogin()
+              this.channel.postMessage({
+                kind: 'login',
+                data: { profile: updatedProfile, authToken },
+              })
+
+              if (isNewUser) {
+                // @ts-ignore
+                if (window['toast']) {
+                  // @ts-ignore
+                  window['toast'].showSuccess({
+                    title: 'New account has been created for you',
+                    description: `You should receive your login and password to your email: ${updatedProfile.email}`,
+                    duration: 100000,
+                    isClosable: true,
+                  })
+                }
+              }
+            }
+
+            upgradeModalState.isOpen = false
             this.profile = updatedProfile
           }
         },

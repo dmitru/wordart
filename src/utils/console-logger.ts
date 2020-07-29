@@ -14,13 +14,16 @@ export interface ConsoleLogger extends loglevel.Logger {
 const createConsoleLoggers = () => {
   const editorStore = createConsoleLogger('editorStore')
   const editor = createConsoleLogger('editor')
+  const authStore = createConsoleLogger('auth-store')
   const generator = createConsoleLogger('generator')
 
   editorStore.enable('debug')
   editor.enable('debug')
+  authStore.enable('debug')
   generator.enable('info')
 
   return {
+    authStore,
     editorStore,
     editor,
     generator,

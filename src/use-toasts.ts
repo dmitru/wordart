@@ -4,7 +4,7 @@ export const useToasts = () => {
   const toasts = useToast()
   const commonParams: UseToastOptions = {
     position: 'bottom-right',
-    duration: 100000,
+    duration: 10000,
     isClosable: true,
   }
   return {

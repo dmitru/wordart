@@ -121,9 +121,15 @@ export const Api = {
       const response = await apiClient.get(`/users/orders`)
       return response.data as Order[]
     },
-    async process(data: ProcessOrderDto): Promise<MyProfile> {
+    async process(
+      data: ProcessOrderDto
+    ): Promise<{ profile: MyProfile; authToken?: string; isNewUser: boolean }> {
       const response = await apiClient.post('/users/orders', data)
-      return response.data as MyProfile
+      return response.data as {
+        profile: MyProfile
+        authToken?: string
+        isNewUser: boolean
+      }
     },
   },
 
