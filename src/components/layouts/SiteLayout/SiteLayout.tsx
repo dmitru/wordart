@@ -2,6 +2,7 @@ import { Box } from '@chakra-ui/core'
 import styled from '@emotion/styled'
 import { Footer } from 'components/layouts/SiteLayout/Footer'
 import { Header } from 'components/layouts/SiteLayout/Header'
+import { UpgradeModalContainer } from 'components/upgrade/UpgradeModal'
 import React from 'react'
 import { Helmet } from 'react-helmet'
 import { getTabTitle } from 'utils/tab-title'
@@ -26,7 +27,11 @@ export const SiteLayout: React.FC<SiteLayoutProps> = ({
       <Helmet>
         <title>{getTabTitle()}</title>
       </Helmet>
+
       <Header fullWidth={fullWidth} />
+
+      <UpgradeModalContainer />
+
       <ContentWrapper fullWidth={fullWidth} fullHeight={fullHeight}>
         {children}
       </ContentWrapper>

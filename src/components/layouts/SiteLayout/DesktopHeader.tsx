@@ -1,26 +1,27 @@
-import React from 'react'
-import styled from '@emotion/styled'
-import Link from 'next/link'
-import { observer } from 'mobx-react'
-import { useStore } from 'services/root-store'
 import {
   Box,
   Menu,
   MenuButton,
-  Portal,
-  MenuTransition,
   MenuList,
+  MenuTransition,
+  Portal,
 } from '@chakra-ui/core'
-import { Urls } from 'urls'
-import { Button } from 'components/shared/Button'
-import { FaRegUserCircle, FaSignOutAlt } from 'react-icons/fa'
-import { useRouter } from 'next/dist/client/router'
+import { AddIcon, ChevronDownIcon, StarIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
-import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
-import { TopNavButton } from 'components/shared/TopNavButton'
-import { useToasts } from 'use-toasts'
+import styled from '@emotion/styled'
+import { Button } from 'components/shared/Button'
 import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
+import { TopNavButton } from 'components/shared/TopNavButton'
+import { useUpgradeModal } from 'components/upgrade/UpgradeModal'
+import { observer } from 'mobx-react'
+import { useRouter } from 'next/dist/client/router'
+import Link from 'next/link'
+import React from 'react'
 import Headroom from 'react-headroom'
+import { FaRegUserCircle, FaSignOutAlt } from 'react-icons/fa'
+import { useStore } from 'services/root-store'
+import { Urls } from 'urls'
+import { useToasts } from 'use-toasts'
 
 export type DesktopHeaderProps = {
   fullWidth?: boolean
@@ -34,10 +35,18 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
     const router = useRouter()
     const { pathname } = router
 
+    const showUpgrade = pathname === Urls.yourDesigns
+
+    const upgradeModal = useUpgradeModal()
+
     const isLoggedIn = authStore.isLoggedIn === true
     const isNotLoggedIn = authStore.isLoggedIn === false
     const isLoggedInAndNotVerified =
       authStore.isLoggedIn === true && !authStore.isEmailConfirmed
+    const isLoggedInWithoutPaidPlan =
+      isLoggedIn &&
+      !authStore.profile?.limits.isActiveDownloadsPack &&
+      !authStore.profile?.limits.isActiveUnlimitedPlan
 
     const desktopHeader = (
       <Headroom style={{ zIndex: 100 }}>
@@ -96,6 +105,18 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
                     </Button>
                   </Link>
                 )}
+
+              {showUpgrade && isLoggedInWithoutPaidPlan && (
+                <Button
+                  onClick={() => upgradeModal.show('generic')}
+                  colorScheme="accent"
+                  leftIcon={<StarIcon />}
+                  mr="3"
+                >
+                  Upgrade
+                </Button>
+              )}
+
               {isLoggedIn && (
                 <>
                   {!isLoggedInAndNotVerified && (
@@ -133,6 +154,13 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
                             // @ts-ignore
                             css={styles}
                           >
+                            {isLoggedInWithoutPaidPlan && (
+                              <MenuItemWithIcon
+                                icon={<StarIcon />}
+                                title="Purchase a plan"
+                                onClick={() => upgradeModal.show('generic')}
+                              />
+                            )}
                             <MenuItemWithIcon
                               icon={<FaRegUserCircle />}
                               title="Your account"

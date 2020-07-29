@@ -1,26 +1,33 @@
 import {
   Box,
+  Button,
   Divider,
   IconButton,
-  Button,
   Link as ChakraLink,
   LinkProps,
+  Stack,
 } from '@chakra-ui/core'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRightIcon, AddIcon, CloseIcon } from '@chakra-ui/icons'
+import {
+  AddIcon,
+  ChevronRightIcon,
+  CloseIcon,
+  StarIcon,
+} from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
 import { Theme } from 'chakra'
+import { useUpgradeModal } from 'components/upgrade/UpgradeModal'
+import { AnimatePresence, motion } from 'framer-motion'
 import { observer } from 'mobx-react'
 import { useRouter } from 'next/dist/client/router'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
+import Headroom from 'react-headroom'
 import { IoMdMenu } from 'react-icons/io'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { useToasts } from 'use-toasts'
 import { LockBodyScroll } from 'utils/use-lock-body-scroll'
-import Headroom from 'react-headroom'
 
 export type MobileHeaderProps = {
   fullWidth?: boolean
@@ -40,10 +47,20 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
     useEffect(() => {
       setIsShowing(false)
     }, [pathname])
+    const upgradeModal = useUpgradeModal()
 
     const isLoggedIn = authStore.isLoggedIn === true
     const isLoggedInAndNotVerified =
       authStore.isLoggedIn === true && !authStore.isEmailConfirmed
+    const isLoggedInWithoutPaidPlan =
+      isLoggedIn &&
+      !authStore.profile?.limits.isActiveDownloadsPack &&
+      !authStore.profile?.limits.isActiveUnlimitedPlan
+
+    const showCreate =
+      !hideCreate && pathname !== Urls.yourDesigns && !isLoggedInAndNotVerified
+
+    const showUpgrade = isLoggedInWithoutPaidPlan
 
     const MobileHeader = (
       <>
@@ -99,19 +116,19 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
                 `}
               >
                 <Box mt="60px" display="flex" flexDirection="column">
-                  {!hideCreate &&
-                    pathname !== Urls.yourDesigns &&
-                    !isLoggedInAndNotVerified && (
-                      <>
-                        <Box mb="5">
+                  {(showUpgrade || showCreate) && (
+                    <>
+                      <Stack spacing="3" mb="5" ml="3" direction="row">
+                        {showCreate && (
                           <Link
                             href={Urls.editor._next}
                             as={Urls.editor.create}
                             passHref
                           >
                             <Button
-                              ml="3"
-                              maxWidth="500px"
+                              as="a"
+                              target="_blank"
+                              maxWidth="300px"
                               active={pathname === Urls.landing}
                               colorScheme="accent"
                               leftIcon={<AddIcon />}
@@ -119,9 +136,25 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
                               Create design
                             </Button>
                           </Link>
-                        </Box>
-                      </>
-                    )}
+                        )}
+
+                        {showUpgrade && (
+                          <Button
+                            ml="3"
+                            maxWidth="300px"
+                            colorScheme="accent"
+                            leftIcon={<StarIcon />}
+                            onClick={() => {
+                              setIsShowing(false)
+                              upgradeModal.show('generic')
+                            }}
+                          >
+                            Upgrade
+                          </Button>
+                        )}
+                      </Stack>
+                    </>
+                  )}
 
                   <Link href={Urls.landing} passHref>
                     <MenuLink active={pathname === Urls.landing}>Home</MenuLink>

@@ -1,7 +1,7 @@
 import { DesktopHeader } from 'components/layouts/SiteLayout/DesktopHeader'
+import { MobileHeader } from 'components/layouts/SiteLayout/MobileHeader'
 import { observer } from 'mobx-react'
 import React from 'react'
-import { MobileHeader } from 'components/layouts/SiteLayout/MobileHeader'
 
 export type HeaderProps = {
   fullWidth?: boolean
