@@ -11,10 +11,11 @@ import {
 import { AddIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
-import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
 import { AddCustomFontModal } from 'components/Editor/components/AddCustomFontModal'
 import { FontPickerModal } from 'components/Editor/components/FontPicker/FontPickerModal'
 import { SectionLabel } from 'components/Editor/components/shared'
+import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
+import { useEditorStore } from 'components/Editor/editor-store'
 import { TargetKind } from 'components/Editor/lib/editor'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import { Button } from 'components/shared/Button'
@@ -24,8 +25,6 @@ import { Tooltip } from 'components/shared/Tooltip'
 import { FontStyleConfig } from 'data/fonts'
 import { uniq } from 'lodash'
 import { observer, useLocalStore } from 'mobx-react'
-import { useStore } from 'services/root-store'
-import { useEditorStore } from 'components/Editor/editor-store'
 
 export type LeftPanelFontsTabProps = {
   target: TargetKind
@@ -240,7 +239,14 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
       <FontButton>
         <img src={thumbnail} />
         {isCustom && (
-          <Badge mr="2" ml="auto" colorScheme="purple">
+          <Badge
+            mr="2"
+            ml="auto"
+            colorScheme="purple"
+            position="absolute"
+            left="0"
+            top="0"
+          >
             custom
           </Badge>
         )}

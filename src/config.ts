@@ -1,6 +1,7 @@
 import packageJson from '../package.json'
 
 export const config = {
+  baseUrl: process.env.NEXT_PUBLIC_WEB_BASE_URL!,
   isDevEnv: process.env.NODE_ENV === 'development',
 
   release: {

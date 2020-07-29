@@ -10,8 +10,11 @@ export const PricingPlans = observer(() => {
   const { authStore } = useStore()
   const { profile } = authStore
 
-  const [selectedPlanId, setSelectedPlanId] = useState(
+  const [selectedUnlimitedPlanId, setSelectedUnlimitedPlanId] = useState(
     unlimitedPricingPlans[0].id
+  )
+  const [selectedDownloadPlanId, setSelectedDownloadPlanId] = useState(
+    downloadsPricingPlans[0].id
   )
 
   const commercialUseHelp = (
@@ -71,12 +74,17 @@ export const PricingPlans = observer(() => {
                   alignItems="center"
                   key={plan.id}
                   onClick={() => {
-                    setSelectedPlanId(plan.id)
+                    setSelectedDownloadPlanId(plan.id)
                   }}
                   _hover={{
-                    bg: plan.id === selectedPlanId ? 'gray.100' : 'gray.50',
+                    bg:
+                      plan.id === selectedDownloadPlanId
+                        ? 'gray.100'
+                        : 'gray.50',
                   }}
-                  bg={plan.id === selectedPlanId ? 'primary.50' : 'white'}
+                  bg={
+                    plan.id === selectedDownloadPlanId ? 'primary.50' : 'white'
+                  }
                   css={css`
                     cursor: pointer;
                   `}
@@ -109,7 +117,7 @@ export const PricingPlans = observer(() => {
                 colorScheme="accent"
                 onClick={() => {
                   window.Paddle.Checkout.open({
-                    product: selectedPlanId,
+                    product: selectedDownloadPlanId,
                     email: profile?.email,
                   })
                 }}
@@ -161,12 +169,17 @@ export const PricingPlans = observer(() => {
                   alignItems="center"
                   key={plan.id}
                   onClick={() => {
-                    setSelectedPlanId(plan.id)
+                    setSelectedUnlimitedPlanId(plan.id)
                   }}
                   _hover={{
-                    bg: plan.id === selectedPlanId ? 'gray.100' : 'gray.50',
+                    bg:
+                      plan.id === selectedUnlimitedPlanId
+                        ? 'gray.100'
+                        : 'gray.50',
                   }}
-                  bg={plan.id === selectedPlanId ? 'primary.50' : 'white'}
+                  bg={
+                    plan.id === selectedUnlimitedPlanId ? 'primary.50' : 'white'
+                  }
                   css={css`
                     cursor: pointer;
                   `}
@@ -199,7 +212,7 @@ export const PricingPlans = observer(() => {
                 colorScheme="accent"
                 onClick={() => {
                   window.Paddle.Checkout.open({
-                    product: selectedPlanId,
+                    product: selectedUnlimitedPlanId,
                     email: profile?.email,
                   })
                 }}

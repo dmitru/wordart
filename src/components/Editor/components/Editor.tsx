@@ -70,6 +70,7 @@ import {
   UpgradeModalContainer,
   useUpgradeModal,
 } from 'components/upgrade/UpgradeModal'
+import { config } from 'config'
 import { saveAs } from 'file-saver'
 import { canvasToDataUri, Dimensions } from 'lib/wordart/canvas-utils'
 import 'lib/wordart/console-extensions'
@@ -83,7 +84,6 @@ import Hotkeys from 'react-hot-keys'
 import { BsTrash } from 'react-icons/bs'
 import {
   FiChevronLeft,
-  FiCopy,
   FiDownload,
   FiEdit,
   FiFilePlus,
@@ -93,15 +93,16 @@ import {
   FiSave,
 } from 'react-icons/fi'
 import { IoMdResize } from 'react-icons/io'
-import { Api } from 'services/api/api'
+import { Api, ApiErrors } from 'services/api/api'
 import { WordcloudId } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
+import { useToasts } from 'use-toasts'
+import { openUrlInNewTab } from 'utils/browser'
 import 'utils/canvas-to-blob'
 import { getTabTitle } from 'utils/tab-title'
 import { useWarnIfUnsavedChanges } from 'utils/use-warn-if-unsaved-changes'
 import { uuid } from 'utils/uuid'
-import { useToasts } from 'use-toasts'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -201,7 +202,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         toast.showSuccess({
           id: 'work-saved',
           title: 'Your work is saved',
-          // duration: 2000,
           isClosable: true,
         })
 
@@ -244,6 +244,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           }
           showSaveToast()
           store.hasUnsavedChanges = false
+        } catch (error) {
+          if (
+            error.response?.data?.message === ApiErrors.NoMediaUploadFreePlan
+          ) {
+            upgradeModal.show('custom-fonts')
+          } else {
+            throw error
+          }
         } finally {
           store.isSaving = false
         }
@@ -534,7 +542,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   {(styles) => (
                     // @ts-ignore
                     <MenuList css={styles} zIndex={4}>
-                      <MenuItem>
+                      <MenuItem
+                        onClick={() =>
+                          openUrlInNewTab(
+                            `${config.baseUrl}${Urls.editor.create}`
+                          )
+                        }
+                      >
                         <FiFilePlus
                           css={css`
                             margin-right: 4px;
@@ -550,14 +564,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         />
                         Save
                       </MenuItem>
-                      <MenuItem>
+                      {/* <MenuItem>
                         <FiCopy
                           css={css`
                             margin-right: 4px;
                           `}
                         />
                         Make Copy
-                      </MenuItem>
+                      </MenuItem> */}
                       <MenuItem>
                         <FiEdit
                           css={css`

@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   Modal,
@@ -10,13 +11,16 @@ import {
   ModalOverlay,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
+import { useUpgradeModal } from 'components/upgrade/UpgradeModal'
+import { createCanvas } from 'lib/wordart/canvas-utils'
 import { parseFontFromBuffer } from 'lib/wordart/fonts'
 import { observer, useLocalStore } from 'mobx-react'
-import { Font } from 'opentype.js'
-import { useRef } from 'react'
-import { sortBy, range } from 'lodash'
+import Link from 'next/link'
 import { useDropzone } from 'react-dropzone'
-import { createCanvas } from 'lib/wordart/canvas-utils'
+import { FaExternalLinkAlt } from 'react-icons/fa'
+import { useStore } from 'services/root-store'
+import { Urls } from 'urls'
+import { useToasts } from 'use-toasts'
 import { arrayBufferToDataUri } from 'utils/buffers'
 
 export type AddCustomFontModalProps = {
@@ -41,11 +45,15 @@ const initialState: State = {
   url: null,
 }
 
+const MAX_FILE_SIZE_LIMIT_BYTES = 5 * 1024 * 1024 // 5 Mb
+
 export const AddCustomFontModal: React.FC<AddCustomFontModalProps> = observer(
   (props) => {
     const { isOpen } = props
-    const originalImgCanvas = useRef<HTMLCanvasElement | null>(null)
-
+    const {
+      authStore: { profile },
+    } = useStore()
+    const toasts = useToasts()
     const state = useLocalStore<State>(() => initialState)
 
     const close = () => {
@@ -55,17 +63,21 @@ export const AddCustomFontModal: React.FC<AddCustomFontModalProps> = observer(
 
     const { getRootProps, getInputProps } = useDropzone({
       onDropAccepted: (files) => {
+        const file = files[0]
+
+        if (file.size > MAX_FILE_SIZE_LIMIT_BYTES) {
+          toasts.showWarning({
+            title: 'File is too large',
+            description: 'Maximum file size is 5Mb',
+          })
+          return
+        }
+
         const reader = new FileReader()
         reader.onload = async () => {
           const fontFile = reader.result as ArrayBuffer
           const font = parseFontFromBuffer(fontFile)
           const url = await arrayBufferToDataUri(fontFile)
-
-          const glyphUnicodes = sortBy(
-            range(font.glyphs.length).map(
-              (index) => font.glyphs.get(index).unicode
-            )
-          ).filter((unicode) => unicode > 0)
 
           const fontTitle = font.names.fontFamily['en'] || 'Custom'
           const fontPath = font.getPath(fontTitle, 0, 0, 300)
@@ -83,17 +95,81 @@ export const AddCustomFontModal: React.FC<AddCustomFontModalProps> = observer(
           state.url = url
           state.title = fontTitle
         }
-        reader.readAsArrayBuffer(files[0])
+        reader.readAsArrayBuffer(file)
       },
     })
 
+    const upgradeModal = useUpgradeModal()
+
     return (
-      <Modal isOpen={isOpen} onClose={close}>
+      <Modal isOpen={isOpen} onClose={close} size="lg">
         <ModalOverlay>
-          <ModalContent maxWidth="350px">
-            <ModalHeader>Choose a font to upload</ModalHeader>
-            <ModalCloseButton />
+          <ModalContent maxWidth="550px">
+            <ModalHeader>Upload custom font file</ModalHeader>
             <ModalBody>
+              {!profile && (
+                <Alert
+                  mb="6"
+                  status="info"
+                  variant="left-accent"
+                  flexDirection="column"
+                >
+                  <p>
+                    Please create an account and purchase one of our plans to
+                    save designs with custom fonts.
+                  </p>
+                  <p>
+                    Note: as a free user, you may still use custom fonts and
+                    export your design, but you won't be able to save it to your
+                    account.
+                  </p>
+                  <Box mt="4">
+                    <Link href={Urls.signup} passHref>
+                      <Button
+                        as="a"
+                        target="_blank"
+                        colorScheme="primary"
+                        onClick={() => {
+                          upgradeModal.show('custom-fonts')
+                        }}
+                        rightIcon={<FaExternalLinkAlt />}
+                      >
+                        Create an account now
+                      </Button>
+                    </Link>
+                  </Box>
+                </Alert>
+              )}
+
+              {profile && !profile.limits.canUploadCustomMedia && (
+                <Alert
+                  mb="6"
+                  status="info"
+                  variant="left-accent"
+                  flexDirection="column"
+                >
+                  <p>
+                    Please purchase one of our plans if you'd like to save
+                    designs with custom fonts to your account.
+                  </p>
+                  <p>
+                    Note: as a free user, you may still use custom fonts and
+                    export your design, but you won't be able to save it to your
+                    account.
+                  </p>
+                  <Box mt="4">
+                    <Button
+                      colorScheme="primary"
+                      onClick={() => {
+                        upgradeModal.show('custom-fonts')
+                      }}
+                    >
+                      Upgrade now
+                    </Button>
+                  </Box>
+                </Alert>
+              )}
+
               <Box
                 mt="4"
                 css={
@@ -153,6 +229,8 @@ export const AddCustomFontModal: React.FC<AddCustomFontModalProps> = observer(
                 </Button>
               )}
             </ModalFooter>
+
+            <ModalCloseButton />
           </ModalContent>
         </ModalOverlay>
       </Modal>

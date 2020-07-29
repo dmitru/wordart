@@ -1,25 +1,29 @@
 import {
-  MyProfile,
-  Wordcloud,
-  EmailLoginParams,
+  CloneWordcloudDto,
+  CreateAnonymousWordcloudDto,
+  CreateFolderDto,
   CreateWordcloudDto,
   EditorPersistedData,
-  WordcloudId,
-  UpdateWordcloudDto,
-  Order,
-  ProcessOrderDto,
-  HdDownloadDto,
-  HdDownloadResult,
-  CreateFolderDto,
+  EmailLoginParams,
+  EmailSignupParams,
   Folder,
   FolderId,
+  HdDownloadDto,
+  HdDownloadResult,
+  MyProfile,
+  Order,
+  ProcessOrderDto,
   UpdateFolderDto,
-  CloneWordcloudDto,
   UpdateManyWordcloudsDto,
-  EmailSignupParams,
-  CreateAnonymousWordcloudDto,
+  UpdateWordcloudDto,
+  Wordcloud,
+  WordcloudId,
 } from 'services/api/types'
 import { apiClient } from './api-client'
+
+export const ApiErrors = {
+  NoMediaUploadFreePlan: 'no_custom_media_for_free_plan',
+}
 
 export const Api = {
   setAuthToken: apiClient.setAuthToken,

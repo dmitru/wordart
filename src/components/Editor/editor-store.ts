@@ -61,6 +61,7 @@ import { loadFont } from 'lib/wordart/fonts'
 import { cloneDeep, uniq, uniqBy } from 'lodash'
 import { action, observable, set, toJS } from 'mobx'
 import paper from 'paper'
+import React, { useContext } from 'react'
 import {
   MatrixSerialized,
   PersistedCustomFontV1,
@@ -78,7 +79,6 @@ import { UniqIdGenerator } from 'utils/ids'
 import { notEmpty } from 'utils/not-empty'
 import { roundFloat } from 'utils/round-float'
 import { exhaustiveCheck } from 'utils/type-utils'
-import React, { useContext } from 'react'
 
 export type EditorMode = 'view' | 'edit'
 
@@ -1162,6 +1162,7 @@ export class EditorStore {
       thumbnail: thumbnailUrl,
       fontStyle: 'regular',
       fontWeight: 'normal',
+      isCustom: true,
     }
     this.customFonts.push({
       title: fontTitle,
