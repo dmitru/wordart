@@ -1,0 +1,4 @@
+[[redirects]]
+from = "/editor/*"
+status = 200
+to = "/editor/[...id].html"
