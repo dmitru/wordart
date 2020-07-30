@@ -17,6 +17,13 @@ const {
 
 module.exports = withSourceMaps({
   poweredByHeader: false,
+  exportPathMap: async function (
+    defaultPathMap,
+    { dev, dir, outDir, distDir, buildId }
+  ) {
+    console.log(defaultPathMap)
+    return defaultPathMap
+  },
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     // In `pages/_app.js`, Sentry is imported from @sentry/browser. While
     // @sentry/node will run in a Node.js environment. @sentry/node will use
