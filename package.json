@@ -9,7 +9,7 @@
     "remove-sourcemaps": "rm -rf ./.next/static/chunks/*.js.map",
     "export": "NODE_ENV=production next export",
     "start": "next start",
-    "deploy:netlify": "REACT_APP_COMMIT_SHA=$(git rev-parse HEAD) NODE_ENV=production next build && next export && npm remove-sourcemaps",
+    "deploy:netlify": "REACT_APP_COMMIT_SHA=$(git rev-parse HEAD) NODE_ENV=production next build && next export && npm run remove-sourcemaps",
     "format": "NODE_ENV=production prettier --write \"src/**/*.{ts,tsx,js,jsx}\"",
     "generate": "plop --plopfile tools/generators/index.js",
     "test:watch": "jest --watch --config=./jest.config.json",
