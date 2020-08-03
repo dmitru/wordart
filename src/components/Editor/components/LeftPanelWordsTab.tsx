@@ -58,6 +58,7 @@ import {
   ListChildComponentProps,
 } from 'react-window'
 import { useToasts } from 'use-toasts'
+import { wordsToCSVData } from '../words-import-export'
 import { CustomizeWordPopover } from './CustomizeWord'
 
 export type LeftPanelWordsTabProps = {
@@ -103,8 +104,8 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
       newWordInputRef.current?.focus()
     }
 
-    const handleAddWord = (word = '') => {
-      store.addWord(target, word)
+    const handleAddWord = (text = '') => {
+      store.addWord(target, { text })
       store.animateVisualize(false)
       setTimeout(
         () => listRef.current?.scrollToItem(words.wordList.length - 1),
@@ -1039,20 +1040,3 @@ const EmptyStateWordsUi: React.FC<{
     {children}
   </Box>
 )
-
-const wordsToCSVData = (words: WordListEntry[]): object[] => {
-  return words.map((w) => {
-    let repeats = (w.repeats ?? -1) === -1 ? '' : w.repeats
-    const angle = w.angle ?? ''
-    const font = w.fontId ?? ''
-    const color = w.color ?? ''
-
-    return {
-      word: w.text,
-      repeats,
-      angle,
-      color,
-      font,
-    }
-  })
-}

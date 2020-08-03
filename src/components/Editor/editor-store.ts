@@ -1350,23 +1350,23 @@ export class EditorStore {
     style.items.words.wordList = []
   }
 
-  @action addWords = (target: TargetKind, words: string[]) => {
+  @action addWords = (target: TargetKind, words: ImportedWord[]) => {
     this.hasUnsavedChanges = true
     const style = this.styleOptions[target]
-    for (const text of words) {
+    for (const word of words) {
       style.items.words.wordList.push({
         id: this.wordIdGen.get(),
-        text,
+        ...word,
       })
     }
   }
 
-  @action addWord = (target: TargetKind, text = '') => {
+  @action addWord = (target: TargetKind, word: ImportedWord) => {
     this.hasUnsavedChanges = true
     const style = this.styleOptions[target]
     style.items.words.wordList.push({
       id: this.wordIdGen.get(),
-      text,
+      ...word,
     })
   }
 
@@ -1674,4 +1674,8 @@ export const EditorStoreContext = React.createContext<EditorStore | null>(null)
 export const useEditorStore = () => {
   const editorStore = useContext(EditorStoreContext)
   return editorStore
+}
+
+export type ImportedWord = Partial<WordListEntry> & {
+  text: string
 }

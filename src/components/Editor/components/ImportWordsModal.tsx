@@ -24,14 +24,18 @@ import { Button } from 'components/shared/Button'
 import { Input } from 'components/shared/Input'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
+import papaparse from 'papaparse'
+import { useDropzone } from 'react-dropzone'
 import { Api } from 'services/api/api'
 import stopword from 'stopword'
+import { ImportedWord } from '../editor-store'
+import { csvDataToWords } from '../words-import-export'
 
 export type ImportWordsModalProps = {
   isOpen: boolean
   onClose: () => void
   onImported: (data: {
-    words: string[]
+    words: ImportedWord[]
     clearExistingBeforeImporting: boolean
   }) => void
 }
@@ -39,6 +43,7 @@ export type ImportWordsModalProps = {
 const state = observable({
   isImporting: false,
   textInput: '',
+  csvInput: '',
   urlInput: '',
   tabIndex: 0,
   removeNumbers: true,
@@ -82,7 +87,7 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
         }
 
         onImported({
-          words,
+          words: words.map((text) => ({ text })),
           clearExistingBeforeImporting: state.clearExistingBeforeImporting,
         })
         state.textInput = ''
@@ -91,7 +96,19 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
 
       // CSV
       if (state.tabIndex === 1) {
-        // TODO
+        const parsedData = papaparse.parse(state.csvInput, {
+          header: true,
+          dynamicTyping: {
+            angle: true,
+            repeats: true,
+          },
+        })
+
+        onImported({
+          words: csvDataToWords(parsedData.data),
+          clearExistingBeforeImporting: state.clearExistingBeforeImporting,
+        })
+        state.csvInput = ''
         return
       }
 
@@ -110,7 +127,7 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
             stemming: state.stemming,
           })
           onImported({
-            words: result.words,
+            words: result.words.map((text) => ({ text })),
             clearExistingBeforeImporting: state.clearExistingBeforeImporting,
           })
           state.urlInput = ''
@@ -120,6 +137,20 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
         return
       }
     }
+
+    const { getRootProps, getInputProps } = useDropzone({
+      onDropAccepted: (files) => {
+        const file = files[0]
+
+        const reader = new FileReader()
+        reader.onload = async () => {
+          const text = reader.result as string
+          state.csvInput = text
+        }
+
+        reader.readAsText(file)
+      },
+    })
 
     const parsingControls = (
       <>
@@ -209,23 +240,29 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
                   <TabPanel>
                     <Box mt="4">
                       <Text>
-                        <Link>Learn more</Link> about importing words from CSV,
-                        Excel or Google Sheets.
+                        <Link>Learn more</Link> about importing words from CSV
+                        files, Excel or Google Sheets.
                       </Text>
-                      <Textarea
-                        mt="3"
-                        placeholder="Paste CSV..."
-                        value={state.textInput}
-                        onChange={(evt: any) => {
-                          state.textInput = evt.target.value
-                        }}
-                      />
-                      <Box mt="3">
-                        <Text>...or choose a CSV file: </Text>
+
+                      <Box mt="3" {...getRootProps()}>
+                        <input {...getInputProps()} />
                         <Button colorScheme="secondary">
                           Open CSV file...
                         </Button>
                       </Box>
+
+                      <Text mt="6" mb="0">
+                        ...or paste CSV below:
+                      </Text>
+
+                      <Textarea
+                        mt="3"
+                        placeholder="Paste CSV here..."
+                        value={state.csvInput}
+                        onChange={(evt: any) => {
+                          state.csvInput = evt.target.value
+                        }}
+                      />
                     </Box>
                   </TabPanel>
 
