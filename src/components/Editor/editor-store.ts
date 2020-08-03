@@ -170,9 +170,6 @@ export class EditorStore {
     ])
     this.availableIconShapes = icons
 
-    this.styleOptions.shape.items.words.fontIds = [
-      this.getAvailableFonts({ popular: true })[0].defaultStyle.fontId,
-    ]
     this.styleOptions.bg.items.words.fontIds = [
       this.getAvailableFonts({ popular: true })[1].defaultStyle.fontId,
     ]

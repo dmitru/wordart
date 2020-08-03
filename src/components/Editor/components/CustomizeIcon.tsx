@@ -18,12 +18,11 @@ import {
 } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { ChoiceButtons } from 'components/Editor/components/ChoiceButtons'
+import { useEditorStore } from 'components/Editor/editor-store'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { observer, useLocalStore } from 'mobx-react'
 import React from 'react'
-import { useStore } from 'services/root-store'
 import { IconListEntry } from '../style-options'
-import { useEditorStore } from 'components/Editor/editor-store'
 
 export type CustomizeIconOptions = {
   // Repeat
@@ -33,8 +32,6 @@ export type CustomizeIconOptions = {
   customColor: boolean
   color: string
 }
-
-const defaultFontId = 'Pacifico:regular'
 
 const getValueFromWordEntry = (icon: IconListEntry): CustomizeIconOptions => {
   return {

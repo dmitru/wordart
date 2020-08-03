@@ -27,6 +27,7 @@ import { Slider } from 'components/shared/Slider'
 import { FontId } from 'data/fonts'
 import { observer, useLocalStore } from 'mobx-react'
 import React from 'react'
+import { defaultFontId } from '../default-style-options'
 import { WordListEntry } from '../style-options'
 
 export type CustomizeWordOptions = {
@@ -43,8 +44,6 @@ export type CustomizeWordOptions = {
   customColor: boolean
   color: string
 }
-
-const defaultFontId = 'Pacifico:regular'
 
 const getValueFromWordEntry = (word: WordListEntry): CustomizeWordOptions => {
   return {
