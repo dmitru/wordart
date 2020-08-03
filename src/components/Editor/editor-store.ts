@@ -55,7 +55,7 @@ import {
   popularFonts,
 } from 'data/fonts'
 import { icons, loadIconsConfig } from 'data/icons'
-import { iconShapes, imageShapes } from 'data/shapes'
+import { getSortedIconsShapes, imageShapes } from 'data/shapes'
 import { createCanvas } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { cloneDeep, uniq, uniqBy } from 'lodash'
@@ -136,7 +136,7 @@ export class EditorStore {
   @observable targetTab = 'shape' as TargetTab
   @observable hasItemChanges = false
   @observable availableImageShapes: ShapeClipartConf[] = imageShapes
-  @observable availableIconShapes: ShapeIconConf[] = iconShapes
+  @observable availableIconShapes: ShapeIconConf[] = []
   @observable hasUnsavedChanges = false
 
   @observable selectedShapeConf: ShapeConf = imageShapes[4]
@@ -168,7 +168,7 @@ export class EditorStore {
       fonts.length === 0 ? loadFontsConfig() : Promise.resolve(),
       icons.length === 0 ? loadIconsConfig() : Promise.resolve(),
     ])
-    this.availableIconShapes = icons
+    this.availableIconShapes = getSortedIconsShapes(icons)
 
     this.styleOptions.bg.items.words.fontIds = [
       this.getAvailableFonts({ popular: true })[1].defaultStyle.fontId,

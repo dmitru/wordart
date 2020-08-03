@@ -4,23 +4,20 @@ import { IconPicker } from 'components/Editor/components/IconPicker'
 import { IconShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
 import { ShapeThumbnailBtn } from 'components/Editor/components/ShapeSelector'
 import { SectionLabel } from 'components/Editor/components/shared'
+import { useEditorStore } from 'components/Editor/editor-store'
 import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
 import { Slider } from 'components/shared/Slider'
 import { Tooltip } from 'components/shared/Tooltip'
-import { iconsCategories } from 'data/icon-categories'
 import { AnimatePresence, motion } from 'framer-motion'
 import { isEqual } from 'lodash'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect } from 'react'
 import { FaCog } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
-import { useStore } from 'services/root-store'
-import { useDebounce } from 'use-debounce'
 import { useDebouncedCallback } from 'use-debounce/lib'
-import { useEditorStore } from 'components/Editor/editor-store'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -56,28 +53,6 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
     // @ts-ignore
     renderKey, // eslint-disable-line
   } = store
-
-  const allCategoryOptions = iconsCategories
-
-  const allItems = store.availableIconShapes
-
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-
-  const [query, setQuery] = useState('')
-
-  const [debouncedQuery] = useDebounce(query, 300)
-
-  const matchingItems = useMemo(() => {
-    const query = debouncedQuery.trim().toLowerCase()
-    return allItems.filter(
-      (s) =>
-        (!query ||
-          (query && s.title.toLowerCase().includes(query)) ||
-          (s.keywords || []).includes(query)) &&
-        (!selectedCategory ||
-          (selectedCategory && (s.categories || []).includes(selectedCategory)))
-    )
-  }, [debouncedQuery, selectedCategory])
 
   const [updateShapeColoringDebounced] = useDebouncedCallback(
     async () => {

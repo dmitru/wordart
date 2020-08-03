@@ -1,10 +1,9 @@
-import { icons } from 'data/icons'
 import { ShapeClipartConf, ShapeIconConf } from 'components/Editor/shape-config'
+import { iconsCategories } from 'data/icon-categories'
+import { sortBy } from 'lodash'
 import animalsShapes from './shapes-animals'
 import geoShapes from './shapes-geo'
 import geometryShapes from './shapes-geometry'
-import { iconsCategories } from 'data/icon-categories'
-import { sortBy } from 'lodash'
 
 const defaultEdgesProcessing = {
   amount: 80,
@@ -144,17 +143,25 @@ const unsortedImageShapes: ShapeClipartConf[] = [
   ),
 ]
 
-const getSortedIconsShapes = (): ShapeIconConf[] => {
+export const getSortedIconsShapes = (
+  icons: ShapeIconConf[]
+): ShapeIconConf[] => {
   const categoryOrderMap: { [category: string]: number } = {}
+
   for (const [index, category] of iconsCategories.entries()) {
     categoryOrderMap[category.label] = index
   }
 
-  return sortBy(
+  const iconsSorted = sortBy(
     icons,
-    (s) => (s.categories ? categoryOrderMap[s.categories[0]] : 999999),
+    (s) =>
+      s.categories && categoryOrderMap[s.categories[0]] != null
+        ? categoryOrderMap[s.categories[0]]
+        : 999999,
     (s) => s.title
   )
+
+  return iconsSorted
 }
 
 const getSortedImageShapes = (): ShapeClipartConf[] => {
@@ -170,5 +177,3 @@ const getSortedImageShapes = (): ShapeClipartConf[] => {
 }
 
 export const imageShapes = getSortedImageShapes()
-
-export const iconShapes = getSortedIconsShapes()
