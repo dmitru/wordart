@@ -21,7 +21,7 @@ import { DragIndicator } from '@styled-icons/material/DragIndicator'
 import { FindAndReplaceModal } from 'components/Editor/components/FindAndReplaceModal'
 import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
 import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
-import { WordConfigId } from 'components/Editor/editor-store'
+import { useEditorStore, WordConfigId } from 'components/Editor/editor-store'
 import { TargetKind } from 'components/Editor/lib/editor'
 import {
   mkBgStyleConfFromOptions,
@@ -38,8 +38,9 @@ import { SearchInput } from 'components/shared/SearchInput'
 import { capitalize, noop } from 'lodash'
 import { observable, runInAction } from 'mobx'
 import { observer, Observer } from 'mobx-react'
+import papaparse from 'papaparse'
 import pluralize from 'pluralize'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import {
   DragDropContext,
   Draggable,
@@ -48,7 +49,7 @@ import {
   Droppable,
 } from 'react-beautiful-dnd'
 import { FaCog } from 'react-icons/fa'
-import { FiSearch, FiDownload } from 'react-icons/fi'
+import { FiDownload, FiRefreshCw, FiSearch } from 'react-icons/fi'
 import { MdFormatSize } from 'react-icons/md'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import {
@@ -56,11 +57,8 @@ import {
   FixedSizeList as List,
   ListChildComponentProps,
 } from 'react-window'
-import { useStore } from 'services/root-store'
 import { useToasts } from 'use-toasts'
 import { CustomizeWordPopover } from './CustomizeWord'
-import { FiRefreshCw } from 'react-icons/fi'
-import { useEditorStore } from 'components/Editor/editor-store'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -144,10 +142,8 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         ? allWords.filter((w) => state.selectedWords.has(w.id))
         : allWords
 
-    const [isDragging, setIsDragging] = useState(false)
-
     const selectedCount = state.selectedWords.size
-    const wordsToProcess =
+    const wordsSelectedOrAll =
       selectedCount === 0
         ? allWords
         : allWords.filter((w) => state.selectedWords.has(w.id))
@@ -212,8 +208,10 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     )
 
     const handleExportCSVClick = () => {
-      alert('TODO')
+      const csv = papaparse.unparse(wordsToCSVData(wordsSelectedOrAll))
+      saveAs(new Blob([csv], { type: 'text/plain;charset=utf-8' }), 'words.csv')
     }
+
     const handleFindAndReplaceClick = () => {
       state.isShowingFindAndReplace = true
     }
@@ -318,7 +316,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     <MenuItemWithIcon
                       icon={<MdFormatSize />}
                       onClick={() => {
-                        for (const w of wordsToProcess) {
+                        for (const w of wordsSelectedOrAll) {
                           w.text = capitalize(w.text)
                         }
                         store.animateVisualize(false)
@@ -329,7 +327,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     <MenuItemWithIcon
                       icon={<MdFormatSize />}
                       onClick={() => {
-                        for (const w of wordsToProcess) {
+                        for (const w of wordsSelectedOrAll) {
                           w.text = w.text.toLocaleUpperCase()
                         }
                         store.animateVisualize(false)
@@ -340,7 +338,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     <MenuItemWithIcon
                       icon={<MdFormatSize />}
                       onClick={() => {
-                        for (const w of wordsToProcess) {
+                        for (const w of wordsSelectedOrAll) {
                           w.text = w.text.toLocaleLowerCase()
                         }
                         store.animateVisualize(false)
@@ -358,18 +356,14 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                       </MenuItemWithIcon>
                     )}
 
-                    {selectedCount === 0 && (
-                      <>
-                        <MenuDivider />
+                    <MenuDivider />
 
-                        <MenuItemWithIcon
-                          onClick={handleExportCSVClick}
-                          icon={<FiDownload />}
-                        >
-                          Export as CSV
-                        </MenuItemWithIcon>
-                      </>
-                    )}
+                    <MenuItemWithIcon
+                      onClick={handleExportCSVClick}
+                      icon={<FiDownload />}
+                    >
+                      Export as CSV
+                    </MenuItemWithIcon>
 
                     <MenuDivider />
 
@@ -377,7 +371,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                       icon={<SmallCloseIcon />}
                       onClick={() => {
                         if (selectedCount > 0) {
-                          for (const w of wordsToProcess) {
+                          for (const w of wordsSelectedOrAll) {
                             store.deleteWord(target, w.id)
                           }
                         } else {
@@ -479,9 +473,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             {allWords.length > 0 && (
               <Box flex="1" width="100%" py="3">
                 <DragDropContext
-                  onBeforeDragStart={() => setIsDragging(true)}
                   onDragEnd={(result) => {
-                    setIsDragging(false)
                     if (!result.destination) {
                       return
                     }
@@ -614,7 +606,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             state.isShowingFindAndReplace = false
 
             let count = 0
-            for (const w of wordsToProcess) {
+            for (const w of wordsSelectedOrAll) {
               if (w.text.includes(find)) {
                 count++
               }
@@ -1047,3 +1039,20 @@ const EmptyStateWordsUi: React.FC<{
     {children}
   </Box>
 )
+
+const wordsToCSVData = (words: WordListEntry[]): object[] => {
+  return words.map((w) => {
+    let repeats = (w.repeats ?? -1) === -1 ? '' : w.repeats
+    const angle = w.angle ?? ''
+    const font = w.fontId ?? ''
+    const color = w.color ?? ''
+
+    return {
+      word: w.text,
+      repeats,
+      angle,
+      color,
+      font,
+    }
+  })
+}

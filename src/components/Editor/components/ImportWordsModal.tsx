@@ -1,6 +1,7 @@
 import {
   Box,
   Checkbox,
+  Collapse,
   Link,
   Modal,
   ModalBody,
@@ -17,16 +18,14 @@ import {
   Tabs,
   Text,
   Textarea,
-  Collapse,
 } from '@chakra-ui/core'
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
 import { Button } from 'components/shared/Button'
+import { Input } from 'components/shared/Input'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
-import stopword from 'stopword'
-import { Input } from 'components/shared/Input'
 import { Api } from 'services/api/api'
-import { boolean } from 'yup'
+import stopword from 'stopword'
 
 export type ImportWordsModalProps = {
   isOpen: boolean
