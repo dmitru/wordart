@@ -149,6 +149,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const { authStore } = useStore()
     const { profile } = authStore
 
+    const hasActivePlan = profile
+      ? profile.limits.isActiveDownloadsPack ||
+        profile.limits.isActiveUnlimitedPlan
+      : false
+
     const router = useRouter()
 
     const cancelVisualizationBtnRef = useRef<HTMLButtonElement>(null)
@@ -731,12 +736,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               Help & Tutorials
             </TopNavButton>
 
-            <Button
-              colorScheme="accent"
-              onClick={() => upgradeModal.show('generic')}
-            >
-              Upgrade
-            </Button>
+            {!hasActivePlan && (
+              <Button
+                colorScheme="accent"
+                onClick={() => upgradeModal.show('generic')}
+              >
+                Upgrade
+              </Button>
+            )}
           </TopNavWrapper>
 
           <EditorLayout>
