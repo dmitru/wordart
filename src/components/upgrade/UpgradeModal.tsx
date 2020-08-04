@@ -30,7 +30,7 @@ const getTitle = (variant: UpgradeModalVariant) => {
     return `You've reached a limit on number of folders you can create in your account. Upgrade now to create more folders, download images for commercial use in high quality, use custom images and fonts and more!`
   }
   if (variant === 'design-limits') {
-    return `You've reached a limit on number of designs you can save to your account. Upgrade now to save more designs, download images for commercial use in high quality, upload custom images and fonts and more!`
+    return `You've reached a limit on number of designs you can save to your account. Upgrade now to save more designs, download images for commercial use in high quality, upload custom images, fonts and more!`
   }
   if (variant === 'custom-fonts') {
     return `Upgrade now to save designs with custom fonts and images and export images for commercial use in high quality!`

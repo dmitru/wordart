@@ -731,7 +731,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               Help & Tutorials
             </TopNavButton>
 
-            <Button colorScheme="accent">Upgrade</Button>
+            <Button
+              colorScheme="accent"
+              onClick={() => upgradeModal.show('generic')}
+            >
+              Upgrade
+            </Button>
           </TopNavWrapper>
 
           <EditorLayout>
