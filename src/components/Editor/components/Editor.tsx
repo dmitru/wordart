@@ -172,6 +172,22 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       setIsShowingEmptyIconsWarning,
     ] = useState(false)
 
+    const handleDelete = async () => {
+      if (!props.wordcloudId) {
+        return
+      }
+      if (
+        !window.confirm(
+          'Are you sure you want to delete this design? You will not be able to undo it.'
+        )
+      ) {
+        return
+      }
+
+      await wordcloudsStore.delete(props.wordcloudId)
+      router.replace(Urls.yourDesigns)
+    }
+
     const saveAnonymously = async (recaptcha: string) => {
       if (isSaving || !store.editor || !isNew) {
         return
@@ -616,7 +632,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         Download as Image
                       </MenuItem>
                       <MenuDivider />
-                      <MenuItem>
+                      <MenuItem isDisabled={isNew} onClick={handleDelete}>
                         <BsTrash
                           css={css`
                             margin-right: 4px;

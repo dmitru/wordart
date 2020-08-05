@@ -1,10 +1,12 @@
+import { Box, Button, Stack, Text } from '@chakra-ui/core'
+import css from '@emotion/css'
+import styled from '@emotion/styled'
 import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
 import { observer } from 'mobx-react'
+import Link from 'next/link'
 import React from 'react'
-import styled from '@emotion/styled'
-import css from '@emotion/css'
-import { Button, Box, Text, Stack } from '@chakra-ui/core'
 import AwesomeSlider from 'react-awesome-slider'
+import { Urls } from 'urls'
 
 const mobileHeaderBreakpoint = `@media screen and (max-width: 1100px)`
 const xsBreakpoint = `@media screen and (max-width: 500px)`
@@ -38,18 +40,25 @@ export const LandingPage = observer(() => {
                 direction={['column', 'row']}
                 alignItems="center"
               >
-                <HeaderCreateNowButton colorScheme="accent" size="lg">
-                  Create now
-                </HeaderCreateNowButton>
+                <Link href={Urls.editor.create} passHref>
+                  <HeaderCreateNowButton as="a" colorScheme="accent" size="lg">
+                    Create now
+                  </HeaderCreateNowButton>
+                </Link>
+
                 <HeaderCtaInfo>or</HeaderCtaInfo>
-                <HeaderCreateNowButton
-                  colorScheme="accent"
-                  variant="outline"
-                  size="lg"
-                  bg="white"
-                >
-                  Sign up
-                </HeaderCreateNowButton>
+
+                <Link href={Urls.signup} passHref>
+                  <HeaderCreateNowButton
+                    colorScheme="accent"
+                    variant="outline"
+                    size="lg"
+                    bg="white"
+                    as="a"
+                  >
+                    Sign up
+                  </HeaderCreateNowButton>
+                </Link>
               </Stack>
             </HeaderCtaContainer>
           </HeaderTitleContainer>
@@ -174,9 +183,12 @@ export const LandingPage = observer(() => {
           It's fast and fun with Wordcloudy – the world's leading word designs
           generator app.
         </Text>
-        <Button size="lg" colorScheme="accent">
-          Start creating
-        </Button>
+
+        <Link href={Urls.editor.create} passHref>
+          <Button as="a" size="lg" colorScheme="accent">
+            Start creating
+          </Button>
+        </Link>
       </CtaFooterSection>
     </SiteLayout>
   )
