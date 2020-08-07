@@ -2,12 +2,10 @@ import { Box, Button, Spinner, Stack, Text } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
 import { useUpgradeModal } from 'components/upgrade/UpgradeModal'
-import { observer, useLocalStore } from 'mobx-react'
+import { observer } from 'mobx-react'
 import Link from 'next/link'
 import React, { useEffect } from 'react'
 import { FaStar } from 'react-icons/fa'
-import { Api } from 'services/api/api'
-import { Order } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 
@@ -19,15 +17,10 @@ export const AccountPage = observer(() => {
 
   const upgradeModal = useUpgradeModal()
 
-  const state = useLocalStore<{ orders: null | Order[] }>(() => ({
-    orders: null,
-  }))
-
   useEffect(() => {
-    const fetchOrders = async () => {
-      state.orders = await Api.orders.fetchMy()
+    if (!authStore.orders) {
+      authStore.fetchMyOrders()
     }
-    fetchOrders()
   }, [])
 
   if (!profile) {
@@ -93,14 +86,14 @@ export const AccountPage = observer(() => {
         </Box>
 
         <h1>Your Purchases</h1>
-        {state.orders == null && <Spinner />}
-        {state.orders && state.orders.length === 0 && (
+        {authStore.orders == null && <Spinner />}
+        {authStore.orders && authStore.orders.length === 0 && (
           <>
             <p>You haven't made any purchases yet.</p>
             {upgradeButton}
           </>
         )}
-        {state.orders && state.orders.length > 0 && (
+        {authStore.orders && authStore.orders.length > 0 && (
           <>
             <table>
               <thead>
@@ -115,7 +108,7 @@ export const AccountPage = observer(() => {
                 </tr>
               </thead>
               <tbody>
-                {state.orders.map((order) => (
+                {authStore.orders.map((order) => (
                   <tr key={order.orderId}>
                     <td>{new Date(order.createdAt).toLocaleString()}</td>
                     <td>
@@ -131,20 +124,17 @@ export const AccountPage = observer(() => {
                 ))}
               </tbody>
             </table>
-            {/* <pre>{JSON.stringify(state.orders, null, 2)}</pre> */}
+            {/* <pre>{JSON.stringify(authStore.orders, null, 2)}</pre> */}
           </>
         )}
 
         <h1>Account Actions</h1>
         <Stack spacing="3" direction="row" alignItems="flex-start">
-          <Button
-            colorScheme="primary"
-            onClick={() => {
-              window.alert('TODO')
-            }}
-          >
-            Change password
-          </Button>
+          <Link passHref href={Urls.resetPasswordRequest}>
+            <Button colorScheme="primary" as="a">
+              Change password
+            </Button>
+          </Link>
 
           <Button
             colorScheme="red"

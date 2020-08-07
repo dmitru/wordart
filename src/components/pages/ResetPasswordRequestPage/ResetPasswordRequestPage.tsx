@@ -10,18 +10,16 @@ import {
 import { css } from '@emotion/core'
 import { yupResolver } from '@hookform/resolvers'
 import { SiteFormLayout } from 'components/layouts/SiteLayout/SiteFormLayout'
+import { Recaptcha } from 'components/shared/Recaptcha'
+import { config } from 'config'
 import { observer } from 'mobx-react'
 import Link from 'next/link'
-import { useRouter } from 'next/dist/client/router'
-import React, { useState, useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { ApiResponseError } from 'services/api/api-client'
+import { Api } from 'services/api/api'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import * as Yup from 'yup'
-import { Recaptcha } from 'components/shared/Recaptcha'
-import { config } from 'config'
-import { Api } from 'services/api/api'
 
 export type ResetPasswordRequestFormValues = {
   email: string
@@ -34,8 +32,9 @@ const ResetPasswordRequestSchema = Yup.object().shape({
 })
 
 export const ResetPasswordRequestPage = observer(() => {
-  const { authStore } = useStore()
-  const router = useRouter()
+  const {
+    authStore: { profile },
+  } = useStore()
   const recaptchaRef = useRef<Recaptcha>(null)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -46,6 +45,9 @@ export const ResetPasswordRequestPage = observer(() => {
     ResetPasswordRequestFormValues
   >({
     resolver: yupResolver(ResetPasswordRequestSchema),
+    defaultValues: {
+      email: profile?.email || '',
+    },
   })
 
   const onCaptchaResponse = async (token: string) => {

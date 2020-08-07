@@ -12,8 +12,6 @@ export function AccountUsage() {
   } = useStore()
   const upgradeModal = useUpgradeModal()
 
-  console.log('check2', { ...profile.limits })
-
   let content = null
   if (
     profile &&
@@ -22,7 +20,7 @@ export function AccountUsage() {
   ) {
     content = (
       <>
-        <Text color="white" mt="0" fontSize="sm" mb="0">
+        <Text color="gray.700" mt="0" fontSize="sm" mb="0">
           <FaStar
             css={css`
               margin-right: 5px;
@@ -39,7 +37,7 @@ export function AccountUsage() {
   if (profile && !profile.limits.isActiveUnlimitedPlan) {
     content = (
       <>
-        <Text color="white" mt="0" fontSize="sm" mb="0">
+        <Text color="gray.700" mt="0" fontSize="sm" mb="0">
           <strong>Free account limits:</strong>{' '}
           {wordcloudsStore.wordclouds.length} / {profile.limits.maxWordclouds}{' '}
           designs
@@ -66,7 +64,7 @@ export function AccountUsage() {
   }
 
   return (
-    <Box bg="primary.500" p="3" borderRadius="lg">
+    <Box bg="primary.50" p="3" borderRadius="lg">
       {content}
     </Box>
   )
