@@ -266,7 +266,8 @@ export const PricingPlans = observer(() => {
           </Box>
         </Box>
         <Text color="gray.400" fontSize="sm" mt="5" mx="3">
-          * All plans are one-time payment, not a recurring subscription.
+          * All plans are one-time payments and <strong>don't</strong>{' '}
+          auto-renew.
         </Text>
       </Box>
     </Box>
