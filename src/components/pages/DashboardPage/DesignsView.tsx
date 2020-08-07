@@ -1,7 +1,6 @@
 import {
   Box,
   Flex,
-  Heading,
   Menu,
   MenuButton,
   MenuList,
@@ -22,6 +21,7 @@ import { PromptModal } from 'components/shared/PromptModal'
 import { SearchInput } from 'components/shared/SearchInput'
 import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
+import Link from 'next/link'
 import pluralize from 'pluralize'
 import React, { useState } from 'react'
 import {
@@ -272,11 +272,47 @@ export const DesignsView = observer(() => {
               maxWidth="600px"
               width="100%"
             >
-              <Heading as="h1" size="lg">
+              <Text fontSize="1.4rem" fontWeight="medium">
                 Welcome to WordCloudy!
-              </Heading>
+              </Text>
 
-              <Box display="flex">
+              <Text>
+                To get started quickly, please follow this quick tutorial:
+                <br />
+                <a
+                  href="https://blog.wordcloudy.com/getting-started-with-wordcloudy-in-3-minutes/"
+                  target="_blank"
+                >
+                  Getting Started: Create Your First Word Design in 3 Minutes.
+                </a>
+              </Text>
+              <Text>
+                You may also want to explore explore{' '}
+                <a
+                  href="https://blog.wordcloudy.com/tag/tutorials/"
+                  target="_blank"
+                >
+                  our other tutorials
+                </a>{' '}
+                to learn about more advanced features of Wordcloudy.
+              </Text>
+
+              <Text fontWeight="medium" fontSize="1.4rem">
+                Getting help
+              </Text>
+              <Text>
+                Please refer to our{' '}
+                <Link passHref href={Urls.faq}>
+                  <a>FAQ</a>
+                </Link>{' '}
+                for common questions. If you need more help, please{' '}
+                <Link passHref href={Urls.contact}>
+                  <a>write to us via the Contact Form</a>
+                </Link>
+                – our friendly support team will reply within 24 hours.
+              </Text>
+
+              <Box display="flex" mt="6">
                 <Button
                   as="a"
                   css={css`
@@ -296,7 +332,13 @@ export const DesignsView = observer(() => {
                   Create your First Design
                 </Button>
 
-                <Button variant="outline" size="lg">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  as="a"
+                  target="_blank"
+                  href="https://blog.wordcloudy.com/tag/tutorials/"
+                >
                   Check out tutorials
                 </Button>
               </Box>
