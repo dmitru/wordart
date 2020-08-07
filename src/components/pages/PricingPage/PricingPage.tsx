@@ -253,7 +253,8 @@ export const PricingPage = observer(() => {
           </Box>
 
           <Box
-            mt={['1rem', '1rem', '4rem']}
+            mt={['1rem', '1rem', '2rem']}
+            mb="3rem"
             display="flex"
             flexDirection="column"
             maxWidth="600px"
