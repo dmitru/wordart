@@ -6,7 +6,10 @@ import { observer } from 'mobx-react'
 import Link from 'next/link'
 import React from 'react'
 import AwesomeSlider from 'react-awesome-slider'
+import withAutoplay from 'react-awesome-slider/dist/autoplay'
 import { Urls } from 'urls'
+
+const Slider = withAutoplay(AwesomeSlider)
 
 const mobileHeaderBreakpoint = `@media screen and (max-width: 1100px)`
 const xsBreakpoint = `@media screen and (max-width: 500px)`
@@ -21,7 +24,8 @@ export const LandingPage = observer(() => {
               Create <em>unique</em> word designs in no time!
             </HeaderTitle>
             <HeaderSubtitle>
-              Easy-to-use online art generator.
+              Easy-to-use online art generator, a superior alternative to
+              WordArt.com
               <br
                 css={css`
                   ${mobileHeaderBreakpoint} {
@@ -65,14 +69,16 @@ export const LandingPage = observer(() => {
 
           <HeaderSliderContainer>
             <HeaderSlider>
-              <AwesomeSlider>
-                <div data-src="/gallery/gallery-0.png" />
-                <div data-src="/gallery/gallery-1.png" />
-                <div data-src="/gallery/gallery-1.png" />
-                <div data-src="/gallery/gallery-1.png" />
-                <div data-src="/gallery/gallery-1.png" />
-                <div data-src="/gallery/gallery-1.png" />
-              </AwesomeSlider>
+              <Slider play={true} cancelOnInteraction={false} interval={3000}>
+                <div data-src="/gallery/gallery-1.jpeg" />
+                <div data-src="/gallery/gallery-2.jpeg" />
+                <div data-src="/gallery/gallery-3.jpeg" />
+                <div data-src="/gallery/gallery-4.jpeg" />
+                <div data-src="/gallery/gallery-5.jpeg" />
+                <div data-src="/gallery/gallery-6.jpeg" />
+                <div data-src="/gallery/gallery-7.jpeg" />
+                <div data-src="/gallery/gallery-8.jpeg" />
+              </Slider>
             </HeaderSlider>
           </HeaderSliderContainer>
         </HeaderContentWidthLimit>

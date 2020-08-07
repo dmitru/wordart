@@ -6,7 +6,6 @@ import { unlimitedPricingPlans } from 'plans'
 import React, { useState } from 'react'
 import { FaCheck } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
-
 const CheckIcon = () => (
   <Box
     as="span"
@@ -189,11 +188,11 @@ export const PricingPlans = observer(() => {
               Unlimited number of HQ downloads
             </div>
             <div>
-            <CheckIcon />
+              <CheckIcon />
               Commercial use {commercialUseHelp}
             </div>
             <div>
-            <CheckIcon />
+              <CheckIcon />
               More advanced features (
               <a href="#pricing-comparison">Learn more</a>)
             </div>
