@@ -135,7 +135,7 @@ export const FoldersView = observer(() => {
           css={css`
             min-height: 160px;
             max-height: 400px;
-            max-height: calc(100vh - 420px);
+            max-height: calc(100vh - 450px);
 
             &::-webkit-scrollbar {
               display: none; /* Chrome Safari */

@@ -1,5 +1,6 @@
-import { Box, Text } from '@chakra-ui/core'
+import { Box, Button, Text } from '@chakra-ui/core'
 import css from '@emotion/css'
+import { useUpgradeModal } from 'components/upgrade/UpgradeModal'
 import React from 'react'
 import { FaStar } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
@@ -7,7 +8,11 @@ import { useStore } from 'services/root-store'
 export function AccountUsage() {
   const {
     authStore: { profile },
+    wordcloudsStore,
   } = useStore()
+  const upgradeModal = useUpgradeModal()
+
+  console.log('check2', { ...profile.limits })
 
   let content = null
   if (
@@ -27,6 +32,31 @@ export function AccountUsage() {
           Your unlimited plan expires at: <br />
           {new Date(profile.unlimitedPlanExpiresAt).toLocaleString()}
         </Text>
+      </>
+    )
+  }
+
+  if (profile && !profile.limits.isActiveUnlimitedPlan) {
+    content = (
+      <>
+        <Text color="white" mt="0" fontSize="sm" mb="0">
+          <strong>Free account limits:</strong>{' '}
+          {wordcloudsStore.wordclouds.length} / {profile.limits.maxWordclouds}{' '}
+          designs
+        </Text>
+        <Button
+          colorScheme="accent"
+          size="sm"
+          mt="3"
+          onClick={() => upgradeModal.show('generic')}
+        >
+          <FaStar
+            css={css`
+              margin-right: 5px;
+            `}
+          />{' '}
+          Upgrade to Unlimited
+        </Button>
       </>
     )
   }

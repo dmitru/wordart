@@ -54,7 +54,7 @@ export class AuthStore {
 
     this.channel.addEventListener('message', this.handleChannelMsg)
 
-    if (!IS_SSR) {
+    if (!IS_SSR && window['Paddle']) {
       window.Paddle.Setup({
         vendor: config.paddle.vendorId,
         eventCallback: async (data: any) => {
