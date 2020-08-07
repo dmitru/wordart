@@ -10,6 +10,8 @@ export type MyProfile = {
   unlimitedPlanExpiresAt?: string
   isEmailConfirmed: boolean
   limits: UserLimits
+  createdAt: string
+  updatedAt: string
 }
 
 export type UserLimits = {
