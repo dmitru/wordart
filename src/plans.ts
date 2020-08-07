@@ -18,6 +18,13 @@ export type PricingPlan = DownloadsPricingPlan | UnlimitedPricingPlan
 export const unlimitedPricingPlans: UnlimitedPricingPlan[] = [
   {
     kind: 'unlimited',
+    id: 618592,
+    title: '1 Day',
+    periodCount: 1,
+    periodUnits: 'day',
+  },
+  {
+    kind: 'unlimited',
     id: 600684,
     title: '1 Week',
     periodCount: 1,
@@ -47,36 +54,36 @@ export const unlimitedPricingPlans: UnlimitedPricingPlan[] = [
 ]
 
 export const downloadsPricingPlans: DownloadsPricingPlan[] = [
-  {
-    kind: 'downloads-pack',
-    id: 597590,
-    title: '1 HQ Download',
-    downloads: 1,
-  },
-  {
-    kind: 'downloads-pack',
-    id: 600538,
-    title: '5 HQ Downloads',
-    downloads: 1,
-  },
-  {
-    kind: 'downloads-pack',
-    id: 600681,
-    title: '10 HQ Downloads',
-    downloads: 1,
-  },
-  {
-    kind: 'downloads-pack',
-    id: 600682,
-    title: '25 HQ Downloads',
-    downloads: 1,
-  },
-  {
-    kind: 'downloads-pack',
-    id: 600683,
-    title: '100 HQ Downloads',
-    downloads: 1,
-  },
+  // {
+  //   kind: 'downloads-pack',
+  //   id: 597590,
+  //   title: '1 HQ Download',
+  //   downloads: 1,
+  // },
+  // {
+  //   kind: 'downloads-pack',
+  //   id: 600538,
+  //   title: '5 HQ Downloads',
+  //   downloads: 1,
+  // },
+  // {
+  //   kind: 'downloads-pack',
+  //   id: 600681,
+  //   title: '10 HQ Downloads',
+  //   downloads: 1,
+  // },
+  // {
+  //   kind: 'downloads-pack',
+  //   id: 600682,
+  //   title: '25 HQ Downloads',
+  //   downloads: 1,
+  // },
+  // {
+  //   kind: 'downloads-pack',
+  //   id: 600683,
+  //   title: '100 HQ Downloads',
+  //   downloads: 1,
+  // },
 ]
 
 export const plans: PricingPlan[] = [
