@@ -271,17 +271,20 @@ export const DesignsView = observer(() => {
 
           {store.hasFetchedWordclouds && allWordclouds.length === 0 && (
             <Box
+              borderRadius="lg"
               mx="auto"
-              p="4"
+              p="6"
               fontSize="lg"
               bg="white"
-              boxShadow="sm"
+              boxShadow="md"
               maxWidth="600px"
               width="100%"
             >
               <Text fontSize="1.4rem" fontWeight="medium">
                 Welcome to WordCloudy!
               </Text>
+
+              <Text>We're happy to see you here!</Text>
 
               <Text>
                 To get started quickly, please follow this quick tutorial:
@@ -304,22 +307,7 @@ export const DesignsView = observer(() => {
                 to learn about more advanced features of Wordcloudy.
               </Text>
 
-              <Text fontWeight="medium" fontSize="1.4rem">
-                Getting help
-              </Text>
-              <Text>
-                Please refer to our{' '}
-                <Link passHref href={Urls.faq}>
-                  <a>FAQ</a>
-                </Link>{' '}
-                for common questions. If you need more help, please{' '}
-                <Link passHref href={Urls.contact}>
-                  <a>write to us via the Contact Form</a>
-                </Link>
-                – our friendly support team will reply within 24 hours.
-              </Text>
-
-              <Box display="flex" mt="6">
+              <Box display="flex" mt="6" mb="2rem">
                 <Button
                   as="a"
                   css={css`
@@ -349,6 +337,21 @@ export const DesignsView = observer(() => {
                   Check out tutorials
                 </Button>
               </Box>
+
+              <Text fontWeight="medium" fontSize="1.4rem">
+                Getting help
+              </Text>
+              <Text>
+                Please refer to our{' '}
+                <Link passHref href={Urls.faq}>
+                  <a>FAQ</a>
+                </Link>{' '}
+                for common questions. If you need more help, please{' '}
+                <Link passHref href={Urls.contact}>
+                  <a>write to us via the Contact Form</a>
+                </Link>
+                – our friendly support team will reply within 24 hours.
+              </Text>
             </Box>
           )}
 

@@ -182,5 +182,9 @@ export const Api = {
       const response = await apiClient.get('/users/profile')
       return response.data as MyProfile
     },
+
+    async deleteMyProfile(): Promise<void> {
+      await apiClient.delete('/users/profile')
+    },
   },
 }

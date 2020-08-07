@@ -134,6 +134,11 @@ export class AuthStore {
     this.orders = orders
   }
 
+  @action deleteMyAccount = async () => {
+    await Api.auth.deleteMyProfile()
+    this.logout()
+  }
+
   @action handleChannelMsg = (msg: AuthChannelMessage) => {
     switch (msg.kind) {
       case 'login': {

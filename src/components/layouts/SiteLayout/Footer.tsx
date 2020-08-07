@@ -10,14 +10,14 @@ export type FooterProps = {}
 
 export const Footer: React.FC<FooterProps> = () => {
   return (
-    <FooterWrapper bg="gray.100" py="6">
+    <FooterWrapper bg="gray.100" py="4">
       <ContentContainer
         display="flex"
         alignItems="center"
         flexDirection="column"
       >
         <Box
-          mt="3"
+          mt="1"
           css={css`
             @media screen and (max-width: 768px) {
               display: flex;

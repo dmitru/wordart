@@ -1,13 +1,15 @@
 import { Box, Button, Spinner, Stack, Text } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
+import { PromptModal } from 'components/shared/PromptModal'
 import { useUpgradeModal } from 'components/upgrade/UpgradeModal'
 import { observer } from 'mobx-react'
 import Link from 'next/link'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaStar } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
+import { useToasts } from 'use-toasts'
 
 export const AccountPage = observer(() => {
   const {
@@ -16,6 +18,8 @@ export const AccountPage = observer(() => {
   } = useStore()
 
   const upgradeModal = useUpgradeModal()
+  const toasts = useToasts()
+  const [isShowingDeleteConfirm, setIsShowingDeleteConfirm] = useState(false)
 
   useEffect(() => {
     if (!authStore.orders) {
@@ -88,10 +92,7 @@ export const AccountPage = observer(() => {
         <h1>Your Purchases</h1>
         {authStore.orders == null && <Spinner />}
         {authStore.orders && authStore.orders.length === 0 && (
-          <>
-            <p>You haven't made any purchases yet.</p>
-            {upgradeButton}
-          </>
+          <p>You haven't made any purchases yet.</p>
         )}
         {authStore.orders && authStore.orders.length > 0 && (
           <>
@@ -140,13 +141,36 @@ export const AccountPage = observer(() => {
             colorScheme="red"
             variant="outline"
             onClick={() => {
-              window.alert('TODO')
+              setIsShowingDeleteConfirm(true)
             }}
           >
             Delete my account
           </Button>
         </Stack>
       </Box>
+
+      {/* Delete account modal */}
+      <PromptModal
+        title="Confirm account removal"
+        isOpen={isShowingDeleteConfirm}
+        onCancel={() => setIsShowingDeleteConfirm(false)}
+        submitText="Delete my account"
+        isSubmitEnabled={(value) => value.trim().toLowerCase() === 'delete'}
+        onSubmit={async (value) => {
+          if (value.trim().toLowerCase() === 'delete') {
+            await authStore.deleteMyAccount()
+            toasts.showSuccess({
+              title: 'You account and all your data has been deleted',
+            })
+          }
+        }}
+      >
+        <p>
+          After you delete your account, all your data will be erased. You won't
+          be able to restore it.
+        </p>
+        <p>Type in "delete" if you really want to delete your account.</p>
+      </PromptModal>
     </SiteLayout>
   )
 })

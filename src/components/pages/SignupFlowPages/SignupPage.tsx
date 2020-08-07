@@ -11,19 +11,19 @@ import {
 import { css } from '@emotion/core'
 import { yupResolver } from '@hookform/resolvers'
 import { SiteFormLayout } from 'components/layouts/SiteLayout/SiteFormLayout'
+import { Recaptcha } from 'components/shared/Recaptcha'
+import { config } from 'config'
 import { observer } from 'mobx-react'
 import { useRouter } from 'next/dist/client/router'
 import Link from 'next/link'
 import React, { useRef, useState } from 'react'
+import { Helmet } from 'react-helmet'
 import { useForm } from 'react-hook-form'
 import { ApiResponseError } from 'services/api/api-client'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
-import * as Yup from 'yup'
-import { Recaptcha } from 'components/shared/Recaptcha'
-import { config } from 'config'
-import { Helmet } from 'react-helmet'
 import { getTabTitle } from 'utils/tab-title'
+import * as Yup from 'yup'
 
 export type SignupFormValues = {
   email: string

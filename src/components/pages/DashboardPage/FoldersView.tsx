@@ -66,7 +66,12 @@ export const FoldersView = observer(() => {
         z-index: 2;
       `}
     >
-      <FoldersList mr="4" mt="96px">
+      <FoldersList mr="4">
+        {/* Account usage */}
+        <Box height="96px" mt="4" mb="6">
+          <AccountUsage />
+        </Box>
+
         <FolderRow
           fontSize="lg"
           fontWeight="medium"
@@ -216,11 +221,6 @@ export const FoldersView = observer(() => {
               </Box>
             </FolderRow>
           ))}
-        </Box>
-
-        {/* Account usage */}
-        <Box mt="6">
-          <AccountUsage />
         </Box>
 
         {/* Delete folder */}
