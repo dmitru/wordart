@@ -27,6 +27,7 @@ import { ApiErrors } from 'services/api/api'
 import { Folder } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { useToasts } from 'use-toasts'
+import { AccountUsage } from './AccountUsage'
 
 export const FoldersView = observer(() => {
   const { wordcloudsStore: store } = useStore()
@@ -102,16 +103,32 @@ export const FoldersView = observer(() => {
           </FolderRow>
         )}
 
-        <Text
-          textTransform="uppercase"
-          fontSize="sm"
-          mb="2"
-          mt="6"
-          fontWeight="medium"
-          color="gray.500"
-        >
-          Folders
-        </Text>
+        <Box py="3" mt="5" display="flex" alignItems="center">
+          <Text
+            flex="1"
+            textTransform="uppercase"
+            fontSize="sm"
+            fontWeight="medium"
+            color="gray.500"
+            mb="0"
+            mt="0"
+          >
+            Folders
+          </Text>
+
+          <Button
+            color="gray.500"
+            variant="outline"
+            width="140px"
+            size="sm"
+            onClick={() => setIsCreatingFolder(true)}
+          >
+            <Box mr="2">
+              <FaPlus />
+            </Box>
+            New Folder
+          </Button>
+        </Box>
 
         <Box
           overflow="auto"
@@ -199,20 +216,11 @@ export const FoldersView = observer(() => {
               </Box>
             </FolderRow>
           ))}
+        </Box>
 
-          <Box mt={store.folders.length > 0 ? '4' : '0'}>
-            <Button
-              color="gray.500"
-              variant="outline"
-              width="140px"
-              onClick={() => setIsCreatingFolder(true)}
-            >
-              <Box mr="2">
-                <FaPlus />
-              </Box>
-              New Folder
-            </Button>
-          </Box>
+        {/* Account usage */}
+        <Box mt="6">
+          <AccountUsage />
         </Box>
 
         {/* Delete folder */}
@@ -236,7 +244,7 @@ export const FoldersView = observer(() => {
           </Text>
           <Text>
             All designs in this folder will <strong>not</strong> be deleted and
-            will be moved outside of this folder.
+            will be simply moved outside of the deleted folder.
           </Text>
         </ConfirmModal>
 
