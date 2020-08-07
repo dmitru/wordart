@@ -19,6 +19,7 @@ import { ConfirmModal } from 'components/shared/ConfirmModal'
 import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 import { PromptModal } from 'components/shared/PromptModal'
 import { SearchInput } from 'components/shared/SearchInput'
+import { useUpgradeModal } from 'components/upgrade/UpgradeModal'
 import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
 import Link from 'next/link'
@@ -30,6 +31,7 @@ import {
   FaSearch,
   FaTimes,
 } from 'react-icons/fa'
+import { ApiErrors } from 'services/api/api'
 import { Folder, Wordcloud } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
@@ -37,12 +39,16 @@ import { useToasts } from 'use-toasts'
 import { openUrlInNewTab } from 'utils/browser'
 
 export const DesignsView = observer(() => {
-  const { wordcloudsStore: store } = useStore()
+  const {
+    wordcloudsStore: store,
+    authStore: { profile },
+  } = useStore()
   const toasts = useToasts()
   const [
     duplicatingWordcloud,
     setDuplicatingWordcloud,
   ] = useState<Wordcloud | null>(null)
+
   const [renamingWordcloud, setRenamingWordcloud] = useState<Wordcloud | null>(
     null
   )
@@ -54,6 +60,7 @@ export const DesignsView = observer(() => {
   )
 
   const [query, setQuery] = useState('')
+  const upgradeModal = useUpgradeModal()
 
   const allWordclouds = store.wordclouds
   const wordcloudsInFolder = allWordclouds.filter((wc) => {
@@ -499,7 +506,16 @@ export const DesignsView = observer(() => {
                 }}
                 onMoveToFolder={() => setMovindWordclouds([wc])}
                 onRename={() => setRenamingWordcloud(wc)}
-                onDuplicate={() => setDuplicatingWordcloud(wc)}
+                onDuplicate={() => {
+                  if (
+                    profile &&
+                    profile.limits.maxWordclouds <= allWordclouds.length
+                  ) {
+                    upgradeModal.show('design-limits')
+                    return
+                  }
+                  setDuplicatingWordcloud(wc)
+                }}
                 onDelete={() => setDeletingWordclouds([wc])}
                 isSelected={selection.has(wc.id)}
                 onSelectionChange={(isSelected) => {
@@ -566,6 +582,11 @@ export const DesignsView = observer(() => {
             }
             try {
               await duplicate(duplicatingWordcloud, title)
+            } catch (error) {
+              if (error.response?.data?.message === ApiErrors.WordcloudsLimit) {
+                upgradeModal.show('design-limits')
+              }
+              setDuplicatingWordcloud(null)
             } finally {
               setDuplicatingWordcloud(null)
             }

@@ -3,10 +3,9 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  PopoverArrow,
-  Text,
   MenuTransition,
   Portal,
+  Text,
 } from '@chakra-ui/core'
 import css from '@emotion/css'
 import {
@@ -17,20 +16,22 @@ import {
 } from 'components/pages/DashboardPage/components'
 import { dashboardUiState } from 'components/pages/DashboardPage/state'
 import { Button } from 'components/shared/Button'
+import { ConfirmModal } from 'components/shared/ConfirmModal'
 import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 import { PromptModal } from 'components/shared/PromptModal'
-import 'lib/wordart/console-extensions'
+import { useUpgradeModal } from 'components/upgrade/UpgradeModal'
 import { observer } from 'mobx-react'
 import React, { useState } from 'react'
 import { FaPencilAlt, FaPlus, FaRegFolder, FaTimes } from 'react-icons/fa'
+import { ApiErrors } from 'services/api/api'
 import { Folder } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { useToasts } from 'use-toasts'
-import { ConfirmModal } from 'components/shared/ConfirmModal'
 
 export const FoldersView = observer(() => {
   const { wordcloudsStore: store } = useStore()
   const toasts = useToasts()
+  const upgradeModal = useUpgradeModal()
   const [renamingFolder, setRenamingFolder] = useState<Folder | null>(null)
   const [deletingFolder, setDeletingFolder] = useState<Folder | null>(null)
   const [isCreatingFolder, setIsCreatingFolder] = useState(false)
@@ -271,6 +272,9 @@ export const FoldersView = observer(() => {
               })
               setIsCreatingFolder(false)
             } catch (error) {
+              if (error.response?.data?.message === ApiErrors.FoldersLimit) {
+                upgradeModal.show('folder-limits')
+              }
               toasts.showError({
                 title: 'Sorry, there was an error when creating new folder',
               })

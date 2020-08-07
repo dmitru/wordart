@@ -23,6 +23,8 @@ import { apiClient } from './api-client'
 
 export const ApiErrors = {
   NoMediaUploadFreePlan: 'no_custom_media_for_free_plan',
+  WordcloudsLimit: 'wordclouds_limit',
+  FoldersLimit: 'folders_limit',
 }
 
 export const Api = {

@@ -270,6 +270,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             error.response?.data?.message === ApiErrors.NoMediaUploadFreePlan
           ) {
             upgradeModal.show('custom-fonts')
+          } else if (
+            error.response?.data?.message === ApiErrors.WordcloudsLimit
+          ) {
+            upgradeModal.show('design-limits')
           } else {
             throw error
           }
