@@ -1,4 +1,5 @@
 import {
+  Box,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -77,7 +78,10 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = observer(
                 </Link>
                 .
               </Text>
-              <PricingPlans />
+
+              <Box mt="2rem">
+                <PricingPlans />
+              </Box>
             </ModalBody>
 
             <ModalCloseButton />

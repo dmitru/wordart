@@ -7,6 +7,22 @@ import React, { useState } from 'react'
 import { FaCheck } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 
+const CheckIcon = () => (
+  <Box
+    as="span"
+    mr="2"
+    display="inline-block"
+    color="green.500"
+    fontSize="xl"
+    css={css`
+      position: relative;
+      bottom: -4px;
+    `}
+  >
+    <FaCheck />
+  </Box>
+)
+
 export const PricingPlans = observer(() => {
   const { authStore } = useStore()
   const { profile } = authStore
@@ -156,8 +172,8 @@ export const PricingPlans = observer(() => {
             pr="4"
             fontSize={['sm', 'md']}
             css={css`
-              margin-left: 20px;
               > div {
+                margin: 10px 0 10px 20px;
                 display: flex;
                 align-items: center;
 
@@ -169,15 +185,15 @@ export const PricingPlans = observer(() => {
             `}
           >
             <div>
-              <FaCheck />
+              <CheckIcon />
               Unlimited number of HQ downloads
             </div>
             <div>
-              <FaCheck />
+            <CheckIcon />
               Commercial use {commercialUseHelp}
             </div>
             <div>
-              <FaCheck />
+            <CheckIcon />
               More advanced features (
               <a href="#pricing-comparison">Learn more</a>)
             </div>
