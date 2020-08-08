@@ -263,7 +263,10 @@ export class EditorStore {
       await this.loadSerialized(params.serialized)
     } else {
       await this.applyColorTheme(themePresets[0])
-      await this.selectShape(this.availableImageShapes[0])
+
+      const defaultShape = this.availableImageShapes[0]
+      await this.selectShape(defaultShape)
+      this.shapesPanel.image.selected = defaultShape.id
     }
 
     this.enterViewMode('shape')
