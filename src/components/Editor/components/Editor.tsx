@@ -123,11 +123,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     }))
 
     const upgradeModal = useUpgradeModal()
-    const toast = useToasts()
+    const toasts = useToasts()
 
     useEffect(() => {
       // @ts-ignore
-      window['toast'] = toast
+      window['toast'] = toasts
     }, [])
 
     const aspectRatio = pageSizePresets[0].aspect
@@ -208,7 +208,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         })
         router.replace(Urls.signup)
 
-        toast.showSuccess({
+        toasts.showSuccess({
           title: 'Your work is saved. Please sign up to continue.',
           duration: 10000,
           isClosable: true,
@@ -220,7 +220,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const handleSaveClick = useCallback(() => {
       const showSaveToast = () =>
-        toast.showSuccess({
+        toasts.showSuccess({
           id: 'work-saved',
           title: 'Your work is saved',
           isClosable: true,
@@ -313,7 +313,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               editorParams.serialized = editorData
             } catch (error) {
               console.error(error)
-              toast.showError({
+              toasts.showError({
                 title: 'Error loading the design',
                 description:
                   "Sorry, we couldn't load this design. If you believe it's a problem on our end, please contact our support at support@wordcloudy.com",
@@ -439,7 +439,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const cancelVisualization = () => {
       store.editor?.cancelVisualization()
-      toast.showInfo({
+      toasts.showInfo({
         title: 'Visualization cancelled',
         duration: 2000,
         isClosable: true,
@@ -485,15 +485,24 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         return
       }
 
-      if (shapeCount > 0) {
-        await store.editor?.generateShapeItems({
-          style: mkShapeStyleConfFromOptions(store.styleOptions.shape),
+      try {
+        if (shapeCount > 0) {
+          await store.editor?.generateShapeItems({
+            style: mkShapeStyleConfFromOptions(store.styleOptions.shape),
+          })
+        }
+        if (bgCount > 0) {
+          await store.editor?.generateBgItems({
+            style: mkBgStyleConfFromOptions(store.styleOptions.bg),
+          })
+        }
+      } catch (error) {
+        store.isVisualizing = false
+        toasts.showError({
+          title:
+            'Sorry, there was an error. Please contact us at support@wordcloudy.com',
         })
-      }
-      if (bgCount > 0) {
-        await store.editor?.generateBgItems({
-          style: mkBgStyleConfFromOptions(store.styleOptions.bg),
-        })
+        throw error
       }
     }
 

@@ -1455,6 +1455,9 @@ export class Editor {
     }
 
     const shapeConfig = this.store.getSelectedShapeConf()
+    if (!shapeConfig) {
+      throw new Error('shape config is null')
+    }
     const wordConfigsById = keyBy(style.items.words.wordList, 'id')
 
     const enableRemoveWhiteBg =
@@ -1674,6 +1677,9 @@ export class Editor {
     )
 
     const shapeConfig = this.store.getSelectedShapeConf()
+    if (!shapeConfig) {
+      throw new Error('shape config is null')
+    }
     const wordConfigsById = keyBy(style.items.words.wordList, 'id')
 
     // @TODO: don't remove edges for single-color SVG shapes

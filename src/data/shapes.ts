@@ -3,7 +3,7 @@ import { iconsCategories } from 'data/icon-categories'
 import { sortBy } from 'lodash'
 
 const defaultEdgesProcessing = {
-  amount: 95,
+  amount: 98,
 }
 
 export let shapes: ShapeClipartConf[] = []
