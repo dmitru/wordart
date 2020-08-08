@@ -55,7 +55,12 @@ import {
   popularFonts,
 } from 'data/fonts'
 import { icons, loadIconsConfig } from 'data/icons'
-import { getSortedIconsShapes, imageShapes } from 'data/shapes'
+import {
+  getSortedIconsShapes,
+  getSortedImageShapes,
+  loadShapesConfig,
+  shapes,
+} from 'data/shapes'
 import { createCanvas } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { cloneDeep, uniq, uniqBy } from 'lodash'
@@ -135,11 +140,11 @@ export class EditorStore {
   @observable leftTabIsTransformingShape = false
   @observable targetTab = 'shape' as TargetTab
   @observable hasItemChanges = false
-  @observable availableImageShapes: ShapeClipartConf[] = imageShapes
+  @observable availableImageShapes: ShapeClipartConf[] = []
   @observable availableIconShapes: ShapeIconConf[] = []
   @observable hasUnsavedChanges = false
 
-  @observable selectedShapeConf: ShapeConf = imageShapes[4]
+  @observable selectedShapeConf: ShapeConf | null = null
 
   wordIdGen = new UniqIdGenerator(3)
   customImgIdGen = new UniqIdGenerator(3)
@@ -167,7 +172,9 @@ export class EditorStore {
     await Promise.all([
       fonts.length === 0 ? loadFontsConfig() : Promise.resolve(),
       icons.length === 0 ? loadIconsConfig() : Promise.resolve(),
+      shapes.length === 0 ? loadShapesConfig() : Promise.resolve(),
     ])
+    this.availableImageShapes = getSortedImageShapes(shapes)
     this.availableIconShapes = getSortedIconsShapes(icons)
 
     this.styleOptions.bg.items.words.fontIds = [
@@ -256,7 +263,7 @@ export class EditorStore {
       await this.loadSerialized(params.serialized)
     } else {
       await this.applyColorTheme(themePresets[0])
-      await this.selectShape(imageShapes[5])
+      await this.selectShape(this.availableImageShapes[0])
     }
 
     this.enterViewMode('shape')
@@ -498,6 +505,10 @@ export class EditorStore {
       }
 
       await this.selectShape(shapeConf, false, false)
+    }
+
+    if (!this.selectedShapeConf) {
+      return
     }
 
     const shape = this.editor.shape
@@ -758,6 +769,9 @@ export class EditorStore {
       return
     }
     const currentShapeConf = this.getSelectedShapeConf()
+    if (!currentShapeConf) {
+      return
+    }
     const shape = await cloneObj(this.editor.shape.obj)
     applyTransformToObj(shape, this.editor.shape.originalTransform)
 
@@ -773,6 +787,9 @@ export class EditorStore {
   getStateSnapshot = (): EditorStateSnapshot => {
     if (!this.editor) {
       throw new Error('editor not initialized')
+    }
+    if (!this.selectedShapeConf) {
+      throw new Error('no selected shape')
     }
 
     let selection: EditorStateSnapshot['selection'] = null
@@ -1313,7 +1330,7 @@ export class EditorStore {
 
   /** Update shape based on the selected shape config (e.g. after shape config changes) */
   updateShapeFromSelectedShapeConf = async () => {
-    if (!this.editor) {
+    if (!this.editor || !this.selectedShapeConf) {
       return
     }
 
@@ -1624,7 +1641,7 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
   },
   image: {
     category: null,
-    selected: imageShapes[0].id,
+    selected: 'circle',
     singleColor: '#4A90E2',
   },
   text: {

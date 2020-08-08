@@ -184,7 +184,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         return
       }
 
-      await wordcloudsStore.delete(props.wordcloudId)
+      await wordcloudsStore.delete([props.wordcloudId])
       router.replace(Urls.yourDesigns)
     }
 

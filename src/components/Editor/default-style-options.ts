@@ -22,7 +22,7 @@ const defaultWordsList: WordListEntry[] = [
     } as WordListEntry)
 )
 
-export const defaultFontId = 'Roboto:900'
+export const defaultFontId = 'Roboto:700'
 
 const defaultWordsListBackground: WordListEntry[] = [].map(
   (s, index) => ({ id: `${index}`, text: s } as WordListEntry)

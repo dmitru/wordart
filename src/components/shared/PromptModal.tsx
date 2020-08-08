@@ -17,7 +17,7 @@ export type PromptModalProps = {
   title: string
   initialValue?: string
   submitText?: string
-  isSubmitEnabled?: (value: string) => void
+  isSubmitEnabled?: (value: string) => boolean
   isOpen: boolean
   onCancel: () => void
   onSubmit: (value: string) => Promise<void>

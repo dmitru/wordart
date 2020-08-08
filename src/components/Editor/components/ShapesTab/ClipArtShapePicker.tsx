@@ -15,20 +15,20 @@ import { css } from '@emotion/core'
 import { ShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
 import { ShapeSelector } from 'components/Editor/components/ShapeSelector'
 import { SectionLabel } from 'components/Editor/components/shared'
+import { useEditorStore } from 'components/Editor/editor-store'
 import { ShapeClipartConf } from 'components/Editor/shape-config'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
 import { SearchInput } from 'components/shared/SearchInput'
 import { Slider } from 'components/shared/Slider'
+import { shapeCategories } from 'data/shapes'
 import { AnimatePresence, motion } from 'framer-motion'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import React, { useEffect, useState } from 'react'
 import { FaCog } from 'react-icons/fa'
-import { useStore } from 'services/root-store'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
-import { useEditorStore } from 'components/Editor/editor-store'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -65,29 +65,10 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
     renderKey, // eslint-disable-line
   } = store
 
-  const allCategoryOptions = [
-    ['geometry', 'Geometric Shapes'],
-    ['animals', 'Animals & Pets'],
-    ['geo', 'Countries & Earth'],
-    ['other', 'Others'],
-    // 'Baby',
-    // 'Birthday',
-    // 'Christmas',
-    // 'Clouds',
-    // 'Geometric Shapes',
-    // 'Emoji',
-    // 'Icons',
-    // 'Love & Wedding',
-    // 'Nature',
-    // 'Music',
-    // 'Money & Business',
-    // 'People',
-    // 'Education & School',
-    // 'Sports',
-    // 'Transport',
-    // 'Other',
-  ].map(([value, label]) => ({ value, label }))
-
+  const allCategoryOptions = shapeCategories.map(({ category, title }) => ({
+    value: category,
+    label: title,
+  }))
   const allClipArtShapes = store.availableImageShapes
 
   const shapesPerCategoryCounts = allCategoryOptions.map(

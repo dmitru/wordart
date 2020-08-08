@@ -37,13 +37,13 @@ export function AccountUsage() {
   if (profile && !profile.limits.isActiveUnlimitedPlan) {
     content = (
       <>
-        <Text color="gray.700" mt="0" fontSize="sm" mb="0">
+        <Text color="gray.600" mt="0" fontSize="sm" mb="0">
           <strong>Free account limits:</strong>{' '}
           {wordcloudsStore.wordclouds.length} / {profile.limits.maxWordclouds}{' '}
           designs
         </Text>
         <Button
-          colorScheme="accent"
+          colorScheme="primary"
           size="sm"
           mt="3"
           onClick={() => upgradeModal.show('generic')}
@@ -64,7 +64,7 @@ export function AccountUsage() {
   }
 
   return (
-    <Box bg="primary.50" p="3" borderRadius="lg">
+    <Box bg="gray.100" p="3" borderRadius="lg">
       {content}
     </Box>
   )
