@@ -103,6 +103,7 @@ import 'utils/canvas-to-blob'
 import { getTabTitle } from 'utils/tab-title'
 import { useWarnIfUnsavedChanges } from 'utils/use-warn-if-unsaved-changes'
 import { uuid } from 'utils/uuid'
+import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -539,15 +540,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           />
 
           <TopNavWrapper alignItems="center" display="flex">
-            <img
-              src="/images/logo.svg"
-              css={css`
-                height: 40px;
-                margin: 0;
-                margin-left: 0.5rem;
-                margin-right: 0.5rem;
-              `}
-            />
             <Link
               href={authStore.isLoggedIn ? Urls.yourDesigns : Urls.landing}
               passHref
@@ -606,14 +598,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         />
                         Make Copy
                       </MenuItem> */}
-                      <MenuItem>
-                        <FiEdit
-                          css={css`
-                            margin-right: 4px;
-                          `}
-                        />
-                        Rename
-                      </MenuItem>
+
                       <MenuItem
                         onClick={() => {
                           state.leftPanelContext = 'resize'
@@ -654,7 +639,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         Delete
                       </MenuItem>
                       <MenuDivider />
-                      <MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          router.push(Urls.yourDesigns)
+                        }}
+                      >
                         <FiChevronLeft
                           css={css`
                             margin-right: 4px;
@@ -722,6 +711,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 `}
               />
               <EditableInput
+                id="title-input"
                 css={css`
                   background-color: white;
                   color: black;
@@ -756,14 +746,69 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             Order Prints
           </TopNavButton> */}
 
-            <TopNavButton colorScheme="secondary" mr="2" ml="auto">
-              <FiHelpCircle
-                css={css`
-                  margin-right: 4px;
-                `}
-              />
-              Help & Tutorials
-            </TopNavButton>
+            <Menu isLazy>
+              <MenuButton
+                as={TopNavButton}
+                colorScheme="secondary"
+                mr="2"
+                ml="auto"
+              >
+                <FiHelpCircle
+                  css={css`
+                    margin-right: 4px;
+                    display: inline-block;
+                  `}
+                />
+                Help
+                <span
+                  css={css`
+                    @media screen and (max-width: 1010px) {
+                      display: none;
+                    }
+                  `}
+                >
+                  {' & Tutorials'}
+                </span>
+              </MenuButton>
+
+              <MenuTransition>
+                {(styles) => (
+                  <Portal>
+                    <MenuList
+                      // @ts-ignore
+                      css={css`
+                        ${styles}
+                        max-width: 320px;
+                      `}
+                    >
+                      <MenuItemWithDescription
+                        title="Open Tutorials"
+                        description="Learn how to use Wordcloudy"
+                        onClick={() => {
+                          openUrlInNewTab(
+                            `https://blog.wordcloudy.com/tag/tutorials/`
+                          )
+                        }}
+                      />
+                      <MenuItemWithDescription
+                        title="Read FAQ"
+                        description="Find answers to commonly asked questions"
+                        onClick={() => {
+                          openUrlInNewTab(`${config.baseUrl}${Urls.faq}`)
+                        }}
+                      />
+                      <MenuItemWithDescription
+                        title="Contact us"
+                        description="Report a problem, give feedback, suggest a feature or ask us anything!"
+                        onClick={() => {
+                          openUrlInNewTab(`${config.baseUrl}${Urls.contact}`)
+                        }}
+                      />
+                    </MenuList>
+                  </Portal>
+                )}
+              </MenuTransition>
+            </Menu>
 
             {!hasActivePlan && (
               <Button
@@ -866,6 +911,23 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     <ColorPalette className="icon" />
                     Colors
                   </LeftNavbarBtn>
+
+                  <div
+                    css={css`
+                      flex: 1;
+                      display: flex;
+                      align-items: flex-end;
+                    `}
+                  >
+                    <img
+                      src="/images/logo.svg"
+                      css={css`
+                        opacity: 0.5;
+                        height: 40px;
+                        margin: 0 auto;
+                      `}
+                    />
+                  </div>
                 </SideNavbar>
 
                 <LeftPanel>
@@ -1477,6 +1539,7 @@ const SideNavbar = styled.div<{ theme: any; activeIndex?: number }>`
   padding: 0;
   margin: 0;
   margin-top: 58px;
+  padding-bottom: 20px;
   /* height: 50px; */
   display: flex;
   flex-direction: column;
