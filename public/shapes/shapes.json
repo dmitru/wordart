@@ -1123,5 +1123,149 @@
     "url": "bicycle.svg",
     "categories": ["shapes"],
     "keywords": ["shape", "bicycle"]
+  },
+  {
+    "title": "Baseball cap",
+    "url": "baseball-cap.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "baseball", "cap"]
+  },
+  {
+    "title": "Sport shape 1",
+    "url": "sport-shape-1-stretch.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "stretch"]
+  },
+  {
+    "title": "Sport shape 2",
+    "url": "sport-shape-2-stretch.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "stretch"]
+  },
+  {
+    "title": "Sport shape 3",
+    "url": "sport-shape-3-meditation.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "meditation"]
+  },
+  {
+    "title": "Sport shape 4",
+    "url": "sport-shape-4-stretch.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "stretch"]
+  },
+  {
+    "title": "Sport shape 5",
+    "url": "sport-shape-5-yoga.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "yoga"]
+  },
+  {
+    "title": "Sport shape 6",
+    "url": "sport-shape-6-baseball.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "baseball"]
+  },
+  {
+    "title": "Sport shape 7",
+    "url": "sport-shape-7-running.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "run"]
+  },
+  {
+    "title": "Sport shape 8",
+    "url": "sport-shape-8-running.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "run"]
+  },
+  {
+    "title": "Medal",
+    "url": "medal.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "medal", "win"]
+  },
+  {
+    "title": "Baseball",
+    "url": "baseball.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "baseball"]
+  },
+  {
+    "title": "Football",
+    "url": "football.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "football"]
+  },
+  {
+    "title": "Goblet",
+    "url": "goblet.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "goblet", "cup"]
+  },
+  {
+    "title": "Tent",
+    "url": "tent-tree.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "tent", "tree", "hike"]
+  },
+  {
+    "title": "Tent 2",
+    "url": "tent-trees.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "tent", "tree", "hike"]
+  },
+  {
+    "title": "Tents",
+    "url": "tents.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "tent", "tree", "hike"]
+  },
+  {
+    "title": "Present 3",
+    "url": "present-3.svg",
+    "categories": ["birthday", "christmas"],
+    "keywords": ["birthday", "christmas", "present"]
+  },
+  {
+    "title": "Present 2",
+    "url": "present-2.svg",
+    "categories": ["birthday", "christmas"],
+    "keywords": ["birthday", "christmas", "present"]
+  },
+  {
+    "title": "Present 1",
+    "url": "present-1.svg",
+    "categories": ["birthday", "christmas"],
+    "keywords": ["birthday", "christmas", "present"]
+  },
+  {
+    "title": "Decoration",
+    "url": "decoration.svg",
+    "categories": ["birthday", "christmas"],
+    "keywords": ["birthday", "christmas", "decoration", "ball", "tree"]
+  },
+  {
+    "title": "Fir",
+    "url": "fir.svg",
+    "categories": ["christmas"],
+    "keywords": ["christmas", "new year", "decoration", "ball", "tree", "fir"]
+  },
+  {
+    "title": "Fir 2",
+    "url": "fir-2.svg",
+    "categories": ["christmas"],
+    "keywords": ["christmas", "new year", "decoration", "ball", "tree", "fir"]
+  },
+  {
+    "title": "Bells",
+    "url": "bells.svg",
+    "categories": ["christmas"],
+    "keywords": ["christmas", "new year", "decoration", "bell", "tree"]
+  },
+  {
+    "title": "Bells 2",
+    "url": "bells-2.svg",
+    "categories": ["christmas"],
+    "keywords": ["christmas", "new year", "decoration", "bell", "tree"]
   }
 ]
