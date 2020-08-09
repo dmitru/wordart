@@ -1267,5 +1267,107 @@
     "url": "bells-2.svg",
     "categories": ["christmas"],
     "keywords": ["christmas", "new year", "decoration", "bell", "tree"]
+  },
+  {
+    "title": "circle lollipop",
+    "url": "circle-lollipop.svg",
+    "categories": ["shapes", "other"],
+    "keywords": ["shape", "circle", "spiral"]
+  },
+  {
+    "title": "Candles",
+    "url": "candles.svg",
+    "categories": ["christmas", "birthday"],
+    "keywords": ["candle", "christmas", "new year", "birthday", "party"]
+  },
+  {
+    "title": "Cake 1",
+    "url": "cake-1.svg",
+    "categories": ["christmas", "birthday", "food"],
+    "keywords": ["cake", "sweet", "food", "christmas", "new year", "birthday", "party"]
+  },
+  {
+    "title": "Cake 2",
+    "url": "cake-2.svg",
+    "categories": ["christmas", "birthday", "food"],
+    "keywords": ["cake", "sweet", "food", "christmas", "new year", "birthday", "party"]
+  },
+  {
+    "title": "Cake 3",
+    "url": "cake-3.svg",
+    "categories": ["christmas", "birthday", "food"],
+    "keywords": ["cake", "sweet", "food", "christmas", "new year", "birthday", "party"]
+  },
+  {
+    "title": "Cake 4",
+    "url": "cake-4.svg",
+    "categories": ["christmas", "birthday", "food"],
+    "keywords": ["cake", "sweet", "food", "christmas", "new year", "birthday", "party"]
+  },
+  {
+    "title": "Cake 5",
+    "url": "cake-5.svg",
+    "categories": ["christmas", "birthday", "food"],
+    "keywords": ["cake", "sweet", "food", "christmas", "new year", "birthday", "party"]
+  },
+  {
+    "title": "Laptop",
+    "url": "laptop.svg",
+    "categories": ["business", "education"],
+    "keywords": ["laptop", "computer", "business", "school", "education"]
+  },
+  {
+    "title": "Piggy Savings",
+    "url": "piggy-savings.svg",
+    "categories": ["business"],
+    "keywords": ["savings", "money", "pig"]
+  },
+  {
+    "title": "Money Bag",
+    "url": "money-bag.svg",
+    "categories": ["business"],
+    "keywords": ["money", "dollar", "bag"]
+  },
+  {
+    "title": "Dollar",
+    "url": "dollar.svg",
+    "categories": ["business"],
+    "keywords": ["money", "dollar", "bag"]
+  },
+  {
+    "title": "Handshake",
+    "url": "handshake.svg",
+    "categories": ["business"],
+    "keywords": ["hands", "handshake", "business"]
+  },
+  {
+    "title": "Suitcase",
+    "url": "suitcase.svg",
+    "categories": ["business"],
+    "keywords": ["suit", "case", "business"]
+  },
+  {
+    "title": "Graduation hat",
+    "url": "graduation-hat.svg",
+    "categories": ["education"],
+    "keywords": ["hat", "school", "university", "bachelor", "grad", "graduation"]
+  },
+  {
+    "title": "Notebooks",
+    "url": "notebooks.svg",
+    "categories": ["education"],
+    "keywords": ["school", "university", "notebook", "office"]
+  },
+  {
+    "title": "Notebooks 2",
+    "url": "notebooks-2.svg",
+    "categories": ["education"],
+    "keywords": ["school", "university", "notebook", "office"]
+  },
+  {
+    "title": "Pencils",
+    "url": "pencils.svg",
+    "categories": ["education"],
+    "keywords": ["pencil", "schoold", "office"]
   }
 ]
