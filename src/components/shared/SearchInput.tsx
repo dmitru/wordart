@@ -1,9 +1,9 @@
 import {
-  InputProps as CInputProps,
   InputGroup,
-  InputLeftElement,
-  InputRightElement,
   InputGroupProps,
+  InputLeftElement,
+  InputProps as CInputProps,
+  InputRightElement,
 } from '@chakra-ui/core'
 import { SearchIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
@@ -43,7 +43,6 @@ export const SearchInput: React.FC<
       <InputRightElement
         onClick={() => onChange('')}
         css={css`
-          top: 4px;
           padding: 0;
         `}
       >

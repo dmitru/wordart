@@ -1,6 +1,6 @@
+import { SvgShapeColorsMapEntry } from 'components/Editor/shape'
 import { fabric } from 'fabric'
 import { flatten, groupBy, sortBy } from 'lodash'
-import { SvgShapeColorsMapEntry } from 'components/Editor/shape'
 
 export const findNamedChildren = (
   item: fabric.Object
@@ -51,8 +51,15 @@ export const computeColorsMap = (
   if (Object.keys(namedChildrenByColor).length > 0) {
     Object.keys(namedChildrenByColor).forEach((colorKey) => {
       const children = namedChildrenByColor[colorKey]
-      const fillColor = getFillColor(children.map((c) => c.item))
-      const strokeColor = getStrokeColor(children.map((c) => c.item))
+      let fillColor = getFillColor(children.map((c) => c.item))
+      let strokeColor = getStrokeColor(children.map((c) => c.item))
+
+      if (fillColor === 'inherit') {
+        fillColor = 'black'
+      }
+      if (strokeColor === 'inherit') {
+        strokeColor = 'black'
+      }
 
       if (fillColor !== strokeColor) {
         if (fillColor) {

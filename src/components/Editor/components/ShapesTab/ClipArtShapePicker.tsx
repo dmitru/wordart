@@ -87,7 +87,9 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
   const matchingShapes = allClipArtShapes.filter(
     (s) =>
       (!query ||
-        (query && s.title.toLowerCase().includes(query.toLowerCase()))) &&
+        (query && s.title.toLowerCase().includes(query.toLowerCase())) ||
+        (s.keywords || []).find((keyword) => keyword.includes(query)) !=
+          null) &&
       (!selectedCategory ||
         (selectedCategory &&
           (s.categories || []).includes(selectedCategory.value)))
