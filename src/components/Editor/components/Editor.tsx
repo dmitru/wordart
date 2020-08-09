@@ -923,7 +923,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       src="/images/logo.svg"
                       css={css`
                         opacity: 0.5;
-                        height: 40px;
                         margin: 0 auto 30px;
                       `}
                     />

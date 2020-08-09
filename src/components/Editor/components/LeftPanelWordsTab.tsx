@@ -60,6 +60,7 @@ import {
 import { useToasts } from 'use-toasts'
 import { wordsToCSVData } from '../words-import-export'
 import { CustomizeWordPopover } from './CustomizeWord'
+import { animateElement } from 'utils/animation'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -102,6 +103,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
     const focusNewWordInput = () => {
       newWordInputRef.current?.focus()
+      animateElement(document.getElementById('add-word-btn-bottom')!)
     }
 
     const handleAddWord = (text = '') => {
@@ -918,6 +920,7 @@ const NewWordInput: React.FC<{
           width="80px"
           children={
             <Button
+              id="add-word-btn-bottom"
               px="3"
               width="100%"
               colorScheme="primary"
