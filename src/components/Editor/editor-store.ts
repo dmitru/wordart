@@ -1,17 +1,17 @@
 import { TargetTab } from 'components/Editor/components/Editor'
 import {
   defaultBgStyleOptions,
-  defaultShapeStyleOptions,
+  defaultShapeStyleOptions
 } from 'components/Editor/default-style-options'
 import {
   Editor,
   EditorInitParams,
-  TargetKind,
+  TargetKind
 } from 'components/Editor/lib/editor'
 import {
   EditorItem,
   EditorItemConfig,
-  EditorItemId,
+  EditorItemId
 } from 'components/Editor/lib/editor-item'
 import { EditorItemConfigShape } from 'components/Editor/lib/editor-item-icon'
 import { EditorItemConfigWord } from 'components/Editor/lib/editor-item-word'
@@ -19,7 +19,7 @@ import {
   applyTransformToObj,
   cloneObj,
   getObjTransformMatrix,
-  objAsCanvasElement,
+  objAsCanvasElement
 } from 'components/Editor/lib/fabric-utils'
 import { Font } from 'components/Editor/lib/generator'
 import { Shape } from 'components/Editor/shape'
@@ -27,13 +27,13 @@ import {
   ShapeClipartConf,
   ShapeConf,
   ShapeIconConf,
-  ShapeId,
+  ShapeId
 } from 'components/Editor/shape-config'
 import {
   getAnglesForPreset,
   mkBgStyleConfFromOptions,
   mkShapeStyleConfFromOptions,
-  ThemePreset,
+  ThemePreset
 } from 'components/Editor/style'
 import {
   BgFill,
@@ -42,7 +42,7 @@ import {
   ItemsColoringGradientConf,
   ItemsColoringShapeConf,
   ShapeStyleOptions,
-  WordListEntry,
+  WordListEntry
 } from 'components/Editor/style-options'
 import { themePresets } from 'components/Editor/theme-presets'
 import { ItemUpdateUndoData } from 'components/Editor/undo'
@@ -52,14 +52,14 @@ import {
   fonts,
   FontStyleConfig,
   loadFontsConfig,
-  popularFonts,
+  popularFonts
 } from 'data/fonts'
 import { icons, loadIconsConfig } from 'data/icons'
 import {
   getSortedIconsShapes,
   getSortedImageShapes,
   loadShapesConfig,
-  shapes,
+  shapes
 } from 'data/shapes'
 import { createCanvas } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
@@ -74,7 +74,7 @@ import {
   PersistedItemV1,
   PersistedItemWordV1,
   PersistedShapeConfV1,
-  PersistedWordV1,
+  PersistedWordV1
 } from 'services/api/persisted/v1'
 import { EditorPersistedData } from 'services/api/types'
 import { RootStore, rootStore } from 'services/root-store'
@@ -264,7 +264,7 @@ export class EditorStore {
     } else {
       await this.applyColorTheme(themePresets[0])
 
-      const defaultShape = this.availableImageShapes[0]
+      const defaultShape = this.availableImageShapes[Math.floor(Math.random() * 12)]
       await this.selectShape(defaultShape)
       this.shapesPanel.image.selected = defaultShape.id
     }

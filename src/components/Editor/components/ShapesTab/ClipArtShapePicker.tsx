@@ -225,6 +225,7 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                                   css={css`
                                     ${styles}
                                     max-height: 300px;
+                                    width: 260px;
                                     overflow: auto;
                                   `}
                                 >
