@@ -6,8 +6,15 @@ import { observer } from 'mobx-react'
 import Link from 'next/link'
 import React from 'react'
 import AwesomeSlider from 'react-awesome-slider'
+// @ts-ignore
 import withAutoplay from 'react-awesome-slider/dist/autoplay'
+import { GiCupcake } from 'react-icons/gi'
 import { Urls } from 'urls'
+import { MdColorLens } from 'react-icons/md'
+import { BsGrid3X3GapFill } from 'react-icons/bs'
+import { GoSettings } from 'react-icons/go'
+import { AiFillPrinter } from 'react-icons/ai'
+import { IoIosChatbubbles } from 'react-icons/io'
 
 const Slider = withAutoplay(AwesomeSlider)
 
@@ -110,7 +117,7 @@ export const LandingPage = observer(() => {
       >
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot>
-            <img src="https://placehold.it/100x100" />
+            <GiCupcake />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
             No design skills required
@@ -122,7 +129,7 @@ export const LandingPage = observer(() => {
 
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot>
-            <img src="https://placehold.it/100x100" />
+            <GoSettings />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
             Customize anything
@@ -135,7 +142,7 @@ export const LandingPage = observer(() => {
 
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot>
-            <img src="https://placehold.it/100x100" />
+            <MdColorLens />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
             Built-in color themes
@@ -147,7 +154,7 @@ export const LandingPage = observer(() => {
 
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot border="gray.500">
-            <img src="https://placehold.it/100x100" />
+            <BsGrid3X3GapFill />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
             Huge built-in library
@@ -159,19 +166,19 @@ export const LandingPage = observer(() => {
 
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot>
-            <img src="https://placehold.it/100x100" />
+            <IoIosChatbubbles />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
             Multi-language support
           </Text>
           <Text color="gray.500">
-            Let your designs speak the language of your audience.
+            Create designs in world's most common languages!
           </Text>
         </UiFeature>
 
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot>
-            <img src="https://placehold.it/100x100" />
+            <AiFillPrinter />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
             Crisp image quality
@@ -414,9 +421,16 @@ const UiScreenshot = styled(Box)`
   border-width: 3px;
   border-radius: 50%;
   background-clip: padding-box;
-  display: table;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0 auto;
   margin-bottom: 25px;
+
+  svg {
+    width: 70px;
+    height: 70px;
+  }
 
   img {
     width: 100%;
