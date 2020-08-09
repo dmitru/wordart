@@ -1003,5 +1003,125 @@
     "url": "skull.svg",
     "categories": ["other", "symbols"],
     "keywords": ["skull", "bone", "pirate"]
+  },
+  {
+    "title": "Birds",
+    "url": "birds.svg",
+    "categories": ["animals"],
+    "keywords": ["bird", "animal"]
+  },
+  {
+    "title": "Plane",
+    "url": "plane.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "plane", "airplane"]
+  },
+  {
+    "title": "Plane 2",
+    "url": "plane-2.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "plane", "airplane"]
+  },
+  {
+    "title": "Bus",
+    "url": "bus.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "bus"]
+  },
+  {
+    "title": "Bus 2",
+    "url": "bus-2.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "bus"]
+  },
+  {
+    "title": "Car",
+    "url": "car.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "car"]
+  },
+  {
+    "title": "Car 2",
+    "url": "car-2.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "car"]
+  },
+  {
+    "title": "Train 1",
+    "url": "train-1.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "train"]
+  },
+  {
+    "title": "Train 2",
+    "url": "train-2.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "train"]
+  },
+  {
+    "title": "Baggage",
+    "url": "baggage.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "baggage"]
+  },
+  {
+    "title": "Kayak",
+    "url": "kayak.svg",
+    "categories": ["leisure"],
+    "keywords": ["transport", "sport", "boat", "paddle", "kayak"]
+  },
+  {
+    "title": "Boat",
+    "url": "boat.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "boat", "sail"]
+  },
+  {
+    "title": "Puzzle",
+    "url": "puzzle.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "puzzle"]
+  },
+  {
+    "title": "Blobs 1",
+    "url": "blobs-1.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "blob"]
+  },
+  {
+    "title": "Blobs 2",
+    "url": "blobs-2.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "blob"]
+  },
+  {
+    "title": "Blobs 3",
+    "url": "blobs-3.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "blob"]
+  },
+  {
+    "title": "Circle Donut",
+    "url": "circle-donut.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "circle"]
+  },
+  {
+    "title": "Cycle 3",
+    "url": "cycle-3.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "cycle", "circle"]
+  },
+  {
+    "title": "Cycle 5",
+    "url": "cycle-5.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "cycle", "circle"]
+  },
+  {
+    "title": "Bicycle",
+    "url": "bicycle.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "bicycle"]
   }
 ]
