@@ -924,7 +924,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       css={css`
                         opacity: 0.5;
                         height: 40px;
-                        margin: 0 auto;
+                        margin: 0 auto 30px;
                       `}
                     />
                   </div>
