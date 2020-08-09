@@ -197,11 +197,23 @@ export const LandingPage = observer(() => {
           generator app.
         </Text>
 
-        <Link href={Urls.editor.create} passHref>
-          <Button as="a" size="lg" colorScheme="accent">
-            Start creating
+        <Stack spacing="3" direction="row" justifyContent="center">
+          <Link href={Urls.editor.create} passHref>
+            <Button as="a" size="lg" colorScheme="accent">
+              Start creating
+            </Button>
+          </Link>
+
+          <Button
+            as="a"
+            target="_blank"
+            href="https://blog.wordcloudy.com/tag/tutorials/"
+            size="lg"
+            variant="outline"
+          >
+            Open tutorial
           </Button>
-        </Link>
+        </Stack>
       </CtaFooterSection>
     </SiteLayout>
   )
