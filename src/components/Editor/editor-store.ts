@@ -641,10 +641,6 @@ export class EditorStore {
         this.shapesPanel.icon.color = this.selectedShapeConf.color
       }
 
-      console.log(
-        'FISH: editor.store.shapesPanel.shapeKind = ',
-        this.shapesPanel.shapeKind
-      )
       this.shapesPanel.shapeKind = this.selectedShapeConf.kind
     }
 
@@ -903,12 +899,23 @@ export class EditorStore {
     ]
 
     const serializeItems = (
-      items: EditorItem[]
+      target: 'bg' | 'shape'
     ): {
       fontIds: FontId[]
       words: PersistedWordV1[]
       items: PersistedItemV1[]
     } => {
+      if (!this.editor) {
+        throw new Error('no editor')
+      }
+
+      let items = this.editor.getItemsSorted(target)
+      let itemsMaxCount = this.styleOptions[target].items.placement
+        .itemsMaxCount
+      if (typeof itemsMaxCount === 'number') {
+        items = items.slice(0, itemsMaxCount)
+      }
+
       const fontIds: FontId[] = uniq(
         items
           .map((item) => {
@@ -1144,8 +1151,8 @@ export class EditorStore {
           fill: serializeBgFill(this.styleOptions.bg.fill),
         },
         shape: serializeShape(this.getShape()!),
-        bgItems: serializeItems(this.editor.getItemsSorted('bg')),
-        shapeItems: serializeItems(this.editor.getItemsSorted('shape')),
+        bgItems: serializeItems('bg'),
+        shapeItems: serializeItems('shape'),
       },
     }
 
@@ -1418,7 +1425,11 @@ export class EditorStore {
 
     // TODO: hide extra items if possible
     if (maxCount !== 'auto') {
-      this.editor?.hideItemsAfter(target, maxCount)
+      if (this.editor) {
+        this.editor.hideItemsAfter(target, maxCount)
+        this.hasUnsavedChanges = true
+        this.editor.version++
+      }
     }
   }
 

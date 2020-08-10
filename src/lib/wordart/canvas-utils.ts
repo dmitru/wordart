@@ -453,7 +453,7 @@ export const detectEdges = (
   const imgData = ctx.getImageData(0, 0, w, h)
   const dataU32 = new Uint32Array(imgData.data.buffer)
 
-  console.screenshot(ctx.canvas)
+  // console.screenshot(ctx.canvas)
 
   const jsfeatMatrix = new jsfeat.matrix_t(w, h, jsfeat.U8C1_t)
   jsfeat.imgproc.grayscale(imgData.data, w, h, jsfeatMatrix)
@@ -472,10 +472,10 @@ export const detectEdges = (
 
   const result = createCanvasCtxCopy(ctx)
   result.putImageData(imgData, 0, 0)
-  console.screenshot(result.canvas)
+  // console.screenshot(result.canvas)
 
   const t2 = performance.now()
-  console.log(`removeEdges: ${(t2 - t1).toFixed(0)}ms`)
+  // console.log(`removeEdges: ${(t2 - t1).toFixed(0)}ms`)
 
   return result.canvas
 }

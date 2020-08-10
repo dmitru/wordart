@@ -803,14 +803,14 @@ export class Generator {
       await onProgressCallback(currentBatch, 1)
     }
 
-    console.screenshot(unrotatedCtx.canvas, 1)
-    console.log(
-      `Placed ${
-        generatedItems.length
-      } items; Finished ${nIter} iterations in ${((t2 - t1) / 1000).toFixed(
-        2
-      )} s, ${((t2 - t1) / nIter).toFixed(3)}ms / iter`
-    )
+    // console.screenshot(unrotatedCtx.canvas, 1)
+    // console.log(
+    //   `Placed ${
+    //     generatedItems.length
+    //   } items; Finished ${nIter} iterations in ${((t2 - t1) / 1000).toFixed(
+    //     2
+    //   )} s, ${((t2 - t1) / nIter).toFixed(3)}ms / iter`
+    // )
 
     return {
       generatedItems,

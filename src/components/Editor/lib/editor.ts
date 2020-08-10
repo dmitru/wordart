@@ -2240,7 +2240,6 @@ export class Editor {
 
       if (supportedFonts.length === 0) {
         errors.push({ word: text })
-        console.log('FISH: errors = ', text)
       } else {
         processedWordList.push({
           wordConfigId: wc.id,

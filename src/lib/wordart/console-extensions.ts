@@ -132,7 +132,7 @@ import { createCanvas } from './canvas-utils'
     ) as ImageBitmapRenderingContext
     const bitmap2 = await createImageBitmap(bitmap)
     ctx.transferFromImageBitmap(bitmap2)
-    console.screenshot(ctx.canvas, scale)
+    // console.screenshot(ctx.canvas, scale)
   }
 })(console)
 

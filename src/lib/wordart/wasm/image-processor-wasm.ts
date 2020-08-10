@@ -129,7 +129,7 @@ const findShapesByColorWasm = (
   if (debug) {
     clearCanvas(ctx)
     ctx.putImageData(imgData, 0, 0)
-    console.screenshot(ctx.canvas, 1)
+    // console.screenshot(ctx.canvas, 1)
   }
 
   for (const { r, g, b, a, count: colorPixelCount } of colorsFiltered) {
