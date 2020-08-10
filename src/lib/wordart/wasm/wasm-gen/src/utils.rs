@@ -73,3 +73,44 @@ impl<'a> Drop for Timer<'a> {
         console::time_end_with_label(self.name);
     }
 }
+
+pub struct ImgData<'a> {
+    pub data: &'a [u32],
+    pub width: i32,
+    pub height: i32,
+}
+
+pub struct ImgDataU8<'a> {
+    pub data: &'a [u8],
+    pub width: i32,
+    pub height: i32,
+}
+
+#[derive(PartialEq, Debug, Copy, Clone, Serialize)]
+pub struct Rgba {
+    pub r: u32,
+    pub g: u32,
+    pub b: u32,
+    pub a: u32,
+}
+
+pub struct ImgDataMut<'a> {
+    pub data: &'a mut [u32],
+    pub width: i32,
+    pub height: i32,
+}
+
+#[wasm_bindgen]
+#[derive(PartialEq, Debug, Copy, Clone, Serialize)]
+pub struct Rect {
+    pub x: i32,
+    pub y: i32,
+    pub w: i32,
+    pub h: i32,
+}
+
+impl Rect {
+    fn area(&self) -> i32 {
+        self.w * self.h
+    }
+}

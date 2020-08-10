@@ -55,7 +55,6 @@ use std::cmp;
 use wasm_bindgen::prelude::*;
 
 // extern crate console_error_panic_hook;
-use crate::hbounds::*;
 use crate::utils::*;
 
 // Console.log macro
