@@ -54,6 +54,7 @@ cur_right is the leftmost occurrence of a filled space we have encountered.
 use std::cmp;
 use wasm_bindgen::prelude::*;
 
+// extern crate console_error_panic_hook;
 use crate::hbounds::*;
 use crate::utils::*;
 
@@ -96,6 +97,8 @@ pub unsafe fn largest_rect(
     bounds_height: usize,
     aspect_ratio: f32,
 ) -> Rect {
+    // console_error_panic_hook::set_once();
+    //
     let img_width = img.width as usize;
     let img = img.data;
     let x1 = bounds_x as usize;

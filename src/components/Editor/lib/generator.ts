@@ -290,11 +290,11 @@ export class Generator {
         shapeCanvasMaxExtent / rotatedBoundsAabb.width
       const rotatedBoundsScaleY1 =
         shapeCanvasMaxExtent / rotatedBoundsAabb.height
-      const rotatedBoundsScaleX = Math.max(
+      const rotatedBoundsScaleX = Math.min(
         rotatedBoundsScaleX1,
         rotatedBoundsScaleY1
       )
-      const rotatedBoundsScaleY = Math.max(
+      const rotatedBoundsScaleY = Math.min(
         rotatedBoundsScaleX1,
         rotatedBoundsScaleY1
       )
