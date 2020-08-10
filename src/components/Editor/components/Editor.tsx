@@ -1438,10 +1438,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             children={
               <>
                 <p>Selected fonts don't support symbols used in these words:</p>
-                <Box mb="4">
-                  {(store.langCheckErrors ?? []).slice(10).map((e, index) => (
-                    <Box key={index}>{e.word}</Box>
-                  ))}
+                <Box as="ul" mb="4">
+                  {(store.langCheckErrors ?? [])
+                    .slice(0, 10)
+                    .map((e, index) => (
+                      <li key={index}>{e.word}</li>
+                    ))}
                 </Box>
                 <p>
                   <strong>
