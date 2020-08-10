@@ -189,13 +189,20 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
     const topToolbar = (
       <Stack direction="row" mb="6" spacing="2">
-        <Button
+        {/* <Button
           colorScheme="primary"
           leftIcon={<AddIcon />}
           onClick={focusNewWordInput}
         >
           Add
-        </Button>
+        </Button> */}
+
+        <NewWordInput
+          onAddClick={() => handleNewWordInputSubmit()}
+          inputRef={newWordInputRef}
+          focusPrevField={focusPrevField}
+          focusNextField={focusNextField}
+        />
 
         <Box ml="auto">
           <Button
@@ -548,43 +555,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                 <EmptyStateWordsUi target={target} />
               </Box>
             )}
-
-            {/* NEW WORD INPUT */}
-            {!state.textFilter && (
-              <Observer>
-                {() => (
-                  <NewWordInput
-                    isPinned={allWords.length > 0}
-                    onAddClick={() => handleNewWordInputSubmit()}
-                    inputRef={newWordInputRef}
-                    inputProps={{
-                      value: state.newWordText,
-                      onChange: (e: any) => {
-                        state.newWordText = e.target.value
-                      },
-                      onKeyDown: (e: React.KeyboardEvent) => {
-                        if (e.key === 'Enter') {
-                          handleNewWordInputSubmit()
-                        } else if (e.key === 'Escape') {
-                          ignoreBlur = true
-                          state.newWordText = ''
-                          newWordInputRef.current?.blur()
-                          setTimeout(() => {
-                            ignoreBlur = false
-                          }, 100)
-                        } else if (e.key === 'ArrowUp') {
-                          e.nativeEvent.preventDefault()
-                          focusPrevField()
-                        } else if (e.key === 'ArrowDown') {
-                          e.nativeEvent.preventDefault()
-                          focusNextField()
-                        }
-                      },
-                    }}
-                  />
-                )}
-              </Observer>
-            )}
           </Box>
         </>
 
@@ -887,53 +857,65 @@ const WordListRow: React.FC<
 )
 
 const NewWordInput: React.FC<{
-  isPinned?: boolean
   inputRef: any
   inputProps: InputProps
+  focusPrevField: () => void
+  focusNextField: () => void
   onAddClick: () => void
-}> = ({ inputProps, inputRef, onAddClick, isPinned }) => {
-  return (
-    <WordRowNewInput
-      css={css`
-        ${isPinned &&
-        `
-        box-shadow: 0 0 8px 0 #00000025;
-        // background-color: hsla(225, 0%, 95%, 1);
-        padding-bottom: 16px;
-        `}
-      `}
-    >
-      <InputGroup flex={1}>
-        <WordInput
-          {...inputProps}
-          className="word-input"
-          autocomplete="off"
-          spellcheck="false"
-          autocorrect="off"
-          flex="1"
-          ref={inputRef}
-          hasBorder
-          placeholder="Type new word here..."
-        />
-        <InputRightElement
-          px="0"
-          width="80px"
-          children={
-            <Button
-              id="add-word-btn-bottom"
-              px="3"
-              width="100%"
-              colorScheme="primary"
-              onClick={onAddClick}
-            >
-              Add
-            </Button>
-          }
-        />
-      </InputGroup>
-    </WordRowNewInput>
-  )
-}
+}> = observer(
+  ({ inputProps, inputRef, onAddClick, focusNextField, focusPrevField }) => {
+    return (
+      <>
+        <InputGroup flex={1}>
+          {/* 
+        // @ts-ignore */}
+          <WordInput
+            value={state.newWordText}
+            onChange={(e: any) => {
+              state.newWordText = e.target.value
+            }}
+            onKeyDown={(e: React.KeyboardEvent) => {
+              if (e.key === 'Enter') {
+                onAddClick()
+              } else if (e.key === 'Escape') {
+                ignoreBlur = true
+                state.newWordText = ''
+                inputRef.current?.blur()
+                setTimeout(() => {
+                  ignoreBlur = false
+                }, 100)
+              } else if (e.key === 'ArrowUp') {
+                e.nativeEvent.preventDefault()
+                focusPrevField()
+              } else if (e.key === 'ArrowDown') {
+                e.nativeEvent.preventDefault()
+                focusNextField()
+              }
+            }}
+            inputRef={inputRef}
+            value={state.newWordText}
+            className="word-input"
+            autocomplete="off"
+            spellcheck="false"
+            autocorrect="off"
+            flex="1"
+            hasBorder
+            placeholder="Type word here..."
+          />
+        </InputGroup>
+
+        <Button
+          id="add-word-btn-bottom"
+          px="4"
+          colorScheme="primary"
+          onClick={onAddClick}
+        >
+          Add
+        </Button>
+      </>
+    )
+  }
+)
 
 const resetWordDefaults = (word: WordListEntry) => {
   word.repeats = -1
