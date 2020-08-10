@@ -241,6 +241,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         if (isSaving || !store.editor) {
           return
         }
+        const itemsCount = store.getItemsCount().total
+        if (itemsCount === 0) {
+          window.alert(
+            'Your design is empty. Please click "Visualize" before saving to place some words.'
+          )
+          return
+        }
+
         store.isSaving = true
 
         try {
@@ -427,10 +435,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const closeExport = useCallback(() => {
       state.isShowingExport = false
     }, [])
+
     const openExport = useCallback(() => {
-      const itemsCount =
-        (store.editor?.items?.shape?.items?.length || 0) +
-        (store.editor?.items?.bg?.items?.length || 0)
+      const itemsCount = store.getItemsCount().total
       if (itemsCount > 0) {
         state.isShowingExport = true
       } else {
@@ -1451,10 +1458,18 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             isOpen={isShowingSignupModal}
             onCancel={() => setIsShowingSignupModal(false)}
             onSubmit={saveAnonymously}
-            title="Please sign up to save your work"
-            submitText="Sign up and save"
+            title="Please sign in to save your work"
+            cancelText="No, thanks"
+            submitText="Save and continue"
           >
-            TODO
+            <p>
+              To save your design to your Wordcloudy account, you'll need to
+              sign in.
+            </p>
+            <p>
+              Please proceed to sign in form – your work will be saved. If you
+              don't have an account yet, you'll be able to create one.
+            </p>
           </ConfirmModalWithRecaptcha>
         </PageLayoutWrapper>
       </EditorStoreContext.Provider>
