@@ -142,6 +142,19 @@ export const LandingPage = observer(() => {
 
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot>
+            <AiFillPrinter />
+          </UiScreenshot>
+          <Text fontWeight="bold" fontSize="lg">
+            Crisp image quality
+          </Text>
+          <Text color="gray.500">
+            Export your designs at high resolution as PNG, JPEG images or as
+            scalable vector graphics (SVG).
+          </Text>
+        </UiFeature>
+
+        <UiFeature maxWidth="240px" textAlign="center" p="5">
+          <UiScreenshot>
             <MdColorLens />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
@@ -173,19 +186,6 @@ export const LandingPage = observer(() => {
           </Text>
           <Text color="gray.500">
             Create designs in world's most common languages!
-          </Text>
-        </UiFeature>
-
-        <UiFeature maxWidth="240px" textAlign="center" p="5">
-          <UiScreenshot>
-            <AiFillPrinter />
-          </UiScreenshot>
-          <Text fontWeight="bold" fontSize="lg">
-            Crisp image quality
-          </Text>
-          <Text color="gray.500">
-            Export your designs as images in PNG, JPEG at high resolution or as
-            SVG.
           </Text>
         </UiFeature>
       </FeaturesSection>
@@ -442,6 +442,9 @@ const UiScreenshot = styled(Box)`
   svg {
     width: 70px;
     height: 70px;
+    * {
+      fill: hsl(206, 56%, 37%);
+    }
   }
 
   img {
