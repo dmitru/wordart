@@ -1600,12 +1600,18 @@ export class Editor {
     const persistedDataBefore = await this.store.serialize()
 
     const shapeObj = this.shape.obj
-    const shapeOriginalColorsObj =
+    let shapeOriginalColorsObj =
       this.shape.kind === 'clipart:svg' ||
       this.shape.kind === 'custom:svg' ||
       this.shape.kind === 'icon'
         ? this.shape.objOriginalColors
         : this.shape.obj
+
+    if (this.shape.kind === 'clipart:svg') {
+      if (this.shape.config.processing.colors.kind === 'single-color') {
+        shapeOriginalColorsObj = this.shape.obj
+      }
+    }
 
     if (!shapeOriginalColorsObj) {
       console.error('No shapeOriginalColorsObj')
