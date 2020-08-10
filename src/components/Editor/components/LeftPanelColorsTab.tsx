@@ -389,26 +389,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     <SectionLabel>Shape</SectionLabel>
 
                     <Box mb="4">
-                      <Slider
-                        css={css`
-                          flex: 1;
-                          margin-right: 20px;
-                        `}
-                        horizontal
-                        afterLabel="%"
-                        label="Opacity"
-                        value={shapeStyle.opacity}
-                        onChange={(value) => {
-                          shapeStyle.opacity = value
-                        }}
-                        onAfterChange={(value) => {
-                          store.editor?.setShapeOpacity(value / 100)
-                        }}
-                        resetValue={defaultShapeStyleOptions.opacity}
-                        min={0}
-                        max={100}
-                        step={1}
-                      />
+                      <ShapeOpacitySlider />
                     </Box>
 
                     <ShapeColorPicker onUpdate={onUpdate} />
@@ -487,6 +468,39 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
     )
   }
 )
+
+const ShapeOpacitySlider = observer(() => {
+  const store = useEditorStore()!
+  const {
+    // @ts-ignore
+    renderKey, // eslint-disable-line
+  } = store
+  const shape = store.getShape()
+  const shapeStyle = store.styleOptions.shape
+
+  return (
+    <Slider
+      css={css`
+        flex: 1;
+        margin-right: 20px;
+      `}
+      horizontal
+      afterLabel="%"
+      label="Opacity"
+      value={shapeStyle.opacity}
+      onChange={(value) => {
+        shapeStyle.opacity = value
+      }}
+      onAfterChange={(value) => {
+        store.editor?.setShapeOpacity(value / 100)
+      }}
+      resetValue={defaultShapeStyleOptions.opacity}
+      min={0}
+      max={100}
+      step={1}
+    />
+  )
+})
 
 export const BgItemsStyleOptions: React.FC<{
   target: TargetKind
