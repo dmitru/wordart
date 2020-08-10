@@ -88,7 +88,7 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
     const hasChosenImage = !!state.originalUrl
 
     return (
-      <Modal isOpen={isOpen} onClose={close}>
+      <Modal isOpen={isOpen} onClose={close} trapFocus={false}>
         <ModalOverlay>
           <ModalContent maxWidth="550px">
             <ModalHeader>
