@@ -189,14 +189,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
     const topToolbar = (
       <Stack direction="row" mb="6" spacing="2">
-        {/* <Button
-          colorScheme="primary"
-          leftIcon={<AddIcon />}
-          onClick={focusNewWordInput}
-        >
-          Add
-        </Button> */}
-
         <NewWordInput
           onAddClick={() => handleNewWordInputSubmit()}
           inputRef={newWordInputRef}
