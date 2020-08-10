@@ -858,64 +858,61 @@ const WordListRow: React.FC<
 
 const NewWordInput: React.FC<{
   inputRef: any
-  inputProps: InputProps
   focusPrevField: () => void
   focusNextField: () => void
   onAddClick: () => void
-}> = observer(
-  ({ inputProps, inputRef, onAddClick, focusNextField, focusPrevField }) => {
-    return (
-      <>
-        <InputGroup flex={1}>
-          {/* 
+}> = observer(({ inputRef, onAddClick, focusNextField, focusPrevField }) => {
+  return (
+    <>
+      <InputGroup flex={1}>
+        {/* 
         // @ts-ignore */}
-          <WordInput
-            value={state.newWordText}
-            onChange={(e: any) => {
-              state.newWordText = e.target.value
-            }}
-            onKeyDown={(e: React.KeyboardEvent) => {
-              if (e.key === 'Enter') {
-                onAddClick()
-              } else if (e.key === 'Escape') {
-                ignoreBlur = true
-                state.newWordText = ''
-                inputRef.current?.blur()
-                setTimeout(() => {
-                  ignoreBlur = false
-                }, 100)
-              } else if (e.key === 'ArrowUp') {
-                e.nativeEvent.preventDefault()
-                focusPrevField()
-              } else if (e.key === 'ArrowDown') {
-                e.nativeEvent.preventDefault()
-                focusNextField()
-              }
-            }}
-            inputRef={inputRef}
-            value={state.newWordText}
-            className="word-input"
-            autocomplete="off"
-            spellcheck="false"
-            autocorrect="off"
-            flex="1"
-            hasBorder
-            placeholder="Type word here..."
-          />
-        </InputGroup>
+        <WordInput
+          value={state.newWordText}
+          onChange={(e: any) => {
+            state.newWordText = e.target.value
+          }}
+          onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === 'Enter') {
+              onAddClick()
+            } else if (e.key === 'Escape') {
+              ignoreBlur = true
+              state.newWordText = ''
+              inputRef.current?.blur()
+              setTimeout(() => {
+                ignoreBlur = false
+              }, 100)
+            } else if (e.key === 'ArrowUp') {
+              e.nativeEvent.preventDefault()
+              focusPrevField()
+            } else if (e.key === 'ArrowDown') {
+              e.nativeEvent.preventDefault()
+              focusNextField()
+            }
+          }}
+          inputRef={inputRef}
+          value={state.newWordText}
+          className="word-input"
+          autocomplete="off"
+          spellcheck="false"
+          autocorrect="off"
+          flex="1"
+          hasBorder
+          placeholder="Type word here..."
+        />
+      </InputGroup>
 
-        <Button
-          id="add-word-btn-bottom"
-          px="4"
-          colorScheme="primary"
-          onClick={onAddClick}
-        >
-          Add
-        </Button>
-      </>
-    )
-  }
-)
+      <Button
+        id="add-word-btn-bottom"
+        px="4"
+        colorScheme="primary"
+        onClick={onAddClick}
+      >
+        Add
+      </Button>
+    </>
+  )
+})
 
 const resetWordDefaults = (word: WordListEntry) => {
   word.repeats = -1

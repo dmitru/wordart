@@ -15,7 +15,6 @@ export const Tooltip: React.FC<
     props.children || null
   ) : (
     <CTooltip
-      openDelay={250}
       hasArrow
       placement="bottom"
       aria-label={props.label || ''}
