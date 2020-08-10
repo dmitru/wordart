@@ -152,7 +152,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         : allWords.filter((w) => state.selectedWords.has(w.id))
 
     const updateSelectedWords = () => {
-      const existingWordIds = new Set(allWords.map((w) => w.id))
+      const existingWordIds = new Set(words.wordList.map((w) => w.id))
       const newSelectedWordIds = new Set(
         [...state.selectedWords.values()].filter((wId) =>
           existingWordIds.has(wId)
