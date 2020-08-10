@@ -1019,6 +1019,9 @@ export class Editor {
             .brighten((2 * brightness) / 100)
             .saturate(-(0.2 * brightness) / 100)
         }
+      } else {
+        // Advance the color index, but don't do anything else
+        colorIndex = (colorIndex + 1) % colors.length
       }
 
       const hex = color!.hex()
