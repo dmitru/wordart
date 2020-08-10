@@ -249,6 +249,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           return
         }
 
+        store.enterViewMode()
+
         store.isSaving = true
 
         try {
