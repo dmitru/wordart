@@ -240,6 +240,8 @@ export const DesignsView = observer(() => {
             </Box>
           )}
         </Box>
+
+        {/* Grid */}
         <Flex
           flex="1"
           wrap="wrap"
@@ -252,7 +254,7 @@ export const DesignsView = observer(() => {
             min-height: calc(100vh - 200px);
             overflow-y: auto;
             background: #f8f8f8;
-            padding: 2rem;
+            padding: 1.5rem;
             box-shadow: inset 0 0 8px 0 #0003;
             margin-bottom: 1rem;
           `}

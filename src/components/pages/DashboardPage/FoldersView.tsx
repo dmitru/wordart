@@ -56,8 +56,9 @@ export const FoldersView = observer(() => {
 
   return (
     <Box
-      maxWidth="300px"
+      maxWidth="320px"
       ml="6"
+      pr="2"
       minWidth="200px"
       flex="1"
       width="100%"
@@ -68,7 +69,7 @@ export const FoldersView = observer(() => {
     >
       <FoldersList mr="4">
         {/* Account usage */}
-        <Box height="96px" mt="4" mb="6">
+        <Box height="96px" mt="70px" mb="6">
           <AccountUsage />
         </Box>
 
