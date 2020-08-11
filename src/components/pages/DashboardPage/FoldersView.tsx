@@ -69,7 +69,7 @@ export const FoldersView = observer(() => {
     >
       <FoldersList mr="4">
         {/* Account usage */}
-        <Box height="96px" mt="70px" mb="6">
+        <Box height="96px" mt="70px" mb="2rem">
           <AccountUsage />
         </Box>
 

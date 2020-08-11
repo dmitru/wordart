@@ -21,13 +21,7 @@ export function AccountUsage() {
   ) {
     content = (
       <>
-        <Text color="gray.700" mt="0" fontSize="sm" mb="0">
-          <FaStar
-            css={css`
-              margin-right: 5px;
-              display: inline-block;
-            `}
-          />{' '}
+        <Text color="gray.600" mt="0" fontSize="sm" mb="0">
           Your unlimited plan expires in <br />
           {`${fromNow(profile.unlimitedPlanExpiresAt!)} (at ${new Date(
             profile.unlimitedPlanExpiresAt!
