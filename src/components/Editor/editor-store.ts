@@ -386,6 +386,8 @@ export class EditorStore {
   }
 
   @action enterEditItemsMode = (target?: TargetKind) => {
+    this.logger.info(`enterEditItemsMode: ${target}`)
+
     this.mode = 'edit'
     if (!this.editor) {
       return
@@ -403,6 +405,8 @@ export class EditorStore {
   }
 
   @action enterViewMode = (target?: TargetKind) => {
+    this.logger.info(`enterViewMode: ${target}`)
+
     this.mode = 'view'
     if (!this.editor) {
       return
@@ -1328,6 +1332,13 @@ export class EditorStore {
     updateShapeColors = true,
     render = true
   ) => {
+    this.logger.info(
+      `selectShape: ${shapeConfig.kind} ${
+        // @ts-ignore
+        shapeConfig['id']
+      }`
+    )
+
     if (!this.editor) {
       return
     }

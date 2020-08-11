@@ -19,8 +19,8 @@ const createConsoleLoggers = () => {
   const analytics = createConsoleLogger('analytics')
   const timings = createConsoleLogger('timings')
 
-  // editorStore.enable('debug')
-  // editor.enable('debug')
+  editorStore.enable('info')
+  editor.enable('info')
   // authStore.enable('debug')
   // generator.enable('info')
   // analytics.enable('debug')
