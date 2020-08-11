@@ -104,6 +104,7 @@ import { getTabTitle } from 'utils/tab-title'
 import { useWarnIfUnsavedChanges } from 'utils/use-warn-if-unsaved-changes'
 import { uuid } from 'utils/uuid'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
+import { WordColorPickerPopover } from './WordColorPickerPopover'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -1322,23 +1323,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
                           {store.selectedItemData && (
                             <>
-                              <ColorPickerPopover
-                                value={
-                                  store.selectedItemData.customColor ||
-                                  store.selectedItemData.color
-                                }
-                                onAfterChange={(color) => {
-                                  store.setItemCustomColor(color)
-                                }}
-                              >
-                                <Button
-                                  onClick={() => {
-                                    store.resetItemCustomColor()
-                                  }}
-                                >
-                                  Reset Default Color
-                                </Button>
-                              </ColorPickerPopover>
+                              <WordColorPickerPopover />
 
                               <Button
                                 ml="2"

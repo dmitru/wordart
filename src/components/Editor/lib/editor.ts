@@ -1032,6 +1032,10 @@ export class Editor {
           (1 - dimSmallerFactor)) *
           itemsStyleConf.opacity
       )
+
+      if (this.store.selectedItemData?.id === item.id) {
+        this.store.selectedItemData.color = item.color
+      }
     }
 
     if (render) {
