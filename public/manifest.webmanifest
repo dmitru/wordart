@@ -1,0 +1,26 @@
+{
+  "short_name": "Wordcloudy",
+  "name": "Weather: Create unique word designs",
+  "description": "Fun & easy to use word art generator",
+  "icons": [
+    {
+      "src": "/images/logo-large.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "hsl(205, 50%, 55%)",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "hsl(205, 50%, 55%)",
+  "shortcuts": [
+    {
+      "name": "Wordcloudy",
+      "short_name": "Wordcloudy",
+      "description": "Create unique word designs",
+      "url": "/",
+      "icons": [{ "src": "/images/logo-large.png", "sizes": "192x192" }]
+    }
+  ]
+}
