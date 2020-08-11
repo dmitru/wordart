@@ -262,6 +262,7 @@ export const CustomizeWordPopover: React.FC<CustomizeWordPopoverProps> = observe
                     onClick={() => {
                       state.isShowingFontPicker = true
                     }}
+                    // @ts-ignore
                     as={SelectedFontThumbnail}
                     mb="0"
                     p="3"

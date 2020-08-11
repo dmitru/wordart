@@ -114,7 +114,12 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
     ) : null
 
   const shapeConfig = store.getSelectedShapeConf()
-  if (!shape || shape.kind !== 'icon' || shapeConfig.kind !== 'icon') {
+  if (
+    !shape ||
+    !shapeConfig ||
+    shape.kind !== 'icon' ||
+    shapeConfig.kind !== 'icon'
+  ) {
     return <></>
   }
 

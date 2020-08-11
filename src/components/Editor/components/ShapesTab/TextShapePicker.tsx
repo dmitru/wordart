@@ -202,6 +202,7 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
                       onClick={() => {
                         setIsShowingFontPicker(true)
                       }}
+                      // @ts-ignore
                       as={SelectedFontThumbnail}
                       mb="0"
                       p="3"

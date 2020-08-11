@@ -126,10 +126,10 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
                             passHref
                           >
                             <Button
+                              // @ts-ignore
                               as="a"
                               target="_blank"
                               maxWidth="300px"
-                              active={pathname === Urls.landing}
                               colorScheme="accent"
                               leftIcon={<AddIcon />}
                             >
@@ -199,6 +199,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
                       <Divider />
 
                       <MenuLink
+                        // @ts-ignore
                         as="button"
                         onClick={() => {
                           authStore.logout()
