@@ -193,7 +193,7 @@ export const PricingPage = observer(() => {
                   <>
                     <CrossIcon />
                     Partial support
-                    <HelpTooltipIcon label="You can create and download your designs as images, but you won't be able to save designs with custom images and fonts to your Wordcloudy account" />{' '}
+                    <HelpTooltipIcon label="You can create and download your designs with custom images and fonts, but you won't be able to save them to your Wordcloudy account" />{' '}
                   </>
                 }
               />

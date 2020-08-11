@@ -4,6 +4,7 @@ import { useUpgradeModal } from 'components/upgrade/UpgradeModal'
 import React from 'react'
 import { FaStar } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
+import fromNow from 'fromnow'
 
 export function AccountUsage() {
   const {
@@ -27,8 +28,11 @@ export function AccountUsage() {
               display: inline-block;
             `}
           />{' '}
-          Your unlimited plan expires at: <br />
-          {new Date(profile.unlimitedPlanExpiresAt).toLocaleString()}
+          Your unlimited plan expires in <br />
+          {`${fromNow(profile.unlimitedPlanExpiresAt!)} (at ${new Date(
+            profile.unlimitedPlanExpiresAt!
+          ).toLocaleString()})`}
+          .
         </Text>
       </>
     )

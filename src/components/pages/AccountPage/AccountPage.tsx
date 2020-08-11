@@ -10,6 +10,7 @@ import { FaStar } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { useToasts } from 'use-toasts'
+import fromNow from 'fromnow'
 
 export const AccountPage = observer(() => {
   const {
@@ -59,8 +60,11 @@ export const AccountPage = observer(() => {
 
             {profile.limits.isActiveUnlimitedPlan && (
               <Box>
-                Unlimited plan expires at{' '}
-                {new Date(profile.unlimitedPlanExpiresAt!).toLocaleString()}
+                Unlimited plan expires in{' '}
+                {`${fromNow(profile.unlimitedPlanExpiresAt!)} (at ${new Date(
+                  profile.unlimitedPlanExpiresAt!
+                ).toLocaleString()})`}
+                .
               </Box>
             )}
 
