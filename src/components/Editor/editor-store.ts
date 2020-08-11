@@ -55,7 +55,12 @@ import {
   popularFonts,
 } from 'data/fonts'
 import { icons, loadIconsConfig } from 'data/icons'
-import { iconShapes, imageShapes } from 'data/shapes'
+import {
+  getSortedIconsShapes,
+  getSortedImageShapes,
+  loadShapesConfig,
+  shapes,
+} from 'data/shapes'
 import { createCanvas } from 'lib/wordart/canvas-utils'
 import { loadFont } from 'lib/wordart/fonts'
 import { cloneDeep, uniq, uniqBy } from 'lodash'
@@ -135,11 +140,11 @@ export class EditorStore {
   @observable leftTabIsTransformingShape = false
   @observable targetTab = 'shape' as TargetTab
   @observable hasItemChanges = false
-  @observable availableImageShapes: ShapeClipartConf[] = imageShapes
-  @observable availableIconShapes: ShapeIconConf[] = iconShapes
+  @observable availableImageShapes: ShapeClipartConf[] = []
+  @observable availableIconShapes: ShapeIconConf[] = []
   @observable hasUnsavedChanges = false
 
-  @observable selectedShapeConf: ShapeConf = imageShapes[4]
+  @observable selectedShapeConf: ShapeConf | null = null
 
   wordIdGen = new UniqIdGenerator(3)
   customImgIdGen = new UniqIdGenerator(3)
@@ -167,12 +172,11 @@ export class EditorStore {
     await Promise.all([
       fonts.length === 0 ? loadFontsConfig() : Promise.resolve(),
       icons.length === 0 ? loadIconsConfig() : Promise.resolve(),
+      shapes.length === 0 ? loadShapesConfig() : Promise.resolve(),
     ])
-    this.availableIconShapes = icons
+    this.availableImageShapes = getSortedImageShapes(shapes)
+    this.availableIconShapes = getSortedIconsShapes(icons)
 
-    this.styleOptions.shape.items.words.fontIds = [
-      this.getAvailableFonts({ popular: true })[0].defaultStyle.fontId,
-    ]
     this.styleOptions.bg.items.words.fontIds = [
       this.getAvailableFonts({ popular: true })[1].defaultStyle.fontId,
     ]
@@ -259,7 +263,12 @@ export class EditorStore {
       await this.loadSerialized(params.serialized)
     } else {
       await this.applyColorTheme(themePresets[0])
-      await this.selectShape(imageShapes[5])
+
+      const defaultShape = this.availableImageShapes[
+        Math.floor(Math.random() * 12)
+      ]
+      await this.selectShape(defaultShape)
+      this.shapesPanel.image.selected = defaultShape.id
     }
 
     this.enterViewMode('shape')
@@ -267,6 +276,13 @@ export class EditorStore {
     this.lifecycleState = 'initialized'
 
     this.hasUnsavedChanges = false
+  }
+
+  getItemsCount = () => {
+    const shape = this.editor?.items?.shape?.items?.length || 0
+    const bg = this.editor?.items?.bg?.items?.length || 0
+    const total = shape + bg
+    return { shape, bg, total }
   }
 
   setItemLock = (lockValue: boolean) => {
@@ -503,6 +519,10 @@ export class EditorStore {
       await this.selectShape(shapeConf, false, false)
     }
 
+    if (!this.selectedShapeConf) {
+      return
+    }
+
     const shape = this.editor.shape
     if ('transform' in data.shape && shape) {
       applyTransformToObj(shape.obj, data.shape.transform)
@@ -621,10 +641,6 @@ export class EditorStore {
         this.shapesPanel.icon.color = this.selectedShapeConf.color
       }
 
-      console.log(
-        'FISH: editor.store.shapesPanel.shapeKind = ',
-        this.shapesPanel.shapeKind
-      )
       this.shapesPanel.shapeKind = this.selectedShapeConf.kind
     }
 
@@ -761,6 +777,9 @@ export class EditorStore {
       return
     }
     const currentShapeConf = this.getSelectedShapeConf()
+    if (!currentShapeConf) {
+      return
+    }
     const shape = await cloneObj(this.editor.shape.obj)
     applyTransformToObj(shape, this.editor.shape.originalTransform)
 
@@ -776,6 +795,9 @@ export class EditorStore {
   getStateSnapshot = (): EditorStateSnapshot => {
     if (!this.editor) {
       throw new Error('editor not initialized')
+    }
+    if (!this.selectedShapeConf) {
+      throw new Error('no selected shape')
     }
 
     let selection: EditorStateSnapshot['selection'] = null
@@ -877,12 +899,23 @@ export class EditorStore {
     ]
 
     const serializeItems = (
-      items: EditorItem[]
+      target: 'bg' | 'shape'
     ): {
       fontIds: FontId[]
       words: PersistedWordV1[]
       items: PersistedItemV1[]
     } => {
+      if (!this.editor) {
+        throw new Error('no editor')
+      }
+
+      let items = this.editor.getItemsSorted(target)
+      let itemsMaxCount = this.styleOptions[target].items.placement
+        .itemsMaxCount
+      if (typeof itemsMaxCount === 'number') {
+        items = items.slice(0, itemsMaxCount)
+      }
+
       const fontIds: FontId[] = uniq(
         items
           .map((item) => {
@@ -1118,8 +1151,8 @@ export class EditorStore {
           fill: serializeBgFill(this.styleOptions.bg.fill),
         },
         shape: serializeShape(this.getShape()!),
-        bgItems: serializeItems(this.editor.getItemsSorted('bg')),
-        shapeItems: serializeItems(this.editor.getItemsSorted('shape')),
+        bgItems: serializeItems('bg'),
+        shapeItems: serializeItems('shape'),
       },
     }
 
@@ -1316,7 +1349,7 @@ export class EditorStore {
 
   /** Update shape based on the selected shape config (e.g. after shape config changes) */
   updateShapeFromSelectedShapeConf = async () => {
-    if (!this.editor) {
+    if (!this.editor || !this.selectedShapeConf) {
       return
     }
 
@@ -1350,23 +1383,23 @@ export class EditorStore {
     style.items.words.wordList = []
   }
 
-  @action addWords = (target: TargetKind, words: string[]) => {
+  @action addWords = (target: TargetKind, words: ImportedWord[]) => {
     this.hasUnsavedChanges = true
     const style = this.styleOptions[target]
-    for (const text of words) {
+    for (const word of words) {
       style.items.words.wordList.push({
         id: this.wordIdGen.get(),
-        text,
+        ...word,
       })
     }
   }
 
-  @action addWord = (target: TargetKind, text = '') => {
+  @action addWord = (target: TargetKind, word: ImportedWord) => {
     this.hasUnsavedChanges = true
     const style = this.styleOptions[target]
     style.items.words.wordList.push({
       id: this.wordIdGen.get(),
-      text,
+      ...word,
     })
   }
 
@@ -1392,7 +1425,11 @@ export class EditorStore {
 
     // TODO: hide extra items if possible
     if (maxCount !== 'auto') {
-      this.editor?.hideItemsAfter(target, maxCount)
+      if (this.editor) {
+        this.editor.hideItemsAfter(target, maxCount)
+        this.hasUnsavedChanges = true
+        this.editor.version++
+      }
     }
   }
 
@@ -1627,7 +1664,7 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
   },
   image: {
     category: null,
-    selected: imageShapes[0].id,
+    selected: 'circle',
     singleColor: '#4A90E2',
   },
   text: {
@@ -1674,4 +1711,8 @@ export const EditorStoreContext = React.createContext<EditorStore | null>(null)
 export const useEditorStore = () => {
   const editorStore = useContext(EditorStoreContext)
   return editorStore
+}
+
+export type ImportedWord = Partial<WordListEntry> & {
+  text: string
 }

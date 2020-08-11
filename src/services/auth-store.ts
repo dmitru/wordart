@@ -6,7 +6,7 @@ import { action, computed, observable, runInAction } from 'mobx'
 import 'mobx-react-lite/batchingForReactDom'
 import { LocalizedPrice, plans } from 'plans'
 import { Api } from 'services/api/api'
-import { MyProfile } from 'services/api/types'
+import { MyProfile, Order } from 'services/api/types'
 import { AuthTokenStore } from 'services/auth-token-store'
 import { RootStore } from 'services/root-store'
 import { consoleLoggers } from 'utils/console-logger'
@@ -46,6 +46,7 @@ export class AuthStore {
 
   @observable hasInitialized = false
   @observable profile: MyProfile | null = null
+  @observable orders: Order[] | null = null
 
   @observable planPrices = new Map<number, LocalizedPrice>()
 
@@ -54,7 +55,7 @@ export class AuthStore {
 
     this.channel.addEventListener('message', this.handleChannelMsg)
 
-    if (!IS_SSR) {
+    if (!IS_SSR && window['Paddle']) {
       window.Paddle.Setup({
         vendor: config.paddle.vendorId,
         eventCallback: async (data: any) => {
@@ -86,6 +87,8 @@ export class AuthStore {
               authToken,
               isNewUser,
             } = await Api.orders.process({ checkoutId })
+
+            this.fetchMyOrders()
 
             this.channel.postMessage({
               kind: 'profile-update',
@@ -124,6 +127,16 @@ export class AuthStore {
       })
       this.fetchLocalizedPrices()
     }
+  }
+
+  @action fetchMyOrders = async () => {
+    const orders = await Api.orders.fetchMy()
+    this.orders = orders
+  }
+
+  @action deleteMyAccount = async () => {
+    await Api.auth.deleteMyProfile()
+    this.logout()
   }
 
   @action handleChannelMsg = (msg: AuthChannelMessage) => {

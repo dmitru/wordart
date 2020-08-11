@@ -23,6 +23,8 @@ import { apiClient } from './api-client'
 
 export const ApiErrors = {
   NoMediaUploadFreePlan: 'no_custom_media_for_free_plan',
+  WordcloudsLimit: 'wordclouds_limit',
+  FoldersLimit: 'folders_limit',
 }
 
 export const Api = {
@@ -179,6 +181,10 @@ export const Api = {
     async getMyProfile(): Promise<MyProfile> {
       const response = await apiClient.get('/users/profile')
       return response.data as MyProfile
+    },
+
+    async deleteMyProfile(): Promise<void> {
+      await apiClient.delete('/users/profile')
     },
   },
 }

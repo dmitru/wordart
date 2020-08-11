@@ -21,7 +21,7 @@ import { DragIndicator } from '@styled-icons/material/DragIndicator'
 import { FindAndReplaceModal } from 'components/Editor/components/FindAndReplaceModal'
 import { ImportWordsModal } from 'components/Editor/components/ImportWordsModal'
 import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
-import { WordConfigId } from 'components/Editor/editor-store'
+import { useEditorStore, WordConfigId } from 'components/Editor/editor-store'
 import { TargetKind } from 'components/Editor/lib/editor'
 import {
   mkBgStyleConfFromOptions,
@@ -38,8 +38,9 @@ import { SearchInput } from 'components/shared/SearchInput'
 import { capitalize, noop } from 'lodash'
 import { observable, runInAction } from 'mobx'
 import { observer, Observer } from 'mobx-react'
+import papaparse from 'papaparse'
 import pluralize from 'pluralize'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import {
   DragDropContext,
   Draggable,
@@ -48,7 +49,7 @@ import {
   Droppable,
 } from 'react-beautiful-dnd'
 import { FaCog } from 'react-icons/fa'
-import { FiSearch, FiDownload } from 'react-icons/fi'
+import { FiDownload, FiRefreshCw, FiSearch } from 'react-icons/fi'
 import { MdFormatSize } from 'react-icons/md'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import {
@@ -56,11 +57,10 @@ import {
   FixedSizeList as List,
   ListChildComponentProps,
 } from 'react-window'
-import { useStore } from 'services/root-store'
 import { useToasts } from 'use-toasts'
+import { wordsToCSVData } from '../words-import-export'
 import { CustomizeWordPopover } from './CustomizeWord'
-import { FiRefreshCw } from 'react-icons/fi'
-import { useEditorStore } from 'components/Editor/editor-store'
+import { animateElement } from 'utils/animation'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -103,10 +103,11 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
     const focusNewWordInput = () => {
       newWordInputRef.current?.focus()
+      animateElement(document.getElementById('add-word-btn-bottom')!)
     }
 
-    const handleAddWord = (word = '') => {
-      store.addWord(target, word)
+    const handleAddWord = (text = '') => {
+      store.addWord(target, { text })
       store.animateVisualize(false)
       setTimeout(
         () => listRef.current?.scrollToItem(words.wordList.length - 1),
@@ -144,16 +145,14 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         ? allWords.filter((w) => state.selectedWords.has(w.id))
         : allWords
 
-    const [isDragging, setIsDragging] = useState(false)
-
     const selectedCount = state.selectedWords.size
-    const wordsToProcess =
+    const wordsSelectedOrAll =
       selectedCount === 0
         ? allWords
         : allWords.filter((w) => state.selectedWords.has(w.id))
 
     const updateSelectedWords = () => {
-      const existingWordIds = new Set(allWords.map((w) => w.id))
+      const existingWordIds = new Set(words.wordList.map((w) => w.id))
       const newSelectedWordIds = new Set(
         [...state.selectedWords.values()].filter((wId) =>
           existingWordIds.has(wId)
@@ -190,13 +189,12 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
     const topToolbar = (
       <Stack direction="row" mb="6" spacing="2">
-        <Button
-          colorScheme="primary"
-          leftIcon={<AddIcon />}
-          onClick={focusNewWordInput}
-        >
-          Add
-        </Button>
+        <NewWordInput
+          onAddClick={() => handleNewWordInputSubmit()}
+          inputRef={newWordInputRef}
+          focusPrevField={focusPrevField}
+          focusNextField={focusNextField}
+        />
 
         <Box ml="auto">
           <Button
@@ -212,8 +210,10 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
     )
 
     const handleExportCSVClick = () => {
-      alert('TODO')
+      const csv = papaparse.unparse(wordsToCSVData(wordsSelectedOrAll))
+      saveAs(new Blob([csv], { type: 'text/plain;charset=utf-8' }), 'words.csv')
     }
+
     const handleFindAndReplaceClick = () => {
       state.isShowingFindAndReplace = true
     }
@@ -318,7 +318,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     <MenuItemWithIcon
                       icon={<MdFormatSize />}
                       onClick={() => {
-                        for (const w of wordsToProcess) {
+                        for (const w of wordsSelectedOrAll) {
                           w.text = capitalize(w.text)
                         }
                         store.animateVisualize(false)
@@ -329,7 +329,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     <MenuItemWithIcon
                       icon={<MdFormatSize />}
                       onClick={() => {
-                        for (const w of wordsToProcess) {
+                        for (const w of wordsSelectedOrAll) {
                           w.text = w.text.toLocaleUpperCase()
                         }
                         store.animateVisualize(false)
@@ -340,7 +340,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     <MenuItemWithIcon
                       icon={<MdFormatSize />}
                       onClick={() => {
-                        for (const w of wordsToProcess) {
+                        for (const w of wordsSelectedOrAll) {
                           w.text = w.text.toLocaleLowerCase()
                         }
                         store.animateVisualize(false)
@@ -358,18 +358,14 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                       </MenuItemWithIcon>
                     )}
 
-                    {selectedCount === 0 && (
-                      <>
-                        <MenuDivider />
+                    <MenuDivider />
 
-                        <MenuItemWithIcon
-                          onClick={handleExportCSVClick}
-                          icon={<FiDownload />}
-                        >
-                          Export as CSV
-                        </MenuItemWithIcon>
-                      </>
-                    )}
+                    <MenuItemWithIcon
+                      onClick={handleExportCSVClick}
+                      icon={<FiDownload />}
+                    >
+                      Export as CSV
+                    </MenuItemWithIcon>
 
                     <MenuDivider />
 
@@ -377,7 +373,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                       icon={<SmallCloseIcon />}
                       onClick={() => {
                         if (selectedCount > 0) {
-                          for (const w of wordsToProcess) {
+                          for (const w of wordsSelectedOrAll) {
                             store.deleteWord(target, w.id)
                           }
                         } else {
@@ -479,9 +475,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             {allWords.length > 0 && (
               <Box flex="1" width="100%" py="3">
                 <DragDropContext
-                  onBeforeDragStart={() => setIsDragging(true)}
                   onDragEnd={(result) => {
-                    setIsDragging(false)
                     if (!result.destination) {
                       return
                     }
@@ -553,43 +547,6 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                 <EmptyStateWordsUi target={target} />
               </Box>
             )}
-
-            {/* NEW WORD INPUT */}
-            {!state.textFilter && (
-              <Observer>
-                {() => (
-                  <NewWordInput
-                    isPinned={allWords.length > 0}
-                    onAddClick={() => handleNewWordInputSubmit()}
-                    inputRef={newWordInputRef}
-                    inputProps={{
-                      value: state.newWordText,
-                      onChange: (e: any) => {
-                        state.newWordText = e.target.value
-                      },
-                      onKeyDown: (e: React.KeyboardEvent) => {
-                        if (e.key === 'Enter') {
-                          handleNewWordInputSubmit()
-                        } else if (e.key === 'Escape') {
-                          ignoreBlur = true
-                          state.newWordText = ''
-                          newWordInputRef.current?.blur()
-                          setTimeout(() => {
-                            ignoreBlur = false
-                          }, 100)
-                        } else if (e.key === 'ArrowUp') {
-                          e.nativeEvent.preventDefault()
-                          focusPrevField()
-                        } else if (e.key === 'ArrowDown') {
-                          e.nativeEvent.preventDefault()
-                          focusNextField()
-                        }
-                      },
-                    }}
-                  />
-                )}
-              </Observer>
-            )}
           </Box>
         </>
 
@@ -614,7 +571,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             state.isShowingFindAndReplace = false
 
             let count = 0
-            for (const w of wordsToProcess) {
+            for (const w of wordsSelectedOrAll) {
               if (w.text.includes(find)) {
                 count++
               }
@@ -892,52 +849,62 @@ const WordListRow: React.FC<
 )
 
 const NewWordInput: React.FC<{
-  isPinned?: boolean
   inputRef: any
-  inputProps: InputProps
+  focusPrevField: () => void
+  focusNextField: () => void
   onAddClick: () => void
-}> = ({ inputProps, inputRef, onAddClick, isPinned }) => {
+}> = observer(({ inputRef, onAddClick, focusNextField, focusPrevField }) => {
   return (
-    <WordRowNewInput
-      css={css`
-        ${isPinned &&
-        `
-        box-shadow: 0 0 8px 0 #00000025;
-        // background-color: hsla(225, 0%, 95%, 1);
-        padding-bottom: 16px;
-        `}
-      `}
-    >
+    <>
       <InputGroup flex={1}>
+        {/* 
+        // @ts-ignore */}
         <WordInput
-          {...inputProps}
+          value={state.newWordText}
+          onChange={(e: any) => {
+            state.newWordText = e.target.value
+          }}
+          onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === 'Enter') {
+              onAddClick()
+            } else if (e.key === 'Escape') {
+              ignoreBlur = true
+              state.newWordText = ''
+              inputRef.current?.blur()
+              setTimeout(() => {
+                ignoreBlur = false
+              }, 100)
+            } else if (e.key === 'ArrowUp') {
+              e.nativeEvent.preventDefault()
+              focusPrevField()
+            } else if (e.key === 'ArrowDown') {
+              e.nativeEvent.preventDefault()
+              focusNextField()
+            }
+          }}
+          inputRef={inputRef}
+          value={state.newWordText}
           className="word-input"
           autocomplete="off"
           spellcheck="false"
           autocorrect="off"
           flex="1"
-          ref={inputRef}
           hasBorder
-          placeholder="Type new word here..."
-        />
-        <InputRightElement
-          px="0"
-          width="80px"
-          children={
-            <Button
-              px="3"
-              width="100%"
-              colorScheme="primary"
-              onClick={onAddClick}
-            >
-              Add
-            </Button>
-          }
+          placeholder="Type word here..."
         />
       </InputGroup>
-    </WordRowNewInput>
+
+      <Button
+        id="add-word-btn-bottom"
+        px="4"
+        colorScheme="primary"
+        onClick={onAddClick}
+      >
+        Add
+      </Button>
+    </>
   )
-}
+})
 
 const resetWordDefaults = (word: WordListEntry) => {
   word.repeats = -1

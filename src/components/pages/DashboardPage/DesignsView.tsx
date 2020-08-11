@@ -1,7 +1,6 @@
 import {
   Box,
   Flex,
-  Heading,
   Menu,
   MenuButton,
   MenuList,
@@ -20,8 +19,10 @@ import { ConfirmModal } from 'components/shared/ConfirmModal'
 import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 import { PromptModal } from 'components/shared/PromptModal'
 import { SearchInput } from 'components/shared/SearchInput'
+import { useUpgradeModal } from 'components/upgrade/UpgradeModal'
 import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
+import Link from 'next/link'
 import pluralize from 'pluralize'
 import React, { useState } from 'react'
 import {
@@ -30,6 +31,7 @@ import {
   FaSearch,
   FaTimes,
 } from 'react-icons/fa'
+import { ApiErrors } from 'services/api/api'
 import { Folder, Wordcloud } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
@@ -37,12 +39,16 @@ import { useToasts } from 'use-toasts'
 import { openUrlInNewTab } from 'utils/browser'
 
 export const DesignsView = observer(() => {
-  const { wordcloudsStore: store } = useStore()
+  const {
+    wordcloudsStore: store,
+    authStore: { profile },
+  } = useStore()
   const toasts = useToasts()
   const [
     duplicatingWordcloud,
     setDuplicatingWordcloud,
   ] = useState<Wordcloud | null>(null)
+
   const [renamingWordcloud, setRenamingWordcloud] = useState<Wordcloud | null>(
     null
   )
@@ -54,6 +60,7 @@ export const DesignsView = observer(() => {
   )
 
   const [query, setQuery] = useState('')
+  const upgradeModal = useUpgradeModal()
 
   const allWordclouds = store.wordclouds
   const wordcloudsInFolder = allWordclouds.filter((wc) => {
@@ -233,6 +240,8 @@ export const DesignsView = observer(() => {
             </Box>
           )}
         </Box>
+
+        {/* Grid */}
         <Flex
           flex="1"
           wrap="wrap"
@@ -245,7 +254,7 @@ export const DesignsView = observer(() => {
             min-height: calc(100vh - 200px);
             overflow-y: auto;
             background: #f8f8f8;
-            padding: 2rem;
+            padding: 1.5rem;
             box-shadow: inset 0 0 8px 0 #0003;
             margin-bottom: 1rem;
           `}
@@ -264,19 +273,43 @@ export const DesignsView = observer(() => {
 
           {store.hasFetchedWordclouds && allWordclouds.length === 0 && (
             <Box
+              borderRadius="lg"
               mx="auto"
-              p="4"
+              p="6"
               fontSize="lg"
               bg="white"
-              boxShadow="sm"
+              boxShadow="md"
               maxWidth="600px"
               width="100%"
             >
-              <Heading as="h1" size="lg">
+              <Text fontSize="1.4rem" fontWeight="medium">
                 Welcome to WordCloudy!
-              </Heading>
+              </Text>
 
-              <Box display="flex">
+              <Text>We're happy to see you here!</Text>
+
+              <Text>
+                To get started quickly, please follow this quick tutorial:
+                <br />
+                <a
+                  href="https://blog.wordcloudy.com/getting-started-with-wordcloudy-in-3-minutes/"
+                  target="_blank"
+                >
+                  Getting Started: Create Your First Word Design in 3 Minutes.
+                </a>
+              </Text>
+              <Text>
+                You may also want to explore explore{' '}
+                <a
+                  href="https://blog.wordcloudy.com/tag/tutorials/"
+                  target="_blank"
+                >
+                  our other tutorials
+                </a>{' '}
+                to learn about more advanced features of Wordcloudy.
+              </Text>
+
+              <Box display="flex" mt="6" mb="2rem">
                 <Button
                   as="a"
                   css={css`
@@ -296,10 +329,31 @@ export const DesignsView = observer(() => {
                   Create your First Design
                 </Button>
 
-                <Button variant="outline" size="lg">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  as="a"
+                  target="_blank"
+                  href="https://blog.wordcloudy.com/tag/tutorials/"
+                >
                   Check out tutorials
                 </Button>
               </Box>
+
+              <Text fontWeight="medium" fontSize="1.4rem">
+                Getting help
+              </Text>
+              <Text>
+                Please refer to our{' '}
+                <Link passHref href={Urls.faq}>
+                  <a>FAQ</a>
+                </Link>{' '}
+                for common questions. If you need more help, please{' '}
+                <Link passHref href={Urls.contact}>
+                  <a>write to us via the Contact Form</a>
+                </Link>
+                – our friendly support team will reply within 24 hours.
+              </Text>
             </Box>
           )}
 
@@ -457,7 +511,16 @@ export const DesignsView = observer(() => {
                 }}
                 onMoveToFolder={() => setMovindWordclouds([wc])}
                 onRename={() => setRenamingWordcloud(wc)}
-                onDuplicate={() => setDuplicatingWordcloud(wc)}
+                onDuplicate={() => {
+                  if (
+                    profile &&
+                    profile.limits.maxWordclouds <= allWordclouds.length
+                  ) {
+                    upgradeModal.show('design-limits')
+                    return
+                  }
+                  setDuplicatingWordcloud(wc)
+                }}
                 onDelete={() => setDeletingWordclouds([wc])}
                 isSelected={selection.has(wc.id)}
                 onSelectionChange={(isSelected) => {
@@ -524,6 +587,11 @@ export const DesignsView = observer(() => {
             }
             try {
               await duplicate(duplicatingWordcloud, title)
+            } catch (error) {
+              if (error.response?.data?.message === ApiErrors.WordcloudsLimit) {
+                upgradeModal.show('design-limits')
+              }
+              setDuplicatingWordcloud(null)
             } finally {
               setDuplicatingWordcloud(null)
             }

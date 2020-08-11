@@ -178,11 +178,11 @@ export class EditorItemWord {
   }
 
   private _updateColor = (color: string) => {
-    this.fabricObj.cornerColor = darken(0.3, color)
+    this.fabricObj.cornerColor = darken(0.05, color)
     this.fabricObj.cornerStrokeColor = lighten(0.3, color)
     this.fabricObj.cornerStyle = 'circle'
     this.fabricObj.transparentCorners = false
-    this.fabricObj.borderColor = darken(0.3, color)
+    this.fabricObj.borderColor = darken(0.05, color)
     this.fabricObj.borderDashArray = [5, 5]
     this.wordObj.set({ fill: color })
     this.lockBorder.set({ stroke: color })

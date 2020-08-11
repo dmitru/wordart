@@ -1019,6 +1019,9 @@ export class Editor {
             .brighten((2 * brightness) / 100)
             .saturate(-(0.2 * brightness) / 100)
         }
+      } else {
+        // Advance the color index, but don't do anything else
+        colorIndex = (colorIndex + 1) % colors.length
       }
 
       const hex = color!.hex()
@@ -1029,6 +1032,10 @@ export class Editor {
           (1 - dimSmallerFactor)) *
           itemsStyleConf.opacity
       )
+
+      if (this.store.selectedItemData?.id === item.id) {
+        this.store.selectedItemData.color = item.color
+      }
     }
 
     if (render) {
@@ -1455,6 +1462,9 @@ export class Editor {
     }
 
     const shapeConfig = this.store.getSelectedShapeConf()
+    if (!shapeConfig) {
+      throw new Error('shape config is null')
+    }
     const wordConfigsById = keyBy(style.items.words.wordList, 'id')
 
     const enableRemoveWhiteBg =
@@ -1594,12 +1604,18 @@ export class Editor {
     const persistedDataBefore = await this.store.serialize()
 
     const shapeObj = this.shape.obj
-    const shapeOriginalColorsObj =
+    let shapeOriginalColorsObj =
       this.shape.kind === 'clipart:svg' ||
       this.shape.kind === 'custom:svg' ||
       this.shape.kind === 'icon'
         ? this.shape.objOriginalColors
         : this.shape.obj
+
+    if (this.shape.kind === 'clipart:svg') {
+      if (this.shape.config.processing.colors.kind === 'single-color') {
+        shapeOriginalColorsObj = this.shape.obj
+      }
+    }
 
     if (!shapeOriginalColorsObj) {
       console.error('No shapeOriginalColorsObj')
@@ -1674,6 +1690,9 @@ export class Editor {
     )
 
     const shapeConfig = this.store.getSelectedShapeConf()
+    if (!shapeConfig) {
+      throw new Error('shape config is null')
+    }
     const wordConfigsById = keyBy(style.items.words.wordList, 'id')
 
     // @TODO: don't remove edges for single-color SVG shapes

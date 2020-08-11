@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::*;
 
-use crate::hbounds::*;
+use crate::utils::*;
 use deltae::*;
 use palette::{rgb, FromColor, IntoColor, Lab, Lch, Srgb};
 use std::collections::HashMap;

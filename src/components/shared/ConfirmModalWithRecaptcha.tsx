@@ -75,7 +75,7 @@ export const ConfirmModalWithRecaptcha: React.FC<ConfirmModalWithRecaptchaProps>
           />
         )}
 
-        <Modal size="sm" isOpen={isOpen} onClose={onCancel}>
+        <Modal size="sm" isOpen={isOpen} onClose={onCancel} autoFocus={false}>
           <ModalOverlay>
             <ModalContent>
               <ModalHeader>{title}</ModalHeader>

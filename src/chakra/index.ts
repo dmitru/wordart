@@ -23,6 +23,17 @@ const myTheme: ChakraTheme = {
         },
       },
     },
+    Textarea: {
+      ...theme.components.Textarea,
+      baseStyle: {
+        ...theme.components.Textarea.baseStyle,
+        // @ts-ignore
+        _placeholder: {
+          opacity: 1,
+          color: 'gray.500',
+        },
+      },
+    },
     Button: {
       ...theme.components.Button,
       baseStyle: {

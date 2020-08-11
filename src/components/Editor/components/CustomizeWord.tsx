@@ -8,12 +8,11 @@ import {
   NumberInputField,
   NumberInputStepper,
   Popover,
-  Button,
   PopoverArrow,
   PopoverBody,
+  PopoverCloseButton,
   PopoverContent,
   PopoverTrigger,
-  PopoverCloseButton,
   Portal,
   Switch,
 } from '@chakra-ui/core'
@@ -21,14 +20,14 @@ import css from '@emotion/css'
 import { ChoiceButtons } from 'components/Editor/components/ChoiceButtons'
 import { SelectedFontThumbnail } from 'components/Editor/components/FontPicker/components'
 import { FontPickerModal } from 'components/Editor/components/FontPicker/FontPickerModal'
+import { useEditorStore } from 'components/Editor/editor-store'
 import { BaseBtn } from 'components/shared/BaseBtn'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { Slider } from 'components/shared/Slider'
 import { FontId } from 'data/fonts'
 import { observer, useLocalStore } from 'mobx-react'
 import React from 'react'
-import { useStore } from 'services/root-store'
-import { useEditorStore } from 'components/Editor/editor-store'
+import { defaultFontId } from '../default-style-options'
 import { WordListEntry } from '../style-options'
 
 export type CustomizeWordOptions = {
@@ -46,8 +45,6 @@ export type CustomizeWordOptions = {
   color: string
 }
 
-const defaultFontId = 'Pacifico:regular'
-
 const getValueFromWordEntry = (word: WordListEntry): CustomizeWordOptions => {
   return {
     repeat:
@@ -60,7 +57,7 @@ const getValueFromWordEntry = (word: WordListEntry): CustomizeWordOptions => {
     customAngle: word.angle != null,
     angle: word.angle || 0,
     customFont: word.fontId != null,
-    font: defaultFontId,
+    font: word.fontId || defaultFontId,
     customColor: word.color != null,
     color: word.color || '#000000',
   }
@@ -270,6 +267,9 @@ export const CustomizeWordPopover: React.FC<CustomizeWordPopoverProps> = observe
                     p="3"
                   >
                     <img
+                      css={css`
+                        width: 100%;
+                      `}
                       src={
                         store.getFontConfigById(state.value.font)?.style
                           .thumbnail

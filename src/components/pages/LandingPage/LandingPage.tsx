@@ -1,10 +1,22 @@
+import { Box, Button, Stack, Text } from '@chakra-ui/core'
+import css from '@emotion/css'
+import styled from '@emotion/styled'
 import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
 import { observer } from 'mobx-react'
+import Link from 'next/link'
 import React from 'react'
-import styled from '@emotion/styled'
-import css from '@emotion/css'
-import { Button, Box, Text, Stack } from '@chakra-ui/core'
 import AwesomeSlider from 'react-awesome-slider'
+// @ts-ignore
+import withAutoplay from 'react-awesome-slider/dist/autoplay'
+import { GiCupcake } from 'react-icons/gi'
+import { Urls } from 'urls'
+import { MdColorLens } from 'react-icons/md'
+import { BsGrid3X3GapFill } from 'react-icons/bs'
+import { GoSettings } from 'react-icons/go'
+import { AiFillPrinter } from 'react-icons/ai'
+import { IoIosChatbubbles } from 'react-icons/io'
+
+const Slider = withAutoplay(AwesomeSlider)
 
 const mobileHeaderBreakpoint = `@media screen and (max-width: 1100px)`
 const xsBreakpoint = `@media screen and (max-width: 500px)`
@@ -19,7 +31,8 @@ export const LandingPage = observer(() => {
               Create <em>unique</em> word designs in no time!
             </HeaderTitle>
             <HeaderSubtitle>
-              Easy-to-use online art generator.
+              Easy-to-use online art generator, a superior alternative to
+              WordArt.com
               <br
                 css={css`
                   ${mobileHeaderBreakpoint} {
@@ -38,32 +51,41 @@ export const LandingPage = observer(() => {
                 direction={['column', 'row']}
                 alignItems="center"
               >
-                <HeaderCreateNowButton colorScheme="accent" size="lg">
-                  Create now
-                </HeaderCreateNowButton>
+                <Link href={Urls.editor.create} passHref>
+                  <HeaderCreateNowButton as="a" colorScheme="accent" size="lg">
+                    Create now
+                  </HeaderCreateNowButton>
+                </Link>
+
                 <HeaderCtaInfo>or</HeaderCtaInfo>
-                <HeaderCreateNowButton
-                  colorScheme="accent"
-                  variant="outline"
-                  size="lg"
-                  bg="white"
-                >
-                  Sign up
-                </HeaderCreateNowButton>
+
+                <Link href={Urls.signup} passHref>
+                  <HeaderCreateNowButton
+                    colorScheme="accent"
+                    variant="outline"
+                    size="lg"
+                    bg="white"
+                    as="a"
+                  >
+                    Sign up
+                  </HeaderCreateNowButton>
+                </Link>
               </Stack>
             </HeaderCtaContainer>
           </HeaderTitleContainer>
 
           <HeaderSliderContainer>
             <HeaderSlider>
-              <AwesomeSlider>
-                <div data-src="/gallery/gallery-0.png" />
-                <div data-src="/gallery/gallery-1.png" />
-                <div data-src="/gallery/gallery-1.png" />
-                <div data-src="/gallery/gallery-1.png" />
-                <div data-src="/gallery/gallery-1.png" />
-                <div data-src="/gallery/gallery-1.png" />
-              </AwesomeSlider>
+              <Slider play={true} cancelOnInteraction={false} interval={3000}>
+                <div data-src="/gallery/gallery-1.jpeg" />
+                <div data-src="/gallery/gallery-2.jpeg" />
+                <div data-src="/gallery/gallery-3.jpeg" />
+                <div data-src="/gallery/gallery-4.jpeg" />
+                <div data-src="/gallery/gallery-5.jpeg" />
+                <div data-src="/gallery/gallery-6.jpeg" />
+                <div data-src="/gallery/gallery-7.jpeg" />
+                <div data-src="/gallery/gallery-8.jpeg" />
+              </Slider>
             </HeaderSlider>
           </HeaderSliderContainer>
         </HeaderContentWidthLimit>
@@ -95,7 +117,7 @@ export const LandingPage = observer(() => {
       >
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot>
-            <img src="https://placehold.it/100x100" />
+            <GiCupcake />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
             No design skills required
@@ -107,7 +129,7 @@ export const LandingPage = observer(() => {
 
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot>
-            <img src="https://placehold.it/100x100" />
+            <GoSettings />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
             Customize anything
@@ -120,7 +142,20 @@ export const LandingPage = observer(() => {
 
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot>
-            <img src="https://placehold.it/100x100" />
+            <AiFillPrinter />
+          </UiScreenshot>
+          <Text fontWeight="bold" fontSize="lg">
+            Crisp image quality
+          </Text>
+          <Text color="gray.500">
+            Export your designs at high resolution as PNG, JPEG images or as
+            scalable vector graphics (SVG).
+          </Text>
+        </UiFeature>
+
+        <UiFeature maxWidth="240px" textAlign="center" p="5">
+          <UiScreenshot>
+            <MdColorLens />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
             Built-in color themes
@@ -132,7 +167,7 @@ export const LandingPage = observer(() => {
 
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot border="gray.500">
-            <img src="https://placehold.it/100x100" />
+            <BsGrid3X3GapFill />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
             Huge built-in library
@@ -144,26 +179,13 @@ export const LandingPage = observer(() => {
 
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot>
-            <img src="https://placehold.it/100x100" />
+            <IoIosChatbubbles />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
             Multi-language support
           </Text>
           <Text color="gray.500">
-            Let your designs speak the language of your audience.
-          </Text>
-        </UiFeature>
-
-        <UiFeature maxWidth="240px" textAlign="center" p="5">
-          <UiScreenshot>
-            <img src="https://placehold.it/100x100" />
-          </UiScreenshot>
-          <Text fontWeight="bold" fontSize="lg">
-            Crisp image quality
-          </Text>
-          <Text color="gray.500">
-            Export your designs as images in PNG, JPEG at high resolution or as
-            SVG.
+            Create designs in world's most common languages!
           </Text>
         </UiFeature>
       </FeaturesSection>
@@ -174,9 +196,24 @@ export const LandingPage = observer(() => {
           It's fast and fun with Wordcloudy – the world's leading word designs
           generator app.
         </Text>
-        <Button size="lg" colorScheme="accent">
-          Start creating
-        </Button>
+
+        <Stack spacing="3" direction="row" justifyContent="center">
+          <Link href={Urls.editor.create} passHref>
+            <Button as="a" size="lg" colorScheme="accent">
+              Start creating
+            </Button>
+          </Link>
+
+          <Button
+            as="a"
+            target="_blank"
+            href="https://blog.wordcloudy.com/tag/tutorials/"
+            size="lg"
+            variant="outline"
+          >
+            Open tutorial
+          </Button>
+        </Stack>
       </CtaFooterSection>
     </SiteLayout>
   )
@@ -396,9 +433,19 @@ const UiScreenshot = styled(Box)`
   border-width: 3px;
   border-radius: 50%;
   background-clip: padding-box;
-  display: table;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0 auto;
   margin-bottom: 25px;
+
+  svg {
+    width: 70px;
+    height: 70px;
+    * {
+      fill: hsl(206, 56%, 37%);
+    }
+  }
 
   img {
     width: 100%;

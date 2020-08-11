@@ -1,0 +1,1373 @@
+[
+  {
+    "title": "Bat",
+    "url": "bat.svg",
+    "categories": ["animals", "halloween"],
+    "keywords": ["bat", "animal", "halloween", "spooky"]
+  },
+  {
+    "title": "Bat 2",
+    "url": "bat-2.svg",
+    "categories": ["animals", "halloween"],
+    "keywords": ["bat", "animal", "halloween", "spooky"]
+  },
+  {
+    "title": "Haunted house",
+    "url": "haunted-house.svg",
+    "categories": ["halloween"],
+    "keywords": ["house", "castle", "halloween", "spooky", "haunted"]
+  },
+  {
+    "title": "Halloween Pumpkin",
+    "url": "halloween-pumpkin.svg",
+    "categories": ["halloween"],
+    "keywords": ["pumpkin", "halloween", "spooky"]
+  },
+  {
+    "title": "Pumpkin",
+    "url": "pumpkin.svg",
+    "categories": ["food"],
+    "keywords": ["pumpkin", "food", "vegetable"]
+  },
+  {
+    "title": "Ghost 1",
+    "url": "ghost-1.svg",
+    "categories": ["halloween"],
+    "keywords": ["ghost", "halloween", "spooky"]
+  },
+  {
+    "title": "Ghost 2",
+    "url": "ghost-2.svg",
+    "categories": ["halloween"],
+    "keywords": ["ghost", "halloween", "spooky"]
+  },
+  {
+    "title": "Ghost 3",
+    "url": "ghost-3.svg",
+    "categories": ["halloween"],
+    "keywords": ["ghost", "halloween", "spooky"]
+  },
+  {
+    "title": "Water Drop 1",
+    "url": "water-drop-1.svg",
+    "categories": ["nature"],
+    "keywords": ["water", "drop", "ocean"]
+  },
+  {
+    "title": "Water Drops",
+    "url": "water-drops.svg",
+    "categories": ["nature"],
+    "keywords": ["water", "drop", "ocean"]
+  },
+  {
+    "title": "Water Glass",
+    "url": "water-glass.svg",
+    "categories": ["nature", "food"],
+    "keywords": ["water", "drop", "ocean", "drink", "glass", "food"]
+  },
+  {
+    "title": "Water Drop 2",
+    "url": "water-drop-2.svg",
+    "categories": ["nature"],
+    "keywords": ["water", "drop", "ocean"]
+  },
+  {
+    "title": "Water Drop 3",
+    "url": "water-drop-3.svg",
+    "categories": ["nature"],
+    "keywords": ["water", "drop", "ocean"]
+  },
+  {
+    "title": "Water Drop 4",
+    "url": "water-drop-4.svg",
+    "categories": ["nature"],
+    "keywords": ["water", "drop", "ocean"]
+  },
+  {
+    "title": "Water Splash",
+    "url": "water-splash.svg",
+    "categories": ["nature"],
+    "keywords": ["water", "splash", "ocean"]
+  },
+  {
+    "title": "Water Bottle",
+    "url": "water-bottle.svg",
+    "categories": ["nature", "food"],
+    "keywords": ["water", "drop", "ocean", "drinks", "bottle"]
+  },
+  {
+    "title": "Water Wave",
+    "url": "water-wave.svg",
+    "categories": ["nature"],
+    "keywords": ["water", "drop", "ocean", "wave"]
+  },
+  {
+    "title": "Fire Stylyzed",
+    "url": "fire-stylized.svg",
+    "categories": ["nature"],
+    "keywords": ["fire", "flame", "stylized"]
+  },
+  {
+    "title": "Fire 1",
+    "url": "fire-1.svg",
+    "categories": ["nature"],
+    "keywords": ["fire", "flame"]
+  },
+  {
+    "title": "Fire 2",
+    "url": "fire-2.svg",
+    "categories": ["nature"],
+    "keywords": ["fire", "flame"]
+  },
+  {
+    "title": "Speech Bubble 1",
+    "url": "speech-bubble-1.svg",
+    "categories": ["clouds"],
+    "keywords": ["speech", "bubble", "say", "comic"]
+  },
+  {
+    "title": "Speech Bubble 2",
+    "url": "speech-bubble-2.svg",
+    "categories": ["clouds"],
+    "keywords": ["speech", "bubble", "say", "comic"]
+  },
+  {
+    "title": "Speech Bubble 3",
+    "url": "speech-bubble-3.svg",
+    "categories": ["clouds"],
+    "keywords": ["speech", "bubble", "say", "comic"]
+  },
+  {
+    "title": "Speech Bubble 4",
+    "url": "speech-bubble-4.svg",
+    "categories": ["clouds"],
+    "keywords": ["speech", "bubble", "say", "comic"]
+  },
+  {
+    "title": "Speech Bubble 5",
+    "url": "speech-bubble-5.svg",
+    "categories": ["clouds"],
+    "keywords": ["speech", "bubble", "say", "comic"]
+  },
+  {
+    "title": "Speech Bubble 6",
+    "url": "speech-bubble-6.svg",
+    "categories": ["clouds"],
+    "keywords": ["speech", "bubble", "say", "comic"]
+  },
+  {
+    "title": "Speech Bubble 7",
+    "url": "speech-bubble-7.svg",
+    "categories": ["clouds"],
+    "keywords": ["speech", "bubble", "say", "comic"]
+  },
+  {
+    "title": "Speech Bubble 8",
+    "url": "speech-bubble-8.svg",
+    "categories": ["clouds"],
+    "keywords": ["speech", "bubble", "say", "comic"]
+  },
+  {
+    "title": "Speech Bubble 9",
+    "url": "speech-bubble-9.svg",
+    "categories": ["clouds"],
+    "keywords": ["speech", "bubble", "say", "comic"]
+  },
+  {
+    "title": "Cloud 1",
+    "url": "clouds-1.svg",
+    "categories": ["clouds", "nature"],
+    "keywords": ["cloud", "sky", "weather"]
+  },
+  {
+    "title": "Cloud 2",
+    "url": "clouds-2.svg",
+    "categories": ["clouds", "nature"],
+    "keywords": ["cloud", "sky", "weather"]
+  },
+  {
+    "title": "Cloud 3",
+    "url": "clouds-3.svg",
+    "categories": ["clouds", "nature"],
+    "keywords": ["cloud", "sky", "weather"]
+  },
+  {
+    "title": "Cloud 4",
+    "url": "clouds-4.svg",
+    "categories": ["clouds", "nature"],
+    "keywords": ["cloud", "sky", "weather"]
+  },
+  {
+    "title": "Rain Cloud",
+    "url": "rain-cloud.svg",
+    "categories": ["nature", "clouds"],
+    "keywords": ["cloud", "storm", "rain", "sky", "weather"]
+  },
+  {
+    "title": "Sunny Cloud 1",
+    "url": "cloud-sunny.svg",
+    "categories": ["clouds", "nature"],
+    "keywords": ["cloud", "sun", "sky", "weather"]
+  },
+  {
+    "title": "Sunny Cloud 2",
+    "url": "cloud-sunny-2.svg",
+    "categories": ["clouds", "nature"],
+    "keywords": ["cloud", "sun", "sky", "weather"]
+  },
+  {
+    "title": "Sun",
+    "url": "sun-1.svg",
+    "categories": ["nature"],
+    "keywords": ["sun", "day", "sky", "weather"]
+  },
+  {
+    "title": "Sun 2",
+    "url": "sun-2.svg",
+    "categories": ["nature"],
+    "keywords": ["sun", "day", "sky", "weather"]
+  },
+  {
+    "title": "Sun 3",
+    "url": "sun-3.svg",
+    "categories": ["nature"],
+    "keywords": ["sun", "day", "sky", "weather"]
+  },
+  {
+    "title": "Moon 1",
+    "url": "moon-1.svg",
+    "categories": ["nature"],
+    "keywords": ["moon", "night", "sky", "weather"]
+  },
+  {
+    "title": "Moon 2",
+    "url": "moon-2.svg",
+    "categories": ["nature"],
+    "keywords": ["moon", "night", "sky", "weather"]
+  },
+  {
+    "title": "Moon Stars",
+    "url": "moon-stars.svg",
+    "categories": ["nature"],
+    "keywords": ["moon", "stars", "night", "sky", "weather"]
+  },
+  {
+    "title": "Star 1",
+    "url": "star-1.svg",
+    "categories": ["nature"],
+    "keywords": ["star", "night", "sky"]
+  },
+  {
+    "title": "Star 2",
+    "url": "star-2.svg",
+    "categories": ["nature"],
+    "keywords": ["star", "night", "sky"]
+  },
+  {
+    "title": "Star 3",
+    "url": "star-3.svg",
+    "categories": ["nature"],
+    "keywords": ["star", "night", "sky"]
+  },
+  {
+    "title": "Cherry",
+    "url": "cherries.svg",
+    "categories": ["food"],
+    "keywords": ["cherry", "berry", "fruit", "food"]
+  },
+  {
+    "title": "Grapes",
+    "url": "grapes.svg",
+    "categories": ["food"],
+    "keywords": ["grape", "berry", "fruit", "food"]
+  },
+  {
+    "title": "Apple 1",
+    "url": "apple-1.svg",
+    "categories": ["food"],
+    "keywords": ["apple", "fruit", "food"]
+  },
+  {
+    "title": "Apple 2",
+    "url": "apple-2.svg",
+    "categories": ["food"],
+    "keywords": ["apple", "fruit", "food"]
+  },
+  {
+    "title": "Apple 3",
+    "url": "apple-3.svg",
+    "categories": ["food"],
+    "keywords": ["apple", "fruit", "food"]
+  },
+  {
+    "title": "Blueberry 1",
+    "url": "blueberry-1.svg",
+    "categories": ["food"],
+    "keywords": ["blueberry", "berries", "fruit", "food"]
+  },
+  {
+    "title": "Blueberry 2",
+    "url": "blueberry-2.svg",
+    "categories": ["food"],
+    "keywords": ["blueberry", "berries", "fruit", "food"]
+  },
+  {
+    "title": "Berry 1",
+    "url": "berry-1.svg",
+    "categories": ["food"],
+    "keywords": ["berries", "fruit", "food"]
+  },
+  {
+    "title": "Strawberry 1",
+    "url": "strawberry-1.svg",
+    "categories": ["food"],
+    "keywords": ["strawberry", "fruit", "food"]
+  },
+  {
+    "title": "Strawberry 2",
+    "url": "strawberry-2.svg",
+    "categories": ["food"],
+    "keywords": ["strawberry", "fruit", "food"]
+  },
+  {
+    "title": "Stop Sign 1",
+    "url": "stop-sign-1.svg",
+    "categories": ["symbols"],
+    "keywords": ["sign", "stop", "warning", "cross"]
+  },
+  {
+    "title": "Cross Sign 1",
+    "url": "cross-sign-1.svg",
+    "categories": ["symbols"],
+    "keywords": ["sign", "stop", "cross"]
+  },
+  {
+    "title": "Cross Sign 2",
+    "url": "cross-sign-2.svg",
+    "categories": ["symbols"],
+    "keywords": ["sign", "warning", "stop", "cross"]
+  },
+  {
+    "title": "Check Sign",
+    "url": "check-sign.svg",
+    "categories": ["symbols"],
+    "keywords": ["sign", "success", "check"]
+  },
+  {
+    "title": "Radiation Sign",
+    "url": "radiation-sign.svg",
+    "categories": ["symbols"],
+    "keywords": ["sign", "radiation", "warning"]
+  },
+  {
+    "title": "Electricity Sign",
+    "url": "electricity-sign.svg",
+    "categories": ["symbols"],
+    "keywords": ["sign", "electricity", "flash", "warning"]
+  },
+  {
+    "title": "Warning Sign",
+    "url": "warning-sign.svg",
+    "categories": ["symbols"],
+    "keywords": ["sign", "warning"]
+  },
+  {
+    "title": "Lock",
+    "url": "lock.svg",
+    "categories": ["symbols"],
+    "keywords": ["lock", "security"]
+  },
+  {
+    "title": "Lock 2",
+    "url": "lock-2.svg",
+    "categories": ["symbols"],
+    "keywords": ["lock", "security"]
+  },
+  {
+    "title": "Key",
+    "url": "key.svg",
+    "categories": ["symbols"],
+    "keywords": ["lock", "security", "key", "password", "door"]
+  },
+  {
+    "title": "Recycling",
+    "url": "recycling.svg",
+    "categories": ["symbols"],
+    "keywords": ["recycle", "recycling", "sign", "reuse", "ecology", "green"]
+  },
+  {
+    "title": "Peace Dove",
+    "url": "peace-dove.svg",
+    "categories": ["animals", "symbols"],
+    "keywords": ["peace", "bird", "dove"]
+  },
+  {
+    "title": "Heart 1",
+    "url": "heart-1.svg",
+    "categories": ["love", "symbols"],
+    "keywords": ["love", "heart", "romance", "relations", "couple"]
+  },
+  {
+    "title": "Heart 2",
+    "url": "heart-2.svg",
+    "categories": ["love", "symbols"],
+    "keywords": ["love", "heart", "romance", "relations", "couple"]
+  },
+  {
+    "title": "Heart 3",
+    "url": "heart-3.svg",
+    "categories": ["love", "symbols"],
+    "keywords": ["love", "heart", "romance", "relations", "couple"]
+  },
+  {
+    "title": "Bread",
+    "url": "bread.svg",
+    "categories": ["food"],
+    "keywords": ["food", "bread", "pastry", "bakery"]
+  },
+  {
+    "title": "Pizza",
+    "url": "pizza.svg",
+    "categories": ["food"],
+    "keywords": ["food", "pizza"]
+  },
+  {
+    "title": "Pizza 2",
+    "url": "pizza-2.svg",
+    "categories": ["food"],
+    "keywords": ["food", "pizza"]
+  },
+  {
+    "title": "Burger",
+    "url": "burger.svg",
+    "categories": ["food"],
+    "keywords": ["food", "burger"]
+  },
+  {
+    "title": "Coffee Beans",
+    "url": "coffee-beans.svg",
+    "categories": ["food"],
+    "keywords": ["food", "drink", "coffee", "bean"]
+  },
+  {
+    "title": "Cup 1",
+    "url": "cup-1.svg",
+    "categories": ["food"],
+    "keywords": ["food", "drink", "coffee", "tea", "cup"]
+  },
+  {
+    "title": "Cup 2",
+    "url": "cup-2.svg",
+    "categories": ["food"],
+    "keywords": ["food", "drink", "coffee", "tea", "cup"]
+  },
+  {
+    "title": "Cup 3",
+    "url": "cup-3.svg",
+    "categories": ["food"],
+    "keywords": ["food", "drink", "coffee", "tea", "cup"]
+  },
+  {
+    "title": "Cup 4",
+    "url": "cup-4.svg",
+    "categories": ["food"],
+    "keywords": ["food", "drink", "coffee", "tea", "cup"]
+  },
+  {
+    "title": "Glass wine",
+    "url": "glass-wine.svg",
+    "categories": ["food"],
+    "keywords": ["food", "drink", "wine", "glass", "alchohol"]
+  },
+  {
+    "title": "Glass heart",
+    "url": "glass-heart.svg",
+    "categories": ["food"],
+    "keywords": ["food", "heart", "drink", "wine", "glass", "alchohol"]
+  },
+  {
+    "title": "Cocktail glass",
+    "url": "cocktail.svg",
+    "categories": ["food"],
+    "keywords": ["food", "drink", "cocktail", "glass", "alchohol"]
+  },
+  {
+    "title": "Glasses",
+    "url": "glasses.svg",
+    "categories": ["food"],
+    "keywords": ["food", "drink", "wine", "glass"]
+  },
+  {
+    "title": "Beer Mug 1",
+    "url": "beer-mug-1.svg",
+    "categories": ["food"],
+    "keywords": ["food", "drink", "beer", "mug", "cup", "brew"]
+  },
+  {
+    "title": "Beer Mug 2",
+    "url": "beer-mug-2.svg",
+    "categories": ["food"],
+    "keywords": ["food", "drink", "beer", "mug", "cup", "brew"]
+  },
+  {
+    "title": "Beer Bottle",
+    "url": "beer-bottle.svg",
+    "categories": ["food"],
+    "keywords": ["food", "drink", "beer", "bottle"]
+  },
+  {
+    "title": "Wine Bottle",
+    "url": "wine-bottle.svg",
+    "categories": ["food"],
+    "keywords": ["food", "drink", "wine", "bottle"]
+  },
+  {
+    "title": "Wine Bottle 2",
+    "url": "wine-bottle-2.svg",
+    "categories": ["food"],
+    "keywords": ["food", "drink", "wine", "bottle"]
+  },
+  {
+    "title": "Broccoli",
+    "url": "broccoli.svg",
+    "categories": ["food"],
+    "keywords": ["food", "veg", "broccoli", "health"]
+  },
+  {
+    "title": "Carrot",
+    "url": "carrot.svg",
+    "categories": ["food"],
+    "keywords": ["food", "veg", "carrot", "health"]
+  },
+  {
+    "title": "Tomato",
+    "url": "tomato.svg",
+    "categories": ["food"],
+    "keywords": ["food", "veg", "tomato", "health", "pomodor"]
+  },
+  {
+    "title": "Party",
+    "url": "party.svg",
+    "categories": ["birthday"],
+    "keywords": ["birthday", "party"]
+  },
+  {
+    "title": "Bread 2",
+    "url": "bread-2.svg",
+    "categories": ["food"],
+    "keywords": ["food", "bread", "bakery"]
+  },
+  {
+    "title": "Croissant",
+    "url": "croissant.svg",
+    "categories": ["food"],
+    "keywords": ["food", "croissant", "bakery", "bread"]
+  },
+  {
+    "title": "Present",
+    "url": "present.svg",
+    "categories": ["birthday", "christmas"],
+    "keywords": ["present", "party", "birthday", "christmas"]
+  },
+  {
+    "title": "Baloons",
+    "url": "baloons.svg",
+    "categories": ["birthday"],
+    "keywords": ["baloon", "party", "birthday", "christmas"]
+  },
+  {
+    "title": "Moustache",
+    "url": "moustache.svg",
+    "categories": ["other"],
+    "keywords": ["moustache", "hipster"]
+  },
+  {
+    "title": "Sunglasses",
+    "url": "sunglasses.svg",
+    "categories": ["other"],
+    "keywords": ["sunglass", "hipster", "glasses"]
+  },
+  {
+    "title": "Location Pin",
+    "url": "location-pin.svg",
+    "categories": ["other", "symbols"],
+    "keywords": ["location", "geo", "map"]
+  },
+  {
+    "title": "Dog side-3",
+    "url": "dog-side-3.svg",
+    "categories": ["animals"],
+    "keywords": ["dog", "pet", "animal"]
+  },
+  {
+    "title": "Owl",
+    "categories": ["animals"],
+    "keywords": ["owl", "bird", "animal"],
+    "url": "owl.svg"
+  },
+  {
+    "title": "Dog side-2",
+    "url": "dog-side-2.svg",
+    "categories": ["animals"],
+    "keywords": ["dog", "pet", "animal"]
+  },
+  {
+    "title": "Dragon 2",
+    "url": "dragon-2.svg",
+    "categories": ["animals"],
+    "keywords": ["dragon", "animal"]
+  },
+  {
+    "title": "Dragon 3",
+    "categories": ["animals"],
+    "url": "dragon-3.svg",
+    "keywords": ["dragon", "animal"]
+  },
+  {
+    "title": "Tortoise",
+    "categories": ["animals"],
+    "url": "tortoise.svg",
+    "keywords": ["tortoise", "animal"]
+  },
+  {
+    "title": "Bird",
+    "categories": ["animals"],
+    "url": "bird.svg",
+    "keywords": ["bird", "animal"]
+  },
+  {
+    "title": "Lion side",
+    "categories": ["animals"],
+    "url": "lion-side.svg",
+    "keywords": ["lion", "animal"]
+  },
+  {
+    "title": "Dog side-4",
+    "categories": ["animals"],
+    "url": "dog-side-4.svg",
+    "keywords": ["dog", "pet", "animal"]
+  },
+  {
+    "title": "Dragon",
+    "url": "dragon.svg",
+    "categories": ["animals"],
+    "keywords": ["dragon", "animal"]
+  },
+  {
+    "title": "Eagle",
+    "categories": ["animals"],
+    "url": "eagle.svg",
+    "keywords": ["bird", "eagle", "animal"]
+  },
+  {
+    "title": "Dog side",
+    "url": "dog-side.svg",
+    "categories": ["animals"],
+    "keywords": ["dog", "pet", "animal"]
+  },
+  {
+    "title": "Dog small",
+    "url": "dog-small.svg",
+    "categories": ["animals"],
+    "keywords": ["dog", "pet", "animal"]
+  },
+  {
+    "title": "Unicorn",
+    "url": "unicorn.svg",
+    "categories": ["animals"],
+    "keywords": ["unicorn", "animal"]
+  },
+  {
+    "title": "Seal whale",
+    "url": "seal-whale.svg",
+    "categories": ["animals"],
+    "keywords": ["whale", "fish", "animal"]
+  },
+  {
+    "title": "Horse",
+    
+    "url": "horse.svg",
+    "categories": ["animals"],
+    "keywords": ["horse", "animal"]
+  },
+  {
+    "title": "Fish",
+    
+    "url": "fish.svg",
+    "categories": ["animals"],
+    "keywords": ["fish", "animal"]
+  },
+  {
+    "title": "Butterfly 2",
+    
+    "url": "butterfly-2.svg",
+    "categories": ["animals"],
+    "keywords": ["insect", "butterfly", "animal"]
+  },
+  {
+    "title": "Snail",
+    
+    "url": "snail.svg",
+    "categories": ["animals"],
+    "keywords": ["snail", "animal"]
+  },
+  {
+    "title": "Snake",
+    
+    "url": "snake.svg",
+    "categories": ["animals"],
+    "keywords": ["snake", "animal"]
+  },
+  {
+    "title": "Bird 2",
+    
+    "url": "bird-2.svg",
+    "categories": ["animals"],
+    "keywords": ["bird", "animal"]
+  },
+  {
+    "title": "Cat paw",
+    
+    "url": "cat-paw.svg",
+    "categories": ["animals"],
+    "keywords": ["dog", "footprint", "paw", "animal"]
+  },
+  {
+    "title": "Cat side",
+    
+    "url": "cat-side.svg",
+    "categories": ["animals"],
+    "keywords": ["cat", "pet", "animal"]
+  },
+  {
+    "title": "Bone",
+    
+    "url": "bone.svg",
+    "categories": ["animals"],
+    "keywords": ["dog", "bone", "pet", "animal"]
+  },
+  {
+    "title": "Horse 4",
+    
+    "url": "horse-4.svg",
+    "categories": ["animals"],
+    "keywords": ["horse", "animal"]
+  },
+  {
+    "title": "Lizard",
+    
+    "url": "lizard.svg",
+    "categories": ["animals"],
+    "keywords": ["lizard", "animal"]
+  },
+  {
+    "title": "Lion side-2",
+    
+    "url": "lion-side-2.svg",
+    "categories": ["animals"],
+    "keywords": ["lion", "animal"]
+  },
+  {
+    "title": "Dog 2",
+    
+    "url": "dog-2.svg",
+    "categories": ["animals"],
+    "keywords": ["dog", "animal"]
+  },
+  {
+    "title": "Horse cowboy",
+    
+    "url": "horse-cowboy.svg",
+    "categories": ["animals"],
+    "keywords": ["horse", "cowboy", "animal"]
+  },
+  {
+    "title": "Wolf",
+    "url": "wolf.svg",
+    "categories": ["animals"],
+    "keywords": ["wolf", "animal"]
+  },
+  {
+    "title": "Horse 3",
+    
+    "url": "horse-3.svg",
+    "categories": ["animals"],
+    "keywords": ["horse", "animal"]
+  },
+  {
+    "title": "Africa",
+    "url": "africa.svg",
+    "categories": ["geography"],
+    "keywords": ["africa", "country", "geo", "earth"]
+  },
+  {
+    "title": "Australia",
+    "url": "australia.svg",
+    "categories": ["geography"],
+    "keywords": ["australia", "country", "geo", "earth"]
+  },
+  {
+    "title": "US",
+    "url": "us.svg",
+    "categories": ["geography"],
+    "keywords": ["us", "united states", "america", "country", "geo", "earth"]
+  },
+  {
+    "title": "Spain",
+    "url": "spain.svg",
+    "categories": ["geography"],
+    "keywords": ["spain", "country", "geo", "earth"]
+  },
+  {
+    "title": "Earth 1",
+    "url": "earth-1.svg",
+    "categories": ["geography"],
+    "keywords": ["planet", "country", "geo", "earth"]
+  },
+  {
+    "title": "Earth 2",
+    "url": "earth-2.svg",
+    "categories": ["geography"],
+    "keywords": ["planet", "country", "geo", "earth"]
+  },
+  {
+    "title": "Earth 3",
+    "url": "earth-3.svg",
+    "categories": ["geography"],
+    "keywords": ["planet", "country", "geo", "earth"]
+  },
+  {
+    "title": "Earth 4",
+    "url": "earth-4.svg",
+    "categories": ["geography"],
+    "keywords": ["planet", "country", "geo", "earth"]
+  },
+  {
+    "title": "Triangle",
+    "url": "triangle.svg",
+    "categories": ["shapes"],
+    "keywords": ["triangle", "geometr", "shape"]
+  },
+  {
+    "title": "Circle",
+    "url": "circle.svg",
+    "categories": ["shapes"],
+    "keywords": ["circle", "geometr", "shape"]
+  },
+  {
+    "title": "Star 5",
+    "url": "star-5.svg",
+    "categories": ["shapes"],
+    "keywords": ["star", "geometr", "shape"]
+  },
+  {
+    "title": "Polygon 5",
+    "url": "polygon-5.svg",
+    "categories": ["shapes"],
+    "keywords": ["polygon", "geometr", "shape"]
+  },
+  {
+    "title": "Polygon 6",
+    "url": "polygon-6.svg",
+    "categories": ["shapes"],
+    "keywords": ["polygon", "geometr", "shape"]
+  },
+  {
+    "title": "Star 24",
+    "url": "star-24.svg",
+    "categories": ["shapes"],
+    "keywords": ["star", "geometr", "shape"]
+  },
+  {
+    "title": "Star 10",
+    "url": "star-10.svg",
+    "categories": ["shapes"],
+    "keywords": ["star", "geometr", "shape"]
+  },
+  {
+    "title": "Polygon 8",
+    "url": "polygon-8.svg",
+    "categories": ["shapes"],
+    "keywords": ["polygon", "geometr", "shape"]
+  },
+  {
+    "title": "Cross straight",
+    "url": "cross.svg",
+    "categories": ["shapes"],
+    "keywords": ["cross", "geometr", "shape"]
+  },
+  {
+    "title": "Square rotated",
+    "url": "square-rotated.svg",
+    "categories": ["shapes"],
+    "keywords": ["square", "geometr", "shape"]
+  },
+  {
+    "title": "Family",
+    "url": "family.svg",
+    "categories": ["love"],
+    "keywords": ["family", "kids", "children"]
+  },
+  {
+    "title": "Mother",
+    "url": "mother.svg",
+    "categories": ["love"],
+    "keywords": ["family", "mother", "kids", "children"]
+  },
+  {
+    "title": "Stroller",
+    "url": "stroller.svg",
+    "categories": ["love"],
+    "keywords": ["stroller", "baby", "kids", "children", "family"]
+  },
+  {
+    "title": "Couple 1",
+    "url": "couple-1.svg",
+    "categories": ["love"],
+    "keywords": ["couple", "pair", "love", "romance", "family"]
+  },
+  {
+    "title": "Couple 2",
+    "url": "couple-2.svg",
+    "categories": ["love"],
+    "keywords": ["couple", "pair", "love", "romance", "family"]
+  },
+  {
+    "title": "Couple 3",
+    "url": "couple-3.svg",
+    "categories": ["love"],
+    "keywords": ["couple", "pair", "love", "romance", "family"]
+  },
+  {
+    "title": "Couple 4",
+    "url": "couple-4.svg",
+    "categories": ["love"],
+    "keywords": ["couple", "pair", "love", "romance", "family"]
+  },
+  {
+    "title": "Couple 5",
+    "url": "couple-5.svg",
+    "categories": ["love"],
+    "keywords": ["couple", "pair", "love", "romance", "family"]
+  },
+  {
+    "title": "Couple 6",
+    "url": "couple-6.svg",
+    "categories": ["love"],
+    "keywords": ["couple", "pair", "love", "romance", "family"]
+  },
+  {
+    "title": "Couple 7",
+    "url": "couple-7.svg",
+    "categories": ["love"],
+    "keywords": ["couple", "pair", "love", "romance", "family"]
+  },
+  {
+    "title": "Kiss",
+    "url": "kiss.svg",
+    "categories": ["love"],
+    "keywords": ["couple", "pair", "love", "romance", "kiss"]
+  },
+  {
+    "title": "Wedding Ring",
+    "url": "wedding-ring.svg",
+    "categories": ["love"],
+    "keywords": ["wedding", "ring", "love", "romance", "marriage"]
+  },
+  {
+    "title": "Stork",
+    "url": "stork.svg",
+    "categories": ["love"],
+    "keywords": ["kids", "children", "family", "baby"]
+  },
+  {
+    "title": "Rainbow Flag",
+    "url": "rainbow-flag.svg",
+    "categories": ["love", "symbols"],
+    "keywords": ["flag", "pride", "lgbt", "rainbow", "gay"]
+  },
+  {
+    "title": "Rainbow 1",
+    "url": "rainbow-1.svg",
+    "categories": ["love", "nature"],
+    "keywords": ["rainbow", "pride", "lgbt", "rainbow", "gay"]
+  },
+  {
+    "title": "Rainbow 2",
+    "url": "rainbow-2.svg",
+    "categories": ["love", "nature"],
+    "keywords": ["rainbow", "pride", "lgbt", "rainbow", "gay"]
+  },
+  {
+    "title": "Skull",
+    "url": "skull.svg",
+    "categories": ["other", "symbols"],
+    "keywords": ["skull", "bone", "pirate"]
+  },
+  {
+    "title": "Birds",
+    "url": "birds.svg",
+    "categories": ["animals"],
+    "keywords": ["bird", "animal"]
+  },
+  {
+    "title": "Plane",
+    "url": "plane.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "plane", "airplane"]
+  },
+  {
+    "title": "Plane 2",
+    "url": "plane-2.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "plane", "airplane"]
+  },
+  {
+    "title": "Bus",
+    "url": "bus.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "bus"]
+  },
+  {
+    "title": "Bus 2",
+    "url": "bus-2.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "bus"]
+  },
+  {
+    "title": "Car",
+    "url": "car.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "car"]
+  },
+  {
+    "title": "Car 2",
+    "url": "car-2.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "car"]
+  },
+  {
+    "title": "Train 1",
+    "url": "train-1.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "train"]
+  },
+  {
+    "title": "Train 2",
+    "url": "train-2.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "train"]
+  },
+  {
+    "title": "Baggage",
+    "url": "baggage.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "baggage"]
+  },
+  {
+    "title": "Kayak",
+    "url": "kayak.svg",
+    "categories": ["leisure"],
+    "keywords": ["transport", "sport", "boat", "paddle", "kayak"]
+  },
+  {
+    "title": "Boat",
+    "url": "boat.svg",
+    "categories": ["transport"],
+    "keywords": ["transport", "boat", "sail"]
+  },
+  {
+    "title": "Puzzle",
+    "url": "puzzle.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "puzzle"]
+  },
+  {
+    "title": "Blobs 1",
+    "url": "blobs-1.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "blob"]
+  },
+  {
+    "title": "Blobs 2",
+    "url": "blobs-2.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "blob"]
+  },
+  {
+    "title": "Blobs 3",
+    "url": "blobs-3.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "blob"]
+  },
+  {
+    "title": "Circle Donut",
+    "url": "circle-donut.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "circle"]
+  },
+  {
+    "title": "Cycle 3",
+    "url": "cycle-3.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "cycle", "circle"]
+  },
+  {
+    "title": "Cycle 5",
+    "url": "cycle-5.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "cycle", "circle"]
+  },
+  {
+    "title": "Bicycle",
+    "url": "bicycle.svg",
+    "categories": ["shapes"],
+    "keywords": ["shape", "bicycle"]
+  },
+  {
+    "title": "Baseball cap",
+    "url": "baseball-cap.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "baseball", "cap"]
+  },
+  {
+    "title": "Sport shape 1",
+    "url": "sport-shape-1-stretch.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "stretch"]
+  },
+  {
+    "title": "Sport shape 2",
+    "url": "sport-shape-2-stretch.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "stretch"]
+  },
+  {
+    "title": "Sport shape 3",
+    "url": "sport-shape-3-meditation.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "meditation"]
+  },
+  {
+    "title": "Sport shape 4",
+    "url": "sport-shape-4-stretch.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "stretch"]
+  },
+  {
+    "title": "Sport shape 5",
+    "url": "sport-shape-5-yoga.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "yoga"]
+  },
+  {
+    "title": "Sport shape 6",
+    "url": "sport-shape-6-baseball.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "baseball"]
+  },
+  {
+    "title": "Sport shape 7",
+    "url": "sport-shape-7-running.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "run"]
+  },
+  {
+    "title": "Sport shape 8",
+    "url": "sport-shape-8-running.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "run"]
+  },
+  {
+    "title": "Medal",
+    "url": "medal.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "medal", "win"]
+  },
+  {
+    "title": "Baseball",
+    "url": "baseball.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "baseball"]
+  },
+  {
+    "title": "Football",
+    "url": "football.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "football"]
+  },
+  {
+    "title": "Goblet",
+    "url": "goblet.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "goblet", "cup"]
+  },
+  {
+    "title": "Tent",
+    "url": "tent-tree.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "tent", "tree", "hike"]
+  },
+  {
+    "title": "Tent 2",
+    "url": "tent-trees.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "tent", "tree", "hike"]
+  },
+  {
+    "title": "Tents",
+    "url": "tents.svg",
+    "categories": ["leisure"],
+    "keywords": ["sport", "tent", "tree", "hike"]
+  },
+  {
+    "title": "Present 3",
+    "url": "present-3.svg",
+    "categories": ["birthday", "christmas"],
+    "keywords": ["birthday", "christmas", "present"]
+  },
+  {
+    "title": "Present 2",
+    "url": "present-2.svg",
+    "categories": ["birthday", "christmas"],
+    "keywords": ["birthday", "christmas", "present"]
+  },
+  {
+    "title": "Present 1",
+    "url": "present-1.svg",
+    "categories": ["birthday", "christmas"],
+    "keywords": ["birthday", "christmas", "present"]
+  },
+  {
+    "title": "Decoration",
+    "url": "decoration.svg",
+    "categories": ["birthday", "christmas"],
+    "keywords": ["birthday", "christmas", "decoration", "ball", "tree"]
+  },
+  {
+    "title": "Fir",
+    "url": "fir.svg",
+    "categories": ["christmas"],
+    "keywords": ["christmas", "new year", "decoration", "ball", "tree", "fir"]
+  },
+  {
+    "title": "Fir 2",
+    "url": "fir-2.svg",
+    "categories": ["christmas"],
+    "keywords": ["christmas", "new year", "decoration", "ball", "tree", "fir"]
+  },
+  {
+    "title": "Bells",
+    "url": "bells.svg",
+    "categories": ["christmas"],
+    "keywords": ["christmas", "new year", "decoration", "bell", "tree"]
+  },
+  {
+    "title": "Bells 2",
+    "url": "bells-2.svg",
+    "categories": ["christmas"],
+    "keywords": ["christmas", "new year", "decoration", "bell", "tree"]
+  },
+  {
+    "title": "circle lollipop",
+    "url": "circle-lollipop.svg",
+    "categories": ["shapes", "other"],
+    "keywords": ["shape", "circle", "spiral"]
+  },
+  {
+    "title": "Candles",
+    "url": "candles.svg",
+    "categories": ["christmas", "birthday"],
+    "keywords": ["candle", "christmas", "new year", "birthday", "party"]
+  },
+  {
+    "title": "Cake 1",
+    "url": "cake-1.svg",
+    "categories": ["christmas", "birthday", "food"],
+    "keywords": ["cake", "sweet", "food", "christmas", "new year", "birthday", "party"]
+  },
+  {
+    "title": "Cake 2",
+    "url": "cake-2.svg",
+    "categories": ["christmas", "birthday", "food"],
+    "keywords": ["cake", "sweet", "food", "christmas", "new year", "birthday", "party"]
+  },
+  {
+    "title": "Cake 3",
+    "url": "cake-3.svg",
+    "categories": ["christmas", "birthday", "food"],
+    "keywords": ["cake", "sweet", "food", "christmas", "new year", "birthday", "party"]
+  },
+  {
+    "title": "Cake 4",
+    "url": "cake-4.svg",
+    "categories": ["christmas", "birthday", "food"],
+    "keywords": ["cake", "sweet", "food", "christmas", "new year", "birthday", "party"]
+  },
+  {
+    "title": "Cake 5",
+    "url": "cake-5.svg",
+    "categories": ["christmas", "birthday", "food"],
+    "keywords": ["cake", "sweet", "food", "christmas", "new year", "birthday", "party"]
+  },
+  {
+    "title": "Laptop",
+    "url": "laptop.svg",
+    "categories": ["business", "education"],
+    "keywords": ["laptop", "computer", "business", "school", "education"]
+  },
+  {
+    "title": "Piggy Savings",
+    "url": "piggy-savings.svg",
+    "categories": ["business"],
+    "keywords": ["savings", "money", "pig"]
+  },
+  {
+    "title": "Money Bag",
+    "url": "money-bag.svg",
+    "categories": ["business"],
+    "keywords": ["money", "dollar", "bag"]
+  },
+  {
+    "title": "Dollar",
+    "url": "dollar.svg",
+    "categories": ["business"],
+    "keywords": ["money", "dollar", "bag"]
+  },
+  {
+    "title": "Handshake",
+    "url": "handshake.svg",
+    "categories": ["business"],
+    "keywords": ["hands", "handshake", "business"]
+  },
+  {
+    "title": "Suitcase",
+    "url": "suitcase.svg",
+    "categories": ["business"],
+    "keywords": ["suit", "case", "business"]
+  },
+  {
+    "title": "Graduation hat",
+    "url": "graduation-hat.svg",
+    "categories": ["education"],
+    "keywords": ["hat", "school", "university", "bachelor", "grad", "graduation"]
+  },
+  {
+    "title": "Notebooks",
+    "url": "notebooks.svg",
+    "categories": ["education"],
+    "keywords": ["school", "university", "notebook", "office"]
+  },
+  {
+    "title": "Notebooks 2",
+    "url": "notebooks-2.svg",
+    "categories": ["education"],
+    "keywords": ["school", "university", "notebook", "office"]
+  },
+  {
+    "title": "Pencils",
+    "url": "pencils.svg",
+    "categories": ["education"],
+    "keywords": ["pencil", "schoold", "office"]
+  }
+]

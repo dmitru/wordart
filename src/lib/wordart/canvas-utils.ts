@@ -1,9 +1,9 @@
-import { noop } from 'lodash'
-import { Rect } from 'lib/wordart/geometry'
-// @ts-ignore
-import jsfeat from 'jsfeat'
 import chroma from 'chroma-js'
 import { RasterProcessingConf } from 'components/Editor/shape-config'
+// @ts-ignore
+import jsfeat from 'jsfeat'
+import { Rect } from 'lib/wordart/geometry'
+import { noop } from 'lodash'
 
 export type Dimensions = { w: number; h: number }
 
@@ -475,7 +475,7 @@ export const detectEdges = (
   // console.screenshot(result.canvas)
 
   const t2 = performance.now()
-  console.log(`removeEdges: ${(t2 - t1).toFixed(0)}ms`)
+  // console.log(`removeEdges: ${(t2 - t1).toFixed(0)}ms`)
 
   return result.canvas
 }

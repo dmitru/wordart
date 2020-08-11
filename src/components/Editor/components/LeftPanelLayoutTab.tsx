@@ -1,52 +1,41 @@
-import { observer } from 'mobx-react'
-import { useStore } from 'services/root-store'
-import { Slider } from 'components/shared/Slider'
+import { Box, Checkbox, Flex } from '@chakra-ui/core'
+import { AddIcon } from '@chakra-ui/icons'
+import css from '@emotion/css'
+import styled from '@emotion/styled'
+import { SectionLabel } from 'components/Editor/components/shared'
+import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
+import { useEditorStore } from 'components/Editor/editor-store'
+import { TargetKind } from 'components/Editor/lib/editor'
+import { WordAnglesPresetKind } from 'components/Editor/style-options'
 import { Button } from 'components/shared/Button'
 import { DeleteButton } from 'components/shared/DeleteButton'
-import { SectionLabel } from 'components/Editor/components/shared'
+import { Slider } from 'components/shared/Slider'
+import { observer } from 'mobx-react'
 import { useCallback, useMemo } from 'react'
-import { TargetKind } from 'components/Editor/lib/editor'
-import {
-  Text,
-  Box,
-  Heading,
-  Flex,
-  Icon,
-  Divider,
-  Checkbox,
-} from '@chakra-ui/core'
-import { WordAnglesPresetKind } from 'components/Editor/style-options'
-// @ts-ignore
-import VerImg from './img/ver.svg'
-// @ts-ignore
-import HorImg from './img/hor.svg'
-// @ts-ignore
-import HorVerImg from './img/hor-ver.svg'
-// @ts-ignore
-import HorVerDiagImg from './img/hor-ver-diag.svg'
-// @ts-ignore
-import DiagImg from './img/diag.svg'
-// @ts-ignore
-import DiagUpImg from './img/diag-up.svg'
-// @ts-ignore
-import DiagDownImg from './img/diag-down.svg'
-// @ts-ignore
-import SlopeImg from './img/slope.svg'
-// @ts-ignore
-import SlopeUpImg from './img/slope-up.svg'
-// @ts-ignore
-import SlopeDownImg from './img/slope-down.svg'
 // @ts-ignore
 import CustomImg from './img/custom.svg'
 // @ts-ignore
+import DiagDownImg from './img/diag-down.svg'
+// @ts-ignore
+import DiagUpImg from './img/diag-up.svg'
+// @ts-ignore
+import DiagImg from './img/diag.svg'
+// @ts-ignore
+import HorVerDiagImg from './img/hor-ver-diag.svg'
+// @ts-ignore
+import HorVerImg from './img/hor-ver.svg'
+// @ts-ignore
+import HorImg from './img/hor.svg'
+// @ts-ignore
 import RandomImg from './img/random.svg'
-import styled from '@emotion/styled'
-import css from '@emotion/css'
-import { animateElement } from 'utils/animation'
-import { Tooltip } from 'components/shared/Tooltip'
-import { LeftPanelTargetLayerDropdown } from 'components/Editor/components/TargetLayerDropdown'
-import { AddIcon } from '@chakra-ui/icons'
-import { useEditorStore } from 'components/Editor/editor-store'
+// @ts-ignore
+import SlopeDownImg from './img/slope-down.svg'
+// @ts-ignore
+import SlopeUpImg from './img/slope-up.svg'
+// @ts-ignore
+import SlopeImg from './img/slope.svg'
+// @ts-ignore
+import VerImg from './img/ver.svg'
 
 const anglePresets: {
   kind: WordAnglesPresetKind

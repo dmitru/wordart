@@ -5,10 +5,12 @@ import {
   MenuTransition,
   Portal,
   MenuList,
+  MenuItem,
 } from '@chakra-ui/core'
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
+import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import {
   BgStyleOptions,
   ShapeStyleOptions,
@@ -130,16 +132,27 @@ export const ShapeItemsColorPickerInline: React.FC<{
               Random
             </Button>
 
-            <Button
-              variant="ghost"
-              ml="2"
-              onClick={() => {
-                shapeStyle.items.coloring.color.colors.length = 1
-                onUpdate()
-              }}
-            >
-              Clear all
-            </Button>
+            <Menu isLazy>
+              <MenuButton mr="2" as={MenuDotsButton} variant="ghost" />
+
+              <Portal>
+                <MenuTransition>
+                  {(styles) => (
+                    // @ts-ignore
+                    <MenuList css={styles}>
+                      <MenuItem
+                        onClick={() => {
+                          shapeStyle.items.coloring.color.colors.length = 1
+                          onUpdate()
+                        }}
+                      >
+                        Clear all
+                      </MenuItem>
+                    </MenuList>
+                  )}
+                </MenuTransition>
+              </Portal>
+            </Menu>
           </Box>
         )}
       </Box>

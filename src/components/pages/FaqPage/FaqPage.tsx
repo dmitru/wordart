@@ -1,4 +1,4 @@
-import { Box, Text } from '@chakra-ui/core'
+import { Box, Text, Stack, Button } from '@chakra-ui/core'
 import styled from '@emotion/styled'
 import { Theme } from 'chakra'
 import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
@@ -9,6 +9,7 @@ import React from 'react'
 import { Helmet } from 'react-helmet'
 import { Urls } from 'urls'
 import { getTabTitle } from 'utils/tab-title'
+import { GoMail } from 'react-icons/go'
 
 export const FaqPage = observer(() => {
   return (
@@ -38,11 +39,28 @@ export const FaqPage = observer(() => {
               color="gray.600"
             >
               Read the FAQ and still have questions or looking for help?{' '}
-              <Link passHref href={Urls.contact}>
-                <a>Contact our friendly support</a>
-              </Link>{' '}
-              – we're happy to help you.
             </Text>
+            <Stack spacing="3" direction="row" mx="auto" mt="2">
+              <Button
+                colorScheme="primary"
+                size="lg"
+                as="a"
+                target="_blank"
+                href="https://blog.wordcloudy.com/tag/tutorials/"
+              >
+                Open tutorials
+              </Button>
+              <Link passHref href={Urls.contact}>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  as="a"
+                  leftIcon={<GoMail />}
+                >
+                  Write to us
+                </Button>
+              </Link>
+            </Stack>
           </Box>
 
           <Box id="faq" mt="1.5rem" maxWidth="700px" mx="auto">

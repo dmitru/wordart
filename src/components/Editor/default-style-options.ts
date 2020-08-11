@@ -1,7 +1,7 @@
 import {
-  WordListEntry,
-  ShapeStyleOptions,
   BgStyleOptions,
+  ShapeStyleOptions,
+  WordListEntry,
 } from 'components/Editor/style-options'
 
 const defaultWordsList: WordListEntry[] = [
@@ -21,6 +21,8 @@ const defaultWordsList: WordListEntry[] = [
       text: s,
     } as WordListEntry)
 )
+
+export const defaultFontId = 'Architects Daughter:regular'
 
 const defaultWordsListBackground: WordListEntry[] = [].map(
   (s, index) => ({ id: `${index}`, text: s } as WordListEntry)
@@ -55,9 +57,9 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
     },
 
     words: {
-      fontIds: [],
+      fontIds: [defaultFontId],
       wordList: defaultWordsList,
-      anglesPreset: '15',
+      anglesPreset: 'horizontal',
       customAngles: [0],
     },
     icons: {
@@ -70,7 +72,7 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
       iconsProportion: 30,
       shapePadding: 15,
       itemDensity: 85,
-      wordsMaxSize: 70,
+      wordsMaxSize: 90,
     },
   },
 }

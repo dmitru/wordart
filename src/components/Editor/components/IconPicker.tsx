@@ -73,6 +73,7 @@ export const IconPicker: React.FC<IconPickerProps> = observer(
               >
                 {selectedCategory || 'All categories'}
               </MenuButton>
+
               <Portal>
                 <MenuTransition>
                   {(styles) => (

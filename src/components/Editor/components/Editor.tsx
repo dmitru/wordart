@@ -103,6 +103,8 @@ import 'utils/canvas-to-blob'
 import { getTabTitle } from 'utils/tab-title'
 import { useWarnIfUnsavedChanges } from 'utils/use-warn-if-unsaved-changes'
 import { uuid } from 'utils/uuid'
+import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
+import { WordColorPickerPopover } from './WordColorPickerPopover'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -123,11 +125,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     }))
 
     const upgradeModal = useUpgradeModal()
-    const toast = useToasts()
+    const toasts = useToasts()
 
     useEffect(() => {
       // @ts-ignore
-      window['toast'] = toast
+      window['toast'] = toasts
     }, [])
 
     const aspectRatio = pageSizePresets[0].aspect
@@ -149,6 +151,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const { authStore } = useStore()
     const { profile } = authStore
 
+    const hasActivePlan = profile
+      ? profile.limits.isActiveDownloadsPack ||
+        profile.limits.isActiveUnlimitedPlan
+      : false
+
     const router = useRouter()
 
     const cancelVisualizationBtnRef = useRef<HTMLButtonElement>(null)
@@ -166,6 +173,22 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       isShowingEmptyIconsWarning,
       setIsShowingEmptyIconsWarning,
     ] = useState(false)
+
+    const handleDelete = async () => {
+      if (!props.wordcloudId) {
+        return
+      }
+      if (
+        !window.confirm(
+          'Are you sure you want to delete this design? You will not be able to undo it.'
+        )
+      ) {
+        return
+      }
+
+      await wordcloudsStore.delete([props.wordcloudId])
+      router.replace(Urls.yourDesigns)
+    }
 
     const saveAnonymously = async (recaptcha: string) => {
       if (isSaving || !store.editor || !isNew) {
@@ -187,7 +210,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         })
         router.replace(Urls.signup)
 
-        toast.showSuccess({
+        toasts.showSuccess({
           title: 'Your work is saved. Please sign up to continue.',
           duration: 10000,
           isClosable: true,
@@ -199,7 +222,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const handleSaveClick = useCallback(() => {
       const showSaveToast = () =>
-        toast.showSuccess({
+        toasts.showSuccess({
           id: 'work-saved',
           title: 'Your work is saved',
           isClosable: true,
@@ -219,6 +242,16 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         if (isSaving || !store.editor) {
           return
         }
+        const itemsCount = store.getItemsCount().total
+        if (itemsCount === 0) {
+          window.alert(
+            'Your design is empty. Please click "Visualize" before saving to place some words.'
+          )
+          return
+        }
+
+        store.enterViewMode()
+
         store.isSaving = true
 
         try {
@@ -249,6 +282,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             error.response?.data?.message === ApiErrors.NoMediaUploadFreePlan
           ) {
             upgradeModal.show('custom-fonts')
+          } else if (
+            error.response?.data?.message === ApiErrors.WordcloudsLimit
+          ) {
+            upgradeModal.show('design-limits')
           } else {
             throw error
           }
@@ -288,7 +325,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               editorParams.serialized = editorData
             } catch (error) {
               console.error(error)
-              toast.showError({
+              toasts.showError({
                 title: 'Error loading the design',
                 description:
                   "Sorry, we couldn't load this design. If you believe it's a problem on our end, please contact our support at support@wordcloudy.com",
@@ -401,10 +438,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const closeExport = useCallback(() => {
       state.isShowingExport = false
     }, [])
+
     const openExport = useCallback(() => {
-      const itemsCount =
-        (store.editor?.items?.shape?.items?.length || 0) +
-        (store.editor?.items?.bg?.items?.length || 0)
+      const itemsCount = store.getItemsCount().total
       if (itemsCount > 0) {
         state.isShowingExport = true
       } else {
@@ -414,7 +450,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const cancelVisualization = () => {
       store.editor?.cancelVisualization()
-      toast.showInfo({
+      toasts.showInfo({
         title: 'Visualization cancelled',
         duration: 2000,
         isClosable: true,
@@ -460,15 +496,24 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         return
       }
 
-      if (shapeCount > 0) {
-        await store.editor?.generateShapeItems({
-          style: mkShapeStyleConfFromOptions(store.styleOptions.shape),
+      try {
+        if (shapeCount > 0) {
+          await store.editor?.generateShapeItems({
+            style: mkShapeStyleConfFromOptions(store.styleOptions.shape),
+          })
+        }
+        if (bgCount > 0) {
+          await store.editor?.generateBgItems({
+            style: mkBgStyleConfFromOptions(store.styleOptions.bg),
+          })
+        }
+      } catch (error) {
+        store.isVisualizing = false
+        toasts.showError({
+          title:
+            'Sorry, there was an error. Please contact us at support@wordcloudy.com',
         })
-      }
-      if (bgCount > 0) {
-        await store.editor?.generateBgItems({
-          style: mkBgStyleConfFromOptions(store.styleOptions.bg),
-        })
+        throw error
       }
     }
 
@@ -505,15 +550,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           />
 
           <TopNavWrapper alignItems="center" display="flex">
-            <img
-              src="/images/logo.svg"
-              css={css`
-                height: 40px;
-                margin: 0;
-                margin-left: 0.5rem;
-                margin-right: 0.5rem;
-              `}
-            />
             <Link
               href={authStore.isLoggedIn ? Urls.yourDesigns : Urls.landing}
               passHref
@@ -572,14 +608,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         />
                         Make Copy
                       </MenuItem> */}
-                      <MenuItem>
-                        <FiEdit
-                          css={css`
-                            margin-right: 4px;
-                          `}
-                        />
-                        Rename
-                      </MenuItem>
+
                       <MenuItem
                         onClick={() => {
                           state.leftPanelContext = 'resize'
@@ -611,7 +640,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         Download as Image
                       </MenuItem>
                       <MenuDivider />
-                      <MenuItem>
+                      <MenuItem isDisabled={isNew} onClick={handleDelete}>
                         <BsTrash
                           css={css`
                             margin-right: 4px;
@@ -620,7 +649,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         Delete
                       </MenuItem>
                       <MenuDivider />
-                      <MenuItem>
+                      <MenuItem
+                        onClick={() => {
+                          router.push(Urls.yourDesigns)
+                        }}
+                      >
                         <FiChevronLeft
                           css={css`
                             margin-right: 4px;
@@ -688,6 +721,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 `}
               />
               <EditableInput
+                id="title-input"
                 css={css`
                   background-color: white;
                   color: black;
@@ -722,16 +756,78 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             Order Prints
           </TopNavButton> */}
 
-            <TopNavButton colorScheme="secondary" mr="2" ml="auto">
-              <FiHelpCircle
-                css={css`
-                  margin-right: 4px;
-                `}
-              />
-              Help & Tutorials
-            </TopNavButton>
+            <Menu isLazy>
+              <MenuButton
+                as={TopNavButton}
+                colorScheme="secondary"
+                mr="2"
+                ml="auto"
+              >
+                <FiHelpCircle
+                  css={css`
+                    margin-right: 4px;
+                    display: inline-block;
+                  `}
+                />
+                Help
+                <span
+                  css={css`
+                    @media screen and (max-width: 1010px) {
+                      display: none;
+                    }
+                  `}
+                >
+                  {' & Tutorials'}
+                </span>
+              </MenuButton>
 
-            <Button colorScheme="accent">Upgrade</Button>
+              <MenuTransition>
+                {(styles) => (
+                  <Portal>
+                    <MenuList
+                      // @ts-ignore
+                      css={css`
+                        ${styles}
+                        max-width: 320px;
+                      `}
+                    >
+                      <MenuItemWithDescription
+                        title="Open Tutorials"
+                        description="Learn how to use Wordcloudy"
+                        onClick={() => {
+                          openUrlInNewTab(
+                            `https://blog.wordcloudy.com/tag/tutorials/`
+                          )
+                        }}
+                      />
+                      <MenuItemWithDescription
+                        title="Read FAQ"
+                        description="Find answers to commonly asked questions"
+                        onClick={() => {
+                          openUrlInNewTab(`${config.baseUrl}${Urls.faq}`)
+                        }}
+                      />
+                      <MenuItemWithDescription
+                        title="Contact us"
+                        description="Report a problem, give feedback, suggest a feature or ask us anything!"
+                        onClick={() => {
+                          openUrlInNewTab(`${config.baseUrl}${Urls.contact}`)
+                        }}
+                      />
+                    </MenuList>
+                  </Portal>
+                )}
+              </MenuTransition>
+            </Menu>
+
+            {!hasActivePlan && (
+              <Button
+                colorScheme="accent"
+                onClick={() => upgradeModal.show('generic')}
+              >
+                Upgrade
+              </Button>
+            )}
           </TopNavWrapper>
 
           <EditorLayout>
@@ -825,6 +921,22 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     <ColorPalette className="icon" />
                     Colors
                   </LeftNavbarBtn>
+
+                  <div
+                    css={css`
+                      flex: 1;
+                      display: flex;
+                      align-items: flex-end;
+                    `}
+                  >
+                    <img
+                      src="/images/logo.svg"
+                      css={css`
+                        opacity: 0.5;
+                        margin: 0 auto 30px;
+                      `}
+                    />
+                  </div>
                 </SideNavbar>
 
                 <LeftPanel>
@@ -1211,23 +1323,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
                           {store.selectedItemData && (
                             <>
-                              <ColorPickerPopover
-                                value={
-                                  store.selectedItemData.customColor ||
-                                  store.selectedItemData.color
-                                }
-                                onAfterChange={(color) => {
-                                  store.setItemCustomColor(color)
-                                }}
-                              >
-                                <Button
-                                  onClick={() => {
-                                    store.resetItemCustomColor()
-                                  }}
-                                >
-                                  Reset Default Color
-                                </Button>
-                              </ColorPickerPopover>
+                              <WordColorPickerPopover />
 
                               <Button
                                 ml="2"
@@ -1327,10 +1423,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             children={
               <>
                 <p>Selected fonts don't support symbols used in these words:</p>
-                <Box mb="4">
-                  {(store.langCheckErrors ?? []).slice(10).map((e, index) => (
-                    <Box key={index}>{e.word}</Box>
-                  ))}
+                <Box as="ul" mb="4">
+                  {(store.langCheckErrors ?? [])
+                    .slice(0, 10)
+                    .map((e, index) => (
+                      <li key={index}>{e.word}</li>
+                    ))}
                 </Box>
                 <p>
                   <strong>
@@ -1349,10 +1447,18 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             isOpen={isShowingSignupModal}
             onCancel={() => setIsShowingSignupModal(false)}
             onSubmit={saveAnonymously}
-            title="Please sign up to save your work"
-            submitText="Sign up and save"
+            title="Please sign in to save your work"
+            cancelText="No, thanks"
+            submitText="Save and continue"
           >
-            TODO
+            <p>
+              To save your design to your Wordcloudy account, you'll need to
+              sign in.
+            </p>
+            <p>
+              Please proceed to sign in form – your work will be saved. If you
+              don't have an account yet, you'll be able to create one.
+            </p>
           </ConfirmModalWithRecaptcha>
         </PageLayoutWrapper>
       </EditorStoreContext.Provider>
@@ -1436,6 +1542,7 @@ const SideNavbar = styled.div<{ theme: any; activeIndex?: number }>`
   padding: 0;
   margin: 0;
   margin-top: 58px;
+  padding-bottom: 20px;
   /* height: 50px; */
   display: flex;
   flex-direction: column;

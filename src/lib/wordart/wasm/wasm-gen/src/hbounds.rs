@@ -15,21 +15,6 @@ extern "C" {
     fn log(s: &str);
 }
 
-#[wasm_bindgen]
-#[derive(PartialEq, Debug, Copy, Clone, Serialize)]
-pub struct Rect {
-    pub x: i32,
-    pub y: i32,
-    pub w: i32,
-    pub h: i32,
-}
-
-impl Rect {
-    fn area(&self) -> i32 {
-        self.w * self.h
-    }
-}
-
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct PointF {
     pub x: f32,
@@ -560,31 +545,6 @@ enum ShapeIntesectionKind {
     Full,
 }
 
-pub struct ImgData<'a> {
-    pub data: &'a [u32],
-    pub width: i32,
-    pub height: i32,
-}
-
-pub struct ImgDataU8<'a> {
-    pub data: &'a [u8],
-    pub width: i32,
-    pub height: i32,
-}
-
-#[derive(PartialEq, Debug, Copy, Clone, Serialize)]
-pub struct Rgba {
-    pub r: u32,
-    pub g: u32,
-    pub b: u32,
-    pub a: u32,
-}
-
-pub struct ImgDataMut<'a> {
-    pub data: &'a mut [u32],
-    pub width: i32,
-    pub height: i32,
-}
 
 fn divide_bounds(bounds: Rect) -> Vec<Rect> {
     let x1 = bounds.x;

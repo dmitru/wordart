@@ -7,14 +7,13 @@ import {
 } from '@chakra-ui/core'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
+import { useEditorStore } from 'components/Editor/editor-store'
 import { generateBlobShapePathData } from 'components/Editor/lib/blob-shape-gen'
 import { ShapeTextConf } from 'components/Editor/shape-config'
 import { Button } from 'components/shared/Button'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { observer } from 'mobx-react'
 import React from 'react'
-import { useStore } from 'services/root-store'
-import { useEditorStore } from 'components/Editor/editor-store'
 
 export const ShapeTypeSelector: React.FC<{}> = observer(() => {
   const store = useEditorStore()!
@@ -49,25 +48,16 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
               `}
             >
               <MenuItemWithDescription
-                title="Blob shape"
-                description="A blob shape for quick and unique designs"
+                title="Icon"
+                description="Choose one of 1,500+ icons and emoticons"
                 onClick={() => {
-                  shapesPanel.shapeKind = 'blob'
-                  const blobShapeSvg = generateBlobShapePathData({
-                    color: store.shapesPanel.blob.color,
-                    points: store.shapesPanel.blob.points,
-                    complexity: store.shapesPanel.blob.complexity,
-                    aspect: store.editor?.aspectRatio || 1,
-                  })
-
-                  store.selectShapeAndSaveUndo({
-                    kind: 'blob',
-                    color: store.shapesPanel.blob.color,
-                    points: store.shapesPanel.blob.points,
-                    complexity: store.shapesPanel.blob.complexity,
-                    pathData: blobShapeSvg,
-                  })
-
+                  shapesPanel.shapeKind = 'icon'
+                  const shapeConf = store.getIconShapeConfById(
+                    shapesPanel.icon.selected
+                  )
+                  if (shapeConf) {
+                    store.selectShapeAndSaveUndo(shapeConf)
+                  }
                   store.animateVisualize(false)
                 }}
               />
@@ -88,16 +78,25 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
               />
 
               <MenuItemWithDescription
-                title="Icon"
-                description="Choose one of 1,500+ icons and emoticons"
+                title="Blob shape"
+                description="A blob shape for quick and unique designs"
                 onClick={() => {
-                  shapesPanel.shapeKind = 'icon'
-                  const shapeConf = store.getIconShapeConfById(
-                    shapesPanel.icon.selected
-                  )
-                  if (shapeConf) {
-                    store.selectShapeAndSaveUndo(shapeConf)
-                  }
+                  shapesPanel.shapeKind = 'blob'
+                  const blobShapeSvg = generateBlobShapePathData({
+                    color: store.shapesPanel.blob.color,
+                    points: store.shapesPanel.blob.points,
+                    complexity: store.shapesPanel.blob.complexity,
+                    aspect: store.editor?.aspectRatio || 1,
+                  })
+
+                  store.selectShapeAndSaveUndo({
+                    kind: 'blob',
+                    color: store.shapesPanel.blob.color,
+                    points: store.shapesPanel.blob.points,
+                    complexity: store.shapesPanel.blob.complexity,
+                    pathData: blobShapeSvg,
+                  })
+
                   store.animateVisualize(false)
                 }}
               />

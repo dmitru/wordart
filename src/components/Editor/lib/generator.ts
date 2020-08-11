@@ -1,9 +1,14 @@
 import chroma from 'chroma-js'
 import { WordConfigId } from 'components/Editor/editor-store'
 import {
+  loadObjFromSvgUrl,
+  objAsCanvasElement,
+  setFillColor,
+} from 'components/Editor/lib/fabric-utils'
+import {
   ShapeConf,
-  ShapeId,
   ShapeIconConf,
+  ShapeId,
 } from 'components/Editor/shape-config'
 import { FontId } from 'data/fonts'
 import {
@@ -25,11 +30,6 @@ import { flatten, sample, uniq } from 'lodash'
 import { Path } from 'opentype.js'
 import paper from 'paper'
 import { consoleLoggers } from 'utils/console-logger'
-import {
-  loadObjFromSvgUrl,
-  objAsCanvasElement,
-  setFillColor,
-} from 'components/Editor/lib/fabric-utils'
 
 const FONT_SIZE = 100
 
@@ -290,11 +290,11 @@ export class Generator {
         shapeCanvasMaxExtent / rotatedBoundsAabb.width
       const rotatedBoundsScaleY1 =
         shapeCanvasMaxExtent / rotatedBoundsAabb.height
-      const rotatedBoundsScaleX = Math.max(
+      const rotatedBoundsScaleX = Math.min(
         rotatedBoundsScaleX1,
         rotatedBoundsScaleY1
       )
-      const rotatedBoundsScaleY = Math.max(
+      const rotatedBoundsScaleY = Math.min(
         rotatedBoundsScaleX1,
         rotatedBoundsScaleY1
       )
@@ -803,14 +803,14 @@ export class Generator {
       await onProgressCallback(currentBatch, 1)
     }
 
-    console.screenshot(unrotatedCtx.canvas, 1)
-    console.log(
-      `Placed ${
-        generatedItems.length
-      } items; Finished ${nIter} iterations in ${((t2 - t1) / 1000).toFixed(
-        2
-      )} s, ${((t2 - t1) / nIter).toFixed(3)}ms / iter`
-    )
+    // console.screenshot(unrotatedCtx.canvas, 1)
+    // console.log(
+    //   `Placed ${
+    //     generatedItems.length
+    //   } items; Finished ${nIter} iterations in ${((t2 - t1) / 1000).toFixed(
+    //     2
+    //   )} s, ${((t2 - t1) / nIter).toFixed(3)}ms / iter`
+    // )
 
     return {
       generatedItems,

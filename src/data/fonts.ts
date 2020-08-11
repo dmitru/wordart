@@ -48,7 +48,7 @@ const getPopularFonts = (fonts: FontConfig[]): FontConfig[] => {
 }
 
 export const loadFontsConfig = async () => {
-  const fontsData = await fetch('/fonts/config.json').then((res) => res.json())
+  const fontsData = await fetch('/fonts/fonts.json').then((res) => res.json())
   fonts.push(...fontsData)
   popularFonts = getPopularFonts(fonts)
   for (const font of popularFonts) {

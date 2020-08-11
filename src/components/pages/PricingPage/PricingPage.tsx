@@ -5,15 +5,50 @@ import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
 import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
 import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
+import Link from 'next/link'
 import React from 'react'
 import { Helmet } from 'react-helmet'
+import { FaCheck } from 'react-icons/fa'
+import { MdClose } from 'react-icons/md'
+import { Urls } from 'urls'
 import { getTabTitle } from 'utils/tab-title'
 import { PricingPlans } from './PricingPlans'
 
+const CheckIcon = () => (
+  <Box
+    as="span"
+    mr="2"
+    display="inline-block"
+    color="green.500"
+    fontSize="xl"
+    css={css`
+      position: relative;
+      bottom: -4px;
+    `}
+  >
+    <FaCheck />
+  </Box>
+)
+const CrossIcon = () => (
+  <Box
+    as="span"
+    mr="2"
+    display="inline-block"
+    color="gray.500"
+    fontSize="xl"
+    css={css`
+      position: relative;
+      bottom: -4px;
+    `}
+  >
+    <MdClose />
+  </Box>
+)
+
 export const PricingPage = observer(() => {
-  const noLimitsHelpIcon = (
-    <HelpTooltipIcon label="Enjoy no limits as long as there are unused HQ downloads in your account + 1 week after that" />
-  )
+  // const noLimitsHelpIcon = (
+  //   <HelpTooltipIcon label="Enjoy no limits as long as there are unused HQ downloads in your account + 1 week after that" />
+  // )
 
   const qualityHelpIcon = (
     <HelpTooltipIcon
@@ -46,103 +81,109 @@ export const PricingPage = observer(() => {
 
   const comparisonSection = (
     <Box
+      boxShadow="lg"
+      borderRadius="lg"
+      bg="white"
       css={css`
-        @media screen and (max-width: 768px) {
-          display: none;
+        margin-right: 2rem;
+        @media screen and (max-width: 1000px) {
+          margin-top: 2rem;
+          margin-right: 0;
         }
       `}
     >
       <Box
-        display="flex"
-        flexDirection="column"
-        maxWidth="600px"
+        p="5"
         textAlign="center"
-        mx="auto"
+        fontSize="xl"
+        bg="gray.100"
+        borderRadius="lg"
       >
-        <Text as="h1" textAlign="center" id="pricing-comparison">
-          Compare free and paid features
-        </Text>
+        Compare free and paid features
       </Box>
 
-      <Box mt="2rem">
+      <Box mt="2rem" p="5">
         <ComparisonTable>
           <thead>
             <tr>
               <th></th>
               <th>FREE</th>
-              <th>UNLIMITED</th>
-              <th>HQ DOWNLOAD PACKS</th>
+              <th>UNLIMITED PLANS</th>
+              {/* <th>HQ DOWNLOAD PACKS</th> */}
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th>Download quality</th>
-              <MainDetailsTableCell main={<>Standard{qualityHelpIcon}</>} />
+              <th>Download quality{qualityHelpIcon}</th>
               <MainDetailsTableCell
                 main={
                   <>
-                    Standard or High
-                    {qualityHelpIcon}
+                    <CrossIcon />
+                    Standard
                   </>
                 }
               />
               <MainDetailsTableCell
+                main={
+                  <>
+                    <CheckIcon />
+                    High
+                  </>
+                }
+              />
+              {/* <MainDetailsTableCell
                 main={
                   <>
                     Standard or High&nbsp;
                     {qualityHelpIcon}
                   </>
                 }
-              />
+              /> */}
             </tr>
 
             <tr>
-              <th>Allowed use</th>
-              <MainDetailsTableCell main="Personal use only" />
-              <MainDetailsTableCell
+              <th>
+                Commercial use
+                <HelpTooltipIcon label="HQ downloads can be used for any commercial purposes. Standard-quality downloads may still not be used commercially" />
+              </th>
+              <MainDetailsTableCell main={<CrossIcon />} />
+              <MainDetailsTableCell main={<CheckIcon />} />
+              {/* <MainDetailsTableCell
                 main={
                   <>
                     Commercial
                     <HelpTooltipIcon label="HQ downloads can be used for any commercial purposes. Standard-quality downloads may still not be used commercially" />
                   </>
                 }
-              />
-              <MainDetailsTableCell
-                main={
-                  <>
-                    Commercial
-                    <HelpTooltipIcon label="HQ downloads can be used for any commercial purposes. Standard-quality downloads may still not be used commercially" />
-                  </>
-                }
-              />
+              /> */}
             </tr>
 
             <tr>
-              <th>Number of HQ downloads</th>
-              <MainDetailsTableCell main="0" />
-              <MainDetailsTableCell
-                main={
-                  <>
-                    Unlimited
-                    <HelpTooltipIcon label="No limit for HQ downloads" />
-                  </>
-                }
-              />
-              <MainDetailsTableCell
+              <th>Unlimited HQ downloads</th>
+              <MainDetailsTableCell main={<CrossIcon />} />
+              <MainDetailsTableCell main={<CheckIcon />} />
+              {/* <MainDetailsTableCell
                 main={
                   <>
                     Limited
                     <HelpTooltipIcon label="Limited number of HQ downloads, depending on the package" />
                   </>
                 }
-              />
+              /> */}
             </tr>
 
             <tr>
               <th>Max. number of saved designs</th>
-              <MainDetailsTableCell main="10" />
-              <MainDetailsTableCell main="Unlimited" />
-              <MainDetailsTableCell main={<>Unlimited {noLimitsHelpIcon}</>} />
+              <MainDetailsTableCell
+                main={
+                  <>
+                    <CrossIcon />
+                    Max. 10
+                  </>
+                }
+              />
+              <MainDetailsTableCell main={<CheckIcon />} />
+              {/* <MainDetailsTableCell main={<>Unlimited {noLimitsHelpIcon}</>} /> */}
             </tr>
 
             <tr>
@@ -150,13 +191,14 @@ export const PricingPage = observer(() => {
               <MainDetailsTableCell
                 main={
                   <>
+                    <CrossIcon />
                     Partial support
-                    <HelpTooltipIcon label="You'll be able to create and download your design with custom images and fonts, but you won't be able to save it to your Wordcloudy account" />{' '}
+                    <HelpTooltipIcon label="You can create and download your designs as images, but you won't be able to save designs with custom images and fonts to your Wordcloudy account" />{' '}
                   </>
                 }
               />
-              <MainDetailsTableCell main="Yes" />
-              <MainDetailsTableCell main="Yes" />
+              <MainDetailsTableCell main={<CheckIcon />} />
+              {/* <MainDetailsTableCell main="Yes" /> */}
             </tr>
           </tbody>
         </ComparisonTable>
@@ -165,8 +207,8 @@ export const PricingPage = observer(() => {
   )
 
   return (
-    <SiteLayout>
-      <Box>
+    <SiteLayout fullWidth>
+      <Box maxWidth="1200px" mx="auto" px={['2', '3', '6']}>
         <Helmet>
           <title>{getTabTitle('Pricing')}</title>
         </Helmet>
@@ -195,12 +237,24 @@ export const PricingPage = observer(() => {
             </Text>
           </Box>
 
-          <PricingPlans />
-
-          {comparisonSection}
+          <Box
+            display="flex"
+            alignItems="flex-start"
+            mt="3rem"
+            css={css`
+              @media screen and (max-width: 1000px) {
+                flex-direction: column-reverse;
+                align-items: center;
+              }
+            `}
+          >
+            {comparisonSection}
+            <PricingPlans />
+          </Box>
 
           <Box
-            mt={['1rem', '1rem', '4rem']}
+            mt={['1rem', '1rem', '2rem']}
+            mb="3rem"
             display="flex"
             flexDirection="column"
             maxWidth="600px"
@@ -301,7 +355,14 @@ export const PricingPage = observer(() => {
                 <QuestionLink href="#getting-help">#</QuestionLink>
                 Where can I get help or ask more questions?
               </h2>
-              <p>TODO</p>
+              <p>
+                For any questions, please use our{' '}
+                <Link passHref href={Urls.contact}>
+                  <a>Contact Form</a>
+                </Link>{' '}
+                to get in touch with us. We're trying to answer all questions
+                within 24 hours.
+              </p>
             </Question>
           </Box>
         </Box>
@@ -329,7 +390,9 @@ export const MainDetailsTableCell: React.FC<{
       vertical-align: top;
     `}
   >
+    {/* <Box display="flex" alignItems="flex-start"> */}
     {main}
+    {/* </Box> */}
     {details && (
       <>
         <br />

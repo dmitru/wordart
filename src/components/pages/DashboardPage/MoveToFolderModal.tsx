@@ -63,7 +63,6 @@ export const MoveToFolderModal: React.FC<MoveToFolderModalProps> = observer(
                         px="2"
                         justifyContent="flex-start"
                         variant="link"
-                        css={css``}
                         onClick={() => handleSubmit(null)}
                       >
                         No folder
@@ -79,7 +78,6 @@ export const MoveToFolderModal: React.FC<MoveToFolderModalProps> = observer(
                             py="3"
                             px="2"
                             variant="link"
-                            css={css``}
                             onClick={() => handleSubmit(f)}
                           >
                             <Box mr="2" fontSize="lg" color="gray.500">

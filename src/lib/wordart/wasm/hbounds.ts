@@ -99,7 +99,7 @@ export const computeHBoundsForCanvasWasm = (
   if (visualize) {
     const ctx2 = createCanvasCtxCopy(ctx)
     drawHBoundsWasm(ctx2, hboundsWasm)
-    console.screenshot(ctx2.canvas)
+    // console.screenshot(ctx2.canvas)
   }
 
   const transform = multiply(

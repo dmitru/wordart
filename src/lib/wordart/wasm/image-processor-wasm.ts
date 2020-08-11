@@ -16,8 +16,20 @@ export class ImageProcessorWasm {
   findShapesByColor = (params: ComputeShapesParams) =>
     findShapesByColorWasm(this.wasm, params)
 
-  findLargestRect = (imgData: ImageData, bounds: Rect, aspect: number): Rect =>
-    findLargestRectWasm(this.wasm, imgData, bounds, aspect)
+  findLargestRect = (
+    imgData: ImageData,
+    bounds: Rect,
+    aspect: number
+  ): Rect => {
+    // console.log(
+    //   'findLargestRect',
+    //   bounds,
+    //   aspect,
+    //   imgData.width,
+    //   imgData.height
+    // )
+    return findLargestRectWasm(this.wasm, imgData, bounds, aspect)
+  }
 }
 
 export type ShapeWasm = {
@@ -117,7 +129,7 @@ const findShapesByColorWasm = (
   if (debug) {
     clearCanvas(ctx)
     ctx.putImageData(imgData, 0, 0)
-    console.screenshot(ctx.canvas, 1)
+    // console.screenshot(ctx.canvas, 1)
   }
 
   for (const { r, g, b, a, count: colorPixelCount } of colorsFiltered) {
