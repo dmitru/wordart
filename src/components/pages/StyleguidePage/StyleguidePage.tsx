@@ -4,6 +4,8 @@ import { observer } from 'mobx-react'
 import styled from '@emotion/styled'
 import { observable } from 'mobx'
 import { Box, Button } from '@chakra-ui/core'
+import { NextSeo } from 'next-seo'
+import { getTabTitle } from 'utils/tab-title'
 
 const PageLayoutWrapper = styled.div`
   margin: 50px auto;
@@ -24,6 +26,7 @@ const state = observable({
 export const StyleguidePage = observer(() => {
   return (
     <PageLayoutWrapper>
+      <NextSeo noindex={true} title={getTabTitle('Reset password')} />
       {/* <Section>
         <h1>Buttons</h1>
         <Button colorScheme="primary">Primary</Button>

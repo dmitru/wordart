@@ -9,6 +9,7 @@ import 'react-awesome-slider/dist/styles.css'
 import { analytics } from 'services/analytics'
 import 'services/error-tracker'
 import { globalStyles } from 'styles/globalStyles'
+import { DefaultSeo } from 'next-seo'
 
 const emotionCache = createCache({
   key: 'css',
@@ -27,6 +28,10 @@ export default class MyApp extends App {
     return (
       <CacheProvider value={emotionCache}>
         <ChakraProvider theme={theme}>
+          <DefaultSeo
+            title="Wordcloudy – Create unique wordcloud designs"
+            description="Online word art generator that is fun and easy-to-use. Create stunning, unique wordcloud designs and export it in print-ready professional quality!"
+          />
           <CSSReset />
           {globalStyles}
           <Component {...pageProps} err={err} />

@@ -3,10 +3,13 @@ import { css } from '@emotion/core'
 import { SiteFormLayout } from 'components/layouts/SiteLayout/SiteFormLayout'
 import { observer } from 'mobx-react'
 import React from 'react'
+import { NextSeo } from 'next-seo'
+import { getTabTitle } from 'utils/tab-title'
 
 export const SignupCompletedPage = observer(() => {
   return (
     <SiteFormLayout>
+      <NextSeo noindex={true} title={getTabTitle('Reset password')} />
       <Box
         bg="white"
         mt="3rem"

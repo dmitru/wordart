@@ -5,13 +5,14 @@ import { observer } from 'mobx-react'
 import React from 'react'
 import { Helmet } from 'react-helmet'
 import { getTabTitle } from 'utils/tab-title'
+import { NextSeo } from 'next-seo'
 
 export const NotFoundPage = observer(() => {
   return (
     <SiteLayout>
       <Box>
         <Helmet>
-          <title>{getTabTitle('Page not found')}</title>
+          <NextSeo noindex={true} title="Page not found" />
         </Helmet>
 
         <Box mb="6rem">

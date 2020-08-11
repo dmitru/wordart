@@ -20,6 +20,8 @@ import { Api } from 'services/api/api'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import * as Yup from 'yup'
+import { NextSeo } from 'next-seo'
+import { getTabTitle } from 'utils/tab-title'
 
 export type ResetPasswordRequestFormValues = {
   email: string
@@ -72,6 +74,8 @@ export const ResetPasswordRequestPage = observer(() => {
 
   return (
     <SiteFormLayout>
+      <NextSeo noindex={true} title={getTabTitle('Reset password')} />
+
       <Box
         bg="white"
         mx="auto"

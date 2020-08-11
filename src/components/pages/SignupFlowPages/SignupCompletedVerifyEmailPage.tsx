@@ -4,11 +4,14 @@ import { SiteFormLayout } from 'components/layouts/SiteLayout/SiteFormLayout'
 import { observer } from 'mobx-react'
 import React from 'react'
 import { useStore } from 'services/root-store'
+import { NextSeo } from 'next-seo'
+import { getTabTitle } from 'utils/tab-title'
 
 export const SignupCompletedVerifyEmailPage = observer(() => {
   const { authStore } = useStore()
   return (
     <SiteFormLayout>
+      <NextSeo noindex={true} title={getTabTitle('Reset password')} />
       <Box
         bg="white"
         mt="3rem"

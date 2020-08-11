@@ -8,6 +8,8 @@ import React, { useEffect, useState } from 'react'
 import { FaChevronRight } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
+import { NextSeo } from 'next-seo'
+import { getTabTitle } from 'utils/tab-title'
 
 export const VerifyEmailPage = observer(() => {
   const [status, setStatus] = useState('verifying')
@@ -35,6 +37,8 @@ export const VerifyEmailPage = observer(() => {
 
   return (
     <SiteFormLayout>
+      <NextSeo noindex={true} title={getTabTitle('Reset password')} />
+
       <Box
         bg="white"
         mt="3rem"

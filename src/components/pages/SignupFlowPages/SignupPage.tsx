@@ -24,6 +24,7 @@ import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { getTabTitle } from 'utils/tab-title'
 import * as Yup from 'yup'
+import { NextSeo } from 'next-seo'
 
 export type SignupFormValues = {
   email: string
@@ -108,6 +109,8 @@ export const SignupPage = observer(() => {
 
   return (
     <SiteFormLayout>
+      <NextSeo noindex={true} title={getTabTitle('Reset password')} />
+
       <Helmet>
         <title>{getTabTitle('Sign up')}</title>
       </Helmet>

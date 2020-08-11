@@ -19,6 +19,8 @@ import { FaChevronRight } from 'react-icons/fa'
 import { Api } from 'services/api/api'
 import { Urls } from 'urls'
 import * as Yup from 'yup'
+import { NextSeo } from 'next-seo'
+import { getTabTitle } from 'utils/tab-title'
 
 export type ResetPasswordFormFormValues = {
   password: string
@@ -89,6 +91,7 @@ export const ResetPasswordFormPage = observer(() => {
 
   return (
     <SiteFormLayout>
+      <NextSeo noindex={true} title={getTabTitle('Reset password')} />
       <Box
         bg="white"
         mx="auto"
