@@ -52,7 +52,12 @@ export const LandingPage = observer(() => {
                 alignItems="center"
               >
                 <Link href={Urls.editor.create} passHref>
-                  <HeaderCreateNowButton as="a" colorScheme="accent" size="lg">
+                  <HeaderCreateNowButton
+                    // @ts-ignore
+                    as="a"
+                    colorScheme="accent"
+                    size="lg"
+                  >
                     Create now
                   </HeaderCreateNowButton>
                 </Link>
@@ -65,6 +70,7 @@ export const LandingPage = observer(() => {
                     variant="outline"
                     size="lg"
                     bg="white"
+                    // @ts-ignore
                     as="a"
                   >
                     Sign up

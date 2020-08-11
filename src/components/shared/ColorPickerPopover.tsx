@@ -24,7 +24,7 @@ export type ColorPickerPopoverProps = {
   usePortal?: boolean
   children?: React.ReactNode
   placement?: PopoverProps['placement']
-} & Omit<ButtonProps, 'children' | 'onChange'>
+} & Omit<ButtonProps, 'children' | 'onChange' | 'value'>
 
 export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
   value,
@@ -98,8 +98,8 @@ export const ColorPickerPopover: React.FC<ColorPickerPopoverProps> = ({
         <PopoverTrigger>
           <ColorSwatchButton
             kind="color"
-            color={value}
             {...props}
+            color={value}
             opacity={colorSwatchOpacity}
           />
         </PopoverTrigger>

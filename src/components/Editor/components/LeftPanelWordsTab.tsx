@@ -684,6 +684,7 @@ const WordListRow: React.FC<
           {(word.repeats ?? -1) !== -1 && <Box mr="2">{word.repeats}</Box>}
           {word.color != null && (
             <ColorSwatchButton
+              // @ts-ignore
               as="span"
               kind="color"
               color={word.color || 'black'}
@@ -883,7 +884,6 @@ const NewWordInput: React.FC<{
             }
           }}
           inputRef={inputRef}
-          value={state.newWordText}
           className="word-input"
           autocomplete="off"
           spellcheck="false"
