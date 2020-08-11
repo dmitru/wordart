@@ -19,7 +19,8 @@ export default class MyDocument extends Document {
       <html>
         <Head>
           <link rel="shortcut icon" href="/favicon.svg" />
-          <script src="https://cdn.paddle.com/paddle/paddle.js"></script>
+          <script src="https://cdn.paddle.com/paddle/paddle.js" />
+          <link rel="manifest" href="/manifest.webmanifest" />
         </Head>
         <body>
           <Main />
