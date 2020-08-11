@@ -237,17 +237,16 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
 
               <PresetBtns>
                 {anglePresets.map((preset) => (
-                  <>
-                    <PresetBtn
-                      active={preset.kind === style.items.words.anglesPreset}
-                      onClick={() => {
-                        style.items.words.anglesPreset = preset.kind
-                        animateVisualize()
-                      }}
-                    >
-                      {preset.Svg && <preset.Svg width="100%" height="100%" />}
-                    </PresetBtn>
-                  </>
+                  <PresetBtn
+                    key={preset.kind}
+                    active={preset.kind === style.items.words.anglesPreset}
+                    onClick={() => {
+                      style.items.words.anglesPreset = preset.kind
+                      animateVisualize()
+                    }}
+                  >
+                    {preset.Svg && <preset.Svg width="100%" height="100%" />}
+                  </PresetBtn>
                 ))}
               </PresetBtns>
               {style.items.words.anglesPreset === 'custom' && (
