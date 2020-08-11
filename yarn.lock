@@ -3635,6 +3635,13 @@
   resolved "https://registry.yarnpkg.com/@types/file-saver/-/file-saver-2.0.1.tgz#e18eb8b069e442f7b956d313f4fadd3ef887354e"
   integrity sha512-g1QUuhYVVAamfCifK7oB7G3aIl4BbOyzDOqVyUfEr4tfBKrXfeH+M+Tg7HKCXSrbzxYdhyCP7z9WbKo0R2hBCw==
 
+"@types/fromnow@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@types/fromnow/-/fromnow-3.0.1.tgz#5954c2930ddc58edff0cb0a9cbf561eca3389a7b"
+  integrity sha512-1tlQp2sItAOWGmLbmmL23GQhdjZSJ145itzl21p85zAhRgB8EJHVh/N25stQJPtQiDQtLKmf412YZ9dbHaIPgw==
+  dependencies:
+    fromnow "*"
+
 "@types/glob@^7.1.1":
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.1.1.tgz#aa59a1c6e3fbc421e07ccd31a944c30eba521575"
@@ -6924,6 +6931,11 @@ from2@^2.1.0:
   dependencies:
     inherits "^2.0.1"
     readable-stream "^2.0.0"
+
+fromnow@*, fromnow@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/fromnow/-/fromnow-3.0.1.tgz#ffa46a8e233e05721ba4c1ae269e92123f6510d4"
+  integrity sha512-yiLiFONFTvJlP4NaaYcJclCExN4wa2EbWJ9cCXqKcFdxkBmiqlDhzGb/yJ8HtvhNh9td7AUwyCW9w9RrLi429A==
 
 fs-minipass@^1.2.5:
   version "1.2.7"
