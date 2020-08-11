@@ -213,7 +213,7 @@ export const drawHBoundsWasmSerialized = (
     ctx.restore()
   }
 
-  console.log('transform = ', transform)
+  // console.log('transform = ', transform)
   ctx.save()
   if (transform) {
     ctx.transform(

@@ -19,12 +19,12 @@ const createConsoleLoggers = () => {
   const analytics = createConsoleLogger('analytics')
   const timings = createConsoleLogger('timings')
 
-  editorStore.enable('debug')
-  editor.enable('debug')
-  authStore.enable('debug')
-  generator.enable('info')
-  analytics.enable('debug')
-  timings.enable('debug')
+  // editorStore.enable('debug')
+  // editor.enable('debug')
+  // authStore.enable('debug')
+  // generator.enable('info')
+  // analytics.enable('debug')
+  // timings.enable('debug')
 
   return {
     authStore,

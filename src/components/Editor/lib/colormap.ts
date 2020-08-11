@@ -45,7 +45,7 @@ export const computeColorsMap = (
     namedChildren,
     (ch) => ch.name.split('_')[0]
   )
-  console.log('computeColorsMap', object, namedChildren)
+  // console.log('computeColorsMap', object, namedChildren)
 
   let colorEntries: SvgShapeColorsMapEntry[] = []
   if (Object.keys(namedChildrenByColor).length > 0) {

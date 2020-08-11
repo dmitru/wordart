@@ -266,7 +266,6 @@ export class AuthStore {
     email: string
     password: string
   }): Promise<void> => {
-    console.log('loginWithEmailOrUsername')
     try {
       const { authToken } = await Api.auth.login(params)
       Api.setAuthToken(authToken)
@@ -291,7 +290,6 @@ export class AuthStore {
     password: string
     recaptcha: string
   }): Promise<void> => {
-    console.log('signupWithEmail')
     try {
       const { authToken } = await Api.auth.signup(params)
       Api.setAuthToken(authToken)

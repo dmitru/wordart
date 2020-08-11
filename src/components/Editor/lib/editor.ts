@@ -244,7 +244,6 @@ export class Editor {
     this.canvas.on('object:modified', (evt) => {
       const target = evt.target
       const { shape } = this
-      console.log('obj:modified')
       if (!target) {
         return
       }
@@ -1717,11 +1716,11 @@ export class Editor {
       .fill(null)
       .map(() => Math.round(360 * Math.random()))
 
-    console.log('edgesAmount = ', edgesAmount)
-    console.log(
-      'blur = ',
-      17 * (1 - (enableEdges && edgesAmount != null ? edgesAmount : 0) / 100)
-    )
+    // console.log('edgesAmount = ', edgesAmount)
+    // console.log(
+    //   'blur = ',
+    //   17 * (1 - (enableEdges && edgesAmount != null ? edgesAmount : 0) / 100)
+    // )
 
     const result = await this.generator.fillShape(
       {
@@ -1856,7 +1855,7 @@ export class Editor {
     this.isUndoing = true
 
     const frame = this.undoStack.undo()
-    console.log('undo', frame)
+    // console.log('undo', frame)
     if (frame.kind === 'visualize') {
       await this.store.loadSerialized(frame.dataBefore)
       this.store.restoreStateSnapshot(frame.stateBefore)
@@ -1876,7 +1875,7 @@ export class Editor {
     const frame = this.undoStack.redo()
     this.isRedoing = true
 
-    console.log('redo', frame)
+    // console.log('redo', frame)
     if (frame.kind === 'visualize') {
       await this.store.loadSerialized(frame.dataAfter)
       this.store.restoreStateSnapshot(frame.stateAfter)

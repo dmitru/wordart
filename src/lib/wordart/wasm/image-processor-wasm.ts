@@ -81,7 +81,7 @@ const findShapesByColorWasm = (
     maxLevel = 12,
     percentAreaThreshold = 0.05,
   } = params
-  console.log('findShapesByColorWasm: ', params)
+  // console.log('findShapesByColorWasm: ', params)
 
   if (!wasm) {
     throw new Error('wasm is not loaded')
@@ -97,7 +97,7 @@ const findShapesByColorWasm = (
   const scaleFactorX = bounds.w / canvasBounds.w
   const scaleFactorY = bounds.h / canvasBounds.h
 
-  console.log('scaleFactorX', 'scaleFactory', scaleFactorX, scaleFactorY)
+  // console.log('scaleFactorX', 'scaleFactory', scaleFactorX, scaleFactorY)
 
   const ctx = createCanvasCtx(canvasBounds)
   ctx.save()

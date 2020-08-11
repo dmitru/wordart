@@ -295,7 +295,7 @@ export const processRasterImg = (
   canvas: HTMLCanvasElement,
   processing: RasterProcessingConf
 ) => {
-  console.log('processImg', canvas.width, canvas.height)
+  // console.log('processImg', canvas.width, canvas.height)
   if (!processing.removeLightBackground && !processing.invert) {
     return
   }

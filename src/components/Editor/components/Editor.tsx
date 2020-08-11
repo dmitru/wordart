@@ -401,7 +401,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             })
 
             if (!result.canDownload) {
-              console.log('Can not download! :(')
+              console.log('API: can not download')
               upgradeModal.show('hq-download')
               return
             }
@@ -459,7 +459,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     useEffect(() => {
       window.addEventListener('beforeprint', (evt) => {
-        console.log('beforeprint = ', evt)
         evt.preventDefault()
       })
     }, [])

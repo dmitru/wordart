@@ -506,7 +506,6 @@ export const DesignsView = observer(() => {
                   }
                 }}
                 onOpenInEditor={() => {
-                  console.log('onOpenInEditor', isSelecting)
                   openUrlInNewTab(Urls.editor.edit(wc.id))
                 }}
                 onMoveToFolder={() => setMovindWordclouds([wc])}
