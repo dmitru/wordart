@@ -2,9 +2,3 @@
 from = "/editor/*"
 status = 200
 to = "/editor/[...id].html"
-
-[[redirects]]
-force = true
-from = "/blog/*"
-status = 200
-to = "https://blog.wordcloudy.com/:splat"
