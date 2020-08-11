@@ -98,7 +98,8 @@ export const ResetPasswordRequestPage = observer(() => {
             </h1>
 
             <Text mt="6" textAlign="center">
-              We've emailed you a link to reset your password.
+              We've emailed you a link to reset your password. Please check your
+              Spam folder too!
             </Text>
 
             <Text color="gray.500" textAlign="center" mt="6">
