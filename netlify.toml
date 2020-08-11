@@ -1,0 +1,9 @@
+[[redirects]]
+from = "/editor/*"
+status = 200
+to = "/editor/[...id].html"
+
+[[redirects]]
+from = "/blog/*"
+status = 200
+to = "https://blog.wordcloudy.com/:splat"
