@@ -267,6 +267,9 @@ export const CustomizeWordPopover: React.FC<CustomizeWordPopoverProps> = observe
                     p="3"
                   >
                     <img
+                      css={css`
+                        width: 100%;
+                      `}
                       src={
                         store.getFontConfigById(state.value.font)?.style
                           .thumbnail
