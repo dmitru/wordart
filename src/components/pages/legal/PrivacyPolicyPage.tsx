@@ -4,11 +4,11 @@ import { observer } from 'mobx-react'
 import React from 'react'
 import { NextSeo } from 'next-seo'
 
-export const NotFoundPage = observer(() => {
+export const PrivacyPolicyPage = observer(() => {
   return (
     <SiteLayout>
       <Box>
-        <NextSeo noindex={true} title="Page not found" />
+        <NextSeo noindex={true} title="Privacy Policy" />
 
         <Box mb="6rem">
           <Box
@@ -19,10 +19,8 @@ export const NotFoundPage = observer(() => {
             mx="auto"
           >
             <Text as="h1" textAlign="center">
-              Page not found
+              TODO
             </Text>
-
-            <Text>Sorry, this page is not found or no longer accessible.</Text>
           </Box>
         </Box>
       </Box>
