@@ -7,4 +7,4 @@ to = "/editor/[...id].html"
 force = true
 from = "/blog/*"
 status = 200
-to = "https://blog.wordcloudy.com/:splat"
+to = "https://blog.wordcloudy.com/blog/:splat"
