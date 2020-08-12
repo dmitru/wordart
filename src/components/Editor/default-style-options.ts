@@ -123,7 +123,7 @@ export const defaultBgStyleOptions: BgStyleOptions = {
       itemsMaxCount: 300,
       iconsProportion: 30,
       shapePadding: 15,
-      itemDensity: 85,
+      itemDensity: 55,
       wordsMaxSize: 70,
     },
   },

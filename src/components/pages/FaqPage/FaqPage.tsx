@@ -145,13 +145,13 @@ export const FaqPage = observer(() => {
                   Wordcloudy can be downloaded as an SVG vector image, offering
                   the best possible quality when printed at any resolution.
                 </li>
-                <li>Support for multiple document sizes</li>
+                <li>Support for custom page sizes</li>
                 <li>
                   First-class support for filling shapes with icons (not just
                   words!)
                 </li>
                 <li>
-                  Ability to fill both shape <em>and</em> background
+                  Ability to fill both shape <em>and</em> background, or both
                 </li>
                 <li>And so much more!..</li>
               </ul>
@@ -162,7 +162,7 @@ export const FaqPage = observer(() => {
             <h1>Using Wordcloudy</h1>
 
             <Question
-              title="Can I cover the whole canvas with words instead of filling some shape?"
+              title="Can I cover the whole canvas with words instead of filling shapes?"
               id="filling-whole-canvas"
             >
               <p>
@@ -173,12 +173,12 @@ export const FaqPage = observer(() => {
             </Question>
 
             <Question
-              title="Can I specify page size or a different aspect ratio e.g. for portrait A4 paper format?"
+              title="Can I specify page size or a different aspect ratio? E.g. for portrait orientation of A4 paper format?"
               id="filling-whole-canvas"
             >
               <p>
-                Yes, you can choose page size by choosing "Page Size..." option
-                in the top-left menu in the editor.
+                Yes, you can customize page size by choosing "Page Size..."
+                option in the top-left menu in the editor.
               </p>
             </Question>
           </Box>
