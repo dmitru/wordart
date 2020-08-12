@@ -199,16 +199,10 @@ export const BgItemsColorPickerInline: React.FC<{
                   <Box mr="3">
                     <ColorPickerPopover
                       disableAlpha
-                      value={chroma(
-                        multicolorIndex === 0
-                          ? bgStyle.items.coloring.gradient.gradient.from
-                          : bgStyle.items.coloring.gradient.gradient.to
-                      )
-                        .alpha(1)
-                        .hex()}
+                      value={chroma(color).alpha(1).hex()}
                       onChange={(hex) => {
                         const color = chroma(hex).hex()
-                        if (multicolorIndex === 0) {
+                        if (index === 0) {
                           bgStyle.items.coloring.gradient.gradient.from = color
                         } else {
                           bgStyle.items.coloring.gradient.gradient.to = color
@@ -217,11 +211,7 @@ export const BgItemsColorPickerInline: React.FC<{
                       onAfterChange={() => {
                         onUpdate()
                       }}
-                      color={
-                        index === 0
-                          ? bgStyle.items.coloring.gradient.gradient.from
-                          : bgStyle.items.coloring.gradient.gradient.to
-                      }
+                      color={color}
                       onClick={() => setMulticolorIndex(index)}
                     />
                   </Box>

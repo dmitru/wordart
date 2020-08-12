@@ -3,6 +3,8 @@ import {
   ShapeStyleOptions,
   WordListEntry,
 } from 'components/Editor/style-options'
+import { range } from 'lodash'
+import chroma from 'chroma-js'
 
 const defaultWordsList: WordListEntry[] = [
   'cloud',
@@ -28,6 +30,8 @@ const defaultWordsListBackground: WordListEntry[] = [].map(
   (s, index) => ({ id: `${index}`, text: s } as WordListEntry)
 )
 
+const getRandomColor = () => chroma.random().luminance(0.3).saturate(0.6).hex()
+
 /** Defines initial state of editor style options UI for the Shape */
 export const defaultShapeStyleOptions: ShapeStyleOptions = {
   opacity: 10,
@@ -36,12 +40,10 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
     brightness: 0,
     opacity: 100,
     coloring: {
-      kind: 'shape',
+      kind: 'color',
       color: {
         kind: 'color',
-        colors: '#54bfa5 #222 #d6125c #38b3f6 #e9c028 #545006 #3da4de #4c0e27'.split(
-          ' '
-        ),
+        colors: range(4).map(() => getRandomColor()),
       },
       gradient: {
         kind: 'gradient',

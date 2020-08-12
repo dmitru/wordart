@@ -262,8 +262,6 @@ export class EditorStore {
     if (params.serialized) {
       await this.loadSerialized(params.serialized)
     } else {
-      await this.applyColorTheme(themePresets[0])
-
       const defaultShape = this.availableImageShapes[
         Math.floor(Math.random() * 12)
       ]
@@ -1479,6 +1477,7 @@ export class EditorStore {
   }
 
   applyColorTheme = async (theme: ThemePreset) => {
+    this.logger.info('applyColorTheme', theme)
     const shape = this.getShape()
     const { shape: shapeStyle, bg: bgStyle } = this.styleOptions
 
