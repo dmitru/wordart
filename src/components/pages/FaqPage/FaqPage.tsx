@@ -159,7 +159,7 @@ export const FaqPage = observer(() => {
           </Box>
 
           <Box mt="1.5rem" maxWidth="700px" mx="auto">
-            <h1>Creating Designs</h1>
+            <h1>Using Wordcloudy</h1>
 
             <Question
               title="Can I cover the whole canvas with words instead of filling some shape?"
