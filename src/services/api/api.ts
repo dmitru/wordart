@@ -112,6 +112,10 @@ export const Api = {
       const response = await apiClient.get('/wordclouds')
       return response.data as Wordcloud[]
     },
+    async fetchById(id: WordcloudId): Promise<Wordcloud> {
+      const response = await apiClient.get(`/wordclouds/${id}`)
+      return response.data as Wordcloud
+    },
     async fetchEditorData(id: WordcloudId): Promise<EditorPersistedData> {
       const response = await apiClient.get(`/wordclouds/${id}/editorData`)
       return response.data as EditorPersistedData

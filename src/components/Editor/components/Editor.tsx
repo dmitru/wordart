@@ -313,7 +313,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           }
 
           if (props.wordcloudId != null) {
+            await wordcloudsStore.fetchWordcloudById(props.wordcloudId)
             const wordcloud = wordcloudsStore.getById(props.wordcloudId)
+
             if (wordcloud) {
               state.title = wordcloud.title
             }

@@ -153,6 +153,11 @@ export class WordcloudsStore {
     this.hasFetchedWordclouds = true
   }
 
+  @action fetchWordcloudById = async (id: WordcloudId) => {
+    const wordcloud = await Api.wordclouds.fetchById(id)
+    this._wordclouds.set(wordcloud.id, wordcloud)
+  }
+
   @action fetchFolders = async () => {
     const folders = await Api.folders.fetchMy()
     this.hasFetchedFolders = true
