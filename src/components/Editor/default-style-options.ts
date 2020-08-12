@@ -7,13 +7,11 @@ import { range } from 'lodash'
 import chroma from 'chroma-js'
 
 const defaultWordsList: WordListEntry[] = [
-  'cloud',
+  'words',
   'art',
+  'design',
   'amazing',
   'beautiful',
-  'drawing',
-  'wow',
-  'impress',
   'stunning',
   'creative',
 ].map(
