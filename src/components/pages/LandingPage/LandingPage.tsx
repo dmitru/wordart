@@ -45,7 +45,7 @@ export const LandingPage = observer(() => {
             </HeaderSubtitle>
 
             <HeaderCtaContainer>
-              <HeaderCtaInfo mb="3">Try without a sign-up!</HeaderCtaInfo>
+              <HeaderCtaInfo mb="3">Try it without a sign-up!</HeaderCtaInfo>
               <Stack
                 spacing="3"
                 direction={['column', 'row']}

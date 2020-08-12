@@ -102,7 +102,7 @@ export const PricingPage = observer(() => {
         Compare free and paid features
       </Box>
 
-      <Box mt="2rem" p="5">
+      <Box mt="0.5rem" p="5">
         <ComparisonTable>
           <thead>
             <tr>
