@@ -1,3 +1,5 @@
+/** @jsx jsx */
+import { jsx } from '@emotion/core'
 import { Box } from '@chakra-ui/core'
 import styled from '@emotion/styled'
 import { Footer } from 'components/layouts/SiteLayout/Footer'

@@ -32,7 +32,7 @@ export const LandingPage = observer(() => {
             </HeaderTitle>
             <HeaderSubtitle>
               Easy-to-use online art generator, a superior alternative to
-              WordArt.com
+              WordArt.com.
               <br
                 css={css`
                   ${mobileHeaderBreakpoint} {

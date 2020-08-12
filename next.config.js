@@ -56,14 +56,14 @@ module.exports = withSourceMaps({
       REACT_APP_COMMIT_SHA &&
       NODE_ENV === 'production'
     ) {
-      config.plugins.push(
-        new SentryWebpackPlugin({
-          include: '.next',
-          ignore: ['node_modules'],
-          urlPrefix: '~/_next',
-          release: REACT_APP_COMMIT_SHA,
-        })
-      )
+      // config.plugins.push(
+      //   new SentryWebpackPlugin({
+      //     include: '.next',
+      //     ignore: ['node_modules'],
+      //     urlPrefix: '~/_next',
+      //     release: REACT_APP_COMMIT_SHA,
+      //   })
+      // )
     }
 
     // Note: we provide webpack above so you should not `require` it

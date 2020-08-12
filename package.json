@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "next",
-    "build": "NODE_ENV=production next build && npm remove-sourcemaps",
+    "build": "NODE_ENV=production next build && npm run remove-sourcemaps",
     "remove-sourcemaps": "rm -rf ./.next/static/chunks/*.js.map",
     "export": "NODE_ENV=production next export",
     "start": "next start",
@@ -123,6 +123,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.8.3",
     "@babel/plugin-syntax-import-meta": "^7.8.3",
+    "@babel/plugin-transform-react-jsx": "^7.10.4",
     "@svgr/webpack": "^5.4.0",
     "@testing-library/jest-dom": "^5.5.0",
     "@testing-library/react": "^10.0.2",
@@ -157,6 +158,7 @@
     "@types/uuid": "^8.0.0",
     "@types/yup": "^0.28.3",
     "babel-jest": "^25.3.0",
+    "babel-plugin-jsx-pragmatic": "^1.0.2",
     "babel-plugin-polished": "^1.1.0",
     "husky": "^4.2.5",
     "jest": "^25.3.0",

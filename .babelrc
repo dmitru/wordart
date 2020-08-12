@@ -5,5 +5,14 @@
     ["emotion", { "sourceMap": false }],
     "@babel/plugin-syntax-import-meta",
     ["@babel/plugin-proposal-decorators", { "legacy": true }]
+    // [
+    //   "babel-plugin-jsx-pragmatic",
+    //   {
+    //     "module": "@emotion/core",
+    //     "export": "jsx",
+    //     "import": "jsx"
+    //   }
+    // ],
+    // ["@babel/plugin-transform-react-jsx", { "pragma": "jsx" }]
   ]
 }
