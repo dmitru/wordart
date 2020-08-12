@@ -176,7 +176,7 @@ export const LandingPage = observer(() => {
             <BsGrid3X3GapFill />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
-            Huge built-in library
+            Huge styles library
           </Text>
           <Text color="gray.500">
             Pick from thousands build-in fonts and shapes, or upload your own!
