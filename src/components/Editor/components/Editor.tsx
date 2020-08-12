@@ -803,7 +803,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         description="Learn how to use Wordcloudy"
                         onClick={() => {
                           openUrlInNewTab(
-                            `https://blog.wordcloudy.com/tag/tutorials/`
+                            `https://wordcloudy.com/blog/tag/tutorials/`
                           )
                         }}
                       />

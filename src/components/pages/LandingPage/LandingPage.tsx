@@ -213,7 +213,7 @@ export const LandingPage = observer(() => {
           <Button
             as="a"
             target="_blank"
-            href="https://blog.wordcloudy.com/tag/tutorials/"
+            href="https://wordcloudy.com/blog/tag/tutorials/"
             size="lg"
             variant="outline"
           >

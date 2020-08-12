@@ -292,7 +292,7 @@ export const DesignsView = observer(() => {
                 To get started quickly, please follow this quick tutorial:
                 <br />
                 <a
-                  href="https://blog.wordcloudy.com/getting-started-with-wordcloudy-in-3-minutes/"
+                  href="https://wordcloudy.com/blog/getting-started-in-5-minutes/"
                   target="_blank"
                 >
                   Getting Started: Create Your First Word Design in 3 Minutes.
@@ -301,7 +301,7 @@ export const DesignsView = observer(() => {
               <Text>
                 You may also want to explore explore{' '}
                 <a
-                  href="https://blog.wordcloudy.com/tag/tutorials/"
+                  href="https://wordcloudy.com/blog/tag/tutorials/"
                   target="_blank"
                 >
                   our other tutorials
@@ -334,7 +334,7 @@ export const DesignsView = observer(() => {
                   size="lg"
                   as="a"
                   target="_blank"
-                  href="https://blog.wordcloudy.com/tag/tutorials/"
+                  href="https://wordcloudy.com/blog/tag/tutorials/"
                 >
                   Check out tutorials
                 </Button>

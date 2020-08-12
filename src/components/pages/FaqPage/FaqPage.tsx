@@ -46,7 +46,7 @@ export const FaqPage = observer(() => {
                 size="lg"
                 as="a"
                 target="_blank"
-                href="https://blog.wordcloudy.com/tag/tutorials/"
+                href="https://wordcloudy.com/blog/tag/tutorials/"
               >
                 Open tutorials
               </Button>

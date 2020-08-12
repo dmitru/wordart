@@ -1,5 +1,5 @@
 export const Urls = {
-  blog: 'https://blog.wordcloudy.com',
+  blog: 'https://wordcloudy.com/blog',
 
   landing: '/',
   login: '/login',
