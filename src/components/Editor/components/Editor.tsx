@@ -493,6 +493,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         store.styleOptions.shape.items.icons.iconList.length
 
       if (bgCount + shapeCount === 0) {
+        await store.editor?.clearItems('shape')
+        await store.editor?.clearItems('bg')
         setIsShowingEmptyIconsWarning(true)
         return
       }
@@ -502,11 +504,15 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           await store.editor?.generateShapeItems({
             style: mkShapeStyleConfFromOptions(store.styleOptions.shape),
           })
+        } else {
+          await store.editor?.clearItems('shape')
         }
         if (bgCount > 0) {
           await store.editor?.generateBgItems({
             style: mkBgStyleConfFromOptions(store.styleOptions.bg),
           })
+        } else {
+          await store.editor?.clearItems('bg')
         }
       } catch (error) {
         store.isVisualizing = false
