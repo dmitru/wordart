@@ -118,20 +118,19 @@ export const FaqPage = observer(() => {
 
             <Question
               title="How is
-                it different from other word art generators?"
+                it different from other word art generators (e.g. WordArt.com)?"
               id="how-is-it-different"
             >
               <p>
                 Wordcloudy was created from scratch using modern technology in
-                order to compete with other existing word art generators you may
-                be familiar with.
+                order to compete with other existing word art generators, like
+                WordArt.com.
               </p>
               <p>
-                It's very similar in spirit to other tools (most notably
-                WordArt.com), but it's more focused on the single task of
-                creating amazing digital and printable designs. As such, there
-                are less compromises in the design and a number of unique
-                features:
+                Worcloudy is more focused on the single task of creating amazing
+                digital and printable designs. It doesn't have the features that
+                it doesn't need. As such, there are less compromises in its
+                design as well as some unique features:
               </p>
               <ul>
                 <li>
@@ -156,6 +155,31 @@ export const FaqPage = observer(() => {
                 </li>
                 <li>And so much more!..</li>
               </ul>
+            </Question>
+          </Box>
+
+          <Box mt="1.5rem" maxWidth="700px" mx="auto">
+            <h1>Creating Designs</h1>
+
+            <Question
+              title="Can I cover the whole canvas with words instead of filling some shape?"
+              id="filling-whole-canvas"
+            >
+              <p>
+                Yes you can! Here's how: in the editor, open the Shape tab, then
+                choose "Fill whole canvas" as your shape type in the top "Shape"
+                dropdown.
+              </p>
+            </Question>
+
+            <Question
+              title="Can I specify page size or a different aspect ratio e.g. for portrait A4 paper format?"
+              id="filling-whole-canvas"
+            >
+              <p>
+                Yes, you can choose page size by choosing "Page Size..." option
+                in the top-left menu in the editor.
+              </p>
             </Question>
           </Box>
         </Box>
