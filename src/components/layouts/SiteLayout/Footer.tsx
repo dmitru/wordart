@@ -83,11 +83,9 @@ export const Footer: React.FC<FooterProps> = () => {
           <Link href={Urls.contact} passHref>
             <FooterLink>Contact</FooterLink>
           </Link>
-          <Link href={Urls.contact} passHref>
-            <FooterLink target="_blank" href="https://blog.wordcloudy.com">
-              Blog
-            </FooterLink>
-          </Link>
+          <FooterLink target="_blank" href="https://blog.wordcloudy.com">
+            Blog
+          </FooterLink>
           <Link href={Urls.privacyPolicy} passHref>
             <FooterLink>Privacy Policy</FooterLink>
           </Link>
