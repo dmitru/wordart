@@ -49,6 +49,7 @@ import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTa
 import { LeftPanelShapesTab } from 'components/Editor/components/ShapesTab/LeftPanelShapesTab'
 import { Spinner } from 'components/Editor/components/Spinner'
 import { WarningModal } from 'components/Editor/components/WarningModal'
+import Joyride from 'react-joyride'
 import {
   EditorStore,
   EditorStoreContext,
@@ -105,6 +106,7 @@ import { useWarnIfUnsavedChanges } from 'utils/use-warn-if-unsaved-changes'
 import { uuid } from 'utils/uuid'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { WordColorPickerPopover } from './WordColorPickerPopover'
+import { useLocalStorage } from 'utils/use-local-storage'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -465,6 +467,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       })
     }, [])
 
+    const [hasClosedProductTour, setHasClosedProductTour] = useLocalStorage(
+      'has-closed-editor-tour',
+      false
+    )
+
     if (!router || !authStore.hasInitialized) {
       return <SpinnerSplashScreen />
     }
@@ -542,6 +549,45 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     return (
       <EditorStoreContext.Provider value={store}>
         <PageLayoutWrapper>
+          <Joyride
+            callback={(data) => {
+              if (data.status === 'finished') {
+                setHasClosedProductTour(true)
+              }
+            }}
+            steps={[
+              {
+                target: '#btn-visualize',
+                content: '🎉Welcome! Click "Visualize" to generate words.',
+              },
+              {
+                target: '#nav-words',
+                content: (
+                  <>
+                    Customize your design: choose words, fonts, layout and
+                    colors. <br />
+                    <br />
+                    Then hit "Visualize" to see the results.
+                  </>
+                ),
+              },
+              {
+                target: '#help-btn',
+                content: (
+                  <>
+                    Read our 3-minute step-by-step tutorial to learn how to
+                    create a beautiful word designs.
+                    <br />
+                    <br />
+                    Still have questions? Write to us, and we'll be happy to
+                    help!
+                  </>
+                ),
+              },
+            ]}
+            run={!hasClosedProductTour}
+          />
+
           <Helmet>
             <title>{getTabTitle(state.title || 'Untitled')}</title>
           </Helmet>
@@ -771,6 +817,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                 ml="auto"
               >
                 <FiHelpCircle
+                  id="help-btn"
                   css={css`
                     margin-right: 4px;
                     display: inline-block;
@@ -862,6 +909,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   </LeftNavbarBtn>
 
                   <LeftNavbarBtn
+                    id="nav-words"
                     onClick={() => {
                       state.leftTab = 'words'
                       state.leftPanelContext = 'normal'
