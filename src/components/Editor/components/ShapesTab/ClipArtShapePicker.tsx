@@ -255,7 +255,6 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                       </Box>
 
                       <SearchInput
-                        autoFocus
                         placeholder="Search..."
                         value={query}
                         onChange={setQuery}

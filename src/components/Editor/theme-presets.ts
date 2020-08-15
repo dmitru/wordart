@@ -14,6 +14,66 @@ const themePresetConfigs: ThemePresetConfig[] = Object.values({
     shapeOpacity: 0.1,
     colors: ['#438D9C', '#E8A664', '#9C6043', '#171717', '#c00'],
   },
+  // From https://vizzlo.com/
+  t100: {
+    bgColor: '#fff',
+    shapeColor: '#FFB99F',
+    shapeOpacity: 0.1,
+    colors: ['#FBC74D', '#FBAC49', '#F46E3B', '#EF2E2C', '#9E1A1C', '#720F12'],
+  },
+  t101: {
+    bgColor: '#fff',
+    shapeColor: '#A8A8A8',
+    shapeOpacity: 0.1,
+    colors: ['#00355e', '#095885', '#2c7eb0', '#579bce', '#76b6ea'],
+  },
+  t102: {
+    bgColor: '#fff',
+    shapeColor: '#A8A8A8',
+    shapeOpacity: 0.1,
+    colors: ['#2C3B59', '#BFA694', '#7F4708', '#53698B', '#E6C7B2'],
+  },
+  t103: {
+    bgColor: '#fff',
+    shapeColor: '#A8A8A8',
+    shapeOpacity: 0.1,
+    colors: ['#72B275', '#B56FAB', '#FFDE17', '#F79420', '#558AB5', '#C64242'],
+  },
+  t104: {
+    bgColor: '#F2EED1',
+    shapeColor: '#A8A8A8',
+    shapeOpacity: 0.1,
+    colors: [
+      '#EEA74F',
+      '#BF423E',
+      '#187E8A',
+      '#3F2F3C',
+      '#F5C267',
+      '#EE6D58',
+      '#EEA74F',
+      '#2CABAF',
+      '#5B4659',
+    ],
+  },
+  t105: {
+    bgColor: '#e9e7e7',
+    shapeColor: '#A8A8A8',
+    shapeOpacity: 0.1,
+    colors: ['#ef543b', '#70a5ab', '#c7b181', '#8b7670'],
+  },
+  t106: {
+    bgColor: '#262626',
+    shapeColor: '#777777',
+    shapeOpacity: 0.1,
+    colors: ['#739DE6', '#D84D4D', '#CC70CD', '#61B17D', '#E5875C'],
+  },
+  t107: {
+    bgColor: '#262626',
+    shapeColor: '#777777',
+    shapeOpacity: 0.1,
+    colors: ['#72B275', '#B56FAB', '#FFDE17', '#F79420', '#558AB5', '#C64242'],
+  },
+  // end
   t2: {
     bgColor: '#000',
     shapeColor: '#f00',
