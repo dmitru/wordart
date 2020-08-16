@@ -19,6 +19,10 @@ const createConsoleLoggers = () => {
   const analytics = createConsoleLogger('analytics')
   const timings = createConsoleLogger('timings')
 
+  authStore.enable('info')
+  timings.enable('info')
+  analytics.enable('info')
+  generator.enable('info')
   editorStore.enable('info')
   editor.enable('info')
   // authStore.enable('debug')

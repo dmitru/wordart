@@ -618,11 +618,11 @@ export class Editor {
   }
 
   setBgColor = (config: BgStyleConf['fill'], render = true) => {
-    this.logger.debug(
-      'setBgColor',
-      toJS(config, { recurseEverything: true }),
-      render
-    )
+    // this.logger.debug(
+    //   'setBgColor',
+    //   toJS(config, { recurseEverything: true }),
+    //   render
+    // )
     this.bgCanvas.backgroundColor = '#ddd'
     this.canvas.backgroundColor = 'transparent'
     this.bgRect.set({
@@ -759,11 +759,11 @@ export class Editor {
   updateShapeColors = async (config: ShapeConf, render = true) => {
     this.store.hasUnsavedChanges = true
 
-    this.logger.debug(
-      'updateShapeColors',
-      render,
-      toJS(config, { recurseEverything: true })
-    )
+    // this.logger.debug(
+    //   'updateShapeColors',
+    //   render,
+    //   toJS(config, { recurseEverything: true })
+    // )
     if (!this.shape) {
       this.logger.debug('>  No current shape, early exit')
       return
@@ -830,12 +830,12 @@ export class Editor {
     this.store.hasUnsavedChanges = true
     const { coloring, dimSmallerItems, brightness } = itemsStyleConf
     const { items } = this.items[target]
-    this.logger.debug(
-      'setItemsStyle',
-      target,
-      toJS(coloring, { recurseEverything: true }),
-      `${items.length} items`
-    )
+    // this.logger.debug(
+    //   'setItemsStyle',
+    //   target,
+    //   toJS(coloring, { recurseEverything: true }),
+    //   `${items.length} items`
+    // )
 
     let colors: string[] = []
     if (coloring.kind === 'gradient' || coloring.kind === 'color') {
@@ -1059,7 +1059,7 @@ export class Editor {
     if (!shapeConfig) {
       throw new Error('Missing shape config')
     }
-    this.logger.debug('setShape', toJS(params, { recurseEverything: true }))
+    this.logger.debug('setShape')
 
     let colorMap: SvgShapeColorsMapEntry[] | undefined
     let shapeObj: fabric.Object | undefined
@@ -1212,10 +1212,7 @@ export class Editor {
     })
     shapeObj.bringToFront()
 
-    console.log('this.shape', this.shape, this.shape?.obj, shapeObj)
-
     if (this.shape?.obj) {
-      console.log('remove old')
       this.canvas.remove(this.shape.obj)
     }
     if (render) {
@@ -1233,7 +1230,6 @@ export class Editor {
       shape.objOriginalColors = shapeCopyObj
     }
 
-    console.log('shape = ', shape)
     this.shape = shape!
 
     this.shape.originalTransform = getObjTransformMatrix(this.shape.obj)
@@ -1370,10 +1366,10 @@ export class Editor {
   generateBgItems = async (params: { style: BgStyleConf }) => {
     const { style } = params
     this.store.visualizeAnimatedLastTime = new Date()
-    this.logger.info(
-      `generateBgItems`,
-      toJS(params.style, { recurseEverything: true })
-    )
+    // this.logger.debug(
+    //   `generateBgItems`,
+    //   toJS(params.style, { recurseEverything: true })
+    // )
 
     if (!this.shape?.obj) {
       console.error('No shape obj')
@@ -1601,10 +1597,10 @@ export class Editor {
 
   generateShapeItems = async (params: { style: ShapeStyleConf }) => {
     const { style } = params
-    this.logger.info(
-      `generateShapeItems`,
-      toJS(params.style, { recurseEverything: true })
-    )
+    // this.logger.debug(
+    //   `generateShapeItems`,
+    //   toJS(params.style, { recurseEverything: true })
+    // )
 
     this.store.visualizeAnimatedLastTime = new Date()
     if (!this.shape?.obj) {

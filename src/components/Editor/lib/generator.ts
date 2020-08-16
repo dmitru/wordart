@@ -65,7 +65,7 @@ export class Generator {
       throw new Error('call init() first')
     }
     this.isCancelled = false
-    this.logger.debug('Generator: generate', task)
+    // this.logger.debug('Generator: generate', task)
 
     const shapeCanvasMaxExtent = 300
     const batchSize = 50

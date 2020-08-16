@@ -1164,10 +1164,10 @@ export class EditorStore {
       },
     }
 
-    this.logger.debug(
-      'serialized: ',
-      toJS(serializedData, { recurseEverything: true })
-    )
+    // this.logger.debug(
+    //   'serialized: ',
+    //   toJS(serializedData, { recurseEverything: true })
+    // )
 
     return serializedData
   }
