@@ -124,7 +124,7 @@ export const BgItemsColorPickerInline: React.FC<{
             </Button>
 
             <Menu isLazy>
-              <MenuButton mr="2" as={MenuDotsButton} variant="ghost" />
+              <MenuButton ml="2" as={MenuDotsButton} variant="ghost" />
 
               <Portal>
                 <MenuTransition>
