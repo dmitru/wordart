@@ -1,5 +1,6 @@
 import { UpgradeModalVariant } from 'components/upgrade/UpgradeModal'
 import { PricingPlan } from 'plans'
+import { ShapeKind } from 'components/Editor/shape-config'
 
 export type StructuredEvent = {
   category: string
@@ -30,7 +31,29 @@ export const CustomMetricIndices = {
   screenHeight: 2,
 }
 
+type DownloadFormat = 'sd-png' | 'sd-jpeg' | 'hd-png' | 'hd-jpeg' | 'hd-svg'
+
 export const StructuredEvents = {
+  // Editor
+  // Open new editor
+  mkNewEditorSession: (): StructuredEvent => ({
+    category: 'editor',
+    action: 'open new design',
+  }),
+  mkSavedEditorSession: (): StructuredEvent => ({
+    category: 'editor',
+    action: 'open saved design',
+  }),
+  mkSaveByShapeType: (shapeKind: ShapeKind): StructuredEvent => ({
+    category: 'editor',
+    action: 'save (shape type)',
+    label: shapeKind,
+  }),
+  mkDownloadByFormat: (format: DownloadFormat): StructuredEvent => ({
+    category: 'editor',
+    action: 'download (format)',
+    label: format,
+  }),
   //
   // Upgrade flow
   mkShowUpgradeWindow: (

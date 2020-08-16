@@ -107,6 +107,7 @@ import { uuid } from 'utils/uuid'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { WordColorPickerPopover } from './WordColorPickerPopover'
 import { useLocalStorage } from 'utils/use-local-storage'
+import { analytics, StructuredEvents } from 'services/analytics'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -261,6 +262,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           const thumbnail = thumbnailCanvas.toDataURL('image/jpeg', 0.85)
           const editorData = await store.serialize()
 
+          analytics.trackStructured(
+            StructuredEvents.mkSaveByShapeType(editorData.data.shape.kind)
+          )
+
           if (isNew) {
             const wordcloud = await wordcloudsStore.create({
               title: state.title || 'Untitled Design',
@@ -315,6 +320,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           }
 
           if (props.wordcloudId != null) {
+            analytics.trackStructured(StructuredEvents.mkSavedEditorSession())
             await wordcloudsStore.fetchWordcloudById(props.wordcloudId)
             const wordcloud = wordcloudsStore.getById(props.wordcloudId)
 
@@ -339,6 +345,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
               router.replace(Urls.yourDesigns)
             }
           } else {
+            analytics.trackStructured(StructuredEvents.mkNewEditorSession())
             state.title = 'New wordart'
           }
 
@@ -388,6 +395,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           return
         }
       }
+
+      analytics.trackStructured(
+        StructuredEvents.mkDownloadByFormat(selectedFormat)
+      )
 
       const startExport = async () => {
         const dimension = hd ? 4096 : 1024
@@ -445,6 +456,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const openExport = useCallback(() => {
       const itemsCount = store.getItemsCount().total
+      console.log('itemsCount = ', itemsCount)
       if (itemsCount > 0) {
         state.isShowingExport = true
       } else {
