@@ -64,18 +64,18 @@ export const LandingPage = observer(() => {
 
                 <HeaderCtaInfo>or</HeaderCtaInfo>
 
-                <Link href={Urls.signup} passHref>
-                  <HeaderCreateNowButton
-                    colorScheme="accent"
-                    variant="outline"
-                    size="lg"
-                    bg="white"
-                    // @ts-ignore
-                    as="a"
-                  >
-                    Sign up
-                  </HeaderCreateNowButton>
-                </Link>
+                <HeaderCreateNowButton
+                  colorScheme="accent"
+                  variant="outline"
+                  size="lg"
+                  bg="white"
+                  // @ts-ignore
+                  as="a"
+                  href="https://wordcloudy.com/blog/getting-started-in-5-minutes/"
+                  target="_blank"
+                >
+                  Quick tutorial
+                </HeaderCreateNowButton>
               </Stack>
             </HeaderCtaContainer>
           </HeaderTitleContainer>
@@ -213,7 +213,7 @@ export const LandingPage = observer(() => {
           <Button
             as="a"
             target="_blank"
-            href="https://wordcloudy.com/blog/tag/tutorials/"
+            href="https://wordcloudy.com/blog/getting-started-in-5-minutes/"
             size="lg"
             variant="outline"
           >
