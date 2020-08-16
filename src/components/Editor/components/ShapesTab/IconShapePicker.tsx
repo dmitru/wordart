@@ -18,6 +18,7 @@ import React, { useEffect } from 'react'
 import { FaCog } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useDebouncedCallback } from 'use-debounce/lib'
+import { ShapeTransformLeftPanelSection } from './components'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -242,60 +243,7 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                 >
                   <Stack mb="4" mt="5" position="absolute" width="100%">
                     <Box>
-                      <SectionLabel>Resize, rotate, transform</SectionLabel>
-                      {!store.leftTabIsTransformingShape && (
-                        <>
-                          <Stack direction="row" mt="3" spacing="3">
-                            <Button
-                              colorScheme="primary"
-                              onClick={() => {
-                                if (!store.editor) {
-                                  return
-                                }
-                                const totalItemsCount =
-                                  (store.editor.items.shape.items.length || 0) +
-                                  (store.editor.items.bg.items.length || 0)
-                                if (
-                                  totalItemsCount > 0 &&
-                                  !window.confirm(
-                                    'All unlocked words will be removed. Do you want to continue?'
-                                  )
-                                ) {
-                                  return
-                                }
-                                store.leftTabIsTransformingShape = true
-                                store.editor.selectShape()
-                              }}
-                            >
-                              Transform shape
-                            </Button>
-                            {resetTransformBtn}
-                          </Stack>
-                        </>
-                      )}
-
-                      {store.leftTabIsTransformingShape && (
-                        <Box>
-                          <Text mt="2">
-                            Drag the shape to move or rotate it.
-                          </Text>
-                          <Stack direction="row" mt="3" spacing="2">
-                            <Button
-                              colorScheme="accent"
-                              onClick={() => {
-                                store.leftTabIsTransformingShape = false
-                                store.editor?.deselectShape()
-                                store.editor?.clearItems('shape')
-                                store.editor?.clearItems('bg')
-                                store.animateVisualize(false)
-                              }}
-                            >
-                              Apply
-                            </Button>
-                            {resetTransformBtn}
-                          </Stack>
-                        </Box>
-                      )}
+                      <ShapeTransformLeftPanelSection />
                     </Box>
                   </Stack>
                 </motion.div>

@@ -62,7 +62,7 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
           style={style}
           px="3px"
           css={css`
-            &:first-child {
+            &:first-of-type {
               padding-top: 3px;
             }
             &:last-child {

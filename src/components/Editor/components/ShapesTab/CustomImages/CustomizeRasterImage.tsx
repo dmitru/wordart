@@ -149,7 +149,9 @@ export const CustomizeRasterImage: React.FC<CustomizeRasterImageProps> = observe
               label={
                 <>
                   Detect & remove edges
-                  <HelpTooltipIcon label="This setting prevents words from crossing boundaries between areas of different colors. The right setting depends on the image, so you may want to try different values and re-visualize a few times before the result looks good!" />
+                  <HelpTooltipIcon
+                    label={`This option prevents words from crossing boundaries between areas of different colors. The "perfect" setting depends on the image, so you may want to try different values and re-visualize a few times before the result looks good!`}
+                  />
                 </>
               }
               value={state.removeEdges}
