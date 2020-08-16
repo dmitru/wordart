@@ -1229,6 +1229,7 @@ export class Editor {
       shape.objOriginalColors = shapeCopyObj
     }
 
+    console.log('shape = ', shape)
     this.shape = shape!
 
     this.shape.originalTransform = getObjTransformMatrix(this.shape.obj)

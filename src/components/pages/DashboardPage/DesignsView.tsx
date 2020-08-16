@@ -37,6 +37,7 @@ import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { useToasts } from 'use-toasts'
 import { openUrlInNewTab } from 'utils/browser'
+import { BsHeartFill } from 'react-icons/bs'
 
 export const DesignsView = observer(() => {
   const {

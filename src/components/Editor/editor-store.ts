@@ -572,6 +572,8 @@ export class EditorStore {
     bgStyle.items.placement = data.bgStyle.items.placement
     bgStyle.items.icons.iconList = data.bgStyle.items.icons.iconList
     bgStyle.items.words.customAngles = data.bgStyle.items.words.angles
+    bgStyle.items.words.anglesPreset = data.bgStyle.items.words.anglePreset
+
     bgStyle.items.words.wordList = data.bgStyle.items.words.wordList
     bgStyle.items.words.fontIds = data.bgStyle.items.words.fontIds
     if (data.bgStyle.items.coloring.kind === 'color') {
@@ -592,6 +594,9 @@ export class EditorStore {
     shapeStyle.items.placement = data.shapeStyle.items.placement
     shapeStyle.items.icons.iconList = data.shapeStyle.items.icons.iconList
     shapeStyle.items.words.customAngles = data.shapeStyle.items.words.angles
+    shapeStyle.items.words.anglesPreset =
+      data.shapeStyle.items.words.anglePreset
+
     shapeStyle.items.words.wordList = data.shapeStyle.items.words.wordList
     shapeStyle.items.words.fontIds = data.shapeStyle.items.words.fontIds
     shapeStyle.opacity = data.shapeStyle.opacity
@@ -738,6 +743,7 @@ export class EditorStore {
 
     this.editor.setShapeOpacity(shapeStyle.opacity / 100, false)
 
+    console.log(this.editor.shape)
     await this.editor.setShapeItems(shapeItems, false)
     await this.editor.setBgItems(bgItems, false)
 
@@ -1128,6 +1134,7 @@ export class EditorStore {
                   : getAnglesForPreset(
                       this.styleOptions.shape.items.words.anglesPreset
                     ),
+              anglePreset: this.styleOptions.shape.items.words.anglesPreset,
               fontIds: this.styleOptions.shape.items.words.fontIds,
               wordList: this.styleOptions.shape.items.words.wordList,
             },
@@ -1146,6 +1153,7 @@ export class EditorStore {
                   : getAnglesForPreset(
                       this.styleOptions.bg.items.words.anglesPreset
                     ),
+              anglePreset: this.styleOptions.bg.items.words.anglesPreset,
               fontIds: this.styleOptions.bg.items.words.fontIds,
               wordList: this.styleOptions.bg.items.words.wordList,
             },

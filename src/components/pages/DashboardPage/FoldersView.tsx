@@ -28,6 +28,7 @@ import { Folder } from 'services/api/types'
 import { useStore } from 'services/root-store'
 import { useToasts } from 'use-toasts'
 import { AccountUsage } from './AccountUsage'
+import { BsHeart } from 'react-icons/bs'
 
 export const FoldersView = observer(() => {
   const { wordcloudsStore: store } = useStore()
@@ -69,7 +70,18 @@ export const FoldersView = observer(() => {
     >
       <FoldersList mr="4">
         {/* Account usage */}
-        <Box height="96px" mt="70px" mb="2rem">
+        <Box mt="20px" mb="20px">
+          <Button
+            mb="10px"
+            colorScheme="primary"
+            variant="ghost"
+            leftIcon={<BsHeart />}
+            as="a"
+            target="_blank"
+            href="https://forms.gle/P5rXX6pvKVBbwVFX7"
+          >
+            Leave us Feedback!
+          </Button>
           <AccountUsage />
         </Box>
 

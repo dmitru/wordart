@@ -82,7 +82,7 @@ import { darken, desaturate } from 'polished'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Helmet } from 'react-helmet'
 import Hotkeys from 'react-hot-keys'
-import { BsTrash } from 'react-icons/bs'
+import { BsTrash, BsHeart } from 'react-icons/bs'
 import {
   FiChevronLeft,
   FiDownload,
@@ -570,16 +570,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             steps={[
               {
                 target: '#btn-visualize',
-                content: '🎉Welcome! Click "Visualize" to generate words.',
+                content: '🎉 Welcome! Click "Visualize" to generate words.',
               },
               {
                 target: '#nav-words',
                 content: (
                   <>
-                    Customize your design: choose words, fonts, layout and
-                    colors. <br />
-                    <br />
-                    Then hit "Visualize" to see the results.
+                    Customize your design: choose shape, words, fonts and
+                    colors. Then hit "Visualize" to see the results.
                   </>
                 ),
               },
@@ -590,9 +588,28 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     Read our 3-minute step-by-step tutorial to learn how to
                     create a beautiful word designs.
                     <br />
+                    <Button
+                      colorScheme="accent"
+                      my="3"
+                      as="a"
+                      target="_blank"
+                      href="https://wordcloudy.com/blog/tag/tutorials/"
+                    >
+                      Open tutorials
+                    </Button>
                     <br />
                     Still have questions? Write to us, and we'll be happy to
                     help!
+                    <br />
+                    <Button
+                      variant="outline"
+                      my="3"
+                      as="a"
+                      target="_blank"
+                      href="https://wordcloudy.com/contact/"
+                    >
+                      Write to us
+                    </Button>
                   </>
                 ),
               },
@@ -711,6 +728,19 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           `}
                         />
                         Delete
+                      </MenuItem>
+                      <MenuDivider />
+                      <MenuItem
+                        onClick={() => {
+                          openUrlInNewTab('https://forms.gle/P5rXX6pvKVBbwVFX7')
+                        }}
+                      >
+                        <BsHeart
+                          css={css`
+                            margin-right: 4px;
+                          `}
+                        />
+                        Leave feedback
                       </MenuItem>
                       <MenuDivider />
                       <MenuItem
@@ -1463,7 +1493,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   >
                     <Spinner />
                     <Text mt="4" fontSize="lg">
-                      Initializing...
+                      {'⌛️ '}Loading, please wait...
                     </Text>
                   </Box>
                 )}

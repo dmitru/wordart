@@ -111,6 +111,7 @@ export const mkWordItemsConfFromOptions = (
 ): WordItemsConf => ({
   wordList: opts.wordList,
   fontIds: opts.fontIds,
+  anglePreset: opts.anglesPreset,
   angles:
     opts.anglesPreset === 'custom'
       ? opts.customAngles
@@ -121,6 +122,7 @@ export type WordItemsConf = {
   wordList: WordListEntry[]
   fontIds: FontId[]
   angles: number[]
+  anglePreset: WordAnglesPresetKind
 }
 
 export type IconItemsConf = {

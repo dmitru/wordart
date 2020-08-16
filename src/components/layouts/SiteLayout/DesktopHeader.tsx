@@ -22,6 +22,8 @@ import { FaRegUserCircle, FaSignOutAlt } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { useToasts } from 'use-toasts'
+import { BsHeartFill } from 'react-icons/bs'
+import { openUrlInNewTab } from 'utils/browser'
 
 export type DesktopHeaderProps = {
   fullWidth?: boolean
@@ -161,6 +163,15 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
                                 onClick={() => upgradeModal.show('generic')}
                               />
                             )}
+                            <MenuItemWithIcon
+                              icon={<BsHeartFill />}
+                              onClick={() => {
+                                openUrlInNewTab(
+                                  'https://forms.gle/P5rXX6pvKVBbwVFX7'
+                                )
+                              }}
+                              title="Give us feedback"
+                            />
                             <MenuItemWithIcon
                               icon={<FaRegUserCircle />}
                               title="Your account"

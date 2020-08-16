@@ -50,6 +50,7 @@ export const FaqPage = observer(() => {
               >
                 Open tutorials
               </Button>
+
               <Link passHref href={Urls.contact}>
                 <Button
                   variant="outline"
@@ -63,7 +64,7 @@ export const FaqPage = observer(() => {
             </Stack>
           </Box>
 
-          <Box id="faq" mt="1.5rem" maxWidth="700px" mx="auto">
+          <Box id="faq" mt="4.5rem" maxWidth="700px" mx="auto">
             <h1>General Questions</h1>
 
             <Question
