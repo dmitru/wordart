@@ -78,7 +78,8 @@ export const FaqPage = observer(() => {
               </p>
               <p>
                 Designs can be fully customized and downloaded in high quality
-                for printing or other creative applications.
+                for printing on cards, canvases, posters, merchendise or for
+                other creative applications.
               </p>
               <p>
                 It's also simple and fun to use and there are some great
