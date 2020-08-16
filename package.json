@@ -63,7 +63,7 @@
     "emotion": "^10.0.27",
     "emotion-server": "^10.0.27",
     "emotion-theming": "^10.0.27",
-    "fabric": "^3.6.3",
+    "fabric": "^4.0.0",
     "file-saver": "^2.0.2",
     "formik": "^2.1.4",
     "framer-motion": "^2.1.0",
