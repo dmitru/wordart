@@ -837,7 +837,11 @@ const WordListRow: React.FC<
           isChecked={isSelected}
           onChange={(e) => {
             // @ts-ignore
-            if (e.nativeEvent.shiftKey && state.lastCheckedIndex != null) {
+            if (
+              e.nativeEvent.shiftKey &&
+              state.lastCheckedIndex != null &&
+              index != null
+            ) {
               onRangeSelectionToggle(
                 Math.min(state.lastCheckedIndex, index),
                 Math.max(state.lastCheckedIndex, index)
