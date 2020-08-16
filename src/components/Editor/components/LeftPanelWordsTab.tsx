@@ -836,8 +836,8 @@ const WordListRow: React.FC<
         <Checkbox
           isChecked={isSelected}
           onChange={(e) => {
-            // @ts-ignore
             if (
+              // @ts-ignore
               e.nativeEvent.shiftKey &&
               state.lastCheckedIndex != null &&
               index != null
