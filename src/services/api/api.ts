@@ -20,6 +20,7 @@ import {
   WordcloudId,
 } from 'services/api/types'
 import { apiClient } from './api-client'
+import pako from 'pako'
 
 export const ApiErrors = {
   NoMediaUploadFreePlan: 'no_custom_media_for_free_plan',
@@ -77,13 +78,25 @@ export const Api = {
 
   wordclouds: {
     async create(data: CreateWordcloudDto): Promise<Wordcloud> {
-      const response = await apiClient.post('/wordclouds', data)
+      const compressedData = pako.deflate(JSON.stringify(data.editorData), {
+        to: 'string',
+      })
+      const response = await apiClient.post('/wordclouds', {
+        ...data,
+        compressedData,
+      })
       return response.data as Wordcloud
     },
     async createAnonymous(
       data: CreateAnonymousWordcloudDto
     ): Promise<Wordcloud> {
-      const response = await apiClient.post('/wordclouds/anonymous', data)
+      const compressedData = pako.deflate(JSON.stringify(data.editorData), {
+        to: 'string',
+      })
+      const response = await apiClient.post('/wordclouds/anonymous', {
+        ...data,
+        compressedData,
+      })
       return response.data as Wordcloud
     },
     async restoreAnonymous(id: WordcloudId): Promise<Wordcloud> {
@@ -103,7 +116,17 @@ export const Api = {
       await apiClient.delete(`/wordclouds/`, { data: { ids } })
     },
     async update(id: WordcloudId, data: UpdateWordcloudDto): Promise<void> {
-      await apiClient.put(`/wordclouds/${id}`, data)
+      if ('editorData' in data) {
+        const compressedData = pako.deflate(JSON.stringify(data.editorData), {
+          to: 'string',
+        })
+        await apiClient.put(`/wordclouds/${id}`, {
+          ...data,
+          editorData: compressedData,
+        })
+      } else {
+        await apiClient.put(`/wordclouds/${id}`, data)
+      }
     },
     async updateMany(data: UpdateManyWordcloudsDto): Promise<void> {
       await apiClient.put(`/wordclouds`, data)

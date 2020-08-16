@@ -204,7 +204,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         const thumbnail = thumbnailCanvas.toDataURL('image/jpeg', 0.85)
         const editorData = await store.serialize()
 
-        const wordcloud = await wordcloudsStore.createAnonymous({
+        await wordcloudsStore.createAnonymous({
           id: uuid(),
           recaptcha,
           title: state.title || 'Untitled Design',

@@ -79,7 +79,7 @@ const state = observable({
   newWordText: '',
   selectedWords: new Set<WordConfigId>(),
   lastCheckedIndex: null as null | number,
-  lastCheckedIndexType: 'check' | 'uncheck',
+  lastCheckedIndexType: 'check' as 'check' | 'uncheck',
 })
 
 let ignoreBlur = false
@@ -836,6 +836,7 @@ const WordListRow: React.FC<
         <Checkbox
           isChecked={isSelected}
           onChange={(e) => {
+            // @ts-ignore
             if (e.nativeEvent.shiftKey && state.lastCheckedIndex != null) {
               onRangeSelectionToggle(
                 Math.min(state.lastCheckedIndex, index),
