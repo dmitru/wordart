@@ -2,8 +2,6 @@ import {
   Box,
   Checkbox,
   InputGroup,
-  InputProps,
-  InputRightElement,
   Menu,
   MenuButton,
   MenuDivider,
@@ -13,7 +11,7 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/core'
-import { AddIcon, ChevronDownIcon, SmallCloseIcon } from '@chakra-ui/icons'
+import { ChevronDownIcon, SmallCloseIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
 import { TextFields } from '@styled-icons/material-twotone/TextFields'
@@ -35,9 +33,9 @@ import { Input } from 'components/shared/Input'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { MenuItemWithIcon } from 'components/shared/MenuItemWithIcon'
 import { SearchInput } from 'components/shared/SearchInput'
-import { capitalize, noop } from 'lodash'
+import { capitalize, noop, every } from 'lodash'
 import { observable, runInAction } from 'mobx'
-import { observer, Observer } from 'mobx-react'
+import { observer } from 'mobx-react'
 import papaparse from 'papaparse'
 import pluralize from 'pluralize'
 import React, { useCallback, useEffect, useRef } from 'react'
@@ -58,9 +56,9 @@ import {
   ListChildComponentProps,
 } from 'react-window'
 import { useToasts } from 'use-toasts'
+import { animateElement } from 'utils/animation'
 import { wordsToCSVData } from '../words-import-export'
 import { CustomizeWordPopover } from './CustomizeWord'
-import { animateElement } from 'utils/animation'
 
 export type LeftPanelWordsTabProps = {
   target: TargetKind
@@ -80,6 +78,8 @@ const state = observable({
   textFilter: '',
   newWordText: '',
   selectedWords: new Set<WordConfigId>(),
+  lastCheckedIndex: null as null | number,
+  lastCheckedIndexType: 'check' | 'uncheck',
 })
 
 let ignoreBlur = false
@@ -276,6 +276,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
             value={state.textFilter}
             onChange={(value) => {
               state.textFilter = value
+              state.lastCheckedIndex = null
             }}
           />
         </Box>
@@ -373,9 +374,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                       icon={<SmallCloseIcon />}
                       onClick={() => {
                         if (selectedCount > 0) {
-                          for (const w of wordsSelectedOrAll) {
-                            store.deleteWord(target, w.id)
-                          }
+                          deleteWords(wordsSelectedOrAll)
                         } else {
                           if (
                             window.confirm(
@@ -402,6 +401,15 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
       </Stack>
     )
 
+    const deleteWords = (words: WordListEntry[]) => {
+      runInAction(() => {
+        for (const w of words) {
+          store.deleteWord(target, w.id)
+        }
+      })
+      state.lastCheckedIndex = null
+    }
+
     const handleWordDelete = useCallback(
       (word: WordListEntry) => {
         store.deleteWord(target, word.id)
@@ -410,6 +418,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
           focusNewWordInput()
         }
         updateSelectedWords()
+        state.lastCheckedIndex = null
       },
       [target]
     )
@@ -438,6 +447,28 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
         } else {
           state.selectedWords.delete(word.id)
         }
+      },
+      [target]
+    )
+
+    const handleRangeSelectionChange = useCallback(
+      (indexFrom: number, indexTo: number) => {
+        const words = selectedOrAllWords.slice(indexFrom, indexTo + 1)
+        if (words.length === 0) {
+          return
+        }
+
+        runInAction(() => {
+          if (state.lastCheckedIndexType === 'uncheck') {
+            words.forEach((word) => {
+              state.selectedWords.delete(word.id)
+            })
+          } else {
+            words.forEach((word) => {
+              state.selectedWords.add(word.id)
+            })
+          }
+        })
       },
       [target]
     )
@@ -523,6 +554,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                 words: filteredWords,
                                 props: {
                                   onSelectedChange: handleSelectionChange,
+                                  onRangeSelectionToggle: handleRangeSelectionChange,
                                   focusNextField,
                                   focusPrevField,
                                   onDelete: handleWordDelete,
@@ -602,6 +634,7 @@ const ListRow = React.memo<ListChildComponentProps>(
       <Draggable key={word.id} draggableId={word.id} index={index}>
         {(provided, snapshot) => (
           <WordListRow
+            index={index}
             provided={provided}
             snapshot={snapshot}
             word={word}
@@ -619,9 +652,11 @@ const ListRow = React.memo<ListChildComponentProps>(
 
 const WordListRow: React.FC<
   {
+    index?: number
     style?: React.CSSProperties
     isSelected: boolean
     onSelectedChange?: (word: WordListEntry, isSelected: boolean) => void
+    onRangeSelectionToggle?: (indexFrom: number, indexTo: number) => void
     provided: DraggableProvided
     snapshot: DraggableStateSnapshot
     word: WordListEntry
@@ -634,8 +669,10 @@ const WordListRow: React.FC<
   } & { [key: string]: any }
 > = observer(
   ({
+    index,
     word,
     isSelected,
+    onRangeSelectionToggle = noop,
     onSelectedChange = noop,
     onAfterColorChange = noop,
     showDragHandle = true,
@@ -798,7 +835,19 @@ const WordListRow: React.FC<
 
         <Checkbox
           isChecked={isSelected}
-          onChange={() => {
+          onChange={(e) => {
+            if (e.nativeEvent.shiftKey && state.lastCheckedIndex != null) {
+              onRangeSelectionToggle(
+                Math.min(state.lastCheckedIndex, index),
+                Math.max(state.lastCheckedIndex, index)
+              )
+              state.lastCheckedIndex = null
+              return
+            }
+            if (index != null) {
+              state.lastCheckedIndex = index
+              state.lastCheckedIndexType = isSelected ? 'uncheck' : 'check'
+            }
             onSelectedChange(word, !isSelected)
           }}
           p="10px"
