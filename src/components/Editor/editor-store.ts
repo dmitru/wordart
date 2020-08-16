@@ -521,12 +521,12 @@ export class EditorStore {
       await this.selectShape(shapeConf, false, false)
     }
 
-    if (!this.selectedShapeConf) {
+    const shape = this.editor.shape
+    if (!this.selectedShapeConf || !shape) {
       return
     }
 
-    const shape = this.editor.shape
-    if ('transform' in data.shape && shape) {
+    if ('transform' in data.shape) {
       applyTransformToObj(shape.obj, data.shape.transform)
       if (
         shape.kind === 'clipart:svg' ||
@@ -538,7 +538,6 @@ export class EditorStore {
     }
 
     if (
-      shape &&
       (shape.kind === 'clipart:svg' || shape.kind === 'custom:svg') &&
       (data.shape.kind === 'clipart:svg' || data.shape.kind === 'custom:svg') &&
       data.shape.processing
@@ -743,7 +742,6 @@ export class EditorStore {
 
     this.editor.setShapeOpacity(shapeStyle.opacity / 100, false)
 
-    console.log(this.editor.shape)
     await this.editor.setShapeItems(shapeItems, false)
     await this.editor.setBgItems(bgItems, false)
 

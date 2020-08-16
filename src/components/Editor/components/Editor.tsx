@@ -349,12 +349,18 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
             state.title = 'New wordart'
           }
 
+          console.log(
+            'props.wordcloudId, authStore.hasInitialized, canvasRef.current, bgCanvasRef.current',
+            props.wordcloudId,
+            authStore.hasInitialized
+          )
+
           await store.initEditor(editorParams)
         }
       }
 
       init()
-    }, [props.wordcloudId, authStore.hasInitialized, canvasRef.current])
+    }, [props.wordcloudId, authStore.hasInitialized])
 
     useEffect(() => {
       return () => {
