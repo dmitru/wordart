@@ -48,15 +48,15 @@ export const Footer: React.FC<FooterProps> = () => {
             />
             Instagram
           </FooterLink>
-          <FooterLink target="_blank" href="https://twitter.com/wordcloudy">
+          {/* <FooterLink target="_blank" href="https://twitter.com/wordcloudy">
             <FaTwitter
               css={css`
                 margin-right: 5px;
               `}
             />
             Twitter
-          </FooterLink>
-          <FooterLink
+          </FooterLink> */}
+          {/* <FooterLink
             target="_blank"
             href="https://www.youtube.com/channel/UC9I9FoBa7XNGItUSmWr3e7A/"
           >
@@ -66,7 +66,7 @@ export const Footer: React.FC<FooterProps> = () => {
               `}
             />
             YouTube
-          </FooterLink>
+          </FooterLink> */}
         </Box>
 
         <Box
