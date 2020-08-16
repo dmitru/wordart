@@ -86,6 +86,9 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
           words = stopword.removeStopwords(words)
         }
 
+        // Limit to 100 words
+        words = words.slice(0, 100)
+
         onImported({
           words: words.map((text) => ({ text })),
           clearExistingBeforeImporting: state.clearExistingBeforeImporting,
@@ -125,6 +128,7 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
             removeCommon: state.removeCommon,
             removeNumbers: state.removeNumbers,
             stemming: state.stemming,
+            limit: 100,
           })
           onImported({
             words: result.words.map((text) => ({ text })),
