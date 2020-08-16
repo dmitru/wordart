@@ -695,9 +695,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         />
                         Print
                       </MenuItem>
-                      <MenuItem>
+                      <MenuItem onClick={openExport}>
                         <FiDownload
-                          onClick={openExport}
                           css={css`
                             margin-right: 4px;
                           `}
