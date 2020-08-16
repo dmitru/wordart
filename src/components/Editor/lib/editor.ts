@@ -1211,7 +1211,11 @@ export class Editor {
       selectable: false,
     })
     shapeObj.bringToFront()
+
+    console.log('this.shape', this.shape, this.shape?.obj, shapeObj)
+
     if (this.shape?.obj) {
+      console.log('remove old')
       this.canvas.remove(this.shape.obj)
     }
     if (render) {
@@ -1524,7 +1528,7 @@ export class Editor {
             },
           },
         },
-        itemPadding: Math.max(1, 100 - style.items.placement.itemDensity),
+        itemPadding: Math.max(1, 108 - style.items.placement.itemDensity),
         // Words
         wordsMaxSize: style.items.placement.wordsMaxSize,
         words: processedWordList,
@@ -1762,7 +1766,7 @@ export class Editor {
             },
           },
         },
-        itemPadding: Math.max(1, 100 - style.items.placement.itemDensity),
+        itemPadding: Math.max(1, 108 - style.items.placement.itemDensity),
         // Words
         wordsMaxSize: style.items.placement.wordsMaxSize,
         words: processedWordList,
@@ -1908,7 +1912,7 @@ export class Editor {
   }
 
   clear = async (clearCanvas = true) => {
-    this.logger.debug('Editor: clear')
+    this.logger.debug('Editor: clear', clearCanvas)
     if (clearCanvas) {
       this.canvas.clear()
     } else {
