@@ -593,9 +593,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       my="3"
                       as="a"
                       target="_blank"
-                      href="https://wordcloudy.com/blog/tag/tutorials/"
+                      href="https://wordcloudy.com/blog/getting-started-in-5-minutes/"
                     >
-                      Open tutorials
+                      Open tutorial
                     </Button>
                     <br />
                     Still have questions? Write to us, and we'll be happy to
@@ -603,7 +603,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     <br />
                     <Button
                       variant="outline"
-                      my="3"
+                      mt="3"
                       as="a"
                       target="_blank"
                       href="https://wordcloudy.com/contact/"
