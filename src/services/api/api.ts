@@ -83,7 +83,7 @@ export const Api = {
       })
       const response = await apiClient.post('/wordclouds', {
         ...data,
-        compressedData,
+        editorData: compressedData,
       })
       return response.data as Wordcloud
     },
@@ -95,7 +95,7 @@ export const Api = {
       })
       const response = await apiClient.post('/wordclouds/anonymous', {
         ...data,
-        compressedData,
+        editorData: compressedData,
       })
       return response.data as Wordcloud
     },
