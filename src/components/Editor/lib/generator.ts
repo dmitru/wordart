@@ -26,7 +26,7 @@ import {
 import { Rect } from 'lib/wordart/geometry'
 import { ImageProcessorWasm } from 'lib/wordart/wasm/image-processor-wasm'
 import { getWasmModule, WasmModule } from 'lib/wordart/wasm/wasm-module'
-import { flatten, sample, uniq } from 'lodash'
+import { flatten, sample, uniq, range, chunk } from 'lodash'
 import { Path } from 'opentype.js'
 import paper from 'paper'
 import { consoleLoggers } from 'utils/console-logger'
@@ -333,9 +333,6 @@ export class Generator {
       rotationInfos.set(0, computeRotationInfo(0))
     }
 
-    unrotatedCtx.fillStyle = 'black'
-    unrotatedCtx.globalCompositeOperation = 'destination-out'
-
     let mostLargestRect: Rect | undefined
 
     let tLastNotified = performance.now()
@@ -355,444 +352,495 @@ export class Generator {
 
     let availableIconIndex = 0
 
-    for (let i = 0; i < nIter; ++i) {
-      let type: 'word' | 'icon' = 'word'
+    const unrotatedCtxPadded = createCanvasCtx(shapeCanvasDimensions)
 
-      hasWords = availableWords.length > 0
-      hasIcons = availableIcons.length > 0
+    unrotatedCtx.fillStyle = 'black'
+    unrotatedCtx.globalCompositeOperation = 'destination-out'
 
-      if (this.isCancelled) {
-        this.isCancelled = false
-        return {
-          generatedItems,
-          status: 'cancelled',
-        }
-      }
+    unrotatedCtxPadded.fillStyle = 'black'
+    unrotatedCtxPadded.globalCompositeOperation = 'destination-out'
 
-      if (hasWords && hasIcons) {
-        type = Math.random() < task.iconProbability ? 'icon' : 'word'
-      } else if (hasWords) {
-        type = 'word'
-      } else if (hasIcons) {
-        type = 'icon'
-      } else {
-        break
-      }
+    const iterations = range(0, nIter)
+    const chunkSize = 15
+    const chunkPaddingFactor = 3
+    const iterationBatches = chunk(iterations, chunkSize)
 
-      if (type === 'word') {
-        const word = availableWords[availableWordIndex]
+    for (let batch of iterationBatches) {
+      console.log('Starting batch: ', batch)
 
-        const wordConfigIndex = task.words.findIndex(
-          (wc) => wc.wordConfigId === word.wordConfigId
-        )!
-        if (wordConfigIndex < 0) {
-          console.error('wordConfigIndex < 0')
-          break
+      clearCanvas(unrotatedCtxPadded)
+      copyCanvas(unrotatedCtx, unrotatedCtxPadded)
+
+      for (let i of batch) {
+        let type: 'word' | 'icon' = 'word'
+
+        hasWords = availableWords.length > 0
+        hasIcons = availableIcons.length > 0
+
+        if (this.isCancelled) {
+          this.isCancelled = false
+          return {
+            generatedItems,
+            status: 'cancelled',
+          }
         }
 
-        const wordIndex = words.findIndex((w) => w === word)
-        if (wordIndex < 0) {
-          console.error('wordIndex < 0')
-          break
-        }
-        const wordConfig = task.words[wordConfigIndex]
-
-        const angle = sample(wordConfig.angles)!
-        const rotationInfo = rotationInfos.get(angle)
-        if (!rotationInfo) {
-          throw new Error(`rotation info is missing for angle ${angle}`)
-        }
-        let {
-          ctx: rotatedCtx,
-          rotatedCanvasDimensions,
-          transform: rotatedBoundsTransform,
-          inverseTransform: rotatedBoundsTransformInverted,
-        } = rotationInfo
-
-        if (allAngles.length === 1 && allAngles[0] === 0) {
-          // Optimize for case of just 1 angle
-          rotatedCtx = unrotatedCtx
-          rotatedBoundsTransform = new paper.Matrix()
-          rotatedBoundsTransformInverted = new paper.Matrix()
+        if (hasWords && hasIcons) {
+          type = Math.random() < task.iconProbability ? 'icon' : 'word'
+        } else if (hasWords) {
+          type = 'word'
+        } else if (hasIcons) {
+          type = 'icon'
         } else {
-          rotatedCtx = rotationInfo.ctx
-          clearCanvas(rotatedCtx)
-          rotatedCtx.save()
-          rotatedBoundsTransformInverted.applyToContext(rotatedCtx)
-
-          rotatedCtx.drawImage(unrotatedCtx.canvas, 0, 0)
-          rotatedCtx.restore()
-        }
-
-        const wordPathBounds = wordPathsBounds[wordIndex]
-        const wordPath = wordPaths[wordIndex]
-
-        // let scale = 1 - (0.5 * i) / nIter
-        let scale = 1
-
-        const rotatedImgData = rotatedCtx.getImageData(
-          0,
-          0,
-          rotatedCanvasDimensions.w,
-          rotatedCanvasDimensions.h
-        )
-        const rotatedCanvasBounds: Rect = {
-          x: 0,
-          y: 0,
-          w: rotatedCanvasDimensions.w,
-          h: rotatedCanvasDimensions.h,
-        }
-        const wordPathSize: Dimensions = {
-          w: wordPathBounds.x2 - wordPathBounds.x1,
-          h: wordPathBounds.y2 - wordPathBounds.y1,
-        }
-        const wordAspect = wordPathSize.w / wordPathSize.h
-
-        const largestRectWasm = imageProcessor.findLargestRect(
-          rotatedImgData,
-          rotatedCanvasBounds,
-          wordAspect
-        )
-        const largestRect: Rect = {
-          x: largestRectWasm.x,
-          y: largestRectWasm.y,
-          w: largestRectWasm.w,
-          h: largestRectWasm.h,
-        }
-
-        if (!mostLargestRect) {
-          mostLargestRect = largestRect
-        }
-
-        if (largestRect.w < 1 || largestRect.h < 1) {
           break
         }
 
-        let pathScale =
-          scale *
-          Math.min(
-            largestRect.w / wordPathSize.w,
-            largestRect.h / wordPathSize.h
-          )
+        if (type === 'word') {
+          const word = availableWords[availableWordIndex]
 
-        const maxMaxDim =
-          (task.wordsMaxSize / 100) *
-          Math.max(mostLargestRect.w, mostLargestRect.h)
-
-        const maxDim = Math.max(wordPathSize.w, wordPathSize.h) * pathScale
-        if (maxDim > maxMaxDim) {
-          pathScale *= maxMaxDim / maxDim
-        }
-
-        unrotatedCtx.save()
-        rotatedBoundsTransform.applyToContext(unrotatedCtx)
-
-        unrotatedCtx.shadowBlur =
-          0.25 + (task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6
-        unrotatedCtx.shadowColor = 'red'
-
-        if (
-          pathScale * Math.min(largestRect.w, largestRect.h) >=
-          0.05 * (shapeCanvasMaxExtent / 360)
-        ) {
-          const dx = Math.max(largestRect.w - pathScale * wordPathSize.w, 0)
-          const dy = Math.max(largestRect.h - pathScale * wordPathSize.h, 0)
-
-          const tx =
-            largestRect.x - pathScale * wordPathBounds.x1 + Math.random() * dx
-          const ty =
-            largestRect.y +
-            largestRect.h -
-            pathScale * wordPathBounds.y2 -
-            Math.random() * dy
-          unrotatedCtx.translate(tx, ty)
-          unrotatedCtx.scale(pathScale, pathScale)
-
-          const wordCenterRotated = new paper.Point(
-            tx + (wordPathSize.w * pathScale) / 2,
-            ty - (wordPathSize.h * pathScale) / 2
-          )
-
-          const wordCenterUnrotated = rotatedBoundsTransform.transform(
-            wordCenterRotated
-          )
-          const col = Math.round(wordCenterUnrotated.x)
-          const row = Math.round(wordCenterUnrotated.y)
-
-          const colorSamplePixelIndex =
-            4 * (unrotatedCtxOriginalShape.canvas.width * row + col)
-          const r = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 0]
-          const g = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 1]
-          const b = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 2]
-
-          const shapeColor = chroma.rgb(r, g, b).hex()
-
-          wordPath.draw(unrotatedCtx)
-          const item: WordGeneratedItem = {
-            index: i,
-            kind: 'word',
-            shapeColor,
-            fontId: word.font.id,
-            text: word.text,
-            wordConfigId: word.wordConfigId,
-            // Transform to the center of the placed item
-            transform: new paper.Matrix()
-              .translate(task.shape.bounds.left, task.shape.bounds.top)
-              .scale(
-                task.shape.bounds.width / shapeCanvasDimensions.w,
-                task.shape.bounds.height / shapeCanvasDimensions.h
-              )
-              .append(rotatedBoundsTransform)
-              .translate(tx, ty)
-              .scale(pathScale)
-              .translate(
-                wordPathBounds.x1 + 0.5 * wordPathSize.w,
-                wordPathBounds.y1 + wordPathSize.h * 0.5
-              ),
+          const wordConfigIndex = task.words.findIndex(
+            (wc) => wc.wordConfigId === word.wordConfigId
+          )!
+          if (wordConfigIndex < 0) {
+            console.error('wordConfigIndex < 0')
+            break
           }
 
-          currentBatch.push(item)
-          generatedItems.push(item)
-        } else {
-          unrotatedCtx.fillRect(
-            largestRect.x,
-            largestRect.y,
-            Math.max(1.2, largestRect.w),
-            Math.max(1.2, largestRect.h)
-          )
-        }
-
-        unrotatedCtx.restore()
-
-        // console.screenshot(shapeCtx.canvas)
-
-        wordRepeats[wordConfigIndex]++
-        availableWords = words.filter((w, index) => {
-          const wordConfIndex = w.wordConfigIndex
-          return (
-            wordMaxRepeats[wordConfIndex] === -1 ||
-            wordRepeats[wordConfIndex] < wordMaxRepeats[wordConfIndex]
-          )
-        })
-        availableWordIndex = (availableWordIndex + 1) % availableWords.length
-      } else {
-        const icon = availableIcons[availableIconIndex]
-
-        const iconConfigIndex = task.icons.findIndex(
-          (wc) => wc.iconConfigId === icon.iconConfigId
-        )!
-        if (iconConfigIndex < 0) {
-          console.error('iconConfigIndex < 0')
-          break
-        }
-
-        const iconIndex = icons.findIndex((w) => w === icon)
-        if (iconIndex < 0) {
-          console.error('iconIndex < 0')
-          break
-        }
-
-        const rasterCanvas = iconRasterCanvases[iconIndex]
-
-        const angle = sample(icon.angles)!
-
-        const rotationInfo = rotationInfos.get(angle)
-        if (!rotationInfo) {
-          throw new Error(`rotation info is missing for angle ${angle}`)
-        }
-
-        let {
-          ctx: rotatedCtx,
-          rotatedCanvasDimensions,
-          transform: rotatedBoundsTransform,
-          inverseTransform: rotatedBoundsTransformInverted,
-        } = rotationInfo
-        // console.log('i = ', i, angle)
-
-        if (allAngles.length === 1 && allAngles[0] === 0) {
-          // Optimize for case of just 1 angle
-          rotatedCtx = unrotatedCtx
-          rotatedBoundsTransform = new paper.Matrix()
-          rotatedBoundsTransformInverted = new paper.Matrix()
-        } else {
-          rotatedCtx = rotationInfo.ctx
-          clearCanvas(rotatedCtx)
-          rotatedCtx.save()
-          rotatedBoundsTransformInverted.applyToContext(rotatedCtx)
-
-          rotatedCtx.drawImage(unrotatedCtx.canvas, 0, 0)
-          rotatedCtx.restore()
-        }
-
-        // let scale = 1 - (0.5 * i) / nIter
-        let scale = 1
-
-        const rotatedImgData = rotatedCtx.getImageData(
-          0,
-          0,
-          rotatedCanvasDimensions.w,
-          rotatedCanvasDimensions.h
-        )
-        const rotatedCanvasBounds: Rect = {
-          x: 0,
-          y: 0,
-          w: rotatedCanvasDimensions.w,
-          h: rotatedCanvasDimensions.h,
-        }
-
-        const iconBounds = iconsBounds[iconIndex]
-        const iconDims: Dimensions = {
-          w: iconBounds.w,
-          h: iconBounds.h,
-        }
-        const aspect = iconDims.w / iconDims.h
-
-        const largestRectWasm = imageProcessor.findLargestRect(
-          rotatedImgData,
-          rotatedCanvasBounds,
-          aspect
-        )
-        const largestRect: Rect = {
-          x: largestRectWasm.x,
-          y: largestRectWasm.y,
-          w: largestRectWasm.w,
-          h: largestRectWasm.h,
-        }
-        if (!mostLargestRect) {
-          mostLargestRect = largestRect
-        }
-
-        if (largestRect.w < 1 || largestRect.h < 1) {
-          break
-        }
-
-        let iconScale =
-          scale *
-          Math.min(largestRect.w / iconDims.w, largestRect.h / iconDims.h)
-
-        const maxMaxDim =
-          (task.iconsMaxSize / 100) *
-          Math.max(mostLargestRect.w, mostLargestRect.h)
-        const maxDim = Math.max(iconDims.w, iconDims.h) * iconScale
-        if (maxDim > maxMaxDim) {
-          iconScale *= maxMaxDim / maxDim
-        }
-
-        unrotatedCtx.save()
-        rotatedBoundsTransform.applyToContext(unrotatedCtx)
-
-        if (task.itemPadding > 0) {
-          unrotatedCtx.shadowBlur =
-            0.25 + (task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6
-          unrotatedCtx.shadowColor = 'red'
-        } else {
-          unrotatedCtx.shadowBlur = 0
-        }
-
-        if (
-          iconScale * Math.min(largestRect.w, largestRect.h) >=
-          0.05 * (shapeCanvasMaxExtent / 360)
-        ) {
-          const dx = Math.max(largestRect.w - iconScale * iconDims.w, 0)
-          const dy = Math.max(largestRect.h - iconScale * iconDims.h, 0)
-
-          const tx =
-            largestRect.x - iconScale * iconBounds.x + Math.random() * dx
-          const ty =
-            largestRect.y +
-            largestRect.h -
-            iconScale * (iconBounds.y + iconBounds.h) -
-            Math.random() * dy
-          unrotatedCtx.translate(tx, ty)
-          unrotatedCtx.scale(iconScale, iconScale)
-
-          unrotatedCtx.drawImage(
-            rasterCanvas,
-            0,
-            0,
-            rasterCanvas.width,
-            rasterCanvas.height,
-            iconBounds.x,
-            iconBounds.y,
-            iconBounds.w,
-            iconBounds.h
-          )
-
-          const wordCenterRotated = new paper.Point(
-            tx + (iconDims.w * iconScale) / 2,
-            ty + (iconDims.h * iconScale) / 2
-          )
-          const wordCenterUnrotated = rotatedBoundsTransform.transform(
-            wordCenterRotated
-          )
-          const col = Math.round(wordCenterUnrotated.x)
-          const row = Math.round(wordCenterUnrotated.y)
-
-          const colorSamplePixelIndex =
-            4 * (unrotatedCtxOriginalShape.canvas.width * row + col)
-          const r = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 0]
-          const g = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 1]
-          const b = unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 2]
-
-          const shapeColor = chroma.rgb(r, g, b).hex()
-
-          const item: ShapeGeneratedItem = {
-            index: i,
-            kind: 'shape',
-            shapeColor,
-            shapeId: (icon.shape as ShapeIconConf).id,
-            transform: new paper.Matrix()
-              .translate(task.shape.bounds.left, task.shape.bounds.top)
-              .scale(
-                task.shape.bounds.width / shapeCanvasDimensions.w,
-                task.shape.bounds.height / shapeCanvasDimensions.h
-              )
-              .append(rotatedBoundsTransform)
-              .translate(tx, ty)
-              .scale(iconScale)
-              .translate(
-                iconBounds.x + iconBounds.w / 2,
-                iconBounds.y + iconBounds.h / 2
-              ),
+          const wordIndex = words.findIndex((w) => w === word)
+          if (wordIndex < 0) {
+            console.error('wordIndex < 0')
+            break
           }
-          currentBatch.push(item)
-          generatedItems.push(item)
-        } else {
-          unrotatedCtx.fillRect(
-            largestRect.x,
-            largestRect.y,
-            Math.max(1.2, largestRect.w),
-            Math.max(1.2, largestRect.h)
+          const wordConfig = task.words[wordConfigIndex]
+
+          const angle = sample(wordConfig.angles)!
+          const rotationInfo = rotationInfos.get(angle)
+          if (!rotationInfo) {
+            throw new Error(`rotation info is missing for angle ${angle}`)
+          }
+          let {
+            ctx: rotatedCtx,
+            rotatedCanvasDimensions,
+            transform: rotatedBoundsTransform,
+            inverseTransform: rotatedBoundsTransformInverted,
+          } = rotationInfo
+
+          if (allAngles.length === 1 && allAngles[0] === 0) {
+            // Optimize for case of just 1 angle
+            rotatedCtx = unrotatedCtxPadded
+            rotatedBoundsTransform = new paper.Matrix()
+            rotatedBoundsTransformInverted = new paper.Matrix()
+          } else {
+            // Copy: unrotated padded -> rotated
+            rotatedCtx = rotationInfo.ctx
+            clearCanvas(rotatedCtx)
+            rotatedCtx.save()
+            rotatedBoundsTransformInverted.applyToContext(rotatedCtx)
+
+            rotatedCtx.drawImage(unrotatedCtxPadded.canvas, 0, 0)
+            rotatedCtx.restore()
+          }
+
+          const wordPathBounds = wordPathsBounds[wordIndex]
+          const wordPath = wordPaths[wordIndex]
+
+          // let scale = 1 - (0.5 * i) / nIter
+          let scale = 1
+
+          const rotatedImgData = rotatedCtx.getImageData(
+            0,
+            0,
+            rotatedCanvasDimensions.w,
+            rotatedCanvasDimensions.h
           )
+          const rotatedCanvasBounds: Rect = {
+            x: 0,
+            y: 0,
+            w: rotatedCanvasDimensions.w,
+            h: rotatedCanvasDimensions.h,
+          }
+          const wordPathSize: Dimensions = {
+            w: wordPathBounds.x2 - wordPathBounds.x1,
+            h: wordPathBounds.y2 - wordPathBounds.y1,
+          }
+          const wordAspect = wordPathSize.w / wordPathSize.h
+
+          const largestRectWasm = imageProcessor.findLargestRect(
+            rotatedImgData,
+            rotatedCanvasBounds,
+            wordAspect
+          )
+          const largestRect: Rect = {
+            x: largestRectWasm.x,
+            y: largestRectWasm.y,
+            w: largestRectWasm.w,
+            h: largestRectWasm.h,
+          }
+
+          if (!mostLargestRect) {
+            mostLargestRect = largestRect
+          }
+
+          if (largestRect.w < 1 || largestRect.h < 1) {
+            break
+          }
+
+          let pathScale =
+            scale *
+            Math.min(
+              largestRect.w / wordPathSize.w,
+              largestRect.h / wordPathSize.h
+            )
+
+          const maxMaxDim =
+            (task.wordsMaxSize / 100) *
+            Math.max(mostLargestRect.w, mostLargestRect.h)
+
+          const maxDim = Math.max(wordPathSize.w, wordPathSize.h) * pathScale
+          if (maxDim > maxMaxDim) {
+            pathScale *= maxMaxDim / maxDim
+          }
+
+          unrotatedCtx.save()
+          unrotatedCtxPadded.save()
+          rotatedBoundsTransform.applyToContext(unrotatedCtx)
+          rotatedBoundsTransform.applyToContext(unrotatedCtxPadded)
+
+          if (
+            pathScale * Math.min(largestRect.w, largestRect.h) >=
+            0.05 * (shapeCanvasMaxExtent / 360)
+          ) {
+            const dx = Math.max(largestRect.w - pathScale * wordPathSize.w, 0)
+            const dy = Math.max(largestRect.h - pathScale * wordPathSize.h, 0)
+
+            const tx =
+              largestRect.x - pathScale * wordPathBounds.x1 + Math.random() * dx
+            const ty =
+              largestRect.y +
+              largestRect.h -
+              pathScale * wordPathBounds.y2 -
+              Math.random() * dy
+
+            unrotatedCtx.translate(tx, ty)
+            unrotatedCtx.scale(pathScale, pathScale)
+
+            unrotatedCtxPadded.translate(tx, ty)
+            unrotatedCtxPadded.scale(pathScale, pathScale)
+
+            const wordCenterRotated = new paper.Point(
+              tx + (wordPathSize.w * pathScale) / 2,
+              ty - (wordPathSize.h * pathScale) / 2
+            )
+
+            const wordCenterUnrotated = rotatedBoundsTransform.transform(
+              wordCenterRotated
+            )
+            const col = Math.round(wordCenterUnrotated.x)
+            const row = Math.round(wordCenterUnrotated.y)
+
+            const colorSamplePixelIndex =
+              4 * (unrotatedCtxOriginalShape.canvas.width * row + col)
+            const r =
+              unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 0]
+            const g =
+              unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 1]
+            const b =
+              unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 2]
+
+            const shapeColor = chroma.rgb(r, g, b).hex()
+
+            unrotatedCtx.shadowBlur =
+              0.5 +
+              (task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 5.6
+            unrotatedCtx.shadowColor = 'red'
+
+            unrotatedCtxPadded.shadowBlur =
+              chunkPaddingFactor *
+              (0.5 +
+                (task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 5.6)
+            unrotatedCtxPadded.shadowColor = 'red'
+
+            wordPath.draw(unrotatedCtx)
+            wordPath.draw(unrotatedCtxPadded)
+
+            const item: WordGeneratedItem = {
+              index: i,
+              kind: 'word',
+              shapeColor,
+              fontId: word.font.id,
+              text: word.text,
+              wordConfigId: word.wordConfigId,
+              // Transform to the center of the placed item
+              transform: new paper.Matrix()
+                .translate(task.shape.bounds.left, task.shape.bounds.top)
+                .scale(
+                  task.shape.bounds.width / shapeCanvasDimensions.w,
+                  task.shape.bounds.height / shapeCanvasDimensions.h
+                )
+                .append(rotatedBoundsTransform)
+                .translate(tx, ty)
+                .scale(pathScale)
+                .translate(
+                  wordPathBounds.x1 + 0.5 * wordPathSize.w,
+                  wordPathBounds.y1 + wordPathSize.h * 0.5
+                ),
+            }
+
+            currentBatch.push(item)
+            generatedItems.push(item)
+          } else {
+            unrotatedCtx.fillRect(
+              largestRect.x,
+              largestRect.y,
+              Math.max(1.2, largestRect.w),
+              Math.max(1.2, largestRect.h)
+            )
+            unrotatedCtxPadded.fillRect(
+              largestRect.x,
+              largestRect.y,
+              Math.max(1.2, largestRect.w),
+              Math.max(1.2, largestRect.h)
+            )
+          }
+
+          unrotatedCtx.restore()
+          unrotatedCtxPadded.restore()
+
+          // console.screenshot(unrotatedCtx.canvas, 0.5)
+          // console.screenshot(unrotatedCtxPadded.canvas, 0.5)
+
+          wordRepeats[wordConfigIndex]++
+          availableWords = words.filter((w, index) => {
+            const wordConfIndex = w.wordConfigIndex
+            return (
+              wordMaxRepeats[wordConfIndex] === -1 ||
+              wordRepeats[wordConfIndex] < wordMaxRepeats[wordConfIndex]
+            )
+          })
+          availableWordIndex = (availableWordIndex + 1) % availableWords.length
+        } else {
+          const icon = availableIcons[availableIconIndex]
+
+          const iconConfigIndex = task.icons.findIndex(
+            (wc) => wc.iconConfigId === icon.iconConfigId
+          )!
+          if (iconConfigIndex < 0) {
+            console.error('iconConfigIndex < 0')
+            break
+          }
+
+          const iconIndex = icons.findIndex((w) => w === icon)
+          if (iconIndex < 0) {
+            console.error('iconIndex < 0')
+            break
+          }
+
+          const rasterCanvas = iconRasterCanvases[iconIndex]
+
+          const angle = sample(icon.angles)!
+
+          const rotationInfo = rotationInfos.get(angle)
+          if (!rotationInfo) {
+            throw new Error(`rotation info is missing for angle ${angle}`)
+          }
+
+          let {
+            ctx: rotatedCtx,
+            rotatedCanvasDimensions,
+            transform: rotatedBoundsTransform,
+            inverseTransform: rotatedBoundsTransformInverted,
+          } = rotationInfo
+          // console.log('i = ', i, angle)
+
+          if (allAngles.length === 1 && allAngles[0] === 0) {
+            // Optimize for case of just 1 angle
+            rotatedCtx = unrotatedCtx
+            rotatedBoundsTransform = new paper.Matrix()
+            rotatedBoundsTransformInverted = new paper.Matrix()
+          } else {
+            rotatedCtx = rotationInfo.ctx
+            clearCanvas(rotatedCtx)
+            rotatedCtx.save()
+            rotatedBoundsTransformInverted.applyToContext(rotatedCtx)
+
+            rotatedCtx.drawImage(unrotatedCtx.canvas, 0, 0)
+            rotatedCtx.restore()
+          }
+
+          // let scale = 1 - (0.5 * i) / nIter
+          let scale = 1
+
+          const rotatedImgData = rotatedCtx.getImageData(
+            0,
+            0,
+            rotatedCanvasDimensions.w,
+            rotatedCanvasDimensions.h
+          )
+          const rotatedCanvasBounds: Rect = {
+            x: 0,
+            y: 0,
+            w: rotatedCanvasDimensions.w,
+            h: rotatedCanvasDimensions.h,
+          }
+
+          const iconBounds = iconsBounds[iconIndex]
+          const iconDims: Dimensions = {
+            w: iconBounds.w,
+            h: iconBounds.h,
+          }
+          const aspect = iconDims.w / iconDims.h
+
+          const largestRectWasm = imageProcessor.findLargestRect(
+            rotatedImgData,
+            rotatedCanvasBounds,
+            aspect
+          )
+          const largestRect: Rect = {
+            x: largestRectWasm.x,
+            y: largestRectWasm.y,
+            w: largestRectWasm.w,
+            h: largestRectWasm.h,
+          }
+          if (!mostLargestRect) {
+            mostLargestRect = largestRect
+          }
+
+          if (largestRect.w < 1 || largestRect.h < 1) {
+            break
+          }
+
+          let iconScale =
+            scale *
+            Math.min(largestRect.w / iconDims.w, largestRect.h / iconDims.h)
+
+          const maxMaxDim =
+            (task.iconsMaxSize / 100) *
+            Math.max(mostLargestRect.w, mostLargestRect.h)
+          const maxDim = Math.max(iconDims.w, iconDims.h) * iconScale
+          if (maxDim > maxMaxDim) {
+            iconScale *= maxMaxDim / maxDim
+          }
+
+          unrotatedCtx.save()
+          rotatedBoundsTransform.applyToContext(unrotatedCtx)
+
+          if (task.itemPadding > 0) {
+            unrotatedCtx.shadowBlur =
+              0.25 +
+              (task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6
+            unrotatedCtx.shadowColor = 'red'
+          } else {
+            unrotatedCtx.shadowBlur = 0
+          }
+
+          if (
+            iconScale * Math.min(largestRect.w, largestRect.h) >=
+            0.05 * (shapeCanvasMaxExtent / 360)
+          ) {
+            const dx = Math.max(largestRect.w - iconScale * iconDims.w, 0)
+            const dy = Math.max(largestRect.h - iconScale * iconDims.h, 0)
+
+            const tx =
+              largestRect.x - iconScale * iconBounds.x + Math.random() * dx
+            const ty =
+              largestRect.y +
+              largestRect.h -
+              iconScale * (iconBounds.y + iconBounds.h) -
+              Math.random() * dy
+            unrotatedCtx.translate(tx, ty)
+            unrotatedCtx.scale(iconScale, iconScale)
+
+            unrotatedCtx.drawImage(
+              rasterCanvas,
+              0,
+              0,
+              rasterCanvas.width,
+              rasterCanvas.height,
+              iconBounds.x,
+              iconBounds.y,
+              iconBounds.w,
+              iconBounds.h
+            )
+
+            const wordCenterRotated = new paper.Point(
+              tx + (iconDims.w * iconScale) / 2,
+              ty + (iconDims.h * iconScale) / 2
+            )
+            const wordCenterUnrotated = rotatedBoundsTransform.transform(
+              wordCenterRotated
+            )
+            const col = Math.round(wordCenterUnrotated.x)
+            const row = Math.round(wordCenterUnrotated.y)
+
+            const colorSamplePixelIndex =
+              4 * (unrotatedCtxOriginalShape.canvas.width * row + col)
+            const r =
+              unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 0]
+            const g =
+              unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 1]
+            const b =
+              unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 2]
+
+            const shapeColor = chroma.rgb(r, g, b).hex()
+
+            const item: ShapeGeneratedItem = {
+              index: i,
+              kind: 'shape',
+              shapeColor,
+              shapeId: (icon.shape as ShapeIconConf).id,
+              transform: new paper.Matrix()
+                .translate(task.shape.bounds.left, task.shape.bounds.top)
+                .scale(
+                  task.shape.bounds.width / shapeCanvasDimensions.w,
+                  task.shape.bounds.height / shapeCanvasDimensions.h
+                )
+                .append(rotatedBoundsTransform)
+                .translate(tx, ty)
+                .scale(iconScale)
+                .translate(
+                  iconBounds.x + iconBounds.w / 2,
+                  iconBounds.y + iconBounds.h / 2
+                ),
+            }
+            currentBatch.push(item)
+            generatedItems.push(item)
+          } else {
+            unrotatedCtx.fillRect(
+              largestRect.x,
+              largestRect.y,
+              Math.max(1.2, largestRect.w),
+              Math.max(1.2, largestRect.h)
+            )
+          }
+
+          unrotatedCtx.restore()
+
+          console.screenshot(unrotatedCtx.canvas)
+
+          iconRepeats[iconIndex]++
+          availableIcons = icons.filter((w, index) => {
+            const wordConfIndex = index
+            return (
+              iconMaxRepeats[index] === -1 ||
+              iconRepeats[index] < iconMaxRepeats[index]
+            )
+          })
+
+          availableIconIndex = (availableIconIndex + 1) % availableIcons.length
         }
 
-        unrotatedCtx.restore()
+        if (currentBatch.length >= batchSize && onProgressCallback) {
+          await onProgressCallback(currentBatch, i / nIter)
+          currentBatch = []
+        }
 
-        // console.screenshot(shapeCtx.canvas)
-
-        iconRepeats[iconIndex]++
-        availableIcons = icons.filter((w, index) => {
-          const wordConfIndex = index
-          return (
-            iconMaxRepeats[index] === -1 ||
-            iconRepeats[index] < iconMaxRepeats[index]
-          )
-        })
-
-        availableIconIndex = (availableIconIndex + 1) % availableIcons.length
-      }
-
-      if (currentBatch.length >= batchSize && onProgressCallback) {
-        await onProgressCallback(currentBatch, i / nIter)
-        currentBatch = []
-      }
-
-      if (i % 30) {
-        const t2 = performance.now()
-        if (t2 - t1 > 50) {
-          tLastNotified = t2
-          // onProgressCallback(i / nIter)
-          // await sleep(10)
+        if (i % 30) {
+          const t2 = performance.now()
+          if (t2 - t1 > 50) {
+            tLastNotified = t2
+            // onProgressCallback(i / nIter)
+            // await sleep(10)
+          }
         }
       }
     }
