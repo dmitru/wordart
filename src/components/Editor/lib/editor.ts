@@ -1102,18 +1102,19 @@ export class Editor {
       shapeObj = await loadObjFromImg(shapeConfig.url)
       const originalCanvas = objAsCanvasElement(shapeObj)
       const processedCanvas = objAsCanvasElement(shapeObj)
-      const processedCanvasWithNoEdges = objAsCanvasElement(shapeObj)
+      const processedCanvasToDisplay = objAsCanvasElement(shapeObj)
 
       if (shapeConfig.processing) {
         processRasterImg(processedCanvas, shapeConfig.processing)
-        processRasterImg(processedCanvasWithNoEdges, {
+        processRasterImg(processedCanvasToDisplay, {
           ...shapeConfig.processing,
+          removeLightBackground: shapeConfig.processing.invert
+            ? shapeConfig.processing.removeLightBackground
+            : undefined,
           edges: undefined,
         })
       }
-      shapeObj = new fabric.Image(
-        canvasToImgElement(processedCanvasWithNoEdges)
-      )
+      shapeObj = new fabric.Image(canvasToImgElement(processedCanvasToDisplay))
 
       shape = {
         // @ts-ignore
@@ -1186,8 +1187,7 @@ export class Editor {
       throw new Error('no shape obj')
     }
 
-    const shouldAutoScale =
-      shapeConfig.kind !== 'full-canvas'
+    const shouldAutoScale = shapeConfig.kind !== 'full-canvas'
 
     if (shouldAutoScale) {
       const w = shapeObj.width!
