@@ -1052,9 +1052,15 @@ export class Editor {
     clear: boolean
     updateShapeColors?: boolean
     render?: boolean
+    resetTransform?: boolean
   }) => {
     this.store.hasUnsavedChanges = true
-    const { shapeConfig, updateShapeColors = true, render = true } = params
+    const {
+      shapeConfig,
+      resetTransform = true,
+      updateShapeColors = true,
+      render = true,
+    } = params
 
     if (!shapeConfig) {
       throw new Error('Missing shape config')
@@ -1096,11 +1102,18 @@ export class Editor {
       shapeObj = await loadObjFromImg(shapeConfig.url)
       const originalCanvas = objAsCanvasElement(shapeObj)
       const processedCanvas = objAsCanvasElement(shapeObj)
+      const processedCanvasWithNoEdges = objAsCanvasElement(shapeObj)
 
       if (shapeConfig.processing) {
         processRasterImg(processedCanvas, shapeConfig.processing)
+        processRasterImg(processedCanvasWithNoEdges, {
+          ...shapeConfig.processing,
+          edges: undefined,
+        })
       }
-      shapeObj = new fabric.Image(canvasToImgElement(processedCanvas))
+      shapeObj = new fabric.Image(
+        canvasToImgElement(processedCanvasWithNoEdges)
+      )
 
       shape = {
         // @ts-ignore
@@ -1173,12 +1186,13 @@ export class Editor {
       throw new Error('no shape obj')
     }
 
-    const shouldAutoScale = shapeConfig.kind !== 'full-canvas'
+    const shouldAutoScale =
+      shapeConfig.kind !== 'full-canvas'
 
     if (shouldAutoScale) {
       const w = shapeObj.width!
       const h = shapeObj.height!
-      const defaultPadding = 50
+      const defaultPadding = shapeConfig.kind === 'custom:raster' ? 0 : 50
 
       const sceneBounds = this.getSceneBounds(defaultPadding)
       if (Math.max(w, h) !== Math.max(sceneBounds.width, sceneBounds.height)) {
@@ -1197,6 +1211,11 @@ export class Editor {
         'center',
         'center'
       )
+    }
+
+    if (!resetTransform && this.shape) {
+      const t = getObjTransformMatrix(this.shape.obj)
+      applyTransformToObj(shapeObj, t)
     }
 
     const { shapeStyle, bgFillStyle } = params

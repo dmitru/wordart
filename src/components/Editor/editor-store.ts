@@ -1363,7 +1363,9 @@ export class EditorStore {
   }
 
   /** Update shape based on the selected shape config (e.g. after shape config changes) */
-  updateShapeFromSelectedShapeConf = async () => {
+  updateShapeFromSelectedShapeConf = async (
+    params: { resetTransform?: boolean } = { resetTransform: true }
+  ) => {
     if (!this.editor || !this.selectedShapeConf) {
       return
     }
@@ -1373,6 +1375,7 @@ export class EditorStore {
       bgFillStyle: mkBgStyleConfFromOptions(this.styleOptions.bg).fill,
       shapeStyle: mkShapeStyleConfFromOptions(this.styleOptions.shape),
       clear: false,
+      resetTransform: params.resetTransform || true,
     })
     if (this.styleOptions.shape.items.coloring.kind === 'shape') {
       await this.editor.setShapeItemsStyle(

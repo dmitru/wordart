@@ -36,8 +36,10 @@ const initialState: CustomizeRasterOptions = {
   processedThumbnailUrl: '',
   originalUrl: '',
   removeLightBackgroundThreshold: 5,
-  removeLightBackground: false,
+  removeLightBackground: true,
   removeEdges: 70,
+  invert: false,
+  invertColor: '#222',
 }
 
 const MAX_FILE_SIZE_LIMIT_BYTES = 5 * 1024 * 1024 // 5 Mb
@@ -90,13 +92,13 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
     return (
       <Modal isOpen={isOpen} onClose={close} trapFocus={false}>
         <ModalOverlay>
-          <ModalContent maxWidth="550px">
+          <ModalContent maxWidth="630px">
             <ModalHeader>
               {hasChosenImage ? 'Customize image' : 'Choose image to upload'}
             </ModalHeader>
 
             <ModalBody>
-              {!profile && (
+              {!profile && !state.originalUrl && (
                 <Alert
                   mb="6"
                   status="info"
@@ -130,34 +132,36 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
                 </Alert>
               )}
 
-              {profile && !profile.limits.canUploadCustomMedia && (
-                <Alert
-                  mb="6"
-                  status="info"
-                  variant="left-accent"
-                  flexDirection="column"
-                >
-                  <p>
-                    Please purchase one of our plans if you'd like to save
-                    designs with custom images to your account.
-                  </p>
-                  <p>
-                    Note: as a free user, you may still use custom images and
-                    export your designs, but you won't be able to save them to
-                    your account.
-                  </p>
-                  <Box mt="4">
-                    <Button
-                      colorScheme="primary"
-                      onClick={() => {
-                        upgradeModal.show('custom-fonts')
-                      }}
-                    >
-                      Upgrade now
-                    </Button>
-                  </Box>
-                </Alert>
-              )}
+              {profile &&
+                !profile.limits.canUploadCustomMedia &&
+                !state.originalUrl && (
+                  <Alert
+                    mb="6"
+                    status="info"
+                    variant="left-accent"
+                    flexDirection="column"
+                  >
+                    <p>
+                      Please purchase one of our plans if you'd like to save
+                      designs with custom images to your account.
+                    </p>
+                    <p>
+                      Note: as a free user, you may still use custom images and
+                      export your designs, but you won't be able to save them to
+                      your account.
+                    </p>
+                    <Box mt="4">
+                      <Button
+                        colorScheme="primary"
+                        onClick={() => {
+                          upgradeModal.show('custom-fonts')
+                        }}
+                      >
+                        Upgrade now
+                      </Button>
+                    </Box>
+                  </Alert>
+                )}
 
               {!state.originalUrl && (
                 <Box

@@ -10,6 +10,7 @@ import { AddCustomImageModal } from './CustomImages/AddCustomImageModal'
 import { FaUpload } from 'react-icons/fa'
 import { ShapeCustomImageRasterConf } from 'components/Editor/shape-config'
 import { useEditorStore } from 'components/Editor/editor-store'
+import { loadImageUrlToCanvasCtx } from 'lib/wordart/canvas-utils'
 
 const initialState = {
   isShowingUploadModal: false,
@@ -133,7 +134,7 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
         onClose={() => {
           state.isShowingUploadModal = false
         }}
-        onSubmit={(value) => {
+        onSubmit={async (value) => {
           const shapeConf: ShapeCustomImageRasterConf = {
             kind: 'custom:raster',
             processedThumbnailUrl: value.processedThumbnailUrl!,
@@ -144,7 +145,11 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
                     amount: value.removeEdges,
                   }
                 : undefined,
-              invert: undefined,
+              invert: value.invert
+                ? {
+                    color: value.invertColor,
+                  }
+                : undefined,
               removeLightBackground: {
                 threshold: value.removeLightBackgroundThreshold,
               },
@@ -153,6 +158,15 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
           }
           lastShapeConfig = shapeConf
 
+          const canvas = await loadImageUrlToCanvasCtx(value.originalUrl)
+
+          store.setPageSize({
+            kind: 'custom',
+            custom: {
+              width: Math.ceil(canvas.canvas.width),
+              height: Math.ceil(canvas.canvas.height),
+            },
+          })
           store.selectShapeAndSaveUndo(shapeConf)
         }}
       />
@@ -169,6 +183,8 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
               shape.config.processing?.removeLightBackground?.threshold || 0,
             removeEdges: shape.config.processing?.edges?.amount || 0,
             originalUrl: shape.url,
+            invert: shape.config.processing?.invert != null ? true : false,
+            invertColor: shape.config.processing?.invert?.color || 'red',
           }}
           onClose={() => {
             state.isShowingCustomizeImage = false
@@ -178,7 +194,11 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
 
             shape.config.processedThumbnailUrl = value.processedThumbnailUrl
             shape.config.processing = {
-              invert: undefined,
+              invert: value.invert
+                ? {
+                    color: value.invertColor,
+                  }
+                : undefined,
               removeLightBackground: value.removeLightBackground
                 ? {
                     threshold: value.removeLightBackgroundThreshold,
@@ -190,7 +210,9 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
                   }
                 : undefined,
             }
-            await store.updateShapeFromSelectedShapeConf()
+            await store.updateShapeFromSelectedShapeConf({
+              resetTransform: false,
+            })
             store.updateShapeThumbnail()
           }}
         />

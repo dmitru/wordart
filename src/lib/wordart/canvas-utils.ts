@@ -250,7 +250,7 @@ export const loadImageUrlToCanvasCtx = async (
     padding?: number
     getSize?: (imgSize: Dimensions) => Dimensions
     onProgress?: ProgressCallback
-  }
+  } = {}
 ): Promise<CanvasRenderingContext2D> => {
   const { width, height, padding = 0, getSize, onProgress = noop } = params
   const img = await fetchImage(url, onProgress)
