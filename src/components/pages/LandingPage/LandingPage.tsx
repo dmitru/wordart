@@ -87,10 +87,10 @@ export const LandingPage = observer(() => {
                 <div data-src="/gallery/gallery-9.jpeg" />
                 <div data-src="/gallery/gallery-10.jpeg" />
                 <div data-src="/gallery/gallery-8.jpeg" />
-                <div data-src="/gallery/gallery-4.jpeg" />
-                <div data-src="/gallery/gallery-3.jpeg" />
-                <div data-src="/gallery/gallery-6.jpeg" />
                 <div data-src="/gallery/gallery-7.jpeg" />
+                <div data-src="/gallery/gallery-4.jpeg" />
+                <div data-src="/gallery/gallery-6.jpeg" />
+                <div data-src="/gallery/gallery-3.jpeg" />
               </Slider>
             </HeaderSlider>
           </HeaderSliderContainer>
