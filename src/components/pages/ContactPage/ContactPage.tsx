@@ -46,7 +46,19 @@ export const ContactPage = observer(() => {
 
                 <Box maxWidth="600px">
                   <Text>
-                    You can contact us with this form, or send us an email to{' '}
+                    The easiest way to contact us is via{' '}
+                    <a
+                      href={`https://www.facebook.com/wordcloudy`}
+                      target="_blank"
+                    >
+                      our official Facebook page
+                    </a>
+                    .
+                  </Text>
+
+                  <Text>
+                    You can also write us with this form below, or send us an
+                    email to{' '}
                     <a href={`mailto://${config.supportEmail}`}>
                       {config.supportEmail}
                     </a>
