@@ -116,7 +116,7 @@ export const PricingPlans = observer(() => {
   //                     fontWeight="semibold"
   //                     fontSize={['sm', 'md', 'xl']}
   //                   >
-  //                     ${price?.price?.net ?? 0}
+  //                     {price?.price?.net ?? 0}
   //                   </Text>
   //                   <Text my="0" ml="3" fontSize="sm" color="gray.500">
   //                     {price?.currency ?? 'USD'}
@@ -239,7 +239,7 @@ export const PricingPlans = observer(() => {
                         fontWeight="semibold"
                         fontSize={['sm', 'md', 'xl']}
                       >
-                        ${price?.price?.net ?? 0}
+                        {price?.price?.net ?? 0}
                       </Text>
                       <Text my="0" ml="3" fontSize="sm" color="gray.500">
                         {price?.currency ?? 'USD'}
