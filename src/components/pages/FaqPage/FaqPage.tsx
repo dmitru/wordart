@@ -175,7 +175,7 @@ export const FaqPage = observer(() => {
             </Question>
 
             <Question
-              title="Can I specify page size or a different aspect ratio? E.g. for portrait orientation of A4 paper format?"
+              title="Can I choose a specific aspect ratio, e.g. for a square Instagram post or for portrait A4 paper?"
               id="filling-whole-canvas"
             >
               <p>

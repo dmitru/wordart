@@ -13,6 +13,10 @@ import { DefaultSeo } from 'next-seo'
 
 const emotionCache = createCache({
   key: 'css',
+  container:
+    typeof document !== 'undefined'
+      ? document.getElementById('emotion') || undefined
+      : undefined,
 })
 
 export default class MyApp extends App {
