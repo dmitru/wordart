@@ -31,8 +31,7 @@ export const LandingPage = observer(() => {
               Create <em>unique</em> word designs in no time!
             </HeaderTitle>
             <HeaderSubtitle>
-              Easy-to-use online art generator, a superior alternative to
-              WordArt.com.
+              Easy-to-use online word art generator.
               <br
                 css={css`
                   ${mobileHeaderBreakpoint} {
@@ -45,7 +44,7 @@ export const LandingPage = observer(() => {
             </HeaderSubtitle>
 
             <HeaderCtaContainer>
-              <HeaderCtaInfo mb="3">Try it without a sign-up!</HeaderCtaInfo>
+              <HeaderCtaInfo mb="3">Try without a sign-up!</HeaderCtaInfo>
               <Stack
                 spacing="3"
                 direction={['column', 'row']}
@@ -331,7 +330,7 @@ const HeaderTitle = styled.h1`
       display: block;
       position: absolute;
       background: hsl(358, 80%, 65%);
-      height: 4px;
+      height: 6px;
       width: 100%;
       bottom: 3px;
       z-index: -1;
