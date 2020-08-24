@@ -1,9 +1,8 @@
 import { Box, Text } from '@chakra-ui/core'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
-import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
+import { SiteLayoutFullWidth } from 'components/layouts/SiteLayout/SiteLayout'
 import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
-import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
 import Link from 'next/link'
 import React from 'react'
@@ -207,7 +206,7 @@ export const PricingPage = observer(() => {
   )
 
   return (
-    <SiteLayout fullWidth>
+    <SiteLayoutFullWidth>
       <Box maxWidth="1200px" mx="auto" px={['2', '3', '6']}>
         <Helmet>
           <title>{getTabTitle('Pricing')}</title>
@@ -367,7 +366,7 @@ export const PricingPage = observer(() => {
           </Box>
         </Box>
       </Box>
-    </SiteLayout>
+    </SiteLayoutFullWidth>
   )
 })
 

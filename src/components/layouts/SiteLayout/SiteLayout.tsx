@@ -30,7 +30,7 @@ export const SiteLayout: React.FC<SiteLayoutProps> = ({
         <title>{getTabTitle()}</title>
       </Helmet>
 
-      <Header fullWidth={fullWidth} />
+      <Header />
 
       <UpgradeModalContainer />
 
@@ -41,6 +41,43 @@ export const SiteLayout: React.FC<SiteLayoutProps> = ({
     </SiteLayoutWrapper>
   )
 }
+
+export const SiteLayoutFullWidth: React.FC<SiteLayoutProps> = ({
+  children,
+  fullHeight = false,
+  noFooter = false,
+  darkenBg = false,
+}) => {
+  return (
+    <SiteLayoutWrapper bg={darkenBg ? 'gray.100' : undefined}>
+      <Helmet>
+        <title>{getTabTitle()}</title>
+      </Helmet>
+
+      <Header />
+
+      <UpgradeModalContainer />
+
+      <ContentWrapperFullWidth fullHeight={fullHeight}>
+        {children}
+      </ContentWrapperFullWidth>
+      {!noFooter && <Footer />}
+    </SiteLayoutWrapper>
+  )
+}
+
+const ContentWrapperFullWidth = styled(Box)<{
+  fullHeight?: boolean
+}>`
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  ${(p) =>
+    p.fullHeight &&
+    'height: 100vh; height: calc(100vh - 60px); overflow: hidden;'};
+  margin: 0 auto;
+  flex: 1 0 auto;
+`
 
 const ContentWrapper = styled(Box)<{
   fullWidth?: boolean

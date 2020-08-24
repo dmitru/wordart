@@ -6,7 +6,6 @@ import { Box } from '@chakra-ui/core'
 export type SiteFormLayoutProps = {
   children: React.ReactNode
   darkenBg?: boolean
-  fullWidth?: boolean
   fullHeight?: boolean
   noFooter?: boolean
 }
@@ -14,7 +13,7 @@ export type SiteFormLayoutProps = {
 export const SiteFormLayout: React.FC<SiteFormLayoutProps> = ({ children }) => {
   return (
     <SiteFormLayoutWrapper bg="gray.100">
-      <Header fullWidth={false} hideCreate />
+      <Header hideCreate />
       <ContentWrapper>{children}</ContentWrapper>
     </SiteFormLayoutWrapper>
   )

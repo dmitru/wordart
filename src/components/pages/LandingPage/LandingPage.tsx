@@ -1,7 +1,7 @@
 import { Box, Button, Stack, Text } from '@chakra-ui/core'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
-import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
+import { SiteLayoutFullWidth } from 'components/layouts/SiteLayout/SiteLayout'
 import { observer } from 'mobx-react'
 import Link from 'next/link'
 import React from 'react'
@@ -23,7 +23,7 @@ const xsBreakpoint = `@media screen and (max-width: 500px)`
 
 export const LandingPage = observer(() => {
   return (
-    <SiteLayout fullWidth>
+    <SiteLayoutFullWidth>
       <HeaderContainer>
         <HeaderContentWidthLimit>
           <HeaderTitleContainer>
@@ -61,8 +61,6 @@ export const LandingPage = observer(() => {
                   </HeaderCreateNowButton>
                 </Link>
 
-                <HeaderCtaInfo>or</HeaderCtaInfo>
-
                 <HeaderCreateNowButton
                   colorScheme="accent"
                   variant="outline"
@@ -73,7 +71,7 @@ export const LandingPage = observer(() => {
                   href="https://wordcloudy.com/blog/getting-started-in-5-minutes/"
                   target="_blank"
                 >
-                  Quick tutorial
+                  See quick tutorial
                 </HeaderCreateNowButton>
               </Stack>
             </HeaderCtaContainer>
@@ -216,11 +214,11 @@ export const LandingPage = observer(() => {
             size="lg"
             variant="outline"
           >
-            Open tutorial
+            See tutorial
           </Button>
         </Stack>
       </CtaFooterSection>
-    </SiteLayout>
+    </SiteLayoutFullWidth>
   )
 })
 
@@ -249,8 +247,7 @@ const HeaderContentWidthLimit = styled.div`
 
 const HeaderContainer = styled.div`
   position: relative;
-  min-height: 100vh;
-  min-height: calc(100vh - 120px);
+  min-height: 750px;
 
   ${mobileHeaderBreakpoint} {
     min-height: unset;
@@ -391,7 +388,7 @@ const HeaderSliderContainer = styled.div`
   z-index: 2;
 
   @media screen and (max-width: 1200px) {
-    margin-right: -100px;
+    margin-right: -40px;
   }
 
   ${mobileHeaderBreakpoint} {

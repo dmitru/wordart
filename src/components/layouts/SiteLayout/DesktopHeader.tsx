@@ -26,12 +26,11 @@ import { BsHeartFill } from 'react-icons/bs'
 import { openUrlInNewTab } from 'utils/browser'
 
 export type DesktopHeaderProps = {
-  fullWidth?: boolean
   hideCreate?: boolean
 }
 
 export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
-  ({ fullWidth = false, hideCreate = false }) => {
+  ({ hideCreate = false }) => {
     const { authStore } = useStore()
     const toasts = useToasts()
     const router = useRouter()
@@ -245,11 +244,10 @@ export const DesktopHeaderWrapper = styled(Box)<{ theme: any }>`
 
 export const ContentContainer = styled(Box)<{
   theme: any
-  fullWidth?: boolean
 }>`
   display: flex;
   width: 100%;
-  ${(p) => !p.fullWidth && 'max-width: 1280px;'}
+  max-width: 1280px;
   margin: 0 auto;
   padding: 10px 20px;
   height: 60px;
