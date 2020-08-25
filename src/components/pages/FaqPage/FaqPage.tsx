@@ -78,12 +78,16 @@ export const FaqPage = observer(() => {
               </p>
               <p>
                 Designs can be fully customized and downloaded in high quality
-                for printing on cards, canvases, posters, merchendise or for
-                other creative applications.
+                for social media, blogs, presentations or for printing on cards,
+                canvases, posters, merchendise or for other creative
+                applications.
               </p>
               <p>
-                It's also simple and fun to use and there are some great
-                tutorials to get you started!
+                It's also simple and fun to use and{' '}
+                <a href="https://wordcloudy.com/blog/tag/tutorials/">
+                  there are tutorials
+                </a>{' '}
+                to get you started!
               </p>
             </Question>
 
@@ -96,6 +100,17 @@ export const FaqPage = observer(() => {
                 </Link>{' '}
                 Some additional features (like saving designs with custom fonts
                 or images) are also only available in the paid version.
+              </p>
+            </Question>
+
+            <Question
+              title="Is there special offers for educational use?"
+              id="is-it-free-for-education"
+            >
+              <p>
+                Please write to us! We may offer our Unlimited plan for free for
+                folks using Wordcloudy in education, or offer a significant
+                discount (determined on case-by-case basis).
               </p>
             </Question>
 
@@ -136,24 +151,23 @@ export const FaqPage = observer(() => {
               </p>
               <ul>
                 <li>
-                  Almost 1,000 of built-in fonts supporting dozens of languages
+                  ✅ Almost 1,000 of built-in fonts supporting dozens of
+                  languages
                 </li>
                 <li>
-                  Huge searcheable collection of icons and vector shapes (custom
-                  shapes are supported too, of course!)
+                  ✅ Huge searcheable collection of icons and vector shapes
+                  (custom shapes are supported too, of course!)
                 </li>
                 <li>
-                  Full support for vector graphics: every design created with
+                  ✅ Full support for vector graphics: every design created with
                   Wordcloudy can be downloaded as an SVG vector image, offering
                   the best possible quality when printed at any resolution.
                 </li>
-                <li>Support for custom page sizes</li>
+                <li>✅ Custom page sizes</li>
+                <li>✅ Filling shapes with icons (not just words!)</li>
                 <li>
-                  First-class support for filling shapes with icons (not just
-                  words!)
-                </li>
-                <li>
-                  Ability to fill both shape <em>and</em> background, or both
+                  ✅ Ability to fill 2 layers: shape <em>and</em> background, or
+                  both.
                 </li>
                 <li>And so much more!..</li>
               </ul>
@@ -164,7 +178,51 @@ export const FaqPage = observer(() => {
             <h1>Using Wordcloudy</h1>
 
             <Question
-              title="Can I cover the whole canvas with words instead of filling shapes?"
+              title="How do I create word art from my custom image file?"
+              id="custom-images"
+            >
+              <p>
+                We have a tutorial on how to do it:{' '}
+                <a
+                  href="https://wordcloudy.com/blog/create-wordcloud-from-custom-image/"
+                  target="_blank"
+                >
+                  check it out!
+                </a>
+              </p>
+            </Question>
+
+            <Question title="Can I use a text as a shape?" id="custom-text">
+              <p>
+                Yes, you can! In the "Shapes" left panel, at the very top,
+                choose "Shape: text". You'll be able to customize the font and
+                color, multi-line text is also supported.
+              </p>
+            </Question>
+
+            <Question
+              title="Can I export or import my words data?"
+              id="export-import"
+            >
+              <p>
+                You can import words on the "Words" left panel, click "Import"
+                to import words from a web page or a CSV file (here's an example{' '}
+                <a
+                  href="https://docs.google.com/spreadsheets/d/1Az4e4vnWCTu823VDOyRyGvOACjmNsDEX13It_I8coR0/edit?usp=sharing"
+                  target="_blank"
+                >
+                  Google Sheet
+                </a>
+                ).
+              </p>
+              <p>
+                You can also export your word list to a CSV file, which you can
+                later edit in MS Excel or Google Sheets.
+              </p>
+            </Question>
+
+            <Question
+              title="Can I fill the whole canvas with words (as opposed to filling a shape)?"
               id="filling-whole-canvas"
             >
               <p>
@@ -175,12 +233,12 @@ export const FaqPage = observer(() => {
             </Question>
 
             <Question
-              title="Can I choose a specific aspect ratio, e.g. for a square Instagram post or for portrait A4 paper?"
+              title="I'd like to have a certain aspect ratio, e.g. A4 portrat, or a square Instagram format"
               id="filling-whole-canvas"
             >
               <p>
-                Yes, you can customize page size by choosing "Page Size..."
-                option in the top-left menu in the editor.
+                You can customize page size in the editor by going to the
+                top-left "Menu", and then choosing the "Page Size..." option.
               </p>
             </Question>
           </Box>
