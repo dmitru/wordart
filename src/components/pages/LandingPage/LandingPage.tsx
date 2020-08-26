@@ -34,7 +34,7 @@ export const LandingPage = observer(() => {
             </HeaderTitle>
             <HeaderSubtitle>
               Easy-to-use word art generator for social media posts, prints,
-              merchendise and more.
+              merchandise and more.
             </HeaderSubtitle>
 
             <HeaderCtaContainer>
