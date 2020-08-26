@@ -66,14 +66,15 @@ export const AccountPage = observer(() => {
               {profile.limits.isActiveUnlimitedPlan ? 'UNLIMITED' : 'FREE'}
             </span>
 
-            {profile.limits.isActiveUnlimitedPlan && (
-              <Alert status="info" mt="2">
-                <AlertIcon />
-                Your unlimited plan expires in{' '}
-                <Timeago date={profile.unlimitedPlanExpiresAt} /> at{' '}
-                {new Date(profile.unlimitedPlanExpiresAt!).toLocaleString()}.
-              </Alert>
-            )}
+            {profile.limits.isActiveUnlimitedPlan &&
+              profile.unlimitedPlanExpiresAt && (
+                <Alert status="info" mt="2">
+                  <AlertIcon />
+                  Your unlimited plan expires in{' '}
+                  <Timeago date={profile.unlimitedPlanExpiresAt} /> at{' '}
+                  {new Date(profile.unlimitedPlanExpiresAt!).toLocaleString()}.
+                </Alert>
+              )}
 
             {!profile.limits.isActiveUnlimitedPlan && (
               <Box>

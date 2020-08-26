@@ -17,7 +17,7 @@ export function AccountUsage() {
   if (
     profile &&
     profile.limits.isActiveUnlimitedPlan &&
-    !!profile.unlimitedPlanExpiresAt
+    profile.unlimitedPlanExpiresAt
   ) {
     content = (
       <>
