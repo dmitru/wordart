@@ -28,6 +28,15 @@ export class RootStore {
     this.authStore.afterLogin = async () => {
       if (this.authStore.profile) {
         analytics.setUserId(this.authStore.profile.id)
+
+        window.drift.on('ready', () => {
+          if (this.authStore.profile) {
+            window.drift.api.setUserAttributes({
+              email: this.authStore.profile.email,
+              id: this.authStore.profile.id,
+            })
+          }
+        })
       }
 
       await this.wordcloudsStore.restoreAnonymousIfNeeded()

@@ -1,6 +1,7 @@
 import { Box, Button, Stack, Text } from '@chakra-ui/core'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
+import { AnimatePresence, motion } from 'framer-motion'
 import { SiteLayoutFullWidth } from 'components/layouts/SiteLayout/SiteLayout'
 import { observer } from 'mobx-react'
 import Link from 'next/link'
@@ -77,7 +78,11 @@ export const LandingPage = observer(() => {
             </HeaderCtaContainer>
           </HeaderTitleContainer>
 
-          <HeaderSliderContainer>
+          <HeaderSliderContainer
+            initial={{ opacity: 0 }}
+            transition={{ ease: 'easeInOut', duration: 0.5 }}
+            animate={{ x: 0, y: 0, opacity: 1 }}
+          >
             <HeaderSlider>
               <Slider play={true} cancelOnInteraction={false} interval={3000}>
                 <div data-src="/gallery/gallery-11.jpeg" />
@@ -379,7 +384,7 @@ const HeaderCtaInfo = styled(Box)`
   }
 `
 
-const HeaderSliderContainer = styled.div`
+const HeaderSliderContainer = styled(motion.div)`
   box-shadow: 0 0 8px 0 #0003;
   transform: rotate(1deg);
   border-radius: 8px;
