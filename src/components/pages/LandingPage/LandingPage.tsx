@@ -16,6 +16,7 @@ import { BsGrid3X3GapFill } from 'react-icons/bs'
 import { GoSettings } from 'react-icons/go'
 import { AiFillPrinter } from 'react-icons/ai'
 import { IoIosChatbubbles } from 'react-icons/io'
+import { ChevronRightIcon } from '@chakra-ui/icons'
 
 const Slider = withAutoplay(AwesomeSlider)
 
@@ -29,23 +30,14 @@ export const LandingPage = observer(() => {
         <HeaderContentWidthLimit>
           <HeaderTitleContainer>
             <HeaderTitle>
-              Create <em>unique</em> word designs in no time!
+              Create unique word designs <em>instantly.</em>
             </HeaderTitle>
             <HeaderSubtitle>
-              Easy-to-use online word art generator.
-              <br
-                css={css`
-                  ${mobileHeaderBreakpoint} {
-                    display: none;
-                  }
-                `}
-              />
-              <br /> Create attractive art in professional print-ready quality
-              even with no design skills.
+              Easy-to-use word art generator for social media posts, prints,
+              merchendise and more.
             </HeaderSubtitle>
 
             <HeaderCtaContainer>
-              <HeaderCtaInfo mb="3">Try without a sign-up!</HeaderCtaInfo>
               <Stack
                 spacing="3"
                 direction={['column', 'row']}
@@ -57,24 +49,16 @@ export const LandingPage = observer(() => {
                     as="a"
                     colorScheme="accent"
                     size="lg"
+                    rightIcon={<ChevronRightIcon />}
                   >
-                    Create now
+                    Create now!
                   </HeaderCreateNowButton>
                 </Link>
-
-                <HeaderCreateNowButton
-                  colorScheme="accent"
-                  variant="outline"
-                  size="lg"
-                  bg="white"
-                  // @ts-ignore
-                  as="a"
-                  href="https://wordcloudy.com/blog/getting-started-in-5-minutes/"
-                  target="_blank"
-                >
-                  See quick tutorial
-                </HeaderCreateNowButton>
               </Stack>
+
+              <HeaderCtaInfo mb="3" mt="4">
+                No account required!
+              </HeaderCtaInfo>
             </HeaderCtaContainer>
           </HeaderTitleContainer>
 
@@ -290,12 +274,12 @@ const HeaderTitleContainer = styled.div`
   position: relative;
   z-index: 2;
   max-width: 430px;
-  margin-top: 50px;
+  margin-top: 80px;
   margin-right: 80px;
 
-  @media screen and (max-width: 1200px) {
+  /* @media screen and (max-width: 1200px) {
     margin-top: 10px;
-  }
+  } */
 
   ${mobileHeaderBreakpoint} {
     max-width: 600px;
@@ -314,7 +298,7 @@ const HeaderTitle = styled.h1`
   position: relative;
   color: #3c526f;
   border-bottom: none;
-  font-size: 56px;
+  font-size: 48px;
   font-weight: 800;
   font-family: 'Nunito', sans-serif;
 
@@ -344,13 +328,13 @@ const HeaderTitle = styled.h1`
 const HeaderSubtitle = styled.h2`
   color: #3c526f;
   font-family: 'Nunito', sans-serif;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 300;
   line-height: 30px;
   border-bottom: none;
 
   ${xsBreakpoint} {
-    font-size: 18px;
+    font-size: 20px;
     line-height: 26px;
   }
 `
@@ -372,7 +356,7 @@ const HeaderCreateNowButton = styled(Button)`
 `
 
 const HeaderCtaInfo = styled(Box)`
-  font-size: 20px;
+  font-size: 18px;
   font-family: 'Nunito', sans-serif;
   font-weight: 300;
   color: #3c526f;
@@ -388,7 +372,7 @@ const HeaderSliderContainer = styled(motion.div)`
   box-shadow: 0 0 8px 0 #0003;
   transform: rotate(1deg);
   border-radius: 8px;
-  margin-top: 80px;
+  margin-top: 50px;
   width: 800px;
   z-index: 2;
 
