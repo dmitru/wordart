@@ -30,7 +30,8 @@ export const LandingPage = observer(() => {
         <HeaderContentWidthLimit>
           <HeaderTitleContainer>
             <HeaderTitle>
-              Create unique word designs <em>instantly.</em>
+              Create unique word designs <em>instantly</em>, with no design
+              skills.
             </HeaderTitle>
             <HeaderSubtitle>
               Easy-to-use word art generator for social media posts, prints,
