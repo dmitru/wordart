@@ -7,6 +7,7 @@ import {
   MenuList,
   MenuItem,
 } from '@chakra-ui/core'
+import { Tooltip } from 'components/shared/Tooltip'
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
@@ -38,7 +39,7 @@ export const ShapeItemsColorPickerKindDropdown: React.FC<{
       >
         {shapeStyle.items.coloring.kind === 'shape' && 'Color: Same as shape'}
         {shapeStyle.items.coloring.kind === 'color' && 'Color: Custom'}
-        {shapeStyle.items.coloring.kind === 'gradient' && 'Color: Scale'}
+        {shapeStyle.items.coloring.kind === 'gradient' && 'Color: Gradient'}
       </MenuButton>
       <MenuTransition>
         {(styles) => (
@@ -68,8 +69,8 @@ export const ShapeItemsColorPickerKindDropdown: React.FC<{
               />
 
               <MenuItemWithDescription
-                title="Color scale"
-                description="Choose 2 colors to use all colors in between"
+                title="Color gradient"
+                description="Choose 2 colors to use all colors between them"
                 onClick={() => {
                   shapeStyle.items.coloring.kind = 'gradient'
                   onUpdate()
@@ -117,20 +118,22 @@ export const ShapeItemsColorPickerInline: React.FC<{
               Add
             </Button>
 
-            <Button
-              variant="ghost"
-              isDisabled={shapeStyle.items.coloring.color.colors.length === 0}
-              onClick={() => {
-                shapeStyle.items.coloring.color.colors = shapeStyle.items.coloring.color.colors.map(
-                  () => getRandomColor()
-                )
-                onUpdate()
-              }}
-              ml="2"
-            >
-              <FiRefreshCw style={{ marginRight: '5px' }} />
-              Random
-            </Button>
+            <Tooltip label="Randomize colors">
+              <Button
+                colorScheme="primary"
+                isDisabled={shapeStyle.items.coloring.color.colors.length === 0}
+                onClick={() => {
+                  shapeStyle.items.coloring.color.colors = shapeStyle.items.coloring.color.colors.map(
+                    () => getRandomColor()
+                  )
+                  onUpdate()
+                }}
+                ml="2"
+              >
+                <FiRefreshCw style={{ marginRight: '5px' }} />
+                Random
+              </Button>
+            </Tooltip>
 
             <Menu isLazy>
               <MenuButton ml="2" as={MenuDotsButton} variant="ghost" />
@@ -235,7 +238,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
                 {shapeStyle.items.coloring.kind === 'gradient' && (
                   <Box>
                     <Button
-                      variant="ghost"
+                      colorScheme="primary"
                       onClick={() => {
                         shapeStyle.items.coloring.gradient.gradient = {
                           from: getRandomColor(),

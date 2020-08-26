@@ -45,7 +45,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { cloneDeep } from 'lodash'
 import { toJS } from 'mobx'
 import { observer, useLocalStore, Observer } from 'mobx-react'
-import { FaCog } from 'react-icons/fa'
+import { FaCog, FaPalette } from 'react-icons/fa'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { defaultShapeStyleOptions } from '../default-style-options'
 import { useEditorStore } from 'components/Editor/editor-store'
@@ -372,8 +372,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                           }),
                         })
                       }}
+                      leftIcon={<FaPalette />}
                     >
-                      Explore Color Themes
+                      Color Themes
                     </Button>
 
                     {/* <Tooltip label="Save current settings as a new theme">

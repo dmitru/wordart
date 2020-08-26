@@ -12,6 +12,7 @@ import { DeleteButton } from 'components/shared/DeleteButton'
 import { Slider } from 'components/shared/Slider'
 import { observer } from 'mobx-react'
 import { useCallback, useMemo } from 'react'
+import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
 // @ts-ignore
 import CustomImg from './img/custom.svg'
 // @ts-ignore
@@ -159,8 +160,16 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
           {style.items.placement.itemsMaxCount !== 'auto' && (
             <Box mb="4">
               <Slider
-                // horizontal
-                label="Max. items count"
+                horizontal
+                label={
+                  <>
+                    Max. count
+                    <HelpTooltipIcon
+                      label={`Max. number of items to place. The algorithm may place less items, e.g. if there's not enough space.`}
+                      ml="3"
+                    />
+                  </>
+                }
                 value={style.items.placement.itemsMaxCount}
                 onChange={handleMaxItemsCountChange}
                 onAfterChange={handleAfterMaxItemsCountChange}
@@ -179,37 +188,57 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
               </Text>
             )} */}
 
-          <Slider
-            horizontal
-            label="Density"
-            afterLabel="%"
-            value={style.items.placement.itemDensity}
-            onChange={(value) => {
-              const val = (value as any) as number
-              style.items.placement.itemDensity = val
-            }}
-            onAfterChange={animateVisualize}
-            resetValue={85}
-            min={0}
-            max={100}
-            step={1}
-          />
+          <Box mb="4">
+            <Slider
+              horizontal
+              label={
+                <>
+                  Density
+                  <HelpTooltipIcon
+                    label={`How close to each other the items should be placed. The higher density is, the closer together they are. The lower, the more apart.`}
+                    ml="3"
+                  />
+                </>
+              }
+              afterLabel="%"
+              value={style.items.placement.itemDensity}
+              onChange={(value) => {
+                const val = (value as any) as number
+                style.items.placement.itemDensity = val
+              }}
+              onAfterChange={animateVisualize}
+              resetValue={85}
+              min={0}
+              max={100}
+              step={1}
+            />
+          </Box>
 
-          <Slider
-            horizontal
-            label="Shape Offset"
-            afterLabel="%"
-            value={style.items.placement.shapePadding}
-            onChange={(value) => {
-              const val = (value as any) as number
-              style.items.placement.shapePadding = val
-            }}
-            onAfterChange={animateVisualize}
-            resetValue={15}
-            min={0}
-            max={100}
-            step={1}
-          />
+          <Box mb="4">
+            <Slider
+              horizontal
+              label={
+                <>
+                  Padding
+                  <HelpTooltipIcon
+                    label={`Add some padding between the shape and placed items.`}
+                    ml="3"
+                  />
+                </>
+              }
+              afterLabel="%"
+              value={style.items.placement.shapePadding}
+              onChange={(value) => {
+                const val = (value as any) as number
+                style.items.placement.shapePadding = val
+              }}
+              onAfterChange={animateVisualize}
+              resetValue={15}
+              min={0}
+              max={100}
+              step={1}
+            />
+          </Box>
         </Box>
 
         {style.items.words.wordList.length > 0 && (
@@ -220,7 +249,15 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
               <Box mb="4">
                 <Slider
                   horizontal
-                  label="Size"
+                  label={
+                    <>
+                      Max. size
+                      <HelpTooltipIcon
+                        label={`Max. size the placed words can be. You can use this slider to make all words larger or smaller.`}
+                        ml="3"
+                      />
+                    </>
+                  }
                   afterLabel="%"
                   value={style.items.placement.wordsMaxSize}
                   onChange={(value) => {
@@ -323,36 +360,58 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
           <Box mb="4">
             <SectionLabel>Icons</SectionLabel>
 
-            <Slider
-              horizontal
-              label="Size"
-              afterLabel="%"
-              value={style.items.placement.iconsMaxSize}
-              onChange={(value) => {
-                const val = (value as any) as number
-                style.items.placement.iconsMaxSize = val
-              }}
-              onAfterChange={animateVisualize}
-              resetValue={30}
-              min={20}
-              max={100}
-              step={1}
-            />
-            <Slider
-              horizontal
-              label="Icons amount"
-              afterLabel="%"
-              value={style.items.placement.iconsProportion}
-              onChange={(value) => {
-                const val = (value as any) as number
-                style.items.placement.iconsProportion = val
-              }}
-              onAfterChange={animateVisualize}
-              resetValue={50}
-              min={0}
-              max={100}
-              step={1}
-            />
+            <Box mb="4">
+              <Slider
+                horizontal
+                label={
+                  <>
+                    Max. size
+                    <HelpTooltipIcon
+                      label={`Max. size the placed icons can be. You can use this slider to make all icons larger or smaller.`}
+                      ml="3"
+                    />
+                  </>
+                }
+                afterLabel="%"
+                value={style.items.placement.iconsMaxSize}
+                onChange={(value) => {
+                  const val = (value as any) as number
+                  style.items.placement.iconsMaxSize = val
+                }}
+                onAfterChange={animateVisualize}
+                resetValue={30}
+                min={20}
+                max={100}
+                step={1}
+              />
+            </Box>
+
+            <Box mb="4">
+              <Slider
+                horizontal
+                label={
+                  <>
+                    Icons amount
+                    <HelpTooltipIcon
+                      label="How many icons compared to words will be placed. For example, 30%
+                          means 30% icons, 70% words"
+                      ml="3"
+                    />
+                  </>
+                }
+                afterLabel="%"
+                value={style.items.placement.iconsProportion}
+                onChange={(value) => {
+                  const val = (value as any) as number
+                  style.items.placement.iconsProportion = val
+                }}
+                onAfterChange={animateVisualize}
+                resetValue={50}
+                min={0}
+                max={100}
+                step={1}
+              />
+            </Box>
 
             <Checkbox
               mt="5"

@@ -57,6 +57,8 @@ export const Slider: React.FC<SliderProps> = (props) => {
     >
       {label && (
         <Text
+          display="flex"
+          alignItems="center"
           color="gray.500"
           fontWeight="medium"
           my="0"

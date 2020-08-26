@@ -91,6 +91,15 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
       <Box
         px="5"
         py="6"
+        css={css`
+          &::-webkit-scrollbar {
+            display: none; /* Chrome Safari */
+          }
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE 10+ */
+          overflow-y: scroll;
+          overflow-x: hidden;
+        `}
         display="flex"
         flexDirection="column"
         height="100%"
@@ -262,9 +271,18 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
               <Box mt="3.5rem">
                 <SectionLabel>Icons Settings</SectionLabel>
 
-                <Box mb="2rem">
+                <Box mb="4">
                   <Slider
-                    label="Size"
+                    horizontal
+                    label={
+                      <>
+                        Max. size
+                        <HelpTooltipIcon
+                          label={`Max. size the placed icons can be. You can use this slider to make all icons larger or smaller.`}
+                          ml="3"
+                        />
+                      </>
+                    }
                     afterLabel="%"
                     value={style.items.placement.iconsMaxSize}
                     onChange={(value) => {
@@ -282,12 +300,14 @@ export const LeftPanelIconsTab: React.FC<LeftPanelIconsTabProps> = observer(
                 </Box>
 
                 <Slider
+                  horizontal
                   label={
                     <>
-                      Amount
+                      Icons amount
                       <HelpTooltipIcon
                         label="How many icons compared to words will be placed. For example, 30%
-                          means 30% icons, 70% words"
+                              means 30% icons, 70% words"
+                        ml="3"
                       />
                     </>
                   }

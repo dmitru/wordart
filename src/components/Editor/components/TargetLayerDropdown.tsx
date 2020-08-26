@@ -29,10 +29,15 @@ export const LeftPanelTargetLayerDropdown = () => (
       padding: 10px 1.5rem;
     `}
   >
-    <Box mr="3">Active layer:</Box>
+    <Box mr="3" color="gray.600" display="flex" alignItems="center">
+      <Box as="span" mr="1">
+        <BsLayersHalf />
+      </Box>
+      Layer:
+    </Box>
     <TargetLayerDropdown />
     <HelpTooltipIcon
-      label={`You can place words and icons to 2 layers: Shape layer and Background layer. When you click "Visualize", both layers will update!`}
+      label={`You can place words and icons on 2 layers: Shape layer and Background layer. When you click "Visualize", both layers will update!`}
       ml="3"
     />
   </Box>
@@ -43,14 +48,7 @@ export const TargetLayerDropdown = observer(() => {
 
   return (
     <Menu isLazy placement="bottom-start">
-      <MenuButton
-        as={Button}
-        leftIcon={<BsLayersHalf />}
-        rightIcon={<ChevronDownIcon />}
-        py="2"
-        px="3"
-        colorScheme="secondary"
-      >
+      <MenuButton as={Button} rightIcon={<ChevronDownIcon />} py="2" px="3">
         {store.targetTab === 'shape' ? 'Shape' : ''}
         {store.targetTab === 'bg' ? 'Background' : ''}
       </MenuButton>

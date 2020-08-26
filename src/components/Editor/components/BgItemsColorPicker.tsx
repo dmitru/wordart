@@ -29,7 +29,7 @@ export const BgItemsColorPickerKindDropdown: React.FC<{
       <MenuButton as={Button} rightIcon={<ChevronDownIcon />} py="2" px="3">
         {/* {bgStyle.items.coloring.kind === 'shape' && 'Color: Same as shape'} */}
         {bgStyle.items.coloring.kind === 'color' && 'Color: Custom'}
-        {bgStyle.items.coloring.kind === 'gradient' && 'Color: Scale'}
+        {bgStyle.items.coloring.kind === 'gradient' && 'Color: Gradient'}
       </MenuButton>
       <MenuTransition>
         {(styles) => (
@@ -59,8 +59,8 @@ export const BgItemsColorPickerKindDropdown: React.FC<{
               />
 
               <MenuItemWithDescription
-                title="Color scale"
-                description="Choose 2 colors to use all colors in between"
+                title="Color gradient"
+                description="Choose 2 colors to use all colors between them"
                 onClick={() => {
                   bgStyle.items.coloring.kind = 'gradient'
                   onUpdate()
@@ -109,7 +109,7 @@ export const BgItemsColorPickerInline: React.FC<{
             </Button>
 
             <Button
-              variant="ghost"
+              colorScheme="primary"
               isDisabled={bgStyle.items.coloring.color.colors.length === 0}
               onClick={() => {
                 bgStyle.items.coloring.color.colors = bgStyle.items.coloring.color.colors.map(
@@ -220,7 +220,7 @@ export const BgItemsColorPickerInline: React.FC<{
               {bgStyle.items.coloring.kind === 'gradient' && (
                 <Box>
                   <Button
-                    variant="ghost"
+                    colorScheme="primary"
                     onClick={() => {
                       bgStyle.items.coloring.gradient.gradient = {
                         from: getRandomColor(),
