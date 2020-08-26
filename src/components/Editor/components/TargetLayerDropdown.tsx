@@ -15,17 +15,26 @@ import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescripti
 import { useStore } from 'services/root-store'
 import { BsLayersHalf } from 'react-icons/bs'
 import { useEditorStore } from 'components/Editor/editor-store'
+import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
 
 export const LeftPanelTargetLayerDropdown = () => (
   <Box
     mb="4"
     shadow="md"
+    display="flex"
+    flexDirection="row"
+    alignItems="center"
     css={css`
       margin: -1.5rem -1.5rem 2rem;
       padding: 10px 1.5rem;
     `}
   >
+    <Box mr="3">Active layer:</Box>
     <TargetLayerDropdown />
+    <HelpTooltipIcon
+      label={`You can place words and icons to 2 layers: Shape layer and Background layer. When you click "Visualize", both layers will update!`}
+      ml="3"
+    />
   </Box>
 )
 
@@ -42,8 +51,8 @@ export const TargetLayerDropdown = observer(() => {
         px="3"
         colorScheme="secondary"
       >
-        {store.targetTab === 'shape' ? 'Shape layer' : ''}
-        {store.targetTab === 'bg' ? 'Background layer' : ''}
+        {store.targetTab === 'shape' ? 'Shape' : ''}
+        {store.targetTab === 'bg' ? 'Background' : ''}
       </MenuButton>
 
       <Portal>

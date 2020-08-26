@@ -28,13 +28,12 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
         py="2"
         px="3"
       >
-        {'Shape: '}
         {shapesPanel.shapeKind === 'blob' && 'Blob'}
         {shapesPanel.shapeKind === 'image' && 'Clip art'}
         {shapesPanel.shapeKind === 'icon' && 'Icon'}
         {shapesPanel.shapeKind === 'custom image' && 'Custom image'}
         {shapesPanel.shapeKind === 'text' && 'Text'}
-        {shapesPanel.shapeKind === 'full-canvas' && 'Fill whole canvas'}
+        {shapesPanel.shapeKind === 'full-canvas' && 'Full canvas'}
       </MenuButton>
 
       <Portal>

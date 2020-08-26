@@ -11,6 +11,7 @@ import { useStore } from 'services/root-store'
 import { FullCanvasShapePicker } from 'components/Editor/components/ShapesTab/FullCanvasShapePicker'
 import css from '@emotion/css'
 import { useEditorStore } from 'components/Editor/editor-store'
+import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
 
 export const LeftPanelShapesTab: React.FC<{}> = observer(() => {
   const { shapesPanel: leftPanelShapesState } = useEditorStore()!
@@ -18,6 +19,9 @@ export const LeftPanelShapesTab: React.FC<{}> = observer(() => {
     <>
       <Box px="5" py="6">
         <Box
+          display="flex"
+          flexDirection="row"
+          alignItems="center"
           mb="4"
           shadow="md"
           css={css`
@@ -25,7 +29,12 @@ export const LeftPanelShapesTab: React.FC<{}> = observer(() => {
             padding: 10px 1.5rem;
           `}
         >
+          <Box mr="3">Shape type:</Box>
           <ShapeTypeSelector />
+          <HelpTooltipIcon
+            label={`There are many different shape types to explore! E.g. you can use your own text or image as a shape, or fill the entire canvas.`}
+            ml="3"
+          />
         </Box>
 
         {leftPanelShapesState.shapeKind === 'image' && <ClipArtShapePicker />}
