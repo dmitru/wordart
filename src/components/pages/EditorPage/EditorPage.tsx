@@ -7,16 +7,17 @@ import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 export const EditorPage = observer(() => {
   const router = useRouter()
   const { id } = router.query
-  if (!id) {
-    return <SpinnerSplashScreen />
-  }
-  const wordcloudId = id[0]
 
   useEffect(() => {
     window.drift?.on('ready', (api: any) => {
       api.hideWelcomeMessage()
     })
   }, [])
+
+  if (!id) {
+    return <SpinnerSplashScreen />
+  }
+  const wordcloudId = id[0]
 
   return (
     <EditorComponent
