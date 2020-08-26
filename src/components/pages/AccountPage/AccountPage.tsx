@@ -1,4 +1,12 @@
-import { Box, Button, Spinner, Stack, Text } from '@chakra-ui/core'
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Spinner,
+  Stack,
+  Text,
+} from '@chakra-ui/core'
 import css from '@emotion/css'
 import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
 import { PromptModal } from 'components/shared/PromptModal'
@@ -10,7 +18,7 @@ import { FaStar } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
 import { useToasts } from 'use-toasts'
-import fromNow from 'fromnow'
+import Timeago from 'react-timeago'
 
 export const AccountPage = observer(() => {
   const {
@@ -59,13 +67,12 @@ export const AccountPage = observer(() => {
             </span>
 
             {profile.limits.isActiveUnlimitedPlan && (
-              <Box>
-                Unlimited plan expires in{' '}
-                {`${fromNow(profile.unlimitedPlanExpiresAt!)} (at ${new Date(
-                  profile.unlimitedPlanExpiresAt!
-                ).toLocaleString()})`}
-                .
-              </Box>
+              <Alert status="info" mt="2">
+                <AlertIcon />
+                Your unlimited plan expires in{' '}
+                <Timeago date={profile.unlimitedPlanExpiresAt} /> at{' '}
+                {new Date(profile.unlimitedPlanExpiresAt!).toLocaleString()}.
+              </Alert>
             )}
 
             {!profile.limits.isActiveUnlimitedPlan && (

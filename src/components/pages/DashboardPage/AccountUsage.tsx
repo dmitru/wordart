@@ -4,7 +4,7 @@ import { useUpgradeModal } from 'components/upgrade/UpgradeModal'
 import React from 'react'
 import { FaStar } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
-import fromNow from 'fromnow'
+import Timeago from 'react-timeago'
 
 export function AccountUsage() {
   const {
@@ -22,11 +22,8 @@ export function AccountUsage() {
     content = (
       <>
         <Text color="gray.600" mt="0" fontSize="sm" mb="0">
-          Your unlimited plan expires in <br />
-          {`${fromNow(profile.unlimitedPlanExpiresAt!)} (at ${new Date(
-            profile.unlimitedPlanExpiresAt!
-          ).toLocaleString()})`}
-          .
+          Your unlimited plan expires in{' '}
+          <Timeago date={profile.unlimitedPlanExpiresAt} />.
         </Text>
       </>
     )
