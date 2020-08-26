@@ -42,6 +42,7 @@ const trackStructured = (analyticsEvent: StructuredEvent) => {
       .filter((x) => x != null)
       .join(' ')
   )
+  ga.trackStructured(category, action, label, value)
 }
 
 const setMetric = (metricIndex: number, value: number) => {
