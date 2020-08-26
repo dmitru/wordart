@@ -30,12 +30,11 @@ export const LandingPage = observer(() => {
         <HeaderContentWidthLimit>
           <HeaderTitleContainer>
             <HeaderTitle>
-              Create unique word designs <em>instantly</em>, with no design
-              skills.
+              Create unique word designs <em>instantly</em>.
             </HeaderTitle>
             <HeaderSubtitle>
               Easy-to-use word art generator for social media posts, prints,
-              merchandise and more.
+              merchandise and more. <br /> <br /> No design skills required!
             </HeaderSubtitle>
 
             <HeaderCtaContainer>
@@ -58,7 +57,7 @@ export const LandingPage = observer(() => {
               </Stack>
 
               <HeaderCtaInfo mb="3" mt="4">
-                No account required!
+                No account needed.
               </HeaderCtaInfo>
             </HeaderCtaContainer>
           </HeaderTitleContainer>
