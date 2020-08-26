@@ -70,8 +70,9 @@ export const AccountPage = observer(() => {
               profile.unlimitedPlanExpiresAt && (
                 <Alert status="info" mt="2">
                   <AlertIcon />
-                  Your unlimited plan expires in{' '}
-                  <Timeago date={profile.unlimitedPlanExpiresAt} /> at{' '}
+                  {'Your unlimited plan expires in '}
+                  <Timeago date={profile.unlimitedPlanExpiresAt} />
+                  {' at '}
                   {new Date(profile.unlimitedPlanExpiresAt!).toLocaleString()}.
                 </Alert>
               )}
