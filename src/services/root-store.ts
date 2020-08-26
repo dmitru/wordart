@@ -29,7 +29,7 @@ export class RootStore {
       if (this.authStore.profile) {
         analytics.setUserId(this.authStore.profile.id)
 
-        window.drift.on('ready', () => {
+        window.drift?.on('ready', () => {
           if (this.authStore.profile) {
             window.drift.api.setUserAttributes({
               email: this.authStore.profile.email,

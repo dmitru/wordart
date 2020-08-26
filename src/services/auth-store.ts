@@ -19,7 +19,7 @@ type TODOANY = any
 declare global {
   interface Window {
     Paddle: any
-    drift: any
+    drift?: any
   }
 }
 

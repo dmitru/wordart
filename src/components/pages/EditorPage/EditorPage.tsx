@@ -13,7 +13,7 @@ export const EditorPage = observer(() => {
   const wordcloudId = id[0]
 
   useEffect(() => {
-    window.drift.on('ready', (api: any) => {
+    window.drift?.on('ready', (api: any) => {
       api.hideWelcomeMessage()
     })
   }, [])
