@@ -242,15 +242,9 @@ export const SvgShapeColorKindDropdown: React.FC<{
 
   return (
     <Menu isLazy>
-      <MenuButton
-        variant="outline"
-        as={Button}
-        rightIcon={<ChevronDownIcon />}
-        py="2"
-        px="3"
-      >
-        {selectedOption === 'color-map' && 'Multicolor'}
-        {selectedOption === 'single-color' && 'Single color'}
+      <MenuButton as={Button} rightIcon={<ChevronDownIcon />} py="2" px="3">
+        {selectedOption === 'color-map' && 'Shape color: Multicolor'}
+        {selectedOption === 'single-color' && 'Shape color: Single'}
       </MenuButton>
       <MenuTransition>
         {(styles) => (
