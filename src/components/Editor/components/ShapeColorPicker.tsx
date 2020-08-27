@@ -124,6 +124,9 @@ export const SvgShapeColorPicker: React.FC<{
         {/* Show the only option - Single color */}
         {colorsCount === 1 && (
           <Flex alignItems="center">
+            <Text my="0" mr="3" fontWeight="medium" color="gray.500">
+              Shape color
+            </Text>
             <ColorPickerPopover
               disableAlpha
               value={chroma(singleColor).alpha(1).hex()}
@@ -304,7 +307,7 @@ export const TextShapeColorPicker: React.FC<{
 
     return (
       <Box display="flex" alignItems="center">
-        <Text my="0" mr="3" fontWeight="semibold" color="gray.500">
+        <Text my="0" mr="3" fontWeight="medium" color="gray.500">
           Color
         </Text>
         <ColorPickerPopover
@@ -331,7 +334,7 @@ export const BlobShapeColorPicker: React.FC<{
 
   return (
     <Box display="flex" alignItems="center">
-      <Text my="0" mr="3" fontWeight="semibold" color="gray.500">
+      <Text my="0" mr="3" fontWeight="medium" color="gray.500">
         Color
       </Text>
       <ColorPickerPopover
@@ -356,7 +359,7 @@ export const FullCanvasShapeColorPicker: React.FC<{
 
   return (
     <Box display="flex" alignItems="center">
-      <Text my="0" mr="3" fontWeight="semibold" color="gray.500">
+      <Text my="0" mr="3" fontWeight="medium" color="gray.500">
         Color
       </Text>
       <ColorPickerPopover
@@ -381,7 +384,7 @@ export const IconShapeColorPicker: React.FC<{
 
   return (
     <Box display="flex" alignItems="center">
-      <Text my="0" mr="3" fontWeight="semibold" color="gray.500">
+      <Text my="0" mr="3" fontWeight="medium" color="gray.500">
         Color
       </Text>
       <ColorPickerPopover

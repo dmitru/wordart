@@ -30,11 +30,11 @@ export const LandingPage = observer(() => {
         <HeaderContentWidthLimit>
           <HeaderTitleContainer>
             <HeaderTitle>
-              Create unique word designs <em>instantly</em>.
+              Create unique word designs <em>in no time</em>.
             </HeaderTitle>
             <HeaderSubtitle>
               Easy-to-use word art generator for social media posts, prints,
-              merchandise and more. <br /> <br /> No design skills required!
+              merchandise and more. <br /> <br /> No design skills required.
             </HeaderSubtitle>
 
             <HeaderCtaContainer>
@@ -51,13 +51,13 @@ export const LandingPage = observer(() => {
                     size="lg"
                     rightIcon={<ChevronRightIcon />}
                   >
-                    Create now!
+                    Create your design
                   </HeaderCreateNowButton>
                 </Link>
               </Stack>
 
               <HeaderCtaInfo mb="3" mt="4">
-                No account needed.
+                You don't need an account to start!
               </HeaderCtaInfo>
             </HeaderCtaContainer>
           </HeaderTitleContainer>
@@ -351,7 +351,7 @@ const HeaderCtaContainer = styled.div`
 `
 
 const HeaderCreateNowButton = styled(Button)`
-  max-width: 200px;
+  max-width: 240px;
   width: 100%;
 `
 

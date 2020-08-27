@@ -75,7 +75,7 @@ export const PricingPlans = observer(() => {
   //           </li>
   //           <li>Commercial use {commercialUseHelp}</li>
   //           <li>
-  //             More advanced features (<a href="#pricing-faq">Learn more</a>)
+  //             More advanced features
   //           </li>
   //         </Box>
 
@@ -185,7 +185,7 @@ export const PricingPlans = observer(() => {
           >
             <div>
               <CheckIcon />
-              Unlimited number of HQ downloads
+              Unlimited HQ downloads
             </div>
             <div>
               <CheckIcon />

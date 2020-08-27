@@ -956,6 +956,20 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   </LeftNavbarBtn>
 
                   <LeftNavbarBtn
+                    onClick={() => {
+                      state.leftTab = 'colors'
+                      state.leftPanelContext = 'normal'
+                    }}
+                    active={
+                      leftTab === 'colors' &&
+                      state.leftPanelContext === 'normal'
+                    }
+                  >
+                    <ColorPalette className="icon" />
+                    Colors
+                  </LeftNavbarBtn>
+
+                  <LeftNavbarBtn
                     id="nav-words"
                     onClick={() => {
                       state.leftTab = 'words'
@@ -1008,20 +1022,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   >
                     <LayoutMasonry className="icon" />
                     Layout
-                  </LeftNavbarBtn>
-
-                  <LeftNavbarBtn
-                    onClick={() => {
-                      state.leftTab = 'colors'
-                      state.leftPanelContext = 'normal'
-                    }}
-                    active={
-                      leftTab === 'colors' &&
-                      state.leftPanelContext === 'normal'
-                    }
-                  >
-                    <ColorPalette className="icon" />
-                    Colors
                   </LeftNavbarBtn>
 
                   <div
@@ -1778,9 +1778,9 @@ export type LeftPanelTab =
   | 'layout'
 const leftPanelTabs: LeftPanelTab[] = [
   'shapes',
+  'colors',
   'words',
   'fonts',
   'symbols',
   'layout',
-  'colors',
 ]

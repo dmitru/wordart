@@ -399,16 +399,6 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
 
                   {/* <shape-items> */}
                   <Box mb="2rem">
-                    <Box display="flex" alignItems="flex-end">
-                      <SectionLabel
-                        css={css`
-                          flex: 1;
-                        `}
-                      >
-                        Shape Items
-                      </SectionLabel>
-                    </Box>
-
                     <Box mt="2" mb="4" display="flex" alignItems="center">
                       <Box>
                         <ShapeItemsColorPickerKindDropdown
@@ -517,10 +507,6 @@ export const BgItemsStyleOptions: React.FC<{
 
   return (
     <Box mb="2rem">
-      <SectionLabel display="flex" alignItems="center">
-        Background Items
-      </SectionLabel>
-
       <Box mt="2" mb="2" display="flex" alignItems="center">
         <Box>
           <BgItemsColorPickerKindDropdown

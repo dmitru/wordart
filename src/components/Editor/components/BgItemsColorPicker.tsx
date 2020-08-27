@@ -28,8 +28,8 @@ export const BgItemsColorPickerKindDropdown: React.FC<{
     <Menu isLazy placement="bottom-start">
       <MenuButton as={Button} rightIcon={<ChevronDownIcon />} py="2" px="3">
         {/* {bgStyle.items.coloring.kind === 'shape' && 'Color: Same as shape'} */}
-        {bgStyle.items.coloring.kind === 'color' && 'Color: Custom'}
-        {bgStyle.items.coloring.kind === 'gradient' && 'Color: Gradient'}
+        {bgStyle.items.coloring.kind === 'color' && 'Items color: Custom'}
+        {bgStyle.items.coloring.kind === 'gradient' && 'Items color: Gradient'}
       </MenuButton>
       <MenuTransition>
         {(styles) => (
@@ -95,10 +95,11 @@ export const BgItemsColorPickerInline: React.FC<{
     <Box>
       <Box display="flex" alignItems="center">
         {bgStyle.items.coloring.kind === 'color' && (
-          <Box mt="3">
+          <Box mt="2">
             <Button
               isDisabled={bgStyle.items.coloring.color.colors.length >= 8}
-              colorScheme="secondary"
+              colorScheme="primary"
+              variant="ghost"
               leftIcon={<AddIcon />}
               onClick={() => {
                 bgStyle.items.coloring.color.colors.push(getRandomColor())
@@ -109,7 +110,8 @@ export const BgItemsColorPickerInline: React.FC<{
             </Button>
 
             <Button
-              colorScheme="primary"
+              variant="ghost"
+              color="gray.500"
               isDisabled={bgStyle.items.coloring.color.colors.length === 0}
               onClick={() => {
                 bgStyle.items.coloring.color.colors = bgStyle.items.coloring.color.colors.map(
@@ -117,14 +119,16 @@ export const BgItemsColorPickerInline: React.FC<{
                 )
                 onUpdate()
               }}
-              ml="2"
             >
-              <FiRefreshCw style={{ marginRight: '5px' }} />
-              Random
+              Randomize
             </Button>
 
             <Menu isLazy>
-              <MenuButton ml="2" as={MenuDotsButton} variant="ghost" />
+              <MenuButton
+                as={MenuDotsButton}
+                variant="ghost"
+                color="gray.500"
+              />
 
               <Portal>
                 <MenuTransition>
@@ -220,7 +224,8 @@ export const BgItemsColorPickerInline: React.FC<{
               {bgStyle.items.coloring.kind === 'gradient' && (
                 <Box>
                   <Button
-                    colorScheme="primary"
+                    variant="ghost"
+                    color="gray.500"
                     onClick={() => {
                       bgStyle.items.coloring.gradient.gradient = {
                         from: getRandomColor(),
@@ -231,8 +236,7 @@ export const BgItemsColorPickerInline: React.FC<{
                     }}
                     ml="2"
                   >
-                    <FiRefreshCw style={{ marginRight: '5px' }} />
-                    Random
+                    Randomize
                   </Button>
                 </Box>
               )}

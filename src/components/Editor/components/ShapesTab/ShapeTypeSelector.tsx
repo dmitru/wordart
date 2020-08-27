@@ -21,7 +21,14 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
 
   return (
     <Menu isLazy placement="bottom-end">
-      <MenuButton as={Button} rightIcon={<ChevronDownIcon />} py="2" px="3">
+      <MenuButton
+        as={Button}
+        rightIcon={<ChevronDownIcon />}
+        py="2"
+        px="3"
+        size="lg"
+      >
+        {'Shape type: '}
         {shapesPanel.shapeKind === 'blob' && 'Blob'}
         {shapesPanel.shapeKind === 'image' && 'Clip art'}
         {shapesPanel.shapeKind === 'icon' && 'Icon'}

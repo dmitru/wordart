@@ -32,7 +32,7 @@ const getRandomColor = () => chroma.random().luminance(0.3).saturate(0.6).hex()
 
 /** Defines initial state of editor style options UI for the Shape */
 export const defaultShapeStyleOptions: ShapeStyleOptions = {
-  opacity: 10,
+  opacity: 20,
   items: {
     dimSmallerItems: 20,
     brightness: 0,

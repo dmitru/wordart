@@ -10,6 +10,7 @@ export const EditorPage = observer(() => {
 
   useEffect(() => {
     window.drift?.on('ready', (api: any) => {
+      console.log('drift ready')
       api.hideWelcomeMessage()
     })
   }, [])
