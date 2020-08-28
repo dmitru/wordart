@@ -33,7 +33,7 @@ export const LandingPage = observer(() => {
               Create unique word designs <em>in no time</em>.
             </HeaderTitle>
             <HeaderSubtitle>
-              Easy-to-use word art generator for social media posts, prints,
+              Easy-to-use word art generator for social media, prints,
               merchandise and more. <br /> <br /> No design skills required!
             </HeaderSubtitle>
 
@@ -98,9 +98,101 @@ export const LandingPage = observer(() => {
         </div>
       </HeaderContainer>
 
+      {/* UI Video header */}
+      <CtaFooterSection
+        mb="30px"
+        initial={{ opacity: 0, y: '40px' }}
+        // @ts-ignore
+        transition={{
+          ease: 'easeInOut',
+          duration: 0.5,
+          delay: 0.5,
+        }}
+        animate={{ x: 0, y: 0, opacity: 1 }}
+      >
+        <h1>Generate beautiful images, instantly</h1>
+        <Text mt="0" mb="0" mx="auto" maxWidth="600px">
+          Let Wordcloudy do the heavy lifting. Have more time for more important
+          things.
+        </Text>
+      </CtaFooterSection>
+
+      {/* UI video */}
+      <Box
+        boxShadow="md"
+        borderColor="gray.200"
+        borderStyle="solid"
+        borderWidth="1px"
+        borderRadius="lg"
+        mt="0"
+        p="5"
+        css={css`
+          position: relative;
+          z-index: 3;
+          width: 100%;
+          max-width: 900px;
+          margin: 0 auto;
+          margin-bottom: 70px;
+          display: flex;
+          align-items: flex-start;
+
+          video {
+            max-width: calc(850 / 560 * 90vh);
+            margin: 0 auto;
+          }
+
+          @media (--break-tablet-down) {
+            padding: 40px;
+          }
+
+          @media (--break-mobile-down), (max-height: 800px) {
+            padding: 20px;
+          }
+
+          @media (--break-mobile-small-down) {
+            padding: 10px;
+          }
+        `}
+      >
+        <video
+          playsInline
+          muted
+          loop
+          autoPlay
+          width="100%"
+          height="auto"
+          preload="metadata"
+        >
+          <source
+            src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/landing-video-loop.mp4"
+            type="video/mp4"
+          />
+        </video>
+      </Box>
+
+      {/* Use cases */}
+      <CtaFooterSection
+        mb="30px"
+        initial={{ opacity: 0, y: '40px' }}
+        // @ts-ignore
+        transition={{
+          ease: 'easeInOut',
+          duration: 0.5,
+          delay: 0.25,
+        }}
+        animate={{ x: 0, y: 0, opacity: 1 }}
+      >
+        <h1>Created for you to achieve your goals</h1>
+        <Text mt="0" mb="0" maxWidth="600px" mx="auto">
+          Make the awesome power of typography, words, shapes and colors your
+          secret weapon, no matter what your field is.
+        </Text>
+      </CtaFooterSection>
+
       <UseCasesSectionContainer mb="4rem" mx="auto" mt="20px">
         <UseCase
           initial={{ opacity: 0, y: '40px' }}
+          // @ts-ignore
           transition={{
             ease: 'easeInOut',
             duration: 0.5,
@@ -127,6 +219,7 @@ export const LandingPage = observer(() => {
 
         <UseCase
           initial={{ opacity: 0, y: '40px' }}
+          // @ts-ignore
           transition={{
             ease: 'easeInOut',
             duration: 0.25,
@@ -155,6 +248,7 @@ export const LandingPage = observer(() => {
 
         <UseCase
           initial={{ opacity: 0, y: '40px' }}
+          // @ts-ignore
           transition={{ ease: 'easeInOut', duration: 0.25, delay: 0.75 }}
           animate={{ x: 0, y: 0, opacity: 1 }}
           css={useCaseStyle}
@@ -177,6 +271,7 @@ export const LandingPage = observer(() => {
 
         <UseCase
           initial={{ opacity: 0, y: '40px' }}
+          // @ts-ignore
           transition={{ ease: 'easeInOut', duration: 0.25, delay: 1 }}
           animate={{ x: 0, y: 0, opacity: 1 }}
           css={useCaseStyle}
@@ -198,6 +293,8 @@ export const LandingPage = observer(() => {
           </Text>
         </UseCase>
       </UseCasesSectionContainer>
+
+      {/* Features */}
 
       <FeaturesSection
         spacing="4"
@@ -235,60 +332,23 @@ export const LandingPage = observer(() => {
         </UiFeature>
 
         <UiFeature maxWidth="240px" textAlign="center" p="5">
-          <UiScreenshot>
-            <AiFillPrinter />
-          </UiScreenshot>
-          <Text fontWeight="bold" fontSize="lg">
-            Crisp image quality
-          </Text>
-          <Text color="gray.500">
-            Export your designs at high resolution as PNG, JPEG images or as
-            scalable vector graphics (SVG).
-          </Text>
-        </UiFeature>
-
-        <UiFeature maxWidth="240px" textAlign="center" p="5">
-          <UiScreenshot>
-            <MdColorLens />
-          </UiScreenshot>
-          <Text fontWeight="bold" fontSize="lg">
-            Built-in color themes
-          </Text>
-          <Text color="gray.500">
-            Quickly find that right feel with our carefully crafted color themes
-          </Text>
-        </UiFeature>
-
-        <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot border="gray.500">
             <BsGrid3X3GapFill />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
-            Huge styles library
+            Huge design library
           </Text>
           <Text color="gray.500">
             Pick from thousands build-in fonts and shapes, or upload your own!
           </Text>
         </UiFeature>
-
-        <UiFeature maxWidth="240px" textAlign="center" p="5">
-          <UiScreenshot>
-            <IoIosChatbubbles />
-          </UiScreenshot>
-          <Text fontWeight="bold" fontSize="lg">
-            Multi-language support
-          </Text>
-          <Text color="gray.500">
-            Create designs in world's most common languages!
-          </Text>
-        </UiFeature>
       </FeaturesSection>
 
-      <CtaFooterSection>
+      <CtaFooterSection mb="120px" mt="80px">
         <h1>Ready to create your own unique designs?</h1>
         <Text mt="0" mb="6">
-          It's fast and fun with Wordcloudy – the world's leading word designs
-          generator app.
+          It's fast and fun with Wordcloudy – advanced and user-friendly word
+          designs generator.
         </Text>
 
         <Stack spacing="3" direction="row" justifyContent="center">
@@ -297,16 +357,6 @@ export const LandingPage = observer(() => {
               Start creating
             </Button>
           </Link>
-
-          <Button
-            as="a"
-            target="_blank"
-            href="https://wordcloudy.com/blog/getting-started-in-5-minutes/"
-            size="lg"
-            variant="outline"
-          >
-            See tutorial
-          </Button>
         </Stack>
       </CtaFooterSection>
     </SiteLayoutFullWidth>
@@ -375,6 +425,20 @@ const HeaderContainer = styled.div`
 `
 
 const HeaderTitleContainer = styled.div`
+  &:before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    z-index: -1;
+    background: #fff7;
+    filter: blur(10px);
+  }
+
   position: relative;
   z-index: 2;
   max-width: 430px;
@@ -578,10 +642,10 @@ const UiScreenshot = styled(Box)`
 `
 
 // ----------- CtaFooterSection --------------
-const CtaFooterSection = styled(Box)`
+const CtaFooterSection = styled(motion.custom(Box))`
   text-align: center;
-
-  margin: 0 20px;
+  margin-left: 20px;
+  margin-right: 20px;
 
   h1 {
     color: #3c526f;
@@ -603,7 +667,4 @@ const CtaFooterSection = styled(Box)`
     font-weight: 300;
     color: #3c526f;
   }
-
-  margin-top: 80px;
-  margin-bottom: 120px;
 `
