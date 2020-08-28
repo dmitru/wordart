@@ -1,22 +1,22 @@
 import { Box, Button, Stack, Text } from '@chakra-ui/core'
+import { ChevronRightIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
-import { AnimatePresence, motion } from 'framer-motion'
 import { SiteLayoutFullWidth } from 'components/layouts/SiteLayout/SiteLayout'
+import { motion } from 'framer-motion'
 import { observer } from 'mobx-react'
 import Link from 'next/link'
 import React from 'react'
 import AwesomeSlider from 'react-awesome-slider'
 // @ts-ignore
 import withAutoplay from 'react-awesome-slider/dist/autoplay'
-import { GiCupcake } from 'react-icons/gi'
-import { Urls } from 'urls'
-import { MdColorLens } from 'react-icons/md'
-import { BsGrid3X3GapFill } from 'react-icons/bs'
-import { GoSettings } from 'react-icons/go'
 import { AiFillPrinter } from 'react-icons/ai'
+import { BsGrid3X3GapFill } from 'react-icons/bs'
+import { GiCupcake } from 'react-icons/gi'
+import { GoSettings } from 'react-icons/go'
 import { IoIosChatbubbles } from 'react-icons/io'
-import { ChevronRightIcon } from '@chakra-ui/icons'
+import { MdColorLens } from 'react-icons/md'
+import { Urls } from 'urls'
 
 const Slider = withAutoplay(AwesomeSlider)
 
@@ -34,7 +34,7 @@ export const LandingPage = observer(() => {
             </HeaderTitle>
             <HeaderSubtitle>
               Easy-to-use word art generator for social media posts, prints,
-              merchandise and more. <br /> <br /> No design skills required.
+              merchandise and more. <br /> <br /> No design skills required!
             </HeaderSubtitle>
 
             <HeaderCtaContainer>
@@ -57,23 +57,24 @@ export const LandingPage = observer(() => {
               </Stack>
 
               <HeaderCtaInfo mb="3" mt="4">
-                Try without a sign-up!
+                Try without a sign-up.
               </HeaderCtaInfo>
             </HeaderCtaContainer>
           </HeaderTitleContainer>
 
           <HeaderSliderContainer
-            initial={{ opacity: 0 }}
+            initial={{ opacity: 0, rotate: '2deg' }}
             transition={{ ease: 'easeInOut', duration: 0.5 }}
-            animate={{ x: 0, y: 0, opacity: 1 }}
+            animate={{ x: 0, y: 0, opacity: 1, rotate: '2deg' }}
           >
             <HeaderSlider>
-              <Slider play={true} cancelOnInteraction={false} interval={3000}>
+              <Slider cancelOnInteraction={false} interval={3000}>
                 <div data-src="/gallery/gallery-11.jpeg" />
-                <div data-src="/gallery/gallery-9.jpeg" />
-                <div data-src="/gallery/gallery-10.jpeg" />
-                <div data-src="/gallery/gallery-8.jpeg" />
+                <div data-src="/gallery/gallery-12.jpeg" />
                 <div data-src="/gallery/gallery-7.jpeg" />
+                <div data-src="/gallery/gallery-8.jpeg" />
+                <div data-src="/gallery/gallery-10.jpeg" />
+                <div data-src="/gallery/gallery-9.jpeg" />
                 <div data-src="/gallery/gallery-4.jpeg" />
                 <div data-src="/gallery/gallery-6.jpeg" />
                 {/* <div data-src="/gallery/gallery-3.jpeg" /> */}
@@ -98,7 +99,14 @@ export const LandingPage = observer(() => {
       </HeaderContainer>
 
       <UseCasesSectionContainer mb="4rem" mx="auto" mt="20px">
-        <Box
+        <UseCase
+          initial={{ opacity: 0, y: '40px' }}
+          transition={{
+            ease: 'easeInOut',
+            duration: 0.5,
+            delay: 0.25,
+          }}
+          animate={{ x: 0, y: 0, opacity: 1 }}
           css={useCaseStyle}
           p="4"
           mx="20px"
@@ -106,17 +114,26 @@ export const LandingPage = observer(() => {
           borderColor="gray.200"
           borderStyle="solid"
           borderWidth="1px"
+          borderRadius="lg"
         >
-          <Text fontSize="xl" fontWeight="medium" color="gray.500">
-            For bloggers
+          <Text fontSize="xl" fontWeight="medium" color="blue.600">
+            Blogs & Social Media
           </Text>
           <Text>
-            <strong>Grab attention and evoke emotions</strong> in your audience
+            <strong>Grab attention and evoke emotion</strong> in your audience
             by the combined power of words, typography, shapes and colors!
           </Text>
-        </Box>
+        </UseCase>
 
-        <Box
+        <UseCase
+          initial={{ opacity: 0, y: '40px' }}
+          transition={{
+            ease: 'easeInOut',
+            duration: 0.25,
+            delay: 0.5,
+            translateY: '-40px',
+          }}
+          animate={{ x: 0, y: 0, opacity: 1 }}
           css={useCaseStyle}
           p="4"
           mx="20px"
@@ -124,18 +141,22 @@ export const LandingPage = observer(() => {
           borderColor="gray.200"
           borderStyle="solid"
           borderWidth="1px"
+          borderRadius="lg"
         >
-          <Text fontSize="xl" fontWeight="medium" color="gray.500">
-            For merchandise
+          <Text fontSize="xl" fontWeight="medium" color="teal.600">
+            Merchandise
           </Text>
           <Text>
             <strong>Delight your customers</strong> with new cool products!{' '}
-            Quickly produce print-ready art for your next top-selling item:{' '}
+            Quickly produce print-ready designs for your next top-selling item:{' '}
             canvas prints, posters, t-shirts and more.
           </Text>
-        </Box>
+        </UseCase>
 
-        <Box
+        <UseCase
+          initial={{ opacity: 0, y: '40px' }}
+          transition={{ ease: 'easeInOut', duration: 0.25, delay: 0.75 }}
+          animate={{ x: 0, y: 0, opacity: 1 }}
           css={useCaseStyle}
           p="4"
           mx="20px"
@@ -143,17 +164,21 @@ export const LandingPage = observer(() => {
           borderColor="gray.200"
           borderStyle="solid"
           borderWidth="1px"
+          borderRadius="lg"
         >
-          <Text fontSize="xl" fontWeight="medium" color="gray.500">
-            For presenters & educators
+          <Text fontSize="xl" fontWeight="medium" color="orange.600">
+            Presenters & Educators
           </Text>
           <Text>
             <strong>Captivate and engage</strong> your audience or students with
             unique and entertaining content or presentation slides.
           </Text>
-        </Box>
+        </UseCase>
 
-        <Box
+        <UseCase
+          initial={{ opacity: 0, y: '40px' }}
+          transition={{ ease: 'easeInOut', duration: 0.25, delay: 1 }}
+          animate={{ x: 0, y: 0, opacity: 1 }}
           css={useCaseStyle}
           p="4"
           mx="20px"
@@ -161,16 +186,17 @@ export const LandingPage = observer(() => {
           borderColor="gray.200"
           borderStyle="solid"
           borderWidth="1px"
+          borderRadius="lg"
         >
-          <Text fontSize="xl" fontWeight="medium" color="gray.500">
-            For designers
+          <Text fontSize="xl" fontWeight="medium" color="pink.600">
+            Designers
           </Text>
           <Text>
             <strong>Save your time creating</strong>
             {' unique designs and backgrounds.'}
             Export your designs as SVG to import in your favorite design tool.
           </Text>
-        </Box>
+        </UseCase>
       </UseCasesSectionContainer>
 
       <FeaturesSection
@@ -319,6 +345,8 @@ const HeaderContainer = styled.div`
   }
 
   background: #f6fafe;
+  background-image: url(/landing/header-bg.jpeg);
+  background-size: contain;
 
   .custom-shape-divider-bottom-1594969392 {
     position: absolute;
@@ -386,6 +414,7 @@ const HeaderTitle = styled.h1`
     position: relative;
     display: inline-block;
     z-index: 2;
+    font-style: normal;
 
     &:before {
       content: '';
@@ -394,7 +423,7 @@ const HeaderTitle = styled.h1`
       background: hsl(358, 80%, 65%);
       height: 6px;
       width: 100%;
-      bottom: 3px;
+      bottom: -3px;
       z-index: -1;
       left: 0;
       border-radius: 8px;
@@ -446,8 +475,7 @@ const HeaderCtaInfo = styled(Box)`
 
 const HeaderSliderContainer = styled(motion.div)`
   box-shadow: 0 0 8px 0 #0003;
-  transform: rotate(1deg);
-  border-radius: 8px;
+  border-radius: 16px;
   margin-top: 65px;
   width: 800px;
   z-index: 2;
@@ -460,10 +488,15 @@ const HeaderSliderContainer = styled(motion.div)`
     margin-right: 0;
     margin-top: 50px;
     width: 100%;
-    transform: none;
+    transform: none !important;
   }
 `
 const HeaderSlider = styled.div`
+  border-radius: 16px;
+  .awssld__content {
+    border-radius: 16px;
+  }
+
   .awssld__container {
     height: 590px;
 
@@ -491,6 +524,8 @@ const useCaseStyle = css`
     max-width: 300px;
   }
 `
+
+const UseCase = styled(motion.custom(Box))``
 
 // ---------- Features section -----------------
 
