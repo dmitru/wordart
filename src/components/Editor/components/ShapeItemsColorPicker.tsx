@@ -22,7 +22,6 @@ import { DeleteButton } from 'components/shared/DeleteButton'
 import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { observer } from 'mobx-react'
 import React, { useState } from 'react'
-import { FiRefreshCw } from 'react-icons/fi'
 
 export const ShapeItemsColorPickerKindDropdown: React.FC<{
   shapeStyle: ShapeStyleOptions
@@ -31,11 +30,9 @@ export const ShapeItemsColorPickerKindDropdown: React.FC<{
   return (
     <Menu isLazy placement="bottom-start">
       <MenuButton as={Button} rightIcon={<ChevronDownIcon />} py="2" px="3">
-        {shapeStyle.items.coloring.kind === 'shape' &&
-          'Items color: Same as shape'}
-        {shapeStyle.items.coloring.kind === 'color' && 'Items color: Custom'}
-        {shapeStyle.items.coloring.kind === 'gradient' &&
-          'Items color: Gradient'}
+        {shapeStyle.items.coloring.kind === 'shape' && 'Same as shape'}
+        {shapeStyle.items.coloring.kind === 'color' && 'Custom'}
+        {shapeStyle.items.coloring.kind === 'gradient' && 'Gradient'}
       </MenuButton>
       <MenuTransition>
         {(styles) => (
@@ -118,7 +115,6 @@ export const ShapeItemsColorPickerInline: React.FC<{
             <Tooltip label="Randomize colors">
               <Button
                 variant="ghost"
-                color="gray.500"
                 isDisabled={shapeStyle.items.coloring.color.colors.length === 0}
                 onClick={() => {
                   shapeStyle.items.coloring.color.colors = shapeStyle.items.coloring.color.colors.map(
@@ -132,11 +128,7 @@ export const ShapeItemsColorPickerInline: React.FC<{
             </Tooltip>
 
             <Menu isLazy>
-              <MenuButton
-                as={MenuDotsButton}
-                variant="ghost"
-                color="gray.500"
-              />
+              <MenuButton as={MenuDotsButton} variant="ghost" />
 
               <Portal>
                 <MenuTransition>
@@ -239,7 +231,6 @@ export const ShapeItemsColorPickerInline: React.FC<{
                   <Box>
                     <Button
                       variant="ghost"
-                      color="gray.500"
                       onClick={() => {
                         shapeStyle.items.coloring.gradient.gradient = {
                           from: getRandomColor(),

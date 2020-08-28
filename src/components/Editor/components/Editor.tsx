@@ -970,6 +970,20 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   </LeftNavbarBtn>
 
                   <LeftNavbarBtn
+                    onClick={() => {
+                      state.leftTab = 'layout'
+                      state.leftPanelContext = 'normal'
+                    }}
+                    active={
+                      leftTab === 'layout' &&
+                      state.leftPanelContext === 'normal'
+                    }
+                  >
+                    <LayoutMasonry className="icon" />
+                    Layout
+                  </LeftNavbarBtn>
+
+                  <LeftNavbarBtn
                     id="nav-words"
                     onClick={() => {
                       state.leftTab = 'words'
@@ -1008,20 +1022,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   >
                     <SmileBeam className="icon" />
                     Icons
-                  </LeftNavbarBtn>
-
-                  <LeftNavbarBtn
-                    onClick={() => {
-                      state.leftTab = 'layout'
-                      state.leftPanelContext = 'normal'
-                    }}
-                    active={
-                      leftTab === 'layout' &&
-                      state.leftPanelContext === 'normal'
-                    }
-                  >
-                    <LayoutMasonry className="icon" />
-                    Layout
                   </LeftNavbarBtn>
 
                   <div
@@ -1779,8 +1779,8 @@ export type LeftPanelTab =
 const leftPanelTabs: LeftPanelTab[] = [
   'shapes',
   'colors',
+  'layout',
   'words',
   'fonts',
   'symbols',
-  'layout',
 ]

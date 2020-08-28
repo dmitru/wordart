@@ -1,5 +1,6 @@
 import {
   Box,
+  Text,
   Flex,
   Popover,
   PopoverArrow,
@@ -400,7 +401,15 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                   {/* <shape-items> */}
                   <Box mb="2rem">
                     <Box mt="2" mb="4" display="flex" alignItems="center">
-                      <Box>
+                      <Box display="flex" alignItems="center">
+                        <Text
+                          my="0"
+                          mr="3"
+                          fontWeight="medium"
+                          color="gray.500"
+                        >
+                          Items color
+                        </Text>
                         <ShapeItemsColorPickerKindDropdown
                           shapeStyle={shapeStyle}
                           onUpdate={updateShapeItemsColoring}
@@ -508,7 +517,10 @@ export const BgItemsStyleOptions: React.FC<{
   return (
     <Box mb="2rem">
       <Box mt="2" mb="2" display="flex" alignItems="center">
-        <Box>
+        <Box display="flex" alignItems="center">
+          <Text my="0" mr="3" fontWeight="medium" color="gray.500">
+            Items color
+          </Text>
           <BgItemsColorPickerKindDropdown
             bgStyle={bgStyle}
             onUpdate={updateBgItemsColoring}
