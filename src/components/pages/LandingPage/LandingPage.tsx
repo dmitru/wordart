@@ -57,7 +57,7 @@ export const LandingPage = observer(() => {
               </Stack>
 
               <HeaderCtaInfo mb="3" mt="4">
-                You don't need an account to start!
+                Try without a sign-up!
               </HeaderCtaInfo>
             </HeaderCtaContainer>
           </HeaderTitleContainer>

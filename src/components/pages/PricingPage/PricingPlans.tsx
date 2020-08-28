@@ -193,11 +193,7 @@ export const PricingPlans = observer(() => {
             </div>
             <div>
               <CheckIcon />
-              More advanced features (
-              <a target="_blank" href="/pricing">
-                Learn more
-              </a>
-              )
+              Custom images and fonts
             </div>
           </Box>
 

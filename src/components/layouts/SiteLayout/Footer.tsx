@@ -95,7 +95,7 @@ export const Footer: React.FC<FooterProps> = () => {
         </Box>
 
         <Box mt="6" color="gray.500">
-          Copyright 2019 – 2020, made with ❤️ in Canada 🇨🇦
+          Wordcloudy. Copyright ©2020. Made with ❤️ in Canada 🇨🇦
         </Box>
       </ContentContainer>
     </FooterWrapper>
