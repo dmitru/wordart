@@ -15,7 +15,7 @@ import { BsGrid3X3GapFill } from 'react-icons/bs'
 import { GiCupcake } from 'react-icons/gi'
 import { GoSettings } from 'react-icons/go'
 import { IoIosChatbubbles } from 'react-icons/io'
-import { MdColorLens } from 'react-icons/md'
+import { MdColorLens, MdTimer } from 'react-icons/md'
 import { Urls } from 'urls'
 
 const Slider = withAutoplay(AwesomeSlider)
@@ -111,9 +111,9 @@ export const LandingPage = observer(() => {
         animate={{ x: 0, y: 0, opacity: 1 }}
       >
         <h1>Generate beautiful images, instantly</h1>
-        <Text mt="0" mb="0" mx="auto" maxWidth="600px">
-          Let Wordcloudy do the heavy lifting. Have more time for more important
-          things.
+        <Text mt="0" mb="0" mx="auto" maxWidth="670px">
+          Let Wordcloudy do the heavy lifting. Spend your time on more important
+          things!
         </Text>
       </CtaFooterSection>
 
@@ -182,10 +182,10 @@ export const LandingPage = observer(() => {
         }}
         animate={{ x: 0, y: 0, opacity: 1 }}
       >
-        <h1>Created for you to achieve your goals</h1>
+        <h1>Helps you achieve your goals</h1>
         <Text mt="0" mb="0" maxWidth="600px" mx="auto">
-          Make the awesome power of typography, words, shapes and colors your
-          secret weapon, no matter what your field is.
+          Use the awesome power of typography, words, shapes and colors to reach
+          your goals, no matter what they are.
         </Text>
       </CtaFooterSection>
 
@@ -212,8 +212,9 @@ export const LandingPage = observer(() => {
             Blogs & Social Media
           </Text>
           <Text>
-            <strong>Grab attention and evoke emotion</strong> in your audience
-            by the combined power of words, typography, shapes and colors!
+            <strong>Grab attention and evoke emotion</strong> in your audience.{' '}
+            <strong>Enhance your message and stand out</strong> with memorable
+            and effective word art.
           </Text>
         </UseCase>
 
@@ -241,8 +242,8 @@ export const LandingPage = observer(() => {
           </Text>
           <Text>
             <strong>Delight your customers</strong> with new cool products!{' '}
-            Quickly produce print-ready designs for your next top-selling item:{' '}
-            canvas prints, posters, t-shirts and more.
+            <strong>Quickly produce print-ready designs</strong> for your next
+            top-selling item: canvas prints, posters, t-shirts and more.
           </Text>
         </UseCase>
 
@@ -311,7 +312,7 @@ export const LandingPage = observer(() => {
             <GiCupcake />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
-            No design skills required
+            No design skills needed
           </Text>
           <Text color="gray.500">
             Wordcloudy is fun and easy to use – anyone can be a creator!
@@ -320,26 +321,26 @@ export const LandingPage = observer(() => {
 
         <UiFeature maxWidth="240px" textAlign="center" p="5">
           <UiScreenshot>
+            <MdTimer />
+          </UiScreenshot>
+          <Text fontWeight="bold" fontSize="lg">
+            Save time & money
+          </Text>
+          <Text color="gray.500">
+            Easily generate awesome designs yourself, without the need for a
+            designer.
+          </Text>
+        </UiFeature>
+
+        <UiFeature maxWidth="240px" textAlign="center" p="5">
+          <UiScreenshot border="gray.500">
             <GoSettings />
           </UiScreenshot>
           <Text fontWeight="bold" fontSize="lg">
             Customize anything
           </Text>
           <Text color="gray.500">
-            Choose shape, placement density, layout, fonts, colors... anything
-            can be tweaked!
-          </Text>
-        </UiFeature>
-
-        <UiFeature maxWidth="240px" textAlign="center" p="5">
-          <UiScreenshot border="gray.500">
-            <BsGrid3X3GapFill />
-          </UiScreenshot>
-          <Text fontWeight="bold" fontSize="lg">
-            Huge design library
-          </Text>
-          <Text color="gray.500">
-            Pick from thousands build-in fonts and shapes, or upload your own!
+            Tweak anything and pick from thousands of built-in fonts and shapes.
           </Text>
         </UiFeature>
       </FeaturesSection>

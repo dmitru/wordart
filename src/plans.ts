@@ -47,7 +47,7 @@ export const unlimitedPricingPlans: UnlimitedPricingPlan[] = [
   {
     kind: 'unlimited',
     id: 600687,
-    title: '1 Year',
+    title: '12 Months',
     periodCount: 1,
     periodUnits: 'year',
   },
