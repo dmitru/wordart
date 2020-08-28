@@ -76,7 +76,7 @@ export const LandingPage = observer(() => {
                 <div data-src="/gallery/gallery-7.jpeg" />
                 <div data-src="/gallery/gallery-4.jpeg" />
                 <div data-src="/gallery/gallery-6.jpeg" />
-                <div data-src="/gallery/gallery-3.jpeg" />
+                {/* <div data-src="/gallery/gallery-3.jpeg" /> */}
               </Slider>
             </HeaderSlider>
           </HeaderSliderContainer>
@@ -96,6 +96,86 @@ export const LandingPage = observer(() => {
           </svg>
         </div>
       </HeaderContainer>
+
+      <UseCasesSectionContainer mb="4rem" mx="auto" mt="20px">
+        <Box
+          css={useCaseStyle}
+          p="4"
+          mx="20px"
+          boxShadow="md"
+          borderColor="gray.200"
+          borderStyle="solid"
+          borderWidth="1px"
+        >
+          <Text fontSize="xl" fontWeight="medium" color="gray.500">
+            For bloggers
+          </Text>
+          <Text>
+            <strong>
+              Grab attention and evoke a strong emotional reaction
+            </strong>{' '}
+            in your audience by harnessing the power of words, typography,
+            shapes and colors!
+          </Text>
+        </Box>
+
+        <Box
+          css={useCaseStyle}
+          p="4"
+          mx="20px"
+          boxShadow="md"
+          borderColor="gray.200"
+          borderStyle="solid"
+          borderWidth="1px"
+        >
+          <Text fontSize="xl" fontWeight="medium" color="gray.500">
+            For merchandise
+          </Text>
+          <Text>
+            <strong>Delight your customers with new awesome products!</strong>{' '}
+            Quickly produce print-ready art for your next top-selling item:{' '}
+            canvas prints, posters, t-shirts and more.
+          </Text>
+        </Box>
+
+        <Box
+          css={useCaseStyle}
+          p="4"
+          mx="20px"
+          boxShadow="md"
+          borderColor="gray.200"
+          borderStyle="solid"
+          borderWidth="1px"
+        >
+          <Text fontSize="xl" fontWeight="medium" color="gray.500">
+            For presenters & educators
+          </Text>
+          <Text>
+            <strong>Captivate and engage</strong> your audience or students with
+            unique and entertaining content or presentation slides.
+          </Text>
+        </Box>
+
+        <Box
+          css={useCaseStyle}
+          p="4"
+          mx="20px"
+          boxShadow="md"
+          borderColor="gray.200"
+          borderStyle="solid"
+          borderWidth="1px"
+        >
+          <Text fontSize="xl" fontWeight="medium" color="gray.500">
+            For designers
+          </Text>
+          <Text>
+            <strong>
+              Save your time creating unique graphic assets and backgrounds.
+            </strong>
+            Export your designs as SVG to import in your favorite design tool.
+          </Text>
+        </Box>
+      </UseCasesSectionContainer>
 
       <FeaturesSection
         spacing="4"
@@ -372,7 +452,7 @@ const HeaderSliderContainer = styled(motion.div)`
   box-shadow: 0 0 8px 0 #0003;
   transform: rotate(1deg);
   border-radius: 8px;
-  margin-top: 50px;
+  margin-top: 65px;
   width: 800px;
   z-index: 2;
 
@@ -394,6 +474,25 @@ const HeaderSlider = styled.div`
     ${xsBreakpoint} {
       height: 50vh;
     }
+  }
+`
+
+// ----------- Use-cases section ---------------
+const UseCasesSectionContainer = styled(Box)({
+  width: '100%',
+  display: 'flex',
+  flexWrap: 'wrap',
+  justifyContent: 'center',
+})
+
+const useCaseStyle = css`
+  margin-bottom: 40px;
+
+  max-width: 300px;
+  width: 100%;
+
+  @media screen and (max-width: 1100px) {
+    max-width: 300px;
   }
 `
 
