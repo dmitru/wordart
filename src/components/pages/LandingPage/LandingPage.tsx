@@ -111,9 +111,8 @@ export const LandingPage = observer(() => {
             For bloggers
           </Text>
           <Text>
-            <strong>Grab attention and evoke strong emotions</strong> in your
-            audience by the combined power of words, typography, shapes and
-            colors!
+            <strong>Grab attention and evoke emotions</strong> in your audience
+            by the combined power of words, typography, shapes and colors!
           </Text>
         </Box>
 
@@ -130,7 +129,7 @@ export const LandingPage = observer(() => {
             For merchandise
           </Text>
           <Text>
-            <strong>Delight your customers with new awesome products!</strong>{' '}
+            <strong>Delight your customers</strong> with new cool products!{' '}
             Quickly produce print-ready art for your next top-selling item:{' '}
             canvas prints, posters, t-shirts and more.
           </Text>
@@ -167,9 +166,8 @@ export const LandingPage = observer(() => {
             For designers
           </Text>
           <Text>
-            <strong>
-              Save your time creating unique graphic assets and backgrounds.
-            </strong>
+            <strong>Save your time creating</strong>
+            {' unique designs and backgrounds.'}
             Export your designs as SVG to import in your favorite design tool.
           </Text>
         </Box>
