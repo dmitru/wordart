@@ -111,11 +111,9 @@ export const LandingPage = observer(() => {
             For bloggers
           </Text>
           <Text>
-            <strong>
-              Grab attention and evoke a strong emotional reaction
-            </strong>{' '}
-            in your audience by harnessing the power of words, typography,
-            shapes and colors!
+            <strong>Grab attention and evoke strong emotions</strong> in your
+            audience by the combined power of words, typography, shapes and
+            colors!
           </Text>
         </Box>
 
