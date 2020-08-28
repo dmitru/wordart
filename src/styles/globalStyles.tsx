@@ -59,6 +59,14 @@ export const globalStyles = (
       ${typography.toString()}
 
       @import url('https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;500;600;700;800&family=Nunito:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap');
+
+      h1 {
+        color: #3c526f;
+        border-bottom: none;
+        font-size: 36px;
+        font-weight: 500;
+        font-family: 'Nunito', sans-serif;
+      }
     `}
   />
 )

@@ -81,60 +81,34 @@ export const PricingPage = observer(() => {
   const comparisonSection = (
     <Box
       boxShadow="lg"
+      borderColor="gray.300"
+      borderStyle="solid"
+      borderWidth="1px"
       borderRadius="lg"
       bg="white"
-      css={css`
-        margin-right: 2rem;
-        @media screen and (max-width: 1000px) {
-          margin-top: 2rem;
-          margin-right: 0;
-        }
-      `}
+      maxWidth="800px"
+      mx="auto"
     >
-      <Box
-        p="5"
-        textAlign="center"
-        fontSize="xl"
-        bg="gray.100"
-        borderRadius="lg"
-      >
-        Compare free and paid features
-      </Box>
-
       <Box mt="0.5rem" p="5">
         <ComparisonTable>
           <thead>
             <tr>
               <th></th>
               <th>FREE</th>
-              <th>UNLIMITED PLANS</th>
+              <th>ANY PAID PLAN</th>
               {/* <th>HQ DOWNLOAD PACKS</th> */}
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th>Download quality{qualityHelpIcon}</th>
-              <MainDetailsTableCell
-                main={
-                  <>
-                    <CrossIcon />
-                    Standard
-                  </>
-                }
-              />
-              <MainDetailsTableCell
-                main={
-                  <>
-                    <CheckIcon />
-                    High
-                  </>
-                }
-              />
+              <th>High quality downloads</th>
+              <MainDetailsTableCell main={<CrossIcon />} />
+              <MainDetailsTableCell main={<CheckIcon />} />
               {/* <MainDetailsTableCell
                 main={
                   <>
-                    Standard or High&nbsp;
-                    {qualityHelpIcon}
+                    Limited
+                    <HelpTooltipIcon label="Limited number of HQ downloads, depending on the package" />
                   </>
                 }
               /> */}
@@ -158,21 +132,7 @@ export const PricingPage = observer(() => {
             </tr>
 
             <tr>
-              <th>Unlimited HQ downloads</th>
-              <MainDetailsTableCell main={<CrossIcon />} />
-              <MainDetailsTableCell main={<CheckIcon />} />
-              {/* <MainDetailsTableCell
-                main={
-                  <>
-                    Limited
-                    <HelpTooltipIcon label="Limited number of HQ downloads, depending on the package" />
-                  </>
-                }
-              /> */}
-            </tr>
-
-            <tr>
-              <th>Max. number of saved designs</th>
+              <th>Unlimited designs</th>
               <MainDetailsTableCell
                 main={
                   <>
@@ -221,7 +181,7 @@ export const PricingPage = observer(() => {
             mx="auto"
           >
             <Text as="h1" textAlign="center">
-              Get the right plan for you
+              Get the right plan for you!
             </Text>
 
             <Text
@@ -236,19 +196,15 @@ export const PricingPage = observer(() => {
             </Text>
           </Box>
 
-          <Box
-            display="flex"
-            alignItems="flex-start"
-            mt="3rem"
-            css={css`
-              @media screen and (max-width: 1000px) {
-                flex-direction: column-reverse;
-                align-items: center;
-              }
-            `}
-          >
-            {comparisonSection}
+          <Box mt="3rem">
             <PricingPlans />
+          </Box>
+
+          <Box mt="3rem">
+            <Text as="h1" textAlign="center">
+              Compare Free and Paid Features
+            </Text>
+            {comparisonSection}
           </Box>
 
           <Box

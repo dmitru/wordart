@@ -17,6 +17,7 @@ import { GoSettings } from 'react-icons/go'
 import { IoIosChatbubbles } from 'react-icons/io'
 import { MdColorLens, MdTimer } from 'react-icons/md'
 import { Urls } from 'urls'
+import { PricingPlans } from 'components/pages/PricingPage/PricingPlans'
 
 const Slider = withAutoplay(AwesomeSlider)
 
@@ -344,6 +345,16 @@ export const LandingPage = observer(() => {
           </Text>
         </UiFeature>
       </FeaturesSection>
+
+      {/* Pricing: TODO */}
+
+      <Box>
+        <PricingPlans />
+      </Box>
+
+      {/* FAQ */}
+
+      {/* Footer CTA */}
 
       <CtaFooterSection mb="120px" mt="80px">
         <h1>Ready to create your own unique designs?</h1>

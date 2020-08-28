@@ -54,36 +54,36 @@ export const unlimitedPricingPlans: UnlimitedPricingPlan[] = [
 ]
 
 export const downloadsPricingPlans: DownloadsPricingPlan[] = [
-  // {
-  //   kind: 'downloads-pack',
-  //   id: 597590,
-  //   title: '1 HQ Download',
-  //   downloads: 1,
-  // },
-  // {
-  //   kind: 'downloads-pack',
-  //   id: 600538,
-  //   title: '5 HQ Downloads',
-  //   downloads: 1,
-  // },
-  // {
-  //   kind: 'downloads-pack',
-  //   id: 600681,
-  //   title: '10 HQ Downloads',
-  //   downloads: 1,
-  // },
-  // {
-  //   kind: 'downloads-pack',
-  //   id: 600682,
-  //   title: '25 HQ Downloads',
-  //   downloads: 1,
-  // },
-  // {
-  //   kind: 'downloads-pack',
-  //   id: 600683,
-  //   title: '100 HQ Downloads',
-  //   downloads: 1,
-  // },
+  {
+    kind: 'downloads-pack',
+    id: 597590,
+    title: '3 HQ Downloads',
+    downloads: 3,
+  },
+  {
+    kind: 'downloads-pack',
+    id: 600538,
+    title: '5 HQ Downloads',
+    downloads: 5,
+  },
+  {
+    kind: 'downloads-pack',
+    id: 600681,
+    title: '10 HQ Downloads',
+    downloads: 10,
+  },
+  {
+    kind: 'downloads-pack',
+    id: 600682,
+    title: '25 HQ Downloads',
+    downloads: 25,
+  },
+  {
+    kind: 'downloads-pack',
+    id: 600683,
+    title: '100 HQ Downloads',
+    downloads: 100,
+  },
 ]
 
 export const plans: PricingPlan[] = [
