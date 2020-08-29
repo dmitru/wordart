@@ -16,20 +16,20 @@ export type UnlimitedPricingPlan = {
 export type PricingPlan = DownloadsPricingPlan | UnlimitedPricingPlan
 
 export const unlimitedPricingPlans: UnlimitedPricingPlan[] = [
-  {
-    kind: 'unlimited',
-    id: 618592,
-    title: '1 Day',
-    periodCount: 1,
-    periodUnits: 'day',
-  },
-  {
-    kind: 'unlimited',
-    id: 600684,
-    title: '1 Week',
-    periodCount: 1,
-    periodUnits: 'week',
-  },
+  // {
+  //   kind: 'unlimited',
+  //   id: 618592,
+  //   title: '1 Day',
+  //   periodCount: 1,
+  //   periodUnits: 'day',
+  // },
+  // {
+  //   kind: 'unlimited',
+  //   id: 600684,
+  //   title: '1 Week',
+  //   periodCount: 1,
+  //   periodUnits: 'week',
+  // },
   {
     kind: 'unlimited',
     id: 600685,
@@ -56,10 +56,16 @@ export const unlimitedPricingPlans: UnlimitedPricingPlan[] = [
 export const downloadsPricingPlans: DownloadsPricingPlan[] = [
   {
     kind: 'downloads-pack',
-    id: 597590,
-    title: '3 HQ Downloads',
-    downloads: 3,
+    id: 628211,
+    title: '1 HQ Download',
+    downloads: 1,
   },
+  // {
+  //   kind: 'downloads-pack',
+  //   id: 597590,
+  //   title: '3 HQ Downloads',
+  //   downloads: 3,
+  // },
   {
     kind: 'downloads-pack',
     id: 600538,

@@ -210,15 +210,15 @@ export const LandingPage = observer(() => {
           </Box>
           <Box>
             <Text fontSize="2rem" color="teal.600" css={useCaseTitleStyle}>
-              For Merchendise Sellers
+              For Creative Entrepreneurs
             </Text>
             <Text fontSize="20px" as="ul" color="gray.700">
               <li>
                 <strong>Delight your customers</strong> with beautiful{' '}
-                <strong>personalized designs</strong>.
+                <strong>personalized items</strong>.
               </li>
               <li>
-                <strong>Easily generate new designs</strong> for your next
+                <strong>Generate new personalized designs</strong> for your next
                 top-selling items.
               </li>
             </Text>
