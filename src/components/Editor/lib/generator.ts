@@ -67,7 +67,7 @@ export class Generator {
     this.isCancelled = false
     // this.logger.debug('Generator: generate', task)
 
-    const shapeCanvasMaxExtent = 300
+    const shapeCanvasMaxExtent = 500
     const batchSize = 50
     const nIter =
       task.itemsMaxCount === 'auto' ? 500 : task.itemsMaxCount || 500
@@ -365,6 +365,8 @@ export class Generator {
     const chunkPaddingFactor = 0.3
     const iterationBatches = chunk(iterations, chunkSize)
 
+    let largestWordHPx = -1
+
     for (const batch of iterationBatches) {
       clearCanvas(unrotatedCtxPadded)
       copyCanvas(unrotatedCtx, unrotatedCtxPadded)
@@ -446,7 +448,7 @@ export class Generator {
           const wordPath = wordPaths[wordIndex]
 
           // let scale = 1 - (0.5 * i) / nIter
-          let scale = 0.9
+          let scale = 1
 
           const rotatedImgData = rotatedCtx.getImageData(
             0,
@@ -464,6 +466,7 @@ export class Generator {
             w: wordPathBounds.x2 - wordPathBounds.x1,
             h: wordPathBounds.y2 - wordPathBounds.y1,
           }
+
           const wordAspect = wordPathSize.w / wordPathSize.h
 
           const largestRectWasm = imageProcessor.findLargestRect(
@@ -503,6 +506,15 @@ export class Generator {
             pathScale *= maxMaxDim / maxDim
           }
 
+          const wordHPx = wordPathSize.h * pathScale
+
+          // Ensure the first word is the largest
+          if (largestWordHPx < 0) {
+            largestWordHPx = wordHPx
+          } else if (wordHPx > largestWordHPx) {
+            pathScale = (largestWordHPx / wordHPx) * pathScale
+          }
+
           unrotatedCtx.save()
           unrotatedCtxPadded.save()
           rotatedBoundsTransform.applyToContext(unrotatedCtx)
@@ -510,7 +522,7 @@ export class Generator {
 
           const minDimension =
             pathScale * Math.min(largestRect.w, largestRect.h)
-          const minDimensionThreshold = 0.05 * (shapeCanvasMaxExtent / 360)
+          const minDimensionThreshold = 0.05 * (shapeCanvasMaxExtent / 500)
 
           if (minDimension >= minDimensionThreshold) {
             const dx = Math.max(largestRect.w - pathScale * wordPathSize.w, 0)
@@ -563,6 +575,7 @@ export class Generator {
             unrotatedCtx.shadowBlur =
               0.5 +
               (task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6
+            // console.log('shadowBlur = ', unrotatedCtx.shadowBlur)
             unrotatedCtx.shadowColor = 'red'
 
             // console.log(
@@ -577,13 +590,35 @@ export class Generator {
             //     (task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 5.6)
             // unrotatedCtxPadded.shadowColor = 'red'
 
-            wordPath.draw(unrotatedCtx)
-
             // console.log(
             //   'wordPathBounds.x1',
             //   wordPathBounds.x1,
             //   wordPathBounds.y1
             // )
+
+            const pathWPx = wordPathSize.w * pathScale
+            const pathHPx = wordPathSize.h * pathScale
+            const pathMinDimPx = Math.min(pathWPx, pathHPx)
+            // console.log('pathMinDimPx = ', pathMinDimPx)
+
+            if (pathMinDimPx < 5) {
+              const pw = pathMinDimPx / pathScale
+              const ph = pathMinDimPx / pathScale
+              // unrotatedCtx.shadowBlur = 0
+              unrotatedCtx.fillRect(
+                wordPathBounds.x1 - pw / 2,
+                wordPathBounds.y1 - ph / 2,
+                wordPathSize.w + pw,
+                wordPathSize.h + ph
+              )
+
+              // console.log('case: SMALL')
+            } else {
+              wordPath.draw(unrotatedCtx)
+
+              // console.log('case: BIG')
+            }
+
             const dw = wordPathSize.w * chunkPaddingFactor
             const dh = wordPathSize.h * chunkPaddingFactor
             unrotatedCtxPadded.fillRect(
@@ -592,6 +627,9 @@ export class Generator {
               wordPathSize.w + dw,
               wordPathSize.h + dh
             )
+
+            // console.screenshot(unrotatedCtx.canvas)
+
             // wordPath.draw(unrotatedCtxPadded)
 
             const item: WordGeneratedItem = {
@@ -751,6 +789,13 @@ export class Generator {
           const maxDim = Math.max(iconDims.w, iconDims.h) * iconScale
           if (maxDim > maxMaxDim) {
             iconScale *= maxMaxDim / maxDim
+          }
+
+          const iconMaxDimPx = maxDim * iconScale
+
+          // Ensure the first word is the largest
+          if (largestWordHPx > 0 && iconMaxDimPx > largestWordHPx) {
+            iconScale = (largestWordHPx / iconMaxDimPx) * iconScale
           }
 
           unrotatedCtx.save()
