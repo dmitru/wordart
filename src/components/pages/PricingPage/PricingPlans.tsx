@@ -1,4 +1,4 @@
-import { Box, Button, Text } from '@chakra-ui/core'
+import { Box, Button, Text, Tag } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
 import { observer } from 'mobx-react'
@@ -6,6 +6,7 @@ import { unlimitedPricingPlans, downloadsPricingPlans } from 'plans'
 import React, { useState } from 'react'
 import { FaCheck } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
+
 const CheckIcon = () => (
   <Box
     as="span"
@@ -25,6 +26,11 @@ const CheckIcon = () => (
 export const PricingPlans = observer(() => {
   const { authStore } = useStore()
   const { profile } = authStore
+
+  const launchSalePlacesLeft = authStore.launchCoupon
+    ? authStore.launchCoupon.allowed_uses - authStore.launchCoupon.times_used
+    : 0
+  const showLaunchSale = launchSalePlacesLeft > 0
 
   const [selectedUnlimitedPlanId, setSelectedUnlimitedPlanId] = useState(
     unlimitedPricingPlans[2].id
@@ -299,6 +305,31 @@ export const PricingPlans = observer(() => {
 
   return (
     <>
+      {showLaunchSale && (
+        <Box display="flex" justifyContent="center" mb="2rem">
+          <Tag colorScheme="purple" mx="auto" fontSize="lg" p="3">
+            {'🔥'}
+            <strong
+              css={css`
+                margin-left: 5px;
+              `}
+            >
+              33% launch sale
+            </strong>
+            : use LAUNCH coupon at check-out.{' '}
+            {
+              <strong
+                css={css`
+                  margin-left: 5px;
+                `}
+              >
+                Only {launchSalePlacesLeft} places left!
+              </strong>
+            }
+          </Tag>
+        </Box>
+      )}
+
       <Box
         display="flex"
         mx="auto"

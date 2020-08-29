@@ -25,6 +25,8 @@ export class RootStore {
       analytics.setMetric(CustomMetricIndices.screenHeight, window.innerHeight)
     }
 
+    this.authStore.fetchLaunchCoupon()
+
     this.authStore.afterLogin = async () => {
       if (this.authStore.profile) {
         analytics.setUserId(this.authStore.profile.id)

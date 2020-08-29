@@ -1,4 +1,4 @@
-import { Box, Button, Stack, Text } from '@chakra-ui/core'
+import { Box, Button, Tag, Stack, Text } from '@chakra-ui/core'
 import { ChevronRightIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
@@ -9,6 +9,7 @@ import { observer } from 'mobx-react'
 import Link from 'next/link'
 import React, { useEffect } from 'react'
 import AwesomeSlider from 'react-awesome-slider'
+import { useStore } from 'services/root-store'
 // @ts-ignore
 import withAutoplay from 'react-awesome-slider/dist/autoplay'
 import { Urls } from 'urls'
@@ -19,21 +20,33 @@ const mobileHeaderBreakpoint = `@media screen and (max-width: 1100px)`
 const xsBreakpoint = `@media screen and (max-width: 500px)`
 
 export const LandingPage = observer(() => {
+  const { authStore } = useStore()
+
   useEffect(() => {
     const video = document.getElementById('ui-video') as HTMLVideoElement
     video.playbackRate = 1.5
   }, [])
+
+  const launchSalePlacesLeft = authStore.launchCoupon
+    ? authStore.launchCoupon.allowed_uses - authStore.launchCoupon.times_used
+    : 0
+  const showLaunchSale = launchSalePlacesLeft > 0
 
   return (
     <SiteLayoutFullWidth>
       <HeaderContainer>
         <HeaderContentWidthLimit>
           <HeaderTitleContainer>
+            <Box style={{ display: showLaunchSale ? 'inline-block' : 'none' }}>
+              <Tag colorScheme="purple" mx="auto" fontSize="lg" p="3">
+                {'🔥 '}33% sale – only {launchSalePlacesLeft} places left!
+              </Tag>
+            </Box>
             <HeaderTitle>
               Create unique word designs <em>in no time</em>.
             </HeaderTitle>
             <HeaderSubtitle>
-              Easy-to-use word art generator for personalized merchandise,
+              Easy-to-use & powerful word art generator for personalized gifts,
               prints, social media and more. <br /> <br /> No design skills
               required!
             </HeaderSubtitle>
@@ -218,7 +231,7 @@ export const LandingPage = observer(() => {
                 <strong>personalized items</strong>.
               </li>
               <li>
-                <strong>Generate new personalized designs</strong> for your next
+                <strong>Quickly generate new designs</strong> for your next
                 top-selling items.
               </li>
             </Text>

@@ -18,6 +18,7 @@ import {
   UpdateWordcloudDto,
   Wordcloud,
   WordcloudId,
+  Coupon,
 } from 'services/api/types'
 import { apiClient } from './api-client'
 import pako from 'pako'
@@ -31,6 +32,13 @@ export const ApiErrors = {
 export const Api = {
   setAuthToken: apiClient.setAuthToken,
   clearAuthToken: apiClient.clearAuthToken,
+
+  coupons: {
+    async fetchLaunchCoupon(): Promise<Coupon> {
+      const response = await apiClient.get('/users/launch-coupon')
+      return response.data as Coupon
+    },
+  },
 
   feedback: {
     async sendForm(data: {

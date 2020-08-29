@@ -114,6 +114,13 @@ export type HdDownloadResult = {
   canDownload: boolean
 }
 
+export type Coupon = {
+  coupon: string
+  allowed_uses: number
+  times_used: number
+  discount_amount: string
+}
+
 export type Order = {
   orderId: string
   createdAt: string

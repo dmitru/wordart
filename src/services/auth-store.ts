@@ -6,7 +6,7 @@ import { action, computed, observable, runInAction } from 'mobx'
 import 'mobx-react-lite/batchingForReactDom'
 import { LocalizedPrice, plans } from 'plans'
 import { Api } from 'services/api/api'
-import { MyProfile, Order } from 'services/api/types'
+import { MyProfile, Order, Coupon } from 'services/api/types'
 import { AuthTokenStore } from 'services/auth-token-store'
 import { RootStore } from 'services/root-store'
 import { consoleLoggers } from 'utils/console-logger'
@@ -48,6 +48,7 @@ export class AuthStore {
   @observable hasInitialized = false
   @observable profile: MyProfile | null = null
   @observable orders: Order[] | null = null
+  @observable launchCoupon: Coupon | null = null
 
   @observable planPrices = new Map<number, LocalizedPrice>()
 
@@ -128,6 +129,11 @@ export class AuthStore {
       })
       this.fetchLocalizedPrices()
     }
+  }
+
+  @action fetchLaunchCoupon = async () => {
+    const coupon = await Api.coupons.fetchLaunchCoupon()
+    this.launchCoupon = coupon
   }
 
   @action fetchMyOrders = async () => {
