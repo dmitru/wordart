@@ -3,21 +3,15 @@ import { ChevronRightIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
 import { SiteLayoutFullWidth } from 'components/layouts/SiteLayout/SiteLayout'
+import { PricingPlans } from 'components/pages/PricingPage/PricingPlans'
 import { motion } from 'framer-motion'
 import { observer } from 'mobx-react'
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect } from 'react'
 import AwesomeSlider from 'react-awesome-slider'
 // @ts-ignore
 import withAutoplay from 'react-awesome-slider/dist/autoplay'
-import { AiFillPrinter } from 'react-icons/ai'
-import { BsGrid3X3GapFill } from 'react-icons/bs'
-import { GiCupcake } from 'react-icons/gi'
-import { GoSettings } from 'react-icons/go'
-import { IoIosChatbubbles } from 'react-icons/io'
-import { MdColorLens, MdTimer } from 'react-icons/md'
 import { Urls } from 'urls'
-import { PricingPlans } from 'components/pages/PricingPage/PricingPlans'
 
 const Slider = withAutoplay(AwesomeSlider)
 
@@ -25,6 +19,11 @@ const mobileHeaderBreakpoint = `@media screen and (max-width: 1100px)`
 const xsBreakpoint = `@media screen and (max-width: 500px)`
 
 export const LandingPage = observer(() => {
+  useEffect(() => {
+    const video = document.getElementById('ui-video') as HTMLVideoElement
+    video.playbackRate = 1.5
+  }, [])
+
   return (
     <SiteLayoutFullWidth>
       <HeaderContainer>
@@ -156,6 +155,7 @@ export const LandingPage = observer(() => {
         `}
       >
         <video
+          id="ui-video"
           playsInline
           muted
           loop
