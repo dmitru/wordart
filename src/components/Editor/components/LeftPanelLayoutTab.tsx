@@ -1,4 +1,4 @@
-import { Box, Checkbox, Flex } from '@chakra-ui/core'
+import { Box, Checkbox, Flex, Alert } from '@chakra-ui/core'
 import { AddIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
@@ -240,6 +240,15 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
             />
           </Box>
         </Box>
+
+        {style.items.words.wordList.length +
+          style.items.icons.iconList.length ===
+          0 && (
+          <Alert status="info">
+            The layer is empty. Please add some words or icons, then click
+            "Visualize".
+          </Alert>
+        )}
 
         {style.items.words.wordList.length > 0 && (
           <>
