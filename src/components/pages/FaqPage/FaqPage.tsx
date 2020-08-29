@@ -79,7 +79,7 @@ export const FaqPage = observer(() => {
               <p>
                 Designs can be fully customized and downloaded in high quality
                 for social media, blogs, presentations or for printing on cards,
-                canvases, posters, merchendise or for other creative
+                canvases, posters, merchandise or for other creative
                 applications.
               </p>
               <p>
@@ -108,9 +108,11 @@ export const FaqPage = observer(() => {
               id="is-it-free-for-education"
             >
               <p>
-                Please write to us! We may offer our Unlimited plan for free for
-                folks using Wordcloudy in education, or offer a significant
-                discount (determined on case-by-case basis).
+                We may offer our Unlimited plan for free or with a significant
+                discount for students, non-profits or folks working in
+                education. Please write to us and tell us about your intended
+                use for Wordcloudy – eligibility is determined on case-by-case
+                basis.
               </p>
             </Question>
 
@@ -154,21 +156,20 @@ export const FaqPage = observer(() => {
                   ✅ Almost 1,000 of built-in fonts supporting dozens of
                   languages
                 </li>
+                <li>✅ Custom page sizes</li>
                 <li>
                   ✅ Huge searcheable collection of icons and vector shapes
                   (custom shapes are supported too, of course!)
+                </li>
+                <li>
+                  ✅ Ability to fill both shape <em>and</em> background layers.
                 </li>
                 <li>
                   ✅ Full support for vector graphics: every design created with
                   Wordcloudy can be downloaded as an SVG vector image, offering
                   the best possible quality when printed at any resolution.
                 </li>
-                <li>✅ Custom page sizes</li>
                 <li>✅ Filling shapes with icons (not just words!)</li>
-                <li>
-                  ✅ Ability to fill 2 layers: shape <em>and</em> background, or
-                  both.
-                </li>
                 <li>And so much more!..</li>
               </ul>
             </Question>
@@ -233,8 +234,8 @@ export const FaqPage = observer(() => {
             </Question>
 
             <Question
-              title="I'd like to have a certain aspect ratio, e.g. A4 portrat, or a square Instagram format"
-              id="filling-whole-canvas"
+              title={`I'd like to do a 8 x 10\" print. Can I change the page aspect ratio?`}
+              id="aspect-ratio"
             >
               <p>
                 You can customize page size in the editor by going to the
@@ -257,15 +258,15 @@ const QuestionStyled = styled(Box)<{ theme: Theme }>`
   }
 `
 
-const Question: React.FC<{
+export const Question: React.FC<{
   title: string
-  id: string
+  id?: string
   children: React.ReactNode
 }> = (props) => (
   <>
-    <QuestionStyled mb="3rem">
+    <QuestionStyled mb="2rem">
       <h2 id={props.id}>
-        {<QuestionLink href={`#${props.id}`}>#</QuestionLink>}
+        {props.id && <QuestionLink href={`#${props.id}`}>#</QuestionLink>}
         {props.title}
       </h2>
       {props.children}

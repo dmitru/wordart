@@ -13,6 +13,7 @@ import { useStore } from 'services/root-store'
 // @ts-ignore
 import withAutoplay from 'react-awesome-slider/dist/autoplay'
 import { Urls } from 'urls'
+import { Question } from 'components/pages/FaqPage/FaqPage'
 
 const Slider = withAutoplay(AwesomeSlider)
 
@@ -37,8 +38,18 @@ export const LandingPage = observer(() => {
       <HeaderContainer>
         <HeaderContentWidthLimit>
           <HeaderTitleContainer>
-            <Box style={{ display: showLaunchSale ? 'inline-block' : 'none' }}>
-              <Tag colorScheme="purple" mx="auto" fontSize="lg" p="3">
+            <Box
+              style={{ display: showLaunchSale ? 'inline-block' : 'none' }}
+              mt="1rem"
+              mb="-1rem"
+            >
+              <Tag
+                colorScheme="purple"
+                mx="auto"
+                fontSize="lg"
+                p="3"
+                display="inline-block"
+              >
                 {'🔥 '}33% sale – only {launchSalePlacesLeft} places left!
               </Tag>
             </Box>
@@ -113,7 +124,7 @@ export const LandingPage = observer(() => {
       </HeaderContainer>
 
       {/* UI Video header */}
-      <CtaFooterSection
+      <SectionHeader
         mb="30px"
         initial={{ opacity: 0, y: '40px' }}
         // @ts-ignore
@@ -124,11 +135,11 @@ export const LandingPage = observer(() => {
         }}
         animate={{ x: 0, y: 0, opacity: 1 }}
       >
-        <h1>Generate beautiful designs, instantly</h1>
+        <h1>Generate beautiful designs, easily</h1>
         <Text mt="0" mb="0" mx="auto" maxWidth="670px">
           Let Wordcloudy do the job. Save your time for more important things!
         </Text>
-      </CtaFooterSection>
+      </SectionHeader>
 
       {/* UI video */}
       <Box
@@ -185,7 +196,7 @@ export const LandingPage = observer(() => {
       </Box>
 
       {/* Use cases */}
-      <CtaFooterSection
+      <SectionHeader
         mb="30px"
         mt="6rem"
         initial={{ opacity: 0, y: '40px' }}
@@ -201,7 +212,7 @@ export const LandingPage = observer(() => {
         <Text mt="0" mb="0" maxWidth="600px" mx="auto">
           Use the awesome power of typography, words, shapes and colors!
         </Text>
-      </CtaFooterSection>
+      </SectionHeader>
 
       <UseCasesSectionContainer mb="4rem" mx="auto" mt="3rem">
         <UseCase
@@ -386,28 +397,51 @@ export const LandingPage = observer(() => {
         </UiFeature>
       </FeaturesSection> */}
 
-      {/* Pricing: TODO */}
-
+      {/* Pricing */}
       <Box mb="5rem">
-        <CtaFooterSection
-          mb="30px"
-          mt="5rem"
-          initial={{ opacity: 0, y: '40px' }}
-          // @ts-ignore
-          transition={{
-            ease: 'easeInOut',
-            duration: 0.5,
-            delay: 0.25,
-          }}
-          animate={{ x: 0, y: 0, opacity: 1 }}
-        >
+        <SectionHeader mb="30px" mt="5rem">
           <h1>Flexible pricing that works for you</h1>
           <Text mt="0" mb="0" maxWidth="600px" mx="auto">
-            Purchase download packs that never expire or choose an unlimited
-            plan for a period of time.
+            Purchase download packs that never expire or go for unlimited plan
+            for a period of time.
           </Text>
-        </CtaFooterSection>
-        <PricingPlans />
+        </SectionHeader>
+
+        <PricingPlans showOneTimePaymentNotice={false} />
+      </Box>
+
+      <SectionHeader mb="30px" mt="5rem">
+        <h1>Frequently Asked Questions</h1>
+      </SectionHeader>
+
+      <Box mx="auto" maxWidth="600px" mb="5rem">
+        <Question title="Can I customize the designs?">
+          Yes, almost everything can be customized! Fonts, colors, layout,
+          words. You can even move and resize individual words!
+        </Question>
+        <Question title="Are these plans subscriptions?">
+          No, all our plans are one-time payments. You will be charged only
+          once.
+        </Question>
+        <Question title="Do you offer discounts?">
+          We offer generous discounts for teachers, students and non-profits.
+          Contact us for more information.
+        </Question>
+        <Question title="Can I get a refund?">
+          Absolutely! If you're unhappy with our product we offer refunds within
+          7 days of purchase.
+        </Question>
+        <Question title="I have more questions!">
+          Please check our our{' '}
+          <Link passHref href={Urls.faq}>
+            <a>FAQ page</a>
+          </Link>{' '}
+          for more details or{' '}
+          <Link passHref href={Urls.contact}>
+            <a>ask us</a>
+          </Link>
+          .
+        </Question>
       </Box>
 
       {/* FAQ */}
@@ -512,7 +546,7 @@ const HeaderTitleContainer = styled.div`
   position: relative;
   z-index: 2;
   max-width: 430px;
-  margin-top: 80px;
+  margin-top: 50px;
   margin-right: 80px;
 
   /* @media screen and (max-width: 1200px) {
@@ -722,8 +756,10 @@ const UiScreenshot = styled(Box)`
   }
 `
 
+// ----------- FAQ -------------
+
 // ----------- CtaFooterSection --------------
-const CtaFooterSection = styled(motion.custom(Box))`
+const SectionHeader = styled(motion.custom(Box))`
   text-align: center;
   margin-left: 20px;
   margin-right: 20px;
