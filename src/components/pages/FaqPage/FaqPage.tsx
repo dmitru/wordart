@@ -6,10 +6,12 @@ import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
 import Link from 'next/link'
 import React from 'react'
+import { css } from '@emotion/core'
 import { Helmet } from 'react-helmet'
 import { Urls } from 'urls'
 import { getTabTitle } from 'utils/tab-title'
 import { GoMail } from 'react-icons/go'
+import { StartCreatingCta } from 'components/pages/LandingPage/LandingPage'
 
 export const FaqPage = observer(() => {
   return (
@@ -58,7 +60,7 @@ export const FaqPage = observer(() => {
                   as="a"
                   leftIcon={<GoMail />}
                 >
-                  Write to us
+                  Ask us!
                 </Button>
               </Link>
             </Stack>
@@ -141,16 +143,12 @@ export const FaqPage = observer(() => {
               id="how-is-it-different"
             >
               <p>
-                Wordcloudy was created from scratch using modern technology in
-                order to compete with other existing word art generators, like
-                WordArt.com.
+                Wordcloudy is focused on the single task of creating amazing
+                digital and printable word art designs. It was carefully
+                designed from scratch to help you save your time and produce
+                great-looking results.
               </p>
-              <p>
-                Worcloudy is more focused on the single task of creating amazing
-                digital and printable designs. It doesn't have the features that
-                it doesn't need. As such, there are less compromises in its
-                design as well as some unique features:
-              </p>
+              <p>To that end, it offers some of the unique features:</p>
               <ul>
                 <li>
                   ✅ Almost 1,000 of built-in fonts supporting dozens of
@@ -223,7 +221,7 @@ export const FaqPage = observer(() => {
             </Question>
 
             <Question
-              title="Can I fill the whole canvas with words (as opposed to filling a shape)?"
+              title="Can I fill the whole canvas with words, instead of filling a shape?"
               id="filling-whole-canvas"
             >
               <p>
@@ -243,6 +241,8 @@ export const FaqPage = observer(() => {
               </p>
             </Question>
           </Box>
+
+          <StartCreatingCta />
         </Box>
       </Box>
     </SiteLayout>
@@ -264,8 +264,15 @@ export const Question: React.FC<{
   children: React.ReactNode
 }> = (props) => (
   <>
-    <QuestionStyled mb="2rem">
-      <h2 id={props.id}>
+    <QuestionStyled mb="2rem" fontSize="lg">
+      <h2
+        id={props.id}
+        css={css`
+          font-weight: 600;
+          font-size: 22px;
+          font-family: 'Nunito', sans-serif;
+        `}
+      >
         {props.id && <QuestionLink href={`#${props.id}`}>#</QuestionLink>}
         {props.title}
       </h2>

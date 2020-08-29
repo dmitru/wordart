@@ -398,7 +398,7 @@ export const LandingPage = observer(() => {
       </FeaturesSection> */}
 
       {/* Pricing */}
-      <Box mb="5rem">
+      <Box mb="5rem" id="pricing">
         <SectionHeader mb="30px" mt="5rem">
           <h1>Flexible pricing that works for you</h1>
           <Text mt="0" mb="0" maxWidth="600px" mx="auto">
@@ -447,25 +447,28 @@ export const LandingPage = observer(() => {
       {/* FAQ */}
 
       {/* Footer CTA */}
-
-      {/* <CtaFooterSection mb="120px" mt="80px">
-        <h1>Ready to create your own unique designs?</h1>
-        <Text mt="0" mb="6">
-          It's fast and fun with Wordcloudy – advanced and user-friendly word
-          designs generator.
-        </Text>
-
-        <Stack spacing="3" direction="row" justifyContent="center">
-          <Link href={Urls.editor.create} passHref>
-            <Button as="a" size="lg" colorScheme="accent">
-              Start creating
-            </Button>
-          </Link>
-        </Stack>
-      </CtaFooterSection> */}
+      <StartCreatingCta />
     </SiteLayoutFullWidth>
   )
 })
+
+export const StartCreatingCta = () => (
+  <SectionHeader mb="120px" mt="80px">
+    <h1>Ready to create your own unique designs?</h1>
+    <Text mt="0" mb="6">
+      It's fast and fun with Wordcloudy – advanced and user-friendly word
+      designs generator.
+    </Text>
+
+    <Stack spacing="3" direction="row" justifyContent="center">
+      <Link href={`${Urls.landing}#pricing`} passHref>
+        <Button as="a" size="lg" colorScheme="accent">
+          Start creating
+        </Button>
+      </Link>
+    </Stack>
+  </SectionHeader>
+)
 
 const widthLimit = css`
   max-width: 1300px;

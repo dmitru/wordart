@@ -64,7 +64,7 @@ export const globalStyles = (
         color: #3c526f;
         border-bottom: none;
         font-size: 36px;
-        font-weight: 500;
+        font-weight: 800;
         font-family: 'Nunito', sans-serif;
       }
     `}
