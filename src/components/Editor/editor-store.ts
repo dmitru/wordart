@@ -262,10 +262,15 @@ export class EditorStore {
     if (params.serialized) {
       await this.loadSerialized(params.serialized)
     } else {
+      const defaultIcon = this.availableIconShapes.find(
+        (i) => i.id === 'fa-solid-heart'
+      )!
+      await this.selectShape(defaultIcon)
+      this.shapesPanel.icon.selected = defaultIcon.id
+
       const defaultShape = this.availableImageShapes[
         Math.floor(Math.random() * 12)
       ]
-      await this.selectShape(defaultShape)
       this.shapesPanel.image.selected = defaultShape.id
     }
 
@@ -1664,7 +1669,7 @@ export type LeftPanelShapesState = {
 }
 
 export const leftPanelShapesInitialState: LeftPanelShapesState = {
-  shapeKind: 'image',
+  shapeKind: 'icon',
   blob: {
     color: '#4A90E2',
     complexity: 70,
