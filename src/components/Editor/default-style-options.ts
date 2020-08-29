@@ -38,7 +38,7 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
     brightness: 0,
     opacity: 100,
     coloring: {
-      kind: 'color',
+      kind: 'shape',
       color: {
         kind: 'color',
         colors: range(4).map(() => getRandomColor()),
