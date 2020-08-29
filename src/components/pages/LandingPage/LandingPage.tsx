@@ -96,10 +96,10 @@ export const LandingPage = observer(() => {
               <Slider play cancelOnInteraction={false} interval={3000}>
                 <div data-src="/gallery/gallery-12.jpeg" />
                 <div data-src="/gallery/gallery-11.jpeg" />
-                <div data-src="/gallery/gallery-7.jpeg" />
                 <div data-src="/gallery/gallery-8.jpeg" />
                 <div data-src="/gallery/gallery-10.jpeg" />
                 <div data-src="/gallery/gallery-9.jpeg" />
+                <div data-src="/gallery/gallery-7.jpeg" />
                 <div data-src="/gallery/gallery-4.jpeg" />
                 <div data-src="/gallery/gallery-6.jpeg" />
                 {/* <div data-src="/gallery/gallery-3.jpeg" /> */}
