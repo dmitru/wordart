@@ -137,7 +137,7 @@ export const PricingPage = observer(() => {
                 main={
                   <>
                     <CrossIcon />
-                    Max. 10
+                    Max. 10 designs
                   </>
                 }
               />

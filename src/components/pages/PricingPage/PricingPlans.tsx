@@ -293,24 +293,34 @@ export const PricingPlans = observer(() => {
             </Box>
           </Box>
         </Box>
-        <Text color="gray.400" fontSize="sm" mt="5" mx="3">
-          * All plans are one-time payments and <strong>don't</strong>{' '}
-          auto-renew.
-        </Text>
       </Box>
     </Box>
   )
 
   return (
-    <Box
-      display="flex"
-      mx="auto"
-      alignItems={['center', 'center', 'flex-start']}
-      justifyContent="center"
-      flexDirection={['column', 'column', 'row']}
-    >
-      {downloadPlans}
-      {unlimitedPlans}
-    </Box>
+    <>
+      <Box
+        display="flex"
+        mx="auto"
+        alignItems={['center', 'center', 'flex-start']}
+        justifyContent="center"
+        flexDirection={['column', 'column', 'row']}
+      >
+        {downloadPlans}
+        {unlimitedPlans}
+      </Box>
+      <Text
+        color="gray.500"
+        fontSize="md"
+        mt="5"
+        mx="auto"
+        textAlign="center"
+        maxWidth="500px"
+      >
+        All plans are one-time payments and don't automatically renew.
+        <br />
+        You will only be charged once.
+      </Text>
+    </>
   )
 })

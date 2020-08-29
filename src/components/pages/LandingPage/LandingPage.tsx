@@ -34,8 +34,9 @@ export const LandingPage = observer(() => {
               Create unique word designs <em>in no time</em>.
             </HeaderTitle>
             <HeaderSubtitle>
-              Easy-to-use word art generator for social media, prints,
-              merchandise and more. <br /> <br /> No design skills required!
+              Easy-to-use word art generator for personalized merchandise,
+              prints, social media and more. <br /> <br /> No design skills
+              required!
             </HeaderSubtitle>
 
             <HeaderCtaContainer>
@@ -69,9 +70,9 @@ export const LandingPage = observer(() => {
             animate={{ x: 0, y: 0, opacity: 1, rotate: '2deg' }}
           >
             <HeaderSlider>
-              <Slider cancelOnInteraction={false} interval={3000}>
-                <div data-src="/gallery/gallery-11.jpeg" />
+              <Slider play cancelOnInteraction={false} interval={3000}>
                 <div data-src="/gallery/gallery-12.jpeg" />
+                <div data-src="/gallery/gallery-11.jpeg" />
                 <div data-src="/gallery/gallery-7.jpeg" />
                 <div data-src="/gallery/gallery-8.jpeg" />
                 <div data-src="/gallery/gallery-10.jpeg" />
@@ -111,10 +112,9 @@ export const LandingPage = observer(() => {
         }}
         animate={{ x: 0, y: 0, opacity: 1 }}
       >
-        <h1>Generate beautiful images, instantly</h1>
+        <h1>Generate beautiful designs, instantly</h1>
         <Text mt="0" mb="0" mx="auto" maxWidth="670px">
-          Let Wordcloudy do the heavy lifting. Spend your time on more important
-          things!
+          Let Wordcloudy do the job. Save your time for more important things!
         </Text>
       </CtaFooterSection>
 
@@ -174,6 +174,7 @@ export const LandingPage = observer(() => {
       {/* Use cases */}
       <CtaFooterSection
         mb="30px"
+        mt="6rem"
         initial={{ opacity: 0, y: '40px' }}
         // @ts-ignore
         transition={{
@@ -185,13 +186,13 @@ export const LandingPage = observer(() => {
       >
         <h1>Helps you achieve your goals</h1>
         <Text mt="0" mb="0" maxWidth="600px" mx="auto">
-          Use the awesome power of typography, words, shapes and colors to reach
-          your goals, no matter what they are.
+          Use the awesome power of typography, words, shapes and colors!
         </Text>
       </CtaFooterSection>
 
-      <UseCasesSectionContainer mb="4rem" mx="auto" mt="20px">
+      <UseCasesSectionContainer mb="4rem" mx="auto" mt="3rem">
         <UseCase
+          my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
           transition={{
@@ -200,105 +201,131 @@ export const LandingPage = observer(() => {
             delay: 0.25,
           }}
           animate={{ x: 0, y: 0, opacity: 1 }}
-          css={useCaseStyle}
           p="4"
           mx="20px"
-          boxShadow="md"
-          borderColor="gray.200"
-          borderStyle="solid"
-          borderWidth="1px"
-          borderRadius="lg"
+          display="flex"
         >
-          <Text fontSize="xl" fontWeight="medium" color="blue.600">
-            Blogs & Social Media
-          </Text>
-          <Text>
-            <strong>Grab attention and evoke emotion</strong> in your audience.{' '}
-            <strong>Enhance your message and stand out</strong> with memorable
-            and effective word art.
-          </Text>
+          <Box maxWidth="300px" width="100%" css={useCaseImgStyle} mr="2rem">
+            <img src="/landing/undraw_add_to_cart_vkjp.svg" />
+          </Box>
+          <Box>
+            <Text fontSize="2rem" color="teal.600" css={useCaseTitleStyle}>
+              For Merchendise Sellers
+            </Text>
+            <Text fontSize="20px" as="ul" color="gray.700">
+              <li>
+                <strong>Delight your customers</strong> with beautiful{' '}
+                <strong>personalized designs</strong>.
+              </li>
+              <li>
+                <strong>Easily generate new designs</strong> for your next
+                top-selling items.
+              </li>
+            </Text>
+          </Box>
         </UseCase>
 
         <UseCase
+          my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
           transition={{
             ease: 'easeInOut',
-            duration: 0.25,
-            delay: 0.5,
-            translateY: '-40px',
+            duration: 0.5,
+            delay: 0.25,
           }}
           animate={{ x: 0, y: 0, opacity: 1 }}
-          css={useCaseStyle}
           p="4"
           mx="20px"
-          boxShadow="md"
-          borderColor="gray.200"
-          borderStyle="solid"
-          borderWidth="1px"
-          borderRadius="lg"
+          display="flex"
+          flexDirection="row-reverse"
         >
-          <Text fontSize="xl" fontWeight="medium" color="teal.600">
-            Merchandise
-          </Text>
-          <Text>
-            <strong>Delight your customers</strong> with new cool products!{' '}
-            <strong>Quickly produce print-ready designs</strong> for your next
-            top-selling item: canvas prints, posters, t-shirts and more.
-          </Text>
+          <Box maxWidth="300px" width="100%" css={useCaseImgStyle} ml="2rem">
+            <img src="/landing/undraw_blogging_vpvv.svg" />
+          </Box>
+          <Box>
+            <Text fontSize="2rem" color="blue.600" css={useCaseTitleStyle}>
+              For Bloggers
+            </Text>
+            <Text fontSize="20px" as="ul" color="gray.700">
+              <li>
+                <strong>Grab attention and evoke emotion</strong> in your
+                audience.
+              </li>
+              <li>
+                <strong>Enhance your message and stand out</strong> with
+                memorable and effective word art.
+              </li>
+            </Text>
+          </Box>
         </UseCase>
 
         <UseCase
+          my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
-          transition={{ ease: 'easeInOut', duration: 0.25, delay: 0.75 }}
+          transition={{
+            ease: 'easeInOut',
+            duration: 0.5,
+            delay: 0.25,
+          }}
           animate={{ x: 0, y: 0, opacity: 1 }}
-          css={useCaseStyle}
           p="4"
           mx="20px"
-          boxShadow="md"
-          borderColor="gray.200"
-          borderStyle="solid"
-          borderWidth="1px"
-          borderRadius="lg"
+          display="flex"
+          flexDirection="row"
         >
-          <Text fontSize="xl" fontWeight="medium" color="orange.600">
-            Presenters & Educators
-          </Text>
-          <Text>
-            <strong>Captivate and engage</strong> your audience or students with
-            unique and entertaining content or presentation slides.
-          </Text>
+          <Box maxWidth="300px" width="100%" css={useCaseImgStyle} mr="2rem">
+            <img src="/landing/undraw_add_color_19gv.svg" />
+          </Box>
+          <Box>
+            <Text fontSize="2rem" color="pink.600">
+              For Designers
+            </Text>
+            <Text fontSize="20px" color="gray.700">
+              <strong>Save your time creating</strong>
+              {' unique design assets and backgrounds. '}
+              Export your creations in{' '}
+              <strong>high-resolution or as SVG</strong> and use them in your
+              favorite design tool.
+            </Text>
+          </Box>
         </UseCase>
 
         <UseCase
+          my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
-          transition={{ ease: 'easeInOut', duration: 0.25, delay: 1 }}
+          transition={{
+            ease: 'easeInOut',
+            duration: 0.5,
+            delay: 0.25,
+          }}
           animate={{ x: 0, y: 0, opacity: 1 }}
-          css={useCaseStyle}
           p="4"
           mx="20px"
-          boxShadow="md"
-          borderColor="gray.200"
-          borderStyle="solid"
-          borderWidth="1px"
-          borderRadius="lg"
+          display="flex"
+          flexDirection="row-reverse"
         >
-          <Text fontSize="xl" fontWeight="medium" color="pink.600">
-            Designers
-          </Text>
-          <Text>
-            <strong>Save your time creating</strong>
-            {' unique designs and backgrounds.'}
-            Export your designs as SVG to import in your favorite design tool.
-          </Text>
+          <Box maxWidth="300px" width="100%" css={useCaseImgStyle} ml="2rem">
+            <img src="/landing/undraw_Presentation_62e1.svg" />
+          </Box>
+          <Box>
+            <Text fontSize="2rem" color="orange.600">
+              For Presenters and Educators
+            </Text>
+            <Text fontSize="20px" color="gray.700">
+              <strong>Captivate and engage</strong> your audience or students
+              with <strong>unique and entertaining</strong> content or
+              presentation slides.
+            </Text>
+          </Box>
         </UseCase>
       </UseCasesSectionContainer>
 
       {/* Features */}
 
-      <FeaturesSection
+      {/* <FeaturesSection
         spacing="4"
         mx="auto"
         maxWidth="900px"
@@ -315,7 +342,7 @@ export const LandingPage = observer(() => {
           <Text fontWeight="bold" fontSize="lg">
             No design skills needed
           </Text>
-          <Text color="gray.500">
+          <Text fontSize="lg" color="gray.500">
             Wordcloudy is fun and easy to use – anyone can be a creator!
           </Text>
         </UiFeature>
@@ -327,7 +354,7 @@ export const LandingPage = observer(() => {
           <Text fontWeight="bold" fontSize="lg">
             Save time & money
           </Text>
-          <Text color="gray.500">
+          <Text fontSize="lg" color="gray.500">
             Easily generate awesome designs yourself, without the need for a
             designer.
           </Text>
@@ -340,15 +367,33 @@ export const LandingPage = observer(() => {
           <Text fontWeight="bold" fontSize="lg">
             Customize anything
           </Text>
-          <Text color="gray.500">
+          <Text fontSize="lg" color="gray.500">
             Tweak anything and pick from thousands of built-in fonts and shapes.
           </Text>
         </UiFeature>
-      </FeaturesSection>
+      </FeaturesSection> */}
 
       {/* Pricing: TODO */}
 
-      <Box>
+      <Box mb="5rem">
+        <CtaFooterSection
+          mb="30px"
+          mt="5rem"
+          initial={{ opacity: 0, y: '40px' }}
+          // @ts-ignore
+          transition={{
+            ease: 'easeInOut',
+            duration: 0.5,
+            delay: 0.25,
+          }}
+          animate={{ x: 0, y: 0, opacity: 1 }}
+        >
+          <h1>Flexible pricing that works for you</h1>
+          <Text mt="0" mb="0" maxWidth="600px" mx="auto">
+            Purchase download packs that never expire or choose an unlimited
+            plan for a period of time.
+          </Text>
+        </CtaFooterSection>
         <PricingPlans />
       </Box>
 
@@ -356,7 +401,7 @@ export const LandingPage = observer(() => {
 
       {/* Footer CTA */}
 
-      <CtaFooterSection mb="120px" mt="80px">
+      {/* <CtaFooterSection mb="120px" mt="80px">
         <h1>Ready to create your own unique designs?</h1>
         <Text mt="0" mb="6">
           It's fast and fun with Wordcloudy – advanced and user-friendly word
@@ -370,7 +415,7 @@ export const LandingPage = observer(() => {
             </Button>
           </Link>
         </Stack>
-      </CtaFooterSection>
+      </CtaFooterSection> */}
     </SiteLayoutFullWidth>
   )
 })
@@ -583,12 +628,23 @@ const HeaderSlider = styled.div`
 `
 
 // ----------- Use-cases section ---------------
-const UseCasesSectionContainer = styled(Box)({
-  width: '100%',
-  display: 'flex',
-  flexWrap: 'wrap',
-  justifyContent: 'center',
-})
+
+const useCaseImgStyle = css`
+  @media screen and (max-width: 670px) {
+    display: none;
+  }
+`
+
+const useCaseTitleStyle = css`
+  margin-left: 30px;
+  @media screen and (max-width: 670px) {
+    margin-left: 0;
+  }
+`
+
+const UseCasesSectionContainer = styled(Box)`
+  max-width: 850px;
+`
 
 const useCaseStyle = css`
   margin-bottom: 40px;
