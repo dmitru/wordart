@@ -361,9 +361,20 @@ export class Generator {
     unrotatedCtxPadded.globalCompositeOperation = 'destination-out'
 
     const iterations = range(0, nIter)
-    const chunkSize = 10
-    const chunkPaddingFactorV = 0.2
-    const chunkPaddingFactorH = 0.3
+    let chunkSize = 12
+
+    if (nIter < 10) {
+      chunkSize = 2
+    }
+    if (nIter < 20) {
+      chunkSize = 4
+    }
+    if (nIter < 40) {
+      chunkSize = 5
+    }
+
+    const chunkPaddingFactorV = 0.1
+    const chunkPaddingFactorH = 0.2
     const iterationBatches = chunk(iterations, chunkSize)
 
     let largestWordHPx = -1
@@ -622,10 +633,31 @@ export class Generator {
 
             const dw = wordPathSize.w * chunkPaddingFactorH
             const dh = wordPathSize.h * chunkPaddingFactorV
+            // unrotatedCtxPadded.fillRect(
+            //   wordPathBounds.x1 - dw / 2,
+            //   wordPathBounds.y1 - dh / 2,
+            //   wordPathSize.w + dw,
+            //   wordPathSize.h + dh
+            // )
+            unrotatedCtx.shadowBlur =
+              0.5 +
+              (task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6
+            // console.log('shadowBlur = ', unrotatedCtx.shadowBlur)
+            unrotatedCtx.shadowColor = 'red'
+            wordPath.draw(unrotatedCtxPadded)
+            unrotatedCtx.shadowBlur = 0
+
+            const dwEnds = (wordPathSize.w * 0.5) / word.text.length
             unrotatedCtxPadded.fillRect(
-              wordPathBounds.x1 - dw / 2,
+              wordPathBounds.x1 - dwEnds,
               wordPathBounds.y1 - dh / 2,
-              wordPathSize.w + dw,
+              dwEnds,
+              wordPathSize.h + dh
+            )
+            unrotatedCtxPadded.fillRect(
+              wordPathBounds.x2,
+              wordPathBounds.y1 - dh / 2,
+              dwEnds,
               wordPathSize.h + dh
             )
 
@@ -793,8 +825,8 @@ export class Generator {
           const iconMaxDimPx = maxDim * iconScale
 
           // Ensure the first word is the largest
-          if (largestWordHPx > 0 && iconMaxDimPx > largestWordHPx) {
-            iconScale = (largestWordHPx / iconMaxDimPx) * iconScale
+          if (largestWordHPx > 0 && iconMaxDimPx > 0.9 * largestWordHPx) {
+            iconScale = ((0.9 * largestWordHPx) / iconMaxDimPx) * iconScale
           }
 
           unrotatedCtx.save()
