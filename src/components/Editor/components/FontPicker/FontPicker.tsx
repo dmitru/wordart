@@ -43,33 +43,36 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
   const { selectedFontId, onHighlighted } = props
   const store = useEditorStore()!
 
-  const allFonts = store.getAvailableFonts({
+  const allFonts = store.getAvailableFonts()
+  const allFontsOrPopular = store.getAvailableFonts({
     popular: state.style === 'popular',
   })
 
   const listRef = useRef<List>(null)
 
   const styleOptions = uniq(
-    flatten(allFonts.map((f) => f.font.categories || []))
+    flatten(allFontsOrPopular.map((f) => f.font.categories || []))
   )
   styleOptions.sort()
 
-  const langOptions = uniq(flatten(allFonts.map((f) => f.font.subsets || [])))
+  const langOptions = uniq(
+    flatten(allFontsOrPopular.map((f) => f.font.subsets || []))
+  )
   langOptions.sort()
   langOptions.unshift('any')
 
-  const fonts = allFonts.filter(
-    (f) =>
-      (state.language === 'any' ||
-        (f.font.subsets || []).includes(state.language)) &&
-      ((state.style === 'popular' && f.font.isPopular) ||
-        (state.style !== 'popular' &&
-          state.style !== 'all' &&
-          (f.font.categories || [])[0] === state.style) ||
-        state.style === 'all') &&
-      f.font.title
-        .toLocaleLowerCase()
-        .startsWith(state.query.toLocaleLowerCase())
+  const fonts = allFonts.filter((f) =>
+    state.query
+      ? f.font.title
+          .toLocaleLowerCase()
+          .startsWith(state.query.toLocaleLowerCase())
+      : (state.language === 'any' ||
+          (f.font.subsets || []).includes(state.language)) &&
+        ((state.style === 'popular' && f.font.isPopular) ||
+          (state.style !== 'popular' &&
+            state.style !== 'all' &&
+            (f.font.categories || [])[0] === state.style) ||
+          state.style === 'all')
   )
 
   const selectedFont = useMemo(
@@ -123,6 +126,17 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
           padding: 8px 20px 4px;
         `}
       >
+        <Box display="flex" mb="1rem">
+          <SearchInput
+            size="lg"
+            placeholder="Find font..."
+            value={state.query}
+            onChange={(value) => {
+              state.query = value
+            }}
+          />
+        </Box>
+
         <Box display="flex" flexWrap="wrap" alignItems="flex-start">
           <Box
             css={css`
@@ -231,16 +245,6 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
             )}
           </Box>
         </Box>
-
-        <Box display="flex" mb="1">
-          <SearchInput
-            placeholder="Find font..."
-            value={state.query}
-            onChange={(value) => {
-              state.query = value
-            }}
-          />
-        </Box>
       </Box>
 
       <Box mt="2" flex="1">
@@ -271,12 +275,10 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
               width="100%"
               colorScheme="secondary"
               onClick={() => {
-                state.language = 'any'
-                state.style = 'popular'
                 state.query = ''
               }}
             >
-              Clear filters
+              Clear search
             </Button>
           </>
         )}

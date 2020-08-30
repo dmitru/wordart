@@ -80,16 +80,32 @@ export const FontPickerModal: React.FC<FontPickerModalProps> = observer(
 
     return (
       <>
-        <Modal size="sm" isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay>
-            <ModalContent>
+            <ModalContent maxWidth="700px" width="100%">
               <ModalHeader>{title}</ModalHeader>
 
               <ModalBody height="calc(100vh - 240px)">
-                <Box display="flex" flexDirection="column" height="100%">
-                  {selectedFont && (
-                    <>
-                      <Box>
+                <Box display="flex" flexDirection="row" height="100%">
+                  <Box display="flex" flexDirection="column" flex="1">
+                    <FontPicker
+                      onHighlighted={(font, fontStyle) => {
+                        state.selectedFontId = fontStyle.fontId
+                        if (showCancel) {
+                          animateElement(
+                            document.getElementById('font-picker-done')!,
+                            'pulsate-fwd-subtle'
+                          )
+                        }
+                        onHighlighted(font, fontStyle)
+                      }}
+                      selectedFontId={state.selectedFontId}
+                    />
+                  </Box>
+
+                  <Box ml="60px" flex="1" mt="100px">
+                    {selectedFont && (
+                      <>
                         {selectedFontStyle && (
                           <SelectedFontThumbnail mb="0" p="3">
                             <img src={selectedFontStyle.thumbnail} />
@@ -139,30 +155,8 @@ export const FontPickerModal: React.FC<FontPickerModalProps> = observer(
                             </MenuList>
                           </Menu>
                         </Box>
-                      </Box>
-                    </>
-                  )}
-
-                  <Box
-                    mt="1rem"
-                    display="flex"
-                    flexDirection="column"
-                    flex="1"
-                    borderTop="1px solid #efefef"
-                  >
-                    <FontPicker
-                      onHighlighted={(font, fontStyle) => {
-                        state.selectedFontId = fontStyle.fontId
-                        if (showCancel) {
-                          animateElement(
-                            document.getElementById('font-picker-done')!,
-                            'pulsate-fwd-subtle'
-                          )
-                        }
-                        onHighlighted(font, fontStyle)
-                      }}
-                      selectedFontId={state.selectedFontId}
-                    />
+                      </>
+                    )}
                   </Box>
                 </Box>
               </ModalBody>
