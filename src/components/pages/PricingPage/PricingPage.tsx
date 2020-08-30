@@ -227,8 +227,7 @@ export const PricingPage = observer(() => {
               fontSize="lg"
               color="gray.600"
             >
-              Find answers to commonly asked questions about our plans and
-              pricing.
+              Find answers to common questions about our plans and pricing.
             </Text>
           </Box>
 

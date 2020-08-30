@@ -1372,7 +1372,7 @@ export class Editor {
     }
 
     this.items[target] = {
-      items,
+      items: [...oldItemsToKeep, ...items],
       itemsById,
       fabricObjToItem,
     }
@@ -1423,6 +1423,9 @@ export class Editor {
 
     const { processedWordList, langCheckErrors } = this.processWordList({
       wordConfigs: style.items.words.wordList,
+      lockedWords: this.items.bg.items.filter(
+        (i) => i.kind === 'word' && i.locked
+      ) as EditorItemWord[],
       defaultFonts,
       defaultAngles: style.items.words.angles,
     })
@@ -1668,6 +1671,9 @@ export class Editor {
 
     const { processedWordList, langCheckErrors } = this.processWordList({
       wordConfigs: style.items.words.wordList,
+      lockedWords: this.items.shape.items.filter(
+        (i) => i.kind === 'word' && i.locked
+      ) as EditorItemWord[],
       defaultFonts,
       defaultAngles: style.items.words.angles,
     })
@@ -2239,6 +2245,7 @@ export class Editor {
   /** Converts WordListEntry[] into FillShapeTaskWordConfig[], doing some validation and error checking */
   processWordList = (params: {
     wordConfigs: WordListEntry[]
+    lockedWords: EditorItemWord[]
     defaultFonts: Font[]
     defaultAngles: number[]
   }): {
@@ -2281,13 +2288,28 @@ export class Editor {
       if (supportedFonts.length === 0) {
         errors.push({ word: text })
       } else {
-        processedWordList.push({
-          wordConfigId: wc.id,
-          text,
-          angles: wc.angle != null ? [wc.angle] : params.defaultAngles,
-          fonts: supportedFonts,
-          repeats: wc.repeats ?? -1,
-        })
+        let repeats = wc.repeats ?? -1
+
+        const lockedWords = params.lockedWords.filter(
+          (w) => w.defaultText === text
+        )
+
+        if (lockedWords.length > 0 && repeats > 0) {
+          repeats -= lockedWords.length
+          if (repeats < 0) {
+            repeats = 0
+          }
+        }
+
+        if (repeats !== 0) {
+          processedWordList.push({
+            wordConfigId: wc.id,
+            text,
+            angles: wc.angle != null ? [wc.angle] : params.defaultAngles,
+            fonts: supportedFonts,
+            repeats,
+          })
+        }
       }
     }
 

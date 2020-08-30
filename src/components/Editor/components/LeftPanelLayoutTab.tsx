@@ -274,7 +274,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                     style.items.placement.wordsMaxSize = val
                   }}
                   onAfterChange={animateVisualize}
-                  resetValue={70}
+                  resetValue={90}
                   min={20}
                   max={100}
                   step={1}

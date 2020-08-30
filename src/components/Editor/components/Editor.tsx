@@ -108,6 +108,7 @@ import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescripti
 import { WordColorPickerPopover } from './WordColorPickerPopover'
 import { useLocalStorage } from 'utils/use-local-storage'
 import { analytics, StructuredEvents } from 'services/analytics'
+import { FaLock, FaLockOpen } from 'react-icons/fa'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -903,7 +904,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                       />
                       <MenuItemWithDescription
                         title="Read FAQ"
-                        description="Find answers to commonly asked questions"
+                        description="Find answers to common questions"
                         onClick={() => {
                           openUrlInNewTab(`${config.baseUrl}${Urls.faq}`)
                         }}
@@ -1427,24 +1428,33 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                             <>
                               <WordColorPickerPopover />
 
-                              <Button
-                                ml="2"
-                                onClick={() => {
-                                  if (!store.selectedItemData) {
-                                    return
+                              <Tooltip label="Lock the item to preserve its position between re-visualizations">
+                                <Button
+                                  ml="2"
+                                  onClick={() => {
+                                    if (!store.selectedItemData) {
+                                      return
+                                    }
+                                    store.setItemLock(
+                                      !Boolean(store.selectedItemData.locked)
+                                    )
+                                  }}
+                                  css={css`
+                                    width: 90px;
+                                  `}
+                                  leftIcon={
+                                    store.selectedItemData.locked ? (
+                                      <FaLockOpen />
+                                    ) : (
+                                      <FaLock />
+                                    )
                                   }
-                                  store.setItemLock(
-                                    !Boolean(store.selectedItemData.locked)
-                                  )
-                                }}
-                                css={css`
-                                  width: 84px;
-                                `}
-                              >
-                                {store.selectedItemData.locked
-                                  ? 'Unlock'
-                                  : 'Lock'}
-                              </Button>
+                                >
+                                  {store.selectedItemData.locked
+                                    ? 'Unlock'
+                                    : 'Lock'}
+                                </Button>
+                              </Tooltip>
                             </>
                           )}
 

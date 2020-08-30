@@ -124,7 +124,7 @@ export const defaultBgStyleOptions: BgStyleOptions = {
       iconsProportion: 30,
       shapePadding: 15,
       itemDensity: 55,
-      wordsMaxSize: 70,
+      wordsMaxSize: 90,
     },
   },
 }
