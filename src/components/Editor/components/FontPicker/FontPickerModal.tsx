@@ -39,7 +39,7 @@ export type FontPickerModalProps = {
 export const FontPickerModal: React.FC<FontPickerModalProps> = observer(
   (props) => {
     const {
-      title = 'Choose font',
+      title = 'Choose a font',
       isOpen,
       cancelText = 'Cancel',
       submitText = 'Choose font',
@@ -83,8 +83,6 @@ export const FontPickerModal: React.FC<FontPickerModalProps> = observer(
         <Modal isOpen={isOpen} onClose={onClose}>
           <ModalOverlay>
             <ModalContent maxWidth="700px" width="100%">
-              <ModalHeader>{title}</ModalHeader>
-
               <ModalBody height="calc(100vh - 240px)">
                 <Box display="flex" flexDirection="row" height="100%">
                   <Box display="flex" flexDirection="column" flex="1">

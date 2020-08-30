@@ -129,7 +129,7 @@ export const FontPicker: React.FC<FontPickerProps> = observer((props) => {
         <Box display="flex" mb="1rem">
           <SearchInput
             size="lg"
-            placeholder="Find font..."
+            placeholder={`Search ${allFonts.length} fonts...`}
             value={state.query}
             onChange={(value) => {
               state.query = value
