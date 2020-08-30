@@ -361,8 +361,9 @@ export class Generator {
     unrotatedCtxPadded.globalCompositeOperation = 'destination-out'
 
     const iterations = range(0, nIter)
-    const chunkSize = 8
-    const chunkPaddingFactor = 0.3
+    const chunkSize = 10
+    const chunkPaddingFactorV = 0.2
+    const chunkPaddingFactorH = 0.3
     const iterationBatches = chunk(iterations, chunkSize)
 
     let largestWordHPx = -1
@@ -619,8 +620,8 @@ export class Generator {
               // console.log('case: BIG')
             }
 
-            const dw = wordPathSize.w * chunkPaddingFactor
-            const dh = wordPathSize.h * chunkPaddingFactor
+            const dw = wordPathSize.w * chunkPaddingFactorH
+            const dh = wordPathSize.h * chunkPaddingFactorV
             unrotatedCtxPadded.fillRect(
               wordPathBounds.x1 - dw / 2,
               wordPathBounds.y1 - dh / 2,
@@ -628,9 +629,7 @@ export class Generator {
               wordPathSize.h + dh
             )
 
-            // console.screenshot(unrotatedCtx.canvas)
-
-            // wordPath.draw(unrotatedCtxPadded)
+            // console.screenshot(unrotatedCtxPadded.canvas)
 
             const item: WordGeneratedItem = {
               index: i,
@@ -845,8 +844,8 @@ export class Generator {
               iconBounds.h
             )
 
-            const dw = iconBounds.w * chunkPaddingFactor
-            const dh = iconBounds.h * chunkPaddingFactor
+            const dw = iconBounds.w * chunkPaddingFactorV
+            const dh = iconBounds.h * chunkPaddingFactorV
             unrotatedCtxPadded.fillRect(
               iconBounds.x - dw / 2,
               iconBounds.y - dh / 2,
@@ -907,8 +906,6 @@ export class Generator {
 
           unrotatedCtx.restore()
           unrotatedCtxPadded.restore()
-
-          // console.screenshot(unrotatedCtx.canvas)
 
           iconRepeats[iconIndex]++
           availableIcons = icons.filter((w, index) => {

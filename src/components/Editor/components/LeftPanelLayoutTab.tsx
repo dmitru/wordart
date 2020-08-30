@@ -262,7 +262,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                     <>
                       Max. size
                       <HelpTooltipIcon
-                        label={`Max. size the placed words can be. You can use this slider to make all words larger or smaller.`}
+                        label={`Size of the largest placed word. You can use this slider to make all words larger or smaller.`}
                         ml="3"
                       />
                     </>

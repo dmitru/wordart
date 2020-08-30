@@ -1270,8 +1270,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                     <ModalContent>
                       <ModalHeader>
                         {store.visualizingStep === 'generating'
-                          ? 'Generating'
-                          : 'Visualizing'}
+                          ? '⏳ Generating'
+                          : '⏳ Visualizing'}
                         : {Math.round(100 * (store.visualizingProgress || 0))}%
                       </ModalHeader>
                       <ModalBody pb={6}>
