@@ -1456,7 +1456,7 @@ export class EditorStore {
     }
   }
 
-  @action setPageSize = (pageSize: Partial<PageSize>) => {
+  @action setPageSize = (pageSize: Partial<PageSize>, resetShape = true) => {
     this.pageSize = { ...this.pageSize, ...pageSize }
     if (!this.editor) {
       return
@@ -1470,9 +1470,11 @@ export class EditorStore {
     this.editor.setAspectRatio(aspect)
 
     // Reset the shape
-    const shapeConf = this.getShapeConf()
-    if (shapeConf) {
-      this.selectShape(shapeConf, false, true)
+    if (resetShape) {
+      const shapeConf = this.getShapeConf()
+      if (shapeConf) {
+        this.selectShape(shapeConf, false, true)
+      }
     }
   }
 

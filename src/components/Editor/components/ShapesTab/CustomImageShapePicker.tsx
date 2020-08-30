@@ -160,13 +160,16 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
 
           const canvas = await loadImageUrlToCanvasCtx(value.originalUrl)
 
-          store.setPageSize({
-            kind: 'custom',
-            custom: {
-              width: Math.ceil(canvas.canvas.width),
-              height: Math.ceil(canvas.canvas.height),
+          store.setPageSize(
+            {
+              kind: 'custom',
+              custom: {
+                width: Math.ceil(canvas.canvas.width),
+                height: Math.ceil(canvas.canvas.height),
+              },
             },
-          })
+            false
+          )
           store.selectShapeAndSaveUndo(shapeConf)
         }}
       />
