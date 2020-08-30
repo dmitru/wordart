@@ -551,6 +551,7 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                     mode="virtual"
                     renderClone={(provided, snapshot, rubric) => (
                       <WordListRow
+                        allWordsCount={0}
                         style={provided.draggableProps.style}
                         isSelected={state.selectedWords.has(
                           filteredWords[rubric.source.index].id
