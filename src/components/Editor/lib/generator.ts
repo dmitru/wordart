@@ -710,6 +710,9 @@ export class Generator {
           // console.screenshot(unrotatedCtxPadded.canvas, 0.5)
 
           wordRepeats[wordConfigIndex]++
+
+          const wordsCountOld = availableWords.length
+
           availableWords = words.filter((w, index) => {
             const wordConfIndex = w.wordConfigIndex
             return (
@@ -717,7 +720,13 @@ export class Generator {
               wordRepeats[wordConfIndex] < wordMaxRepeats[wordConfIndex]
             )
           })
-          availableWordIndex = (availableWordIndex + 1) % availableWords.length
+
+          if (wordsCountOld !== availableWords.length) {
+            availableWordIndex = availableWordIndex % availableWords.length
+          } else {
+            availableWordIndex =
+              (availableWordIndex + 1) % availableWords.length
+          }
         } else {
           const icon = availableIcons[availableIconIndex]
 
@@ -940,15 +949,22 @@ export class Generator {
           unrotatedCtxPadded.restore()
 
           iconRepeats[iconIndex]++
+
+          const iconsCountOld = availableIcons.length
+
           availableIcons = icons.filter((w, index) => {
-            const wordConfIndex = index
             return (
               iconMaxRepeats[index] === -1 ||
               iconRepeats[index] < iconMaxRepeats[index]
             )
           })
 
-          availableIconIndex = (availableIconIndex + 1) % availableIcons.length
+          if (iconsCountOld !== availableIcons.length) {
+            availableIconIndex = availableIconIndex % availableIcons.length
+          } else {
+            availableIconIndex =
+              (availableIconIndex + 1) % availableIcons.length
+          }
         }
 
         if (currentBatch.length >= batchSize && onProgressCallback) {
