@@ -46,7 +46,7 @@ import {
   DraggableStateSnapshot,
   Droppable,
 } from 'react-beautiful-dnd'
-import { FaCog } from 'react-icons/fa'
+import { FaCog, FaChevronUp, FaChevronDown } from 'react-icons/fa'
 import { FiDownload, FiRefreshCw, FiSearch } from 'react-icons/fi'
 import { MdFormatSize } from 'react-icons/md'
 import AutoSizer from 'react-virtualized-auto-sizer'
@@ -423,6 +423,34 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
       [target]
     )
 
+    const handleWordMoveToStart = useCallback(
+      (word: WordListEntry) => {
+        const index = words.wordList.findIndex((w) => w === word)
+        if (index > -1) {
+          runInAction(() => {
+            words.wordList.splice(index, 1)
+            words.wordList.unshift(word)
+          })
+          store.animateVisualize(false)
+        }
+      },
+      [target]
+    )
+
+    const handleWordMoveToEnd = useCallback(
+      (word: WordListEntry) => {
+        const index = words.wordList.findIndex((w) => w === word)
+        if (index > -1) {
+          runInAction(() => {
+            words.wordList.splice(index, 1)
+            words.wordList.push(word)
+          })
+          store.animateVisualize(false)
+        }
+      },
+      [target]
+    )
+
     const handleWordEditsSubmit = useCallback(
       (word: WordListEntry) => {
         const text = word.text.trim()
@@ -557,7 +585,10 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
                                   onRangeSelectionToggle: handleRangeSelectionChange,
                                   focusNextField,
                                   focusPrevField,
+                                  allWordsCount: words.wordList.length,
                                   onDelete: handleWordDelete,
+                                  onMoveToStart: handleWordMoveToStart,
+                                  onMoveToEnd: handleWordMoveToEnd,
                                   onSubmit: handleWordEditsSubmit,
                                   onAfterColorChange: handleWordColorChange,
                                 },
@@ -652,6 +683,7 @@ const ListRow = React.memo<ListChildComponentProps>(
 
 const WordListRow: React.FC<
   {
+    allWordsCount: number
     index?: number
     style?: React.CSSProperties
     isSelected: boolean
@@ -661,6 +693,8 @@ const WordListRow: React.FC<
     snapshot: DraggableStateSnapshot
     word: WordListEntry
     showDragHandle?: boolean
+    onMoveToStart?: (word: WordListEntry) => void
+    onMoveToEnd?: (word: WordListEntry) => void
     onDelete?: (word: WordListEntry) => void
     onSubmit?: (word: WordListEntry) => void
     onAfterColorChange?: () => void
@@ -670,6 +704,7 @@ const WordListRow: React.FC<
 > = observer(
   ({
     index,
+    allWordsCount,
     word,
     isSelected,
     onRangeSelectionToggle = noop,
@@ -678,6 +713,8 @@ const WordListRow: React.FC<
     showDragHandle = true,
     provided,
     snapshot,
+    onMoveToStart = noop,
+    onMoveToEnd = noop,
     onSubmit = noop,
     onDelete = noop,
     focusNextField = noop,
@@ -768,6 +805,22 @@ const WordListRow: React.FC<
             {(styles) => (
               // @ts-ignore
               <MenuList css={styles}>
+                {index != null && index > 0 && (
+                  <MenuItemWithIcon
+                    icon={<FaChevronUp />}
+                    onClick={() => onMoveToStart(word)}
+                  >
+                    Move to top
+                  </MenuItemWithIcon>
+                )}
+                {index != null && index < allWordsCount - 1 && (
+                  <MenuItemWithIcon
+                    icon={<FaChevronDown />}
+                    onClick={() => onMoveToEnd(word)}
+                  >
+                    Move to bottom
+                  </MenuItemWithIcon>
+                )}
                 {hasCustomizations && (
                   <MenuItemWithIcon
                     icon={<FiRefreshCw />}
