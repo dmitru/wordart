@@ -1286,42 +1286,6 @@ export class Editor {
     return items
   }
 
-  deleteNonLockedShapeItems = async () => {
-    const oldItemsToDelete = [...this.items.shape.itemsById.values()].filter(
-      (item) => !item.locked
-    )
-    this.canvas.remove(
-      ...flatten(
-        oldItemsToDelete.map((item) => [
-          item.fabricObj,
-          ...item.fabricObj.getObjects(),
-        ])
-      )
-    )
-    oldItemsToDelete.forEach((i) => this.items.shape.itemsById.delete(i.id))
-  }
-
-  // addShapeItems = async (itemConfigs: EditorItemConfig[]) => {
-  //   let { items, itemsById, fabricObjToItem } = await this.convertToEditorItems(
-  //     itemConfigs
-  //   )
-  //   const oldItemsToKeep = [...this.items.shape.items]
-  //   for (const item of oldItemsToKeep) {
-  //     itemsById.set(item.id, item)
-  //     fabricObjToItem.set(item.fabricObj, item)
-  //   }
-
-  //   const objs = items.map((item) => item.fabricObj)
-  //   this.canvas.add(...objs)
-  //   this.canvas.requestRenderAll()
-
-  //   this.items.shape = {
-  //     items: [...oldItemsToKeep, ...items],
-  //     itemsById,
-  //     fabricObjToItem,
-  //   }
-  // }
-
   setShapeItems = (itemConfigs: EditorItemConfig[], render = true) =>
     this.setItems('shape', itemConfigs, render)
 

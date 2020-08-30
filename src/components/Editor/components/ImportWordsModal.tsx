@@ -19,7 +19,8 @@ import {
   Text,
   Textarea,
 } from '@chakra-ui/core'
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
+import { uniq } from 'lodash'
+import { ChevronDownIcon, ChevronUpIcon, SettingsIcon } from '@chakra-ui/icons'
 import { Button } from 'components/shared/Button'
 import { Input } from 'components/shared/Input'
 import { observable } from 'mobx'
@@ -28,8 +29,27 @@ import papaparse from 'papaparse'
 import { useDropzone } from 'react-dropzone'
 import { Api } from 'services/api/api'
 import stopword from 'stopword'
+import pluralize from 'pluralize'
 import { ImportedWord } from '../editor-store'
 import { csvDataToWords } from '../words-import-export'
+import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
+import { FaSlidersH } from 'react-icons/fa'
+
+const stopwordList = [
+  ...stopword.en,
+  ...stopword.es,
+  ...stopword.fr,
+  ...stopword.de,
+  ...stopword.it,
+  ...stopword.ru,
+  'not',
+  'one',
+  'de',
+  'it',
+  'so',
+  'la',
+  'among',
+]
 
 export type ImportWordsModalProps = {
   isOpen: boolean
@@ -47,7 +67,7 @@ const state = observable({
   urlInput: '',
   tabIndex: 0,
   removeNumbers: true,
-  stemming: true,
+  singularize: true,
   removeCommon: true,
   clearExistingBeforeImporting: true,
   isShowingOptions: false,
@@ -66,7 +86,7 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
         // Remove non-words symbols
         words = words
           .map((w) => {
-            return w.replace(/\W+$/, '').replace(/^\W+/, '')
+            return w.replace(/'s$/, '').replace(/\W+$/, '').replace(/^\W+/, '')
           })
           .filter((w) => w)
 
@@ -83,8 +103,16 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
 
         // Remove stop-words
         if (state.removeCommon) {
-          words = stopword.removeStopwords(words)
+          words = stopword.removeStopwords(words, stopwordList)
         }
+
+        // Singularize
+        if (state.singularize) {
+          words = words.map((w) => pluralize.singular(w))
+        }
+
+        // Make unique
+        words = uniq(words)
 
         // Limit to 100 words
         words = words.slice(0, 100)
@@ -127,7 +155,7 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
             url,
             removeCommon: state.removeCommon,
             removeNumbers: state.removeNumbers,
-            stemming: state.stemming,
+            singularize: state.singularize,
             limit: 100,
           })
           onImported({
@@ -166,8 +194,9 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
           rightIcon={
             state.isShowingOptions ? <ChevronUpIcon /> : <ChevronDownIcon />
           }
+          leftIcon={<FaSlidersH />}
         >
-          {state.isShowingOptions ? 'Hide ' : 'Show '} options
+          Options
         </Button>
 
         <Collapse isOpen={state.isShowingOptions}>
@@ -178,7 +207,7 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
                 state.removeCommon = e.target.checked
               }}
             >
-              Remove common words (e.g. "and", "a", "the", etc)
+              Remove common words ("and", "a", "the", etc)
             </Checkbox>
 
             <Checkbox
@@ -191,12 +220,13 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
             </Checkbox>
 
             <Checkbox
-              isChecked={state.stemming}
+              isChecked={state.singularize}
               onChange={(e) => {
-                state.stemming = e.target.checked
+                state.singularize = e.target.checked
               }}
             >
-              Word stemming (e.g. treat “love” and “loves” as the same word)
+              Make all words singular
+              <HelpTooltipIcon label="Normalizes words, e.g. turns the word “dogs“ into “dog“" />
             </Checkbox>
           </Stack>
         </Collapse>

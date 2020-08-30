@@ -288,6 +288,8 @@ export class EditorStore {
     return { shape, bg, total }
   }
 
+  removeItem = () => {}
+
   setItemLock = (lockValue: boolean) => {
     if (!this.selectedItem || !this.selectedItemData) {
       return

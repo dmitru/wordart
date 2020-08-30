@@ -108,7 +108,7 @@ import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescripti
 import { WordColorPickerPopover } from './WordColorPickerPopover'
 import { useLocalStorage } from 'utils/use-local-storage'
 import { analytics, StructuredEvents } from 'services/analytics'
-import { FaLock, FaLockOpen } from 'react-icons/fa'
+import { FaLock, FaLockOpen, FaTrashAlt } from 'react-icons/fa'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -1423,6 +1423,16 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           >
                             Reset All
                           </Button>
+
+                          <Tooltip label="Remove item">
+                            <Button
+                              mr="2"
+                              variant="ghost"
+                              onClick={() => store.removeItem()}
+                            >
+                              <FaTrashAlt />
+                            </Button>
+                          </Tooltip>
 
                           {store.selectedItemData && (
                             <>

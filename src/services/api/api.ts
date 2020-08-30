@@ -58,7 +58,7 @@ export const Api = {
       url: string
       removeCommon?: boolean
       removeNumbers?: boolean
-      stemming?: boolean
+      singularize?: boolean
       limit?: number
     }): Promise<{ words: string[]; counts: number[] }> {
       const response = await apiClient.post('/extract/url', data)
