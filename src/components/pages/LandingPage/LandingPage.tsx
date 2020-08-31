@@ -794,7 +794,7 @@ const useCaseTitleStyle = css`
 `
 
 const UseCasesSectionContainer = styled(Box)`
-  max-width: 850px;
+  max-width: 950px;
 `
 
 const useCaseStyle = css`
