@@ -121,7 +121,7 @@ export const IconPicker: React.FC<IconPickerProps> = observer(
         </Flex>
 
         <ShapeSelector
-          columns={6}
+          columns={4}
           showProcessedThumbnails={false}
           overscanCount={3}
           shapes={matchingItems}
