@@ -55,9 +55,9 @@ export const LandingPage = observer(() => {
             </Box> */}
             <HeaderTitle>
               Instantly create
-              <br /> <em className="first">unique word art,</em>
+              <br /> <em className="first">unique word art.</em>
               <br />
-              without design skills.
+              No design skills required.
             </HeaderTitle>
             <HeaderSubtitle>
               Powerful & easy-to-use word art generator for personalized gifts,
@@ -90,20 +90,22 @@ export const LandingPage = observer(() => {
           </HeaderTitleContainer>
 
           <HeaderSliderContainer
-            initial={{ opacity: 0, rotate: '2deg' }}
+            initial={{ opacity: 0 }}
             transition={{ ease: 'easeInOut', duration: 0.5 }}
-            animate={{ x: 0, y: 0, opacity: 1, rotate: '2deg' }}
+            animate={{ x: 0, y: 0, opacity: 1 }}
           >
             <HeaderSlider>
               <Slider play cancelOnInteraction={false} interval={3000}>
-                <div data-src="/gallery/gallery-12.jpeg" />
-                <div data-src="/gallery/gallery-11.jpeg" />
+                <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/Untitled%20design.jpg" />
+                <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/landing-slides-50.jpg" />
+                <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/landing-slides-jessica.jpg" />
+                {/* <div data-src="/gallery/gallery-11.jpeg" />
                 <div data-src="/gallery/gallery-8.jpeg" />
                 <div data-src="/gallery/gallery-10.jpeg" />
                 <div data-src="/gallery/gallery-9.jpeg" />
                 <div data-src="/gallery/gallery-7.jpeg" />
                 <div data-src="/gallery/gallery-4.jpeg" />
-                <div data-src="/gallery/gallery-6.jpeg" />
+                <div data-src="/gallery/gallery-6.jpeg" /> */}
                 {/* <div data-src="/gallery/gallery-3.jpeg" /> */}
               </Slider>
             </HeaderSlider>
@@ -165,10 +167,6 @@ export const LandingPage = observer(() => {
         </Text>
       </SectionHeader>
 
-      <Box mb="2rem">
-        <CreateCtaButton />
-      </Box>
-
       {/* UI video */}
       <Box
         boxShadow="md"
@@ -220,6 +218,10 @@ export const LandingPage = observer(() => {
             type="video/mp4"
           />
         </video>
+      </Box>
+
+      <Box mt="2rem">
+        <CreateCtaButton />
       </Box>
 
       {/* Use cases */}
@@ -283,8 +285,6 @@ export const LandingPage = observer(() => {
             </Text>
           </Box>
         </UseCase>
-
-        <CreateCtaButton />
 
         <UseCase
           my="2rem"
@@ -578,8 +578,8 @@ const HeaderTitleContainer = styled.div`
 
   position: relative;
   z-index: 2;
-  max-width: 520px;
-  margin-top: 50px;
+  max-width: 400px;
+  margin-top: 70px;
   margin-right: 30px;
 
   /* @media screen and (max-width: 1200px) {
@@ -650,8 +650,8 @@ const HeaderSubtitle = styled.h2`
   color: #3c526f;
   font-family: 'Nunito', sans-serif;
   font-size: 26px;
-  font-weight: 500;
-  line-height: 30px;
+  font-weight: 400;
+  line-height: 36px;
   border-bottom: none;
 
   em {
@@ -746,7 +746,8 @@ const HeaderSliderContainer = styled(motion.div)`
   box-shadow: 0 0 8px 0 #0003;
   border-radius: 16px;
   margin-top: 65px;
-  width: 700px;
+  max-width: 800px;
+  width: 100%;
   z-index: 2;
 
   margin-right: -100px;
