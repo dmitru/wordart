@@ -66,12 +66,6 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
                 </LogoLink>
               </Link>
 
-              <Link href={Urls.pricing} passHref>
-                <TopNavLink active={pathname === Urls.pricing}>
-                  Pricing
-                </TopNavLink>
-              </Link>
-
               <Link href={Urls.faq} passHref>
                 <TopNavLink active={pathname === Urls.faq}>FAQ</TopNavLink>
               </Link>
@@ -85,6 +79,12 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
               <TopNavLink target="_blank" href={Urls.blog}>
                 Blog
               </TopNavLink>
+
+              <Link href={Urls.pricing} passHref>
+                <TopNavLink active={pathname === Urls.pricing}>
+                  Pricing
+                </TopNavLink>
+              </Link>
             </Box>
 
             <Box

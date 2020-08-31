@@ -38,10 +38,10 @@ export const PricingPlans = observer(
     const showLaunchSale = launchSalePlacesLeft > 0
 
     const [selectedUnlimitedPlanId, setSelectedUnlimitedPlanId] = useState(
-      unlimitedPricingPlans[2].id
+      unlimitedPricingPlans[1].id
     )
     const [selectedDownloadPlanId, setSelectedDownloadPlanId] = useState(
-      downloadsPricingPlans[2].id
+      downloadsPricingPlans[1].id
     )
 
     const commercialUseHelp = (
@@ -92,7 +92,7 @@ export const PricingPlans = observer(
             >
               <div>
                 <CheckIcon />
-                HQ download packs don't expire
+                HQ download packs never expire
                 <HelpTooltipIcon
                   mr="3"
                   css={css`
@@ -104,11 +104,7 @@ export const PricingPlans = observer(
               </div>
               <div>
                 <CheckIcon />
-                Commercial use {commercialUseHelp}
-              </div>
-              <div>
-                <CheckIcon />
-                Custom images and fonts
+                Personal or commercial use {commercialUseHelp}
               </div>
             </Box>
 
@@ -228,11 +224,7 @@ export const PricingPlans = observer(
               </div>
               <div>
                 <CheckIcon />
-                Commercial use {commercialUseHelp}
-              </div>
-              <div>
-                <CheckIcon />
-                Custom images and fonts
+                Personal or commercial use {commercialUseHelp}
               </div>
             </Box>
 

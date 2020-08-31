@@ -94,14 +94,17 @@ export const PricingPage = observer(() => {
           <thead>
             <tr>
               <th></th>
-              <th>FREE</th>
-              <th>ANY PAID PLAN</th>
+              <th>Free</th>
+              <th>All paid plans</th>
               {/* <th>HQ DOWNLOAD PACKS</th> */}
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th>High quality downloads</th>
+              <th>
+                High quality downloads
+                <HelpTooltipIcon label="HQ downloads are high-resolution JPEG and PNG (up to 4,096 px) or SVG vector downloads. Standard quality is low-res PNG or JPEG up to 1,024 px." />
+              </th>
               <MainDetailsTableCell main={<CrossIcon />} />
               <MainDetailsTableCell main={<CheckIcon />} />
               {/* <MainDetailsTableCell
@@ -132,7 +135,7 @@ export const PricingPage = observer(() => {
             </tr>
 
             <tr>
-              <th>Unlimited designs</th>
+              <th>Unlimited saved designs</th>
               <MainDetailsTableCell
                 main={
                   <>
@@ -143,21 +146,6 @@ export const PricingPage = observer(() => {
               />
               <MainDetailsTableCell main={<CheckIcon />} />
               {/* <MainDetailsTableCell main={<>Unlimited {noLimitsHelpIcon}</>} /> */}
-            </tr>
-
-            <tr>
-              <th>Custom fonts and image shapes</th>
-              <MainDetailsTableCell
-                main={
-                  <>
-                    <CrossIcon />
-                    Partial support
-                    <HelpTooltipIcon label="You can create and download your designs with custom images and fonts, but you won't be able to save them to your Wordcloudy account" />{' '}
-                  </>
-                }
-              />
-              <MainDetailsTableCell main={<CheckIcon />} />
-              {/* <MainDetailsTableCell main="Yes" /> */}
             </tr>
           </tbody>
         </ComparisonTable>
@@ -172,7 +160,7 @@ export const PricingPage = observer(() => {
           <title>{getTabTitle('Pricing')}</title>
         </Helmet>
 
-        <Box mb="4rem">
+        <Box mb="4rem" mt="2rem">
           <Box
             display="flex"
             flexDirection="column"
@@ -180,8 +168,8 @@ export const PricingPage = observer(() => {
             textAlign="center"
             mx="auto"
           >
-            <Text as="h1" textAlign="center">
-              Get the right plan for you!
+            <Text as="h1" textAlign="center" mb="0.5rem">
+              Find the right plan for you
             </Text>
 
             <Text
@@ -191,8 +179,7 @@ export const PricingPage = observer(() => {
               fontSize={['sm', 'lg']}
               color="gray.600"
             >
-              WordCloudy is free for <em>non-commercial</em> use. Try it as long
-              as you like to see if it's right for you.
+              WordCloudy is free for <em>non-commercial, personal use</em>.
             </Text>
           </Box>
 
@@ -200,7 +187,7 @@ export const PricingPage = observer(() => {
             <PricingPlans />
           </Box>
 
-          <Box mt="3rem">
+          <Box mt="4rem">
             <Text as="h1" textAlign="center">
               Compare Free and Paid Features
             </Text>
@@ -222,7 +209,7 @@ export const PricingPage = observer(() => {
 
             <Text
               textAlign="center"
-              maxWidth="480px"
+              maxWidth="600px"
               mx="auto"
               fontSize="lg"
               color="gray.600"
@@ -250,8 +237,8 @@ export const PricingPage = observer(() => {
                 happy with my purchase, can I get a refund?
               </h2>
               <p>
-                Absolutely! We prodive full refund within 7 days after the
-                purchase if you're not 100% satisfied.
+                Absolutely! We prodive full refund within 14 days after the
+                purchase if you're not satisfied with our product.
               </p>
             </Question>
 

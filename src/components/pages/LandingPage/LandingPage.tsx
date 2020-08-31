@@ -38,7 +38,7 @@ export const LandingPage = observer(() => {
       <HeaderContainer>
         <HeaderContentWidthLimit>
           <HeaderTitleContainer>
-            <Box
+            {/* <Box
               style={{ display: showLaunchSale ? 'inline-block' : 'none' }}
               mt="1rem"
               mb="-1rem"
@@ -52,14 +52,16 @@ export const LandingPage = observer(() => {
               >
                 {'🔥 '}33% sale – only {launchSalePlacesLeft} places left!
               </Tag>
-            </Box>
+            </Box> */}
             <HeaderTitle>
-              Create unique word designs <em>in no time</em>.
+              Instantly create
+              <br /> <em className="first">unique word art,</em>
+              <br />
+              without design skills.
             </HeaderTitle>
             <HeaderSubtitle>
-              Easy-to-use & powerful word art generator for personalized gifts,
-              prints, social media and more. <br /> <br /> No design skills
-              required!
+              Powerful & easy-to-use word art generator for personalized gifts,
+              prints, social media and more.
             </HeaderSubtitle>
 
             <HeaderCtaContainer>
@@ -76,13 +78,13 @@ export const LandingPage = observer(() => {
                     size="lg"
                     rightIcon={<ChevronRightIcon />}
                   >
-                    Create your design
+                    Create for FREE
                   </HeaderCreateNowButton>
                 </Link>
               </Stack>
 
               <HeaderCtaInfo mb="3" mt="4">
-                Try without a sign-up.
+                No account needed!
               </HeaderCtaInfo>
             </HeaderCtaContainer>
           </HeaderTitleContainer>
@@ -123,7 +125,29 @@ export const LandingPage = observer(() => {
         </div>
       </HeaderContainer>
 
-      {/* UI Video header */}
+      {/* Gifts */}
+      {/* <SectionHeader
+        mb="30px"
+        initial={{ opacity: 0, y: '40px' }}
+        // @ts-ignore
+        transition={{
+          ease: 'easeInOut',
+          duration: 0.5,
+          delay: 0.5,
+        }}
+        animate={{ x: 0, y: 0, opacity: 1 }}
+      >
+        <h1>Use your own words for special, thoughtful gifts</h1>
+        <Text mt="0" mb="0" mx="auto" maxWidth="700px">
+          Create, personalize and order high-quality printed gifts from our
+          store.
+        </Text>
+      </SectionHeader> */}
+
+      {/* TODO: gifts gallery */}
+      {/* <CreateCtaButton /> */}
+
+      {/* UI video */}
       <SectionHeader
         mb="30px"
         initial={{ opacity: 0, y: '40px' }}
@@ -135,11 +159,15 @@ export const LandingPage = observer(() => {
         }}
         animate={{ x: 0, y: 0, opacity: 1 }}
       >
-        <h1>Generate beautiful designs, easily</h1>
-        <Text mt="0" mb="0" mx="auto" maxWidth="670px">
-          Let Wordcloudy do the job. Save your time for more important things!
+        <h1>Creating is fast, fun and easy</h1>
+        <Text mt="0" mb="0" mx="auto" fontSize="24px" maxWidth="700px">
+          Wordcloudy is incredibly user-friendly and fun – anyone can create!
         </Text>
       </SectionHeader>
+
+      <Box mb="2rem">
+        <CreateCtaButton />
+      </Box>
 
       {/* UI video */}
       <Box
@@ -148,7 +176,6 @@ export const LandingPage = observer(() => {
         borderStyle="solid"
         borderWidth="1px"
         borderRadius="lg"
-        mt="0"
         p="5"
         css={css`
           position: relative;
@@ -208,13 +235,14 @@ export const LandingPage = observer(() => {
         }}
         animate={{ x: 0, y: 0, opacity: 1 }}
       >
-        <h1>Helps you achieve your goals</h1>
+        <h1>Word art for your work & business</h1>
         <Text mt="0" mb="0" maxWidth="600px" mx="auto">
-          Use the awesome power of typography, words, shapes and colors!
+          Use the awesome power of typography, words, shapes and colors to help
+          you with your work.
         </Text>
       </SectionHeader>
 
-      <UseCasesSectionContainer mb="4rem" mx="auto" mt="3rem">
+      <UseCasesSectionContainer mb="0rem" mx="auto" mt="3rem">
         <UseCase
           my="2rem"
           initial={{ opacity: 0, y: '40px' }}
@@ -234,20 +262,29 @@ export const LandingPage = observer(() => {
           </Box>
           <Box>
             <Text fontSize="2rem" color="teal.600" css={useCaseTitleStyle}>
-              For Creative Entrepreneurs
+              For Gift Stores
             </Text>
             <Text fontSize="20px" as="ul" color="gray.700">
               <li>
-                <strong>Delight your customers</strong> with beautiful{' '}
-                <strong>personalized items</strong>.
+                <strong>Delight your customers</strong> with new beautiful
+                items.
               </li>
               <li>
-                <strong>Quickly generate new designs</strong> for your next
-                top-selling items.
+                <strong>Save time creating personalized designs</strong> for
+                your clients.
+              </li>
+              <li>
+                <strong>Customize every aspect</strong> of your designs.
+              </li>
+              <li>
+                <strong>Download images in highest quality</strong> for printing
+                or use in other design tools.
               </li>
             </Text>
           </Box>
         </UseCase>
+
+        <CreateCtaButton />
 
         <UseCase
           my="2rem"
@@ -278,7 +315,7 @@ export const LandingPage = observer(() => {
               </li>
               <li>
                 <strong>Enhance your message and stand out</strong> with
-                memorable and effective word art.
+                memorable and powerful visuals.
               </li>
             </Text>
           </Box>
@@ -306,12 +343,15 @@ export const LandingPage = observer(() => {
             <Text fontSize="2rem" color="pink.600">
               For Designers
             </Text>
-            <Text fontSize="20px" color="gray.700">
-              <strong>Save your time creating</strong>
-              {' unique design assets and backgrounds. '}
-              Export your creations in{' '}
-              <strong>high-resolution or as SVG</strong> and use them in your
-              favorite design tool.
+            <Text fontSize="20px" color="gray.700" as="ul">
+              <li>
+                <strong>Save your time creating</strong>
+                {' unique design assets and backgrounds.'}
+              </li>
+              <li>
+                Export your designs in{' '}
+                <strong>high-resolution raster or vector</strong> formats.
+              </li>
             </Text>
           </Box>
         </UseCase>
@@ -339,13 +379,14 @@ export const LandingPage = observer(() => {
               For Presenters and Educators
             </Text>
             <Text fontSize="20px" color="gray.700">
-              <strong>Captivate and engage</strong> your audience or students
-              with <strong>unique and entertaining</strong> content or
-              presentation slides.
+              <strong>Captivate and engage</strong> your audience and students
+              with <strong>unique and entertaining</strong> content and slides.
             </Text>
           </Box>
         </UseCase>
       </UseCasesSectionContainer>
+
+      <CreateCtaButton />
 
       {/* Features */}
 
@@ -402,8 +443,8 @@ export const LandingPage = observer(() => {
         <SectionHeader mb="30px" mt="5rem">
           <h1>Flexible pricing that works for you</h1>
           <Text mt="0" mb="0" maxWidth="600px" mx="auto">
-            Purchase download packs that never expire or go for unlimited plan
-            for a period of time.
+            Purchase digitals downloads in highest quality, for personal or
+            commercial use.
           </Text>
         </SectionHeader>
 
@@ -415,10 +456,6 @@ export const LandingPage = observer(() => {
       </SectionHeader>
 
       <Box mx="auto" maxWidth="600px" mb="5rem">
-        <Question title="Can I customize the designs?">
-          Yes, almost everything can be customized! Fonts, colors, layout,
-          words. You can even move and resize individual words!
-        </Question>
         <Question title="Are these plans subscriptions?">
           No, all our plans are one-time payments. You will be charged only
           once.
@@ -428,8 +465,8 @@ export const LandingPage = observer(() => {
           Contact us for more information.
         </Question>
         <Question title="Can I get a refund?">
-          Absolutely! If you're unhappy with our product we offer refunds within
-          7 days of purchase.
+          Absolutely! If you're unhappy with our product we'll give you a refund
+          within 14 days of purchase.
         </Question>
         <Question title="I have more questions!">
           Please check our our{' '}
@@ -456,17 +493,10 @@ export const StartCreatingCta = () => (
   <SectionHeader mb="120px" mt="80px">
     <h1>Ready to create your own unique designs?</h1>
     <Text mt="0" mb="6">
-      It's fast and fun with Wordcloudy – advanced and user-friendly word
-      designs generator.
+      It's fast and fun with Wordcloudy – no account required.
     </Text>
 
-    <Stack spacing="3" direction="row" justifyContent="center">
-      <Link href={`${Urls.landing}#pricing`} passHref>
-        <Button as="a" size="lg" colorScheme="accent">
-          Start creating
-        </Button>
-      </Link>
-    </Stack>
+    <CreateCtaButton />
   </SectionHeader>
 )
 
@@ -548,9 +578,9 @@ const HeaderTitleContainer = styled.div`
 
   position: relative;
   z-index: 2;
-  max-width: 430px;
+  max-width: 520px;
   margin-top: 50px;
-  margin-right: 80px;
+  margin-right: 30px;
 
   /* @media screen and (max-width: 1200px) {
     margin-top: 10px;
@@ -591,13 +621,28 @@ const HeaderTitle = styled.h1`
       content: '';
       display: block;
       position: absolute;
-      background: hsl(358, 80%, 65%);
-      height: 6px;
+      height: 1.1em;
       width: 100%;
-      bottom: -3px;
-      z-index: -1;
+      width: calc(100% + 0.5em);
+      bottom: -0.05em;
+      z-index: -2;
       left: 0;
-      border-radius: 8px;
+      left: calc(0px - 0.25em);
+      /* border-radius: 0.5em; */
+    }
+
+    &.first {
+      color: white;
+      &:before {
+        background: #ff8a8f;
+      }
+    }
+
+    &.second {
+      color: white;
+      &:before {
+        background: #33bec0;
+      }
     }
   }
 `
@@ -605,9 +650,45 @@ const HeaderSubtitle = styled.h2`
   color: #3c526f;
   font-family: 'Nunito', sans-serif;
   font-size: 26px;
-  font-weight: 300;
+  font-weight: 500;
   line-height: 30px;
   border-bottom: none;
+
+  em {
+    position: relative;
+    display: inline-block;
+    z-index: 2;
+    font-style: normal;
+
+    &:before {
+      content: '';
+      display: block;
+      position: absolute;
+      height: 1em;
+      width: 100%;
+      width: calc(100% + 0.5em);
+      z-index: -2;
+      height: 1.2em;
+      bottom: -0.1em;
+      left: 0;
+      left: calc(0px - 0.25em);
+      border-radius: 8px;
+    }
+
+    &.first {
+      color: white;
+      &:before {
+        background: #ff7c81;
+      }
+    }
+
+    &.second {
+      color: white;
+      &:before {
+        background: #33bec0;
+      }
+    }
+  }
 
   ${xsBreakpoint} {
     font-size: 20px;
@@ -627,12 +708,13 @@ const HeaderCtaContainer = styled.div`
 `
 
 const HeaderCreateNowButton = styled(Button)`
-  max-width: 240px;
+  max-width: 300px;
+  font-size: 1.3rem;
   width: 100%;
 `
 
 const HeaderCtaInfo = styled(Box)`
-  font-size: 18px;
+  font-size: 20px;
   font-family: 'Nunito', sans-serif;
   font-weight: 300;
   color: #3c526f;
@@ -644,12 +726,30 @@ const HeaderCtaInfo = styled(Box)`
   }
 `
 
+const CreateCtaButton = () => (
+  <Box textAlign="center">
+    <Link href={Urls.editor.create} passHref>
+      <HeaderCreateNowButton
+        // @ts-ignore
+        as="a"
+        colorScheme="accent"
+        size="lg"
+        rightIcon={<ChevronRightIcon />}
+      >
+        Create for FREE
+      </HeaderCreateNowButton>
+    </Link>
+  </Box>
+)
+
 const HeaderSliderContainer = styled(motion.div)`
   box-shadow: 0 0 8px 0 #0003;
   border-radius: 16px;
   margin-top: 65px;
-  width: 800px;
+  width: 700px;
   z-index: 2;
+
+  margin-right: -100px;
 
   @media screen and (max-width: 1200px) {
     margin-right: -40px;
@@ -782,9 +882,12 @@ const SectionHeader = styled(motion.custom(Box))`
   }
 
   p {
-    font-size: 20px;
+    font-size: 22px;
     font-family: 'Nunito', sans-serif;
     font-weight: 300;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
     color: #3c526f;
   }
 `
