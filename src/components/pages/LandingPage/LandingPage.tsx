@@ -247,6 +247,11 @@ export const LandingPage = observer(() => {
 
       <UseCasesSectionContainer mb="0rem" mx="auto" mt="3rem">
         <UseCase
+          boxShadow="md"
+          borderColor="gray.200"
+          borderStyle="solid"
+          borderWidth="1px"
+          borderRadius="lg"
           my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
@@ -288,6 +293,11 @@ export const LandingPage = observer(() => {
         </UseCase>
 
         <UseCase
+          boxShadow="md"
+          borderColor="gray.200"
+          borderStyle="solid"
+          borderWidth="1px"
+          borderRadius="lg"
           my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
@@ -323,6 +333,11 @@ export const LandingPage = observer(() => {
         </UseCase>
 
         <UseCase
+          boxShadow="md"
+          borderColor="gray.200"
+          borderStyle="solid"
+          borderWidth="1px"
+          borderRadius="lg"
           my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
@@ -341,7 +356,7 @@ export const LandingPage = observer(() => {
             <img src="/landing/undraw_add_color_19gv.svg" />
           </Box>
           <Box>
-            <Text fontSize="2rem" color="pink.600">
+            <Text fontSize="2rem" color="pink.600" css={useCaseTitleStyle}>
               For Designers
             </Text>
             <Text fontSize="20px" color="gray.700" as="ul">
@@ -358,6 +373,11 @@ export const LandingPage = observer(() => {
         </UseCase>
 
         <UseCase
+          boxShadow="md"
+          borderColor="gray.200"
+          borderStyle="solid"
+          borderWidth="1px"
+          borderRadius="lg"
           my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
@@ -373,7 +393,7 @@ export const LandingPage = observer(() => {
           flexDirection="row-reverse"
         >
           <Box maxWidth="300px" width="100%" css={useCaseImgStyle} ml="2rem">
-            <img src="/landing/undraw_Presentation_62e1.svg" />
+            <img src="/landing/undraw_Preparation_re_t0ce.svg" />
           </Box>
           <Box>
             <Text fontSize="2rem" color="orange.600">
