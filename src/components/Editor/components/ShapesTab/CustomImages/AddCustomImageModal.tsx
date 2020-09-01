@@ -2,7 +2,6 @@ import {
   Alert,
   Box,
   Button,
-  Link,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -20,6 +19,7 @@ import { useDropzone } from 'react-dropzone'
 import { FaExternalLinkAlt } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 import { Urls } from 'urls'
+import Link from 'next/link'
 import { useToasts } from 'use-toasts'
 import {
   CustomizeRasterImage,

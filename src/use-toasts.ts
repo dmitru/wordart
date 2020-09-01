@@ -3,7 +3,7 @@ import { useToast, UseToastOptions } from '@chakra-ui/core'
 export const useToasts = () => {
   const toasts = useToast()
   const commonParams: UseToastOptions = {
-    position: 'bottom-right',
+    position: 'bottom',
     duration: 10000,
     isClosable: true,
   }
