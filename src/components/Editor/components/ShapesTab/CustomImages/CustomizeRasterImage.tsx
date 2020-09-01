@@ -22,7 +22,6 @@ export type CustomizeRasterOptions = {
   processedThumbnailUrl: string
   originalUrl: string
   fill: 'fill' | 'invert' | 'original'
-  fillInvert: boolean
   fillColor: string
   removeLightBackground: boolean
   removeLightBackgroundThreshold: number
