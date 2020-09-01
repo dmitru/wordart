@@ -80,7 +80,7 @@ export const FoldersView = observer(() => {
             target="_blank"
             href="https://forms.gle/P5rXX6pvKVBbwVFX7"
           >
-            Leave us Feedback!
+            Leave your Feedback!
           </Button>
           <AccountUsage />
         </Box>

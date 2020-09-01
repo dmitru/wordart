@@ -97,8 +97,9 @@ export const LandingPage = observer(() => {
             <HeaderSlider>
               <Slider play cancelOnInteraction={false} interval={3000}>
                 <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/Untitled%20design.jpg" />
-                <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/landing-slides-50.jpg" />
+                <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/landing-sliders-portrait.jpg" />
                 <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/landing-slides-jessica.jpg" />
+                <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/landing-slides-50.jpg" />
                 {/* <div data-src="/gallery/gallery-11.jpeg" />
                 <div data-src="/gallery/gallery-8.jpeg" />
                 <div data-src="/gallery/gallery-10.jpeg" />

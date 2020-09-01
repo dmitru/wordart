@@ -25,8 +25,8 @@ type ProcessingParams = {
   removeLightBackground: boolean
   removeLightBackgroundThreshold: number
   removeEdges: number
-  invert: boolean
-  invertColor: string
+  fill: 'fill' | 'invert' | 'original'
+  fillColor: string
 }
 
 export const CustomizeRasterImageModal: React.FC<CustomizeRasterImageModalProps> = observer(
@@ -34,7 +34,7 @@ export const CustomizeRasterImageModal: React.FC<CustomizeRasterImageModalProps>
     const state = useLocalStore<ProcessingParams>(() => props.value)
 
     return (
-      <Modal isOpen={props.isOpen} onClose={props.onClose}>
+      <Modal isOpen={props.isOpen} onClose={props.onClose} autoFocus={false}>
         <ModalOverlay>
           <ModalContent maxWidth="630px" width="100%">
             <ModalHeader>Customize Image</ModalHeader>

@@ -11,6 +11,7 @@ import {
 import { observer, useLocalStore } from 'mobx-react'
 import { useRef, useEffect } from 'react'
 import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
+import { ChoiceButtons } from 'components/Editor/components/ChoiceButtons'
 
 export type CustomizeRasterImageProps = {
   value: CustomizeRasterOptions
@@ -20,8 +21,9 @@ export type CustomizeRasterImageProps = {
 export type CustomizeRasterOptions = {
   processedThumbnailUrl: string
   originalUrl: string
-  invert: boolean
-  invertColor: string
+  fill: 'fill' | 'invert' | 'original'
+  fillInvert: boolean
+  fillColor: string
   removeLightBackground: boolean
   removeLightBackgroundThreshold: number
   removeEdges: number
@@ -41,7 +43,7 @@ export const CustomizeRasterImage: React.FC<CustomizeRasterImageProps> = observe
       const c = document.getElementById('preview-canvas') as
         | HTMLCanvasElement
         | undefined
-      console.log('updateImgPreview', state, c, originalImgCanvas.current)
+
       if (!c) {
         return
       }
@@ -55,11 +57,18 @@ export const CustomizeRasterImage: React.FC<CustomizeRasterImageProps> = observe
           edges: {
             amount: state.removeEdges,
           },
-          invert: state.invert
-            ? {
-                color: state.invertColor,
-              }
-            : undefined,
+          fill:
+            state.fill === 'fill'
+              ? {
+                  color: state.fillColor,
+                }
+              : undefined,
+          invert:
+            state.fill === 'invert'
+              ? {
+                  color: state.fillColor,
+                }
+              : undefined,
           removeLightBackground: state.removeLightBackground
             ? {
                 threshold: state.removeLightBackgroundThreshold,
@@ -150,7 +159,7 @@ export const CustomizeRasterImage: React.FC<CustomizeRasterImageProps> = observe
         const loadOriginalImg = async () => {
           const ctxOriginal = await loadImageUrlToCanvasCtxWithMaxSize(
             value.originalUrl,
-            1000
+            1600
           )
           originalImgCanvas.current = ctxOriginal.canvas
           updateImgPreview(state)
@@ -203,28 +212,30 @@ export const CustomizeRasterImage: React.FC<CustomizeRasterImageProps> = observe
           </Box> */}
 
           <Box alignItems="center" display="flex" height="40px">
-            <Switch
-              id="invert-bg"
-              mr="2"
-              isChecked={state.invert}
-              onChange={(e) => {
-                state.invert = e.target.checked
+            <ChoiceButtons
+              choices={[
+                { title: 'Original', value: 'original' },
+                { title: 'Fill', value: 'fill' },
+                { title: 'Invert', value: 'invert' },
+              ]}
+              value={state.fill}
+              onChange={(value) => {
+                state.fill = value as 'original' | 'fill' | 'invert'
                 updateImgPreviewThrottled(state)
                 onChange(state)
               }}
             />
-            <FormLabel mr="5" htmlFor="invert-bg" mb="0">
-              Invert background
-            </FormLabel>
-            {state.invert && (
-              <ColorPickerPopover
-                value={state.invertColor}
-                onChange={(color) => {
-                  state.invertColor = color
-                  updateImgPreviewThrottled(state)
-                  onChange(state)
-                }}
-              />
+            {!!state.fill && (
+              <Box ml="3">
+                <ColorPickerPopover
+                  value={state.fillColor}
+                  onChange={(color) => {
+                    state.fillColor = color
+                    updateImgPreviewThrottled(state)
+                    onChange(state)
+                  }}
+                />
+              </Box>
             )}
           </Box>
 

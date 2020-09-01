@@ -145,11 +145,18 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
                     amount: value.removeEdges,
                   }
                 : undefined,
-              invert: value.invert
-                ? {
-                    color: value.invertColor,
-                  }
-                : undefined,
+              invert:
+                value.fill === 'invert'
+                  ? {
+                      color: value.fillColor,
+                    }
+                  : undefined,
+              fill:
+                value.fill === 'fill'
+                  ? {
+                      color: value.fillColor,
+                    }
+                  : undefined,
               removeLightBackground: {
                 threshold: value.removeLightBackgroundThreshold,
               },
@@ -186,8 +193,16 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
               shape.config.processing?.removeLightBackground?.threshold || 0,
             removeEdges: shape.config.processing?.edges?.amount || 0,
             originalUrl: shape.url,
-            invert: shape.config.processing?.invert != null ? true : false,
-            invertColor: shape.config.processing?.invert?.color || 'red',
+            fill:
+              shape.config.processing?.invert != null
+                ? 'invert'
+                : shape.config.processing?.fill != null
+                ? 'fill'
+                : 'original',
+            fillColor:
+              shape.config.processing?.invert?.color ||
+              shape.config.processing?.fill?.color ||
+              'red',
           }}
           onClose={() => {
             state.isShowingCustomizeImage = false
@@ -197,11 +212,18 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
 
             shape.config.processedThumbnailUrl = value.processedThumbnailUrl
             shape.config.processing = {
-              invert: value.invert
-                ? {
-                    color: value.invertColor,
-                  }
-                : undefined,
+              invert:
+                value.fill === 'invert'
+                  ? {
+                      color: value.fillColor,
+                    }
+                  : undefined,
+              fill:
+                value.fill === 'fill'
+                  ? {
+                      color: value.fillColor,
+                    }
+                  : undefined,
               removeLightBackground: value.removeLightBackground
                 ? {
                     threshold: value.removeLightBackgroundThreshold,

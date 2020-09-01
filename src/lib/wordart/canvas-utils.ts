@@ -295,16 +295,22 @@ export const processRasterImg = (
   canvas: HTMLCanvasElement,
   processing: RasterProcessingConf
 ) => {
-  // console.log('processImg', canvas.width, canvas.height)
-  if (!processing.removeLightBackground && !processing.invert) {
+  if (
+    !processing.removeLightBackground &&
+    !processing.invert &&
+    !processing.fill
+  ) {
     return
   }
 
   const ctx = canvas.getContext('2d')!
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-  const [red, green, blue] = processing.invert?.color
-    ? chroma(processing.invert.color).rgb()
-    : [0, 0, 0]
+
+  const color = processing.fill?.color || processing.invert?.color
+  console.log('processImg', processing, color, canvas.width, canvas.height)
+
+  const [red, green, blue] = color ? chroma(color).rgb() : [0, 0, 0]
+
   const threshold = processing.removeLightBackground?.threshold || 0
   const lightnessThresholdNorm = 255 - (255 * threshold) / 100
 
@@ -324,6 +330,19 @@ export const processRasterImg = (
           imgData.data[imgDataIndex + 0] = 255
           imgData.data[imgDataIndex + 1] = 255
           imgData.data[imgDataIndex + 2] = 255
+          imgData.data[imgDataIndex + 3] = 0
+        }
+      }
+
+      if (processing.fill) {
+        // Fully transparent pixel
+        const isFilledAtLeastABit = imgData.data[imgDataIndex + 3] > 0
+        if (isFilledAtLeastABit) {
+          imgData.data[imgDataIndex + 3] = 255
+          imgData.data[imgDataIndex] = red
+          imgData.data[imgDataIndex + 1] = green
+          imgData.data[imgDataIndex + 2] = blue
+        } else {
           imgData.data[imgDataIndex + 3] = 0
         }
       }

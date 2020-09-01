@@ -985,6 +985,8 @@ export class Editor {
             let colorString = item.shapeColor
             if (shape.config.processing?.invert) {
               colorString = shape.config.processing.invert.color
+            } else if (shape.config.processing?.fill) {
+              colorString = shape.config.processing.fill.color
             }
             color = chroma(colorString)
           } else if (shape.kind === 'text') {
@@ -1108,9 +1110,10 @@ export class Editor {
         processRasterImg(processedCanvas, shapeConfig.processing)
         processRasterImg(processedCanvasToDisplay, {
           ...shapeConfig.processing,
-          removeLightBackground: shapeConfig.processing.invert
-            ? shapeConfig.processing.removeLightBackground
-            : undefined,
+          removeLightBackground:
+            shapeConfig.processing.invert || shapeConfig.processing.fill
+              ? shapeConfig.processing.removeLightBackground
+              : undefined,
           edges: undefined,
         })
       }

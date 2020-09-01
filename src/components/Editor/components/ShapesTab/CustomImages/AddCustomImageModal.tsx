@@ -38,8 +38,9 @@ const initialState: CustomizeRasterOptions = {
   removeLightBackgroundThreshold: 5,
   removeLightBackground: true,
   removeEdges: 70,
-  invert: false,
-  invertColor: '#222',
+  fill: 'original',
+  fillInvert: false,
+  fillColor: '#a33',
 }
 
 const MAX_FILE_SIZE_LIMIT_BYTES = 5 * 1024 * 1024 // 5 Mb
@@ -77,7 +78,7 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
         reader.onload = async () => {
           const ctxOriginal = await loadImageUrlToCanvasCtxWithMaxSize(
             reader.result as string,
-            1000
+            1600
           )
           state.originalUrl = ctxOriginal.canvas.toDataURL()
           state.processedThumbnailUrl = state.originalUrl

@@ -125,8 +125,12 @@ export type RasterProcessingConf = {
     /** Edge detection intensity, 0-100% */
     amount: number
   }
+  fill?: {
+    /** Color to fill the filled space */
+    color: string
+  }
   invert?: {
-    /** Color to fill the negative space */
+    /** Color to fill the empty space */
     color: string
   }
 }
