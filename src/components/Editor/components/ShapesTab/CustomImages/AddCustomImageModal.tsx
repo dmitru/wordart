@@ -39,7 +39,6 @@ const initialState: CustomizeRasterOptions = {
   removeLightBackground: true,
   removeEdges: 70,
   fill: 'original',
-  fillInvert: false,
   fillColor: '#a33',
 }
 
