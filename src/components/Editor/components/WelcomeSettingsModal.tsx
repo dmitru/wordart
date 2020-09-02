@@ -30,16 +30,21 @@ export const WelcomeSettingsModal: React.FC<WelcomeSettingsModalProps> = observe
     const { wordcloudsStore } = useStore()
     const { templates } = wordcloudsStore
 
-    useEffect(() => {
-      wordcloudsStore.fetchTemplates()
-    }, [])
-
     const toasts = useToasts()
     const state = useLocalStore(() => ({
       isSubmitting: false,
       // selectedTemplate: null as string | null,
       selectedTemplate: 'a12fce2d-e538-42e7-a895-01f972f5570a' as string | null,
     }))
+
+    // Init
+    useEffect(() => {
+      const init = async () => {
+        await wordcloudsStore.fetchTemplates()
+        state.selectedTemplate = wordcloudsStore.templates[0].id
+      }
+      init()
+    }, [])
 
     const handleSubmit = async () => {
       state.isSubmitting = true
