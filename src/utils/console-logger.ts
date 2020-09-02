@@ -62,8 +62,8 @@ const createConsoleLogger = (
 
 const initConsoleLoggers = () => {
   const consoleLoggers = createConsoleLoggers()
-  consoleLoggers.editor.enable('debug')
-  consoleLoggers.generator.enable('debug')
+  // consoleLoggers.editor.enable('debug')
+  // consoleLoggers.generator.enable('debug')
   return consoleLoggers
 }
 

@@ -1,7 +1,7 @@
 import { reject } from 'lodash'
 import { consoleLoggers } from 'utils/console-logger'
 import { StructuredEvent } from './events'
-import * as ga from './google-analytics'
+import * as googleAnalytics from './google-analytics'
 
 export { StructuredEvents } from './events'
 
@@ -30,7 +30,7 @@ const setUserId = (uid: UserId | 'anonymous') => {
 const trackPageView = () => {
   const logger = consoleLoggers.analytics
   logger.info('trackPageView', window.location)
-  ga.trackPageView({ location: window.location, userId })
+  googleAnalytics.trackPageView({ location: window.location, userId })
 }
 
 const trackStructured = (analyticsEvent: StructuredEvent) => {
@@ -42,19 +42,19 @@ const trackStructured = (analyticsEvent: StructuredEvent) => {
       .filter((x) => x != null)
       .join(' ')
   )
-  ga.trackStructured(category, action, label, value)
+  googleAnalytics.trackStructured(category, action, label, value)
 }
 
 const setMetric = (metricIndex: number, value: number) => {
   const logger = consoleLoggers.analytics
   logger.info('setMetric', metricIndex, value)
-  ga.setMetric(metricIndex, value)
+  googleAnalytics.setMetric(metricIndex, value)
 }
 
 const setDimension = (dimensionIndex: number, value: string) => {
   const logger = consoleLoggers.analytics
   logger.info('setDimension', dimensionIndex, value)
-  ga.setDimension(dimensionIndex, value)
+  googleAnalytics.setDimension(dimensionIndex, value)
 }
 
 // Start tracking a measurement, which will be recorded once `completeMeasurements` has been
@@ -114,7 +114,7 @@ const endTiming = (completionEvent: TimingEvent) => {
 
     const duration = Math.round(measure.duration)
 
-    ga.trackTiming(category, name, duration)
+    googleAnalytics.trackTiming(category, name, duration)
 
     timingsLogger.info(`${category} / ${name}, ${duration / 1000}s`)
     window.performance.clearMeasures(measurementName)
