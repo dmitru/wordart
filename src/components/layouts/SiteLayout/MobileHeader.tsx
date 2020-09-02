@@ -176,9 +176,9 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
                     </MenuLink>
                   </Link>
 
-                  <MenuLink href={Urls.blog} target="_blank">
+                  {/* <MenuLink href={Urls.blog} target="_blank">
                     Blog
-                  </MenuLink>
+                  </MenuLink> */}
 
                   <Divider />
 

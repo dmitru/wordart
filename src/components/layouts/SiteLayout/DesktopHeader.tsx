@@ -76,9 +76,9 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
                 </TopNavLink>
               </Link>
 
-              <TopNavLink target="_blank" href={Urls.blog}>
+              {/* <TopNavLink target="_blank" href={Urls.blog}>
                 Blog
-              </TopNavLink>
+              </TopNavLink> */}
 
               <Link href={Urls.pricing} passHref>
                 <TopNavLink active={pathname === Urls.pricing}>
