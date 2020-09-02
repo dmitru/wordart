@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Divider,
   FormControl,
   FormHelperText,
   FormLabel,
@@ -25,6 +26,7 @@ import { Urls } from 'urls'
 import { getTabTitle } from 'utils/tab-title'
 import * as Yup from 'yup'
 import { NextSeo } from 'next-seo'
+import { FaGoogle, FaFacebook } from 'react-icons/fa'
 
 export type SignupFormValues = {
   email: string
@@ -48,6 +50,7 @@ export const SignupPage = observer(() => {
   const recaptchaRef = useRef<Recaptcha>(null)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isUsingEmail, setIsUsingEmail] = useState(false)
   const [error, setError] = useState('')
 
   const {
@@ -123,7 +126,9 @@ export const SignupPage = observer(() => {
         boxShadow="lg"
         borderRadius="lg"
       >
-        <h1
+        <Text
+          as="h1"
+          fontSize="1.5rem"
           css={css`
             border: none;
             margin-top: 1rem;
@@ -132,7 +137,7 @@ export const SignupPage = observer(() => {
           `}
         >
           Create Account
-        </h1>
+        </Text>
 
         <Stack
           spacing="1rem"
@@ -143,77 +148,94 @@ export const SignupPage = observer(() => {
           <Stack flex="1" spacing="3" mt="6" mb="4" justifyContent="center">
             <Button
               as="a"
-              colorScheme="primary"
+              colorScheme="red"
+              leftIcon={<FaGoogle />}
               href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}
             >
-              Sign up with Google
+              Sign in with Google
             </Button>
             <Button
               as="a"
               colorScheme="facebook"
+              leftIcon={<FaFacebook />}
               href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/facebook`}
             >
-              Sign up with Facebook
+              Sign in with Facebook
             </Button>
           </Stack>
 
-          <Stack
-            flex="2"
-            as="form"
-            onSubmit={handleSubmit(onSubmit)}
-            spacing="4"
-          >
-            <Recaptcha
-              sitekey={config.recaptcha.siteKey}
-              size="invisible"
-              ref={recaptchaRef}
-              onVerify={onCaptchaResponse}
-            />
+          <Divider />
 
-            <FormControl id="email">
-              <FormLabel>Email address</FormLabel>
-              <Input type="email" name="email" ref={register} />
-              <FormHelperText>
-                We'll send you a confirmation email. We never share your data
-                with anyone.
-              </FormHelperText>
-              {errors.email && (
-                <FormHelperText color="red.500">
-                  {errors.email?.message}
-                </FormHelperText>
-              )}
-            </FormControl>
-
-            <FormControl id="password">
-              <FormLabel>Password</FormLabel>
-              <Input type="password" name="password" ref={register} />
-              {errors.password && (
-                <FormHelperText color="red.500">
-                  {errors.password?.message}
-                </FormHelperText>
-              )}
-            </FormControl>
-
-            <FormControl id="passwordRepeat">
-              <FormLabel>Repeat password</FormLabel>
-              <Input type="password" name="passwordRepeat" ref={register} />
-              {errors.passwordRepeat && (
-                <FormHelperText color="red.500">
-                  {errors.passwordRepeat?.message}
-                </FormHelperText>
-              )}
-            </FormControl>
-
+          {!isUsingEmail && (
             <Button
-              type="submit"
-              colorScheme="accent"
-              isLoading={formState.isSubmitting || isSubmitting}
+              variant="outline"
+              onClick={() => {
+                setIsUsingEmail(true)
+              }}
             >
-              Sign up
+              Create account with email and password
             </Button>
+          )}
 
-            {error && <Text color="red.500">{error}</Text>}
-          </Stack>
+          {isUsingEmail && (
+            <Stack
+              flex="2"
+              as="form"
+              onSubmit={handleSubmit(onSubmit)}
+              spacing="4"
+            >
+              <Recaptcha
+                sitekey={config.recaptcha.siteKey}
+                size="invisible"
+                ref={recaptchaRef}
+                onVerify={onCaptchaResponse}
+              />
+
+              <FormControl id="email">
+                <FormLabel>Email address</FormLabel>
+                <Input type="email" name="email" ref={register} />
+                <FormHelperText>
+                  We'll send you a confirmation email. We never share your data
+                  with anyone.
+                </FormHelperText>
+                {errors.email && (
+                  <FormHelperText color="red.500">
+                    {errors.email?.message}
+                  </FormHelperText>
+                )}
+              </FormControl>
+
+              <FormControl id="password">
+                <FormLabel>Password</FormLabel>
+                <Input type="password" name="password" ref={register} />
+                {errors.password && (
+                  <FormHelperText color="red.500">
+                    {errors.password?.message}
+                  </FormHelperText>
+                )}
+              </FormControl>
+
+              <FormControl id="passwordRepeat">
+                <FormLabel>Repeat password</FormLabel>
+                <Input type="password" name="passwordRepeat" ref={register} />
+                {errors.passwordRepeat && (
+                  <FormHelperText color="red.500">
+                    {errors.passwordRepeat?.message}
+                  </FormHelperText>
+                )}
+              </FormControl>
+
+              <Button
+                type="submit"
+                colorScheme="accent"
+                isLoading={formState.isSubmitting || isSubmitting}
+              >
+                Sign up
+              </Button>
+
+              {error && <Text color="red.500">{error}</Text>}
+            </Stack>
+          )}
         </Stack>
       </Box>
 

@@ -5,6 +5,7 @@ import {
   FormHelperText,
   Input,
   Stack,
+  Divider,
   Text,
 } from '@chakra-ui/core'
 import { css } from '@emotion/core'
@@ -21,6 +22,8 @@ import { Urls } from 'urls'
 import * as Yup from 'yup'
 import { Helmet } from 'react-helmet'
 import { getTabTitle } from 'utils/tab-title'
+import GoogleButton from 'react-google-button'
+import { FaFacebook, FaGoogle } from 'react-icons/fa'
 
 export type LoginFormValues = {
   email: string
@@ -80,7 +83,9 @@ export const LoginPage = observer(() => {
         boxShadow="lg"
         borderRadius="lg"
       >
-        <h1
+        <Text
+          as="h1"
+          fontSize="1.5rem"
           css={css`
             border: none;
             margin-top: 1rem;
@@ -89,25 +94,29 @@ export const LoginPage = observer(() => {
           `}
         >
           Log in to Your Account
-        </h1>
+        </Text>
 
         <Stack spacing="6" mt="6">
           <Stack flex="1" spacing="3" mb="5" justifyContent="center">
             <Button
               as="a"
-              colorScheme="primary"
+              colorScheme="red"
+              leftIcon={<FaGoogle />}
               href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}
             >
-              Log in with Google
+              Sign in with Google
             </Button>
             <Button
               as="a"
               colorScheme="facebook"
+              leftIcon={<FaFacebook />}
               href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/facebook`}
             >
-              Log in with Facebook
+              Sign in with Facebook
             </Button>
           </Stack>
+
+          <Divider />
 
           <Stack
             flex="2"
@@ -167,7 +176,7 @@ export const LoginPage = observer(() => {
           </Text>
           <Link passHref href={Urls.signup}>
             <Button as="a" colorScheme="accent">
-              Create account
+              Create an account
             </Button>
           </Link>
         </Box>

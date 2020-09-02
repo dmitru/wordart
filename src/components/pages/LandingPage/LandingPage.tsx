@@ -78,7 +78,7 @@ export const LandingPage = observer(() => {
                     size="lg"
                     rightIcon={<ChevronRightIcon />}
                   >
-                    Create for FREE
+                    Create your design
                   </HeaderCreateNowButton>
                 </Link>
               </Stack>
@@ -243,11 +243,6 @@ export const LandingPage = observer(() => {
 
       <UseCasesSectionContainer mb="0rem" mx="auto" mt="3rem">
         <UseCase
-          boxShadow="md"
-          borderColor="gray.200"
-          borderStyle="solid"
-          borderWidth="1px"
-          borderRadius="lg"
           my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
@@ -289,11 +284,6 @@ export const LandingPage = observer(() => {
         </UseCase>
 
         <UseCase
-          boxShadow="md"
-          borderColor="gray.200"
-          borderStyle="solid"
-          borderWidth="1px"
-          borderRadius="lg"
           my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
@@ -329,11 +319,6 @@ export const LandingPage = observer(() => {
         </UseCase>
 
         <UseCase
-          boxShadow="md"
-          borderColor="gray.200"
-          borderStyle="solid"
-          borderWidth="1px"
-          borderRadius="lg"
           my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
@@ -369,11 +354,6 @@ export const LandingPage = observer(() => {
         </UseCase>
 
         <UseCase
-          boxShadow="md"
-          borderColor="gray.200"
-          borderStyle="solid"
-          borderWidth="1px"
-          borderRadius="lg"
           my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
@@ -755,7 +735,7 @@ const CreateCtaButton = () => (
         size="lg"
         rightIcon={<ChevronRightIcon />}
       >
-        Create for FREE
+        Start creating
       </HeaderCreateNowButton>
     </Link>
   </Box>
