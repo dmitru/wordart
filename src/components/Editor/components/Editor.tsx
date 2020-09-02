@@ -1140,8 +1140,8 @@ Order Prints
             target: '#help-btn',
             content: (
               <>
-                Read our 3-minute step-by-step tutorial to learn how to create a
-                beautiful word designs.
+                Read our 3-minute step-by-step tutorial to learn to use the
+                editor to create beautiful word designs.
                 <br />
                 <Button
                   colorScheme="accent"
