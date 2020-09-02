@@ -841,7 +841,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           <MenuButton
             mr="2"
             as={TopNavButton}
-            variant="primary"
+            variant="secondary"
             leftIcon={<FiMenu />}
           >
             Menu
@@ -1040,12 +1040,7 @@ Order Prints
 </TopNavButton> */}
 
         <Menu isLazy>
-          <MenuButton
-            as={TopNavButton}
-            colorScheme="secondary"
-            mr="2"
-            ml="auto"
-          >
+          <MenuButton as={TopNavButton} variant="secondary" mr="2" ml="auto">
             <FiHelpCircle
               id="help-btn"
               css={css`
