@@ -52,12 +52,19 @@ export class WordcloudsStore {
 
   @observable hasFetchedWordclouds = false
   @observable hasFetchedFolders = false
+  @observable templates: Wordcloud[] | null = null
   @observable private _wordclouds = new Map<WordcloudId, Wordcloud>()
   @observable private _folders = new Map<FolderId, Folder>()
 
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
     this.channel.addEventListener('message', this.handleChannelMsg)
+  }
+
+  @action fetchTemplates = async () => {
+    if (!this.templates) {
+      this.templates = await Api.wordclouds.fetchTemplates()
+    }
   }
 
   @action handleChannelMsg = (msg: WordcloudChannelMessage) => {

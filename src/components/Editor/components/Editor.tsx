@@ -31,7 +31,6 @@ import {
   SmallCloseIcon,
 } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
-import styled from '@emotion/styled'
 import * as Sentry from '@sentry/react'
 import { MagicWand } from '@styled-icons/boxicons-solid/MagicWand'
 import { ColorPalette } from '@styled-icons/evaicons-solid/ColorPalette'
@@ -40,6 +39,25 @@ import { SmileBeam } from '@styled-icons/fa-solid/SmileBeam'
 import { Font } from '@styled-icons/icomoon/Font'
 import { TextFields } from '@styled-icons/material/TextFields'
 import { LayoutMasonry } from '@styled-icons/remix-fill/LayoutMasonry'
+import {
+  Canvas,
+  CanvasContainer,
+  CanvasWrappper,
+  EditorLayout,
+  ExportButton,
+  LeftBottomWrapper,
+  LeftNavbarBtn,
+  LeftPanel,
+  LeftPanelContent,
+  LeftPanelTab,
+  leftPanelTabs,
+  LeftWrapper,
+  PageLayoutWrapper,
+  RightWrapper,
+  SideNavbar,
+  TopNavWrapper,
+  TopToolbar,
+} from 'components/Editor/components/editor-components'
 import { LeftPanelColorsTab } from 'components/Editor/components/LeftPanelColorsTab'
 import { LeftPanelFontsTab } from 'components/Editor/components/LeftPanelFontsTab'
 import { LeftPanelIconsTab } from 'components/Editor/components/LeftPanelIconsTab'
@@ -49,7 +67,6 @@ import { LeftPanelWordsTab } from 'components/Editor/components/LeftPanelWordsTa
 import { LeftPanelShapesTab } from 'components/Editor/components/ShapesTab/LeftPanelShapesTab'
 import { Spinner } from 'components/Editor/components/Spinner'
 import { WarningModal } from 'components/Editor/components/WarningModal'
-import Joyride from 'react-joyride'
 import {
   EditorStore,
   EditorStoreContext,
@@ -60,10 +77,9 @@ import {
   mkBgStyleConfFromOptions,
   mkShapeStyleConfFromOptions,
 } from 'components/Editor/style'
-import { BaseBtn } from 'components/shared/BaseBtn'
-import { ColorPickerPopover } from 'components/shared/ColorPickerPopover'
 import { ConfirmModalWithRecaptcha } from 'components/shared/ConfirmModalWithRecaptcha'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
+import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { SpinnerSplashScreen } from 'components/shared/SpinnerSplashScreen'
 import { Tooltip } from 'components/shared/Tooltip'
 import { TopNavButton } from 'components/shared/TopNavButton'
@@ -78,15 +94,14 @@ import 'lib/wordart/console-extensions'
 import { observer, useLocalStore } from 'mobx-react'
 import { useRouter } from 'next/dist/client/router'
 import Link from 'next/link'
-import { darken, desaturate } from 'polished'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Helmet } from 'react-helmet'
 import Hotkeys from 'react-hot-keys'
-import { BsTrash, BsHeart } from 'react-icons/bs'
+import { BsHeart, BsTrash } from 'react-icons/bs'
+import { FaLock, FaLockOpen, FaTrashAlt } from 'react-icons/fa'
 import {
   FiChevronLeft,
   FiDownload,
-  FiEdit,
   FiFilePlus,
   FiHelpCircle,
   FiMenu,
@@ -94,6 +109,8 @@ import {
   FiSave,
 } from 'react-icons/fi'
 import { IoMdResize } from 'react-icons/io'
+import Joyride from 'react-joyride'
+import { analytics, StructuredEvents } from 'services/analytics'
 import { Api, ApiErrors } from 'services/api/api'
 import { WordcloudId } from 'services/api/types'
 import { useStore } from 'services/root-store'
@@ -102,32 +119,11 @@ import { useToasts } from 'use-toasts'
 import { openUrlInNewTab } from 'utils/browser'
 import 'utils/canvas-to-blob'
 import { getTabTitle } from 'utils/tab-title'
+import { useLocalStorage } from 'utils/use-local-storage'
 import { useWarnIfUnsavedChanges } from 'utils/use-warn-if-unsaved-changes'
 import { uuid } from 'utils/uuid'
-import { MenuItemWithDescription } from 'components/shared/MenuItemWithDescription'
 import { WordColorPickerPopover } from './WordColorPickerPopover'
-import { useLocalStorage } from 'utils/use-local-storage'
-import { analytics, StructuredEvents } from 'services/analytics'
-import { FaLock, FaLockOpen, FaTrashAlt } from 'react-icons/fa'
-import {
-  LeftPanelTab,
-  PageLayoutWrapper,
-  TopNavWrapper,
-  EditorLayout,
-  LeftWrapper,
-  LeftBottomWrapper,
-  SideNavbar,
-  leftPanelTabs,
-  LeftNavbarBtn,
-  LeftPanel,
-  LeftPanelContent,
-  RightWrapper,
-  TopToolbar,
-  ExportButton,
-  CanvasWrappper,
-  Canvas,
-  CanvasContainer,
-} from 'components/Editor/components/editor-components'
+import { WelcomeSettingsModal } from './WelcomeSettingsModal'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -145,6 +141,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       leftPanelContext: 'normal' as 'normal' | 'resize',
       isShowingExport: false,
       isShowingExportNoItemsWarning: false,
+      showWelcomeSettings: !props.wordcloudId,
     }))
 
     const upgradeModal = useUpgradeModal()
@@ -183,6 +180,113 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const cancelVisualizationBtnRef = useRef<HTMLButtonElement>(null)
     const [isShowingSignupModal, setIsShowingSignupModal] = useState(false)
+
+    // Initialization
+    const init = async ({
+      wordcloudId,
+      templateId,
+    }: {
+      wordcloudId?: string | null
+      templateId?: string | null
+    }) => {
+      if (
+        !(
+          authStore.hasInitialized &&
+          canvasRef.current &&
+          bgCanvasRef.current &&
+          store.lifecycleState === 'initial'
+        )
+      ) {
+        return
+      }
+      const editorParams: EditorStoreInitParams = {
+        canvas: canvasRef.current,
+        bgCanvas: bgCanvasRef.current,
+        canvasWrapperEl: canvasWrapperRef.current!,
+        aspectRatio,
+      }
+
+      if (wordcloudId != null) {
+        analytics.trackStructured(StructuredEvents.mkSavedEditorSession())
+        await wordcloudsStore.fetchWordcloudById(wordcloudId)
+        const wordcloud = wordcloudsStore.getById(wordcloudId)
+
+        if (wordcloud) {
+          state.title = wordcloud.title
+        }
+
+        try {
+          const editorData = await Api.wordclouds.fetchEditorData(wordcloudId)
+          editorParams.serialized = editorData
+        } catch (error) {
+          console.error(error)
+          toasts.showError({
+            title: 'Error loading the design',
+            description:
+              "Sorry, we couldn't load this design. If you believe it's a problem on our end, please contact our support at support@wordcloudy.com",
+            isClosable: true,
+            duration: 8000,
+          })
+          router.replace(Urls.yourDesigns)
+        }
+      } else if (templateId) {
+        analytics.trackStructured(
+          StructuredEvents.mkTemplateEditorSession(templateId)
+        )
+        await wordcloudsStore.fetchWordcloudById(templateId)
+        const wordcloud = wordcloudsStore.getById(templateId)
+
+        if (wordcloud) {
+          state.title = wordcloud.title
+        }
+
+        try {
+          const editorData = await Api.wordclouds.fetchEditorData(templateId)
+          editorParams.serialized = editorData
+        } catch (error) {
+          console.error(error)
+          toasts.showError({
+            title: 'Error loading the design',
+            description:
+              "Sorry, we couldn't load this design. If you believe it's a problem on our end, please contact our support at support@wordcloudy.com",
+            isClosable: true,
+            duration: 8000,
+          })
+          router.replace(Urls.yourDesigns)
+        }
+      } else {
+        analytics.trackStructured(StructuredEvents.mkNewEditorSession())
+        state.title = 'New wordart'
+      }
+
+      console.log(
+        'props.wordcloudId, authStore.hasInitialized, canvasRef.current, bgCanvasRef.current',
+        props.wordcloudId,
+        authStore.hasInitialized
+      )
+
+      await store.initEditor(editorParams)
+    }
+
+    // Init for loaded wordcloud
+    useEffect(() => {
+      if (!authStore.hasInitialized) {
+        return
+      }
+      if (props.wordcloudId) {
+        init({ wordcloudId: props.wordcloudId })
+      }
+    }, [props.wordcloudId, authStore.hasInitialized])
+
+    const welcomeSettingsModal = (
+      <WelcomeSettingsModal
+        isOpen={state.showWelcomeSettings}
+        onSubmit={async ({ templateId }) => {
+          state.showWelcomeSettings = false
+          await init({ templateId })
+        }}
+      />
+    )
 
     const hasUnsavedChanges = useCallback((url?: string) => {
       if (url?.startsWith('/editor/')) {
@@ -323,64 +427,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
       save()
     }, [authStore.isLoggedIn, props.wordcloudId, store.hasUnsavedChanges])
-
-    useEffect(() => {
-      const init = async () => {
-        if (
-          authStore.hasInitialized &&
-          canvasRef.current &&
-          bgCanvasRef.current &&
-          store.lifecycleState === 'initial'
-        ) {
-          const editorParams: EditorStoreInitParams = {
-            canvas: canvasRef.current,
-            bgCanvas: bgCanvasRef.current,
-            canvasWrapperEl: canvasWrapperRef.current!,
-            aspectRatio,
-          }
-
-          if (props.wordcloudId != null) {
-            analytics.trackStructured(StructuredEvents.mkSavedEditorSession())
-            await wordcloudsStore.fetchWordcloudById(props.wordcloudId)
-            const wordcloud = wordcloudsStore.getById(props.wordcloudId)
-
-            if (wordcloud) {
-              state.title = wordcloud.title
-            }
-
-            try {
-              const editorData = await Api.wordclouds.fetchEditorData(
-                props.wordcloudId
-              )
-              editorParams.serialized = editorData
-            } catch (error) {
-              console.error(error)
-              toasts.showError({
-                title: 'Error loading the design',
-                description:
-                  "Sorry, we couldn't load this design. If you believe it's a problem on our end, please contact our support at support@wordcloudy.com",
-                isClosable: true,
-                duration: 8000,
-              })
-              router.replace(Urls.yourDesigns)
-            }
-          } else {
-            analytics.trackStructured(StructuredEvents.mkNewEditorSession())
-            state.title = 'New wordart'
-          }
-
-          console.log(
-            'props.wordcloudId, authStore.hasInitialized, canvasRef.current, bgCanvasRef.current',
-            props.wordcloudId,
-            authStore.hasInitialized
-          )
-
-          await store.initEditor(editorParams)
-        }
-      }
-
-      init()
-    }, [props.wordcloudId, authStore.hasInitialized])
 
     useEffect(() => {
       return () => {
@@ -1396,6 +1442,8 @@ Order Prints
         <PageLayoutWrapper>
           {productTour}
 
+          {welcomeSettingsModal}
+
           <Helmet>
             <title>{getTabTitle(state.title || 'Untitled')}</title>
           </Helmet>
@@ -1521,7 +1569,8 @@ Order Prints
                     id="scene"
                   />
                 </CanvasContainer>
-                {store.lifecycleState !== 'initialized' && (
+
+                {store.lifecycleState === 'initializing' && (
                   <Box
                     position="absolute"
                     width="100%"

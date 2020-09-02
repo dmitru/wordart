@@ -44,6 +44,11 @@ export const StructuredEvents = {
     category: 'editor',
     action: 'open saved design',
   }),
+  mkTemplateEditorSession: (templateId: string): StructuredEvent => ({
+    category: 'editor',
+    action: 'open new from template',
+    label: templateId,
+  }),
   mkSaveByShapeType: (shapeKind: ShapeKind): StructuredEvent => ({
     category: 'editor',
     action: 'save (shape type)',
