@@ -98,7 +98,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Helmet } from 'react-helmet'
 import Hotkeys from 'react-hot-keys'
 import { BsHeart, BsTrash } from 'react-icons/bs'
-import { FaLock, FaLockOpen, FaTrashAlt } from 'react-icons/fa'
+import { FaLock, FaLockOpen, FaShoppingCart, FaTrashAlt } from 'react-icons/fa'
 import {
   FiChevronLeft,
   FiDownload,
@@ -136,6 +136,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const [store] = useState(() => new EditorStore())
 
     const state = useLocalStore(() => ({
+      showOrderFeatureTodo: false,
       title: 'New wordart',
       leftTab: 'shapes' as LeftPanelTab,
       leftPanelContext: 'normal' as 'normal' | 'resize',
@@ -970,7 +971,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
         <Editable
           css={css`
-            background: #fff3;
+            /* background: #fff3; */
             padding: 5px 8px;
             overflow: hidden;
             border-radius: 4px;
@@ -1014,6 +1015,8 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         </Editable>
 
         <TopNavButton
+          ml="auto"
+          mr="2"
           variant="secondary"
           onClick={openExport}
           colorScheme="secondary"
@@ -1040,8 +1043,32 @@ css={css`
 Order Prints
 </TopNavButton> */}
 
+        <Button
+          mr="2"
+          as={TopNavButton}
+          variant="primary"
+          onClick={() => {
+            state.showOrderFeatureTodo = true
+            analytics.trackStructured(StructuredEvents.mkOrderPrintsClick())
+          }}
+          leftIcon={<FaShoppingCart />}
+        >
+          Order Prints
+        </Button>
+
+        <WarningModal
+          icon={false}
+          isOpen={state.showOrderFeatureTodo}
+          onClose={() => {
+            state.showOrderFeatureTodo = false
+          }}
+          header="Feature coming soon"
+        >
+          <p>Coming soon: Order printed goods with your own word designs!</p>
+        </WarningModal>
+
         <Menu isLazy>
-          <MenuButton as={TopNavButton} variant="secondary" mr="2" ml="auto">
+          <MenuButton as={TopNavButton} variant="secondary" mr="2">
             <FiHelpCircle
               id="help-btn"
               css={css`

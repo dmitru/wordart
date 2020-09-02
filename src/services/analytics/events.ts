@@ -49,6 +49,10 @@ export const StructuredEvents = {
     action: 'open new from template',
     label: templateId,
   }),
+  mkOrderPrintsClick: (): StructuredEvent => ({
+    category: 'editor',
+    action: 'order prints click',
+  }),
   mkSaveByShapeType: (shapeKind: ShapeKind): StructuredEvent => ({
     category: 'editor',
     action: 'save (shape type)',

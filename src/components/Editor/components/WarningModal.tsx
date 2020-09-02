@@ -15,6 +15,7 @@ import { FaExclamationCircle } from 'react-icons/fa'
 
 export type WarningModalProps = {
   children?: React.ReactNode
+  icon?: boolean
   header?: string
   content?: string
   isOpen: boolean
@@ -22,7 +23,7 @@ export type WarningModalProps = {
 }
 
 export const WarningModal: React.FC<WarningModalProps> = observer(
-  ({ isOpen, onClose, header, content, children }) => {
+  ({ icon = true, isOpen, onClose, header, content, children }) => {
     return (
       <Modal size="md" isOpen={isOpen} onClose={onClose}>
         <ModalOverlay>
@@ -30,21 +31,23 @@ export const WarningModal: React.FC<WarningModalProps> = observer(
             {header && <ModalHeader>{header}</ModalHeader>}
             <ModalBody>
               <Box display="flex" alignItems="center" flexDirection="column">
-                <Box
-                  mr="1rem"
-                  mb="6"
-                  bg="red.50"
-                  color="red.300"
-                  minWidth="80px"
-                  height="80px"
-                  fontSize="60px"
-                  borderRadius="100%"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <FaExclamationCircle />
-                </Box>
+                {icon && (
+                  <Box
+                    mr="1rem"
+                    mb="6"
+                    bg="red.50"
+                    color="red.300"
+                    minWidth="80px"
+                    height="80px"
+                    fontSize="60px"
+                    borderRadius="100%"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <FaExclamationCircle />
+                  </Box>
+                )}
 
                 <Box>
                   {content && <Text>{content}</Text>}
