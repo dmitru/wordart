@@ -1,4 +1,4 @@
-import { TargetTab } from 'components/Editor/components/Editor'
+import { TargetTab } from 'components/Editor/components/editor-components'
 import {
   defaultBgStyleOptions,
   defaultShapeStyleOptions,
