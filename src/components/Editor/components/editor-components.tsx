@@ -215,9 +215,9 @@ export type LeftPanelTab =
   | 'layout'
 export const leftPanelTabs: LeftPanelTab[] = [
   'shapes',
-  'colors',
-  'layout',
   'words',
   'fonts',
   'symbols',
+  'layout',
+  'colors',
 ]

@@ -1194,28 +1194,6 @@ Order Prints
         </LeftNavbarBtn>
 
         <LeftNavbarBtn
-          onClick={() => {
-            state.leftTab = 'colors'
-            state.leftPanelContext = 'normal'
-          }}
-          active={leftTab === 'colors' && state.leftPanelContext === 'normal'}
-        >
-          <ColorPalette className="icon" />
-          Colors
-        </LeftNavbarBtn>
-
-        <LeftNavbarBtn
-          onClick={() => {
-            state.leftTab = 'layout'
-            state.leftPanelContext = 'normal'
-          }}
-          active={leftTab === 'layout' && state.leftPanelContext === 'normal'}
-        >
-          <LayoutMasonry className="icon" />
-          Layout
-        </LeftNavbarBtn>
-
-        <LeftNavbarBtn
           id="nav-words"
           onClick={() => {
             state.leftTab = 'words'
@@ -1247,6 +1225,28 @@ Order Prints
         >
           <SmileBeam className="icon" />
           Icons
+        </LeftNavbarBtn>
+
+        <LeftNavbarBtn
+          onClick={() => {
+            state.leftTab = 'layout'
+            state.leftPanelContext = 'normal'
+          }}
+          active={leftTab === 'layout' && state.leftPanelContext === 'normal'}
+        >
+          <LayoutMasonry className="icon" />
+          Layout
+        </LeftNavbarBtn>
+
+        <LeftNavbarBtn
+          onClick={() => {
+            state.leftTab = 'colors'
+            state.leftPanelContext = 'normal'
+          }}
+          active={leftTab === 'colors' && state.leftPanelContext === 'normal'}
+        >
+          <ColorPalette className="icon" />
+          Colors
         </LeftNavbarBtn>
 
         <div

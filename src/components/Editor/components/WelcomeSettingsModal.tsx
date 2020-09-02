@@ -76,7 +76,7 @@ export const WelcomeSettingsModal: React.FC<WelcomeSettingsModalProps> = observe
             </ModalHeader>
             <ModalBody>
               <Text mb="4" fontSize="lg" textAlign="center" color="gray.500">
-                You will be able to customize everything later.
+                Don't sweat it! You can customize everything later.
               </Text>
               <Box display="flex" flexWrap="wrap">
                 {templates &&
