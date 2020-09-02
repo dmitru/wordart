@@ -324,7 +324,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
       store.isSaving = true
       try {
-        const thumbnailCanvas = await store.editor.exportAsRaster(380)
+        const thumbnailCanvas = await store.editor.exportAsRaster(
+          config.thumbnailSizePx
+        )
         const thumbnail = thumbnailCanvas.toDataURL('image/jpeg', 0.85)
         const editorData = await store.serialize()
 

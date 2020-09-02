@@ -1,6 +1,8 @@
 import packageJson from '../package.json'
 
 export const config = {
+  thumbnailSizePx: 380,
+
   baseUrl: process.env.NEXT_PUBLIC_WEB_BASE_URL!,
   isDevEnv: process.env.NODE_ENV === 'development',
 
@@ -35,3 +37,6 @@ export const config = {
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL!,
   },
 }
+
+// @ts-ignore
+window['config'] = config
