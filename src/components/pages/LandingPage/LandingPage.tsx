@@ -357,7 +357,7 @@ export const LandingPage = observer(() => {
           </Box>
           <Box>
             <Text fontSize="2rem" color="pink.600" css={useCaseTitleStyle}>
-              For Designers
+              For Artists & Designers
             </Text>
             <Text fontSize="20px" color="gray.700" as="ul">
               <li>
