@@ -5,11 +5,10 @@ export default class MyDocument extends Document {
   getGoogleAnalyticsTags() {
     return {
       __html: `
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-      
-        gtag('config', '${config.ga.trackingCode}');
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};
+      ga.l=+new Date;
+      ga('create', '${config.ga.trackingCode}', 'auto');
+      ga('send', 'pageview');
       `,
     }
   }
@@ -30,12 +29,12 @@ export default class MyDocument extends Document {
 
           {config.ga.enabled && (
             <>
+              <script dangerouslySetInnerHTML={this.getGoogleAnalyticsTags()} />
               <script
                 async
-                src={`https://www.googletagmanager.com/gtag/js?id=${config.ga.trackingCode}`}
+                src="https://www.google-analytics.com/analytics.js"
               />
               {/* We call the function above to inject the contents of the script tag */}
-              <script dangerouslySetInnerHTML={this.getGoogleAnalyticsTags()} />
             </>
           )}
         </body>
