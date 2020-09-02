@@ -373,12 +373,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           return
         }
         const itemsCount = store.getItemsCount().total
-        if (itemsCount === 0) {
-          window.alert(
-            'Your design is empty. Please click "Visualize" before saving to place some words.'
-          )
-          return
-        }
+        // if (itemsCount === 0) {
+        //   window.alert(
+        //     'Your design is empty. Please click "Visualize" to place some words before saving.'
+        //   )
+        //   return
+        // }
 
         store.enterViewMode()
 
