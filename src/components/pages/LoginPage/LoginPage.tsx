@@ -22,7 +22,6 @@ import { Urls } from 'urls'
 import * as Yup from 'yup'
 import { Helmet } from 'react-helmet'
 import { getTabTitle } from 'utils/tab-title'
-import GoogleButton from 'react-google-button'
 import { FaFacebook, FaGoogle } from 'react-icons/fa'
 
 export type LoginFormValues = {
