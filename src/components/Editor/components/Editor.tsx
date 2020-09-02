@@ -584,64 +584,817 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       })
     }
 
+    const visualizingModal = (
+      <Modal
+        initialFocusRef={cancelVisualizationBtnRef}
+        finalFocusRef={cancelVisualizationBtnRef}
+        isOpen={store.isVisualizing}
+        onClose={cancelVisualization}
+        closeOnOverlayClick={false}
+        closeOnEsc={false}
+      >
+        <ModalOverlay>
+          <ModalContent>
+            <ModalHeader>
+              {store.visualizingStep === 'generating'
+                ? '⏳ Generating'
+                : '⏳ Visualizing'}
+              : {Math.round(100 * (store.visualizingProgress || 0))}%
+            </ModalHeader>
+            <ModalBody pb={6}>
+              <Stack>
+                <Progress
+                  isAnimated
+                  hasStripe
+                  css={css`
+                    &,
+                    * {
+                      transition: all 0.2s !important;
+                    }
+                  `}
+                  color="accent"
+                  height="32px"
+                  value={(store.visualizingProgress || 0) * 100}
+                />
+                <Text fontSize="lg"></Text>
+              </Stack>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button
+                ref={cancelVisualizationBtnRef}
+                onClick={cancelVisualization}
+              >
+                Cancel
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </ModalOverlay>
+      </Modal>
+    )
+
+    const exportModal = (
+      <Modal
+        isOpen={state.isShowingExport}
+        onClose={closeExport}
+        trapFocus={false}
+      >
+        <ModalOverlay>
+          <ModalContent
+            css={css`
+              max-width: 530px;
+            `}
+          >
+            <ModalHeader>Choose Download Format</ModalHeader>
+            <ModalBody pb={6}>
+              {isExporting ? (
+                <>
+                  <Spinner />
+                </>
+              ) : (
+                <>
+                  <Text fontSize="lg">
+                    <strong>Standard Download,</strong> for personal use only
+                  </Text>
+                  <Stack direction="row" spacing="3" flexWrap="wrap">
+                    <ExportButton
+                      variant="outline"
+                      boxShadow={
+                        selectedFormat === 'sd-png'
+                          ? '0 0 0 3px rgb(237, 93, 98) !important'
+                          : 'none'
+                      }
+                      onClick={() => setSelectedFormat('sd-png')}
+                    >
+                      <Text mt="0" fontSize="lg" fontWeight="bold">
+                        PNG
+                      </Text>
+                      <Text mb="0" fontSize="sm" fontWeight="normal">
+                        1024 px
+                      </Text>
+                      <Text mb="0" fontSize="sm" fontWeight="normal">
+                        Higher quality
+                      </Text>
+                    </ExportButton>
+
+                    <ExportButton
+                      variant="outline"
+                      boxShadow={
+                        selectedFormat === 'sd-jpeg'
+                          ? '0 0 0 3px rgb(237, 93, 98) !important'
+                          : 'none'
+                      }
+                      onClick={() => setSelectedFormat('sd-jpeg')}
+                    >
+                      <Text mt="0" fontSize="lg" fontWeight="bold">
+                        JPEG
+                      </Text>
+                      <Text mb="0" fontSize="sm" fontWeight="normal">
+                        1024 px
+                      </Text>
+                      <Text mb="0" fontSize="sm" fontWeight="normal">
+                        Smaller file size
+                      </Text>
+                    </ExportButton>
+                  </Stack>
+
+                  <Box mt="6">
+                    <Text fontSize="lg">
+                      <strong>HQ Download,</strong> personal or commercial use
+                    </Text>
+                    <Stack direction="row" spacing="3" flexWrap="wrap">
+                      <ExportButton
+                        variant="outline"
+                        boxShadow={
+                          selectedFormat === 'hd-png'
+                            ? '0 0 0 3px rgb(237, 93, 98) !important'
+                            : 'none'
+                        }
+                        onClick={() => setSelectedFormat('hd-png')}
+                      >
+                        <Text mt="0" fontSize="lg">
+                          PNG (HD)
+                        </Text>
+                        <Text mb="0" fontSize="sm">
+                          4096 px
+                        </Text>
+                      </ExportButton>
+
+                      <ExportButton
+                        variant="outline"
+                        boxShadow={
+                          selectedFormat === 'hd-jpeg'
+                            ? '0 0 0 3px rgb(237, 93, 98) !important'
+                            : 'none'
+                        }
+                        onClick={() => setSelectedFormat('hd-jpeg')}
+                      >
+                        <Text mt="0" fontSize="lg">
+                          JPEG (HD)
+                        </Text>
+                        <Text mb="0" fontSize="sm">
+                          4096 px
+                        </Text>
+                      </ExportButton>
+
+                      <ExportButton
+                        variant="outline"
+                        boxShadow={
+                          selectedFormat === 'hd-svg'
+                            ? '0 0 0 3px rgb(237, 93, 98) !important'
+                            : 'none'
+                        }
+                        onClick={() => setSelectedFormat('hd-svg')}
+                      >
+                        <Text mt="0" fontSize="lg">
+                          SVG
+                        </Text>
+                        <Text mb="0" fontSize="sm">
+                          Vector format
+                        </Text>
+                      </ExportButton>
+                    </Stack>
+                  </Box>
+                </>
+              )}
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                colorScheme="accent"
+                leftIcon={<DownloadIcon />}
+                onClick={handleDownloadClick}
+              >
+                Download
+              </Button>
+            </ModalFooter>
+            <ModalCloseButton />
+          </ModalContent>
+        </ModalOverlay>
+      </Modal>
+    )
+
+    const topNavItems = (
+      <>
+        <Link
+          href={authStore.isLoggedIn ? Urls.yourDesigns : Urls.landing}
+          passHref
+        >
+          <TopNavButton mr="1" variant="secondary" colorScheme="secondary">
+            <FiChevronLeft
+              css={css`
+                margin-right: 4px;
+              `}
+            />
+            Home
+          </TopNavButton>
+        </Link>
+
+        <Menu isLazy>
+          <MenuButton
+            mr="2"
+            as={TopNavButton}
+            variant="primary"
+            leftIcon={<FiMenu />}
+          >
+            Menu
+          </MenuButton>
+          <Portal>
+            <MenuTransition>
+              {(styles) => (
+                // @ts-ignore
+                <MenuList css={styles} zIndex={4}>
+                  <MenuItem
+                    onClick={() =>
+                      openUrlInNewTab(`${config.baseUrl}${Urls.editor.create}`)
+                    }
+                  >
+                    <FiFilePlus
+                      css={css`
+                        margin-right: 4px;
+                      `}
+                    />
+                    New...
+                  </MenuItem>
+                  <MenuItem onClick={handleSaveClick}>
+                    <FiSave
+                      css={css`
+                        margin-right: 4px;
+                      `}
+                    />
+                    Save
+                  </MenuItem>
+                  {/* <MenuItem>
+          <FiCopy
+            css={css`
+              margin-right: 4px;
+            `}
+          />
+          Make Copy
+        </MenuItem> */}
+
+                  <MenuItem
+                    onClick={() => {
+                      state.leftPanelContext = 'resize'
+                    }}
+                  >
+                    <IoMdResize
+                      css={css`
+                        margin-right: 4px;
+                      `}
+                    />
+                    Page Size...
+                  </MenuItem>
+                  <MenuDivider />
+                  <MenuItem onClick={handlePrint}>
+                    <FiPrinter
+                      css={css`
+                        margin-right: 4px;
+                      `}
+                    />
+                    Print
+                  </MenuItem>
+                  <MenuItem onClick={openExport}>
+                    <FiDownload
+                      css={css`
+                        margin-right: 4px;
+                      `}
+                    />{' '}
+                    Download as Image
+                  </MenuItem>
+                  <MenuDivider />
+                  <MenuItem isDisabled={isNew} onClick={handleDelete}>
+                    <BsTrash
+                      css={css`
+                        margin-right: 4px;
+                      `}
+                    />
+                    Delete
+                  </MenuItem>
+                  <MenuDivider />
+                  <MenuItem
+                    onClick={() => {
+                      openUrlInNewTab('https://forms.gle/P5rXX6pvKVBbwVFX7')
+                    }}
+                  >
+                    <BsHeart
+                      css={css`
+                        margin-right: 4px;
+                      `}
+                    />
+                    Leave feedback
+                  </MenuItem>
+                  <MenuDivider />
+                  <MenuItem
+                    onClick={() => {
+                      router.push(Urls.yourDesigns)
+                    }}
+                  >
+                    <FiChevronLeft
+                      css={css`
+                        margin-right: 4px;
+                      `}
+                    />
+                    Go Back to Your Designs
+                  </MenuItem>
+                </MenuList>
+              )}
+            </MenuTransition>
+          </Portal>
+        </Menu>
+
+        <Button
+          colorScheme="secondary"
+          onClick={handleSaveClick}
+          isLoading={isSaving}
+          mr="2"
+          css={css`
+            width: 90px;
+          `}
+        >
+          <FiSave
+            css={css`
+              margin-right: 4px;
+            `}
+          />
+          Save
+        </Button>
+
+        <Editable
+          css={css`
+            background: #fff3;
+            padding: 5px 8px;
+            overflow: hidden;
+            border-radius: 4px;
+            display: flex;
+            height: 40px;
+
+            &:hover {
+              background: #ffffff15;
+            }
+          `}
+          value={state.title}
+          onChange={(value) => {
+            state.title = value
+            store.hasUnsavedChanges = true
+          }}
+          selectAllOnFocus={false}
+          placeholder="Untitled Design"
+          color="white"
+          fontSize="xl"
+          maxWidth="200px"
+          flex={1}
+          mr="2"
+        >
+          <EditablePreview
+            width="100%"
+            py="0"
+            css={css`
+              text-overflow: ellipsis;
+              overflow-x: hidden;
+              overflow-y: hidden;
+              white-space: nowrap;
+            `}
+          />
+          <EditableInput
+            id="title-input"
+            css={css`
+              background-color: white;
+              color: black;
+            `}
+          />
+        </Editable>
+
+        <TopNavButton
+          variant="secondary"
+          onClick={openExport}
+          colorScheme="secondary"
+        >
+          <FiDownload
+            css={css`
+              margin-right: 4px;
+            `}
+          />
+          Download
+        </TopNavButton>
+
+        {/* <TopNavButton
+onClick={openExport}
+isLoading={isExporting}
+loadingText="Saving..."
+mr="1"
+>
+<FiShoppingCart
+css={css`
+  margin-right: 4px;
+`}
+/>
+Order Prints
+</TopNavButton> */}
+
+        <Menu isLazy>
+          <MenuButton
+            as={TopNavButton}
+            colorScheme="secondary"
+            mr="2"
+            ml="auto"
+          >
+            <FiHelpCircle
+              id="help-btn"
+              css={css`
+                margin-right: 4px;
+                display: inline-block;
+              `}
+            />
+            Help
+            <span
+              css={css`
+                @media screen and (max-width: 1010px) {
+                  display: none;
+                }
+              `}
+            >
+              {' & Tutorials'}
+            </span>
+          </MenuButton>
+
+          <MenuTransition>
+            {(styles) => (
+              <Portal>
+                <MenuList
+                  // @ts-ignore
+                  css={css`
+                    ${styles}
+                    max-width: 320px;
+                  `}
+                >
+                  <MenuItemWithDescription
+                    title="Open Tutorials"
+                    description="Learn how to use Wordcloudy"
+                    onClick={() => {
+                      openUrlInNewTab(
+                        `https://wordcloudy.com/blog/tag/tutorials/`
+                      )
+                    }}
+                  />
+                  <MenuItemWithDescription
+                    title="Read FAQ"
+                    description="Find answers to common questions"
+                    onClick={() => {
+                      openUrlInNewTab(`${config.baseUrl}${Urls.faq}`)
+                    }}
+                  />
+                  <MenuItemWithDescription
+                    title="Contact us"
+                    description="Report a problem, give feedback, suggest a feature or ask us anything!"
+                    onClick={() => {
+                      openUrlInNewTab(`${config.baseUrl}${Urls.contact}`)
+                    }}
+                  />
+                </MenuList>
+              </Portal>
+            )}
+          </MenuTransition>
+        </Menu>
+
+        {!hasActivePlan && (
+          <Button
+            colorScheme="accent"
+            onClick={() => upgradeModal.show('generic')}
+          >
+            Upgrade
+          </Button>
+        )}
+      </>
+    )
+
+    const productTour = (
+      <Joyride
+        callback={(data) => {
+          if (data.status === 'finished') {
+            setHasClosedProductTour(true)
+          }
+        }}
+        steps={[
+          {
+            target: '#btn-visualize',
+            content: '🎉 Welcome! Click "Visualize" to generate words.',
+          },
+          {
+            target: '#nav-words',
+            content: (
+              <>
+                Customize your design: choose shape, words, fonts and colors.
+                Then hit "Visualize" to see the results.
+              </>
+            ),
+          },
+          {
+            target: '#help-btn',
+            content: (
+              <>
+                Read our 3-minute step-by-step tutorial to learn how to create a
+                beautiful word designs.
+                <br />
+                <Button
+                  colorScheme="accent"
+                  my="3"
+                  as="a"
+                  target="_blank"
+                  href="https://wordcloudy.com/blog/getting-started-in-5-minutes/"
+                >
+                  Open tutorial
+                </Button>
+                <br />
+                Still have questions? Write to us, and we'll be happy to help!
+                <br />
+                <Button
+                  variant="outline"
+                  mt="3"
+                  as="a"
+                  target="_blank"
+                  href="https://wordcloudy.com/contact/"
+                >
+                  Write to us
+                </Button>
+              </>
+            ),
+          },
+        ]}
+        run={!hasClosedProductTour}
+      />
+    )
+
+    const leftNav = (
+      <SideNavbar
+        activeIndex={
+          state.leftPanelContext === 'normal'
+            ? leftPanelTabs.findIndex((s) => s === state.leftTab)
+            : undefined
+        }
+      >
+        <LeftNavbarBtn
+          onClick={() => {
+            state.leftTab = 'shapes'
+            state.leftPanelContext = 'normal'
+          }}
+          active={
+            state.leftTab === 'shapes' && state.leftPanelContext === 'normal'
+          }
+        >
+          <Shapes className="icon" />
+          Shape
+        </LeftNavbarBtn>
+
+        <LeftNavbarBtn
+          onClick={() => {
+            state.leftTab = 'colors'
+            state.leftPanelContext = 'normal'
+          }}
+          active={leftTab === 'colors' && state.leftPanelContext === 'normal'}
+        >
+          <ColorPalette className="icon" />
+          Colors
+        </LeftNavbarBtn>
+
+        <LeftNavbarBtn
+          onClick={() => {
+            state.leftTab = 'layout'
+            state.leftPanelContext = 'normal'
+          }}
+          active={leftTab === 'layout' && state.leftPanelContext === 'normal'}
+        >
+          <LayoutMasonry className="icon" />
+          Layout
+        </LeftNavbarBtn>
+
+        <LeftNavbarBtn
+          id="nav-words"
+          onClick={() => {
+            state.leftTab = 'words'
+            state.leftPanelContext = 'normal'
+          }}
+          active={leftTab === 'words' && state.leftPanelContext === 'normal'}
+        >
+          <TextFields className="icon" />
+          Words
+        </LeftNavbarBtn>
+
+        <LeftNavbarBtn
+          onClick={() => {
+            state.leftTab = 'fonts'
+            state.leftPanelContext = 'normal'
+          }}
+          active={leftTab === 'fonts' && state.leftPanelContext === 'normal'}
+        >
+          <Font className="icon" />
+          Fonts
+        </LeftNavbarBtn>
+
+        <LeftNavbarBtn
+          onClick={() => {
+            state.leftTab = 'symbols'
+            state.leftPanelContext = 'normal'
+          }}
+          active={leftTab === 'symbols' && state.leftPanelContext === 'normal'}
+        >
+          <SmileBeam className="icon" />
+          Icons
+        </LeftNavbarBtn>
+
+        <div
+          css={css`
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+          `}
+        >
+          <img
+            src="/images/logo.svg"
+            css={css`
+              opacity: 0.5;
+              margin: 0 auto 30px;
+            `}
+          />
+        </div>
+      </SideNavbar>
+    )
+
+    const topEditorToolbar = (
+      <>
+        <Button
+          id="btn-visualize"
+          css={css`
+            width: 128px;
+          `}
+          colorScheme="accent"
+          isLoading={store.isVisualizing}
+          onClick={handleVisualizeClick}
+        >
+          <MagicWand
+            size={24}
+            css={css`
+              margin-right: 4px;
+            `}
+          />
+          Visualize
+        </Button>
+
+        <Tooltip
+          label="Undo"
+          aria-label="Undo"
+          hasArrow
+          zIndex={5}
+          isDisabled={!store.editor?.canUndo}
+        >
+          <IconButton
+            isLoading={store.editor?.isUndoing}
+            ml="3"
+            icon={<ArrowBackIcon />}
+            aria-label="Undo"
+            variant="outline"
+            isDisabled={!store.editor?.canUndo}
+            onClick={store.editor?.undo}
+          />
+        </Tooltip>
+        <Tooltip
+          label="Redo"
+          aria-label="Redo"
+          hasArrow
+          zIndex={5}
+          isDisabled={!store.editor?.canRedo}
+        >
+          <IconButton
+            ml="1"
+            isLoading={store.editor?.isRedoing}
+            icon={<ArrowForwardIcon />}
+            aria-label="Redo"
+            variant="outline"
+            isDisabled={!store.editor?.canRedo}
+            onClick={store.editor?.redo}
+          />
+        </Tooltip>
+
+        <Box mr="3" ml="auto">
+          {store.mode === 'view' && hasItems && (
+            <>
+              <Menu isLazy>
+                <MenuButton mr="2" as={MenuDotsButton} variant="ghost" />
+
+                <Portal>
+                  <MenuTransition>
+                    {(styles) => (
+                      // @ts-ignore
+                      <MenuList css={styles}>
+                        <MenuItem
+                          onClick={() => {
+                            store.editor?.clearItems('shape', true)
+                          }}
+                          isDisabled={!hasShapeItems}
+                        >
+                          <SmallCloseIcon color="gray.500" mr="2" />
+                          Delete all Shape items
+                        </MenuItem>
+
+                        <MenuItem
+                          onClick={() => {
+                            store.editor?.clearItems('bg', true)
+                          }}
+                          isDisabled={!hasBgItems}
+                        >
+                          <SmallCloseIcon color="gray.500" mr="2" />
+                          Delete all Background items
+                        </MenuItem>
+                      </MenuList>
+                    )}
+                  </MenuTransition>
+                </Portal>
+              </Menu>
+
+              <Button
+                variant="outline"
+                py="1"
+                onClick={() => {
+                  store.enterEditItemsMode()
+                }}
+              >
+                Edit Items
+              </Button>
+            </>
+          )}
+
+          {store.mode === 'edit' && (
+            <>
+              <Button
+                mr="2"
+                isDisabled={!store.hasItemChanges}
+                variant="ghost"
+                onClick={() => store.resetAllItems()}
+              >
+                Reset All
+              </Button>
+
+              <Tooltip label="Remove item">
+                <Button
+                  mr="2"
+                  variant="ghost"
+                  onClick={() => store.removeItem()}
+                >
+                  <FaTrashAlt />
+                </Button>
+              </Tooltip>
+
+              {store.selectedItemData && (
+                <>
+                  <WordColorPickerPopover />
+
+                  <Tooltip label="Lock the item to preserve its position between re-visualizations">
+                    <Button
+                      ml="2"
+                      onClick={() => {
+                        if (!store.selectedItemData) {
+                          return
+                        }
+                        store.setItemLock(
+                          !Boolean(store.selectedItemData.locked)
+                        )
+                      }}
+                      css={css`
+                        width: 90px;
+                      `}
+                      leftIcon={
+                        store.selectedItemData.locked ? (
+                          <FaLockOpen />
+                        ) : (
+                          <FaLock />
+                        )
+                      }
+                    >
+                      {store.selectedItemData.locked ? 'Unlock' : 'Lock'}
+                    </Button>
+                  </Tooltip>
+                </>
+              )}
+
+              <Button
+                ml="2"
+                py="1"
+                colorScheme="green"
+                onClick={() => {
+                  store.enterViewMode()
+                }}
+              >
+                Done
+              </Button>
+            </>
+          )}
+        </Box>
+      </>
+    )
+
     return (
       <EditorStoreContext.Provider value={store}>
         <PageLayoutWrapper>
-          <Joyride
-            callback={(data) => {
-              if (data.status === 'finished') {
-                setHasClosedProductTour(true)
-              }
-            }}
-            steps={[
-              {
-                target: '#btn-visualize',
-                content: '🎉 Welcome! Click "Visualize" to generate words.',
-              },
-              {
-                target: '#nav-words',
-                content: (
-                  <>
-                    Customize your design: choose shape, words, fonts and
-                    colors. Then hit "Visualize" to see the results.
-                  </>
-                ),
-              },
-              {
-                target: '#help-btn',
-                content: (
-                  <>
-                    Read our 3-minute step-by-step tutorial to learn how to
-                    create a beautiful word designs.
-                    <br />
-                    <Button
-                      colorScheme="accent"
-                      my="3"
-                      as="a"
-                      target="_blank"
-                      href="https://wordcloudy.com/blog/getting-started-in-5-minutes/"
-                    >
-                      Open tutorial
-                    </Button>
-                    <br />
-                    Still have questions? Write to us, and we'll be happy to
-                    help!
-                    <br />
-                    <Button
-                      variant="outline"
-                      mt="3"
-                      as="a"
-                      target="_blank"
-                      href="https://wordcloudy.com/contact/"
-                    >
-                      Write to us
-                    </Button>
-                  </>
-                ),
-              },
-            ]}
-            run={!hasClosedProductTour}
-          />
+          {productTour}
 
           <Helmet>
             <title>{getTabTitle(state.title || 'Untitled')}</title>
@@ -658,408 +1411,13 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           />
 
           <TopNavWrapper alignItems="center" display="flex">
-            <Link
-              href={authStore.isLoggedIn ? Urls.yourDesigns : Urls.landing}
-              passHref
-            >
-              <TopNavButton mr="1" variant="secondary" colorScheme="secondary">
-                <FiChevronLeft
-                  css={css`
-                    margin-right: 4px;
-                  `}
-                />
-                Home
-              </TopNavButton>
-            </Link>
-
-            <Menu isLazy>
-              <MenuButton
-                mr="2"
-                as={TopNavButton}
-                variant="primary"
-                leftIcon={<FiMenu />}
-              >
-                Menu
-              </MenuButton>
-              <Portal>
-                <MenuTransition>
-                  {(styles) => (
-                    // @ts-ignore
-                    <MenuList css={styles} zIndex={4}>
-                      <MenuItem
-                        onClick={() =>
-                          openUrlInNewTab(
-                            `${config.baseUrl}${Urls.editor.create}`
-                          )
-                        }
-                      >
-                        <FiFilePlus
-                          css={css`
-                            margin-right: 4px;
-                          `}
-                        />
-                        New...
-                      </MenuItem>
-                      <MenuItem onClick={handleSaveClick}>
-                        <FiSave
-                          css={css`
-                            margin-right: 4px;
-                          `}
-                        />
-                        Save
-                      </MenuItem>
-                      {/* <MenuItem>
-                        <FiCopy
-                          css={css`
-                            margin-right: 4px;
-                          `}
-                        />
-                        Make Copy
-                      </MenuItem> */}
-
-                      <MenuItem
-                        onClick={() => {
-                          state.leftPanelContext = 'resize'
-                        }}
-                      >
-                        <IoMdResize
-                          css={css`
-                            margin-right: 4px;
-                          `}
-                        />
-                        Page Size...
-                      </MenuItem>
-                      <MenuDivider />
-                      <MenuItem onClick={handlePrint}>
-                        <FiPrinter
-                          css={css`
-                            margin-right: 4px;
-                          `}
-                        />
-                        Print
-                      </MenuItem>
-                      <MenuItem onClick={openExport}>
-                        <FiDownload
-                          css={css`
-                            margin-right: 4px;
-                          `}
-                        />{' '}
-                        Download as Image
-                      </MenuItem>
-                      <MenuDivider />
-                      <MenuItem isDisabled={isNew} onClick={handleDelete}>
-                        <BsTrash
-                          css={css`
-                            margin-right: 4px;
-                          `}
-                        />
-                        Delete
-                      </MenuItem>
-                      <MenuDivider />
-                      <MenuItem
-                        onClick={() => {
-                          openUrlInNewTab('https://forms.gle/P5rXX6pvKVBbwVFX7')
-                        }}
-                      >
-                        <BsHeart
-                          css={css`
-                            margin-right: 4px;
-                          `}
-                        />
-                        Leave feedback
-                      </MenuItem>
-                      <MenuDivider />
-                      <MenuItem
-                        onClick={() => {
-                          router.push(Urls.yourDesigns)
-                        }}
-                      >
-                        <FiChevronLeft
-                          css={css`
-                            margin-right: 4px;
-                          `}
-                        />
-                        Go Back to Your Designs
-                      </MenuItem>
-                    </MenuList>
-                  )}
-                </MenuTransition>
-              </Portal>
-            </Menu>
-
-            <Button
-              colorScheme="secondary"
-              onClick={handleSaveClick}
-              isLoading={isSaving}
-              mr="2"
-              css={css`
-                width: 90px;
-              `}
-            >
-              <FiSave
-                css={css`
-                  margin-right: 4px;
-                `}
-              />
-              Save
-            </Button>
-
-            <Editable
-              css={css`
-                background: #fff3;
-                padding: 5px 8px;
-                overflow: hidden;
-                border-radius: 4px;
-                display: flex;
-                height: 40px;
-
-                &:hover {
-                  background: #ffffff15;
-                }
-              `}
-              value={state.title}
-              onChange={(value) => {
-                state.title = value
-                store.hasUnsavedChanges = true
-              }}
-              selectAllOnFocus={false}
-              placeholder="Untitled Design"
-              color="white"
-              fontSize="xl"
-              maxWidth="200px"
-              flex={1}
-              mr="2"
-            >
-              <EditablePreview
-                width="100%"
-                py="0"
-                css={css`
-                  text-overflow: ellipsis;
-                  overflow-x: hidden;
-                  overflow-y: hidden;
-                  white-space: nowrap;
-                `}
-              />
-              <EditableInput
-                id="title-input"
-                css={css`
-                  background-color: white;
-                  color: black;
-                `}
-              />
-            </Editable>
-
-            <TopNavButton
-              variant="secondary"
-              onClick={openExport}
-              colorScheme="secondary"
-            >
-              <FiDownload
-                css={css`
-                  margin-right: 4px;
-                `}
-              />
-              Download
-            </TopNavButton>
-
-            {/* <TopNavButton
-            onClick={openExport}
-            isLoading={isExporting}
-            loadingText="Saving..."
-            mr="1"
-          >
-            <FiShoppingCart
-              css={css`
-                margin-right: 4px;
-              `}
-            />
-            Order Prints
-          </TopNavButton> */}
-
-            <Menu isLazy>
-              <MenuButton
-                as={TopNavButton}
-                colorScheme="secondary"
-                mr="2"
-                ml="auto"
-              >
-                <FiHelpCircle
-                  id="help-btn"
-                  css={css`
-                    margin-right: 4px;
-                    display: inline-block;
-                  `}
-                />
-                Help
-                <span
-                  css={css`
-                    @media screen and (max-width: 1010px) {
-                      display: none;
-                    }
-                  `}
-                >
-                  {' & Tutorials'}
-                </span>
-              </MenuButton>
-
-              <MenuTransition>
-                {(styles) => (
-                  <Portal>
-                    <MenuList
-                      // @ts-ignore
-                      css={css`
-                        ${styles}
-                        max-width: 320px;
-                      `}
-                    >
-                      <MenuItemWithDescription
-                        title="Open Tutorials"
-                        description="Learn how to use Wordcloudy"
-                        onClick={() => {
-                          openUrlInNewTab(
-                            `https://wordcloudy.com/blog/tag/tutorials/`
-                          )
-                        }}
-                      />
-                      <MenuItemWithDescription
-                        title="Read FAQ"
-                        description="Find answers to common questions"
-                        onClick={() => {
-                          openUrlInNewTab(`${config.baseUrl}${Urls.faq}`)
-                        }}
-                      />
-                      <MenuItemWithDescription
-                        title="Contact us"
-                        description="Report a problem, give feedback, suggest a feature or ask us anything!"
-                        onClick={() => {
-                          openUrlInNewTab(`${config.baseUrl}${Urls.contact}`)
-                        }}
-                      />
-                    </MenuList>
-                  </Portal>
-                )}
-              </MenuTransition>
-            </Menu>
-
-            {!hasActivePlan && (
-              <Button
-                colorScheme="accent"
-                onClick={() => upgradeModal.show('generic')}
-              >
-                Upgrade
-              </Button>
-            )}
+            {topNavItems}
           </TopNavWrapper>
 
           <EditorLayout>
             <LeftWrapper>
               <LeftBottomWrapper>
-                <SideNavbar
-                  activeIndex={
-                    state.leftPanelContext === 'normal'
-                      ? leftPanelTabs.findIndex((s) => s === state.leftTab)
-                      : undefined
-                  }
-                >
-                  <LeftNavbarBtn
-                    onClick={() => {
-                      state.leftTab = 'shapes'
-                      state.leftPanelContext = 'normal'
-                    }}
-                    active={
-                      state.leftTab === 'shapes' &&
-                      state.leftPanelContext === 'normal'
-                    }
-                  >
-                    <Shapes className="icon" />
-                    Shape
-                  </LeftNavbarBtn>
-
-                  <LeftNavbarBtn
-                    onClick={() => {
-                      state.leftTab = 'colors'
-                      state.leftPanelContext = 'normal'
-                    }}
-                    active={
-                      leftTab === 'colors' &&
-                      state.leftPanelContext === 'normal'
-                    }
-                  >
-                    <ColorPalette className="icon" />
-                    Colors
-                  </LeftNavbarBtn>
-
-                  <LeftNavbarBtn
-                    onClick={() => {
-                      state.leftTab = 'layout'
-                      state.leftPanelContext = 'normal'
-                    }}
-                    active={
-                      leftTab === 'layout' &&
-                      state.leftPanelContext === 'normal'
-                    }
-                  >
-                    <LayoutMasonry className="icon" />
-                    Layout
-                  </LeftNavbarBtn>
-
-                  <LeftNavbarBtn
-                    id="nav-words"
-                    onClick={() => {
-                      state.leftTab = 'words'
-                      state.leftPanelContext = 'normal'
-                    }}
-                    active={
-                      leftTab === 'words' && state.leftPanelContext === 'normal'
-                    }
-                  >
-                    <TextFields className="icon" />
-                    Words
-                  </LeftNavbarBtn>
-
-                  <LeftNavbarBtn
-                    onClick={() => {
-                      state.leftTab = 'fonts'
-                      state.leftPanelContext = 'normal'
-                    }}
-                    active={
-                      leftTab === 'fonts' && state.leftPanelContext === 'normal'
-                    }
-                  >
-                    <Font className="icon" />
-                    Fonts
-                  </LeftNavbarBtn>
-
-                  <LeftNavbarBtn
-                    onClick={() => {
-                      state.leftTab = 'symbols'
-                      state.leftPanelContext = 'normal'
-                    }}
-                    active={
-                      leftTab === 'symbols' &&
-                      state.leftPanelContext === 'normal'
-                    }
-                  >
-                    <SmileBeam className="icon" />
-                    Icons
-                  </LeftNavbarBtn>
-
-                  <div
-                    css={css`
-                      flex: 1;
-                      display: flex;
-                      align-items: flex-end;
-                    `}
-                  >
-                    <img
-                      src="/images/logo.svg"
-                      css={css`
-                        opacity: 0.5;
-                        margin: 0 auto 30px;
-                      `}
-                    />
-                  </div>
-                </SideNavbar>
+                {leftNav}
 
                 <LeftPanel>
                   <LeftPanelContent
@@ -1134,374 +1492,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                   }}
                 />
 
-                <Modal
-                  isOpen={state.isShowingExport}
-                  onClose={closeExport}
-                  trapFocus={false}
-                >
-                  <ModalOverlay>
-                    <ModalContent
-                      css={css`
-                        max-width: 530px;
-                      `}
-                    >
-                      <ModalHeader>Choose Download Format</ModalHeader>
-                      <ModalBody pb={6}>
-                        {isExporting ? (
-                          <>
-                            <Spinner />
-                          </>
-                        ) : (
-                          <>
-                            <Text fontSize="lg">
-                              <strong>Standard Download,</strong> for personal
-                              use only
-                            </Text>
-                            <Stack direction="row" spacing="3" flexWrap="wrap">
-                              <ExportButton
-                                variant="outline"
-                                boxShadow={
-                                  selectedFormat === 'sd-png'
-                                    ? '0 0 0 3px rgb(237, 93, 98) !important'
-                                    : 'none'
-                                }
-                                onClick={() => setSelectedFormat('sd-png')}
-                              >
-                                <Text mt="0" fontSize="lg" fontWeight="bold">
-                                  PNG
-                                </Text>
-                                <Text mb="0" fontSize="sm" fontWeight="normal">
-                                  1024 px
-                                </Text>
-                                <Text mb="0" fontSize="sm" fontWeight="normal">
-                                  Higher quality
-                                </Text>
-                              </ExportButton>
+                {exportModal}
 
-                              <ExportButton
-                                variant="outline"
-                                boxShadow={
-                                  selectedFormat === 'sd-jpeg'
-                                    ? '0 0 0 3px rgb(237, 93, 98) !important'
-                                    : 'none'
-                                }
-                                onClick={() => setSelectedFormat('sd-jpeg')}
-                              >
-                                <Text mt="0" fontSize="lg" fontWeight="bold">
-                                  JPEG
-                                </Text>
-                                <Text mb="0" fontSize="sm" fontWeight="normal">
-                                  1024 px
-                                </Text>
-                                <Text mb="0" fontSize="sm" fontWeight="normal">
-                                  Smaller file size
-                                </Text>
-                              </ExportButton>
-                            </Stack>
+                {visualizingModal}
 
-                            <Box mt="6">
-                              <Text fontSize="lg">
-                                <strong>HQ Download,</strong> personal or
-                                commercial use
-                              </Text>
-                              <Stack
-                                direction="row"
-                                spacing="3"
-                                flexWrap="wrap"
-                              >
-                                <ExportButton
-                                  variant="outline"
-                                  boxShadow={
-                                    selectedFormat === 'hd-png'
-                                      ? '0 0 0 3px rgb(237, 93, 98) !important'
-                                      : 'none'
-                                  }
-                                  onClick={() => setSelectedFormat('hd-png')}
-                                >
-                                  <Text mt="0" fontSize="lg">
-                                    PNG (HD)
-                                  </Text>
-                                  <Text mb="0" fontSize="sm">
-                                    4096 px
-                                  </Text>
-                                </ExportButton>
-
-                                <ExportButton
-                                  variant="outline"
-                                  boxShadow={
-                                    selectedFormat === 'hd-jpeg'
-                                      ? '0 0 0 3px rgb(237, 93, 98) !important'
-                                      : 'none'
-                                  }
-                                  onClick={() => setSelectedFormat('hd-jpeg')}
-                                >
-                                  <Text mt="0" fontSize="lg">
-                                    JPEG (HD)
-                                  </Text>
-                                  <Text mb="0" fontSize="sm">
-                                    4096 px
-                                  </Text>
-                                </ExportButton>
-
-                                <ExportButton
-                                  variant="outline"
-                                  boxShadow={
-                                    selectedFormat === 'hd-svg'
-                                      ? '0 0 0 3px rgb(237, 93, 98) !important'
-                                      : 'none'
-                                  }
-                                  onClick={() => setSelectedFormat('hd-svg')}
-                                >
-                                  <Text mt="0" fontSize="lg">
-                                    SVG
-                                  </Text>
-                                  <Text mb="0" fontSize="sm">
-                                    Vector format
-                                  </Text>
-                                </ExportButton>
-                              </Stack>
-                            </Box>
-                          </>
-                        )}
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button
-                          colorScheme="accent"
-                          leftIcon={<DownloadIcon />}
-                          onClick={handleDownloadClick}
-                        >
-                          Download
-                        </Button>
-                      </ModalFooter>
-                      <ModalCloseButton />
-                    </ModalContent>
-                  </ModalOverlay>
-                </Modal>
-
-                <Modal
-                  initialFocusRef={cancelVisualizationBtnRef}
-                  finalFocusRef={cancelVisualizationBtnRef}
-                  isOpen={store.isVisualizing}
-                  onClose={cancelVisualization}
-                  closeOnOverlayClick={false}
-                  closeOnEsc={false}
-                >
-                  <ModalOverlay>
-                    <ModalContent>
-                      <ModalHeader>
-                        {store.visualizingStep === 'generating'
-                          ? '⏳ Generating'
-                          : '⏳ Visualizing'}
-                        : {Math.round(100 * (store.visualizingProgress || 0))}%
-                      </ModalHeader>
-                      <ModalBody pb={6}>
-                        <Stack>
-                          <Progress
-                            isAnimated
-                            hasStripe
-                            css={css`
-                              &,
-                              * {
-                                transition: all 0.2s !important;
-                              }
-                            `}
-                            color="accent"
-                            height="32px"
-                            value={(store.visualizingProgress || 0) * 100}
-                          />
-                          <Text fontSize="lg"></Text>
-                        </Stack>
-                      </ModalBody>
-
-                      <ModalFooter>
-                        <Button
-                          ref={cancelVisualizationBtnRef}
-                          onClick={cancelVisualization}
-                        >
-                          Cancel
-                        </Button>
-                      </ModalFooter>
-                    </ModalContent>
-                  </ModalOverlay>
-                </Modal>
-
-                {store.lifecycleState === 'initialized' && (
-                  <>
-                    <Button
-                      id="btn-visualize"
-                      css={css`
-                        width: 128px;
-                      `}
-                      colorScheme="accent"
-                      isLoading={store.isVisualizing}
-                      onClick={handleVisualizeClick}
-                    >
-                      <MagicWand
-                        size={24}
-                        css={css`
-                          margin-right: 4px;
-                        `}
-                      />
-                      Visualize
-                    </Button>
-
-                    <Tooltip
-                      label="Undo"
-                      aria-label="Undo"
-                      hasArrow
-                      zIndex={5}
-                      isDisabled={!store.editor?.canUndo}
-                    >
-                      <IconButton
-                        isLoading={store.editor?.isUndoing}
-                        ml="3"
-                        icon={<ArrowBackIcon />}
-                        aria-label="Undo"
-                        variant="outline"
-                        isDisabled={!store.editor?.canUndo}
-                        onClick={store.editor?.undo}
-                      />
-                    </Tooltip>
-                    <Tooltip
-                      label="Redo"
-                      aria-label="Redo"
-                      hasArrow
-                      zIndex={5}
-                      isDisabled={!store.editor?.canRedo}
-                    >
-                      <IconButton
-                        ml="1"
-                        isLoading={store.editor?.isRedoing}
-                        icon={<ArrowForwardIcon />}
-                        aria-label="Redo"
-                        variant="outline"
-                        isDisabled={!store.editor?.canRedo}
-                        onClick={store.editor?.redo}
-                      />
-                    </Tooltip>
-
-                    <Box mr="3" ml="auto">
-                      {store.mode === 'view' && hasItems && (
-                        <>
-                          <Menu isLazy>
-                            <MenuButton
-                              mr="2"
-                              as={MenuDotsButton}
-                              variant="ghost"
-                            />
-
-                            <Portal>
-                              <MenuTransition>
-                                {(styles) => (
-                                  // @ts-ignore
-                                  <MenuList css={styles}>
-                                    <MenuItem
-                                      onClick={() => {
-                                        store.editor?.clearItems('shape', true)
-                                      }}
-                                      isDisabled={!hasShapeItems}
-                                    >
-                                      <SmallCloseIcon color="gray.500" mr="2" />
-                                      Delete all Shape items
-                                    </MenuItem>
-
-                                    <MenuItem
-                                      onClick={() => {
-                                        store.editor?.clearItems('bg', true)
-                                      }}
-                                      isDisabled={!hasBgItems}
-                                    >
-                                      <SmallCloseIcon color="gray.500" mr="2" />
-                                      Delete all Background items
-                                    </MenuItem>
-                                  </MenuList>
-                                )}
-                              </MenuTransition>
-                            </Portal>
-                          </Menu>
-
-                          <Button
-                            variant="outline"
-                            py="1"
-                            onClick={() => {
-                              store.enterEditItemsMode()
-                            }}
-                          >
-                            Edit Items
-                          </Button>
-                        </>
-                      )}
-
-                      {store.mode === 'edit' && (
-                        <>
-                          <Button
-                            mr="2"
-                            isDisabled={!store.hasItemChanges}
-                            variant="ghost"
-                            onClick={() => store.resetAllItems()}
-                          >
-                            Reset All
-                          </Button>
-
-                          <Tooltip label="Remove item">
-                            <Button
-                              mr="2"
-                              variant="ghost"
-                              onClick={() => store.removeItem()}
-                            >
-                              <FaTrashAlt />
-                            </Button>
-                          </Tooltip>
-
-                          {store.selectedItemData && (
-                            <>
-                              <WordColorPickerPopover />
-
-                              <Tooltip label="Lock the item to preserve its position between re-visualizations">
-                                <Button
-                                  ml="2"
-                                  onClick={() => {
-                                    if (!store.selectedItemData) {
-                                      return
-                                    }
-                                    store.setItemLock(
-                                      !Boolean(store.selectedItemData.locked)
-                                    )
-                                  }}
-                                  css={css`
-                                    width: 90px;
-                                  `}
-                                  leftIcon={
-                                    store.selectedItemData.locked ? (
-                                      <FaLockOpen />
-                                    ) : (
-                                      <FaLock />
-                                    )
-                                  }
-                                >
-                                  {store.selectedItemData.locked
-                                    ? 'Unlock'
-                                    : 'Lock'}
-                                </Button>
-                              </Tooltip>
-                            </>
-                          )}
-
-                          <Button
-                            ml="2"
-                            py="1"
-                            colorScheme="green"
-                            onClick={() => {
-                              store.enterViewMode()
-                            }}
-                          >
-                            Done
-                          </Button>
-                        </>
-                      )}
-                    </Box>
-                  </>
-                )}
+                {store.lifecycleState === 'initialized' && topEditorToolbar}
 
                 {store.lifecycleState !== 'initialized' && (
                   <>
