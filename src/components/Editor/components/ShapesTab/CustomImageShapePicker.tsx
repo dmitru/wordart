@@ -89,7 +89,7 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
               <Button
                 mt="4"
                 leftIcon={<FaUpload />}
-                colorScheme="primary"
+                colorScheme="accent"
                 onClick={() => {
                   state.isShowingUploadModal = true
                 }}
@@ -111,6 +111,8 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
                 )}
 
                 <Button
+                  colorScheme="accent"
+                  leftIcon={<FaUpload />}
                   onClick={() => {
                     state.isShowingUploadModal = true
                   }}

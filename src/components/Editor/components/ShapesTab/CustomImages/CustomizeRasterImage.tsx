@@ -224,7 +224,7 @@ export const CustomizeRasterImage: React.FC<CustomizeRasterImageProps> = observe
                 onChange(state)
               }}
             />
-            {!!state.fill && (
+            {state.fill !== 'original' && (
               <Box ml="3">
                 <ColorPickerPopover
                   value={state.fillColor}
@@ -241,8 +241,8 @@ export const CustomizeRasterImage: React.FC<CustomizeRasterImageProps> = observe
           <Box mt="4">
             <Slider
               afterLabel="%"
-              resetValue={5}
-              label="Remove background threshold"
+              resetValue={50}
+              label="Remove background"
               value={state.removeLightBackgroundThreshold}
               onChange={(value) => {
                 state.removeLightBackgroundThreshold = value

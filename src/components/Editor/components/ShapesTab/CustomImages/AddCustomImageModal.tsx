@@ -35,7 +35,7 @@ export type AddCustomImageModalProps = {
 const initialState: CustomizeRasterOptions = {
   processedThumbnailUrl: '',
   originalUrl: '',
-  removeLightBackgroundThreshold: 5,
+  removeLightBackgroundThreshold: 50,
   removeLightBackground: true,
   removeEdges: 70,
   fill: 'original',

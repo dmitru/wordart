@@ -431,9 +431,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     }, [authStore.isLoggedIn, props.wordcloudId, store.hasUnsavedChanges])
 
     useEffect(() => {
+      // store.lifecycleState = 'initial'
       return () => {
         store.destroyEditor()
-        store.lifecycleState = 'initial'
+        console.log('use effect 2')
+        // store.lifecycleState = 'initial'
       }
     }, [])
 
@@ -1335,7 +1337,7 @@ Order Prints
                           isDisabled={!hasShapeItems}
                         >
                           <SmallCloseIcon color="gray.500" mr="2" />
-                          Delete all Shape items
+                          Clear Shape layer
                         </MenuItem>
 
                         <MenuItem
@@ -1345,7 +1347,7 @@ Order Prints
                           isDisabled={!hasBgItems}
                         >
                           <SmallCloseIcon color="gray.500" mr="2" />
-                          Delete all Background items
+                          Clear Background layer
                         </MenuItem>
                       </MenuList>
                     )}
@@ -1353,15 +1355,17 @@ Order Prints
                 </Portal>
               </Menu>
 
-              <Button
-                variant="outline"
-                py="1"
-                onClick={() => {
-                  store.enterEditItemsMode()
-                }}
-              >
-                Edit Items
-              </Button>
+              <Tooltip label="Move, resize and lock placed words">
+                <Button
+                  variant="outline"
+                  py="1"
+                  onClick={() => {
+                    store.enterEditItemsMode()
+                  }}
+                >
+                  Edit Words
+                </Button>
+              </Tooltip>
             </>
           )}
 
@@ -1376,15 +1380,17 @@ Order Prints
                 Reset All
               </Button>
 
-              <Tooltip label="Remove item">
-                <Button
-                  mr="2"
-                  variant="ghost"
-                  onClick={() => store.removeItem()}
-                >
-                  <FaTrashAlt />
-                </Button>
-              </Tooltip>
+              {store.selectedItemData && (
+                <Tooltip label="Remove item">
+                  <Button
+                    mr="2"
+                    variant="ghost"
+                    onClick={() => store.removeItem()}
+                  >
+                    <FaTrashAlt />
+                  </Button>
+                </Tooltip>
+              )}
 
               {store.selectedItemData && (
                 <>
