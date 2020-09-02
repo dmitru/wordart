@@ -793,55 +793,61 @@ const WordListRow: React.FC<
 
     const wordMenu = (
       <Menu isLazy placement="bottom-end">
-        <MenuButton
-          as={WordMenuButton}
-          ml="2"
-          size="sm"
-          mr="-10px"
-          variant="ghost"
-        />
+        {({ isOpen }) => (
+          <>
+            <MenuButton
+              as={WordMenuButton}
+              ml="2"
+              size="sm"
+              mr="-10px"
+              variant="ghost"
+            />
 
-        <Portal>
-          <MenuTransition>
-            {(styles) => (
-              // @ts-ignore
-              <MenuList css={styles}>
-                {index != null && index > 0 && (
-                  <MenuItemWithIcon
-                    icon={<FaChevronUp />}
-                    onClick={() => onMoveToStart(word)}
-                  >
-                    Move to top
-                  </MenuItemWithIcon>
-                )}
-                {index != null && index < allWordsCount - 1 && (
-                  <MenuItemWithIcon
-                    icon={<FaChevronDown />}
-                    onClick={() => onMoveToEnd(word)}
-                  >
-                    Move to bottom
-                  </MenuItemWithIcon>
-                )}
-                {hasCustomizations && (
-                  <MenuItemWithIcon
-                    icon={<FiRefreshCw />}
-                    onClick={handleResetDefaults}
-                  >
-                    Reset defaults
-                  </MenuItemWithIcon>
-                )}
-                <MenuItemWithIcon
-                  icon={<SmallCloseIcon />}
-                  onClick={() => {
-                    onDelete(word)
-                  }}
-                >
-                  Delete
-                </MenuItemWithIcon>
-              </MenuList>
+            {isOpen && (
+              <Portal>
+                <MenuTransition>
+                  {(styles) => (
+                    // @ts-ignore
+                    <MenuList css={styles}>
+                      {index != null && index > 0 && (
+                        <MenuItemWithIcon
+                          icon={<FaChevronUp />}
+                          onClick={() => onMoveToStart(word)}
+                        >
+                          Move to top
+                        </MenuItemWithIcon>
+                      )}
+                      {index != null && index < allWordsCount - 1 && (
+                        <MenuItemWithIcon
+                          icon={<FaChevronDown />}
+                          onClick={() => onMoveToEnd(word)}
+                        >
+                          Move to bottom
+                        </MenuItemWithIcon>
+                      )}
+                      {hasCustomizations && (
+                        <MenuItemWithIcon
+                          icon={<FiRefreshCw />}
+                          onClick={handleResetDefaults}
+                        >
+                          Reset defaults
+                        </MenuItemWithIcon>
+                      )}
+                      <MenuItemWithIcon
+                        icon={<SmallCloseIcon />}
+                        onClick={() => {
+                          onDelete(word)
+                        }}
+                      >
+                        Delete
+                      </MenuItemWithIcon>
+                    </MenuList>
+                  )}
+                </MenuTransition>
+              </Portal>
             )}
-          </MenuTransition>
-        </Portal>
+          </>
+        )}
       </Menu>
     )
 
