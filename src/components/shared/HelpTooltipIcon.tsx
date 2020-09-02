@@ -19,7 +19,7 @@ export const HelpTooltipIcon: React.FC<
       cursor="help"
       ml="2"
       fontSize="lg"
-      color="gray.300"
+      color="blue.200"
       display="inline-block"
       {...props}
     >

@@ -212,34 +212,35 @@ export const FullCanvasShapePicker: React.FC<{}> = observer(() => {
                 url={state.thumbnailPreview}
               />
             )}
-            <Box
-              flex={1}
-              ml="3"
-              display="flex"
-              flexDirection="column"
-              alignItems="flex-start"
-              justifyContent="space-between"
-              height="120px"
-            >
-              <Box flex={1} width="100%" mb="2">
-                <ShapeOpacitySlider
-                  style={shapeStyle}
-                  onAfterChange={(value: number) => {
-                    store.editor?.setShapeOpacity(value / 100)
-                  }}
-                />
-              </Box>
-
-              <Box display="flex" alignItems="center" mb="5">
-                <FullCanvasShapeColorPicker
-                  shapeConf={shape.config}
-                  onAfterChange={updateShapeColoringDebounced}
-                  onChange={updateThumbnailDebounced}
-                />
-              </Box>
-            </Box>
           </Box>
         </>
+      </Box>
+
+      <Box
+        flex={1}
+        mt="6"
+        display="flex"
+        flexDirection="column"
+        alignItems="flex-start"
+        justifyContent="space-between"
+        height="120px"
+      >
+        <Box flex={1} width="100%" mb="4">
+          <ShapeOpacitySlider
+            style={shapeStyle}
+            onAfterChange={(value: number) => {
+              store.editor?.setShapeOpacity(value / 100)
+            }}
+          />
+        </Box>
+
+        <Box display="flex" alignItems="center" mb="5">
+          <FullCanvasShapeColorPicker
+            shapeConf={shape.config}
+            onAfterChange={updateShapeColoringDebounced}
+            onChange={updateThumbnailDebounced}
+          />
+        </Box>
       </Box>
     </>
   )

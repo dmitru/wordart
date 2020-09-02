@@ -431,11 +431,10 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     }, [authStore.isLoggedIn, props.wordcloudId, store.hasUnsavedChanges])
 
     useEffect(() => {
-      // store.lifecycleState = 'initial'
+      store.lifecycleState = 'initial'
       return () => {
         store.destroyEditor()
-        console.log('use effect 2')
-        // store.lifecycleState = 'initial'
+        store.lifecycleState = 'initial'
       }
     }, [])
 
@@ -956,7 +955,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           colorScheme="secondary"
           onClick={handleSaveClick}
           isLoading={isSaving}
-          mr="2"
+          mr="4"
           css={css`
             width: 90px;
           `}
@@ -1245,22 +1244,6 @@ Order Prints
           <ColorPalette className="icon" />
           Colors
         </LeftNavbarBtn>
-
-        <div
-          css={css`
-            flex: 1;
-            display: flex;
-            align-items: flex-end;
-          `}
-        >
-          <img
-            src="/images/logo.svg"
-            css={css`
-              opacity: 0.5;
-              margin: 0 auto 30px;
-            `}
-          />
-        </div>
       </SideNavbar>
     )
 

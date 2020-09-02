@@ -31,6 +31,20 @@ export const ResetShapeTransformButton: React.FC<{}> = observer(() => {
           ml="1"
           variant="outline"
           onClick={() => {
+            if (!store.editor) {
+              return
+            }
+            const totalItemsCount =
+              (store.editor.items.shape.items.length || 0) +
+              (store.editor.items.bg.items.length || 0)
+            if (
+              totalItemsCount > 0 &&
+              !window.confirm(
+                'All unlocked words will be removed. Do you want to continue?'
+              )
+            ) {
+              return
+            }
             store.editor?.clearItems('shape')
             store.editor?.clearItems('bg')
             applyTransformToObj(shape.obj, shape.originalTransform)

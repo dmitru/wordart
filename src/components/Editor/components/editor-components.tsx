@@ -114,6 +114,8 @@ export const SideNavbar = styled.div<{ theme: any; activeIndex?: number }>`
 export const LeftNavbarBtn = styled(BaseBtn)<{ theme: any; active: boolean }>`
   min-width: 20%;
   font-weight: 500;
+  font-size: 14px;
+  width: 85px;
   height: 75px;
   padding: 0 20px 0 20px;
   text-transform: uppercase;
@@ -122,7 +124,6 @@ export const LeftNavbarBtn = styled(BaseBtn)<{ theme: any; active: boolean }>`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 12px;
   border-radius: 0;
   color: ${(p) => p.theme.colors.leftPanel.textInactive};
   outline: none;

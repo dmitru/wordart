@@ -252,7 +252,7 @@ export const FontListButton: React.FC<FontListButtonProps> = ({
         )}
 
         <FontChangeButton
-          colorScheme="secondary"
+          colorScheme="accent"
           aria-label="Change font"
           size="sm"
           ml="2"

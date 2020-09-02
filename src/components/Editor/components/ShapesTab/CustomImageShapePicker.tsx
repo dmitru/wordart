@@ -7,7 +7,7 @@ import React, { useEffect } from 'react'
 import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
 import { CustomizeRasterImageModal } from './CustomImages/CustomizeRasterImageModal'
 import { AddCustomImageModal } from './CustomImages/AddCustomImageModal'
-import { FaUpload } from 'react-icons/fa'
+import { FaSlidersH, FaUpload } from 'react-icons/fa'
 import { ShapeCustomImageRasterConf } from 'components/Editor/shape-config'
 import { useEditorStore } from 'components/Editor/editor-store'
 import { loadImageUrlToCanvasCtx } from 'lib/wordart/canvas-utils'
@@ -105,6 +105,7 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
                     onClick={() => {
                       state.isShowingCustomizeImage = true
                     }}
+                    leftIcon={<FaSlidersH />}
                   >
                     Customize
                   </Button>

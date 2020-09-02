@@ -15,7 +15,7 @@ import { isEqual } from 'lodash'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import React, { useEffect } from 'react'
-import { FaCog } from 'react-icons/fa'
+import { FaCog, FaSlidersH } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { ShapeTransformLeftPanelSection } from './components'
@@ -206,8 +206,8 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
                     onClick={() => {
                       state.mode = 'customize shape'
                     }}
+                    leftIcon={<FaSlidersH />}
                   >
-                    <FaCog style={{ marginRight: '5px' }} />
                     Customize
                   </Button>
                 )}

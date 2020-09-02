@@ -408,7 +408,7 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                           fontWeight="medium"
                           color="gray.500"
                         >
-                          Items color
+                          Words color
                         </Text>
                         <ShapeItemsColorPickerKindDropdown
                           shapeStyle={shapeStyle}
@@ -519,7 +519,7 @@ export const BgItemsStyleOptions: React.FC<{
       <Box mt="2" mb="2" display="flex" alignItems="center">
         <Box display="flex" alignItems="center">
           <Text my="0" mr="3" fontWeight="medium" color="gray.500">
-            Items color
+            Words color
           </Text>
           <BgItemsColorPickerKindDropdown
             bgStyle={bgStyle}

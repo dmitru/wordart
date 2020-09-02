@@ -372,10 +372,6 @@ const EmptyStateShapesUi = () => (
     borderWidth="1px"
     p="6"
   >
-    <Box mb="4">
-      <Tag colorScheme="purple">Beta feature</Tag>
-    </Box>
-
     <Box
       mb="1rem"
       bg="primary.50"

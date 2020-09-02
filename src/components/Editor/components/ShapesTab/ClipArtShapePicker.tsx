@@ -26,7 +26,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 import React, { useEffect, useState } from 'react'
-import { FaCog } from 'react-icons/fa'
+import { FaSlidersH } from 'react-icons/fa'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
 
@@ -160,8 +160,8 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                     onClick={() => {
                       state.mode = 'customize shape'
                     }}
+                    leftIcon={<FaSlidersH />}
                   >
-                    <FaCog style={{ marginRight: '5px' }} />
                     Customize
                   </Button>
                 )}
