@@ -1639,13 +1639,9 @@ Order Prints
             submitText="Save and continue"
           >
             <p>
-              To save your design to your Wordcloudy account, you'll need to
-              sign in.
+              If you don't have an account yet, you'll be able to create one.
             </p>
-            <p>
-              Please proceed to sign in form – your work will be saved. If you
-              don't have an account yet, you'll be able to create one.
-            </p>
+            <p>Don't worry – your work will be saved!</p>
           </ConfirmModalWithRecaptcha>
         </PageLayoutWrapper>
       </EditorStoreContext.Provider>
