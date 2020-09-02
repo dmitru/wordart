@@ -38,5 +38,7 @@ export const config = {
   },
 }
 
-// @ts-ignore
-window['config'] = config
+if (typeof window !== 'undefined') {
+  // @ts-ignore
+  window['config'] = config
+}
