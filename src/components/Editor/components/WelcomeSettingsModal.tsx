@@ -8,6 +8,7 @@ import {
   ModalOverlay,
   AspectRatio,
   Image,
+  ModalCloseButton,
   Text,
   Box,
 } from '@chakra-ui/core'
@@ -65,17 +66,18 @@ export const WelcomeSettingsModal: React.FC<WelcomeSettingsModalProps> = observe
       <Modal
         onClose={handleSubmit}
         isOpen={props.isOpen}
-        closeOnEsc={false}
-        closeOnOverlayClick={false}
         size="lg"
         scrollBehavior="inside"
       >
         <ModalOverlay>
           <ModalContent maxWidth="1200px">
             <ModalHeader textAlign="center">
-              Choose a template to start
+              Choose a starting template
             </ModalHeader>
             <ModalBody>
+              <Text mb="4" fontSize="lg" textAlign="center" color="gray.500">
+                You will be able to customize everything later.
+              </Text>
               <Box display="flex" flexWrap="wrap">
                 {templates &&
                   templates.map((template) => (
@@ -143,6 +145,7 @@ export const WelcomeSettingsModal: React.FC<WelcomeSettingsModalProps> = observe
                 Start creating
               </Button>
             </ModalFooter>
+            <ModalCloseButton />
           </ModalContent>
         </ModalOverlay>
       </Modal>
