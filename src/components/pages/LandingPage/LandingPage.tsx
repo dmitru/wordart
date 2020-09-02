@@ -600,6 +600,8 @@ const HeaderTitleContainer = styled.div`
   position: relative;
   z-index: 2;
   max-width: 400px;
+  min-width: 370px;
+  width: 100%;
   margin-top: 70px;
   margin-right: 30px;
 
@@ -778,7 +780,8 @@ const HeaderSliderContainer = styled(motion.div)`
   }
 
   ${mobileHeaderBreakpoint} {
-    margin-right: 0;
+    margin-right: auto;
+    margin-left: auto;
     margin-top: 50px;
     width: 100%;
     transform: none !important;

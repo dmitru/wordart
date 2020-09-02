@@ -12,6 +12,7 @@ import {
   Box,
 } from '@chakra-ui/core'
 import { ChevronRightIcon } from '@chakra-ui/icons'
+import { css } from '@emotion/core'
 import { Spinner } from 'components/Editor/components/Spinner'
 import { observer, useLocalStore } from 'mobx-react'
 import React, { useEffect } from 'react'
@@ -107,7 +108,12 @@ export const WelcomeSettingsModal: React.FC<WelcomeSettingsModalProps> = observe
                           overflow="hidden"
                           border="none"
                         >
-                          <Image src={template.thumbnail} objectFit="contain" />
+                          <Image
+                            src={template.thumbnail}
+                            css={css`
+                              object-fit: contain !important;
+                            `}
+                          />
                         </AspectRatio>
                         <Text p="3" mb="0" fontSize="lg" fontWeight="medium">
                           {template.title}

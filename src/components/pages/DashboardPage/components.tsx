@@ -89,7 +89,12 @@ export const WordcloudThumbnail: React.FC<WordcloudThumbnailProps> = ({
         overflow="hidden"
         border="none"
       >
-        <Image src={wordcloud.thumbnail} objectFit="contain" />
+        <Image
+          src={wordcloud.thumbnail}
+          css={css`
+            object-fit: contain !important;
+          `}
+        />
       </AspectRatio>
       <Text
         p="3"
