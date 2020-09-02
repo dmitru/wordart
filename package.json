@@ -34,7 +34,7 @@
     "@chakra-ui/theme": "^1.0.0-rc.3",
     "@emotion/babel-preset-css-prop": "^10.0.27",
     "@emotion/cache": "^10.0.29",
-    "@emotion/core": "10.0.28",
+    "@emotion/core": "10.0.35",
     "@emotion/css": "^10.0.27",
     "@emotion/styled": "^10.0.27",
     "@hookform/resolvers": "^0.0.6",
