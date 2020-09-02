@@ -143,6 +143,10 @@ export const Api = {
       const response = await apiClient.get('/wordclouds')
       return response.data as Wordcloud[]
     },
+    async fetchTemplates(): Promise<Wordcloud[]> {
+      const response = await apiClient.get('/wordclouds/templates')
+      return response.data as Wordcloud[]
+    },
     async fetchById(id: WordcloudId): Promise<Wordcloud> {
       const response = await apiClient.get(`/wordclouds/${id}`)
       return response.data as Wordcloud
