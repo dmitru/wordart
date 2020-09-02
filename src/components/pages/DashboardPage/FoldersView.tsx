@@ -85,42 +85,6 @@ export const FoldersView = observer(() => {
           <AccountUsage />
         </Box>
 
-        <FolderRow
-          fontSize="lg"
-          fontWeight="medium"
-          color="gray.600"
-          py={2}
-          px={3}
-          isSelected={dashboardUiState.folder === 'all'}
-          onClick={() => {
-            dashboardUiState.folder = 'all'
-          }}
-        >
-          All your designs
-          <FolderRowTag ml="auto" size="sm">
-            {store.wordclouds.length}
-          </FolderRowTag>
-        </FolderRow>
-
-        {store.folders.length > 0 && (
-          <FolderRow
-            fontSize="lg"
-            fontWeight="medium"
-            color="gray.600"
-            py={2}
-            px={3}
-            isSelected={dashboardUiState.folder === 'no folder'}
-            onClick={() => {
-              dashboardUiState.folder = 'no folder'
-            }}
-          >
-            Designs with no folder
-            <FolderRowTag ml="auto" size="sm">
-              {store.wordclouds.filter((wc) => !wc.folderId).length}
-            </FolderRowTag>
-          </FolderRow>
-        )}
-
         <Box py="3" mt="5" display="flex" alignItems="center">
           <Text
             flex="1"
@@ -162,6 +126,44 @@ export const FoldersView = observer(() => {
             -ms-overflow-style: none; /* IE 10+ */
           `}
         >
+          {store.folders.length > 0 && (
+            <FolderRow
+              fontSize="lg"
+              fontWeight="medium"
+              color="gray.600"
+              py={2}
+              px={3}
+              isSelected={dashboardUiState.folder === 'all'}
+              onClick={() => {
+                dashboardUiState.folder = 'all'
+              }}
+            >
+              All your designs
+              <FolderRowTag ml="auto" size="sm">
+                {store.wordclouds.length}
+              </FolderRowTag>
+            </FolderRow>
+          )}
+
+          {store.folders.length > 0 && (
+            <FolderRow
+              fontSize="lg"
+              fontWeight="medium"
+              color="gray.600"
+              py={2}
+              px={3}
+              isSelected={dashboardUiState.folder === 'no folder'}
+              onClick={() => {
+                dashboardUiState.folder = 'no folder'
+              }}
+            >
+              Designs with no folder
+              <FolderRowTag ml="auto" size="sm">
+                {store.wordclouds.filter((wc) => !wc.folderId).length}
+              </FolderRowTag>
+            </FolderRow>
+          )}
+
           {store.folders.map((f) => (
             <FolderRow
               hideCountOnHover
