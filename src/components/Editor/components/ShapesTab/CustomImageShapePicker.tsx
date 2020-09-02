@@ -44,6 +44,8 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
   useEffect(() => {
     if (lastShapeConfig && (!shape || shape.kind !== lastShapeConfig.kind)) {
       store.selectShapeAndSaveUndo(lastShapeConfig)
+    } else if (!lastShapeConfig && shape?.kind === 'custom:raster') {
+      lastShapeConfig = shape.config
     }
   }, [])
 

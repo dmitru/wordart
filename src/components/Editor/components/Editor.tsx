@@ -930,7 +930,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         margin-right: 4px;
                       `}
                     />
-                    Leave feedback
+                    Leave Feedback
                   </MenuItem>
                   <MenuDivider />
                   <MenuItem
