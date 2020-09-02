@@ -89,11 +89,7 @@ export const LandingPage = observer(() => {
             </HeaderCtaContainer>
           </HeaderTitleContainer>
 
-          <HeaderSliderContainer
-            initial={{ opacity: 0 }}
-            transition={{ ease: 'easeInOut', duration: 0.5 }}
-            animate={{ x: 0, y: 0, opacity: 1 }}
-          >
+          <HeaderSliderContainer>
             <HeaderSlider>
               <Slider play cancelOnInteraction={false} interval={3000}>
                 <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/Untitled%20design.jpg" />
