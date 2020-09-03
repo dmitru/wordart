@@ -436,8 +436,8 @@ export const LandingPage = observer(() => {
       </FeaturesSection> */}
 
       {/* Pricing */}
-      <Box mb="5rem" id="pricing">
-        <SectionHeader mb="30px" mt="5rem">
+      <Box mb="5rem" id="pricing" mt="6rem">
+        <SectionHeader mb="30px">
           <h1>Flexible pricing that works for you</h1>
           <Text mt="0" mb="0" maxWidth="600px" mx="auto">
             Purchase digitals downloads in highest quality, for personal or

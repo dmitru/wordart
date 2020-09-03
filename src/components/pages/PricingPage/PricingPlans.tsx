@@ -7,6 +7,11 @@ import React, { useState } from 'react'
 import { FaCheck } from 'react-icons/fa'
 import { useStore } from 'services/root-store'
 
+const formatPrice = (priceUsd: number, currency = 'USD') =>
+  Intl.NumberFormat('en-US', { style: 'currency', currency: currency }).format(
+    priceUsd
+  )
+
 const CheckIcon = () => (
   <Box
     as="span"
@@ -147,11 +152,7 @@ export const PricingPlans = observer(
                         fontWeight="semibold"
                         fontSize={['sm', 'md', 'xl']}
                       >
-                        {price?.price?.net ?? 0}
-                        {price?.price?.net &&
-                        price?.price?.net === Math.round(price?.price?.net)
-                          ? '.00'
-                          : ''}
+                        {formatPrice(price?.price?.gross ?? 0, price?.currency)}
                       </Text>
                       <Text my="0" ml="3" fontSize="sm" color="gray.500">
                         {price?.currency ?? 'USD'}
@@ -261,18 +262,17 @@ export const PricingPlans = observer(
                       {plan.title}
                     </Text>
 
-                    {price?.price?.net != null && (
+                    {price?.price?.gross != null && (
                       <>
                         <Text
                           my="0"
                           fontWeight="semibold"
                           fontSize={['sm', 'md', 'xl']}
                         >
-                          {price?.price?.net ?? 0}
-                          {price?.price?.net &&
-                          price?.price?.net === Math.round(price?.price?.net)
-                            ? '.00'
-                            : ''}
+                          {formatPrice(
+                            price?.price?.gross ?? 0,
+                            price?.currency
+                          )}
                         </Text>
                         <Text my="0" ml="3" fontSize="sm" color="gray.500">
                           {price?.currency ?? 'USD'}
