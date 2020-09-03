@@ -639,11 +639,11 @@ export class Generator {
             //   wordPathSize.w + dw,
             //   wordPathSize.h + dh
             // )
-            unrotatedCtx.shadowBlur =
+            unrotatedCtxPadded.shadowBlur =
               0.5 +
               (task.itemPadding / 100) * (shapeCanvasMaxExtent / 360) * 3.6
             // console.log('shadowBlur = ', unrotatedCtx.shadowBlur)
-            unrotatedCtx.shadowColor = 'red'
+            unrotatedCtxPadded.shadowColor = 'red'
             wordPath.draw(unrotatedCtxPadded)
             unrotatedCtx.shadowBlur = 0
 
