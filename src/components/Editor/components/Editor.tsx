@@ -1546,7 +1546,7 @@ Order Prints
               <TopToolbar display="flex" alignItems="center" px="5">
                 <WarningModal
                   header="Your design is empty"
-                  content="Please add some words or icons to your design and click Visualize first."
+                  content="Please add some words or icons to your design and click Visualize before downloading your design."
                   isOpen={state.isShowingExportNoItemsWarning}
                   onClose={() => {
                     state.isShowingExportNoItemsWarning = false

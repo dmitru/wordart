@@ -453,6 +453,11 @@ export const LandingPage = observer(() => {
       </SectionHeader>
 
       <Box mx="auto" maxWidth="600px" mb="5rem">
+        <Question title="Is Wordcloudy free to use?">
+          Yes, Wordcloudy is free for personal use. If you'd like to use designs
+          created with Wordcloudy commercially, please purchase one of our
+          plans.
+        </Question>
         <Question title="Are these plans subscriptions?">
           No, all our plans are one-time payments. You will be charged only
           once.
