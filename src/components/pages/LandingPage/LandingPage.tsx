@@ -23,10 +23,10 @@ const xsBreakpoint = `@media screen and (max-width: 500px)`
 export const LandingPage = observer(() => {
   const { authStore } = useStore()
 
-  // useEffect(() => {
-  //   const video = document.getElementById('ui-video') as HTMLVideoElement
-  //   video.playbackRate = 1.5
-  // }, [])
+  useEffect(() => {
+    const video = document.getElementById('ui-video') as HTMLVideoElement
+    video.playbackRate = 0.8
+  }, [])
 
   const launchSalePlacesLeft = authStore.launchCoupon
     ? authStore.launchCoupon.allowed_uses - authStore.launchCoupon.times_used

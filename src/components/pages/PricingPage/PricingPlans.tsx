@@ -40,7 +40,8 @@ export const PricingPlans = observer(
     const launchSalePlacesLeft = authStore.launchCoupon
       ? authStore.launchCoupon.allowed_uses - authStore.launchCoupon.times_used
       : 0
-    const showLaunchSale = launchSalePlacesLeft > 0
+    // const showLaunchSale = launchSalePlacesLeft > 0
+    const showLaunchSale = false
 
     const [selectedUnlimitedPlanId, setSelectedUnlimitedPlanId] = useState(
       unlimitedPricingPlans[1].id
