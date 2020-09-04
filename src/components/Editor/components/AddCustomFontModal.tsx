@@ -75,25 +75,33 @@ export const AddCustomFontModal: React.FC<AddCustomFontModalProps> = observer(
 
         const reader = new FileReader()
         reader.onload = async () => {
-          const fontFile = reader.result as ArrayBuffer
-          const font = parseFontFromBuffer(fontFile)
-          const url = await arrayBufferToDataUri(fontFile)
+          try {
+            const fontFile = reader.result as ArrayBuffer
+            const font = parseFontFromBuffer(fontFile)
+            const url = await arrayBufferToDataUri(fontFile)
 
-          const fontTitle = font.names.fontFamily['en'] || 'Custom'
-          const fontPath = font.getPath(fontTitle, 0, 0, 300)
-          const bounds = fontPath.getBoundingBox()
+            const fontTitle = font.names.fontFamily['en'] || 'Custom'
+            const fontPath = font.getPath(fontTitle, 0, 0, 300)
+            const bounds = fontPath.getBoundingBox()
 
-          const canvas = createCanvas({
-            w: bounds.x2 - bounds.x1,
-            h: bounds.y2 - bounds.y1,
-          })
-          const ctx = canvas.getContext('2d')!
-          ctx.translate(-bounds.x1, -bounds.y1)
-          fontPath.draw(ctx)
+            const canvas = createCanvas({
+              w: bounds.x2 - bounds.x1,
+              h: bounds.y2 - bounds.y1,
+            })
+            const ctx = canvas.getContext('2d')!
+            ctx.translate(-bounds.x1, -bounds.y1)
+            fontPath.draw(ctx)
 
-          state.thumbnailUrl = canvas.toDataURL()
-          state.url = url
-          state.title = fontTitle
+            state.thumbnailUrl = canvas.toDataURL()
+            state.url = url
+            state.title = fontTitle
+          } catch (error) {
+            toasts.showError({
+              title: 'Unsupported font file',
+              description: `Please choose a *.TTF, *.OTF and *.WOFF font file`,
+            })
+            console.error(error)
+          }
         }
         reader.readAsArrayBuffer(file)
       },
