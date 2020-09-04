@@ -73,14 +73,35 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
           return
         }
 
+        const lowercaseName = file.name.toLowerCase()
+        if (
+          !lowercaseName.endsWith('jpeg') ||
+          lowercaseName.endsWith('jpg') ||
+          lowercaseName.endsWith('png')
+        ) {
+          toasts.showWarning({
+            title: 'Please upload an image file',
+            description: 'JPEG and PNG images are supported',
+          })
+          return
+        }
+
         const reader = new FileReader()
         reader.onload = async () => {
-          const ctxOriginal = await loadImageUrlToCanvasCtxWithMaxSize(
-            reader.result as string,
-            1600
-          )
-          state.originalUrl = ctxOriginal.canvas.toDataURL()
-          state.processedThumbnailUrl = state.originalUrl
+          try {
+            const ctxOriginal = await loadImageUrlToCanvasCtxWithMaxSize(
+              reader.result as string,
+              1600
+            )
+            state.originalUrl = ctxOriginal.canvas.toDataURL()
+            state.processedThumbnailUrl = state.originalUrl
+          } catch (error) {
+            toasts.showError({
+              title: 'Please upload an image file',
+              description: 'JPEG and PNG images are supported',
+            })
+            console.error(error)
+          }
         }
 
         reader.readAsDataURL(file)
