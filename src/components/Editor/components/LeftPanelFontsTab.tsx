@@ -74,7 +74,7 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
         categories: ['custom'],
       })
 
-      if (style.items.words.fontIds.length < 8) {
+      if (style.items.words.fontIds.length < 10) {
         style.items.words.fontIds.push(fontId)
       }
     }
@@ -151,10 +151,10 @@ export const LeftPanelFontsTab: React.FC<LeftPanelFontsTabProps> = observer(
               </MenuList>
             </Menu>
 
-            <Tooltip label="You can use up to 8 different fonts in your designs">
+            <Tooltip label="You can use up to 10 different fonts in your designs at the same time">
               <Box ml="auto">
                 <Tag rounded="full" colorScheme="gray">
-                  <TagLabel>{(fonts || []).length} / 8</TagLabel>
+                  <TagLabel>{(fonts || []).length} / 10</TagLabel>
                 </Tag>
               </Box>
             </Tooltip>
