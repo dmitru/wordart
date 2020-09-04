@@ -14,7 +14,7 @@ export const ChoiceButtons: React.FC<
   } & Omit<BoxProps, 'size' | 'onChange'>
 > = ({ size = 'md', choices, value, onChange, ...props }) => {
   return (
-    <Flex direction="row">
+    <Flex direction="row" {...props}>
       {choices.map((choice, index) => (
         <Button
           {...(index < choices.length - 1
