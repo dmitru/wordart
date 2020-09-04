@@ -11,6 +11,9 @@ import { FaSlidersH, FaUpload } from 'react-icons/fa'
 import { ShapeCustomImageRasterConf } from 'components/Editor/shape-config'
 import { useEditorStore } from 'components/Editor/editor-store'
 import { loadImageUrlToCanvasCtx } from 'lib/wordart/canvas-utils'
+import { useDebouncedCallback } from 'use-debounce/lib'
+import { CustomRasterShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
+import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 
 const initialState = {
   isShowingUploadModal: false,
@@ -58,6 +61,27 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
     }
   }, [])
 
+  const [updateShapeColoringDebounced] = useDebouncedCallback(
+    async () => {
+      if (!shape) {
+        return
+      }
+      const style = mkShapeStyleConfFromOptions(shapeStyle)
+      await store.updateShapeFromSelectedShapeConf({
+        resetTransform: false,
+      })
+      store.updateShapeThumbnail()
+      if (style.items.coloring.kind === 'shape') {
+        store.editor?.setShapeItemsStyle(style.items)
+      }
+    },
+    20,
+    {
+      leading: true,
+      trailing: true,
+    }
+  )
+
   return (
     <>
       <Box>
@@ -79,6 +103,13 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
                   onAfterChange={(value: number) => {
                     store.editor?.setShapeOpacity(value / 100)
                   }}
+                />
+              </Box>
+
+              <Box display="flex" alignItems="center" mb="5" mt="2">
+                <CustomRasterShapeColorPicker
+                  shapeConf={shape.config}
+                  onAfterChange={updateShapeColoringDebounced}
                 />
               </Box>
             </Box>
@@ -186,67 +217,69 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
         }}
       />
 
-      {shape && shape.kind === 'custom:raster' && (
-        <CustomizeRasterImageModal
-          isOpen={state.isShowingCustomizeImage}
-          value={{
-            processedThumbnailUrl: shape.url,
-            removeLightBackground:
-              (shape.config.processing?.removeLightBackground?.threshold || 0) >
-              0,
-            removeLightBackgroundThreshold:
-              shape.config.processing?.removeLightBackground?.threshold || 0,
-            removeEdges: shape.config.processing?.edges?.amount || 0,
-            originalUrl: shape.url,
-            fill:
-              shape.config.processing?.invert != null
-                ? 'invert'
-                : shape.config.processing?.fill != null
-                ? 'fill'
-                : 'original',
-            fillColor:
-              shape.config.processing?.invert?.color ||
-              shape.config.processing?.fill?.color ||
-              'red',
-          }}
-          onClose={() => {
-            state.isShowingCustomizeImage = false
-          }}
-          onSubmit={async (value) => {
-            state.thumbnailPreview = value.processedThumbnailUrl
-
-            shape.config.processedThumbnailUrl = value.processedThumbnailUrl
-            shape.config.processing = {
-              invert:
-                value.fill === 'invert'
-                  ? {
-                      color: value.fillColor,
-                    }
-                  : undefined,
+      {shape &&
+        shape.kind === 'custom:raster' &&
+        state.isShowingCustomizeImage && (
+          <CustomizeRasterImageModal
+            isOpen
+            value={{
+              processedThumbnailUrl: shape.url,
+              removeLightBackground:
+                (shape.config.processing?.removeLightBackground?.threshold ||
+                  0) > 0,
+              removeLightBackgroundThreshold:
+                shape.config.processing?.removeLightBackground?.threshold || 0,
+              removeEdges: shape.config.processing?.edges?.amount || 0,
+              originalUrl: shape.url,
               fill:
-                value.fill === 'fill'
+                shape.config.processing?.invert != null
+                  ? 'invert'
+                  : shape.config.processing?.fill != null
+                  ? 'fill'
+                  : 'original',
+              fillColor:
+                shape.config.processing?.invert?.color ||
+                shape.config.processing?.fill?.color ||
+                'red',
+            }}
+            onClose={() => {
+              state.isShowingCustomizeImage = false
+            }}
+            onSubmit={async (value) => {
+              state.thumbnailPreview = value.processedThumbnailUrl
+
+              shape.config.processedThumbnailUrl = value.processedThumbnailUrl
+              shape.config.processing = {
+                invert:
+                  value.fill === 'invert'
+                    ? {
+                        color: value.fillColor,
+                      }
+                    : undefined,
+                fill:
+                  value.fill === 'fill'
+                    ? {
+                        color: value.fillColor,
+                      }
+                    : undefined,
+                removeLightBackground: value.removeLightBackground
                   ? {
-                      color: value.fillColor,
+                      threshold: value.removeLightBackgroundThreshold,
                     }
                   : undefined,
-              removeLightBackground: value.removeLightBackground
-                ? {
-                    threshold: value.removeLightBackgroundThreshold,
-                  }
-                : undefined,
-              edges: value.removeEdges
-                ? {
-                    amount: value.removeEdges,
-                  }
-                : undefined,
-            }
-            await store.updateShapeFromSelectedShapeConf({
-              resetTransform: false,
-            })
-            store.updateShapeThumbnail()
-          }}
-        />
-      )}
+                edges: value.removeEdges
+                  ? {
+                      amount: value.removeEdges,
+                    }
+                  : undefined,
+              }
+              await store.updateShapeFromSelectedShapeConf({
+                resetTransform: false,
+              })
+              store.updateShapeThumbnail()
+            }}
+          />
+        )}
     </>
   )
 })

@@ -478,6 +478,10 @@ export class EditorStore {
         processedThumbnailUrl: data.shape.url,
         processing: data.shape.processing || {},
       }
+      if (data.shape.processing?.fill?.color) {
+        this.shapesPanel.customImage.fillColor =
+          data.shape.processing?.fill?.color
+      }
       await this.selectShape(customShapeConf, false, false)
     } else if (data.shape.kind === 'text') {
       const customShapeConf: ShapeConf = {
@@ -1534,6 +1538,9 @@ export class EditorStore {
       shape.config.color = theme.shapeFill
     } else if (shape.kind === 'blob') {
       shape.config.color = theme.shapeFill
+    } else if (shape.kind === 'custom:raster') {
+      shape.config.processing.fill = { color: theme.shapeFill }
+      await this.updateShapeFromSelectedShapeConf({ resetTransform: false })
     }
 
     // Shape items coloring
@@ -1581,7 +1588,7 @@ export class EditorStore {
     this.shapesPanel.icon.color = color
     this.shapesPanel.fullCanvas.color = color
     this.shapesPanel.image.singleColor = color
-    this.shapesPanel.customImage.invertColor = color
+    this.shapesPanel.customImage.fillColor = color
   }
 }
 
@@ -1680,7 +1687,7 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
     points: 5,
   },
   customImage: {
-    invertColor: '#4A90E2',
+    fillColor: '#4A90E2',
   },
   fullCanvas: {
     color: '#4A90E2',
@@ -1703,7 +1710,7 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
 }
 
 export type CustomImageShapeOptions = {
-  invertColor: string
+  fillColor: string
 }
 
 export type ImageShapeOptions = {

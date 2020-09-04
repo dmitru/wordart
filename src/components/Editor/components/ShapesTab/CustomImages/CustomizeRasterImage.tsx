@@ -1,4 +1,4 @@
-import { Box, FormLabel, Switch } from '@chakra-ui/core'
+import { Box, Text, FormLabel, Switch } from '@chakra-ui/core'
 import css from '@emotion/css'
 import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
 import { Slider } from 'components/shared/Slider'
@@ -210,6 +210,9 @@ export const CustomizeRasterImage: React.FC<CustomizeRasterImageProps> = observe
             </FormLabel>
           </Box> */}
 
+          <Text mb="2" mr="3" fontWeight="medium" color="gray.500">
+            Color
+          </Text>
           <Box alignItems="center" display="flex" height="40px">
             <ChoiceButtons
               choices={[
@@ -238,7 +241,7 @@ export const CustomizeRasterImage: React.FC<CustomizeRasterImageProps> = observe
             )}
           </Box>
 
-          <Box mt="4">
+          <Box mt="6">
             <Slider
               afterLabel="%"
               resetValue={50}
@@ -257,7 +260,7 @@ export const CustomizeRasterImage: React.FC<CustomizeRasterImageProps> = observe
             />
           </Box>
 
-          <Box mt="4">
+          <Box mt="6">
             <Slider
               afterLabel="%"
               label={

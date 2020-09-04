@@ -636,8 +636,19 @@ export class Editor {
   }
 
   updateRasterShapeColors = (config: RasterProcessingConf) => {
+    if (this.shape?.kind !== 'custom:raster') {
+      console.error(
+        `Unexpected shape type: expected custom:raster, got ${this.shape?.kind}`
+      )
+      return
+    }
+
     // @TODO
-    console.error('not implemented')
+    if (!this.shape.obj) {
+      return
+    }
+
+    // console.error('not implemented')
   }
 
   updateBlobShapeColors = async (color: string) => {
@@ -1237,9 +1248,9 @@ export class Editor {
     if (this.shape?.obj) {
       this.canvas.remove(this.shape.obj)
     }
-    if (render) {
-      this.canvas.clear()
-    }
+    // if (render) {
+    //   this.canvas.clear()
+    // }
     this.canvas.add(shapeObj)
 
     if (

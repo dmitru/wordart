@@ -34,7 +34,7 @@ export const CustomizeRasterImageModal: React.FC<CustomizeRasterImageModalProps>
     const state = useLocalStore<ProcessingParams>(() => props.value)
 
     return (
-      <Modal isOpen={props.isOpen} onClose={props.onClose} autoFocus={false}>
+      <Modal isOpen={props.isOpen} onClose={props.onClose}>
         <ModalOverlay>
           <ModalContent maxWidth="630px" width="100%">
             <ModalHeader>Customize Image</ModalHeader>

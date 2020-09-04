@@ -200,6 +200,10 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
       if (updateItems && shapeStyle.items.coloring.kind === 'shape') {
         store.editor?.setShapeItemsStyle(style.items)
       }
+
+      if (shape.kind === 'custom:raster') {
+        await store.updateShapeFromSelectedShapeConf({ resetTransform: false })
+      }
     }
 
     const [onUpdate] = useDebouncedCallback(onUpdateImmediately, 20, {

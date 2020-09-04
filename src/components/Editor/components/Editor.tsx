@@ -1053,7 +1053,16 @@ Order Prints
           }}
           leftIcon={<FaShoppingCart />}
         >
-          Order Prints
+          Order
+          <span
+            css={css`
+              @media screen and (max-width: 1010px) {
+                display: none;
+              }
+            `}
+          >
+            {' Prints'}
+          </span>
         </Button>
 
         <WarningModal

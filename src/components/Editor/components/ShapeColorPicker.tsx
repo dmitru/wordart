@@ -29,6 +29,7 @@ import {
   ShapeRandomBlobConf,
   ShapeFullCanvasConf,
   ShapeIconConf,
+  ShapeCustomImageConf,
 } from 'components/Editor/shape-config'
 import { noop, isEqual } from 'lodash'
 import { FiRefreshCw } from 'react-icons/fi'
@@ -46,6 +47,15 @@ export const ShapeColorPicker: React.FC<{
 
   if (shape.kind === 'clipart:svg' || shape.kind === 'custom:svg') {
     return <SvgShapeColorPicker onAfterChange={onUpdate} shape={shape} />
+  }
+
+  if (shape.kind === 'custom:raster') {
+    return (
+      <CustomRasterShapeColorPicker
+        onAfterChange={onUpdate}
+        shapeConf={shape.config}
+      />
+    )
   }
 
   if (shape.kind === 'text') {
@@ -386,6 +396,44 @@ export const IconShapeColorPicker: React.FC<{
         onChange={(color) => {
           store.shapesPanel.icon.color = color
           shapeConf.color = color
+          store.updateColorForAllShapeTypes(color)
+          onChange()
+        }}
+        onAfterChange={onAfterChange}
+      />
+    </Box>
+  )
+})
+
+export const CustomRasterShapeColorPicker: React.FC<{
+  onAfterChange?: () => void
+  onChange?: () => void
+  shapeConf: ShapeCustomImageConf
+}> = observer(({ shapeConf, onAfterChange = noop, onChange = noop }) => {
+  const store = useEditorStore()!
+
+  if (shapeConf.kind !== 'custom:raster') {
+    return null
+  }
+
+  if (!shapeConf.processing.fill && !shapeConf.processing.invert) {
+    return null
+  }
+
+  return (
+    <Box display="flex" alignItems="center">
+      <Text my="0" mr="3" fontWeight="medium" color="gray.500">
+        Color
+      </Text>
+      <ColorPickerPopover
+        value={store.shapesPanel.customImage.fillColor}
+        onChange={(color) => {
+          store.shapesPanel.customImage.fillColor = color
+          if (shapeConf.processing.fill) {
+            shapeConf.processing.fill = { color }
+          } else if (shapeConf.processing.invert) {
+            shapeConf.processing.invert = { color }
+          }
           store.updateColorForAllShapeTypes(color)
           onChange()
         }}
