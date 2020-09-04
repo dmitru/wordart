@@ -10,20 +10,32 @@ import {
   Image,
   ModalCloseButton,
   Text,
+  Menu,
+  MenuButton,
+  Portal,
+  MenuDivider,
+  MenuItem,
+  MenuList,
+  MenuTransition,
   Box,
 } from '@chakra-ui/core'
-import { ChevronRightIcon } from '@chakra-ui/icons'
+import { ChevronDownIcon, ChevronRightIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
 import { Spinner } from 'components/Editor/components/Spinner'
 import { observer, useLocalStore } from 'mobx-react'
 import React, { useEffect } from 'react'
+import { pageSizePresets } from 'components/Editor/editor-store'
 import { useStore } from 'services/root-store'
 import { useToasts } from 'use-toasts'
 import { animateElement } from 'utils/animation'
 
 export type WelcomeSettingsModalProps = {
   isOpen: boolean
-  onSubmit: (params: { templateId: string | null }) => Promise<void>
+  onSubmit: (params: {
+    templateId: string | null
+    presetId: string | null
+    aspect: number
+  }) => Promise<void>
 }
 
 export const WelcomeSettingsModal: React.FC<WelcomeSettingsModalProps> = observer(
@@ -33,6 +45,9 @@ export const WelcomeSettingsModal: React.FC<WelcomeSettingsModalProps> = observe
 
     const toasts = useToasts()
     const state = useLocalStore(() => ({
+      pageSizePreset: pageSizePresets[0].id as string | null,
+      customWidth: 4,
+      customHeight: 3,
       isSubmitting: false,
       // selectedTemplate: null as string | null,
       selectedTemplate: 'a12fce2d-e538-42e7-a895-01f972f5570a' as string | null,
@@ -49,9 +64,22 @@ export const WelcomeSettingsModal: React.FC<WelcomeSettingsModalProps> = observe
       init()
     }, [])
 
+    const selectedPreset = pageSizePresets.find(
+      (p) => p.id === state.pageSizePreset
+    )
+
+    let customAspect = state.customWidth / state.customHeight
+    if (Number.isNaN(customAspect) || !Number.isFinite(customAspect)) {
+      customAspect = 1
+    }
+
     const handleSubmit = async () => {
       state.isSubmitting = true
-      await props.onSubmit({ templateId: state.selectedTemplate })
+      await props.onSubmit({
+        templateId: state.selectedTemplate,
+        presetId: selectedPreset?.id || null,
+        aspect: selectedPreset?.aspect || customAspect || 1,
+      })
       state.isSubmitting = false
       Object.assign(state, {
         selectedTemplate: null,
@@ -72,13 +100,62 @@ export const WelcomeSettingsModal: React.FC<WelcomeSettingsModalProps> = observe
         <ModalOverlay>
           <ModalContent maxWidth="1200px">
             <ModalHeader textAlign="center">
-              Choose a starting template
+              Choose a Starting Template
             </ModalHeader>
             <ModalBody>
               <Text mb="4" fontSize="lg" textAlign="center" color="gray.500">
                 Don't sweat it! You can customize everything later.
               </Text>
-              <Box display="flex" flexWrap="wrap">
+
+              <Box pb="4" pl="3">
+                <Menu isLazy>
+                  <MenuButton
+                    as={Button}
+                    variant="outline"
+                    rightIcon={<ChevronDownIcon />}
+                  >
+                    <Box display="flex" alignItems="center" flexDirection="row">
+                      <Text mb="0" mr="2">
+                        Page size:
+                      </Text>
+                      <Text mb="0" fontWeight="normal">
+                        {selectedPreset?.title || 'custom'}
+                      </Text>
+                      <Text mb="0" color="gray.500" ml="4" fontWeight="normal">
+                        {selectedPreset?.subtitle || null}
+                      </Text>
+                    </Box>
+                  </MenuButton>
+
+                  <MenuTransition>
+                    {(styles) => (
+                      // @ts-ignore
+                      <MenuList css={styles} zIndex={4}>
+                        {pageSizePresets.map((preset) => (
+                          <MenuItem
+                            key={preset.id}
+                            onClick={() => {
+                              state.pageSizePreset = preset.id
+                            }}
+                          >
+                            <Box flexDirection="column">
+                              <Box fontWeight="medium">{preset.title}</Box>
+                              <Box color="gray.500">{preset.subtitle}</Box>
+                            </Box>
+                          </MenuItem>
+                        ))}
+                      </MenuList>
+                    )}
+                  </MenuTransition>
+                </Menu>
+              </Box>
+
+              <Box
+                display="flex"
+                flexWrap="wrap"
+                overflow="auto"
+                height="calc(100vh - 380px)"
+              >
                 {templates &&
                   templates.map((template) => (
                     <Box

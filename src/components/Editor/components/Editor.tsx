@@ -186,7 +186,11 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const init = async ({
       wordcloudId,
       templateId,
+      presetId,
+      aspect,
     }: {
+      presetId?: string | null
+      aspect?: number
       wordcloudId?: string | null
       templateId?: string | null
     }) => {
@@ -266,7 +270,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         authStore.hasInitialized
       )
 
-      await store.initEditor(editorParams)
+      const matchingPageSizePreset =
+        presetId && pageSizePresets.find((p) => p.id === presetId)
+      await store.initEditor(
+        editorParams,
+        matchingPageSizePreset
+          ? { kind: 'preset', preset: matchingPageSizePreset }
+          : undefined
+      )
     }
 
     // Init for loaded wordcloud
@@ -282,9 +293,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const welcomeSettingsModal = (
       <WelcomeSettingsModal
         isOpen={state.showWelcomeSettings}
-        onSubmit={async ({ templateId }) => {
+        onSubmit={async ({ templateId, presetId, aspect }) => {
           state.showWelcomeSettings = false
-          await init({ templateId })
+          await init({ templateId, presetId, aspect })
         }}
       />
     )
@@ -580,37 +591,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const leftTab = state.leftTab
 
     const handleVisualizeClick = async () => {
-      const bgCount =
-        store.styleOptions.bg.items.words.wordList.length +
-        store.styleOptions.bg.items.icons.iconList.length
-      const shapeCount =
-        store.styleOptions.shape.items.words.wordList.length +
-        store.styleOptions.shape.items.icons.iconList.length
-
-      if (bgCount + shapeCount === 0) {
-        await store.editor?.clearItems('shape')
-        await store.editor?.clearItems('bg')
-        setIsShowingEmptyIconsWarning(true)
-        return
-      }
-
       try {
-        if (shapeCount > 0) {
-          await store.editor?.generateShapeItems({
-            style: mkShapeStyleConfFromOptions(store.styleOptions.shape),
-          })
-        } else {
-          await store.editor?.clearItems('shape')
-        }
-        if (bgCount > 0) {
-          await store.editor?.generateBgItems({
-            style: mkBgStyleConfFromOptions(store.styleOptions.bg),
-          })
-        } else {
-          await store.editor?.clearItems('bg')
-        }
+        await store.visualizeAll()
       } catch (error) {
-        store.isVisualizing = false
         toasts.showError({
           title:
             'Sorry, there was an error. Please contact us at support@wordcloudy.com',

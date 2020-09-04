@@ -173,7 +173,7 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
                   </Box>
                 </Box>
               )}
-              {!profile && !state.originalUrl && (
+              {/* {profile && !profile.limits.canUploadCustomImages && !state.originalUrl && (
                 <Alert
                   mb="6"
                   status="info"
@@ -205,7 +205,7 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
                     </Link>
                   </Box>
                 </Alert>
-              )}
+              )} */}
 
               {profile &&
                 !profile.limits.canUploadCustomImages &&

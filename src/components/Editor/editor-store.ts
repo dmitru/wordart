@@ -165,7 +165,10 @@ export class EditorStore {
   } | null = null
   selectedItem: EditorItem | null = null
 
-  @action initEditor = async (params: EditorStoreInitParams) => {
+  @action initEditor = async (
+    params: EditorStoreInitParams,
+    pageSize?: Partial<PageSize>
+  ) => {
     this.logger.debug('initEditor', params)
     this.lifecycleState = 'initializing'
 
@@ -260,7 +263,7 @@ export class EditorStore {
     window['editor'] = this.editor
 
     if (params.serialized) {
-      await this.loadSerialized(params.serialized)
+      await this.loadSerialized(params.serialized, pageSize)
     } else {
       const defaultIcon = this.availableIconShapes.find(
         (i) => i.id === 'fa-solid-heart'
@@ -430,7 +433,11 @@ export class EditorStore {
     this.editor.disableSelectionMode()
   }
 
-  @action loadSerialized = async (serialized: EditorPersistedData) => {
+  @action loadSerialized = async (
+    serialized: EditorPersistedData,
+    /** Whether to resize the page to a different page size (e.g. for starting templates) */
+    resizePage?: Partial<PageSize>
+  ) => {
     const shouldShowModal =
       serialized.data.bgItems.items.length > 0 ||
       serialized.data.shapeItems.items.length > 0
@@ -444,26 +451,35 @@ export class EditorStore {
       throw new Error('editor is not initialized')
     }
     const { data } = serialized
-    this.editor.setAspectRatio(
-      serialized.data.sceneSize.w / serialized.data.sceneSize.h,
-      false
-    )
 
-    const matchingPageSizePreset = pageSizePresets.find(
-      (p) =>
-        Math.abs(
-          p.aspect - serialized.data.sceneSize.w / serialized.data.sceneSize.h
-        ) /
-          p.aspect <
-        1e-1
-    )
-    if (matchingPageSizePreset) {
-      this.pageSize.kind = 'preset'
-      this.pageSize.preset = matchingPageSizePreset
+    const shouldVisualizeItems = !resizePage
+    const shouldGenerateItems = !shouldVisualizeItems
+
+    if (resizePage?.preset) {
+      await this.setPageSize(resizePage, false)
     } else {
-      this.pageSize.kind = 'custom'
-      this.pageSize.custom.width = serialized.data.sceneSize.w
-      this.pageSize.custom.height = serialized.data.sceneSize.h
+      this.editor.setAspectRatio(
+        serialized.data.sceneSize.w / serialized.data.sceneSize.h,
+        false
+      )
+
+      // Find the closest match among page size presets
+      const matchingPageSizePreset = pageSizePresets.find(
+        (p) =>
+          Math.abs(
+            p.aspect - serialized.data.sceneSize.w / serialized.data.sceneSize.h
+          ) /
+            p.aspect <
+          1e-1
+      )
+      if (matchingPageSizePreset) {
+        this.pageSize.kind = 'preset'
+        this.pageSize.preset = matchingPageSizePreset
+      } else {
+        this.pageSize.kind = 'custom'
+        this.pageSize.custom.width = serialized.data.sceneSize.w
+        this.pageSize.custom.height = serialized.data.sceneSize.h
+      }
     }
 
     for (const font of serialized.data.customFonts) {
@@ -537,7 +553,7 @@ export class EditorStore {
       return
     }
 
-    if ('transform' in data.shape) {
+    if ('transform' in data.shape && !resizePage) {
       applyTransformToObj(shape.obj, data.shape.transform)
       if (
         shape.kind === 'clipart:svg' ||
@@ -546,6 +562,10 @@ export class EditorStore {
       ) {
         applyTransformToObj(shape.objOriginalColors, data.shape.transform)
       }
+    }
+
+    if (resizePage?.preset) {
+      await this.setPageSize(resizePage, true)
     }
 
     if (
@@ -738,23 +758,25 @@ export class EditorStore {
       return result
     }
 
-    const [shapeItems, bgItems] = await Promise.all([
-      deserializeItems({
-        items: data.shapeItems.items,
-        fontIds: data.shapeItems.fontIds,
-        words: data.shapeItems.words,
-      }),
-      deserializeItems({
-        items: data.bgItems.items,
-        fontIds: data.bgItems.fontIds,
-        words: data.bgItems.words,
-      }),
-    ])
-
     this.editor.setShapeOpacity(shapeStyle.opacity / 100, false)
 
-    await this.editor.setShapeItems(shapeItems, false)
-    await this.editor.setBgItems(bgItems, false)
+    if (shouldVisualizeItems) {
+      const [shapeItems, bgItems] = await Promise.all([
+        deserializeItems({
+          items: data.shapeItems.items,
+          fontIds: data.shapeItems.fontIds,
+          words: data.shapeItems.words,
+        }),
+        deserializeItems({
+          items: data.bgItems.items,
+          fontIds: data.bgItems.fontIds,
+          words: data.bgItems.words,
+        }),
+      ])
+
+      await this.editor.setShapeItems(shapeItems, false)
+      await this.editor.setBgItems(bgItems, false)
+    }
 
     this.editor.setBgOpacity(
       bgStyle.fill.kind === 'transparent' ? 0 : bgStyle.fill.color.opacity / 100
@@ -782,10 +804,49 @@ export class EditorStore {
     this.editor.key = data.key
     this.editor.version = data.version
 
+    if (shouldGenerateItems) {
+      await this.visualizeAll()
+    }
+
     if (shouldShowModal) {
       this.visualizingProgress = 1
       this.isVisualizing = false
       this.visualizingStep = null
+    }
+  }
+
+  visualizeAll = async () => {
+    const bgCount =
+      this.styleOptions.bg.items.words.wordList.length +
+      this.styleOptions.bg.items.icons.iconList.length
+    const shapeCount =
+      this.styleOptions.shape.items.words.wordList.length +
+      this.styleOptions.shape.items.icons.iconList.length
+
+    if (bgCount + shapeCount === 0) {
+      await this.editor?.clearItems('shape')
+      await this.editor?.clearItems('bg')
+      return
+    }
+
+    try {
+      if (shapeCount > 0) {
+        await this.editor?.generateShapeItems({
+          style: mkShapeStyleConfFromOptions(this.styleOptions.shape),
+        })
+      } else {
+        await this.editor?.clearItems('shape')
+      }
+      if (bgCount > 0) {
+        await this.editor?.generateBgItems({
+          style: mkBgStyleConfFromOptions(this.styleOptions.bg),
+        })
+      } else {
+        await this.editor?.clearItems('bg')
+      }
+    } catch (error) {
+      this.isVisualizing = false
+      throw error
     }
   }
 
@@ -1462,7 +1523,10 @@ export class EditorStore {
     }
   }
 
-  @action setPageSize = (pageSize: Partial<PageSize>, resetShape = true) => {
+  @action setPageSize = async (
+    pageSize: Partial<PageSize>,
+    resetShape = true
+  ) => {
     this.pageSize = { ...this.pageSize, ...pageSize }
     if (!this.editor) {
       return
@@ -1479,7 +1543,7 @@ export class EditorStore {
     if (resetShape) {
       const shapeConf = this.getShapeConf()
       if (shapeConf) {
-        this.selectShape(shapeConf, false, true)
+        await this.selectShape(shapeConf, true, true)
       }
     }
   }
@@ -1612,34 +1676,46 @@ export type PageSizePreset = {
 
 export const pageSizePresets: PageSizePreset[] = [
   {
+    id: '8-10-landscape',
+    subtitle: '8 x 10"',
+    title: 'Landscape Print',
+    aspect: 10 / 8,
+  },
+  {
+    id: '10-8-portrait',
+    subtitle: '8 x 10"',
+    title: 'Portrait Print',
+    aspect: 8 / 10,
+  },
+  {
+    id: '24-18-landscape',
+    subtitle: '18 x 24"',
+    title: 'Landscape Poster',
+    aspect: 24 / 18,
+  },
+  {
+    id: '18-24-portrait',
+    subtitle: '18 x 24"',
+    title: 'Portrait Poster',
+    aspect: 18 / 24,
+  },
+  {
     id: 'a-paper-landscape',
     title: 'Paper Landscape',
-    subtitle: 'Paper sizes from A2 to A6',
+    subtitle: 'All paper sizes: A2 to A6',
     aspect: 297 / 210,
   },
   {
     id: 'a-paper-portrait',
     title: 'Paper Portrait',
-    subtitle: 'Paper sizes from A2 to A6',
+    subtitle: 'All paper sizes: A2 to A6',
     aspect: 210 / 297,
   },
   {
     id: 'square',
     title: 'Square',
-    subtitle: 'Aspect: 1 x 1',
+    // subtitle: 'Aspect: 1 x 1',
     aspect: 1,
-  },
-  {
-    id: '4:3',
-    title: 'Landscape',
-    subtitle: 'Aspect: 4 x 3',
-    aspect: 4 / 3,
-  },
-  {
-    id: '3:4',
-    title: 'Portrait',
-    subtitle: 'Aspect: 3 x 4',
-    aspect: 3 / 4,
   },
 ]
 

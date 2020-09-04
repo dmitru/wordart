@@ -29,7 +29,7 @@ export const ResetShapeTransformButton: React.FC<{}> = observer(() => {
       >
         <Button
           ml="1"
-          variant="outline"
+          variant="ghost"
           onClick={() => {
             if (!store.editor) {
               return

@@ -1117,8 +1117,13 @@ export class Editor {
       const processedCanvas = objAsCanvasElement(shapeObj)
       const processedCanvasToDisplay = objAsCanvasElement(shapeObj)
 
+      // TODO: limit canvas size
+
       if (shapeConfig.processing) {
-        processRasterImg(processedCanvas, shapeConfig.processing)
+        processRasterImg(processedCanvas, {
+          ...shapeConfig.processing,
+          edges: undefined,
+        })
         processRasterImg(processedCanvasToDisplay, {
           ...shapeConfig.processing,
           removeLightBackground:

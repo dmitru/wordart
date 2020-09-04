@@ -91,29 +91,6 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
     }
   }, [])
 
-  const resetTransformBtn =
-    shape && !isEqual(shape.originalTransform, shape.transform) ? (
-      <Tooltip
-        label="Center shape and restore its original size"
-        isDisabled={isEqual(shape.originalTransform, shape.transform)}
-      >
-        <Button
-          ml="1"
-          variant="outline"
-          onClick={() => {
-            store.editor?.clearItems('shape')
-            store.editor?.clearItems('bg')
-            applyTransformToObj(shape.obj, shape.originalTransform)
-            shape.transform = [...shape.originalTransform] as MatrixSerialized
-            store.editor?.canvas.requestRenderAll()
-            store.renderKey++
-          }}
-        >
-          Reset original
-        </Button>
-      </Tooltip>
-    ) : null
-
   const shapeConfig = store.getSelectedShapeConf()
   if (
     !shape ||

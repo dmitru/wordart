@@ -84,14 +84,10 @@ export const LeftPanelResizeTab: React.FC<{
       {/* Custom aspect ratio input */}
       {store.pageSize.kind === 'custom' && (
         <>
-          <Box mt="5">
-            <SectionLabel>Custom aspect ratio</SectionLabel>
-          </Box>
-
           <Stack
             spacing="2"
             mt="5"
-            mb="4"
+            mb="2rem"
             direction="row"
             alignItems="flex-end"
           >
@@ -139,7 +135,7 @@ export const LeftPanelResizeTab: React.FC<{
                 store.setPageSize({})
               }}
             >
-              Update
+              Apply
             </Button>
           </Stack>
         </>
