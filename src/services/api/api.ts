@@ -54,7 +54,11 @@ export const Api = {
   },
 
   extractor: {
-    async fromUrl(data: {
+    async imageFromUrl(data: { url: string }): Promise<{ data: string }> {
+      const response = await apiClient.post('/extract/image', data)
+      return response.data as { data: string }
+    },
+    async wordsFromUrl(data: {
       url: string
       removeCommon?: boolean
       removeNumbers?: boolean

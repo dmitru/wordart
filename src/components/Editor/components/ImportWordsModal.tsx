@@ -151,7 +151,7 @@ export const ImportWordsModal: React.FC<ImportWordsModalProps> = observer(
           if (!url.startsWith('http')) {
             url = `https://${url}`
           }
-          const result = await Api.extractor.fromUrl({
+          const result = await Api.extractor.wordsFromUrl({
             url,
             removeCommon: state.removeCommon,
             removeNumbers: state.removeNumbers,

@@ -249,6 +249,7 @@ export const CustomizeRasterImage: React.FC<CustomizeRasterImageProps> = observe
               value={state.removeLightBackgroundThreshold}
               onChange={(value) => {
                 state.removeLightBackgroundThreshold = value
+                updateImgPreviewThrottled(state)
               }}
               onAfterChange={() => {
                 updateImgPreviewThrottled(state)
@@ -275,6 +276,7 @@ export const CustomizeRasterImage: React.FC<CustomizeRasterImageProps> = observe
               value={state.removeEdges}
               onChange={(value) => {
                 state.removeEdges = value
+                updateImgPreviewThrottled(state)
               }}
               onAfterChange={() => {
                 updateImgPreviewThrottled(state)

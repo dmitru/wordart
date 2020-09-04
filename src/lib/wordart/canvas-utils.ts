@@ -307,7 +307,7 @@ export const processRasterImg = (
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
   const color = processing.fill?.color || processing.invert?.color
-  console.log('processImg', processing, color, canvas.width, canvas.height)
+  // console.log('processImg', processing, color, canvas.width, canvas.height)
 
   const [red, green, blue] = color ? chroma(color).rgb() : [0, 0, 0]
 
