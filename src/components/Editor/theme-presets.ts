@@ -71,7 +71,7 @@ const themePresetConfigs: ThemePresetConfig[] = Object.values({
   // },
   td: {
     bgColor: '#71C9CE',
-    shapeColor: '#205D61 ',
+    shapeColor: '#205D61',
     shapeOpacity: 0.1,
     colors: '#EEFEFE #CBF1F5 #E3FDFD'.split(' '),
   },
@@ -85,7 +85,7 @@ const themePresetConfigs: ThemePresetConfig[] = Object.values({
     bgColor: '#432F44',
     shapeColor: '#fff ',
     shapeOpacity: 0.05,
-    colors: '#FFD460 #EA5455 #E46386'.split(' '),
+    colors: '#FFD460 #F06769 #E46386'.split(' '),
   },
   ta: {
     bgColor: '#515070',

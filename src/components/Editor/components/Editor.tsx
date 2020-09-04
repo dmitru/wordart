@@ -991,7 +991,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           placeholder="Untitled Design"
           color="white"
           fontSize="xl"
-          maxWidth="200px"
+          maxWidth="320px"
           flex={1}
           mr="2"
         >
@@ -1053,7 +1053,7 @@ Order Prints
           }}
           leftIcon={<FaShoppingCart />}
         >
-          Order
+          <span>Order</span>
           <span
             css={css`
               @media screen and (max-width: 1010px) {
@@ -1061,7 +1061,7 @@ Order Prints
               }
             `}
           >
-            {' Prints'}
+            &nbsp;Prints
           </span>
         </Button>
 
