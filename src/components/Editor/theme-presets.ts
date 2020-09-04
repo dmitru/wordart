@@ -77,13 +77,13 @@ const themePresetConfigs: ThemePresetConfig[] = Object.values({
   },
   tc: {
     bgColor: '#FBDCC4',
-    shapeColor: '#F2A07B ',
+    shapeColor: '#F2A07B',
     shapeOpacity: 0.1,
     colors: '#5F1D55 #931C4B #D16838'.split(' '),
   },
   t3: {
     bgColor: '#432F44',
-    shapeColor: '#fff ',
+    shapeColor: '#ffffff',
     shapeOpacity: 0.05,
     colors: '#FFD460 #F06769 #E46386'.split(' '),
   },
