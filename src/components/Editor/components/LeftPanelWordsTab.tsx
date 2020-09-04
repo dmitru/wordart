@@ -11,7 +11,7 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/core'
-import { ChevronDownIcon, SmallCloseIcon } from '@chakra-ui/icons'
+import { ChevronDownIcon, CopyIcon, SmallCloseIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
 import { TextFields } from '@styled-icons/material-twotone/TextFields'
@@ -88,9 +88,11 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
   ({ target }) => {
     const store = useEditorStore()!
     const style = store.styleOptions[target]
+    const otherLayerStyle = store.styleOptions[target === 'bg' ? 'shape' : 'bg']
     const shapeStyle = store.styleOptions.shape
     const bgStyle = store.styleOptions.bg
     const words = style.items.words
+    const otherLayerWords = otherLayerStyle.items.words.wordList
 
     const toasts = useToasts()
 
@@ -608,7 +610,20 @@ export const LeftPanelWordsTab: React.FC<LeftPanelWordsTabProps> = observer(
 
             {allWords.length === 0 && (
               <Box px="20px" mt="1rem" mb="5">
-                <EmptyStateWordsUi target={target} />
+                <EmptyStateWordsUi target={target}>
+                  {otherLayerWords.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      colorScheme="primary"
+                      onClick={() => {
+                        store.addWords(target, otherLayerWords)
+                      }}
+                      leftIcon={<CopyIcon />}
+                    >
+                      Copy from the other layer
+                    </Button>
+                  )}
+                </EmptyStateWordsUi>
               </Box>
             )}
           </Box>
