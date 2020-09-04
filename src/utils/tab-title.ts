@@ -1,2 +1,4 @@
 export const getTabTitle = (prefix = '') =>
-  `${prefix ? `${prefix} – ` : ''}Wordcloudy – Create unique wordcloud designs`
+  `${
+    prefix ? `${prefix} – ` : ''
+  }Instant word art designs generator | Wordcloudy`
