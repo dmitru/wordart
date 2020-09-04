@@ -27,6 +27,12 @@ const themePresetConfigs: ThemePresetConfig[] = Object.values({
     shapeOpacity: 0.1,
     colors: ['#00355e', '#095885', '#2c7eb0', '#579bce', '#76b6ea'],
   },
+  t105: {
+    bgColor: '#fff',
+    shapeColor: '#A8A8A8',
+    shapeOpacity: 0.1,
+    colors: ['#ef543b', '#70a5ab', '#c7b181', '#8b7670'],
+  },
   t102: {
     bgColor: '#fff',
     shapeColor: '#A8A8A8',
@@ -55,17 +61,63 @@ const themePresetConfigs: ThemePresetConfig[] = Object.values({
       '#5B4659',
     ],
   },
-  t105: {
-    bgColor: '#fff',
-    shapeColor: '#A8A8A8',
+  t11: {
+    bgColor: '#999',
+    shapeColor: 'rgb(0,0,0)',
     shapeOpacity: 0.1,
-    colors: ['#ef543b', '#70a5ab', '#c7b181', '#8b7670'],
+    colors: ['#dadada'],
+  },
+  t12: {
+    bgColor: '#fff',
+    shapeColor: 'rgb(0,0,0)',
+    shapeOpacity: 0.05,
+    colors: ['#4c4c4c'],
+  },
+  // t6: {
+  //   bgColor: '#fff',
+  //   shapeColor: 'rgb(3,49,140)',
+  //   shapeOpacity: 0.15,
+  //   colors: ['#03318c', '#021f59', '#61a2ca', '#30588c', '#32628c'],
+  // },
+
+  t16: {
+    bgColor: '#341c01',
+    shapeColor: 'rgb(193,118,46)',
+    shapeOpacity: 0.2,
+    colors: '#fffff0 #d0aa3a #cea92e #c1762e #aea764 #d59733 #e9e3cd'.split(
+      ' '
+    ),
+  },
+  t17: {
+    bgColor: '#262626',
+    shapeColor: 'rgb(4,117,111)',
+    shapeOpacity: 0.2,
+    colors: ['#3498db', '#d90000', '#ff2d00', '#ff8c00', '#04756f'],
+  },
+  t10: {
+    bgColor: '#223564',
+    shapeColor: 'rgb(0,0,0)',
+    shapeOpacity: 0.1,
+    colors: ['#f7e4be', '#f0f4bc', '#9a80a4', '#848da6'],
   },
   t106: {
     bgColor: '#262626',
     shapeColor: '#777777',
     shapeOpacity: 0.1,
     colors: ['#739DE6', '#D84D4D', '#CC70CD', '#61B17D', '#E5875C'],
+  },
+  t21: {
+    bgColor: '#262626',
+    shapeColor: 'rgb(142,40,0)',
+    shapeOpacity: 0.2,
+    colors: ['#468966', '#fff0a5', '#ffb03b', '#b64926', '#8e2800'],
+  },
+
+  t23: {
+    bgColor: '#473b51',
+    shapeColor: 'rgb(0,0,0)',
+    shapeOpacity: 0.2,
+    colors: ['#f7ff4a', '#e3013a', '#f28e2c', '#57adf5'],
   },
   t107: {
     bgColor: '#262626',
@@ -80,12 +132,6 @@ const themePresetConfigs: ThemePresetConfig[] = Object.values({
     shapeOpacity: 0.1,
     colors: '#fff #e55b3f #efba43 #f6ba78 #ea8032 #c6312d #f28791'.split(' '),
   },
-  t3: {
-    bgColor: '#000',
-    shapeColor: '#fff',
-    shapeOpacity: 0.1,
-    colors: ['#f00', '#0f0', '#00f'],
-  },
   t4: {
     bgColor: '#272822',
     shapeColor: '#000',
@@ -97,50 +143,6 @@ const themePresetConfigs: ThemePresetConfig[] = Object.values({
     shapeColor: 'rgb(0,0,128)',
     shapeOpacity: 0.15,
     colors: ['#d6d6d6'],
-  },
-  t6: {
-    bgColor: '#fff',
-    shapeColor: 'rgb(3,49,140)',
-    shapeOpacity: 0.15,
-    colors: ['#03318c', '#021f59', '#61a2ca', '#30588c', '#32628c'],
-  },
-  t7: {
-    bgColor: '#222',
-    shapeColor: 'rgb(255,0,0)',
-    shapeOpacity: 0.15,
-    colors: ['#ff530d', '#e82c0c', '#f00', '#e80c7a', '#ff0dff'],
-  },
-  t8: {
-    bgColor: '#edd1a4',
-    shapeColor: 'rgb(99,62,0)',
-    shapeOpacity: 0.2,
-    colors: '#c30000 #c37a00 #650281 #de3333 #de5c5c #7e602c #633e00 #481e53'.split(
-      ' '
-    ),
-  },
-  t9: {
-    bgColor: '#8d8380',
-    shapeColor: 'rgb(255,255,255)',
-    shapeOpacity: 0.4,
-    colors: ['#3a3f42', '#575d51', '#42361d'],
-  },
-  t10: {
-    bgColor: '#223564',
-    shapeColor: 'rgb(0,0,0)',
-    shapeOpacity: 0.1,
-    colors: ['#f7e4be', '#f0f4bc', '#9a80a4', '#848da6'],
-  },
-  t11: {
-    bgColor: '#999',
-    shapeColor: 'rgb(0,0,0)',
-    shapeOpacity: 0.1,
-    colors: ['#d0d0d0'],
-  },
-  t12: {
-    bgColor: '#fff',
-    shapeColor: 'rgb(0,0,0)',
-    shapeOpacity: 0.1,
-    colors: ['#4c4c4c'],
   },
   t13: {
     bgColor: '#000',
@@ -156,31 +158,33 @@ const themePresetConfigs: ThemePresetConfig[] = Object.values({
       ' '
     ),
   },
-  t15: {
-    bgColor: '#fff',
-    shapeColor: 'rgb(0,0,0)',
-    shapeOpacity: 0.1,
-    colors: ['#e23940', '#003777'],
-  },
-  t16: {
-    bgColor: '#341c01',
-    shapeColor: 'rgb(193,118,46)',
-    shapeOpacity: 0.2,
-    colors: '#fffff0 #d0aa3a #cea92e #c1762e #aea764 #d59733 #e9e3cd'.split(
-      ' '
-    ),
-  },
-  t17: {
-    bgColor: '#262626',
-    shapeColor: 'rgb(4,117,111)',
-    shapeOpacity: 0.2,
-    colors: ['#3498db', '#d90000', '#ff2d00', '#ff8c00', '#04756f'],
-  },
+
   t18: {
     bgColor: '#091c2b',
     shapeColor: 'rgb(0,0,0)',
     shapeOpacity: 0.2,
     colors: ['#edecf2', '#c1d4f2', '#6d98ba', '#3669a2', '#8793dd'],
+  },
+
+  t7: {
+    bgColor: '#222',
+    shapeColor: 'rgb(255,0,0)',
+    shapeOpacity: 0.15,
+    colors: ['#ff530d', '#e82c0c', '#f00', '#e80c7a', '#ff0dff'],
+  },
+  // t8: {
+  //   bgColor: '#edd1a4',
+  //   shapeColor: 'rgb(99,62,0)',
+  //   shapeOpacity: 0.2,
+  //   colors: '#c30000 #c37a00 #650281 #de3333 #de5c5c #7e602c #633e00 #481e53'.split(
+  //     ' '
+  //   ),
+  // },
+  t9: {
+    bgColor: '#8d8380',
+    shapeColor: 'rgb(255,255,255)',
+    shapeOpacity: 0.4,
+    colors: ['#3a3f42', '#575d51', '#42361d'],
   },
   t19: {
     bgColor: '#fff',
@@ -190,29 +194,23 @@ const themePresetConfigs: ThemePresetConfig[] = Object.values({
       ' '
     ),
   },
-  t20: {
-    bgColor: '#fff',
-    shapeColor: 'rgb(0,0,0)',
-    shapeOpacity: 0.1,
-    colors: ['#9000a8', '#9d4040', '#60a831', '#314ed4', '#31a5d4'],
-  },
-  t21: {
-    bgColor: '#262626',
-    shapeColor: 'rgb(142,40,0)',
-    shapeOpacity: 0.2,
-    colors: ['#468966', '#fff0a5', '#ffb03b', '#b64926', '#8e2800'],
-  },
   t22: {
     bgColor: '#fff',
     shapeColor: 'rgb(101,29,50)',
     shapeOpacity: 0.1,
     colors: ['#509e2f', '#41b6e6', '#abad23', '#005f61', '#651d32'],
   },
-  t23: {
-    bgColor: '#473b51',
+  t15: {
+    bgColor: '#fff',
     shapeColor: 'rgb(0,0,0)',
-    shapeOpacity: 0.2,
-    colors: ['#f7ff4a', '#e3013a', '#f28e2c', '#57adf5'],
+    shapeOpacity: 0.1,
+    colors: ['#e23940', '#003777'],
+  },
+  t20: {
+    bgColor: '#fff',
+    shapeColor: 'rgb(0,0,0)',
+    shapeOpacity: 0.1,
+    colors: ['#9000a8', '#9d4040', '#60a831', '#314ed4', '#31a5d4'],
   },
 })
 
@@ -247,37 +245,4 @@ const createPreset = (conf: ThemePresetConfig, title: string): ThemePreset => {
 
 export const themePresets: ThemePreset[] = [
   ...themePresetConfigs.map((c, index) => createPreset(c, `Theme ${index}`)),
-  {
-    title: 'Dark',
-    bgDimSmallerItems: 20,
-    shapeDimSmallerItems: 20,
-    shapeOpacity: 20,
-    itemsOpacity: 100,
-    bgFill: '#252431',
-    shapeFill: 'red',
-    bgItemsColoring: {
-      kind: 'color',
-      colors: ['white'],
-    },
-    shapeItemsColoring: {
-      kind: 'color',
-      colors: ['#FF3F3F', '#D98151'],
-    },
-  },
-  {
-    title: 'Dark 2',
-    bgDimSmallerItems: 20,
-    shapeDimSmallerItems: 20,
-    shapeOpacity: 20,
-    itemsOpacity: 100,
-    bgFill: '#252431',
-    shapeFill: 'yellow',
-    bgItemsColoring: {
-      kind: 'color',
-      colors: ['white'],
-    },
-    shapeItemsColoring: {
-      kind: 'shape',
-    },
-  },
 ]
