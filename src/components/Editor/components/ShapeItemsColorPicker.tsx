@@ -127,27 +127,16 @@ export const ShapeItemsColorPickerInline: React.FC<{
               </Button>
             </Tooltip>
 
-            <Menu isLazy>
-              <MenuButton as={MenuDotsButton} variant="ghost" />
-
-              <Portal>
-                <MenuTransition>
-                  {(styles) => (
-                    // @ts-ignore
-                    <MenuList css={styles}>
-                      <MenuItem
-                        onClick={() => {
-                          shapeStyle.items.coloring.color.colors.length = 1
-                          onUpdate()
-                        }}
-                      >
-                        Clear all
-                      </MenuItem>
-                    </MenuList>
-                  )}
-                </MenuTransition>
-              </Portal>
-            </Menu>
+            <Button
+              variant="ghost"
+              isDisabled={shapeStyle.items.coloring.color.colors.length === 0}
+              onClick={() => {
+                shapeStyle.items.coloring.color.colors.length = 1
+                onUpdate()
+              }}
+            >
+              Clear
+            </Button>
           </Box>
         )}
       </Box>

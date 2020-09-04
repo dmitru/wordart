@@ -122,27 +122,16 @@ export const BgItemsColorPickerInline: React.FC<{
               Randomize
             </Button>
 
-            <Menu isLazy>
-              <MenuButton as={MenuDotsButton} variant="ghost" />
-
-              <Portal>
-                <MenuTransition>
-                  {(styles) => (
-                    // @ts-ignore
-                    <MenuList css={styles}>
-                      <MenuItem
-                        onClick={() => {
-                          bgStyle.items.coloring.color.colors.length = 1
-                          onUpdate()
-                        }}
-                      >
-                        Clear all
-                      </MenuItem>
-                    </MenuList>
-                  )}
-                </MenuTransition>
-              </Portal>
-            </Menu>
+            <Button
+              variant="ghost"
+              isDisabled={bgStyle.items.coloring.color.colors.length === 0}
+              onClick={() => {
+                bgStyle.items.coloring.color.colors.length = 1
+                onUpdate()
+              }}
+            >
+              Clear
+            </Button>
           </Box>
         )}
       </Box>
