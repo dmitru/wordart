@@ -21,7 +21,7 @@ export const LeftPanelShapesTab: React.FC<{}> = observer(() => {
         <Box display="flex" flexDirection="row" alignItems="center" mb="6">
           <ShapeTypeSelector />
           <HelpTooltipIcon
-            label={`There are many different shape types to explore! E.g. you can use your own text or image as a shape, or fill the entire canvas.`}
+            label={`There are many different shape types to explore! You can use your own text or image as a shape, or fill the entire canvas.`}
             ml="3"
           />
         </Box>

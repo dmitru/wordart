@@ -29,7 +29,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
         size="lg"
       >
         {'Shape type: '}
-        {shapesPanel.shapeKind === 'blob' && 'Blob'}
+        {shapesPanel.shapeKind === 'blob' && 'Wordcloud'}
         {shapesPanel.shapeKind === 'image' && 'Clip art'}
         {shapesPanel.shapeKind === 'icon' && 'Icon'}
         {shapesPanel.shapeKind === 'custom image' && 'Custom image'}
@@ -78,8 +78,8 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
               />
 
               <MenuItemWithDescription
-                title="Blob shape"
-                description="A blob shape for quick and unique designs"
+                title="Wordcloud"
+                description="A random blob shape for a classic wordcloud design"
                 onClick={() => {
                   shapesPanel.shapeKind = 'blob'
                   const blobShapeSvg = generateBlobShapePathData({
