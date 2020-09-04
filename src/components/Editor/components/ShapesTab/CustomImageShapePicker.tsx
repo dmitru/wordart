@@ -273,6 +273,11 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
                     }
                   : undefined,
               }
+
+              if (value.fill) {
+                store.shapesPanel.customImage.fillColor = value.fillColor
+              }
+
               await store.updateShapeFromSelectedShapeConf({
                 resetTransform: false,
               })
