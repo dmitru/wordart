@@ -141,7 +141,7 @@ export const AddCustomFontModal: React.FC<AddCustomFontModalProps> = observer(
                 </Alert>
               )}
 
-              {profile && !profile.limits.canUploadCustomMedia && (
+              {profile && !profile.limits.canUploadCustomFonts && (
                 <Alert
                   mb="6"
                   status="info"
@@ -154,8 +154,8 @@ export const AddCustomFontModal: React.FC<AddCustomFontModalProps> = observer(
                   </p>
                   <p>
                     Note: as a free user, you may still use custom fonts and
-                    export your design, but you won't be able to save it to your
-                    account.
+                    download your designs, but you won't be able to save these
+                    designs to your account.
                   </p>
                   <Box mt="4">
                     <Button

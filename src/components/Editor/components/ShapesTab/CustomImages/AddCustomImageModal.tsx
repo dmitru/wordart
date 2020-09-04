@@ -133,7 +133,7 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
               )}
 
               {profile &&
-                !profile.limits.canUploadCustomMedia &&
+                !profile.limits.canUploadCustomImages &&
                 !state.originalUrl && (
                   <Alert
                     mb="6"
@@ -147,8 +147,8 @@ export const AddCustomImageModal: React.FC<AddCustomImageModalProps> = observer(
                     </p>
                     <p>
                       Note: as a free user, you may still use custom images and
-                      export your designs, but you won't be able to save them to
-                      your account.
+                      download your designs, but you won't be able to save these
+                      designs to your account.
                     </p>
                     <Box mt="4">
                       <Button

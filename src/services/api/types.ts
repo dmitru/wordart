@@ -20,7 +20,8 @@ export type UserLimits = {
   canDownloadHd: boolean
   maxFolders: number
   maxWordclouds: number
-  canUploadCustomMedia: boolean
+  canUploadCustomImages: boolean
+  canUploadCustomFonts: boolean
 }
 
 export type UserProfile = {
