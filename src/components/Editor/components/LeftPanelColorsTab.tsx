@@ -303,11 +303,9 @@ export const LeftPanelColorsTab: React.FC<LeftPanelColorsTabProps> = observer(
                     </AnimatePresence>
                   </Flex>
 
-                  <SectionLabel>Color themes</SectionLabel>
-
                   <ThemePresetThumbnails
                     css={css`
-                      height: calc(100vh - 200px);
+                      height: calc(100vh - 160px);
                     `}
                     display="flex"
                     flexDirection="row"
