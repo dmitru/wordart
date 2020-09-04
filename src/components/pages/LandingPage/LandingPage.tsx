@@ -60,8 +60,8 @@ export const LandingPage = observer(() => {
               No design skills required.
             </HeaderTitle>
             <HeaderSubtitle>
-              Powerful & easy-to-use word art generator for personalized gifts,
-              prints, social media and more.
+              Powerful & easy-to-use word art generator for personalized prints,
+              gifts and more.
             </HeaderSubtitle>
 
             <HeaderCtaContainer>
@@ -265,12 +265,12 @@ export const LandingPage = observer(() => {
             </Text>
             <Text fontSize="20px" as="ul" color="gray.700">
               <li>
-                <strong>Delight your customers</strong> with new beautiful
-                items.
+                <strong>Stand out, attract and delight your clients</strong>{' '}
+                with new beautiful items.
               </li>
               <li>
-                <strong>Save time creating personalized designs</strong> for
-                your clients.
+                <strong>Save your time creating personalized designs</strong>{' '}
+                for your clients.
               </li>
               <li>
                 <strong>Customize every aspect</strong> of your designs.
@@ -311,8 +311,8 @@ export const LandingPage = observer(() => {
                 audience.
               </li>
               <li>
-                <strong>Enhance your message and stand out</strong> with
-                memorable and powerful visuals.
+                <strong>Enhance your message</strong> with memorable and
+                powerful visuals.
               </li>
             </Text>
           </Box>
@@ -342,7 +342,7 @@ export const LandingPage = observer(() => {
             </Text>
             <Text fontSize="20px" color="gray.700" as="ul">
               <li>
-                <strong>Save your time creating</strong>
+                <strong>Save time creating</strong>
                 {' unique design assets and backgrounds.'}
               </li>
               <li>
@@ -353,7 +353,7 @@ export const LandingPage = observer(() => {
           </Box>
         </UseCase>
 
-        <UseCase
+        {/* <UseCase
           my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
@@ -380,7 +380,7 @@ export const LandingPage = observer(() => {
               with <strong>unique and entertaining</strong> content and slides.
             </Text>
           </Box>
-        </UseCase>
+        </UseCase> */}
       </UseCasesSectionContainer>
 
       <CreateCtaButton />
@@ -453,10 +453,11 @@ export const LandingPage = observer(() => {
       </SectionHeader>
 
       <Box mx="auto" maxWidth="600px" mb="5rem">
-        <Question title="Is Wordcloudy free to use?">
-          Yes, Wordcloudy is free for personal use. If you'd like to use designs
-          created with Wordcloudy commercially, please purchase one of our
-          plans.
+        <Question title="Can I use Wordcloudy for free?">
+          You can use Wordcloudy for free for <strong>personal use</strong>. If
+          you'd like to use designs created with Wordcloudy for any commercial
+          purpose (e.g. selling digital or physical goods), please purchase one
+          of our plans.
         </Question>
         <Question title="Are these plans subscriptions?">
           No, all our plans are one-time payments. You will be charged only
