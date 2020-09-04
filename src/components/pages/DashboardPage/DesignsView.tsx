@@ -283,13 +283,13 @@ export const DesignsView = observer(() => {
               width="100%"
             >
               <Text fontSize="1.4rem" fontWeight="medium">
-                Welcome to WordCloudy!
+                Welcome to WordCloudy
               </Text>
 
-              <Text>We're happy to see you here!</Text>
+              <Text>We're happy to see you here! 🙌</Text>
 
-              <Text>
-                To get started quickly, please follow this quick tutorial:
+              {/* <Text>
+                To get started, check out this quick tutorial:
                 <br />
                 <a
                   href="https://wordcloudy.com/blog/getting-started-in-5-minutes/"
@@ -307,7 +307,7 @@ export const DesignsView = observer(() => {
                   our other tutorials
                 </a>{' '}
                 to learn about more advanced features of Wordcloudy.
-              </Text>
+              </Text> */}
 
               <Box display="flex" mt="6" mb="2rem">
                 <Button
@@ -352,7 +352,7 @@ export const DesignsView = observer(() => {
                 <Link passHref href={Urls.contact}>
                   <a>write to us via the Contact Form</a>
                 </Link>
-                – our friendly support team will reply within 24 hours.
+                – we're trying to reply to all requests within 24 hours.
               </Text>
             </Box>
           )}
