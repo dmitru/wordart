@@ -151,7 +151,17 @@ export const TextShapePicker: React.FC<{}> = observer(() => {
       <Box>
         <>
           <Box display="flex" alignItems="flex-start" mb="3">
-            {shape && <BigShapeThumbnail url={state.thumbnailPreview} />}
+            {shape && (
+              <BigShapeThumbnail
+                url={state.thumbnailPreview}
+                bg={
+                  store.styleOptions.bg.fill.kind === 'color' &&
+                  store.styleOptions.bg.fill.color.opacity > 0
+                    ? store.styleOptions.bg.fill.color.color
+                    : 'transparent'
+                }
+              />
+            )}
 
             <Box
               flex={1}

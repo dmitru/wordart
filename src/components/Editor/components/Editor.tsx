@@ -143,6 +143,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       isShowingExport: false,
       isShowingExportNoItemsWarning: false,
       showWelcomeSettings: !props.wordcloudId,
+      fetchedTemplates: false,
     }))
 
     const upgradeModal = useUpgradeModal()
@@ -280,6 +281,20 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       )
     }
 
+    // Fetch templates
+    useEffect(() => {
+      const init = async () => {
+        await wordcloudsStore.fetchTemplates()
+        state.fetchedTemplates = true
+        if (wordcloudsStore.templates!.length === 0) {
+          state.showWelcomeSettings = false
+          await init({})
+        }
+      }
+
+      init()
+    }, [])
+
     // Init for loaded wordcloud
     useEffect(() => {
       if (!authStore.hasInitialized) {
@@ -290,15 +305,16 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       }
     }, [props.wordcloudId, authStore.hasInitialized])
 
-    const welcomeSettingsModal = (
-      <WelcomeSettingsModal
-        isOpen={state.showWelcomeSettings}
-        onSubmit={async ({ templateId, presetId, aspect }) => {
-          state.showWelcomeSettings = false
-          await init({ templateId, presetId, aspect })
-        }}
-      />
-    )
+    const welcomeSettingsModal =
+      state.fetchedTemplates && wordcloudsStore.templates!.length > 0 ? (
+        <WelcomeSettingsModal
+          isOpen={state.showWelcomeSettings}
+          onSubmit={async ({ templateId, presetId, aspect }) => {
+            state.showWelcomeSettings = false
+            await init({ templateId, presetId, aspect })
+          }}
+        />
+      ) : null
 
     const hasUnsavedChanges = useCallback((url?: string) => {
       if (url?.startsWith('/editor/')) {

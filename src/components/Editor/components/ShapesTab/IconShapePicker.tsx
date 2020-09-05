@@ -18,7 +18,7 @@ import React, { useEffect } from 'react'
 import { FaCog, FaSlidersH } from 'react-icons/fa'
 import { MatrixSerialized } from 'services/api/persisted/v1'
 import { useDebouncedCallback } from 'use-debounce/lib'
-import { ShapeTransformLeftPanelSection } from './components'
+import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
 
 type TabMode = 'home' | 'customize shape'
 const initialState = {
@@ -107,47 +107,14 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
         <>
           <Box display="flex" alignItems="flex-start" mb="3">
             {shape && (
-              <ShapeThumbnailBtn
-                css={css`
-                  width: 180px;
-                  height: 180px;
-                  min-width: 180px;
-                  cursor: default !important;
-
-                  padding: 10px;
-                  border: 2px solid #e9e9e9;
-
-                  img {
-                    position: relative;
-                    z-index: 2;
-                    width: 165px;
-                    height: 165px;
-                  }
-
-                  &,
-                  &:hover,
-                  &:focus {
-                    background-image: url(/images/editor/transparent-bg.svg);
-                    background-repeat: repeat;
-                    background-size: 15px;
-                  }
-
-                  position: relative;
-
-                  &:after {
-                    position: absolute;
-                    content: '';
-                    width: 100%;
-                    height: 100%;
-                    top: 0;
-                    left: 0;
-                    z-index: 1;
-                    background: white !important;
-                    opacity: 0.6;
-                  }
-                `}
-                backgroundColor="white"
+              <BigShapeThumbnail
                 url={shape.config.processedThumbnailUrl!}
+                bg={
+                  store.styleOptions.bg.fill.kind === 'color' &&
+                  store.styleOptions.bg.fill.color.opacity > 0
+                    ? store.styleOptions.bg.fill.color.color
+                    : 'transparent'
+                }
               />
             )}
             <Box

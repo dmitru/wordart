@@ -87,7 +87,15 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
       <Box>
         {shape && shape.kind === 'custom:raster' && (
           <Box display="flex" alignItems="flex-start" mb="3">
-            <BigShapeThumbnail url={shape.config.processedThumbnailUrl} />
+            <BigShapeThumbnail
+              url={shape.config.processedThumbnailUrl}
+              bg={
+                store.styleOptions.bg.fill.kind === 'color' &&
+                store.styleOptions.bg.fill.color.opacity > 0
+                  ? store.styleOptions.bg.fill.color.color
+                  : 'transparent'
+              }
+            />
             <Box
               flex={1}
               ml="3"

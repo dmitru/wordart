@@ -133,8 +133,7 @@ export const ShapeTransformLeftPanelSection: React.FC<{}> = observer(() => {
   )
 })
 
-export const BigShapeThumbnail = styled(ShapeThumbnailBtn)`
-  background: white;
+export const BigShapeThumbnail = styled(ShapeThumbnailBtn)<{ bg?: string }>`
   width: 180px;
   height: 180px;
   min-width: 180px;
@@ -153,6 +152,7 @@ export const BigShapeThumbnail = styled(ShapeThumbnailBtn)`
   &,
   &:hover,
   &:focus {
+    background: ${(p) => p.bg || 'transparent'};
     background-image: url(/images/editor/transparent-bg.svg);
     background-repeat: repeat;
     background-size: 15px;

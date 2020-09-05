@@ -132,7 +132,15 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
             {shape &&
               (shape.kind === 'clipart:raster' ||
                 shape.kind === 'clipart:svg') && (
-                <BigShapeThumbnail url={shape.config.processedThumbnailUrl!} />
+                <BigShapeThumbnail
+                  url={shape.config.processedThumbnailUrl!}
+                  bg={
+                    store.styleOptions.bg.fill.kind === 'color' &&
+                    store.styleOptions.bg.fill.color.opacity > 0
+                      ? store.styleOptions.bg.fill.color.color
+                      : 'transparent'
+                  }
+                />
               )}
             <Box
               flex={1}

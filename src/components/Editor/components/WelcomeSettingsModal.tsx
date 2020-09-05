@@ -56,7 +56,6 @@ export const WelcomeSettingsModal: React.FC<WelcomeSettingsModalProps> = observe
     // Init
     useEffect(() => {
       const init = async () => {
-        await wordcloudsStore.fetchTemplates()
         if (wordcloudsStore.templates) {
           state.selectedTemplate = wordcloudsStore.templates[0].id
         }

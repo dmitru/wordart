@@ -164,7 +164,15 @@ export const BlobShapePicker: React.FC<{}> = observer(() => {
       <Box>
         <>
           <Box display="flex" alignItems="flex-start" mb="3">
-            <BigShapeThumbnail url={state.thumbnailPreview} />
+            <BigShapeThumbnail
+              url={state.thumbnailPreview}
+              bg={
+                store.styleOptions.bg.fill.kind === 'color' &&
+                store.styleOptions.bg.fill.color.opacity > 0
+                  ? store.styleOptions.bg.fill.color.color
+                  : 'transparent'
+              }
+            />
 
             <Box
               flex={1}

@@ -531,13 +531,15 @@ export class EditorStore {
         data.shape.kind === 'icon') &&
       data.shape.shapeId != null
     ) {
-      const shapeId = data.shape.shapeId
-      const shapeConf =
+      let shapeId = data.shape.shapeId
+      let shapeConf =
         this.availableIconShapes.find((s) => s.id === shapeId) ||
         this.availableImageShapes.find((s) => s.id === shapeId)
 
       if (!shapeConf) {
-        throw new Error(`shape config not found for shape id ${shapeId}`)
+        console.error(`shape config not found for shape id ${shapeId}`)
+        shapeId = this.availableIconShapes[0].id
+        shapeConf = this.availableIconShapes[0]
       }
 
       if (data.shape.kind === 'icon' && shapeConf.kind === 'icon') {
