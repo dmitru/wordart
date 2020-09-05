@@ -678,6 +678,7 @@ export class EditorStore {
         this.shapesPanel.fullCanvas.color = this.selectedShapeConf.color
       } else if (this.selectedShapeConf.kind === 'icon') {
         this.shapesPanel.icon.color = this.selectedShapeConf.color
+        this.shapesPanel.icon.selected = this.selectedShapeConf.id
       }
 
       this.shapesPanel.shapeKind = this.selectedShapeConf.kind
