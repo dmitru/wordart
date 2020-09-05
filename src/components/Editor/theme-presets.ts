@@ -8,11 +8,11 @@ type ThemePresetConfig = {
   colors: string[]
 }
 const themePresetConfigs: ThemePresetConfig[] = Object.values({
-  t1: {
+  t12: {
     bgColor: '#fff',
-    shapeColor: '#fff',
-    shapeOpacity: 0.1,
-    colors: ['#438D9C', '#E8A664', '#9C6043', '#171717', '#c00'],
+    shapeColor: 'rgb(0,0,0)',
+    shapeOpacity: 0.03,
+    colors: ['#333'],
   },
   // From https://vizzlo.com/
   t100: {
@@ -21,11 +21,29 @@ const themePresetConfigs: ThemePresetConfig[] = Object.values({
     shapeOpacity: 0.1,
     colors: ['#FBC74D', '#FBAC49', '#F46E3B', '#EF2E2C', '#9E1A1C', '#720F12'],
   },
+  t100a: {
+    bgColor: '#fff',
+    shapeColor: '#83D07F',
+    shapeOpacity: 0.1,
+    colors: ['#87D048', '#1A9E30', '#0F7228', '#74B52B'],
+  },
+  t100b: {
+    bgColor: '#fff',
+    shapeColor: '#C67FD0',
+    shapeOpacity: 0.1,
+    colors: ['#D4396B', '#BC50C8', '#721A9E', '#710F72'],
+  },
   t101: {
     bgColor: '#fff',
-    shapeColor: '#A8A8A8',
+    shapeColor: '#7FAADC',
     shapeOpacity: 0.1,
     colors: ['#00355e', '#095885', '#2c7eb0', '#579bce', '#76b6ea'],
+  },
+  t1: {
+    bgColor: '#fff',
+    shapeColor: '#fff',
+    shapeOpacity: 0.1,
+    colors: ['#438D9C', '#E8A664', '#9C6043', '#171717', '#c00'],
   },
   t105: {
     bgColor: '#fff',
@@ -44,12 +62,6 @@ const themePresetConfigs: ThemePresetConfig[] = Object.values({
     shapeColor: '#A8A8A8',
     shapeOpacity: 0.1,
     colors: ['#72B275', '#B56FAB', '#FFB411', '#F79420', '#558AB5', '#C64242'],
-  },
-  t12: {
-    bgColor: '#fff',
-    shapeColor: 'rgb(0,0,0)',
-    shapeOpacity: 0.03,
-    colors: ['#333'],
   },
   t11: {
     bgColor: '#999',
