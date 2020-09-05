@@ -63,7 +63,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
               />
 
               <MenuItemWithDescription
-                title="Clip art"
+                title="Clip Art / Silhouettes"
                 description="Pick one of hundreds images"
                 onClick={() => {
                   shapesPanel.shapeKind = 'image'
@@ -121,7 +121,7 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
               />
 
               <MenuItemWithDescription
-                title="Custom image"
+                title="Custom Image"
                 description="Upload your own image!"
                 onClick={() => {
                   shapesPanel.shapeKind = 'custom image'
@@ -130,8 +130,8 @@ export const ShapeTypeSelector: React.FC<{}> = observer(() => {
               />
 
               <MenuItemWithDescription
-                title="Fill whole canvas"
-                description="Use the entire canvas as a shape"
+                title="Full Canvas"
+                description="Fill the entire canvas with words"
                 onClick={() => {
                   store.selectShapeAndSaveUndo({
                     kind: 'full-canvas',

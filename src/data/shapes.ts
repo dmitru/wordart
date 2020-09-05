@@ -1,6 +1,6 @@
 import { ShapeClipartConf, ShapeIconConf } from 'components/Editor/shape-config'
 import { iconsCategories } from 'data/icon-categories'
-import { sortBy } from 'lodash'
+import { last, sortBy } from 'lodash'
 
 const defaultEdgesProcessing = {
   amount: 98,
@@ -20,15 +20,29 @@ export const loadShapesConfig = async () => {
     title: row[1],
   }))
 
-  for (let shape of shapesData) {
+  for (const shape of shapesData) {
+    const absoluteUrl =
+      shape.url.startsWith('/') || shape.url.startsWith('http')
+        ? (shape.url as string)
+        : `/shapes/svg/${shape.url}`
+
+    // Fallback title from filename
+    const title =
+      shape.title ||
+      last(absoluteUrl.split('/') as string[])!
+        .replace('.svg', '')
+        .replace('-', ' ')
+        .toLowerCase()
+
     shapes.push({
       categories: ['other'],
       ...shape,
+      title,
       kind: 'clipart:svg',
-      id: `${shape.title.toLocaleLowerCase().replace(' ', '-')}`,
-      url: `/shapes/svg/${shape.url}`,
-      thumbnailUrl: `/shapes/svg/${shape.url}`,
-      processedThumbnailUrl: `/shapes/svg/${shape.url}`,
+      id: `${(shape.title || title).replace(' ', '-').toLowerCase()}`,
+      url: absoluteUrl,
+      thumbnailUrl: absoluteUrl,
+      processedThumbnailUrl: absoluteUrl,
       processing: {
         colors: { kind: 'original' },
         edges: defaultEdgesProcessing,

@@ -1778,7 +1778,7 @@ export const leftPanelShapesInitialState: LeftPanelShapesState = {
   },
   image: {
     category: null,
-    selected: 'circle',
+    selected: 'football-player-silhouette',
     singleColor: '#4A90E2',
   },
   text: {
