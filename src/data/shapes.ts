@@ -84,6 +84,6 @@ export const getSortedImageShapes = (
   return sortBy(
     shapes,
     (s) => (s.categories ? map[s.categories[0]] ?? 999 : 999),
-    (s) => s.title
+    (s) => (s.keywords ? (s.keywords.includes('silhouette') ? 0 : 1) : 0)
   )
 }
