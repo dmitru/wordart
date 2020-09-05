@@ -274,12 +274,12 @@ export const LandingPage = observer(() => {
               </li>
               <li>
                 <strong>Customize every aspect</strong> of your designs to{' '}
-                <strong>delight your clients.</strong>
+                <strong>delight your customers.</strong>
               </li>
               <li>
                 Download designs in{' '}
                 <strong>highest quality for printing</strong>
-                or use in other design tools.
+                {' or use in other design tools.'}
               </li>
             </Text>
           </Box>
@@ -802,7 +802,7 @@ const useCaseTitleStyle = css`
 `
 
 const UseCasesSectionContainer = styled(Box)`
-  max-width: 950px;
+  max-width: 800px;
 `
 
 const useCaseStyle = css`
