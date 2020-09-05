@@ -324,6 +324,19 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                     >
                       Reset
                     </Button>
+
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        style.items.words.customAngles = style.items.words.customAngles.map(
+                          () => -90 + Math.round(Math.random() * 180)
+                        )
+                        animateVisualize()
+                      }}
+                    >
+                      Randomize
+                    </Button>
                   </Box>
 
                   <Box mt="2" pl="20px">
