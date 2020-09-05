@@ -283,7 +283,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     // Fetch templates
     useEffect(() => {
-      const init = async () => {
+      const fetchAndInit = async () => {
         await wordcloudsStore.fetchTemplates()
         state.fetchedTemplates = true
         if (wordcloudsStore.templates!.length === 0) {
@@ -292,7 +292,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         }
       }
 
-      init()
+      fetchAndInit()
     }, [])
 
     // Init for loaded wordcloud
