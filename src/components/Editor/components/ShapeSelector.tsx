@@ -35,13 +35,18 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
     const listRef = useRef<List>(null)
 
     useEffect(() => {
-      if (listRef.current && selectedShapeId != null) {
-        // Scroll to the current item
-        const itemIndex = shapes.findIndex((s) => s.id === selectedShapeId)
-        if (itemIndex > -1) {
-          listRef.current.scrollToItem(Math.ceil(itemIndex / columns), 'center')
+      // Scroll to the current item
+      setTimeout(() => {
+        if (listRef.current && selectedShapeId != null) {
+          const itemIndex = shapes.findIndex((s) => s.id === selectedShapeId)
+          if (itemIndex > -1) {
+            listRef.current.scrollToItem(
+              Math.ceil(itemIndex / columns),
+              'center'
+            )
+          }
         }
-      }
+      }, 300)
     }, [listRef.current])
 
     const cols = columns
