@@ -173,7 +173,12 @@ export const WelcomeSettingsModal: React.FC<WelcomeSettingsModalProps> = observe
                             ) as HTMLButtonElement
                           )
                         }}
-                        boxShadow="lg"
+                        boxShadow="md"
+                        transition="transform 0.2s"
+                        _hover={{
+                          boxShadow: 'lg',
+                          transform: 'translateY(-4px)',
+                        }}
                         cursor="pointer"
                         borderStyle="solid"
                         borderWidth="2px"

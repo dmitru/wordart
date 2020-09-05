@@ -60,6 +60,8 @@ export const PricingPlans = observer(
       />
     )
 
+    // TODO: add free plans
+
     const downloadPlans = (
       <Box
         // mt={['2rem', '2rem', '3rem']}
@@ -98,6 +100,11 @@ export const PricingPlans = observer(
             >
               <div>
                 <CheckIcon />
+                Downloads in professional print quality (320dpi for 8 x 10"
+                prints)
+              </div>
+              <div>
+                <CheckIcon />
                 HQ download packs never expire
                 <HelpTooltipIcon
                   mr="3"
@@ -111,6 +118,10 @@ export const PricingPlans = observer(
               <div>
                 <CheckIcon />
                 Personal or commercial use {commercialUseHelp}
+              </div>
+              <div>
+                <CheckIcon />
+                Transparent backgrounds
               </div>
             </Box>
 
@@ -155,9 +166,9 @@ export const PricingPlans = observer(
                       >
                         {formatPrice(price?.price?.gross ?? 0, price?.currency)}
                       </Text>
-                      <Text my="0" ml="3" fontSize="sm" color="gray.500">
+                      {/* <Text my="0" ml="3" fontSize="sm" color="gray.500">
                         {price?.currency ?? 'USD'}
-                      </Text>
+                      </Text> */}
                     </>
                   </Box>
                 )
@@ -222,11 +233,20 @@ export const PricingPlans = observer(
             >
               <div>
                 <CheckIcon />
+                Downloads in professional print quality (320dpi for 8 x 10"
+                prints)
+              </div>
+              <div>
+                <CheckIcon />
                 Unlimited HQ downloads
               </div>
               <div>
                 <CheckIcon />
                 Personal or commercial use {commercialUseHelp}
+              </div>
+              <div>
+                <CheckIcon />
+                Transparent backgrounds
               </div>
             </Box>
 
@@ -275,9 +295,9 @@ export const PricingPlans = observer(
                             price?.currency
                           )}
                         </Text>
-                        <Text my="0" ml="3" fontSize="sm" color="gray.500">
+                        {/* <Text my="0" ml="3" fontSize="sm" color="gray.500">
                           {price?.currency ?? 'USD'}
-                        </Text>
+                        </Text> */}
                       </>
                     )}
                   </Box>

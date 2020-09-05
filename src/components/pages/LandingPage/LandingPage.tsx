@@ -265,18 +265,20 @@ export const LandingPage = observer(() => {
             </Text>
             <Text fontSize="20px" as="ul" color="gray.700">
               <li>
-                <strong>Stand out, attract and delight your clients</strong>{' '}
-                with new beautiful items.
+                <strong>Get ahead of competition</strong> with new personalized
+                items.
               </li>
               <li>
-                <strong>Save your time creating personalized designs</strong>{' '}
+                <strong>Save your time creating custom designs</strong> tailored
                 for your clients.
               </li>
               <li>
-                <strong>Customize every aspect</strong> of your designs.
+                <strong>Customize every aspect</strong> of your designs to{' '}
+                <strong>delight your clients.</strong>
               </li>
               <li>
-                <strong>Download images in highest quality</strong> for printing
+                Download designs in{' '}
+                <strong>highest quality for printing</strong>
                 or use in other design tools.
               </li>
             </Text>
