@@ -33,7 +33,7 @@ export default class MyApp extends App {
       <CacheProvider value={emotionCache}>
         <ChakraProvider theme={theme}>
           <DefaultSeo
-            title="Instant word art designs generator | Wordcloudy"
+            title="Instant word designs generator | Wordcloudy"
             description="Generate personalized word art and download it in highest quality. Create your own designs in no time for unique gifts, prints, posters and more!"
           />
           <CSSReset />
