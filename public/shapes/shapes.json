@@ -59,6 +59,19 @@
     ]
   },
   {
+    "url": "https://wordcloudy.sfo2.digitaloceanspaces.com/shapes/cycling.svg",
+    "categories": [
+      "leisure"
+    ],
+    "keywords": [
+      "sport",
+      "cycle",
+      "bike",
+      "tour",
+      "silhouette"
+    ]
+  },
+  {
     "url": "https://wordcloudy.sfo2.digitaloceanspaces.com/shapes/Boy-Diving-Backwards-Silhouette.svg",
     "categories": [
       "leisure"
@@ -95,19 +108,7 @@
       "silhouette"
     ]
   },
-  {
-    "url": "https://wordcloudy.sfo2.digitaloceanspaces.com/shapes/cycling.svg",
-    "categories": [
-      "leisure"
-    ],
-    "keywords": [
-      "sport",
-      "cycle",
-      "bike",
-      "tour",
-      "silhouette"
-    ]
-  },
+  
   {
     "url": "https://wordcloudy.sfo2.digitaloceanspaces.com/shapes/fish-fishing.svg",
     "categories": [
@@ -2843,7 +2844,8 @@
     ],
     "keywords": [
       "shape",
-      "bicycle"
+      "bicycle",
+      "silhouette"
     ]
   },
   {
@@ -2855,8 +2857,7 @@
     "keywords": [
       "sport",
       "baseball",
-      "cap",
-      "silhouette"
+      "cap"
     ]
   },
   {
