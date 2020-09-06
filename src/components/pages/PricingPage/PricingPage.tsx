@@ -147,6 +147,34 @@ export const PricingPage = observer(() => {
               <MainDetailsTableCell main={<CheckIcon />} />
               {/* <MainDetailsTableCell main={<>Unlimited {noLimitsHelpIcon}</>} /> */}
             </tr>
+
+            <tr>
+              <th>Use your own custom fonts</th>
+              <MainDetailsTableCell main={<CrossIcon />} />
+              <MainDetailsTableCell main={<CheckIcon />} />
+              {/* <MainDetailsTableCell
+                main={
+                  <>
+                    Limited
+                    <HelpTooltipIcon label="Limited number of HQ downloads, depending on the package" />
+                  </>
+                }
+              /> */}
+            </tr>
+
+            <tr>
+              <th>Transparent backgrounds</th>
+              <MainDetailsTableCell main={<CrossIcon />} />
+              <MainDetailsTableCell main={<CheckIcon />} />
+              {/* <MainDetailsTableCell
+                main={
+                  <>
+                    Limited
+                    <HelpTooltipIcon label="Limited number of HQ downloads, depending on the package" />
+                  </>
+                }
+              /> */}
+            </tr>
           </tbody>
         </ComparisonTable>
       </Box>
@@ -206,16 +234,6 @@ export const PricingPage = observer(() => {
             <Text as="h1" id="pricing-faq" textAlign="center">
               Pricing FAQ
             </Text>
-
-            <Text
-              textAlign="center"
-              maxWidth="600px"
-              mx="auto"
-              fontSize="lg"
-              color="gray.600"
-            >
-              Find answers to common questions about our plans and pricing.
-            </Text>
           </Box>
 
           <Box id="pricing-faq" mt="1.5rem" maxWidth="700px" mx="auto">
@@ -237,8 +255,8 @@ export const PricingPage = observer(() => {
                 happy with my purchase, can I get a refund?
               </h2>
               <p>
-                Absolutely! We prodive full refund within 14 days after the
-                purchase if you're not satisfied with our product.
+                Absolutely! We offer full refunds within 14 days after the
+                purchase if you're not happy with our service.
               </p>
             </Question>
 

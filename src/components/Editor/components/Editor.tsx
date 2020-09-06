@@ -71,7 +71,6 @@ import {
   EditorStore,
   EditorStoreContext,
   EditorStoreInitParams,
-  pageSizePresets,
 } from 'components/Editor/editor-store'
 import {
   mkBgStyleConfFromOptions,
@@ -124,6 +123,13 @@ import { useWarnIfUnsavedChanges } from 'utils/use-warn-if-unsaved-changes'
 import { uuid } from 'utils/uuid'
 import { WordColorPickerPopover } from './WordColorPickerPopover'
 import { WelcomeSettingsModal } from './WelcomeSettingsModal'
+import {
+  PageSize,
+  pageSizePresets,
+  defaultPageSizePreset,
+  PageSizeSettings,
+  getAspect,
+} from 'components/Editor/page-size-presets'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -154,8 +160,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       window['toast'] = toasts
     }, [])
 
-    const aspectRatio = pageSizePresets[0].aspect
-    const [canvasSize] = useState<Dimensions>({ w: 900 * aspectRatio, h: 900 })
+    const defaultAspectRatio =
+      defaultPageSizePreset.width / defaultPageSizePreset.height
+    const [canvasSize] = useState<Dimensions>({
+      w: 900 * defaultAspectRatio,
+      h: 900,
+    })
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const bgCanvasRef = useRef<HTMLCanvasElement>(null)
     const canvasWrapperRef = useRef<HTMLDivElement>(null)
@@ -187,11 +197,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const init = async ({
       wordcloudId,
       templateId,
-      presetId,
-      aspect,
+      pageSize,
     }: {
-      presetId?: string | null
-      aspect?: number
+      pageSize?: PageSizeSettings
       wordcloudId?: string | null
       templateId?: string | null
     }) => {
@@ -205,12 +213,14 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       ) {
         return
       }
+
       const editorParams: EditorStoreInitParams = {
         canvas: canvasRef.current,
         bgCanvas: bgCanvasRef.current,
         canvasWrapperEl: canvasWrapperRef.current!,
-        aspectRatio,
+        aspectRatio: pageSize ? getAspect(pageSize) : defaultAspectRatio,
       }
+      console.log('editorParams.aspectRatio', editorParams.aspectRatio)
 
       if (wordcloudId != null) {
         analytics.trackStructured(StructuredEvents.mkSavedEditorSession())
@@ -265,20 +275,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         state.title = 'New wordart'
       }
 
-      console.log(
-        'props.wordcloudId, authStore.hasInitialized, canvasRef.current, bgCanvasRef.current',
-        props.wordcloudId,
-        authStore.hasInitialized
-      )
-
-      const matchingPageSizePreset =
-        presetId && pageSizePresets.find((p) => p.id === presetId)
-      await store.initEditor(
-        editorParams,
-        matchingPageSizePreset
-          ? { kind: 'preset', preset: matchingPageSizePreset }
-          : undefined
-      )
+      await store.initEditor(editorParams, pageSize)
     }
 
     // Fetch templates
@@ -309,9 +306,9 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       state.fetchedTemplates && wordcloudsStore.templates!.length > 0 ? (
         <WelcomeSettingsModal
           isOpen={state.showWelcomeSettings}
-          onSubmit={async ({ templateId, presetId, aspect }) => {
+          onSubmit={async ({ templateId, pageSize }) => {
             state.showWelcomeSettings = false
-            await init({ templateId, presetId, aspect })
+            await init({ templateId, pageSize })
           }}
         />
       ) : null
@@ -891,7 +888,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                         margin-right: 4px;
                       `}
                     />
-                    Page Size...
+                    Resize page...
                   </MenuItem>
                   <MenuDivider />
                   <MenuItem onClick={handlePrint}>

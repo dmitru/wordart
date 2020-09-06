@@ -22,6 +22,14 @@ import {
   objAsCanvasElement,
 } from 'components/Editor/lib/fabric-utils'
 import { Font } from 'components/Editor/lib/generator'
+import {
+  defaultPageSizePreset,
+  getAspect,
+  PageSize,
+  PageSizePreset,
+  pageSizePresets,
+  PageSizeSettings,
+} from 'components/Editor/page-size-presets'
 import { Shape } from 'components/Editor/shape'
 import {
   ShapeClipartConf,
@@ -128,12 +136,12 @@ export class EditorStore {
     shape: defaultShapeStyleOptions,
   }
 
-  @observable pageSize: PageSize = {
-    kind: 'preset',
-    preset: pageSizePresets[0],
+  @observable pageSize: PageSizeSettings = {
+    preset: defaultPageSizePreset,
     custom: {
       width: 16,
       height: 9,
+      unit: 'in',
     },
   }
 
@@ -167,7 +175,7 @@ export class EditorStore {
 
   @action initEditor = async (
     params: EditorStoreInitParams,
-    pageSize?: Partial<PageSize>
+    pageSize?: PageSizeSettings
   ) => {
     this.logger.debug('initEditor', params)
     this.lifecycleState = 'initializing'
@@ -436,7 +444,7 @@ export class EditorStore {
   @action loadSerialized = async (
     serialized: EditorPersistedData,
     /** Whether to resize the page to a different page size (e.g. for starting templates) */
-    resizePage?: Partial<PageSize>
+    resizePage?: PageSizeSettings
   ) => {
     const shouldShowModal =
       serialized.data.bgItems.items.length > 0 ||
@@ -455,7 +463,7 @@ export class EditorStore {
     const shouldVisualizeItems = !resizePage
     const shouldGenerateItems = !shouldVisualizeItems
 
-    if (resizePage?.preset) {
+    if (resizePage) {
       await this.setPageSize(resizePage, false)
     } else {
       this.editor.setAspectRatio(
@@ -467,16 +475,16 @@ export class EditorStore {
       const matchingPageSizePreset = pageSizePresets.find(
         (p) =>
           Math.abs(
-            p.aspect - serialized.data.sceneSize.w / serialized.data.sceneSize.h
+            p.width / p.height -
+              serialized.data.sceneSize.w / serialized.data.sceneSize.h
           ) /
-            p.aspect <
+            (p.width / p.height) <
           1e-1
       )
       if (matchingPageSizePreset) {
-        this.pageSize.kind = 'preset'
         this.pageSize.preset = matchingPageSizePreset
       } else {
-        this.pageSize.kind = 'custom'
+        this.pageSize.preset = null
         this.pageSize.custom.width = serialized.data.sceneSize.w
         this.pageSize.custom.height = serialized.data.sceneSize.h
       }
@@ -566,7 +574,7 @@ export class EditorStore {
       }
     }
 
-    if (resizePage?.preset) {
+    if (resizePage) {
       await this.setPageSize(resizePage, true)
     }
 
@@ -1527,18 +1535,15 @@ export class EditorStore {
   }
 
   @action setPageSize = async (
-    pageSize: Partial<PageSize>,
+    pageSize: PageSizeSettings,
     resetShape = true
   ) => {
-    this.pageSize = { ...this.pageSize, ...pageSize }
+    this.pageSize = pageSize
     if (!this.editor) {
       return
     }
     this.hasUnsavedChanges = true
-    const aspect =
-      this.pageSize.kind === 'preset'
-        ? this.pageSize.preset.aspect
-        : this.pageSize.custom.width / this.pageSize.custom.height
+    const aspect = getAspect(this.pageSize)
 
     this.editor.setAspectRatio(aspect)
 
@@ -1660,67 +1665,6 @@ export class EditorStore {
 }
 
 export type WordConfigId = string
-
-export type PageSize = {
-  kind: 'preset' | 'custom'
-  preset: PageSizePreset
-  custom: {
-    width: number
-    height: number
-  }
-}
-
-export type PageSizePreset = {
-  id: string
-  title: string
-  subtitle?: string
-  aspect: number
-}
-
-export const pageSizePresets: PageSizePreset[] = [
-  {
-    id: '8-10-landscape',
-    subtitle: '8 x 10"',
-    title: 'Landscape Print',
-    aspect: 10 / 8,
-  },
-  {
-    id: '10-8-portrait',
-    subtitle: '8 x 10"',
-    title: 'Portrait Print',
-    aspect: 8 / 10,
-  },
-  {
-    id: '24-18-landscape',
-    subtitle: '18 x 24"',
-    title: 'Landscape Poster',
-    aspect: 24 / 18,
-  },
-  {
-    id: '18-24-portrait',
-    subtitle: '18 x 24"',
-    title: 'Portrait Poster',
-    aspect: 18 / 24,
-  },
-  {
-    id: 'a-paper-landscape',
-    title: 'Paper Landscape',
-    subtitle: 'All paper sizes: A2 to A6',
-    aspect: 297 / 210,
-  },
-  {
-    id: 'a-paper-portrait',
-    title: 'Paper Portrait',
-    subtitle: 'All paper sizes: A2 to A6',
-    aspect: 210 / 297,
-  },
-  {
-    id: 'square',
-    title: 'Square',
-    // subtitle: 'Aspect: 1 x 1',
-    aspect: 1,
-  },
-]
 
 export type EditorStateSnapshot = {
   mode: EditorMode
