@@ -67,18 +67,24 @@ export const PricingPlans = observer(
     // TODO: add free plans
     const freePlans = (
       <Box
-      // mt={['2rem', '2rem', '3rem']}
-      // mb={['2rem', '2rem', '2rem']}
-      // mx={[2, 6]}
+        bg="white"
+        // mt={['2rem', '2rem', '3rem']}
+        // mb={['2rem', '2rem', '2rem']}
+        // mx={[2, 6]}
       >
         <Box width={['300px', '340px', '320px', '320px', '360px']}>
           <Box boxShadow="lg" borderRadius="lg">
             <Box
               p="5"
               fontSize={['lg', 'lg', 'lg', 'xl']}
-              bg="gray.100"
+              borderTopColor="blue.100"
+              borderTopWidth="10px"
+              borderTopStyle="solid"
+              borderBottomColor="gray.100"
+              borderBottomWidth="1px"
+              borderBottomStyle="solid"
               textAlign="center"
-              borderRadius="lg"
+              borderTopRadius="lg"
             >
               Free Plan
             </Box>
@@ -143,18 +149,24 @@ export const PricingPlans = observer(
 
     const downloadPlans = (
       <Box
-      // mt={['2rem', '2rem', '3rem']}
-      // mb={['2rem', '2rem', '2rem']}
-      // mx={[2, 6]}
+        bg="white"
+        // mt={['2rem', '2rem', '3rem']}
+        // mb={['2rem', '2rem', '2rem']}
+        // mx={[2, 6]}
       >
         <Box width={['300px', '340px', '320px', '320px', '360px']}>
           <Box boxShadow="lg" borderRadius="lg">
             <Box
               p="5"
               fontSize={['lg', 'lg', 'lg', 'xl']}
-              bg="gray.100"
+              borderTopColor="blue.100"
+              borderTopWidth="10px"
+              borderTopStyle="solid"
+              borderBottomColor="gray.100"
+              borderBottomWidth="1px"
+              borderBottomStyle="solid"
               textAlign="center"
-              borderRadius="lg"
+              borderTopRadius="lg"
             >
               High Quality Download Packs
             </Box>
@@ -287,18 +299,24 @@ export const PricingPlans = observer(
 
     const unlimitedPlans = (
       <Box
-      // mt={['1rem', '1rem', '3rem']}
-      // mb={['1rem', '1rem', '1rem']}
-      // mx={[2, 6]}
+        // mt={['1rem', '1rem', '3rem']}
+        // mb={['1rem', '1rem', '1rem']}
+        // mx={[2, 6]}
+        bg="white"
       >
         <Box width={['300px', '340px', '320px', '320px', '360px']}>
           <Box boxShadow="lg" borderRadius="lg">
             <Box
               p="5"
               fontSize="xl"
-              bg="gray.100"
               textAlign="center"
-              borderRadius="lg"
+              borderTopColor="blue.100"
+              borderTopWidth="10px"
+              borderTopStyle="solid"
+              borderBottomColor="gray.100"
+              borderBottomWidth="1px"
+              borderBottomStyle="solid"
+              borderTopRadius="lg"
             >
               Unlimited Plans
             </Box>
@@ -472,6 +490,17 @@ export const PricingPlans = observer(
           {downloadPlans}
           {unlimitedPlans}
         </Stack>
+
+        <Text
+          color="gray.500"
+          fontSize="md"
+          mt="5"
+          mx="auto"
+          textAlign="center"
+          maxWidth="500px"
+        >
+          All payments are processed by Paddle.com in a secure way.
+        </Text>
 
         {showOneTimePaymentNotice && (
           <Text

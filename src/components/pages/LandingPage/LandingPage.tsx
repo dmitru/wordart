@@ -158,9 +158,10 @@ export const LandingPage = observer(() => {
         }}
         animate={{ x: 0, y: 0, opacity: 1 }}
       >
-        <h1>Your own unique designs in no time</h1>
+        <h1>Your own unique designs – in no time</h1>
         <Text mt="0" mb="0" mx="auto" fontSize="24px" maxWidth="700px">
-          The most advanced word art generator – user-friendly and fun to use.
+          Being creative is easy and fun with our user-friendly word art
+          generator.
         </Text>
       </SectionHeader>
 
@@ -178,7 +179,7 @@ export const LandingPage = observer(() => {
           width: 100%;
           max-width: 900px;
           margin: 0 auto;
-          margin-bottom: 70px;
+          margin-bottom: 50px;
           display: flex;
           align-items: flex-start;
 
@@ -217,87 +218,73 @@ export const LandingPage = observer(() => {
         </video>
       </Box>
 
-      <Box mt="2rem">
+      <Box mt="1rem" mb="3rem">
         <CreateCtaButton />
       </Box>
 
       {/* Use cases: personal */}
-      <SectionHeader
-        mb="30px"
-        mt="6rem"
-        initial={{ opacity: 0, y: '40px' }}
-        // @ts-ignore
-        transition={{
-          ease: 'easeInOut',
-          duration: 0.5,
-          delay: 0.25,
-        }}
-        animate={{ x: 0, y: 0, opacity: 1 }}
+      <Box
+        css={css`
+          background: linear-gradient(56deg, #f6faff, #f7f9ffeb);
+          padding-top: 20px;
+          padding-bottom: 20px;
+        `}
       >
-        <h1>Memories for your friends & special ones</h1>
-        <Text mt="0" mb="0" maxWidth="600px" mx="auto">
-          Life is too short for off-the-shelf gifts. Your loved ones deserve
-          more! Share your feelings in a most thoughtful, memorable and personal
-          way.
-        </Text>
-      </SectionHeader>
-
-      <UseCasesSectionContainer mb="0rem" mx="auto" mt="3rem">
-        <UseCase
-          my="2rem"
-          initial={{ opacity: 0, y: '40px' }}
-          // @ts-ignore
-          transition={{
-            ease: 'easeInOut',
-            duration: 0.5,
-            delay: 0.25,
-          }}
-          animate={{ x: 0, y: 0, opacity: 1 }}
-          p="4"
-          mx="20px"
-          display="flex"
-          flexDirection="row-reverse"
-        >
-          <Box maxWidth="260px" width="100%" css={useCaseImgStyle} ml="2rem">
-            <img src="/landing/undraw_loving_story_0j59.svg" />
-          </Box>
-          <Box>
-            <Text fontSize="20px" as="ul" color="gray.700">
-              <li>
-                Start with a template, then <strong>use your own words</strong>{' '}
-                for truly unique and personal designs.
-              </li>
-              <li>
-                <strong>Choose any shape and colors</strong> to make it even
-                more special.
-              </li>
-              <li>
-                Have your designs <strong>printed and shipped</strong> from our
-                store (as posters, frame prints, t-shirts and more – coming
-                soon!)
-              </li>
-              <li>
-                <strong>No design skills needed</strong> – you too can create
-                amazing word art in minutes!
-              </li>
+        <Box>
+          <SectionHeader mb="30px">
+            <h1>Delight your friends & special ones</h1>
+            <Text mt="0" mb="0" maxWidth="600px" mx="auto">
+              Life is too short for off-the-shelf gifts. Your loved ones deserve
+              better!
             </Text>
-          </Box>
-        </UseCase>
-      </UseCasesSectionContainer>
+          </SectionHeader>
+
+          <UseCasesSectionContainer mb="0rem" mx="auto" mt="3rem">
+            <UseCase
+              my="2rem"
+              p="4"
+              mx="20px"
+              display="flex"
+              flexDirection="row-reverse"
+            >
+              <Box
+                maxWidth="280px"
+                width="100%"
+                css={useCaseImgStyle}
+                ml="2rem"
+                display="flex"
+                justifyContent="center"
+              >
+                <img src="/landing/undraw_loving_story_0j59.svg" />
+              </Box>
+              <Box>
+                <Text fontSize="20px" as="ul" color="gray.700">
+                  <li>
+                    <strong>Start with a template</strong>, then{' '}
+                    <strong>add your own words</strong> to make it special.
+                  </li>
+                  <li>
+                    <strong>Add personal touch</strong> by choosing shape and
+                    colors.
+                  </li>
+                  <li>
+                    Have your designs <strong>printed and shipped</strong> from
+                    our store (as posters, frame prints, t-shirts and more –
+                    coming soon!)
+                  </li>
+                  <li>
+                    <strong>No design skills needed</strong> – you too can
+                    create amazing word art in minutes!
+                  </li>
+                </Text>
+              </Box>
+            </UseCase>
+          </UseCasesSectionContainer>
+        </Box>
+      </Box>
 
       {/* Use cases */}
-      <SectionHeader
-        mb="30px"
-        mt="6rem"
-        initial={{ opacity: 0, y: '40px' }}
-        // @ts-ignore
-        transition={{
-          ease: 'easeInOut',
-          duration: 0.5,
-          delay: 0.25,
-        }}
-        animate={{ x: 0, y: 0, opacity: 1 }}
-      >
+      <SectionHeader mb="30px" mt="6rem">
         <h1>For your business & work</h1>
         <Text mt="0" mb="0" maxWidth="600px" mx="auto">
           Use the awesome power of typography and words to your advantage.
@@ -305,20 +292,7 @@ export const LandingPage = observer(() => {
       </SectionHeader>
 
       <UseCasesSectionContainer mb="0rem" mx="auto" mt="3rem">
-        <UseCase
-          my="2rem"
-          initial={{ opacity: 0, y: '40px' }}
-          // @ts-ignore
-          transition={{
-            ease: 'easeInOut',
-            duration: 0.5,
-            delay: 0.25,
-          }}
-          animate={{ x: 0, y: 0, opacity: 1 }}
-          p="4"
-          mx="20px"
-          display="flex"
-        >
+        <UseCase my="2rem" p="4" mx="20px" display="flex">
           <Box maxWidth="260px" width="100%" css={useCaseImgStyle} mr="2rem">
             <img src="/landing/undraw_add_to_cart_vkjp.svg" />
           </Box>
@@ -329,7 +303,7 @@ export const LandingPage = observer(() => {
             <Text fontSize="20px" as="ul" color="gray.700">
               <li>
                 <strong>Get ahead of competition</strong> and{' '}
-                <strong>delight your customers</strong> with new personalized
+                <strong>find new happy customers</strong> with personalized
                 items.
               </li>
               <li>
@@ -338,7 +312,7 @@ export const LandingPage = observer(() => {
               </li>
               <li>
                 <strong>Sell designs as high-quality prints</strong>
-                {' or as digital downloads.'}
+                {' or as digital downloads in your store.'}
               </li>
             </Text>
           </Box>
@@ -381,14 +355,6 @@ export const LandingPage = observer(() => {
 
         <UseCase
           my="2rem"
-          initial={{ opacity: 0, y: '40px' }}
-          // @ts-ignore
-          transition={{
-            ease: 'easeInOut',
-            duration: 0.5,
-            delay: 0.25,
-          }}
-          animate={{ x: 0, y: 0, opacity: 1 }}
           p="4"
           mx="20px"
           display="flex"
@@ -501,17 +467,26 @@ export const LandingPage = observer(() => {
       </FeaturesSection> */}
 
       {/* Pricing */}
-      <Box mb="5rem" id="pricing" mt="6rem">
-        <SectionHeader mb="30px">
-          <h1>Flexible pricing that works for you</h1>
-          <Text mt="0" mb="0" maxWidth="600px" mx="auto">
-            Purchase digitals downloads in highest quality,
-            <br />
-            for personal or commercial use.
-          </Text>
-        </SectionHeader>
+      <Box
+        mt="3rem"
+        css={css`
+          background: linear-gradient(56deg, #f6faff, #f7f9ffeb);
+          padding-top: 20px;
+          padding-bottom: 20px;
+        `}
+      >
+        <Box mb="5rem" id="pricing">
+          <SectionHeader mb="30px">
+            <h1>Flexible pricing that works for you</h1>
+            <Text mt="0" mb="0" maxWidth="600px" mx="auto">
+              Purchase digitals downloads in highest quality,
+              <br />
+              for personal or commercial use.
+            </Text>
+          </SectionHeader>
 
-        <PricingPlans showOneTimePaymentNotice={false} />
+          <PricingPlans showOneTimePaymentNotice={false} />
+        </Box>
       </Box>
 
       <SectionHeader mb="30px" mt="7rem">
