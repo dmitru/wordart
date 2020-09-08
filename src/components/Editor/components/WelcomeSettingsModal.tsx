@@ -99,7 +99,7 @@ export const WelcomeSettingsModal: React.FC<WelcomeSettingsModalProps> = observe
               </Text>
 
               <Box>
-                <Box pb="3" pl="3">
+                <Box pb="3" pl="3" maxWidth="370px">
                   <PageSizePicker
                     value={state.pageSize}
                     onChange={(value) => {

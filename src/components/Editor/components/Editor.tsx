@@ -501,7 +501,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       )
 
       const startExport = async () => {
-        const dimension = hd ? 4096 : 1024
+        const dimension = hd ? 8192 : 1024
         if (!store.editor) {
           return
         }
@@ -679,6 +679,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       </Modal>
     )
 
+    // TODO: refactor
     const exportModal = (
       <Modal
         isOpen={state.isShowingExport}
@@ -762,7 +763,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           PNG (HD)
                         </Text>
                         <Text mb="0" fontSize="sm">
-                          4096 px
+                          8192 px
                         </Text>
                       </ExportButton>
 
@@ -779,7 +780,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
                           JPEG (HD)
                         </Text>
                         <Text mb="0" fontSize="sm">
-                          4096 px
+                          8192 px
                         </Text>
                       </ExportButton>
 

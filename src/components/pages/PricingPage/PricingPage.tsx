@@ -59,8 +59,8 @@ export const PricingPage = observer(() => {
               1024px
             </li>
             <li>
-              <strong>High Quality (HQ):</strong> PNG, JPEG (up to 4096px) or
-              SVG vector format
+              <strong>High Quality (HQ):</strong> PNG, JPEG (up to 8192 x 8192
+              px) or SVG vector format
             </li>
           </ul>
         </>

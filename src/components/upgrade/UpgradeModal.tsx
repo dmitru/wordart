@@ -80,7 +80,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = observer(
               </Text>
 
               <Box mt="2rem">
-                <PricingPlans />
+                <PricingPlans showFreePlans={false} />
               </Box>
             </ModalBody>
 

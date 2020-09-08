@@ -29,8 +29,8 @@ export const pageSizePresets: PageSizePreset[] = [
     id: 'square',
     title: 'Square',
     // subtitle: 'Aspect: 1 x 1',
-    height: 4096,
-    width: 4096,
+    height: 8192,
+    width: 8192,
     unit: 'px',
   },
   {
@@ -100,6 +100,7 @@ export const pageSizePresets: PageSizePreset[] = [
   {
     id: 'a-paper-landscape',
     title: 'A4 Paper, landscape',
+    subtitle: '11” x 8.5”',
     width: 210,
     height: 297,
     unit: 'mm',
@@ -107,6 +108,7 @@ export const pageSizePresets: PageSizePreset[] = [
   {
     id: 'a-paper-portrait',
     title: 'A4 Paper, portrait',
+    subtitle: '8.5” x 11”',
     width: 297,
     height: 210,
     unit: 'mm',

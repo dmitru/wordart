@@ -4,6 +4,7 @@ import {
   Divider,
   IconButton,
   Link as ChakraLink,
+  Tag,
   LinkProps,
   Stack,
 } from '@chakra-ui/core'
@@ -76,6 +77,17 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
                       width: auto;
                     `}
                   />
+                  <Tag
+                    colorScheme="teal"
+                    size="sm"
+                    css={css`
+                      position: absolute;
+                      top: 4px;
+                      right: -44px;
+                    `}
+                  >
+                    beta
+                  </Tag>
                 </LogoLink>
               </Link>
 
@@ -294,6 +306,7 @@ export const LogoLink = styled.a`
   font-size: 1.6rem;
   height: 30px;
   margin-right: 2rem;
+  position: absolute;
   &,
   &:focus,
   &:hover {

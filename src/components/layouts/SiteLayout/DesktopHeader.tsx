@@ -5,6 +5,7 @@ import {
   MenuList,
   MenuTransition,
   Portal,
+  Tag,
 } from '@chakra-ui/core'
 import { AddIcon, ChevronDownIcon, StarIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
@@ -63,6 +64,17 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
                       width: auto;
                     `}
                   />
+                  <Tag
+                    colorScheme="teal"
+                    size="sm"
+                    css={css`
+                      position: absolute;
+                      top: -12px;
+                      right: -24px;
+                    `}
+                  >
+                    beta
+                  </Tag>
                 </LogoLink>
               </Link>
 
@@ -81,7 +93,18 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
               </TopNavLink> */}
 
               <Link href={Urls.pricing} passHref>
-                <TopNavLink active={pathname === Urls.pricing}>
+                <TopNavLink
+                  active={pathname === Urls.pricing}
+                  onClick={(e) => {
+                    console.log(pathname)
+                    if (pathname === '/') {
+                      e.preventDefault()
+                      const pricingSection = document.getElementById('pricing')
+                      console.log(pricingSection)
+                      pricingSection?.scrollIntoView({ behavior: 'smooth' })
+                    }
+                  }}
+                >
                   Pricing
                 </TopNavLink>
               </Link>
@@ -224,6 +247,7 @@ export const LogoLink = styled.a`
   color: white;
   font-size: 1.6rem;
   height: 30px;
+  position: relative;
   margin-right: 2rem;
   &,
   &:focus,

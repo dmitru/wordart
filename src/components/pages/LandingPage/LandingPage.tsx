@@ -55,9 +55,9 @@ export const LandingPage = observer(() => {
             </Box> */}
             <HeaderTitle>
               Instantly create
-              <br /> <em className="first">unique word art.</em>
+              <br /> <em className="first">unique word art</em>
               <br />
-              No design skills required.
+              without design skills.
             </HeaderTitle>
             <HeaderSubtitle>
               Powerful & easy-to-use word art generator for personalized prints,
@@ -93,8 +93,8 @@ export const LandingPage = observer(() => {
             <HeaderSlider>
               <Slider play cancelOnInteraction={false} interval={3000}>
                 <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/Untitled%20design.jpg" />
-                <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/landing-sliders-portrait.jpg" />
                 <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/landing-slides-jessica.jpg" />
+                <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/landing-sliders-portrait.jpg" />
                 <div data-src="https://wordcloudy.sfo2.digitaloceanspaces.com/media/landing-slides-50.jpg" />
                 {/* <div data-src="/gallery/gallery-11.jpeg" />
                 <div data-src="/gallery/gallery-8.jpeg" />
@@ -158,9 +158,9 @@ export const LandingPage = observer(() => {
         }}
         animate={{ x: 0, y: 0, opacity: 1 }}
       >
-        <h1>Creating is fast, fun and easy</h1>
+        <h1>Your own unique designs in no time</h1>
         <Text mt="0" mb="0" mx="auto" fontSize="24px" maxWidth="700px">
-          Wordcloudy is incredibly user-friendly and fun – anyone can create!
+          The most advanced word art generator – user-friendly and fun to use.
         </Text>
       </SectionHeader>
 
@@ -221,6 +221,70 @@ export const LandingPage = observer(() => {
         <CreateCtaButton />
       </Box>
 
+      {/* Use cases: personal */}
+      <SectionHeader
+        mb="30px"
+        mt="6rem"
+        initial={{ opacity: 0, y: '40px' }}
+        // @ts-ignore
+        transition={{
+          ease: 'easeInOut',
+          duration: 0.5,
+          delay: 0.25,
+        }}
+        animate={{ x: 0, y: 0, opacity: 1 }}
+      >
+        <h1>Memories for your friends & special ones</h1>
+        <Text mt="0" mb="0" maxWidth="600px" mx="auto">
+          Life is too short for off-the-shelf gifts. Your loved ones deserve
+          more! Share your feelings in a most thoughtful, memorable and personal
+          way.
+        </Text>
+      </SectionHeader>
+
+      <UseCasesSectionContainer mb="0rem" mx="auto" mt="3rem">
+        <UseCase
+          my="2rem"
+          initial={{ opacity: 0, y: '40px' }}
+          // @ts-ignore
+          transition={{
+            ease: 'easeInOut',
+            duration: 0.5,
+            delay: 0.25,
+          }}
+          animate={{ x: 0, y: 0, opacity: 1 }}
+          p="4"
+          mx="20px"
+          display="flex"
+          flexDirection="row-reverse"
+        >
+          <Box maxWidth="260px" width="100%" css={useCaseImgStyle} ml="2rem">
+            <img src="/landing/undraw_loving_story_0j59.svg" />
+          </Box>
+          <Box>
+            <Text fontSize="20px" as="ul" color="gray.700">
+              <li>
+                Start with a template, then <strong>use your own words</strong>{' '}
+                for truly unique and personal designs.
+              </li>
+              <li>
+                <strong>Choose any shape and colors</strong> to make it even
+                more special.
+              </li>
+              <li>
+                Have your designs <strong>printed and shipped</strong> from our
+                store (as posters, frame prints, t-shirts and more – coming
+                soon!)
+              </li>
+              <li>
+                <strong>No design skills needed</strong> – you too can create
+                amazing word art in minutes!
+              </li>
+            </Text>
+          </Box>
+        </UseCase>
+      </UseCasesSectionContainer>
+
       {/* Use cases */}
       <SectionHeader
         mb="30px"
@@ -234,10 +298,9 @@ export const LandingPage = observer(() => {
         }}
         animate={{ x: 0, y: 0, opacity: 1 }}
       >
-        <h1>Word art for your needs</h1>
+        <h1>For your business & work</h1>
         <Text mt="0" mb="0" maxWidth="600px" mx="auto">
-          Use the awesome power of typography, words, shapes and colors to help
-          you with your work.
+          Use the awesome power of typography and words to your advantage.
         </Text>
       </SectionHeader>
 
@@ -256,7 +319,7 @@ export const LandingPage = observer(() => {
           mx="20px"
           display="flex"
         >
-          <Box maxWidth="300px" width="100%" css={useCaseImgStyle} mr="2rem">
+          <Box maxWidth="260px" width="100%" css={useCaseImgStyle} mr="2rem">
             <img src="/landing/undraw_add_to_cart_vkjp.svg" />
           </Box>
           <Box>
@@ -265,27 +328,23 @@ export const LandingPage = observer(() => {
             </Text>
             <Text fontSize="20px" as="ul" color="gray.700">
               <li>
-                <strong>Get ahead of competition</strong> with new personalized
+                <strong>Get ahead of competition</strong> and{' '}
+                <strong>delight your customers</strong> with new personalized
                 items.
               </li>
               <li>
-                <strong>Save your time creating custom designs</strong> tailored
-                for your clients.
+                <strong>Save time creating custom designs</strong> tailored for
+                your clients.
               </li>
               <li>
-                <strong>Customize every aspect</strong> of your designs to{' '}
-                <strong>delight your customers.</strong>
-              </li>
-              <li>
-                Download designs in{' '}
-                <strong>highest quality for printing</strong>
-                {' or use in other design tools.'}
+                <strong>Sell designs as high-quality prints</strong>
+                {' or as digital downloads.'}
               </li>
             </Text>
           </Box>
         </UseCase>
 
-        <UseCase
+        {/* <UseCase
           my="2rem"
           initial={{ opacity: 0, y: '40px' }}
           // @ts-ignore
@@ -300,7 +359,7 @@ export const LandingPage = observer(() => {
           display="flex"
           flexDirection="row-reverse"
         >
-          <Box maxWidth="300px" width="100%" css={useCaseImgStyle} ml="2rem">
+          <Box maxWidth="260px" width="100%" css={useCaseImgStyle} ml="2rem">
             <img src="/landing/undraw_blogging_vpvv.svg" />
           </Box>
           <Box>
@@ -318,7 +377,7 @@ export const LandingPage = observer(() => {
               </li>
             </Text>
           </Box>
-        </UseCase>
+        </UseCase> */}
 
         <UseCase
           my="2rem"
@@ -333,9 +392,9 @@ export const LandingPage = observer(() => {
           p="4"
           mx="20px"
           display="flex"
-          flexDirection="row"
+          flexDirection="row-reverse"
         >
-          <Box maxWidth="300px" width="100%" css={useCaseImgStyle} mr="2rem">
+          <Box maxWidth="300px" width="100%" css={useCaseImgStyle} ml="2rem">
             <img src="/landing/undraw_add_color_19gv.svg" />
           </Box>
           <Box>
@@ -344,12 +403,16 @@ export const LandingPage = observer(() => {
             </Text>
             <Text fontSize="20px" color="gray.700" as="ul">
               <li>
-                <strong>Save time creating</strong>
-                {' unique design assets and backgrounds.'}
+                <strong>Explore new design territory</strong> with 100%
+                customizable word designs
               </li>
               <li>
-                Export your designs in{' '}
-                <strong>high-resolution raster or vector</strong> formats.
+                <strong>Save time</strong> creating unique design assets and
+                backgrounds
+              </li>
+              <li>
+                Export designs in <strong>high-res raster or vector</strong>{' '}
+                formats.
               </li>
             </Text>
           </Box>
@@ -442,36 +505,36 @@ export const LandingPage = observer(() => {
         <SectionHeader mb="30px">
           <h1>Flexible pricing that works for you</h1>
           <Text mt="0" mb="0" maxWidth="600px" mx="auto">
-            Purchase digitals downloads in highest quality, for personal or
-            commercial use.
+            Purchase digitals downloads in highest quality,
+            <br />
+            for personal or commercial use.
           </Text>
         </SectionHeader>
 
         <PricingPlans showOneTimePaymentNotice={false} />
       </Box>
 
-      <SectionHeader mb="30px" mt="5rem">
+      <SectionHeader mb="30px" mt="7rem">
         <h1>Frequently Asked Questions</h1>
       </SectionHeader>
 
-      <Box mx="auto" maxWidth="600px" mb="5rem">
-        <Question title="Can I use Wordcloudy for free?">
-          You can use Wordcloudy for free for <strong>personal use</strong>. If
-          you'd like to use designs created with Wordcloudy for any commercial
-          purpose (e.g. selling digital or physical goods), please purchase one
-          of our plans.
+      <Box mx="auto" maxWidth="700px" mb="5rem" px="6">
+        <Question title="What's your refund policy?">
+          If you're unhappy with our product we'll give you a refund within 14
+          days of purchase.
         </Question>
         <Question title="Are these plans subscriptions?">
-          No, all our plans are one-time payments. You will be charged only
+          No, all our plans are one-time payments. You will only be charged
           once.
+        </Question>
+        <Question title="Can I use Wordcloudy for free?">
+          You can use Wordcloudy for free for personal use. If you'd like to use
+          designs created with Wordcloudy for any commercial purpose (e.g.
+          selling digital or physical goods), please purchase one of our plans.
         </Question>
         <Question title="Do you offer discounts?">
           We offer generous discounts for teachers, students and non-profits.
           Contact us for more information.
-        </Question>
-        <Question title="Can I get a refund?">
-          Absolutely! If you're unhappy with our product we'll give you a refund
-          within 14 days of purchase.
         </Question>
         <Question title="I have more questions!">
           Please check our our{' '}
@@ -495,7 +558,7 @@ export const LandingPage = observer(() => {
 })
 
 export const StartCreatingCta = () => (
-  <SectionHeader mb="120px" mt="80px">
+  <SectionHeader mb="120px" mt="120px">
     <h1>Ready to create your own unique designs?</h1>
     <Text mt="0" mb="6">
       It's fast and fun with Wordcloudy – no account required.
