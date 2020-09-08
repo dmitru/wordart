@@ -34,27 +34,16 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
   }) => {
     const listRef = useRef<List>(null)
 
-    useEffect(() => {
-      // Scroll to the current item
-      setTimeout(() => {
-        if (listRef.current && selectedShapeId != null) {
-          const itemIndex = shapes.findIndex((s) => s.id === selectedShapeId)
-          if (itemIndex > -1) {
-            listRef.current.scrollToItem(
-              Math.ceil(itemIndex / columns),
-              'center'
-            )
-          }
-        }
-      }, 300)
-    }, [listRef.current])
-
     const cols = columns
     const rows = Math.ceil(shapes.length / cols)
 
     const width = 106 * 3
     const itemWidth = width / cols
     const itemHeight = width / cols
+
+    const itemIndex = shapes.findIndex((s) => s.id === selectedShapeId)
+    const itemRow = Math.ceil(itemIndex / cols)
+    const initialScrollOffset = itemIndex > -1 ? (itemRow - 2) * itemHeight : 0
 
     const ThumbnailsRow: ListProps['children'] = ({ index, style }) => {
       const rowShapes = new Array(cols)
@@ -102,6 +91,7 @@ export const ShapeSelector: React.FC<ShapeSelectorProps> = observer(
           <AutoSizer defaultWidth={346} defaultHeight={600}>
             {({ height }) => (
               <List
+                initialScrollOffset={initialScrollOffset}
                 overscanCount={overscanCount}
                 height={height}
                 itemCount={rows}
