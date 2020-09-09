@@ -1245,7 +1245,7 @@ export class Editor {
       opacity: shapeStyle.opacity,
       selectable: false,
     })
-    shapeObj.bringToFront()
+    shapeObj.sendToBack()
 
     if (this.shape?.obj) {
       this.canvas.remove(this.shape.obj)
