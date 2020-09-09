@@ -472,10 +472,11 @@ export const LandingPage = observer(() => {
         css={css`
           background: linear-gradient(56deg, #f6faff, #f7f9ffeb);
           padding-top: 20px;
-          padding-bottom: 20px;
+          padding-bottom: 10px;
         `}
+        id="pricing"
       >
-        <Box mb="5rem" id="pricing">
+        <Box mb="3rem">
           <SectionHeader mb="30px">
             <h1>Flexible pricing that works for you</h1>
             <Text mt="0" mb="0" maxWidth="600px" mx="auto">
@@ -489,7 +490,7 @@ export const LandingPage = observer(() => {
         </Box>
       </Box>
 
-      <SectionHeader mb="30px" mt="7rem">
+      <SectionHeader mb="30px" mt="4rem">
         <h1>Frequently Asked Questions</h1>
       </SectionHeader>
 

@@ -1,4 +1,16 @@
-import { Box, Button, Text, Tag, Stack } from '@chakra-ui/core'
+import {
+  Box,
+  Button,
+  Tag,
+  Text,
+  Stack,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+  Portal,
+} from '@chakra-ui/core'
 import css from '@emotion/css'
 import { HelpTooltipIcon } from 'components/shared/HelpTooltipIcon'
 import { observer } from 'mobx-react'
@@ -28,6 +40,58 @@ const CheckIcon = ({ isInactive }: { isInactive?: boolean }) => (
   >
     <FaCheck />
   </Box>
+)
+
+export const SeeSamplesPopover = () => (
+  <Popover trigger="hover" closeOnEsc placement="bottom" autoFocus={false}>
+    <PopoverTrigger>
+      <Text mb="0" color="blue.500">
+        {'(see samples)'}
+      </Text>
+    </PopoverTrigger>
+    <Portal>
+      <PopoverContent width="280px">
+        <PopoverArrow />
+        <PopoverBody p={5}>
+          <Box>
+            <Text>
+              Download an example HQ image to help you assess the quality of
+              generated images:
+            </Text>
+            <ul>
+              <li>
+                <a
+                  rel="noreferrer"
+                  target="_blank"
+                  href="https://wordcloudy.sfo2.digitaloceanspaces.com/media/hq-sample-1.png"
+                >
+                  PNG (recommended)
+                </a>
+              </li>
+              <li>
+                <a
+                  rel="noreferrer"
+                  target="_blank"
+                  href="https://wordcloudy.sfo2.digitaloceanspaces.com/media/hq-sample-1.jpeg"
+                >
+                  JPEG
+                </a>
+              </li>
+              <li>
+                <a
+                  rel="noreferrer"
+                  target="_blank"
+                  href="https://wordcloudy.sfo2.digitaloceanspaces.com/media/hq-sample-1.svg"
+                >
+                  SVG
+                </a>
+              </li>
+            </ul>
+          </Box>
+        </PopoverBody>
+      </PopoverContent>
+    </Portal>
+  </Popover>
 )
 
 export const PricingPlans = observer(
@@ -109,18 +173,20 @@ export const PricingPlans = observer(
             >
               <div>
                 <CheckIcon />
-                Order items with your designs (coming soon)
+                <Text mb="0" color="gray.600">
+                  Order printed goods with your designs (coming soon)
+                </Text>
               </div>
               <div>
                 <CheckIcon isInactive />
-                Download in medium quality
+                Medium quality digital downloads
                 <HelpTooltipIcon
                   mr="3"
                   css={css`
                     top: 4x;
                     position: relative;
                   `}
-                  label={`Download images in medium resolution up to 1024 x 1024 px`}
+                  label={`Download images in resolution up to 1024 x 1024 px`}
                 />
               </div>
               <div>
@@ -172,7 +238,7 @@ export const PricingPlans = observer(
             </Box>
 
             <Box
-              color="gray.500"
+              color="gray.600"
               mt="5"
               pr="4"
               fontSize={['sm', 'md', 'sm', 'sm', 'md']}
@@ -191,7 +257,11 @@ export const PricingPlans = observer(
             >
               <div>
                 <CheckIcon />
-                Download in high print quality
+                <div>
+                  High quality digital downloads
+                  <br />
+                  <SeeSamplesPopover />
+                </div>
                 <HelpTooltipIcon
                   mr="3"
                   css={css`
@@ -322,7 +392,7 @@ export const PricingPlans = observer(
             </Box>
 
             <Box
-              color="gray.500"
+              color="gray.600"
               mt="5"
               pr="4"
               fontSize={['sm', 'md', 'sm', 'sm', 'md']}
@@ -341,7 +411,11 @@ export const PricingPlans = observer(
             >
               <div>
                 <CheckIcon />
-                Download in high print quality
+                <div>
+                  High quality digital downloads
+                  <br />
+                  <SeeSamplesPopover />
+                </div>
                 <HelpTooltipIcon
                   mr="3"
                   css={css`
