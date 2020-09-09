@@ -580,6 +580,7 @@ export class EditorStore {
       ) {
         applyTransformToObj(shape.objOriginalColors, data.shape.transform)
       }
+      shape.transform = data.shape.transform
     }
 
     if (resizePage) {
