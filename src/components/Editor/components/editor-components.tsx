@@ -12,6 +12,7 @@ import { BaseBtn } from 'components/shared/BaseBtn'
 import { debounce } from 'lodash'
 import { observer } from 'mobx-react'
 import { darken, desaturate } from 'polished'
+import { EditorComponentState } from './Editor'
 
 export const DesignTitleInput = observer(
   ({
@@ -19,15 +20,18 @@ export const DesignTitleInput = observer(
     state,
   }: {
     onChange: (value: string) => void
-    state: { hasUnsavedChanges: boolean; pageTitle: string; title: string }
+    state: EditorComponentState
   }) => {
-    const updatePageTitle = useCallback((value: string) => {
-      state.pageTitle = value
-    }, [])
+    const updatePageTitle = useCallback(
+      (value: string) => {
+        state.pageTitle = value
+      },
+      [state]
+    )
 
     const updatePageTitleDebounced = useMemo(
       () => debounce(updatePageTitle, 300, { leading: false, trailing: true }),
-      []
+      [state, updatePageTitle]
     )
 
     return (
@@ -44,12 +48,20 @@ export const DesignTitleInput = observer(
             background: #ffffff15;
           }
         `}
+        defaultValue={state.title}
         value={state.title}
+        onKeyDown={(e: React.KeyboardEvent) => {
+          if (e.key === 'Escape') {
+            e.preventDefault()
+            e.defaultPrevented = true
+          }
+        }}
         onChange={(value) => {
           state.title = value
           updatePageTitleDebounced(value)
           onChange(value)
         }}
+        onBlur={() => null}
         selectAllOnFocus={false}
         placeholder="Untitled Design"
         color="white"
@@ -70,6 +82,7 @@ export const DesignTitleInput = observer(
         />
         <EditableInput
           id="title-input"
+          onBlur={() => null}
           css={css`
             background-color: white;
             color: black;

@@ -1,9 +1,6 @@
 import {
   Box,
   Button,
-  Editable,
-  EditableInput,
-  EditablePreview,
   IconButton,
   Menu,
   MenuButton,
@@ -131,6 +128,7 @@ import {
   PageSizeSettings,
   getAspect,
 } from 'components/Editor/page-size-presets'
+import { observable } from 'mobx'
 
 export type EditorComponentProps = {
   wordcloudId?: WordcloudId
@@ -138,21 +136,23 @@ export type EditorComponentProps = {
 
 const UnsavedChangesMsg = 'If you leave the page, unsaved changes will be lost.'
 
+const initialState = {
+  showOrderFeatureTodo: false,
+  title: 'New wordart!',
+  pageTitle: 'New wordart!',
+  leftTab: 'shapes' as LeftPanelTab,
+  leftPanelContext: 'normal' as 'normal' | 'resize',
+  isShowingExport: false,
+  isShowingExportNoItemsWarning: false,
+  showWelcomeSettings: false,
+  fetchedTemplates: false,
+}
+export type EditorComponentState = typeof initialState
+const state = observable(initialState)
+
 export const EditorComponent: React.FC<EditorComponentProps> = observer(
   (props) => {
     const [store] = useState(() => new EditorStore())
-
-    const state = useLocalStore(() => ({
-      showOrderFeatureTodo: false,
-      title: 'New wordart',
-      pageTitle: 'New wordart',
-      leftTab: 'shapes' as LeftPanelTab,
-      leftPanelContext: 'normal' as 'normal' | 'resize',
-      isShowingExport: false,
-      isShowingExportNoItemsWarning: false,
-      showWelcomeSettings: !props.wordcloudId,
-      fetchedTemplates: false,
-    }))
 
     const upgradeModal = useUpgradeModal()
     const toasts = useToasts()
@@ -160,6 +160,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     useEffect(() => {
       // @ts-ignore
       window['toast'] = toasts
+      state.showWelcomeSettings = !props.wordcloudId
     }, [])
 
     const defaultAspectRatio =
@@ -222,7 +223,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
         canvasWrapperEl: canvasWrapperRef.current!,
         aspectRatio: pageSize ? getAspect(pageSize) : defaultAspectRatio,
       }
-      console.log('editorParams.aspectRatio', editorParams.aspectRatio)
 
       if (wordcloudId != null) {
         analytics.trackStructured(StructuredEvents.mkSavedEditorSession())
@@ -561,7 +561,6 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
     const openExport = useCallback(() => {
       const itemsCount = store.getItemsCount().total
-      console.log('itemsCount = ', itemsCount)
       if (itemsCount > 0) {
         state.isShowingExport = true
       } else {
@@ -1422,8 +1421,6 @@ Order Prints
         </Box>
       </>
     )
-
-    console.log('pageTitle = ', state.pageTitle)
 
     return (
       <EditorStoreContext.Provider value={store}>
