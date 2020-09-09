@@ -57,6 +57,7 @@ import {
   SideNavbar,
   TopNavWrapper,
   TopToolbar,
+  DesignTitleInput,
 } from 'components/Editor/components/editor-components'
 import { LeftPanelColorsTab } from 'components/Editor/components/LeftPanelColorsTab'
 import { LeftPanelFontsTab } from 'components/Editor/components/LeftPanelFontsTab'
@@ -144,6 +145,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
     const state = useLocalStore(() => ({
       showOrderFeatureTodo: false,
       title: 'New wordart',
+      pageTitle: 'New wordart',
       leftTab: 'shapes' as LeftPanelTab,
       leftPanelContext: 'normal' as 'normal' | 'resize',
       isShowingExport: false,
@@ -229,6 +231,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
         if (wordcloud) {
           state.title = wordcloud.title
+          state.pageTitle = wordcloud.title
         }
 
         try {
@@ -254,6 +257,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
 
         if (wordcloud) {
           state.title = wordcloud.title
+          state.pageTitle = wordcloud.title
         }
 
         try {
@@ -273,6 +277,7 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
       } else {
         analytics.trackStructured(StructuredEvents.mkNewEditorSession())
         state.title = 'New wordart'
+        state.pageTitle = 'New wordart'
       }
 
       await store.initEditor(editorParams, pageSize)
@@ -966,50 +971,12 @@ export const EditorComponent: React.FC<EditorComponentProps> = observer(
           Save
         </Button>
 
-        <Editable
-          css={css`
-            /* background: #fff3; */
-            padding: 5px 8px;
-            overflow: hidden;
-            border-radius: 4px;
-            display: flex;
-            height: 40px;
-
-            &:hover {
-              background: #ffffff15;
-            }
-          `}
-          value={state.title}
-          onChange={(value) => {
-            state.title = value
+        <DesignTitleInput
+          state={state}
+          onChange={() => {
             store.hasUnsavedChanges = true
           }}
-          selectAllOnFocus={false}
-          placeholder="Untitled Design"
-          color="white"
-          fontSize="xl"
-          maxWidth="320px"
-          flex={1}
-          mr="2"
-        >
-          <EditablePreview
-            width="100%"
-            py="0"
-            css={css`
-              text-overflow: ellipsis;
-              overflow-x: hidden;
-              overflow-y: hidden;
-              white-space: nowrap;
-            `}
-          />
-          <EditableInput
-            id="title-input"
-            css={css`
-              background-color: white;
-              color: black;
-            `}
-          />
-        </Editable>
+        />
 
         <TopNavButton
           ml="auto"
@@ -1456,6 +1423,8 @@ Order Prints
       </>
     )
 
+    console.log('pageTitle = ', state.pageTitle)
+
     return (
       <EditorStoreContext.Provider value={store}>
         <PageLayoutWrapper>
@@ -1464,7 +1433,7 @@ Order Prints
           {welcomeSettingsModal}
 
           <Helmet>
-            <title>{getTabTitle(state.title || 'Untitled')}</title>
+            <title>{getTabTitle(state.pageTitle || 'Untitled')}</title>
           </Helmet>
 
           <UpgradeModalContainer />

@@ -1,9 +1,84 @@
-import { Box, Button } from '@chakra-ui/core'
+import {
+  Box,
+  Button,
+  Editable,
+  EditableInput,
+  EditablePreview,
+} from '@chakra-ui/core'
+import { useCallback, useMemo } from 'react'
+import { css } from '@emotion/core'
 import styled from '@emotion/styled'
 import { BaseBtn } from 'components/shared/BaseBtn'
-import 'lib/wordart/console-extensions'
+import { debounce } from 'lodash'
+import { observer } from 'mobx-react'
 import { darken, desaturate } from 'polished'
-import 'utils/canvas-to-blob'
+
+export const DesignTitleInput = observer(
+  ({
+    onChange,
+    state,
+  }: {
+    onChange: (value: string) => void
+    state: { hasUnsavedChanges: boolean; pageTitle: string; title: string }
+  }) => {
+    const updatePageTitle = useCallback((value: string) => {
+      state.pageTitle = value
+    }, [])
+
+    const updatePageTitleDebounced = useMemo(
+      () => debounce(updatePageTitle, 300, { leading: false, trailing: true }),
+      []
+    )
+
+    return (
+      <Editable
+        css={css`
+          /* background: #fff3; */
+          padding: 5px 8px;
+          overflow: hidden;
+          border-radius: 4px;
+          display: flex;
+          height: 40px;
+
+          &:hover {
+            background: #ffffff15;
+          }
+        `}
+        value={state.title}
+        onChange={(value) => {
+          state.title = value
+          updatePageTitleDebounced(value)
+          onChange(value)
+        }}
+        selectAllOnFocus={false}
+        placeholder="Untitled Design"
+        color="white"
+        fontSize="xl"
+        maxWidth="320px"
+        flex={1}
+        mr="2"
+      >
+        <EditablePreview
+          width="100%"
+          py="0"
+          css={css`
+            text-overflow: ellipsis;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            white-space: nowrap;
+          `}
+        />
+        <EditableInput
+          id="title-input"
+          css={css`
+            background-color: white;
+            color: black;
+          `}
+        />
+      </Editable>
+    )
+  }
+)
 
 export const ExportButton = styled(Button)(
   {
