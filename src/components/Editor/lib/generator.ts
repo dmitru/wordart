@@ -582,6 +582,8 @@ export class Generator {
             const b =
               unrotatedCtxOriginalColorsImgData[colorSamplePixelIndex + 2]
 
+            console.screenshot(unrotatedCtxOriginalShape.canvas)
+
             const shapeColor = chroma.rgb(r, g, b).hex()
 
             unrotatedCtx.shadowBlur =

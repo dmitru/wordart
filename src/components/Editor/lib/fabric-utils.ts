@@ -85,7 +85,9 @@ export const cloneFabricCanvas = (
 
 export const cloneObjAsImage = (obj: fabric.Object) =>
   new Promise<fabric.Image>((r) =>
-    obj!.cloneAsImage((obj: fabric.Object) => r(obj as fabric.Image))
+    obj!.cloneAsImage((obj: fabric.Object) => r(obj as fabric.Image), {
+      format: 'png',
+    })
   )
 
 export const objAsCanvasElement = (obj: fabric.Object): HTMLCanvasElement =>

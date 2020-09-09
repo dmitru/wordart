@@ -733,7 +733,7 @@ export class Editor {
 
     let shapeObj = await cloneObj(this.shape.objOriginalColors)
     shapeObj.selectable = false
-    shapeObj.opacity = this.shape.obj.opacity || 1
+    shapeObj.opacity = this.shape.obj.opacity ?? 1
     const { colors } = config
 
     if (colors.kind === 'original') {
@@ -770,11 +770,11 @@ export class Editor {
   updateShapeColors = async (config: ShapeConf, render = true) => {
     this.store.hasUnsavedChanges = true
 
-    // this.logger.debug(
-    //   'updateShapeColors',
-    //   render,
-    //   toJS(config, { recurseEverything: true })
-    // )
+    this.logger.debug(
+      'updateShapeColors',
+      render,
+      toJS(config, { recurseEverything: true })
+    )
     if (!this.shape) {
       this.logger.debug('>  No current shape, early exit')
       return
@@ -841,12 +841,12 @@ export class Editor {
     this.store.hasUnsavedChanges = true
     const { coloring, dimSmallerItems, brightness } = itemsStyleConf
     const { items } = this.items[target]
-    // this.logger.debug(
-    //   'setItemsStyle',
-    //   target,
-    //   toJS(coloring, { recurseEverything: true }),
-    //   `${items.length} items`
-    // )
+    this.logger.debug(
+      'setItemsStyle',
+      target,
+      toJS(coloring, { recurseEverything: true }),
+      `${items.length} items`
+    )
 
     let colors: string[] = []
     if (coloring.kind === 'gradient' || coloring.kind === 'color') {
@@ -994,6 +994,7 @@ export class Editor {
             shape.kind === 'clipart:raster'
           ) {
             let colorString = item.shapeColor
+            console.log('colorString', colorString)
             if (shape.config.processing?.invert) {
               colorString = shape.config.processing.invert.color
             } else if (shape.config.processing?.fill) {
@@ -1424,9 +1425,9 @@ export class Editor {
     await this.generator.init()
 
     const shapeClone = await cloneObj(shapeObj)
+    shapeClone.opacity = 1
     shapeClone.set({ opacity: 1 })
     const shapeImage = await cloneObjAsImage(shapeClone)
-
     const shapeCanvas = objAsCanvasElement(shapeImage)
 
     const sceneBounds = this.getSceneBounds(0)
@@ -1598,10 +1599,10 @@ export class Editor {
 
   generateShapeItems = async (params: { style: ShapeStyleConf }) => {
     const { style } = params
-    // this.logger.debug(
-    //   `generateShapeItems`,
-    //   toJS(params.style, { recurseEverything: true })
-    // )
+    this.logger.debug(
+      `generateShapeItems`,
+      toJS(params.style, { recurseEverything: true })
+    )
 
     this.store.visualizeAnimatedLastTime = new Date()
     if (!this.shape?.obj) {
@@ -1666,11 +1667,16 @@ export class Editor {
     await this.generator.init()
 
     const shapeClone = await cloneObj(shapeObj)
+    shapeClone.opacity = 1
     shapeClone.set({ opacity: 1 })
     const shapeImage = await cloneObjAsImage(shapeClone)
-
     const shapeCanvas = objAsCanvasElement(shapeImage)
-    const shapeCanvasOriginalColors = objAsCanvasElement(shapeOriginalColorsObj)
+
+    const shapeOriginalColorsObjClone = await cloneObj(shapeOriginalColorsObj)
+    shapeOriginalColorsObjClone.set({ opacity: 1 })
+    const shapeCanvasOriginalColors = objAsCanvasElement(
+      shapeOriginalColorsObjClone
+    )
 
     let canvasSubtract: HTMLCanvasElement | undefined
     const lockedItems = this.getItemsSorted('shape').filter((i) => i.locked)
