@@ -994,7 +994,6 @@ export class Editor {
             shape.kind === 'clipart:raster'
           ) {
             let colorString = item.shapeColor
-            console.log('colorString', colorString)
             if (shape.config.processing?.invert) {
               colorString = shape.config.processing.invert.color
             } else if (shape.config.processing?.fill) {
