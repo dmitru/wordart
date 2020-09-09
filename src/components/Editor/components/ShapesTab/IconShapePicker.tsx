@@ -1,22 +1,15 @@
-import { Box, Flex, Stack, Text } from '@chakra-ui/core'
-import { css } from '@emotion/core'
+import { Box, Flex, Stack } from '@chakra-ui/core'
 import { IconPicker } from 'components/Editor/components/IconPicker'
 import { IconShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
-import { ShapeThumbnailBtn } from 'components/Editor/components/ShapeSelector'
-import { SectionLabel } from 'components/Editor/components/shared'
 import { useEditorStore } from 'components/Editor/editor-store'
-import { applyTransformToObj } from 'components/Editor/lib/fabric-utils'
 import { mkShapeStyleConfFromOptions } from 'components/Editor/style'
 import { Button } from 'components/shared/Button'
 import { Slider } from 'components/shared/Slider'
-import { Tooltip } from 'components/shared/Tooltip'
 import { AnimatePresence, motion } from 'framer-motion'
-import { isEqual } from 'lodash'
-import { observable } from 'mobx'
+import { observable, toJS } from 'mobx'
 import { observer } from 'mobx-react'
 import React, { useEffect } from 'react'
-import { FaCog, FaSlidersH } from 'react-icons/fa'
-import { MatrixSerialized } from 'services/api/persisted/v1'
+import { FaSlidersH } from 'react-icons/fa'
 import { useDebouncedCallback } from 'use-debounce/lib'
 import { BigShapeThumbnail, ShapeTransformLeftPanelSection } from './components'
 
@@ -62,6 +55,10 @@ export const IconShapePicker: React.FC<{}> = observer(() => {
       }
       const style = mkShapeStyleConfFromOptions(shapeStyle)
       await store.editor?.updateShapeColors(shape.config, true)
+      console.log(
+        'updateShapeColoringDebounced',
+        toJS(shape.config, { recurseEverything: true })
+      )
       store.updateShapeThumbnail()
       if (style.items.coloring.kind === 'shape') {
         store.editor?.setShapeItemsStyle(style.items)

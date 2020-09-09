@@ -550,7 +550,15 @@ export class EditorStore {
         shapeConf = this.availableIconShapes[0]
       }
 
-      if (data.shape.kind === 'icon' && shapeConf.kind === 'icon') {
+      if (
+        data.shape.kind === 'clipart:svg' &&
+        shapeConf.kind === 'clipart:svg'
+      ) {
+        if (data.shape.processing?.colors.kind === 'single-color') {
+          const color = data.shape.processing?.colors.color
+          this.updateColorForAllShapeTypes(color)
+        }
+      } else if (data.shape.kind === 'icon' && shapeConf.kind === 'icon') {
         shapeConf.color = data.shape.color
         this.updateColorForAllShapeTypes(data.shape.color)
       }
@@ -1439,6 +1447,21 @@ export class EditorStore {
       updateShapeColors,
       render,
     })
+
+    if (shapeConfig.kind === 'clipart:svg') {
+      const shape = this.editor.shape
+      if (
+        shape &&
+        shape.kind === 'clipart:svg' &&
+        shape.colorMap.length === 1
+      ) {
+        shape.config.processing.colors = {
+          kind: 'single-color',
+          color: this.shapesPanel.image.singleColor,
+        }
+        await this.editor.updateShapeColors(shape.config)
+      }
+    }
 
     this.editor.version++
     this.hasUnsavedChanges = true

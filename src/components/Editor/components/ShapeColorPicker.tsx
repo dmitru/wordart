@@ -83,158 +83,163 @@ export const ShapeColorPicker: React.FC<{
 })
 
 export const SvgShapeColorPicker: React.FC<{
+  label?: string
   shape: ShapeClipartSvg | ShapeCustomImageSvg
   onAfterChange?: () => void
   onChange?: () => void
-}> = observer(({ shape, onAfterChange = noop, onChange = noop }) => {
-  const store = useEditorStore()!
-  const shapeConfig = shape.config
-  const colorsCount = shape.originalColors.length
-  const colorsKind = shapeConfig.processing.colors.kind
+}> = observer(
+  ({ label = 'Shape color', shape, onAfterChange = noop, onChange = noop }) => {
+    const store = useEditorStore()!
+    const shapeConfig = shape.config
+    const colorsCount = shape.originalColors.length
+    const colorsKind = shapeConfig.processing.colors.kind
 
-  let selectedOption = colorsKind
-  if (colorsKind === 'original') {
-    selectedOption = colorsCount > 1 ? 'color-map' : 'single-color'
-  }
+    let selectedOption = colorsKind
+    if (colorsKind === 'original') {
+      selectedOption = colorsCount > 1 ? 'color-map' : 'single-color'
+    }
 
-  const singleColor =
-    shapeConfig.processing.colors.kind === 'single-color'
-      ? store.shapesPanel.image.singleColor
-      : shape.originalColors[0]
-  const multiColors =
-    shapeConfig.processing.colors.kind === 'color-map'
-      ? shapeConfig.processing.colors.colors
-      : shape.originalColors
+    const singleColor =
+      shapeConfig.processing.colors.kind === 'single-color'
+        ? store.shapesPanel.image.singleColor
+        : shape.originalColors[0]
+    const multiColors =
+      shapeConfig.processing.colors.kind === 'color-map'
+        ? shapeConfig.processing.colors.colors
+        : shape.originalColors
 
-  const areMultiColorsDifferent = !isEqual(multiColors, shape.originalColors)
+    const areMultiColorsDifferent = !isEqual(multiColors, shape.originalColors)
 
-  const resetDefaultColorsBtn = (
-    <Tooltip label="Reset default colors">
-      <IconButton
-        ml="2"
-        aria-label="Reset default"
-        icon={<FiRefreshCw />}
-        variant="ghost"
-        size="sm"
-        color="gray.500"
-        onClick={() => {
-          shapeConfig.processing.colors = {
-            kind: 'original',
-          }
-          shape.customColors = [...shape.originalColors]
-          onAfterChange()
-        }}
-      />
-    </Tooltip>
-  )
+    const resetDefaultColorsBtn = (
+      <Tooltip label="Reset default colors">
+        <IconButton
+          ml="2"
+          aria-label="Reset default"
+          icon={<FiRefreshCw />}
+          variant="ghost"
+          size="sm"
+          color="gray.500"
+          onClick={() => {
+            shapeConfig.processing.colors = {
+              kind: 'original',
+            }
+            shape.customColors = [...shape.originalColors]
+            onAfterChange()
+          }}
+        />
+      </Tooltip>
+    )
 
-  return (
-    <>
-      <Box mt="2" mb="4" display="flex" alignItems="center">
-        {/* Show the only option - Single color */}
-        {colorsCount === 1 && (
-          <Flex alignItems="center">
-            <Text my="0" mr="3" fontWeight="medium" color="gray.500">
-              Shape color
-            </Text>
-            <ColorPickerPopover
-              disableAlpha
-              value={chroma(singleColor).alpha(1).hex()}
-              onChange={(color) => {
-                store.shapesPanel.image.singleColor = color
-                shapeConfig.processing.colors = {
-                  kind: 'single-color',
-                  color,
-                }
-                onChange()
-              }}
-              onAfterChange={onAfterChange}
-            />
-            {shapeConfig.processing.colors.kind === 'single-color' && (
-              <Tooltip label="Reset default color">
-                <IconButton
-                  aria-label="Reset default"
-                  icon={<FiRefreshCw />}
-                  variant="ghost"
-                  size="sm"
-                  color="gray.500"
-                  ml="2"
-                  onClick={() => {
-                    shapeConfig.processing.colors.kind = 'original'
-                    onAfterChange()
-                  }}
-                />
-              </Tooltip>
-            )}
-          </Flex>
-        )}
+    return (
+      <>
+        <Box mt="2" mb="4" display="flex" alignItems="center">
+          {/* Show the only option - Single color */}
+          {colorsCount === 1 && (
+            <Flex alignItems="center">
+              <Text my="0" mr="3" fontWeight="medium" color="gray.500">
+                {label}
+              </Text>
+              <ColorPickerPopover
+                disableAlpha
+                value={chroma(singleColor).alpha(1).hex()}
+                onChange={(color) => {
+                  store.shapesPanel.image.singleColor = color
+                  store.updateColorForAllShapeTypes(color)
 
-        {colorsCount > 1 && (
-          <>
-            {selectedOption === 'single-color' && (
-              <Box display="flex" alignItems="flex-start" flexWrap="wrap">
-                <SvgShapeColorKindDropdown
-                  shape={shape}
-                  onAfterChange={onAfterChange}
-                />
-                <Box ml="3">
-                  <ColorPickerPopover
-                    disableAlpha
-                    value={chroma(singleColor).alpha(1).hex()}
-                    onChange={(color) => {
-                      store.shapesPanel.image.singleColor = color
-                      shapeConfig.processing.colors = {
-                        kind: 'single-color',
-                        color,
-                      }
-                      onChange()
+                  shapeConfig.processing.colors = {
+                    kind: 'single-color',
+                    color,
+                  }
+                  onChange()
+                }}
+                onAfterChange={onAfterChange}
+              />
+              {shapeConfig.processing.colors.kind === 'single-color' && (
+                <Tooltip label="Reset default color">
+                  <IconButton
+                    aria-label="Reset default"
+                    icon={<FiRefreshCw />}
+                    variant="ghost"
+                    size="sm"
+                    color="gray.500"
+                    ml="2"
+                    onClick={() => {
+                      shapeConfig.processing.colors.kind = 'original'
+                      onAfterChange()
                     }}
+                  />
+                </Tooltip>
+              )}
+            </Flex>
+          )}
+
+          {colorsCount > 1 && (
+            <>
+              {selectedOption === 'single-color' && (
+                <Box display="flex" alignItems="flex-start" flexWrap="wrap">
+                  <SvgShapeColorKindDropdown
+                    shape={shape}
                     onAfterChange={onAfterChange}
                   />
+                  <Box ml="3">
+                    <ColorPickerPopover
+                      disableAlpha
+                      value={chroma(singleColor).alpha(1).hex()}
+                      onChange={(color) => {
+                        store.shapesPanel.image.singleColor = color
+                        shapeConfig.processing.colors = {
+                          kind: 'single-color',
+                          color,
+                        }
+                        onChange()
+                      }}
+                      onAfterChange={onAfterChange}
+                    />
+                  </Box>
+
+                  {resetDefaultColorsBtn}
                 </Box>
+              )}
 
-                {resetDefaultColorsBtn}
-              </Box>
-            )}
+              {selectedOption === 'color-map' && (
+                <Box>
+                  <SvgShapeColorKindDropdown
+                    shape={shape}
+                    onAfterChange={onAfterChange}
+                  />
 
-            {selectedOption === 'color-map' && (
-              <Box>
-                <SvgShapeColorKindDropdown
-                  shape={shape}
-                  onAfterChange={onAfterChange}
-                />
+                  <Box mt="3">
+                    {multiColors.map((color, index) => (
+                      <Box mr="1" mb="2" key={index} display="inline-block">
+                        <ColorPickerPopover
+                          disableAlpha
+                          value={chroma(multiColors[index]).alpha(1).hex()}
+                          onChange={(hex) => {
+                            const newColors = [...multiColors]
+                            newColors[index] = hex
 
-                <Box mt="3">
-                  {multiColors.map((color, index) => (
-                    <Box mr="1" mb="2" key={index} display="inline-block">
-                      <ColorPickerPopover
-                        disableAlpha
-                        value={chroma(multiColors[index]).alpha(1).hex()}
-                        onChange={(hex) => {
-                          const newColors = [...multiColors]
-                          newColors[index] = hex
+                            shapeConfig.processing.colors = {
+                              kind: 'color-map',
+                              colors: newColors,
+                            }
+                            onChange()
+                          }}
+                          onAfterChange={onAfterChange}
+                        />
+                      </Box>
+                    ))}
 
-                          shapeConfig.processing.colors = {
-                            kind: 'color-map',
-                            colors: newColors,
-                          }
-                          onChange()
-                        }}
-                        onAfterChange={onAfterChange}
-                      />
-                    </Box>
-                  ))}
-
-                  {areMultiColorsDifferent && resetDefaultColorsBtn}
+                    {areMultiColorsDifferent && resetDefaultColorsBtn}
+                  </Box>
                 </Box>
-              </Box>
-            )}
-          </>
-        )}
-      </Box>
-    </>
-  )
-})
+              )}
+            </>
+          )}
+        </Box>
+      </>
+    )
+  }
+)
 
 export const SvgShapeColorKindDropdown: React.FC<{
   shape: ShapeClipartSvg | ShapeCustomImageSvg

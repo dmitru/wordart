@@ -12,7 +12,10 @@ import {
 } from '@chakra-ui/core'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
-import { ShapeColorPicker } from 'components/Editor/components/ShapeColorPicker'
+import {
+  ShapeColorPicker,
+  SvgShapeColorPicker,
+} from 'components/Editor/components/ShapeColorPicker'
 import { ShapeSelector } from 'components/Editor/components/ShapeSelector'
 import { SectionLabel } from 'components/Editor/components/shared'
 import { useEditorStore } from 'components/Editor/editor-store'
@@ -124,6 +127,28 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
     }
   }, [])
 
+  const [updateShapeColoringDebounced] = useDebouncedCallback(
+    async () => {
+      if (!shape) {
+        return
+      }
+      const style = mkShapeStyleConfFromOptions(shapeStyle)
+      await store.editor?.updateShapeColors(shape.config, true)
+      store.updateShapeThumbnail()
+      if (style.items.coloring.kind === 'shape') {
+        store.editor?.setShapeItemsStyle(style.items)
+      }
+    },
+    20,
+    {
+      leading: true,
+      trailing: true,
+    }
+  )
+
+  const hasSingleColor =
+    shape && shape.kind === 'clipart:svg' && shape.colorMap.length === 1
+
   return (
     <>
       <Box>
@@ -160,7 +185,17 @@ export const ClipArtShapePicker: React.FC<{}> = observer(() => {
                 />
               </Box>
 
-              <Flex marginTop="65px" width="100%">
+              {hasSingleColor && shape && shape.kind === 'clipart:svg' && (
+                <Box display="flex" alignItems="center" mt="1">
+                  <SvgShapeColorPicker
+                    shape={shape}
+                    label="Color"
+                    onAfterChange={updateShapeColoringDebounced}
+                  />
+                </Box>
+              )}
+
+              <Flex mt={!hasSingleColor ? '65px' : 0} width="100%">
                 {state.mode === 'home' && (
                   <Button
                     display="flex"

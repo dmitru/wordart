@@ -1126,10 +1126,6 @@ export class Editor {
         })
         processRasterImg(processedCanvasToDisplay, {
           ...shapeConfig.processing,
-          removeLightBackground:
-            shapeConfig.processing.invert || shapeConfig.processing.fill
-              ? shapeConfig.processing.removeLightBackground
-              : undefined,
           edges: undefined,
         })
       }
