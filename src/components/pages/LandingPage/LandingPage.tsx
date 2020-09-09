@@ -377,8 +377,8 @@ export const LandingPage = observer(() => {
                 backgrounds
               </li>
               <li>
-                Export designs in <strong>high-res raster or vector</strong>{' '}
-                formats.
+                Export designs in{' '}
+                <strong>high-resolution raster or vector</strong> formats.
               </li>
             </Text>
           </Box>
