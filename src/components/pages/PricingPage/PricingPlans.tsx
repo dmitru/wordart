@@ -193,10 +193,10 @@ export const PricingPlans = observer(
                 <CheckIcon isInactive />
                 Personal use only
               </div>
-              <div>
+              {/* <div>
                 <CheckIcon isInactive />
                 No transparent backgrounds
-              </div>
+              </div> */}
             </Box>
 
             <Box p="5" pt={['0', '3']}>
@@ -291,10 +291,10 @@ export const PricingPlans = observer(
                 <CheckIcon />
                 Commercial use {commercialUseHelp}
               </div>
-              <div>
+              {/* <div>
                 <CheckIcon />
                 Transparent backgrounds
-              </div>
+              </div> */}
             </Box>
 
             <Box p="5" pt={['0', '1', '4']}>
@@ -437,10 +437,10 @@ export const PricingPlans = observer(
                 <CheckIcon />
                 Commercial use {commercialUseHelp}
               </div>
-              <div>
+              {/* <div>
                 <CheckIcon />
                 Transparent backgrounds
-              </div>
+              </div> */}
             </Box>
 
             <Box p="5" pt={['0', '1', '4']}>
