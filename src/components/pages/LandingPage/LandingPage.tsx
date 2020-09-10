@@ -264,13 +264,13 @@ export const LandingPage = observer(() => {
                     <strong>add your own words</strong> to make it special.
                   </li>
                   <li>
-                    <strong>Add personal touch</strong> by choosing shape and
+                    <strong>Add a personal touch</strong> by choosing shape and
                     colors.
                   </li>
                   <li>
                     Have your designs <strong>printed and shipped</strong> from
-                    our store (as posters, frame prints, t-shirts and more –
-                    coming soon!)
+                    our store as posters, frame prints, t-shirts and more
+                    (coming soon!)
                   </li>
                   <li>
                     <strong>No design skills needed</strong> – you too can
