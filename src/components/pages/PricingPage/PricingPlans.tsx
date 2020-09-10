@@ -55,7 +55,7 @@ export const SeeSamplesPopover = () => (
         <PopoverBody p={5}>
           <Box>
             <Text>
-              Download an example HQ image to help you assess the quality of
+              Download a sample HQ image to help you assess the quality of
               generated images:
             </Text>
             <ul>
