@@ -209,11 +209,12 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
           }
           lastShapeConfig = shapeConf
 
-          const canvas = await loadImageUrlToCanvasCtx(value.originalUrl)
-
-          store.shapesPanel.customImage.fillColor = value.fillColor
+          if (value.fill) {
+            store.updateColorForAllShapeTypes(value.fillColor)
+          }
 
           // Auto-resize the page size to fit the image
+          // const canvas = await loadImageUrlToCanvasCtx(value.originalUrl)
           // store.setPageSize(
           //   {
           //     kind: 'custom',
@@ -286,7 +287,7 @@ export const CustomImageShapePicker: React.FC<{}> = observer(() => {
               }
 
               if (value.fill) {
-                store.shapesPanel.customImage.fillColor = value.fillColor
+                store.updateColorForAllShapeTypes(value.fillColor)
               }
 
               await store.updateShapeFromSelectedShapeConf({
