@@ -207,7 +207,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                 style.items.placement.itemDensity = val
               }}
               onAfterChange={animateVisualize}
-              resetValue={85}
+              resetValue={95}
               min={0}
               max={100}
               step={1}
@@ -233,7 +233,7 @@ export const LeftPanelLayoutTab: React.FC<LeftPanelLayoutTabProps> = observer(
                 style.items.placement.shapePadding = val
               }}
               onAfterChange={animateVisualize}
-              resetValue={15}
+              resetValue={10}
               min={0}
               max={100}
               step={1}
