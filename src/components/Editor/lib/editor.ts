@@ -1244,7 +1244,6 @@ export class Editor {
       opacity: shapeStyle.opacity,
       selectable: false,
     })
-    shapeObj.sendToBack()
 
     if (this.shape?.obj) {
       this.canvas.remove(this.shape.obj)
@@ -1253,6 +1252,7 @@ export class Editor {
     //   this.canvas.clear()
     // }
     this.canvas.add(shapeObj)
+    shapeObj.sendToBack()
 
     if (
       shape?.kind === 'clipart:svg' ||
