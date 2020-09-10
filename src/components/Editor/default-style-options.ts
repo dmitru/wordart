@@ -41,7 +41,7 @@ export const defaultShapeStyleOptions: ShapeStyleOptions = {
       kind: 'shape',
       color: {
         kind: 'color',
-        colors: range(4).map(() => getRandomColor()),
+        colors: range(1).map(() => getRandomColor()),
       },
       gradient: {
         kind: 'gradient',
