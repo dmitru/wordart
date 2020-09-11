@@ -1362,7 +1362,7 @@ Order Prints
                 Reset All
               </Button>
 
-              {store.selectedItemData && (
+              {/* {store.selectedItemData && (
                 <Tooltip label="Remove item">
                   <Button
                     mr="2"
@@ -1372,7 +1372,7 @@ Order Prints
                     <FaTrashAlt />
                   </Button>
                 </Tooltip>
-              )}
+              )} */}
 
               {store.selectedItemData && (
                 <>
