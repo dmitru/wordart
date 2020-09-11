@@ -36,7 +36,7 @@ export const pageSizePresets: PageSizePreset[] = [
   {
     id: '10-8-portrait',
     subtitle: '8” x 10”',
-    title: 'Frame print, portrait',
+    title: '8 x 10" Frame, portrait',
     height: 10,
     width: 8,
     unit: 'in',
@@ -44,7 +44,7 @@ export const pageSizePresets: PageSizePreset[] = [
   {
     id: '8-10-landscape',
     subtitle: '8” x 10”',
-    title: 'Frame print, landscape',
+    title: '8 x 10" Frame, landscape',
     height: 8,
     width: 10,
     unit: 'in',
