@@ -1,4 +1,4 @@
-import { Box, Button, Tag, Stack, Text } from '@chakra-ui/core'
+import { Box, Button, Tag, Stack, Text, Alert } from '@chakra-ui/core'
 import { ChevronRightIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'
@@ -476,7 +476,7 @@ export const LandingPage = observer(() => {
         `}
         id="pricing"
       >
-        <Box mb="3rem">
+        <Box mb="3rem" px="6">
           <SectionHeader mb="30px">
             <h1>Flexible pricing that works for you</h1>
             <Text mt="0" mb="0" maxWidth="600px" mx="auto">
@@ -485,6 +485,32 @@ export const LandingPage = observer(() => {
               for personal or commercial use.
             </Text>
           </SectionHeader>
+
+          <Alert
+            mx="auto"
+            maxWidth="700px"
+            mb="2rem"
+            colorScheme="purple"
+            bg="purple.500"
+            color="white"
+            borderRadius="lg"
+          >
+            <div>
+              <strong>Beta-testers wanted! </strong>
+              Try the product for 1 month for FREE, and give your feedback to
+              help us make Wordcloudy better. Sounds interesting? Please{' '}
+              <Link passHref href="/contact">
+                <a
+                  css={css`
+                    color: white;
+                  `}
+                >
+                  contact us
+                </a>
+              </Link>
+              .
+            </div>
+          </Alert>
 
           <PricingPlans showOneTimePaymentNotice={false} />
         </Box>
