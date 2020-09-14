@@ -77,7 +77,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
                       width: auto;
                     `}
                   />
-                  <Tag
+                  {/* <Tag
                     colorScheme="teal"
                     size="sm"
                     css={css`
@@ -87,7 +87,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
                     `}
                   >
                     beta
-                  </Tag>
+                  </Tag> */}
                 </LogoLink>
               </Link>
 

@@ -486,7 +486,7 @@ export const LandingPage = observer(() => {
             </Text>
           </SectionHeader>
 
-          <Alert
+          {/* <Alert
             mx="auto"
             maxWidth="700px"
             mb="2rem"
@@ -510,7 +510,7 @@ export const LandingPage = observer(() => {
               </Link>
               .
             </div>
-          </Alert>
+          </Alert> */}
 
           <PricingPlans showOneTimePaymentNotice={false} />
         </Box>
