@@ -1,7 +1,6 @@
 import { Box, Text, Button } from '@chakra-ui/core'
 import { SiteLayout } from 'components/layouts/SiteLayout/SiteLayout'
 import { ContactForm } from 'components/shared/ContactForm'
-import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
 import React, { useState } from 'react'
 import { Helmet } from 'react-helmet'

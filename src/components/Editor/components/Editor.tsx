@@ -87,7 +87,6 @@ import {
 import { config } from 'config'
 import { saveAs } from 'file-saver'
 import { canvasToDataUri, Dimensions } from 'lib/wordart/canvas-utils'
-import 'lib/wordart/console-extensions'
 import { observer, useLocalStore } from 'mobx-react'
 import { useRouter } from 'next/dist/client/router'
 import Link from 'next/link'

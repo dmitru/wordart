@@ -10,6 +10,9 @@ import { analytics } from 'services/analytics'
 import 'services/error-tracker'
 import { globalStyles } from 'styles/globalStyles'
 import { DefaultSeo } from 'next-seo'
+import { initConsoleLogImg } from 'console-log-img'
+
+initConsoleLogImg()
 
 const emotionCache = createCache({
   key: 'css',

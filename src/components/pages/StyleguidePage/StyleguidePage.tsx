@@ -1,5 +1,4 @@
 import React from 'react'
-import 'lib/wordart/console-extensions'
 import { observer } from 'mobx-react'
 import styled from '@emotion/styled'
 import { observable } from 'mobx'

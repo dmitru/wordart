@@ -5618,6 +5618,11 @@ console-control-strings@^1.0.0, console-control-strings@~1.1.0:
   resolved "https://registry.yarnpkg.com/console-control-strings/-/console-control-strings-1.1.0.tgz#3d7cf4464db6446ea644bf4b39507f9851008e8e"
   integrity sha1-PXz0Rk22RG6mRL9LOVB/mFEAjo4=
 
+console-log-img@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/console-log-img/-/console-log-img-3.0.1.tgz#1b5e6af53cb7789d96c3ce653eba85dab565d5f2"
+  integrity sha512-9ozyn7tKsPfu0VIEBEvMNKRntRwp35Tt2hTSNPKO4/0KKXvIKcoA+XUgwoWqkUC1ONon0L3mU/ig9M6ufbdePA==
+
 console-polyfill@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/console-polyfill/-/console-polyfill-0.1.2.tgz#96cfed51caf78189f699572e6f18271dc37c0e30"
