@@ -64,17 +64,6 @@ export const DesktopHeader: React.FC<DesktopHeaderProps> = observer(
                       width: auto;
                     `}
                   />
-                  <Tag
-                    colorScheme="teal"
-                    size="sm"
-                    css={css`
-                      position: absolute;
-                      top: -12px;
-                      right: -24px;
-                    `}
-                  >
-                    beta
-                  </Tag>
                 </LogoLink>
               </Link>
 

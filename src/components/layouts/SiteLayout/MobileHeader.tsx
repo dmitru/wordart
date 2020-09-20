@@ -77,17 +77,6 @@ export const MobileHeader: React.FC<MobileHeaderProps> = observer(
                       width: auto;
                     `}
                   />
-                  {/* <Tag
-                    colorScheme="teal"
-                    size="sm"
-                    css={css`
-                      position: absolute;
-                      top: 4px;
-                      right: -44px;
-                    `}
-                  >
-                    beta
-                  </Tag> */}
                 </LogoLink>
               </Link>
 
