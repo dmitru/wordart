@@ -60,8 +60,8 @@ export const LandingPage = observer(() => {
               without design skills.
             </HeaderTitle>
             <HeaderSubtitle>
-              Powerful & easy-to-use word art generator for personalized prints,
-              gifts and more.
+              Powerful & easy-to-use wordcloud generator for personalized
+              prints, gifts and more.
             </HeaderSubtitle>
 
             <HeaderCtaContainer>
@@ -158,10 +158,9 @@ export const LandingPage = observer(() => {
         }}
         animate={{ x: 0, y: 0, opacity: 1 }}
       >
-        <h1>Your own unique designs – in no time</h1>
+        <h1>Create wordcloud designs in no time</h1>
         <Text mt="0" mb="0" mx="auto" fontSize="24px" maxWidth="700px">
-          Being creative is easy and fun with our user-friendly word art
-          generator.
+          Your own unique word art for gifts and prints
         </Text>
       </SectionHeader>
 
@@ -232,7 +231,7 @@ export const LandingPage = observer(() => {
       >
         <Box>
           <SectionHeader mb="30px">
-            <h1>Delight your friends & special ones</h1>
+            <h1>Create personal, memorable gifts</h1>
             <Text mt="0" mb="0" maxWidth="600px" mx="auto">
               Life is too short for off-the-shelf gifts. Your loved ones deserve
               better!
@@ -285,9 +284,9 @@ export const LandingPage = observer(() => {
 
       {/* Use cases */}
       <SectionHeader mb="30px" mt="6rem">
-        <h1>For your business & work</h1>
+        <h1>Wordcloud generator for your business</h1>
         <Text mt="0" mb="0" maxWidth="600px" mx="auto">
-          Use the awesome power of typography and words to your advantage.
+          Create custom wordcloud designs, fast and at scale
         </Text>
       </SectionHeader>
 
@@ -517,7 +516,7 @@ export const LandingPage = observer(() => {
       </Box>
 
       <SectionHeader mb="30px" mt="4rem">
-        <h1>Frequently Asked Questions</h1>
+        <h1>Frequently asked questions</h1>
       </SectionHeader>
 
       <Box mx="auto" maxWidth="700px" mb="5rem" px="6">
@@ -561,7 +560,7 @@ export const LandingPage = observer(() => {
 
 export const StartCreatingCta = () => (
   <SectionHeader mb="120px" mt="120px">
-    <h1>Ready to create your own unique designs?</h1>
+    <h1>Ready to create your own unique word art?</h1>
     <Text mt="0" mb="6">
       It's fast and fun with Wordcloudy – no account required.
     </Text>
