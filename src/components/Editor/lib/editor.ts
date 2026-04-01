@@ -2209,12 +2209,18 @@ export class Editor {
   }
 
   fetchFonts = async (fontIds: FontId[]): Promise<Font[]> => {
-    return Promise.all(
+    const results = await Promise.all(
       fontIds.map(async (fontId) => {
-        if (this.fontsInfo.has(fontId)) {
-          return this.fontsInfo.get(fontId)!.font
+        const cached = this.fontsInfo.get(fontId)
+        if (cached?.font) {
+          return cached.font
         }
-        const { style } = this.store.getFontConfigById(fontId)!
+        const config = this.store.getFontConfigById(fontId)
+        if (!config) {
+          console.warn(`Font not found: ${fontId}, skipping`)
+          return null
+        }
+        const { style } = config
         const font: Font = {
           otFont: await loadFont(style.url)!,
           id: fontId,
@@ -2224,6 +2230,7 @@ export class Editor {
         return font
       })
     )
+    return results.filter((f): f is Font => f != null)
   }
 
   /** Converts WordListEntry[] into FillShapeTaskWordConfig[], doing some validation and error checking */

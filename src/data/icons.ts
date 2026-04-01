@@ -14,13 +14,13 @@ export let icons: ShapeIconConf[] = []
 export const loadIconsConfig = async () => {
   const [iconsFaSolid, iconsFaRegular, iconsFaBrands] = await Promise.all([
     fetch(
-      'https://wordcloudy.sfo2.digitaloceanspaces.com/config/icons-fa-solid.json'
+      '/config/icons-fa-solid.json'
     ).then((res) => res.json()),
     fetch(
-      'https://wordcloudy.sfo2.digitaloceanspaces.com/config/icons-fa-regular.json'
+      '/config/icons-fa-regular.json'
     ).then((res) => res.json()),
     fetch(
-      'https://wordcloudy.sfo2.digitaloceanspaces.com/config/icons-fa-brands.json'
+      '/config/icons-fa-brands.json'
     ).then((res) => res.json()),
   ])
 

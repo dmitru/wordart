@@ -4,10 +4,10 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuTransition,
   Portal,
   Text,
 } from '@chakra-ui/core'
+import { MenuTransition } from 'chakra/MenuTransition'
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import { Spinner } from 'components/Editor/components/Spinner'

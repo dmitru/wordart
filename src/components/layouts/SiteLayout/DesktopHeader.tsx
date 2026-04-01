@@ -3,10 +3,10 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuTransition,
   Portal,
   Tag,
 } from '@chakra-ui/core'
+import { MenuTransition } from 'chakra/MenuTransition'
 import { AddIcon, ChevronDownIcon, StarIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'

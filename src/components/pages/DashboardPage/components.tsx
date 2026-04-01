@@ -8,12 +8,12 @@ import {
   MenuButton,
   MenuDivider,
   MenuList,
-  MenuTransition,
   Portal,
   PopoverArrow,
   Tag,
   Text,
 } from '@chakra-ui/core'
+import { MenuTransition } from 'chakra/MenuTransition'
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import styled from '@emotion/styled'

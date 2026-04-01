@@ -2,11 +2,11 @@ import {
   Box,
   Menu,
   MenuButton,
-  MenuTransition,
   Portal,
   MenuList,
   MenuItem,
 } from '@chakra-ui/core'
+import { MenuTransition } from 'chakra/MenuTransition'
 import { Tooltip } from 'components/shared/Tooltip'
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'

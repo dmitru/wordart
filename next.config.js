@@ -66,6 +66,13 @@ module.exports = withSourceMaps({
       )
     }
 
+    // Fix for react-joyride .mjs imports
+    config.module.rules.push({
+      test: /\.mjs$/,
+      include: /node_modules/,
+      type: 'javascript/auto',
+    })
+
     // Note: we provide webpack above so you should not `require` it
     // Perform customizations to webpack config
     // Important: return the modified config

@@ -5,7 +5,6 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  MenuTransition,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -14,6 +13,7 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/core'
+import { MenuTransition } from 'chakra/MenuTransition'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'
 import {

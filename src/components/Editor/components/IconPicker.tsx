@@ -4,11 +4,11 @@ import {
   Menu,
   MenuButton,
   Portal,
-  MenuTransition,
   MenuDivider,
   MenuItem,
   MenuList,
 } from '@chakra-ui/core'
+import { MenuTransition } from 'chakra/MenuTransition'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
 import { ShapeSelector } from 'components/Editor/components/ShapeSelector'

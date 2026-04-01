@@ -6,10 +6,10 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  MenuTransition,
   Portal,
   Stack,
 } from '@chakra-ui/core'
+import { MenuTransition } from 'chakra/MenuTransition'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
 import {

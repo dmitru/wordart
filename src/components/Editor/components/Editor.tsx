@@ -7,7 +7,6 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  MenuTransition,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -21,6 +20,7 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/core'
+import { MenuTransition } from 'chakra/MenuTransition'
 import {
   ArrowBackIcon,
   ArrowForwardIcon,

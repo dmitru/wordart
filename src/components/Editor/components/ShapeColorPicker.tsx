@@ -7,9 +7,9 @@ import {
   IconButton,
   MenuList,
   Text,
-  MenuTransition,
   Portal,
 } from '@chakra-ui/core'
+import { MenuTransition } from 'chakra/MenuTransition'
 import css from '@emotion/css'
 import chroma from 'chroma-js'
 import {

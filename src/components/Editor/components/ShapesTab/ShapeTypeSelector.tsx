@@ -2,9 +2,9 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuTransition,
   Portal,
 } from '@chakra-ui/core'
+import { MenuTransition } from 'chakra/MenuTransition'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { css } from '@emotion/core'
 import { useEditorStore } from 'components/Editor/editor-store'

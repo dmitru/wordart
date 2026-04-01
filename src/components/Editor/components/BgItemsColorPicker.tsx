@@ -4,10 +4,10 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuTransition,
   Portal,
   MenuItem,
 } from '@chakra-ui/core'
+import { MenuTransition } from 'chakra/MenuTransition'
 import { MenuDotsButton } from 'components/shared/MenuDotsButton'
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import css from '@emotion/css'

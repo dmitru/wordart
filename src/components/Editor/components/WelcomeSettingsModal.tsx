@@ -115,7 +115,7 @@ export const WelcomeSettingsModal: React.FC<WelcomeSettingsModalProps> = observe
                   overflow="auto"
                   height="calc(100vh - 380px)"
                 >
-                  {templates &&
+                  {templates && Array.isArray(templates) &&
                     templates.map((template) => (
                       <Box
                         key={template.id}

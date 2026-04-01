@@ -12,10 +12,10 @@ export let shapeCategories: { category: string; title: string }[] = []
 export const loadShapesConfig = async () => {
   const [shapesData, shapeCategoriesData] = await Promise.all([
     fetch(
-      'https://wordcloudy.sfo2.digitaloceanspaces.com/config/shapes.json'
+      '/config/shapes.json'
     ).then((res) => res.json()),
     fetch(
-      'https://wordcloudy.sfo2.digitaloceanspaces.com/config/shape-categories.json'
+      '/config/shape-categories.json'
     ).then((res) => res.json()),
   ])
 

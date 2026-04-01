@@ -22,7 +22,7 @@ const defaultWordsList: WordListEntry[] = [
     } as WordListEntry)
 )
 
-export const defaultFontId = 'Amatic SC:700'
+export const defaultFontId = 'Permanent Marker:regular'
 
 const defaultWordsListBackground: WordListEntry[] = [].map(
   (s, index) => ({ id: `${index}`, text: s } as WordListEntry)

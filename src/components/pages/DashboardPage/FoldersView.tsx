@@ -3,10 +3,10 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuTransition,
   Portal,
   Text,
 } from '@chakra-ui/core'
+import { MenuTransition } from 'chakra/MenuTransition'
 import css from '@emotion/css'
 import {
   FolderMenuButton,
